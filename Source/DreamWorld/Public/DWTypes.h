@@ -353,7 +353,7 @@ enum class EDWDamageType : uint8
  * ?????????????
  */
 UENUM(BlueprintType)
-enum class EInventoryActionType : uint8
+enum class EQueryItemType : uint8
 {
 	// ???
 	Addition,
@@ -1049,16 +1049,6 @@ public:
 
 	static FItem Empty;
 
-	FORCEINLINE static FItem Clone(FItem InItem, int InCount = -1)
-	{
-		if (InItem == Empty) return Empty;
-		FItem tmpItem;
-		tmpItem.ID = InItem.ID;
-		tmpItem.Count = InCount == -1 ? InItem.Count : InCount;
-		tmpItem.Level = InItem.Level;
-		return tmpItem;
-	}
-
 public:
 	FORCEINLINE FItem()
 	{
@@ -1074,6 +1064,13 @@ public:
 		Level = InLevel;
 	}
 	
+	FORCEINLINE FItem(const FItem& InItem, int InCount = -1)
+	{
+		ID = InItem.ID;
+		Count = InCount == -1 ? InItem.Count : InCount;
+		Level = InItem.Level;
+	}
+
 	virtual ~FItem() = default;
 	
 	FItemData GetData() const;
@@ -1085,17 +1082,73 @@ public:
 
 	FORCEINLINE bool EqualType(FItem InItem) const
 	{
-		return InItem.IsValid() && InItem.ID == ID;
+		return InItem.IsValid() && InItem.ID == ID && InItem.Level == Level;
 	}
 
 	FORCEINLINE friend bool operator==(const FItem& A, const FItem& B)
 	{
-		return (A.ID == B.ID) && (A.GetData().Type == B.GetData().Type) && (A.Count == B.Count);
+		return (A.ID == B.ID) && (A.GetData().Type == B.GetData().Type) && (A.Count == B.Count) && (A.Level == B.Level);
 	}
 
 	FORCEINLINE friend bool operator!=(const FItem& A, const FItem& B)
 	{
-		return (A.ID != B.ID) || (A.GetData().Type != B.GetData().Type) || (A.Count != B.Count);
+		return (A.ID != B.ID) || (A.GetData().Type != B.GetData().Type) || (A.Count != B.Count) || (A.Level != B.Level);
+	}
+
+	FORCEINLINE friend FItem operator+(FItem& A, FItem& B)
+	{
+		if(A.EqualType(B))
+		{
+			A.Count += B.Count;
+		}
+		return A;
+	}
+
+	FORCEINLINE friend FItem operator-(FItem& A, FItem& B)
+	{
+		if(A.EqualType(B))
+		{
+			A.Count -= B.Count;
+		}
+		return A;
+	}
+
+	FORCEINLINE friend FItem& operator+=(FItem& A, FItem& B)
+	{
+		if(A.EqualType(B))
+		{
+			A.Count += B.Count;
+		}
+		return A;
+	}
+
+	FORCEINLINE friend FItem& operator-=(FItem& A, FItem& B)
+	{
+		if(A.EqualType(B))
+		{
+			A.Count -= B.Count;
+		}
+		return A;
+	}
+};
+
+USTRUCT(BlueprintType)
+struct DREAMWORLD_API FQueryItemInfo
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	FItem Item;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<UInventorySlot*> Slots;
+
+public:
+	FORCEINLINE FQueryItemInfo()
+	{
+		Item = FItem();
+		Slots = TArray<UInventorySlot*>();
 	}
 };
 
@@ -1353,9 +1406,6 @@ public:
 		
 		ChunkHeightRange = 3;
 
-		VitalityRaceDensity = 50.f;
-		CharacterRaceDensity = 50.f;
-
 		TerrainBaseHeight = 0.1f;
 		TerrainPlainScale = FVector(0.005f, 0.005f, 0.2f);
 		TerrainMountainScale = FVector(0.03f, 0.03f, 0.25f);
@@ -1365,6 +1415,9 @@ public:
 		TerrainBedrockVoxelHeight = 0.02f;
 
 		ChunkMaterials = TArray<FChunkMaterial>();
+
+		VitalityRaceDensity = 50.f;
+		CharacterRaceDensity = 50.f;
 
 		LastVitalityRaceIndex = FIndex::ZeroIndex;
 		LastCharacterRaceIndex = FIndex::ZeroIndex;
@@ -1381,12 +1434,6 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 ChunkHeightRange;
-						
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	float VitalityRaceDensity;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	float CharacterRaceDensity;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float TerrainBaseHeight;
@@ -1411,7 +1458,13 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<FChunkMaterial> ChunkMaterials;
-	
+							
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float VitalityRaceDensity;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float CharacterRaceDensity;
+
 	FIndex LastVitalityRaceIndex;
 
 	FIndex LastCharacterRaceIndex;
@@ -1496,6 +1549,7 @@ public:
 UENUM(BlueprintType)
 enum class ESplitSlotType : uint8
 {
+	None,
 	Default,
 	Shortcut,
 	Auxiliary,

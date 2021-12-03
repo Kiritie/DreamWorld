@@ -178,7 +178,7 @@ bool UVoxel::OnMouseDown(EMouseButton InMouseButton, const FVoxelHitResult& InHi
 			auto tmpSlot = UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryBar>()->GetSelectedSlot();
 			if(PlayerCharacter && tmpSlot && !tmpSlot->IsEmpty())
 			{
-				FItem tmpItem = FItem::Clone(tmpSlot->GetItem(), 1);
+				FItem tmpItem = FItem(tmpSlot->GetItem(), 1);
 				if(PlayerCharacter->GenerateVoxel(InHitResult, tmpItem))
 				{
 					tmpSlot->SubItem(tmpItem);

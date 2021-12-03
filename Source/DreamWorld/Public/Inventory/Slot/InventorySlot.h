@@ -7,6 +7,9 @@
 
 class UInventory;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnInventorySlotRefresh);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnInventorySlotCooldownRefresh);
+
 /**
  * 物品槽
  */
@@ -18,6 +21,8 @@ class DREAMWORLD_API UInventorySlot : public UObject
 public:
 	UInventorySlot();
 
+	//////////////////////////////////////////////////////////////////////////
+	/// Properties
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Default")
 	FItem Item;
@@ -26,32 +31,38 @@ protected:
 	UInventory* Owner;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Default")
-	UWidgetInventorySlot* UISlot;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Default")
 	EItemType LimitType;
 		
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Default")
 	ESplitSlotType SplitType;
 
 	FGameplayAbilitySpecHandle AbilityHandle;
+	
+public:
+	FOnInventorySlotRefresh OnInventorySlotRefresh;
+	FOnInventorySlotRefresh OnInventorySlotCooldownRefresh;
 
+	//////////////////////////////////////////////////////////////////////////
+	/// Initialize
 public:
 	UFUNCTION(BlueprintCallable)
 	virtual void InitSlot(UInventory* InOwner, FItem InItem, EItemType InLimitType = EItemType::None, ESplitSlotType InSplitType = ESplitSlotType::Default);
-		
-	UFUNCTION(BlueprintCallable)
-	virtual void SetUISlot(UWidgetInventorySlot* InUISlot);
 
-	UFUNCTION(BlueprintCallable)
-	virtual bool CheckSlot(FItem InItem);
+	//////////////////////////////////////////////////////////////////////////
+	/// Checks
+public:
+	UFUNCTION(BlueprintPure)
+	virtual bool CheckSlot(FItem& InItem) const;
 
-	UFUNCTION(BlueprintCallable)
-	virtual bool CanPutIn(FItem InItem);
+	UFUNCTION(BlueprintPure)
+	virtual bool CanPutIn(FItem& InItem) const;
 					
-	UFUNCTION(BlueprintCallable)
-	virtual bool Contains(FItem InItem);
+	UFUNCTION(BlueprintPure)
+	virtual bool Contains(FItem& InItem) const;
 
+	//////////////////////////////////////////////////////////////////////////
+	/// Actions
+public:
 	UFUNCTION(BlueprintCallable)
 	virtual void Refresh();
 
@@ -94,6 +105,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual void ClearItem();
 
+	//////////////////////////////////////////////////////////////////////////
+	/// Cooldown
 public:
 	void StartCooldown();
 
@@ -112,6 +125,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetCooldownInfo(const FDWCooldownInfo& InCooldownInfo) { CooldownInfo = InCooldownInfo; }
 
+	//////////////////////////////////////////////////////////////////////////
+	/// Getter/Setter
 public:
 	UFUNCTION(BlueprintCallable)
 	bool IsEmpty() const;
@@ -127,9 +142,6 @@ public:
 	
 	UFUNCTION(BlueprintPure)
 	UInventory* GetOwner() const { return Owner; }
-	
-	UFUNCTION(BlueprintPure)
-	UWidgetInventorySlot* GetUISlot() const { return UISlot; }
 	
 	UFUNCTION(BlueprintPure)
 	EItemType GetLimitType() const { return LimitType; }

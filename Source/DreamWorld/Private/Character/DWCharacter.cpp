@@ -616,7 +616,7 @@ void ADWCharacter::DeathEnd()
 	SetVisible(false);
 	GetCharacterMovement()->SetActive(false);
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	if(Inventory) Inventory->DiscardAll();
+	if(Inventory) Inventory->DiscardAllItem();
 	if(!IsPlayer())
 	{
 		if(GetController())

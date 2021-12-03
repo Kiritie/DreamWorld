@@ -28,19 +28,19 @@ FInventorySaveData UVitalityInventory::ToData(bool bSaved)
 	return Super::ToData();
 }
 
-void UVitalityInventory::DiscardAll()
+void UVitalityInventory::DiscardAllItem()
 {
-	Super::DiscardAll();
+	Super::DiscardAllItem();
 }
 
-void UVitalityInventory::ClearAll()
+void UVitalityInventory::ClearAllItem()
 {
-	Super::ClearAll();
+	Super::ClearAllItem();
 }
 
-TArray<UInventorySlot*> UVitalityInventory::GetValidatedList(EInventoryActionType InActionType, FItem& InItem, int32 InStartIndex, int32 InEndIndex)
+FQueryItemInfo UVitalityInventory::GetItemInfoByRange(EQueryItemType InActionType, FItem InItem, int32 InStartIndex, int32 InEndIndex)
 {
-	return Super::GetValidatedList(InActionType, InItem, InStartIndex, InEndIndex);
+	return Super::GetItemInfoByRange(InActionType, InItem, InStartIndex, InEndIndex);
 }
 
 AVitalityObject* UVitalityInventory::GetOwnerVitality() const

@@ -26,23 +26,23 @@ FInventorySaveData UCharacterInventory::ToData(bool bSaved)
 	return Super::ToData();
 }
 
-void UCharacterInventory::DiscardAll()
-{
-	Super::DiscardAll();
-}
-
-void UCharacterInventory::ClearAll()
-{
-	Super::ClearAll();
-}
-
-TArray<UInventorySlot*> UCharacterInventory::GetValidatedList(EInventoryActionType InActionType, FItem& InItem, int32 InStartIndex, int32 InEndIndex)
+FQueryItemInfo UCharacterInventory::GetSlotListByRange(EQueryItemType InActionType, FItem InItem, int32 InStartIndex, int32 InEndIndex)
 {
 	if (InStartIndex == -1 && HasSplitSlotInfo(ESplitSlotType::Shortcut) && GetOwnerCharacter() && GetOwnerCharacter()->IsPlayer())
 	{
 		InStartIndex = GetSplitSlotInfo(ESplitSlotType::Shortcut).StartIndex + UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryBar>()->GetSelectedSlotIndex();
 	}
-	return Super::GetValidatedList(InActionType, InItem, InStartIndex, InEndIndex);
+	return Super::GetItemInfoByRange(InActionType, InItem, InStartIndex, InEndIndex);
+}
+
+void UCharacterInventory::DiscardAllItem()
+{
+	Super::DiscardAllItem();
+}
+
+void UCharacterInventory::ClearAllItem()
+{
+	Super::ClearAllItem();
 }
 
 ADWCharacter* UCharacterInventory::GetOwnerCharacter() const

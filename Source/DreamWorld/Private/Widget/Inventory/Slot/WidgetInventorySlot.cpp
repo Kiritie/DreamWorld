@@ -116,7 +116,8 @@ void UWidgetInventorySlot::InitSlot(UInventorySlot* InOwnerSlot)
 	OwnerSlot = InOwnerSlot;
 	if(OwnerSlot)
 	{
-		OwnerSlot->SetUISlot(this);
+		OwnerSlot->OnInventorySlotRefresh.AddDynamic(this, &UWidgetInventorySlot::Refresh);
+		OwnerSlot->OnInventorySlotCooldownRefresh.AddDynamic(this, &UWidgetInventorySlot::RefreshCooldown);
 	}
 }
 

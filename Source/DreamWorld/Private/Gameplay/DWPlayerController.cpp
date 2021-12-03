@@ -215,28 +215,28 @@ void ADWPlayerController::LoadPlayer(const FString& InPlayerName)
 					for (int32 i = 0; i < VoxelDatas.Num(); i++)
 					{
 						FItem tmpItem = FItem(VoxelDatas[i].ID, VoxelDatas[i].MaxCount);
-						NewPlayerCharacter->GetInventory()->AdditionItems(tmpItem);
+						NewPlayerCharacter->GetInventory()->AdditionItemByRange(tmpItem);
 					}
 
 					auto EquipDatas = UDWHelper::LoadEquipDatas();
 					for (int32 i = 0; i < EquipDatas.Num(); i++)
 					{
 						FItem tmpItem = FItem(EquipDatas[i].ID, EquipDatas[i].MaxCount);
-						NewPlayerCharacter->GetInventory()->AdditionItems(tmpItem);
+						NewPlayerCharacter->GetInventory()->AdditionItemByRange(tmpItem);
 					}
 
 					auto PropDatas = UDWHelper::LoadPropDatas();
 					for (int32 i = 0; i < PropDatas.Num(); i++)
 					{
 						FItem tmpItem = FItem(PropDatas[i].ID, PropDatas[i].MaxCount);
-						NewPlayerCharacter->GetInventory()->AdditionItems(tmpItem);
+						NewPlayerCharacter->GetInventory()->AdditionItemByRange(tmpItem);
 					}
 
 					auto SkillDatas = UDWHelper::LoadSkillDatas();
 					for (int32 i = 0; i < SkillDatas.Num(); i++)
 					{
 						FItem tmpItem = FItem(SkillDatas[i].ID, SkillDatas[i].MaxCount);
-						NewPlayerCharacter->GetInventory()->AdditionItems(tmpItem);
+						NewPlayerCharacter->GetInventory()->AdditionItemByRange(tmpItem);
 					}
 				}
 

@@ -64,7 +64,7 @@ void APickUp::OnPickUp(ADWCharacter* InPicker)
 	OwnerChunk->DestroyPickUp(this);
 	if(InPicker && InPicker->GetInventory())
 	{
-		InPicker->GetInventory()->AdditionItems(Item, -1);
+		InPicker->GetInventory()->AdditionItemByRange(Item, -1);
 	}
 }
 

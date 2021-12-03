@@ -18,6 +18,8 @@ class DREAMWORLD_API UInventory : public UObject
 public:
 	UInventory();
 	
+	//////////////////////////////////////////////////////////////////////////
+	/// Properties
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Default")
 	TMap<ESplitSlotType, FSplitSlotInfo> SplitInfos;
@@ -34,6 +36,8 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Default")
 	UInventorySlot* SelectedSlot;
 
+	//////////////////////////////////////////////////////////////////////////
+	/// Initialize
 public:
 	virtual void Initialize(AActor* InOwner, TMap<ESplitSlotType, FSplitSlotInfo> InSplitInfos);
 	
@@ -43,30 +47,44 @@ public:
 
 	virtual FInventorySaveData ToData(bool bSaved = true);
 
+	//////////////////////////////////////////////////////////////////////////
+	/// Actions
+public:
+	UFUNCTION(BlueprintPure)
+	virtual FQueryItemInfo GetItemInfoByRange(EQueryItemType InQueryType, FItem InItem, int32 InStartIndex = 0, int32 InEndIndex = -1);
+
+	UFUNCTION(BlueprintPure)
+	virtual FQueryItemInfo GetItemInfoBySplitType(EQueryItemType InQueryType, FItem InItem, ESplitSlotType InSplitSlotType);
+	
 	UFUNCTION(BlueprintCallable)
-	virtual void AdditionItems(FItem& InItem, int32 InStartIndex = 0, int32 InEndIndex = -1);
-
-	virtual void AdditionItems(FItem& InItem, ESplitSlotType InSplitSlotType);
-
-	UFUNCTION(BlueprintCallable)
-	virtual void RemoveItems(FItem& InItem, int32 InStartIndex = 0, int32 InEndIndex = -1);
-
-	virtual void RemoveItems(FItem& InItem, ESplitSlotType InSplitSlotType);
-
-	UFUNCTION(BlueprintCallable)
-	virtual void ClearItems(FItem& InItem);
-
-	UFUNCTION(BlueprintCallable)
-	virtual void DiscardAll();
+	virtual void AdditionItemByRange(FItem& InItem, int32 InStartIndex = 0, int32 InEndIndex = -1);
 
 	UFUNCTION(BlueprintCallable)
-	virtual void ClearAll();
+	virtual void AdditionItemBySplitType(FItem& InItem, ESplitSlotType InSplitSlotType);
 
 	UFUNCTION(BlueprintCallable)
-	virtual TArray<UInventorySlot*> GetValidatedList(EInventoryActionType InActionType, FItem& InItem, int32 InStartIndex = 0, int32 InEndIndex = -1);
+	virtual void RemoveItemByRange(FItem& InItem, int32 InStartIndex = 0, int32 InEndIndex = -1);
 
-	virtual TArray<UInventorySlot*> GetValidatedList(EInventoryActionType InActionType, FItem& InItem, ESplitSlotType InSplitSlotType);
+	UFUNCTION(BlueprintCallable)
+	virtual void RemoveItemBySplitType(FItem& InItem, ESplitSlotType InSplitSlotType);
 
+	UFUNCTION(BlueprintCallable)
+	virtual void MoveItemByRange(UInventory* InTargetInventory, FItem& InItem, int32 InSelfStartIndex = 0, int32 InSelfEndIndex = -1, int32 InTargetStartIndex = 0, int32 InTargetEndIndex = -1);
+
+	UFUNCTION(BlueprintCallable)
+	virtual void MoveItemBySplitType(UInventory* InTargetInventory, FItem& InItem, ESplitSlotType InSelfSplitSlotType, ESplitSlotType InTargetSplitSlotType);
+
+	UFUNCTION(BlueprintCallable)
+	virtual void ClearItem(FItem& InItem);
+
+	UFUNCTION(BlueprintCallable)
+	virtual void ClearAllItem();
+
+	UFUNCTION(BlueprintCallable)
+	virtual void DiscardAllItem();
+
+	//////////////////////////////////////////////////////////////////////////
+	/// Setter/Getter
 public:
 	UFUNCTION(BlueprintPure)
 	AActor* GetOwnerActor() const { return OwnerActor; }
@@ -79,6 +97,9 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void SetConnectInventory(UInventory* val) { ConnectInventory = val; }
+	
+	UFUNCTION(BlueprintPure)
+	int32 GetSlotsNum() const;
 
 	UFUNCTION(BlueprintPure)
 	TArray<UInventorySlot*> GetSlots() const { return Slots; }
@@ -105,7 +126,6 @@ public:
 	TArray<T*> GetSplitSlots(ESplitSlotType InSplitSlotType)
 	{
 		TArray<T*> SplitSlots = TArray<T*>();
-
 		for (auto Iter : SplitInfos)
 		{
 			if(Iter.Key == InSplitSlotType)
@@ -117,7 +137,6 @@ public:
 				break;
 			}
 		}
-
 		return SplitSlots;
 	}
 		

@@ -24,11 +24,11 @@ public:
 
 	virtual FInventorySaveData ToData(bool bSaved = true) override;
 
-	virtual void DiscardAll() override;
+	virtual void DiscardAllItem() override;
 
-	virtual void ClearAll() override;
+	virtual void ClearAllItem() override;
 
-	virtual TArray<UInventorySlot*> GetValidatedList(EInventoryActionType InActionType, FItem& InItem, int32 InStartIndex = 0, int32 InEndIndex = -1) override;
+	virtual FQueryItemInfo GetItemInfoByRange(EQueryItemType InActionType, FItem InItem, int32 InStartIndex = 0, int32 InEndIndex = -1) override;
 
 public:
 	UFUNCTION(BlueprintPure)

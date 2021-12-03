@@ -159,7 +159,7 @@ void AVitalityObject::Death(ADWCharacter* InKiller /*= nullptr*/)
 		}
 		SetEXP(0);
 		SetHealth(0.f);
-		Inventory->DiscardAll();
+		Inventory->DiscardAllItem();
 		OwnerChunk->DestroyVitalityObject(this);
 	}
 }

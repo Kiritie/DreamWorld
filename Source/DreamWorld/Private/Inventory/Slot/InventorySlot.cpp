@@ -12,7 +12,6 @@
 UInventorySlot::UInventorySlot()
 {
 	Item = FItem::Empty;
-	UISlot = nullptr;
 	Owner = nullptr;
 	LimitType = EItemType::None;
 	SplitType = ESplitSlotType::Default;
@@ -27,23 +26,17 @@ void UInventorySlot::InitSlot(UInventory* InOwner, FItem InItem, EItemType InLim
 	SplitType = InSplitType;
 }
 
-void UInventorySlot::SetUISlot(UWidgetInventorySlot* InUISlot)
-{
-	UISlot = InUISlot;
-	UISlot->Refresh();
-}
-
-bool UInventorySlot::CheckSlot(FItem InItem)
+bool UInventorySlot::CheckSlot(FItem& InItem) const
 {
 	return LimitType == EItemType::None || LimitType == InItem.GetData().Type;
 }
 
-bool UInventorySlot::CanPutIn(FItem InItem)
+bool UInventorySlot::CanPutIn(FItem& InItem) const
 {
 	return (IsEmpty() && CheckSlot(InItem)) || (Item.EqualType(InItem) && GetRemainVolume() > 0);
 }
 
-bool UInventorySlot::Contains(FItem InItem)
+bool UInventorySlot::Contains(FItem& InItem) const
 {
 	return !IsEmpty() && Item.EqualType(InItem);
 }
@@ -54,7 +47,7 @@ void UInventorySlot::Refresh()
 	{
 		SetItem(FItem::Empty, false);
 	}
-	if (UISlot) UISlot->Refresh();
+	OnInventorySlotRefresh.Broadcast();
 }
 
 void UInventorySlot::PreSet(FItem& InItem)
@@ -137,18 +130,18 @@ void UInventorySlot::SplitItem(int InCount /*= -1*/)
 	if (IsEmpty()) return;
 
 	if(InCount == - 1) InCount = Item.Count;
-	int tmpCount = Item.Count / InCount;
-	auto tmpList = Owner->GetValidatedList(EInventoryActionType::Addition, Item);
+	const int tmpCount = Item.Count / InCount;
+	auto QueryItemInfo = Owner->GetItemInfoByRange(EQueryItemType::Addition, Item);
 	for (int i = 0; i < InCount; i++)
 	{
-		FItem tmpItem = FItem::Clone(Item, tmpCount);
+		FItem tmpItem = FItem(Item, tmpCount);
 		Item.Count -= tmpItem.Count;
-		for (int j = 0; j < tmpList.Num(); j++)
+		for (int j = 0; j < QueryItemInfo.Slots.Num(); j++)
 		{
-			if (tmpList[j]->IsEmpty() && tmpList[j] != this)
+			if (QueryItemInfo.Slots[j]->IsEmpty() && QueryItemInfo.Slots[j] != this)
 			{
-				tmpList[j]->SetItem(tmpItem);
-				tmpList.RemoveAt(j);
+				QueryItemInfo.Slots[j]->SetItem(tmpItem);
+				QueryItemInfo.Slots.RemoveAt(j);
 				break;
 			}
 		}
@@ -161,39 +154,21 @@ void UInventorySlot::MoveItem(int InCount /*= -1*/)
 	if (IsEmpty()) return;
 
 	if (InCount == -1) InCount = Item.Count;
-	FItem tmpItem = FItem::Clone(Item, InCount);
+	FItem tmpItem = FItem(Item, InCount);
 
 	if(Owner->GetConnectInventory())
 	{
-		Owner->GetConnectInventory()->AdditionItems(tmpItem);
+		Owner->GetConnectInventory()->AdditionItemByRange(tmpItem);
 	}
 	else
 	{
 		switch (Item.GetData().Type)
 		{
-			case EItemType::Voxel:
-			case EItemType::Prop:
-			{
-				if(GetSplitType() != ESplitSlotType::Shortcut)
-				{
-					Owner->AdditionItems(tmpItem, ESplitSlotType::Shortcut);
-				}
-				else
-				{
-					Owner->AdditionItems(tmpItem, ESplitSlotType::Default);
-				}
-				break;
-			}
 			case EItemType::Equip:
 			{
 				if(GetSplitType() != ESplitSlotType::Equip)
 				{
-					Owner->AdditionItems(tmpItem, ESplitSlotType::Equip);
-				}
-				else
-				{
-					Owner->AdditionItems(tmpItem, ESplitSlotType::Default);
-					Owner->AdditionItems(tmpItem, ESplitSlotType::Shortcut);
+					Owner->AdditionItemBySplitType(tmpItem, ESplitSlotType::Equip);
 				}
 				break;
 			}
@@ -201,13 +176,38 @@ void UInventorySlot::MoveItem(int InCount /*= -1*/)
 			{
 				if(GetSplitType() != ESplitSlotType::Skill)
 				{
-					Owner->AdditionItems(tmpItem, ESplitSlotType::Skill);
+					Owner->AdditionItemBySplitType(tmpItem, ESplitSlotType::Skill);
 				}
-				else
-				{
-					Owner->AdditionItems(tmpItem, ESplitSlotType::Default);
-					Owner->AdditionItems(tmpItem, ESplitSlotType::Shortcut);
-				}
+				break;
+			}
+			default: break;
+		}
+		switch(GetSplitType())
+		{
+			case ESplitSlotType::Default:
+			{
+				Owner->AdditionItemBySplitType(tmpItem, ESplitSlotType::Shortcut);
+				Owner->AdditionItemBySplitType(tmpItem, ESplitSlotType::Auxiliary);
+				break;
+			}
+			case ESplitSlotType::Shortcut:
+			{
+				Owner->AdditionItemBySplitType(tmpItem, ESplitSlotType::Default);
+				Owner->AdditionItemBySplitType(tmpItem, ESplitSlotType::Auxiliary);
+				break;
+			}
+			case ESplitSlotType::Auxiliary:
+			{
+				Owner->AdditionItemBySplitType(tmpItem, ESplitSlotType::Default);
+				Owner->AdditionItemBySplitType(tmpItem, ESplitSlotType::Shortcut);
+				break;
+			}
+			case ESplitSlotType::Equip:
+			case ESplitSlotType::Skill:
+			{
+				Owner->AdditionItemBySplitType(tmpItem, ESplitSlotType::Default);
+				Owner->AdditionItemBySplitType(tmpItem, ESplitSlotType::Shortcut);
+				Owner->AdditionItemBySplitType(tmpItem, ESplitSlotType::Auxiliary);
 				break;
 			}
 			default: break;
@@ -232,7 +232,7 @@ void UInventorySlot::UseItem(int InCount /*= -1*/)
 			{
 				for(int32 i = 0; i < InCount; i ++)
 				{
-					FItem tmpItem = FItem::Clone(Item, 1);
+					FItem tmpItem = FItem(Item, 1);
 					if(OwnerCharacter->UseItem(tmpItem))
 					{
 						OwnerCharacter->DoAction(ECharacterActionType::Use);
@@ -249,7 +249,7 @@ void UInventorySlot::UseItem(int InCount /*= -1*/)
 			{
 				for(int32 i = 0; i < InCount; i ++)
 				{
-					FItem tmpItem = FItem::Clone(Item, 1);
+					FItem tmpItem = FItem(Item, 1);
 					if(OwnerCharacter->UseItem(tmpItem) && ActiveItem())
 					{
 						OwnerCharacter->DoAction(ECharacterActionType::Use);
@@ -262,12 +262,22 @@ void UInventorySlot::UseItem(int InCount /*= -1*/)
 		}
 		case EItemType::Equip:
 		{
-			MoveItem(InCount);
+			if(GetSplitType() != ESplitSlotType::Equip)
+			{
+				MoveItem(InCount);
+			}
 			break;
 		}
 		case EItemType::Skill:
 		{
-			MoveItem(InCount);
+			if(GetSplitType() != ESplitSlotType::Skill)
+			{
+				MoveItem(InCount);
+			}
+			else
+			{
+				ActiveItem();
+			}
 			break;
 		}
 		default: break;
@@ -279,7 +289,7 @@ void UInventorySlot::DiscardItem(int InCount /*= -1*/)
 	if (IsEmpty()) return;
 
 	if (InCount == -1) InCount = Item.Count;
-	FItem tmpItem = FItem::Clone(Item, InCount);
+	FItem tmpItem = FItem(Item, InCount);
 	auto chunk = AWorldManager::Get()->FindChunk(Owner->GetOwnerActor()->GetActorLocation());
 	if (chunk != nullptr)
 	{
@@ -347,10 +357,7 @@ void UInventorySlot::RefreshCooldown(float DeltaSeconds)
 			StopCooldown();
 		}
 	}
-	if(UISlot)
-	{
-		UISlot->RefreshCooldown();
-	}
+	OnInventorySlotCooldownRefresh.Broadcast();
 }
 
 bool UInventorySlot::IsEmpty() const
