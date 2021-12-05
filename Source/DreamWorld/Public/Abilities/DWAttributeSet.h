@@ -1,6 +1,6 @@
 #pragma once
 
-#include "DreamWorld.h"
+#include "DreamWorld/DreamWorld.h"
 #include "AttributeSet.h"
 #include "AbilitySystemComponent.h"
 #include "DWAttributeSet.generated.h"

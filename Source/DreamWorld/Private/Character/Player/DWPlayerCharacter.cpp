@@ -25,14 +25,13 @@
 #include "Inventory/CharacterInventory.h"
 #include "Inventory/Slot/InventorySlot.h"
 #include "Gameplay/DWGameState.h"
-#include "ObjectPoolModuleBPLibrary.h"
-#include "WidgetModuleBPLibrary.h"
 #include "Equip/EquipWeapon.h"
 #include "Equip/EquipShield.h"
 #include "Inventory/Slot/InventorySkillSlot.h"
 #include "Character/Player/DWPlayerCharacterCameraManager.h"
 #include "Widget/WidgetPrimaryPanel.h"
 #include "Inventory/Slot/InventoryEquipSlot.h"
+#include "Widget/WidgetModuleBPLibrary.h"
 
 //////////////////////////////////////////////////////////////////////////
 // ADWPlayerCharacter

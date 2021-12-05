@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "DreamWorld.h"
+#include "DreamWorld/DreamWorld.h"
 #include "Inventory/Slot/InventorySlot.h"
 #include "InventoryEquipSlot.generated.h"
 
@@ -24,7 +24,7 @@ protected:
 public:
 	virtual void InitSlot(UInventory* InOwner, FItem InItem, EItemType InLimitType /* = EItemType::None */, ESplitSlotType InSplitType /*= ESplitSlotType::Default*/) override;
 
-	virtual bool CheckSlot(FItem InItem) override;
+	virtual bool CheckSlot(FItem& InItem) const override;
 	
 	virtual void Refresh() override;
 

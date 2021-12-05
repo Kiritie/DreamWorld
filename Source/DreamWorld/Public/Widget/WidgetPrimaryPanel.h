@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include "DreamWorld.h"
-#include "UserWidgetBase.h"
+#include "DreamWorld/DreamWorld.h"
+#include "Widget/User/UserWidgetBase.h"
 #include "WidgetPrimaryPanel.generated.h"
 
 class ADWPlayerCharacter;

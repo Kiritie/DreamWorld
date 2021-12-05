@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "MainModule.h"
+#include "Main/MainModule.h"
 
 #include "DWMainModule.generated.h"
 

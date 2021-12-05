@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include "DreamWorld.h"
-#include "ObjectPoolInterface.h"
+#include "DreamWorld/DreamWorld.h"
+#include "ObjectPool/ObjectPoolInterface.h"
 
 #include "Voxel.generated.h"
 

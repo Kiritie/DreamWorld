@@ -3,11 +3,8 @@
 
 #include "Interaction/Components/InteractionComponent.h"
 
-#include "DWCharacter.h"
-#include "DWPlayerCharacter.h"
-#include "GlobalToolsBPLibrary.h"
-#include "WidgetModuleBPLibrary.h"
-#include "WidgetPrimaryPanel.h"
+#include "Character/DWCharacter.h"
+#include "Interaction/Interaction.h"
 
 UInteractionComponent::UInteractionComponent(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {

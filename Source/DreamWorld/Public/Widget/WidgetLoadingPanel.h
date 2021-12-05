@@ -2,8 +2,9 @@
 
 #pragma once
 
-#include "DreamWorld.h"
-#include "UserWidgetBase.h"
+#include "DreamWorld/DreamWorld.h"
+#include "Widget/User/UserWidgetBase.h"
+
 #include "WidgetLoadingPanel.generated.h"
 
 /**

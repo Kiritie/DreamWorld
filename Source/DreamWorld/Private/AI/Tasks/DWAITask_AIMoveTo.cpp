@@ -1,7 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "DWAITask_AIMoveTo.h"
+#include "AI/Tasks/DWAITask_AIMoveTo.h"
+
 #include "BehaviorTree/BehaviorTreeTypes.h"
 #include "Character/DWCharacter.h"
 #include "AI/DWAIController.h"

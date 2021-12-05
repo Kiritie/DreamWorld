@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "DreamWorld.h"
+#include "DreamWorld/DreamWorld.h"
 #include "Vitality/VitalityObject.h"
 #include "VitalityVoxel.generated.h"
 

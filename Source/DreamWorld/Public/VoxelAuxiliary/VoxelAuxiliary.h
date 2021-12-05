@@ -2,9 +2,10 @@
 
 #pragma once
 
-#include "DreamWorld.h"
-#include "Interaction.h"
+#include "DreamWorld/DreamWorld.h"
 #include "GameFramework/Actor.h"
+#include "Interaction/Interaction.h"
+
 #include "VoxelAuxiliary.generated.h"
 
 class UVoxel;

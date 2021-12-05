@@ -3,7 +3,7 @@
 
 #include "World/AsyncTasks/ChunkMapGenerateTask.h"
 
-#include "WorldManager.h"
+#include "World/WorldManager.h"
 
 ChunkMapGenerateTask::ChunkMapGenerateTask(AWorldManager* InWorldManager, TArray<AChunk*> InChunkMapGenerateQueue)
 {

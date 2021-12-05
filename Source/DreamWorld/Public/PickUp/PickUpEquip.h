@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "DreamWorld.h"
+#include "DreamWorld/DreamWorld.h"
 #include "PickUp/PickUp.h"
 #include "PickUpEquip.generated.h"
 

@@ -1,10 +1,10 @@
 // Copyright 1998-2019 Epic Games, Inc. All Rights Reserved.
 
-#include "DreamWorld.h"
+#include "DreamWorld/DreamWorld.h"
 #include "Modules/ModuleManager.h"
 
 /**
- * 实现主要的游戏模块
+ * 实锟斤拷锟斤拷要锟斤拷锟斤拷戏模锟斤拷
  */
 IMPLEMENT_PRIMARY_GAME_MODULE( FDefaultGameModuleImpl, DreamWorld, "DreamWorld" );
  

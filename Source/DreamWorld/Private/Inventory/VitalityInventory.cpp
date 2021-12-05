@@ -5,8 +5,7 @@
 #include "Widget/Inventory/WidgetInventoryBar.h"
 #include "Inventory/Slot/InventoryEquipSlot.h"
 #include "Gameplay/DWGameInstance.h"
-#include "VitalityObject.h"
-#include "WidgetModuleBPLibrary.h"
+#include "Vitality/VitalityObject.h"
 
 UVitalityInventory::UVitalityInventory()
 {

@@ -1,7 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "DWAIDecorator_CheckEnemy.h"
+#include "AI/Decorators/DWAIDecorator_CheckEnemy.h"
+
 #include "Character/DWCharacter.h"
 #include "AIModule/Classes/BehaviorTree/BehaviorTreeComponent.h"
 #include "AIModule/Classes/BehaviorTree/BlackboardComponent.h"

@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "DreamWorld.h"
+#include "DreamWorld/DreamWorld.h"
 #include "Components/ActorComponent.h"
 #include "WorldWeatherComponent.generated.h"
 
@@ -10,7 +10,7 @@ class ASkyLight;
 class ADirectionalLight;
 
 /**
- * ÌìÆø¹ÜÀí×é¼þ
+ * ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
  */
 UCLASS(Blueprintable, meta = (BlueprintSpawnableComponent))
 class DREAMWORLD_API UWorldWeatherComponent : public UActorComponent

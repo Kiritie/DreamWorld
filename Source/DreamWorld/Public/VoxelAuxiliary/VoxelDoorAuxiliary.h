@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "DreamWorld.h"
+#include "DreamWorld/DreamWorld.h"
 #include "VoxelAuxiliary/VoxelVirtualAuxiliary.h"
 #include "VoxelDoorAuxiliary.generated.h"
 

@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "DreamWorld.h"
+#include "DreamWorld/DreamWorld.h"
 #include "Inventory/Inventory.h"
 #include "VitalityInventory.generated.h"
 

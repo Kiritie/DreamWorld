@@ -2,11 +2,11 @@
 
 #include "Gameplay/DWGameInstance.h"
 
-#include "DebugModuleTypes.h"
+#include "Debug/DebugModuleTypes.h"
 #include "Character/Player/DWPlayerCharacter.h"
 #include "Gameplay/DWPlayerController.h"
 #include "Engine/World.h"
-#include "UserWidgetBase.h"
+#include "Widget/User/UserWidgetBase.h"
 #include "Widget/WidgetMainMenu.h"
 #include "Widget/WidgetPausingMenu.h"
 #include "Widget/WidgetLoadingPanel.h"

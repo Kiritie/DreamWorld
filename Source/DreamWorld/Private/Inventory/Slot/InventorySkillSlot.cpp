@@ -2,14 +2,13 @@
 
 #include "Inventory/Slot/InventorySkillSlot.h"
 
-#include "DebugModuleTypes.h"
-#include "WidgetModuleBPLibrary.h"
-#include "WidgetPrimaryPanel.h"
 #include "Inventory/Inventory.h"
 #include "Inventory/Slot/InventorySlot.h"
 #include "Character/Player/DWPlayerCharacter.h"
 #include "Widget/Inventory/Slot/WidgetInventorySkillSlot.h"
 #include "Abilities/Character/DWCharacterSkillAbility.h"
+#include "Widget/WidgetModuleBPLibrary.h"
+#include "Widget/WidgetPrimaryPanel.h"
 
 UInventorySkillSlot::UInventorySkillSlot()
 {

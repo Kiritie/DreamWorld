@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "DreamWorld.h"
+#include "DreamWorld/DreamWorld.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "DWHelper.generated.h"
 

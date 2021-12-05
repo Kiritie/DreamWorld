@@ -3,11 +3,10 @@
 
 #include "Voxel/VoxelWater.h"
 
-#include "DWCharacterPart.h"
 #include "World/Chunk.h"
 #include "World/WorldManager.h"
-#include "Object.h"
 #include "Character/DWCharacter.h"
+#include "Character/DWCharacterPart.h"
 #include "Character/Player/DWPlayerCharacter.h"
 #include "GameFramework/PawnMovementComponent.h"
 #include "Components/SkeletalMeshComponent.h"

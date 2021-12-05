@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "DreamWorld.h"
+#include "DreamWorld/DreamWorld.h"
 #include "AI/DWAIServiceBase.h"
 #include "../../DWTypes.h"
 #include "DWAIService_RefreshState.generated.h"
@@ -10,7 +10,7 @@
 class ADWCharacter;
 
 /**
- * AI·þÎñ_Ë¢ÐÂ×´Ì¬
+ * AIï¿½ï¿½ï¿½ï¿½_Ë¢ï¿½ï¿½×´Ì¬
  */
 UCLASS()
 class DREAMWORLD_API UDWAIService_RefreshState : public UDWAIServiceBase

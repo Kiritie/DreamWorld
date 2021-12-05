@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "DreamWorld.h"
+#include "DreamWorld/DreamWorld.h"
 #include "Components/BoxComponent.h"
 
 #include "DWCharacterPart.generated.h"

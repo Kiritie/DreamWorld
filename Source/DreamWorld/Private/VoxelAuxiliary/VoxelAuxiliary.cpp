@@ -3,7 +3,7 @@
 
 #include "VoxelAuxiliary/VoxelAuxiliary.h"
 
-#include "InteractionComponent.h"
+#include "Interaction/Components/InteractionComponent.h"
 #include "Voxel/Voxel.h"
 #include "World/Chunk.h"
 

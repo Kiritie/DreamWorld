@@ -5,10 +5,10 @@
 #include "Gameplay/DWPlayerController.h"
 #include "Gameplay/DWGameState.h"
 #include "Gameplay/DWGameInstance.h"
-#include "DWMainModule.h"
 #include "Kismet/GameplayStatics.h"
 #include "World/WorldManager.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Main/MainModule.h"
 
 ADWGameMode::ADWGameMode()
 {

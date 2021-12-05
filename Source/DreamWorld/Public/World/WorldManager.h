@@ -2,10 +2,10 @@
 
 #pragma once
 
-#include "DreamWorld.h"
+#include "AsyncTasks/ChunkMapBuildTask.h"
+#include "AsyncTasks/ChunkMapGenerateTask.h"
+#include "DreamWorld/DreamWorld.h"
 #include "GameFramework/Actor.h"
-#include "ChunkMapBuildTask.h"
-#include "ChunkMapGenerateTask.h"
 #include "WorldManager.generated.h"
 
 class AChunk;

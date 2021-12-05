@@ -162,26 +162,6 @@ void UInventorySlot::MoveItem(int InCount /*= -1*/)
 	}
 	else
 	{
-		switch (Item.GetData().Type)
-		{
-			case EItemType::Equip:
-			{
-				if(GetSplitType() != ESplitSlotType::Equip)
-				{
-					Owner->AdditionItemBySplitType(tmpItem, ESplitSlotType::Equip);
-				}
-				break;
-			}
-			case EItemType::Skill:
-			{
-				if(GetSplitType() != ESplitSlotType::Skill)
-				{
-					Owner->AdditionItemBySplitType(tmpItem, ESplitSlotType::Skill);
-				}
-				break;
-			}
-			default: break;
-		}
 		switch(GetSplitType())
 		{
 			case ESplitSlotType::Default:
@@ -264,7 +244,8 @@ void UInventorySlot::UseItem(int InCount /*= -1*/)
 		{
 			if(GetSplitType() != ESplitSlotType::Equip)
 			{
-				MoveItem(InCount);
+				Owner->AdditionItemBySplitType(Item, ESplitSlotType::Equip); 
+				Refresh();
 			}
 			break;
 		}
@@ -272,7 +253,8 @@ void UInventorySlot::UseItem(int InCount /*= -1*/)
 		{
 			if(GetSplitType() != ESplitSlotType::Skill)
 			{
-				MoveItem(InCount);
+				Owner->AdditionItemBySplitType(Item, ESplitSlotType::Skill);
+				Refresh();
 			}
 			else
 			{

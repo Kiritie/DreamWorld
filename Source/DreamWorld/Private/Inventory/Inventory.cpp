@@ -2,14 +2,14 @@
 
 #include "Inventory/Inventory.h"
 
-#include "InventoryAuxiliarySlot.h"
 #include "Inventory/Slot/InventorySlot.h"
 #include "Vitality/Vitality.h"
-#include "InventoryEquipSlot.h"
-#include "InventoryGenerateSlot.h"
-#include "InventoryShortcutSlot.h"
-#include "InventorySkillSlot.h"
 #include "Abilities/Item/DWItemAbility.h"
+#include "Inventory/Slot/InventoryAuxiliarySlot.h"
+#include "Inventory/Slot/InventoryEquipSlot.h"
+#include "Inventory/Slot/InventoryGenerateSlot.h"
+#include "Inventory/Slot/InventoryShortcutSlot.h"
+#include "Inventory/Slot/InventorySkillSlot.h"
 
 UInventory::UInventory()
 {

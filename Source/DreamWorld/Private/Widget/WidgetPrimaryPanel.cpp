@@ -3,9 +3,10 @@
 
 #include "Widget/WidgetPrimaryPanel.h"
 
-#include "DWPlayerCharacter.h"
-#include "WidgetModule.h"
-#include "WidgetModuleBPLibrary.h"
+#include "Character/DWCharacter.h"
+#include "Main/MainModule.h"
+#include "Widget/WidgetModule.h"
+
 
 UWidgetPrimaryPanel::UWidgetPrimaryPanel(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {

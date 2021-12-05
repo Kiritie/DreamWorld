@@ -2,9 +2,9 @@
 
 #include "Inventory/CharacterInventory.h"
 
-#include "WidgetInventoryBar.h"
-#include "WidgetModuleBPLibrary.h"
 #include "Character/DWCharacter.h"
+#include "Widget/WidgetModuleBPLibrary.h"
+#include "Widget/Inventory/WidgetInventoryBar.h"
 
 UCharacterInventory::UCharacterInventory()
 {
@@ -26,7 +26,7 @@ FInventorySaveData UCharacterInventory::ToData(bool bSaved)
 	return Super::ToData();
 }
 
-FQueryItemInfo UCharacterInventory::GetSlotListByRange(EQueryItemType InActionType, FItem InItem, int32 InStartIndex, int32 InEndIndex)
+FQueryItemInfo UCharacterInventory::GetItemInfoByRange(EQueryItemType InActionType, FItem InItem, int32 InStartIndex, int32 InEndIndex)
 {
 	if (InStartIndex == -1 && HasSplitSlotInfo(ESplitSlotType::Shortcut) && GetOwnerCharacter() && GetOwnerCharacter()->IsPlayer())
 	{

@@ -1,15 +1,10 @@
 // Copyright 1998-2019 Epic Games, Inc. All Rights Reserved.
 
-#include "DWMainModule.h"
+#include "Main/DWMainModule.h"
 
-#include "Chunk.h"
-#include "ObjectPoolModuleBPLibrary.h"
-#include "SpawnPoolModuleBPLibrary.h"
-#include "Voxel.h"
-#include "VoxelDoor.h"
-#include "VoxelPlant.h"
-#include "VoxelTorch.h"
-#include "VoxelWater.h"
+#include "SpawnPool/SpawnPoolModuleBPLibrary.h"
+#include "Voxel/Voxel.h"
+#include "World/Chunk.h"
 
 ADWMainModule::ADWMainModule()
 {

@@ -2,12 +2,12 @@
 
 #pragma once
 
-#include "DreamWorld.h"
+#include "DreamWorld/DreamWorld.h"
 #include "Widget/Inventory/Slot/WidgetInventorySlot.h"
 #include "WidgetInventoryEquipSlot.generated.h"
 
 /**
- * UI×°±¸²Û
+ * UI×°ï¿½ï¿½ï¿½ï¿½
  */
 UCLASS(BlueprintType)
 class DREAMWORLD_API UWidgetInventoryEquipSlot : public UWidgetInventorySlot

@@ -3,13 +3,13 @@
 
 #include "Widget/Inventory/WidgetInventoryBar.h"
 
-#include "Inventory.h"
-#include "WidgetModuleBPLibrary.h"
-#include "WidgetPrimaryPanel.h"
 #include "Widget/Inventory/Slot/WidgetInventorySlot.h"
 #include "Character/Player/DWPlayerCharacter.h"
+#include "Inventory/Inventory.h"
 #include "Widget/Inventory/WidgetInventoryPanel.h"
 #include "Inventory/Slot/InventorySlot.h"
+#include "Widget/WidgetModuleBPLibrary.h"
+#include "Widget/WidgetPrimaryPanel.h"
 
 UWidgetInventoryBar::UWidgetInventoryBar(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -46,10 +46,10 @@ void UWidgetInventoryBar::SelectInventorySlot(int32 InSlotIndex)
 
 UInventorySlot* UWidgetInventoryBar::GetSelectedSlot() const
 {
-	auto UISlots = GetSplitUISlots(ESplitSlotType::Shortcut);
-	if(UISlots.Num() > SelectedSlotIndex)
+	auto SplitUISlots = GetSplitUISlots(ESplitSlotType::Shortcut);
+	if(SplitUISlots.Num() > SelectedSlotIndex)
 	{
-		return UISlots[SelectedSlotIndex]->GetOwnerSlot();
+		return SplitUISlots[SelectedSlotIndex]->GetOwnerSlot();
 	}
 	return nullptr;
 }

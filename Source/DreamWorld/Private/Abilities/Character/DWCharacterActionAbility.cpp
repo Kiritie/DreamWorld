@@ -1,6 +1,6 @@
 #include "Abilities/Character/DWCharacterActionAbility.h"
 
-#include "DWCharacter.h"
+#include "Character/DWCharacter.h"
 
 UDWCharacterActionAbility::UDWCharacterActionAbility()
 {

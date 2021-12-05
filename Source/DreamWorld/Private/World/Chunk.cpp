@@ -3,7 +3,6 @@
 
 #include "World/Chunk.h"
 
-#include "DWCharacterPart.h"
 #include "Voxel/Voxel.h"
 #include "PickUp/PickUp.h"
 #include "PickUp/PickUpVoxel.h"
@@ -13,7 +12,6 @@
 #include "Voxel/Components/VoxelMeshComponent.h"
 #include "Vitality/VitalityObject.h"
 #include "Gameplay/DWGameInstance.h"
-#include "ObjectPoolModuleBPLibrary.h"
 #include "DataSave/WorldDataSave.h"
 #include "Engine/World.h"
 #include "PickUp/PickUpVoxel.h"

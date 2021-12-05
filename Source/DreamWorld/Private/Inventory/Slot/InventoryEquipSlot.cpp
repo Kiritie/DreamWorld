@@ -16,7 +16,7 @@ void UInventoryEquipSlot::InitSlot(UInventory* InOwner, FItem InItem, EItemType 
 	Super::InitSlot(InOwner, InItem, InLimitType, InSplitType);
 }
 
-bool UInventoryEquipSlot::CheckSlot(FItem InItem)
+bool UInventoryEquipSlot::CheckSlot(FItem& InItem) const
 {
 	return Super::CheckSlot(InItem) && UDWHelper::LoadEquipData(InItem.ID).PartType == PartType;
 }

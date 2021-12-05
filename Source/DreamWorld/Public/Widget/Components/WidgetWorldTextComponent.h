@@ -2,12 +2,12 @@
 
 #pragma once
 
-#include "DreamWorld.h"
-#include "WidgetComponent.h"
+#include "Components/WidgetComponent.h"
+#include "DreamWorld/DreamWorld.h"
 #include "WidgetWorldTextComponent.generated.h"
 
 /**
- * ÊÀ½çÎÄ±¾×é¼þ
+ * ï¿½ï¿½ï¿½ï¿½ï¿½Ä±ï¿½ï¿½ï¿½ï¿½
  */
 UCLASS(Blueprintable, meta = (BlueprintSpawnableComponent))
 class DREAMWORLD_API UWidgetWorldTextComponent : public UWidgetComponent

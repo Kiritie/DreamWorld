@@ -1,7 +1,6 @@
 #pragma once
 
-#include "DreamWorld.h"
-#include "Interface.h"
+#include "DreamWorld/DreamWorld.h"
 #include "Vitality.generated.h"
 
 class ADWCharacter;

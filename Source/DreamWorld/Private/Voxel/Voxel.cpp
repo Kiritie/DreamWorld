@@ -11,14 +11,13 @@
 #include "Character/Player/DWPlayerCharacter.h"
 #include "Engine/World.h"
 #include "Gameplay/DWGameInstance.h"
-#include "ObjectPoolModuleBPLibrary.h"
 #include "VoxelAuxiliary/VoxelAuxiliary.h"
 #include "Inventory/CharacterInventory.h"
 #include "Inventory/Slot/InventorySlot.h"
-#include "SharedPointer.h"
-#include "WidgetModuleBPLibrary.h"
 #include "DataSave/WorldDataSave.h"
 #include "Kismet/GameplayStatics.h"
+#include "ObjectPool/ObjectPoolModuleBPLibrary.h"
+#include "Widget/WidgetModuleBPLibrary.h"
 
 UVoxel* UVoxel::EmptyVoxel = nullptr;
 

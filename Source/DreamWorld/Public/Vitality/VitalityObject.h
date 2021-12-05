@@ -2,13 +2,13 @@
 
 #pragma once
 
-#include "DreamWorld.h"
+#include "DreamWorld/DreamWorld.h"
 #include "GameFramework/Actor.h"
 #include "Vitality/Vitality.h"
 #include "AbilitySystemInterface.h"
-#include "Interaction.h"
 #include "Abilities/DWAbilitySystemComponent.h"
-#include "Components/InteractionComponent.h"
+#include "Interaction/Interaction.h"
+#include "Interaction/Components/InteractionComponent.h"
 
 #include "VitalityObject.generated.h"
 

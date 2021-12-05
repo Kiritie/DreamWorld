@@ -3,7 +3,6 @@
 #include "GameFramework/Actor.h"
 #include "Vitality/Vitality.h"
 #include "GameplayEffectExtension.h"
-#include "GameplayAbilityTypes.h"
 #include "AbilitySystemComponent.h"
 #include "GameFramework/PlayerController.h"
 #include "Character/DWCharacter.h"

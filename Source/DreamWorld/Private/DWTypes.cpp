@@ -1,13 +1,11 @@
 #include "DWTypes.h"
 
-#include "Chunk.h"
-#include "ObjectPoolModuleBPLibrary.h"
-#include "VoxelPlant.h"
-#include "VoxelWater.h"
+#include "World/Chunk.h"
 #include "World/WorldManager.h"
 #include "Voxel/Voxel.h"
 #include "Character/Player/DWPlayerCharacter.h"
 #include "Kismet/GameplayStatics.h"
+#include "Voxel/VoxelPlant.h"
 
 FItem FItem::Empty = FItem(NAME_None, 0, 0);
 

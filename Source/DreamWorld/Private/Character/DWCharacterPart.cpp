@@ -3,10 +3,9 @@
 
 #include "Character/DWCharacterPart.h"
 
-#include "Chunk.h"
-#include "DWCharacter.h"
-#include "Voxel.h"
-#include "WorldManager.h"
+#include "Character/DWCharacter.h"
+#include "Voxel/Voxel.h"
+#include "World/Chunk.h"
 
 UDWCharacterPart::UDWCharacterPart(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {

@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "DreamWorld.h"
+#include "DreamWorld/DreamWorld.h"
 #include "Character/Human/DWHumanCharacter.h"
 #include "DWPlayerCharacter.generated.h"
 

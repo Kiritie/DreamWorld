@@ -2,8 +2,9 @@
 
 #pragma once
 
-#include "DreamWorld.h"
-#include "UserWidgetBase.h"
+#include "DreamWorld/DreamWorld.h"
+#include "Widget/User/UserWidgetBase.h"
+
 #include "WidgetInventory.generated.h"
 
 class UWidgetInventorySlot;
@@ -19,6 +20,10 @@ class DREAMWORLD_API UWidgetInventory : public UUserWidgetBase
 
 public:
 	UWidgetInventory(const FObjectInitializer& ObjectInitializer);
+
+protected:
+	UPROPERTY(BlueprintReadWrite)
+	TArray<UWidgetInventorySlot*> UISlots;
 
 public:
 	virtual void OnRefresh_Implementation() override;

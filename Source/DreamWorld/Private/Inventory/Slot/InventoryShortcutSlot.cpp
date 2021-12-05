@@ -2,12 +2,11 @@
 
 #include "Inventory/Slot/InventoryShortcutSlot.h"
 
-#include "DWPlayerCharacter.h"
-#include "WidgetInventoryBar.h"
-#include "WidgetModuleBPLibrary.h"
-#include "WidgetPrimaryPanel.h"
+#include "Character/Player/DWPlayerCharacter.h"
 #include "Inventory/Inventory.h"
 #include "Inventory/Slot/InventorySlot.h"
+#include "Widget/WidgetModuleBPLibrary.h"
+#include "Widget/WidgetPrimaryPanel.h"
 
 UInventoryShortcutSlot::UInventoryShortcutSlot()
 {

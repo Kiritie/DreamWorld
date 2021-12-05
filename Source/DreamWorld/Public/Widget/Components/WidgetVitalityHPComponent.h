@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include "DreamWorld.h"
-#include "WidgetComponent.h"
+#include "Components/WidgetComponent.h"
+#include "DreamWorld/DreamWorld.h"
 #include "WidgetVitalityHPComponent.generated.h"
 
 class AVitalityObject;

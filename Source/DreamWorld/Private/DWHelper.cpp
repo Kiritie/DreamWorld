@@ -10,9 +10,9 @@
 #include "Engine/Engine.h"
 #include "Gameplay/DWGameInstance.h"
 #include "Gameplay/DWGameState.h"
-#include "DWMainModule.h"
-#include "MainModuleBPLibrary.h"
 #include "Engine/DataTable.h"
+#include "Main/DWMainModule.h"
+#include "Main/MainModuleBPLibrary.h"
 #include "Widget/WidgetLoadingPanel.h"
 #include "Widget/WidgetMainMenu.h"
 #include "Widget/WidgetPausingMenu.h"
@@ -558,7 +558,7 @@ TArray<FVitalityData> UDWHelper::LoadVitalityDatas()
 
 FVitalityData UDWHelper::LoadVitalityData(const FName& InVitalityID)
 {
-	if (VitalityDatas.Num() == 0) LoadVoxelDatas();
+	if (VitalityDatas.Num() == 0) LoadVitalityDatas();
 
 	if (VitalityDatas.Contains(InVitalityID))
 	{
@@ -588,7 +588,7 @@ TArray<FCharacterData> UDWHelper::LoadCharacterDatas()
 
 FCharacterData UDWHelper::LoadCharacterData(const FName& InCharacterID)
 {
-	if (CharacterDatas.Num() == 0) LoadVoxelDatas();
+	if (CharacterDatas.Num() == 0) LoadCharacterDatas();
 
 	if (CharacterDatas.Contains(InCharacterID))
 	{
@@ -618,7 +618,7 @@ TArray<FVitalityRaceData> UDWHelper::LoadVitalityRaceDatas()
 
 FVitalityRaceData UDWHelper::LoadVitalityRaceData(const FName& InVitalityRaceID)
 {
-	if (VitalityRaceDatas.Num() == 0) LoadVoxelDatas();
+	if (VitalityRaceDatas.Num() == 0) LoadVitalityRaceDatas();
 
 	if (VitalityRaceDatas.Contains(InVitalityRaceID))
 	{
@@ -669,7 +669,7 @@ TArray<FCharacterRaceData> UDWHelper::LoadCharacterRaceDatas()
 
 FCharacterRaceData UDWHelper::LoadCharacterRaceData(const FName& InCharacterRaceID)
 {
-	if (CharacterRaceDatas.Num() == 0) LoadVoxelDatas();
+	if (CharacterRaceDatas.Num() == 0) LoadCharacterRaceDatas();
 
 	if (CharacterRaceDatas.Contains(InCharacterRaceID))
 	{

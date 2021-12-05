@@ -3,12 +3,12 @@
 
 #include "Equip/Equip.h"
 
-#include "CharacterInventory.h"
-#include "GlobalToolsBPLibrary.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Character/DWCharacter.h"
+#include "Inventory/Inventory.h"
 #include "Inventory/Slot/InventoryEquipSlot.h"
+#include "Tool/GlobalToolsBPLibrary.h"
 
 // Sets default values
 AEquip::AEquip()

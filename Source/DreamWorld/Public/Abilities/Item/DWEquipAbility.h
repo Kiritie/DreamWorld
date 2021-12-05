@@ -1,6 +1,6 @@
 #pragma once
 
-#include "DreamWorld.h"
+#include "DreamWorld/DreamWorld.h"
 #include "Abilities/Item/DWItemAbility.h"
 #include "DWEquipAbility.generated.h"
 

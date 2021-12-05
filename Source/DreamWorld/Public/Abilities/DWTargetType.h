@@ -1,14 +1,13 @@
 #pragma once
 
-#include "DreamWorld.h"
-#include "NoExportTypes.h"
-#include "GameplayAbilityTypes.h"
+#include "Abilities/GameplayAbilityTypes.h"
+#include "DreamWorld/DreamWorld.h"
 #include "DWTargetType.generated.h"
  
  class IVitality;
 
 /**
- * ÄÜÁ¦Ä¿±ê»ùÀà
+ * ï¿½ï¿½ï¿½ï¿½Ä¿ï¿½ï¿½ï¿½ï¿½ï¿½
  */
 UCLASS(Blueprintable, meta = (ShowWorldContextPin))
 class DREAMWORLD_API UDWTargetType : public UObject
@@ -18,13 +17,13 @@ class DREAMWORLD_API UDWTargetType : public UObject
 public:
 	UDWTargetType() {}
 
-	/** »ñÈ¡Ä¿±ê */
+	/** ï¿½ï¿½È¡Ä¿ï¿½ï¿½ */
 	UFUNCTION(BlueprintNativeEvent)
 	void GetTargets(AActor* OwningActor, AActor* TargetingActor, FGameplayEventData EventData, TArray<FHitResult>& OutHitResults, TArray<AActor*>& OutActors) const;
 };
 
 /**
- * ÄÜÁ¦Ä¿±ê_Ê¹ÓÃÓµÓÐÕß
+ * ï¿½ï¿½ï¿½ï¿½Ä¿ï¿½ï¿½_Ê¹ï¿½ï¿½Óµï¿½ï¿½ï¿½ï¿½
  */
 UCLASS(NotBlueprintable)
 class DREAMWORLD_API UDWTargetType_UseOwner : public UDWTargetType
@@ -38,7 +37,7 @@ public:
 };
 
 /**
- * ÄÜÁ¦Ä¿±ê_Ê¹ÓÃÊÂ¼þÊý¾Ý
+ * ï¿½ï¿½ï¿½ï¿½Ä¿ï¿½ï¿½_Ê¹ï¿½ï¿½ï¿½Â¼ï¿½ï¿½ï¿½ï¿½ï¿½
  */
 UCLASS(NotBlueprintable)
 class DREAMWORLD_API UDWTargetType_UseEventData : public UDWTargetType

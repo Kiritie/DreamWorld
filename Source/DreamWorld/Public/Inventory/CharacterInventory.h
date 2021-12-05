@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "DreamWorld.h"
+#include "DreamWorld/DreamWorld.h"
 #include "Inventory/Inventory.h"
 #include "CharacterInventory.generated.h"
 
@@ -28,7 +28,7 @@ public:
 	virtual FInventorySaveData ToData(bool bSaved = true) override;
 
 public:
-	virtual FQueryItemInfo GetSlotListByRange(EQueryItemType InActionType, FItem InItem, int32 InStartIndex = 0, int32 InEndIndex = -1) override;
+	virtual FQueryItemInfo GetItemInfoByRange(EQueryItemType InActionType, FItem InItem, int32 InStartIndex = 0, int32 InEndIndex = -1) override;
 
 	virtual void DiscardAllItem() override;
 

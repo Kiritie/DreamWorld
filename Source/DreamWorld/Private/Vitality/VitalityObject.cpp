@@ -3,11 +3,9 @@
 
 #include "Vitality/VitalityObject.h"
 
-#include "VitalityInventory.h"
 #include "Components/BoxComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Character/DWCharacter.h"
-#include "WidgetComponent.h"
 #include "Widget/Other/WidgetWorldText.h"
 #include "Widget/Other/WidgetVitalityHP.h"
 #include "Widget/Components/WidgetVitalityHPComponent.h"
@@ -17,8 +15,9 @@
 #include "Abilities/DWAbilitySystemComponent.h"
 #include "Abilities/DWAttributeSet.h"
 #include "Abilities/DWGameplayAbility.h"
+#include "Inventory/VitalityInventory.h"
 
-// Sets default values
+	// Sets default values
 AVitalityObject::AVitalityObject()
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.

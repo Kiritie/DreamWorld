@@ -4,8 +4,7 @@
 #include "Abilities/GameplayAbilityTargetTypes.h"
 #include "GameplayAbilitySpec.h"
 #include "GameplayEffectTypes.h"
-#include "ObjectAndNameAsStringProxyArchive.h"
-#include "ParameterModuleTypes.h"
+#include "Parameter/ParameterModuleTypes.h"
 
 #include "DWTypes.generated.h"
 

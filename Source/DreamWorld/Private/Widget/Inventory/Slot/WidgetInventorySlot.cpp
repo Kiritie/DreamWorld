@@ -3,12 +3,11 @@
 
 #include "Widget/Inventory/Slot/WidgetInventorySlot.h"
 
-#include "Border.h"
+#include "Blueprint/DragDropOperation.h"
+#include "Components/Border.h"
+#include "Components/Image.h"
+#include "Components/TextBlock.h"
 #include "Widget/Inventory/WidgetInventory.h"
-#include "DragDropOperation.h"
-#include "Image.h"
-#include "TextBlock.h"
-#include "WidgetBlueprintLibrary.h"
 #include "Inventory/Slot/InventorySlot.h"
 #include "Kismet/KismetTextLibrary.h"
 #include "Materials/MaterialInstanceDynamic.h"
@@ -119,6 +118,8 @@ void UWidgetInventorySlot::InitSlot(UInventorySlot* InOwnerSlot)
 		OwnerSlot->OnInventorySlotRefresh.AddDynamic(this, &UWidgetInventorySlot::Refresh);
 		OwnerSlot->OnInventorySlotCooldownRefresh.AddDynamic(this, &UWidgetInventorySlot::RefreshCooldown);
 	}
+	Refresh();
+	RefreshCooldown();
 }
 
 void UWidgetInventorySlot::SplitItem(int InCount)

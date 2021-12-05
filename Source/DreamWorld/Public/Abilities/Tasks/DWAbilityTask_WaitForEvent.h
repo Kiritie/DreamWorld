@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "DreamWorld.h"
+#include "DreamWorld/DreamWorld.h"
 #include "Abilities/Tasks/AbilityTask.h"
 #include "DWAbilityTask_WaitForEvent.generated.h"
 

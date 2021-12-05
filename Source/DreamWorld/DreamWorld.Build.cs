@@ -12,6 +12,10 @@ public class DreamWorld : ModuleRules
 		// ����Ԥ����ͷ�ļ�
 		PrivatePCHHeaderFile = "DreamWorld.h";
 
+		bLegacyPublicIncludePaths = false;
+
+		ShadowVariableWarningLevel = WarningLevel.Error;
+
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
 		// ��ӹ�������ģ��

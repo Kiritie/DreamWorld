@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include "DreamWorld.h"
-#include "SpawnPoolInterface.h"
+#include "DreamWorld/DreamWorld.h"
+#include "SpawnPool/SpawnPoolInterface.h"
 #include "GameFramework/Actor.h"
 #include "Chunk.generated.h"
 

@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "DreamWorld.h"
+#include "DreamWorld/DreamWorld.h"
 #include "AIController.h"
 #include "Perception/AIPerceptionTypes.h"
 #include "DWAIController.generated.h"

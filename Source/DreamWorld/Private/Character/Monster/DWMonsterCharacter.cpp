@@ -3,14 +3,13 @@
 
 #include "Character/Monster/DWMonsterCharacter.h"
 
-#include "CharacterInventory.h"
 #include "Components/BoxComponent.h"
-#include "ConstructorHelpers.h"
-#include "DWHumanCharacter.h"
-#include "InventorySlot.h"
 #include "BehaviorTree/BehaviorTree.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "AI/DWAIBlackboard.h"
+#include "Character/Human/DWHumanCharacter.h"
+#include "Inventory/Inventory.h"
+#include "Inventory/Slot/InventorySlot.h"
 
 ADWMonsterCharacter::ADWMonsterCharacter()
 {
