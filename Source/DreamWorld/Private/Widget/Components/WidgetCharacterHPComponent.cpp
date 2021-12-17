@@ -4,11 +4,16 @@
 #include "Widget/Components/WidgetCharacterHPComponent.h"
 #include "Character/Player/DWPlayerCharacter.h"
 #include "Character/DWCharacter.h"
+#include "UObject/ConstructorHelpers.h"
 #include "Widget/Other/WidgetCharacterHP.h"
 
 UWidgetCharacterHPComponent::UWidgetCharacterHPComponent()
 {
-	SetWidgetClass(UDWHelper::LoadWidgetCharacterHPClass());
+	static ConstructorHelpers::FClassFinder<UWidgetCharacterHP> CharacterHPClassFinder(TEXT("WidgetBlueprint'/Game/Blueprints/Widget/Other/WB_CharacterHP.WB_CharacterHP_C'"));
+	if(CharacterHPClassFinder.Succeeded())
+	{
+		SetWidgetClass(CharacterHPClassFinder.Class);
+	}
 	SetWidgetSpace(EWidgetSpace::Screen);
 	SetDrawSize(FVector2D(220, 60));
 	SetPivot(FVector2D(0.5f, 1));

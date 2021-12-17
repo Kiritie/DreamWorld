@@ -24,6 +24,30 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Default")
 	int32 SelectedSlotIndex;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components", meta = (BindWidget, OptionalWidget = false))
+	class UGridPanel* ShortcutContent;
+
+	// UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components", meta = (BindWidget, OptionalWidget = false))
+	class UGridPanel* AuxiliaryContent;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components", meta = (BindWidget, OptionalWidget = false))
+	class UGridPanel* LeftSkillContent;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components", meta = (BindWidget, OptionalWidget = false))
+	class UGridPanel* RightSkillContent;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TSubclassOf<class UWidgetInventoryShortcutSlot> ShortcutSlotClass;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TSubclassOf<class UWidgetInventoryAuxiliarySlot> AuxiliarySlotClass;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TSubclassOf<class UWidgetInventorySkillSlot> SkillSlotClass;
+
+public:
+	virtual void OnInitialize_Implementation(AActor* InOwner) override;
+
 public:
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
 	void UpdateSelectBox();

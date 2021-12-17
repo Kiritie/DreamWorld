@@ -121,7 +121,7 @@ void UDWAttributeSet::PostGameplayEffectExecute(const struct FGameplayEffectModC
 				{
 					HitResult = *Context.GetHitResult();
 				}
-				TargetVitality->HandleDamage(LocalDamageDone, HitResult, SourceTags, SourceCharacter, SourceActor);
+				TargetVitality->HandleDamage(EDWDamageType::Physics, LocalDamageDone, true, HitResult, SourceTags, SourceActor);
 
 				if(TargetCharacter && DefendRateDone == 0.f)
 				{

@@ -1,12 +1,18 @@
 #include "Widget/Inventory/WidgetInventory.h"
 
+#include "Components/GridPanel.h"
+#include "Inventory/Slot/InventorySkillSlot.h"
 #include "Inventory/Slot/InventorySlot.h"
 #include "Vitality/Vitality.h"
-#include "Widget/Inventory/Slot/WidgetInventorySlot.h"
 
 UWidgetInventory::UWidgetInventory(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 
+}
+
+void UWidgetInventory::OnInitialize_Implementation(AActor* InOwner)
+{
+	Super::OnInitialize_Implementation(InOwner);
 }
 
 void UWidgetInventory::OnRefresh_Implementation()
@@ -25,13 +31,9 @@ UInventory* UWidgetInventory::GetInventory() const
 
 TArray<UWidgetInventorySlot*> UWidgetInventory::GetSplitUISlots(ESplitSlotType InSplitSlotType) const
 {
-	TArray<UWidgetInventorySlot*> ReturnValue;
-	for (auto Iter : UISlots)
+	if(UISlotDatas.Contains(InSplitSlotType))
 	{
-		if(Iter->GetOwnerSlot()->GetSplitType() == InSplitSlotType)
-		{
-			ReturnValue.Add(Iter);
-		}
+		return UISlotDatas[InSplitSlotType].Slots;
 	}
-	return ReturnValue;
+	return TArray<UWidgetInventorySlot*>();
 }

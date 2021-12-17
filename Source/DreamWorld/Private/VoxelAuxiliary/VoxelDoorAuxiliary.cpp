@@ -7,13 +7,14 @@
 #include "Voxel/Voxel.h"
 #include "Character/Player/DWPlayerCharacter.h"
 #include "Components/BoxComponent.h"
+#include "Interaction/Components/VoxelInteractionComponent.h"
 #include "Voxel/VoxelDoor.h"
 
 // Sets default values
 AVoxelDoorAuxiliary::AVoxelDoorAuxiliary()
 {
-	InteractOptions.Add(EInteractOption::Open);
-	InteractOptions.Add(EInteractOption::Close);
+	Interaction->AddInteractionAction(EInteractAction::Open);
+	Interaction->AddInteractionAction(EInteractAction::Close);
 }
 
 // Called when the game starts or when spawned
@@ -38,29 +39,51 @@ void AVoxelDoorAuxiliary::Initialize(AChunk* InOwnerChunk, FIndex InVoxelIndex)
 	Super::Initialize(InOwnerChunk, InVoxelIndex);
 }
 
-bool AVoxelDoorAuxiliary::OnInteract(IInteraction* InTrigger, EInteractOption InInteractOption)
+bool AVoxelDoorAuxiliary::CanInteract(IInteraction* InInteractionTarget, EInteractAction InInteractAction)
 {
-	if(!Super::OnInteract(InTrigger, InInteractOption)) return false;
-
-	if(InteractOptions.Contains(InInteractOption))
+	if(!Super::CanInteract(InInteractionTarget, InInteractAction)) return false;
+	
+	switch (InInteractAction)
 	{
-		switch (InInteractOption)
+		case EInteractAction::Open:
 		{
-			case EInteractOption::Open:
+			if(!GetVoxelItem().GetParam(FName("bOpened")).GetBooleanValue())
 			{
-				OpenDoor();
-				break;
+				return true;
 			}
-			case EInteractOption::Close:
-			{
-				CloseDoor();
-				break;
-			}
-			default: break;
+			break;
 		}
-		return true;
+		case EInteractAction::Close:
+		{
+			if(GetVoxelItem().GetParam(FName("bOpened")).GetBooleanValue())
+			{
+				return true;
+			}
+			break;
+		}
+		default: return true;
 	}
 	return false;
+}
+
+void AVoxelDoorAuxiliary::OnInteract(IInteraction* InTrigger, EInteractAction InInteractAction)
+{
+	Super::OnInteract(InTrigger, InInteractAction);
+
+	switch (InInteractAction)
+	{
+		case EInteractAction::Open:
+		{
+			OpenDoor();
+			break;
+		}
+		case EInteractAction::Close:
+		{
+			CloseDoor();
+			break;
+		}
+		default: break;
+	}
 }
 
 void AVoxelDoorAuxiliary::OpenDoor()

@@ -29,11 +29,13 @@ protected:
 public:	
 	virtual void Initialize(AChunk* InOwnerChunk, FIndex InVoxelIndex);
 
-	virtual bool OnInteract(IInteraction* InTrigger, EInteractOption InInteractOption) override;
+	virtual bool CanInteract(IInteraction* InTrigger, EInteractAction InInteractAction) override;
+
+	virtual void OnInteract(IInteraction* InTrigger, EInteractAction InInteractAction) override;
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-	class UInteractionComponent* Interaction;
+	class UVoxelInteractionComponent* Interaction;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	FIndex VoxelIndex;
@@ -41,19 +43,10 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	AChunk* OwnerChunk;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	TArray<EInteractOption> InteractOptions;
-
-	IInteraction* InteractingTarget;
-
 public:
 	FIndex GetVoxelIndex() const { return VoxelIndex; }
 
 	FVoxelItem& GetVoxelItem() const;
 
-	virtual TArray<EInteractOption> GetInteractOptions(IInteraction* InTrigger) const override { return InteractOptions; }
-
-	virtual IInteraction* GetInteractingTarget() const override { return InteractingTarget; }
-
-	virtual void SetInteractingTarget(IInteraction* InTarget) override { InteractingTarget = InTarget; }
+	virtual UInteractionComponent* GetInteractionComponent() const override;
 };

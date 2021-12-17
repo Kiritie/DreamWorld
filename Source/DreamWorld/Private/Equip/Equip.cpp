@@ -45,7 +45,7 @@ void AEquip::Initialize(ADWCharacter* InOwnerCharacter)
 	if (OwnerCharacter)
 	{
 		OwnerCharacter->GetInventory()->GetSplitSlots<UInventoryEquipSlot>(ESplitSlotType::Equip)[(int32)GetEquipData().PartType];
-		AttachToComponent(OwnerCharacter->GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, *UGlobalToolsBPLibrary::EnumValueToString(TEXT("EEquipPartType"), (int32)GetEquipData().PartType));
+		AttachToComponent(OwnerCharacter->GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, *UGlobalToolsBPLibrary::GetEnumValueAuthoredName(TEXT("EEquipPartType"), (int32)GetEquipData().PartType));
 	}
 }
 

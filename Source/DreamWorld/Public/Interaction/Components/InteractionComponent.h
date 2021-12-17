@@ -17,7 +17,18 @@ class DREAMWORLD_API UInteractionComponent : public UBoxComponent
 		
 public:
 	UInteractionComponent(const FObjectInitializer& ObjectInitializer);
+
+protected:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TArray<EInteractAction> InteractActions;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	EInteractAction InteractingAction;
 	
+	IInteraction* OverlappingTarget;
+
+	IInteraction* InteractionTarget;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -29,5 +40,22 @@ protected:
 	virtual void OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
 public:
-	IInteraction* GetOwnerInteraction() const;
+	virtual bool DoInteract(IInteraction* InInteractionTarget, EInteractAction InInteractAction);
+
+public:
+	void AddInteractionAction(EInteractAction InInteractAction);
+		
+	void RemoveInteractionAction(EInteractAction InInteractAction);
+		
+	TArray<EInteractAction> GetValidInteractActions(IInteraction* InInteractionTarget) const;
+	
+	EInteractAction GetInteractingAction() const { return InteractingAction; }
+
+	IInteraction* GetOverlappingTarget() const { return OverlappingTarget; }
+
+	IInteraction* GetInteractionOwner() const;
+
+	IInteraction* GetInteractionTarget() const { return InteractionTarget; }
+	
+	void SetInteractionTarget(IInteraction* InInteractionTarget);
 };

@@ -26,7 +26,7 @@ void UInventoryShortcutSlot::Refresh()
 		if (PlayerCharacter->GetInventory()->GetSelectedSlot() == this)
 		{
 			PlayerCharacter->UpdateVoxelMesh();
-			UWidgetModuleBPLibrary::GetUserWidget<UWidgetPrimaryPanel>()->RefreshOptions();
+			UWidgetModuleBPLibrary::GetUserWidget<UWidgetPrimaryPanel>()->RefreshActions();
 		}
 	}
 }

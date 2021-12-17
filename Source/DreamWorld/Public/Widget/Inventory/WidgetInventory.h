@@ -22,10 +22,12 @@ public:
 	UWidgetInventory(const FObjectInitializer& ObjectInitializer);
 
 protected:
-	UPROPERTY(BlueprintReadWrite)
-	TArray<UWidgetInventorySlot*> UISlots;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Default")
+	TMap<ESplitSlotType, FWidgetSplitSlotData> UISlotDatas;
 
 public:
+	virtual void OnInitialize_Implementation(AActor* InOwner) override;
+	
 	virtual void OnRefresh_Implementation() override;
 
 	UFUNCTION(BlueprintPure)

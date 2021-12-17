@@ -79,6 +79,20 @@ FString FVoxelItem::GetStringData() const
 	return tmpData;
 }
 
+bool FVoxelItem::HasParam(FName InName) const
+{
+	return Params.Contains(InName);
+}
+
+FParameter& FVoxelItem::GetParam(FName InName)
+{
+	if(HasParam(InName))
+	{
+		return Params[InName];
+	}
+	return FParameter::Empty;
+}
+
 void FTeamData::AddMember(ADWCharacter* InMember)
 {
 	if (!Members.Contains(InMember))

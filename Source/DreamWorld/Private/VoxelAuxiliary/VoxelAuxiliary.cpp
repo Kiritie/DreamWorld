@@ -4,6 +4,7 @@
 #include "VoxelAuxiliary/VoxelAuxiliary.h"
 
 #include "Interaction/Components/InteractionComponent.h"
+#include "Interaction/Components/VoxelInteractionComponent.h"
 #include "Voxel/Voxel.h"
 #include "World/Chunk.h"
 
@@ -15,7 +16,7 @@ AVoxelAuxiliary::AVoxelAuxiliary()
 
 	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
 
-	Interaction = CreateDefaultSubobject<UInteractionComponent>(FName("Interaction"));
+	Interaction = CreateDefaultSubobject<UVoxelInteractionComponent>(FName("Interaction"));
 	Interaction->SetupAttachment(RootComponent);
 	Interaction->SetRelativeLocation(FVector(0, 0, 0));
 
@@ -34,19 +35,14 @@ void AVoxelAuxiliary::Initialize(AChunk* InOwnerChunk, FIndex InVoxelIndex)
 	VoxelIndex = InVoxelIndex;
 }
 
-bool AVoxelAuxiliary::OnInteract(IInteraction* InTrigger, EInteractOption InInteractOption)
+bool AVoxelAuxiliary::CanInteract(IInteraction* InTrigger, EInteractAction InInteractAction)
 {
-	if (!InTrigger) return false;
+	return true;
+}
 
-	if(InteractOptions.Contains(InInteractOption))
-	{
-		// switch (InInteractOption)
-		// {
-		// 	default: break;
-		// }
-		return true;
-	}
-	return false;
+void AVoxelAuxiliary::OnInteract(IInteraction* InTrigger, EInteractAction InInteractAction)
+{
+	
 }
 
 FVoxelItem& AVoxelAuxiliary::GetVoxelItem() const
@@ -56,4 +52,9 @@ FVoxelItem& AVoxelAuxiliary::GetVoxelItem() const
 		return OwnerChunk->GetVoxelItem(VoxelIndex);
 	}
 	return FVoxelItem::EmptyVoxel;
+}
+
+UInteractionComponent* AVoxelAuxiliary::GetInteractionComponent() const
+{
+	return Interaction;
 }

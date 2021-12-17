@@ -29,6 +29,7 @@
 #include "Equip/EquipShield.h"
 #include "Inventory/Slot/InventorySkillSlot.h"
 #include "Character/Player/DWPlayerCharacterCameraManager.h"
+#include "Interaction/Components/InteractionComponent.h"
 #include "Widget/WidgetPrimaryPanel.h"
 #include "Inventory/Slot/InventoryEquipSlot.h"
 #include "Widget/WidgetModuleBPLibrary.h"
@@ -129,11 +130,11 @@ void ADWPlayerCharacter::SetupPlayerInputComponent(class UInputComponent* Player
 
 	PlayerInputComponent->SetTickableWhenPaused(true);
 
-	PlayerInputComponent->BindAction("Interact1", IE_Pressed, this, &ADWPlayerCharacter::DoInteractOption1);
-	PlayerInputComponent->BindAction("Interact2", IE_Pressed, this, &ADWPlayerCharacter::DoInteractOption1);
-	PlayerInputComponent->BindAction("Interact3", IE_Pressed, this, &ADWPlayerCharacter::DoInteractOption1);
-	PlayerInputComponent->BindAction("Interact4", IE_Pressed, this, &ADWPlayerCharacter::DoInteractOption1);
-	PlayerInputComponent->BindAction("Interact5", IE_Pressed, this, &ADWPlayerCharacter::DoInteractOption1);
+	PlayerInputComponent->BindAction("Interact1", IE_Pressed, this, &ADWPlayerCharacter::DoInteractAction1);
+	PlayerInputComponent->BindAction("Interact2", IE_Pressed, this, &ADWPlayerCharacter::DoInteractAction1);
+	PlayerInputComponent->BindAction("Interact3", IE_Pressed, this, &ADWPlayerCharacter::DoInteractAction1);
+	PlayerInputComponent->BindAction("Interact4", IE_Pressed, this, &ADWPlayerCharacter::DoInteractAction1);
+	PlayerInputComponent->BindAction("Interact5", IE_Pressed, this, &ADWPlayerCharacter::DoInteractAction1);
 
 	PlayerInputComponent->BindAction("Dodge", IE_Pressed, this, &ADWPlayerCharacter::OnDodgePressed);
 	PlayerInputComponent->BindAction("Dodge", IE_Released, this, &ADWPlayerCharacter::OnDodgeReleased);
@@ -271,7 +272,7 @@ void ADWPlayerCharacter::Revive()
 	SetControlMode(ControlMode);
 }
 
-void ADWPlayerCharacter::Death(ADWCharacter* InKiller)
+void ADWPlayerCharacter::Death(AActor* InKiller)
 {
 	Super::Death(InKiller);
 	if(TargetSystem->IsLocked())
@@ -283,7 +284,6 @@ void ADWPlayerCharacter::Death(ADWCharacter* InKiller)
 void ADWPlayerCharacter::DeathEnd()
 {
 	Super::DeathEnd();
-	SetInteractingTarget(this);
 	UWidgetModuleBPLibrary::GetUserWidget<UWidgetPrimaryPanel>()->SetCrosshairVisible(false);
 }
 
@@ -451,13 +451,6 @@ bool ADWPlayerCharacter::RaycastVoxel(FVoxelHitResult& OutHitResult)
 		}
 	}
 	return false;
-}
-
-bool ADWPlayerCharacter::DoInteract(IInteraction* InTarget, EInteractOption InInteractOption)
-{
-	if(!Super::DoInteract(InTarget, InInteractOption)) return false;
-	UWidgetModuleBPLibrary::GetUserWidget<UWidgetPrimaryPanel>()->RefreshOptions();
-	return true;
 }
 
 void ADWPlayerCharacter::ToggleControlMode()
@@ -764,44 +757,59 @@ void ADWPlayerCharacter::ReleaseSkillAbility4()
 	}
 }
 
-void ADWPlayerCharacter::DoInteractOption1()
+void ADWPlayerCharacter::DoInteractAction1()
 {
-	if(!InteractingTarget || !InteractingTarget->GetInteractOptions(this).IsValidIndex(0)
-		|| bBreakAllInput && InteractingTarget->GetInteractOptions(this)[0] != EInteractOption::Revive) return;
-
-	DoInteract(InteractingTarget, InteractingTarget->GetInteractOptions(this)[0]);
+	if(UInteractionComponent* InteractionTarget = GetInteractionComponent()->GetInteractionTarget()->GetInteractionComponent())
+	{
+		if(InteractionTarget->GetValidInteractActions(this).IsValidIndex(0))
+		{
+			InteractionTarget->DoInteract(this, InteractionTarget->GetValidInteractActions(this)[0]);
+		}
+	}
 }
 
-void ADWPlayerCharacter::DoInteractOption2()
+void ADWPlayerCharacter::DoInteractAction2()
 {
-	if(!InteractingTarget || !InteractingTarget->GetInteractOptions(this).IsValidIndex(1)
-		|| bBreakAllInput && InteractingTarget->GetInteractOptions(this)[1] != EInteractOption::Revive) return;
-
-	DoInteract(InteractingTarget, InteractingTarget->GetInteractOptions(this)[1]);
+	if(UInteractionComponent* InteractionTarget = GetInteractionComponent()->GetInteractionTarget()->GetInteractionComponent())
+	{
+		if(InteractionTarget->GetValidInteractActions(this).IsValidIndex(1))
+		{
+			InteractionTarget->DoInteract(this, InteractionTarget->GetValidInteractActions(this)[1]);
+		}
+	}
 }
 
-void ADWPlayerCharacter::DoInteractOption3()
+void ADWPlayerCharacter::DoInteractAction3()
 {
-	if(!InteractingTarget || !InteractingTarget->GetInteractOptions(this).IsValidIndex(2)
-		|| bBreakAllInput && InteractingTarget->GetInteractOptions(this)[2] != EInteractOption::Revive) return;
-	
-	DoInteract(InteractingTarget, InteractingTarget->GetInteractOptions(this)[2]);
+	if(UInteractionComponent* InteractionTarget = GetInteractionComponent()->GetInteractionTarget()->GetInteractionComponent())
+	{
+		if(InteractionTarget->GetValidInteractActions(this).IsValidIndex(2))
+		{
+			InteractionTarget->DoInteract(this, InteractionTarget->GetValidInteractActions(this)[2]);
+		}
+	}
 }
 
-void ADWPlayerCharacter::DoInteractOption4()
+void ADWPlayerCharacter::DoInteractAction4()
 {
-	if(!InteractingTarget || !InteractingTarget->GetInteractOptions(this).IsValidIndex(3)
-		|| bBreakAllInput && InteractingTarget->GetInteractOptions(this)[3] != EInteractOption::Revive) return;
-
-	DoInteract(InteractingTarget, InteractingTarget->GetInteractOptions(this)[3]);
+	if(UInteractionComponent* InteractionTarget = GetInteractionComponent()->GetInteractionTarget()->GetInteractionComponent())
+	{
+		if(InteractionTarget->GetValidInteractActions(this).IsValidIndex(3))
+		{
+			InteractionTarget->DoInteract(this, InteractionTarget->GetValidInteractActions(this)[3]);
+		}
+	}
 }
 
-void ADWPlayerCharacter::DoInteractOption5()
+void ADWPlayerCharacter::DoInteractAction5()
 {
-	if(!InteractingTarget || !InteractingTarget->GetInteractOptions(this).IsValidIndex(4)
-		|| bBreakAllInput && InteractingTarget->GetInteractOptions(this)[4] != EInteractOption::Revive) return;
-
-	DoInteract(InteractingTarget, InteractingTarget->GetInteractOptions(this)[4]);
+	if(UInteractionComponent* InteractionTarget = GetInteractionComponent()->GetInteractionTarget()->GetInteractionComponent())
+	{
+		if(InteractionTarget->GetValidInteractActions(this).IsValidIndex(4))
+		{
+			InteractionTarget->DoInteract(this, InteractionTarget->GetValidInteractActions(this)[4]);
+		}
+	}
 }
 
 void ADWPlayerCharacter::HandleNameChanged(const FString& NewValue)
@@ -992,10 +1000,4 @@ void ADWPlayerCharacter::HandleExpendSpeedAttribute(float NewValue, float DeltaV
 ADWPlayerController* ADWPlayerCharacter::GetPlayerController() const
 {
 	return GetController<ADWPlayerController>();
-}
-
-void ADWPlayerCharacter::SetInteractingTarget(IInteraction* InTarget)
-{
-	Super::SetInteractingTarget(InTarget);
-	UWidgetModuleBPLibrary::GetUserWidget<UWidgetPrimaryPanel>()->RefreshOptions();
 }

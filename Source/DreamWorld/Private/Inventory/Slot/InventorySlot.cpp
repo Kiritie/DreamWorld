@@ -302,7 +302,7 @@ bool UInventorySlot::CancelItem()
 	{
 		if(IVitality* Vitality = Cast<IVitality>(GetOwner()->GetOwnerActor()))
 		{
-			Vitality->CancelAbility(AbilityHandle);
+			Vitality->CancelAbilityByHandle(AbilityHandle);
 			return true;
 		}
 	}

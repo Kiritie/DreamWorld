@@ -23,7 +23,7 @@ public:
 	
 	virtual void Revive() = 0;
 
-	virtual void Death(ADWCharacter* InKiller = nullptr) = 0;
+	virtual void Death(AActor* InKiller = nullptr) = 0;
 		
 	virtual void ResetData(bool bRefresh = false) = 0;
 
@@ -33,6 +33,9 @@ public:
 	
 	virtual void ModifyEXP(float InDeltaValue) = 0;
 
+	virtual void AddWorldText(FString InContent, EWorldTextType InContentType, EWorldTextStyle InContentStyle) = 0;
+
+public:
 	virtual bool IsDead() const = 0;
 	
 	virtual FString GetNameC() const = 0;
@@ -75,25 +78,37 @@ public:
 	
 	virtual class UInventory* GetInventory() const = 0;
 
+public:
 	virtual FGameplayAbilitySpecHandle AcquireAbility(TSubclassOf<UDWGameplayAbility> InAbility, int32 InLevel = 1) = 0;
 
 	virtual bool ActiveAbility(FGameplayAbilitySpecHandle AbilityHandle, bool bAllowRemoteActivation = false) = 0;
 
-	virtual bool ActiveAbility(TSubclassOf<UDWGameplayAbility> AbilityClass, bool bAllowRemoteActivation = false) = 0;
+	virtual bool ActiveAbilityByClass(TSubclassOf<UDWGameplayAbility> AbilityClass, bool bAllowRemoteActivation = false) = 0;
 
-	virtual bool ActiveAbility(const FGameplayTagContainer& GameplayTagContainer, bool bAllowRemoteActivation = false) = 0;
+	virtual bool ActiveAbilityByTag(const FGameplayTagContainer& GameplayTagContainer, bool bAllowRemoteActivation = false) = 0;
 
 	virtual void CancelAbility(UDWGameplayAbility* Ability) = 0;
 
-	virtual void CancelAbility(const FGameplayAbilitySpecHandle& AbilityHandle) = 0;
+	virtual void CancelAbilityByHandle(const FGameplayAbilitySpecHandle& AbilityHandle) = 0;
 
-	virtual void CancelAbilities(const FGameplayTagContainer* WithTags=nullptr, const FGameplayTagContainer* WithoutTags=nullptr, UDWGameplayAbility* Ignore=nullptr) = 0;
+	virtual void CancelAbilities(const FGameplayTagContainer& WithTags, const FGameplayTagContainer& WithoutTags, UDWGameplayAbility* Ignore = nullptr) = 0;
 	
-	virtual void CancelAllAbilities(UDWGameplayAbility* Ignore=nullptr) = 0;
+	virtual void CancelAllAbilities(UDWGameplayAbility* Ignore = nullptr) = 0;
+	
+	virtual FActiveGameplayEffectHandle ApplyEffectByClass(TSubclassOf<UGameplayEffect> EffectClass) = 0;
+	
+	virtual FActiveGameplayEffectHandle ApplyEffectBySpecHandle(const FGameplayEffectSpecHandle& SpecHandle) = 0;
+		
+	virtual FActiveGameplayEffectHandle ApplyEffectBySpec(const FGameplayEffectSpec& Spec) = 0;
 
-	virtual void SpawnWidgetWorldText(EWorldTextType InContextType, FString InContext) = 0;
+	virtual bool RemoveEffect(FActiveGameplayEffectHandle Handle, int32 StacksToRemove=-1) = 0;
 
-	virtual void HandleDamage(const float LocalDamageDone, FHitResult HitResult, const struct FGameplayTagContainer& SourceTags, ADWCharacter* SourceCharacter, AActor* SourceActor) = 0;
+	virtual void GetActiveAbilities(FGameplayTagContainer AbilityTags, TArray<UDWGameplayAbility*>& ActiveAbilities) = 0;
+
+	virtual bool GetAbilityInfo(TSubclassOf<UDWGameplayAbility> AbilityClass, FDWAbilityInfo& OutAbilityInfo) = 0;
+
+public:
+	virtual void HandleDamage(EDWDamageType DamageType, const float LocalDamageDone, bool bHasCrited, FHitResult HitResult, const FGameplayTagContainer& SourceTags, AActor* SourceActor) = 0;
 		
 	virtual void HandleNameChanged(const FString& NewValue) = 0;
 

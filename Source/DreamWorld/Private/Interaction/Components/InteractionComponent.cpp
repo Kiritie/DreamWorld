@@ -5,6 +5,8 @@
 
 #include "Character/DWCharacter.h"
 #include "Interaction/Interaction.h"
+#include "Widget/WidgetModuleBPLibrary.h"
+#include "Widget/WidgetPrimaryPanel.h"
 
 UInteractionComponent::UInteractionComponent(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -23,35 +25,96 @@ void UInteractionComponent::BeginPlay()
 
 void UInteractionComponent::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if(!GetOwnerInteraction() || OtherActor == GetOwner()) return;
+	if(!GetInteractionOwner() || OtherActor == GetOwner()) return;
+
+	if(OverlappingTarget) return;
 	
 	if(IInteraction* OtherInteraction = Cast<IInteraction>(OtherActor))
 	{
-		if(!OtherInteraction->GetInteractingTarget())
+		OverlappingTarget = OtherInteraction;
+		if(ADWCharacter* OtherCharacter = Cast<ADWCharacter>(OtherActor))
 		{
-			OtherInteraction->SetInteractingTarget(GetOwnerInteraction());
+			if(OtherCharacter->IsPlayer())
+			{
+				UWidgetModuleBPLibrary::GetUserWidget<UWidgetPrimaryPanel>()->RefreshActions();
+			}
 		}
 	}
 }
 
 void UInteractionComponent::OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	if(!GetOwnerInteraction() || OtherActor == GetOwner()) return;
-	
+	if(!GetInteractionOwner() || OtherActor == GetOwner()) return;
+
+	if(!OverlappingTarget) return;
+
 	if(IInteraction* OtherInteraction = Cast<IInteraction>(OtherActor))
 	{
-		if(OtherInteraction->GetInteractingTarget() == GetOwnerInteraction())
+		if(OverlappingTarget == OtherInteraction)
 		{
-			ADWCharacter* OtherCharacter = Cast<ADWCharacter>(OtherInteraction);
-			if(!OtherCharacter || !OtherCharacter->IsRiding())
+			OverlappingTarget = nullptr;
+			if(ADWCharacter* OtherCharacter = Cast<ADWCharacter>(OtherActor))
 			{
-				OtherInteraction->SetInteractingTarget(nullptr);
+				if(OtherCharacter->IsPlayer())
+				{
+					UWidgetModuleBPLibrary::GetUserWidget<UWidgetPrimaryPanel>()->RefreshActions();
+				}
 			}
 		}
 	}
 }
 
-IInteraction* UInteractionComponent::GetOwnerInteraction() const
+bool UInteractionComponent::DoInteract(IInteraction* InInteractionTarget, EInteractAction InInteractAction)
+{
+	if(!InInteractionTarget || InInteractAction == EInteractAction::None || !InteractActions.Contains(InInteractAction) || InteractingAction != EInteractAction::None) return false;
+	
+	if(GetInteractionOwner()->CanInteract(InInteractionTarget, InInteractAction))
+	{
+		SetInteractionTarget(InInteractionTarget);
+		GetInteractionOwner()->OnInteract(InInteractionTarget, InInteractAction);
+	}
+	return false;
+}
+
+void UInteractionComponent::AddInteractionAction(EInteractAction InInteractAction)
+{
+	if(!InteractActions.Contains(InInteractAction))
+	{
+		InteractActions.Add(InInteractAction);
+	}
+}
+
+void UInteractionComponent::RemoveInteractionAction(EInteractAction InInteractAction)
+{
+	if(InteractActions.Contains(InInteractAction))
+	{
+		InteractActions.Remove(InInteractAction);
+	}
+}
+
+TArray<EInteractAction> UInteractionComponent::GetValidInteractActions(IInteraction* InInteractionTarget) const
+{
+	TArray<EInteractAction> ReturnValues;
+	for(auto Iter : InteractActions)
+	{
+		if(GetInteractionOwner()->CanInteract(InInteractionTarget, Iter))
+		{
+			ReturnValues.Add(Iter);
+		}
+	}
+	return ReturnValues;
+}
+
+IInteraction* UInteractionComponent::GetInteractionOwner() const
 {
 	return Cast<IInteraction>(GetOwner());
+}
+
+void UInteractionComponent::SetInteractionTarget(IInteraction* InInteractionTarget)
+{
+	InteractionTarget = InInteractionTarget;
+	if(InteractionTarget)
+	{
+		InteractionTarget->GetInteractionComponent()->InteractionTarget = GetInteractionOwner();
+	}
 }

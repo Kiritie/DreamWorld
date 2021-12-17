@@ -12,6 +12,7 @@
 
 #include "VitalityObject.generated.h"
 
+class UVitalityInteractionComponent;
 class AChunk;
 class ADWCharacter;
 class UBoxComponent;
@@ -61,17 +62,12 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "VitalityStats")
 	AChunk* OwnerChunk;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "VitalityStats")
-	TArray<EInteractOption> InteractOptions;
-
-	IInteraction* InteractingTarget;
-
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	UBoxComponent* BoxComponent;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-	UInteractionComponent* Interaction;
+	UVitalityInteractionComponent* Interaction;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	UWidgetVitalityHPComponent* WidgetVitalityHP;
@@ -93,17 +89,22 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	virtual void Serialize(FArchive& Ar) override;
+
 	UFUNCTION(BlueprintCallable)
 	void LoadData(FVitalityObjectSaveData InSaveData);
 
 	UFUNCTION(BlueprintPure)
 	FVitalityObjectSaveData ToData(bool bSaved = true);
+	
+	UFUNCTION(BlueprintCallable)
+	virtual void ResetData(bool bRefresh = false) override;
+	
+	UFUNCTION(BlueprintCallable)
+	virtual void RefreshData() override;
 
 	UFUNCTION(BlueprintCallable)
-	virtual void SpawnWidgetWorldText(EWorldTextType InContextType, FString InContext) override;
-
-	UFUNCTION(BlueprintCallable)
-	virtual void Death(ADWCharacter* InKiller = nullptr) override;
+	virtual void Death(AActor* InKiller = nullptr) override;
 
 	UFUNCTION(BlueprintCallable)
 	virtual void Spawn() override;
@@ -112,23 +113,50 @@ public:
 	virtual void Revive() override;
 	
 	UFUNCTION(BlueprintCallable)
+	virtual void AddWorldText(FString InContent, EWorldTextType InContentType, EWorldTextStyle InContentStyle) override;
+
+public:
+	UFUNCTION(BlueprintCallable)
 	virtual FGameplayAbilitySpecHandle AcquireAbility(TSubclassOf<UDWGameplayAbility> InAbility, int32 InLevel = 1) override;
 
 	UFUNCTION(BlueprintCallable)
 	virtual bool ActiveAbility(FGameplayAbilitySpecHandle AbilityHandle, bool bAllowRemoteActivation = false) override;
 
-	virtual bool ActiveAbility(TSubclassOf<UDWGameplayAbility> AbilityClass, bool bAllowRemoteActivation = false) override;
+	UFUNCTION(BlueprintCallable)
+	virtual bool ActiveAbilityByClass(TSubclassOf<UDWGameplayAbility> AbilityClass, bool bAllowRemoteActivation = false) override;
 
-	virtual bool ActiveAbility(const FGameplayTagContainer& GameplayTagContainer, bool bAllowRemoteActivation = false) override;
+	UFUNCTION(BlueprintCallable)
+	virtual bool ActiveAbilityByTag(const FGameplayTagContainer& GameplayTagContainer, bool bAllowRemoteActivation = false) override;
 
 	UFUNCTION(BlueprintCallable)
 	virtual void CancelAbility(UDWGameplayAbility* Ability) override;
 
-	virtual void CancelAbility(const FGameplayAbilitySpecHandle& AbilityHandle) override;
+	UFUNCTION(BlueprintCallable)
+	virtual void CancelAbilityByHandle(const FGameplayAbilitySpecHandle& AbilityHandle) override;
 
-	virtual void CancelAbilities(const FGameplayTagContainer* WithTags=nullptr, const FGameplayTagContainer* WithoutTags=nullptr, UDWGameplayAbility* Ignore=nullptr) override;
+	UFUNCTION(BlueprintCallable)
+	virtual void CancelAbilities(const FGameplayTagContainer& WithTags, const FGameplayTagContainer& WithoutTags, UDWGameplayAbility* Ignore=nullptr) override;
 	
+	UFUNCTION(BlueprintCallable)
 	virtual void CancelAllAbilities(UDWGameplayAbility* Ignore=nullptr) override;
+	
+	UFUNCTION(BlueprintCallable)
+	virtual FActiveGameplayEffectHandle ApplyEffectByClass(TSubclassOf<UGameplayEffect> EffectClass) override;
+	
+	UFUNCTION(BlueprintCallable)
+	virtual FActiveGameplayEffectHandle ApplyEffectBySpecHandle(const FGameplayEffectSpecHandle& SpecHandle) override;
+		
+	UFUNCTION(BlueprintCallable)
+	virtual FActiveGameplayEffectHandle ApplyEffectBySpec(const FGameplayEffectSpec& Spec) override;
+
+	UFUNCTION(BlueprintCallable)
+	virtual bool RemoveEffect(FActiveGameplayEffectHandle Handle, int32 StacksToRemove=-1) override;
+
+	UFUNCTION(BlueprintPure)
+	virtual void GetActiveAbilities(FGameplayTagContainer AbilityTags, TArray<UDWGameplayAbility*>& ActiveAbilities) override;
+
+	UFUNCTION(BlueprintPure)
+	virtual bool GetAbilityInfo(TSubclassOf<UDWGameplayAbility> AbilityClass, FDWAbilityInfo& OutAbilityInfo) override;
 
 	UFUNCTION(BlueprintCallable)
 	virtual void ModifyHealth(float InDeltaValue) override;
@@ -136,74 +164,70 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual void ModifyEXP(float InDeltaValue) override;
 
-	virtual bool OnInteract(IInteraction* InTrigger, EInteractOption InInteractOption) override;
+	virtual bool CanInteract(IInteraction* InInteractionTarget, EInteractAction InInteractAction) override;
+
+	virtual void OnInteract(IInteraction* InInteractionTarget, EInteractAction InInteractAction) override;
 
 public:
-	UFUNCTION(BlueprintCallable)
-	virtual void ResetData(bool bRefresh = false) override;
-	
-	UFUNCTION(BlueprintCallable)
-	virtual void RefreshData() override;
+	UFUNCTION(BlueprintPure)
+	virtual bool IsDead() const override;
 
 	UFUNCTION(BlueprintPure)
-	bool IsDead() const override;
-
-	UFUNCTION(BlueprintPure)
-	FString GetNameC() const override { return Name; }
+	virtual FString GetNameC() const override { return Name; }
 
 	UFUNCTION(BlueprintCallable)
-	void SetNameC(const FString& InName) override;
+	virtual void SetNameC(const FString& InName) override;
 	
 	UFUNCTION(BlueprintPure)
-	FString GetRaceID() const override { return RaceID; }
+	virtual FString GetRaceID() const override { return RaceID; }
 
 	UFUNCTION(BlueprintCallable)
-	void SetRaceID(const FString& InRaceID) override;
+	virtual void SetRaceID(const FString& InRaceID) override;
 
 	UFUNCTION(BlueprintCallable)
-	void SetLevelC(int32 InLevel);
+	virtual void SetLevelC(int32 InLevel) override;
 
 	UFUNCTION(BlueprintPure)
-	int32 GetLevelC() const override { return Level; }
+	virtual int32 GetLevelC() const override { return Level; }
 
 	UFUNCTION(BlueprintPure)
-	int32 GetEXP() const override { return EXP; }
+	virtual int32 GetEXP() const override { return EXP; }
 		
 	UFUNCTION(BlueprintCallable)
-	void SetEXP(int32 InEXP);
+	virtual void SetEXP(int32 InEXP) override;
 		
 	UFUNCTION(BlueprintPure)
-	int32 GetBaseEXP() const override { return BaseEXP; }
+	virtual int32 GetBaseEXP() const override { return BaseEXP; }
 			
 	UFUNCTION(BlueprintPure)
-	int32 GetEXPFactor() const override { return EXPFactor; }
+	virtual int32 GetEXPFactor() const override { return EXPFactor; }
 
 	UFUNCTION(BlueprintPure)
-	int32 GetMaxEXP() const override;
+	virtual int32 GetMaxEXP() const override;
 
 	UFUNCTION(BlueprintPure)
-	int32 GetTotalEXP() const override;
+	virtual int32 GetTotalEXP() const override;
 
 	UFUNCTION(BlueprintPure)
-	FString GetHeadInfo() const override;
+	virtual FString GetHeadInfo() const override;
 			
 	UFUNCTION(BlueprintPure)
-	float GetHealth() const override;
+	virtual float GetHealth() const override;
 					
 	UFUNCTION(BlueprintCallable)
-	void SetHealth(float InValue) override;
+	virtual void SetHealth(float InValue) override;
 
 	UFUNCTION(BlueprintPure)
-	float GetMaxHealth() const override;
+	virtual float GetMaxHealth() const override;
 		
 	UFUNCTION(BlueprintCallable)
-	void SetMaxHealth(float InValue) override;
+	virtual void SetMaxHealth(float InValue) override;
 	
 	UFUNCTION(BlueprintPure)
-	float GetPhysicsDamage() const override;
+	virtual float GetPhysicsDamage() const override;
 	
 	UFUNCTION(BlueprintPure)
-	float GetMagicDamage() const override;
+	virtual float GetMagicDamage() const override;
 						
 	UFUNCTION(BlueprintPure)
 	FVitalityData GetVitalityData() const;
@@ -215,7 +239,7 @@ public:
 	void SetOwnerChunk(AChunk* InOwnerChunk) { OwnerChunk = InOwnerChunk; }
 
 	UFUNCTION(BlueprintPure)
-	UInventory* GetInventory() const override { return Inventory; }
+	virtual UInventory* GetInventory() const override { return Inventory; }
 		
 	UFUNCTION(BlueprintPure)
 	UWidgetVitalityHP* GetWidgetVitalityHPWidget() const;
@@ -223,14 +247,11 @@ public:
 	UFUNCTION(BlueprintPure)
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override {return AbilitySystem;}
 
-	virtual TArray<EInteractOption> GetInteractOptions(IInteraction* InTrigger) const override { return InteractOptions; }
-
-	virtual IInteraction* GetInteractingTarget() const override { return InteractingTarget; }
-
-	virtual void SetInteractingTarget(IInteraction* InTarget) override { InteractingTarget = InTarget; }
+	UFUNCTION(BlueprintPure)
+	virtual UInteractionComponent* GetInteractionComponent() const override;
 
 public:
-	virtual void HandleDamage(const float LocalDamageDone, FHitResult HitResult, const struct FGameplayTagContainer& SourceTags, ADWCharacter* SourceCharacter, AActor* SourceActor) override;
+	virtual void HandleDamage(EDWDamageType DamageType, const float LocalDamageDone, bool bHasCrited, FHitResult HitResult, const FGameplayTagContainer& SourceTags, AActor* SourceActor) override;
 		
 	virtual void HandleNameChanged(const FString& NewValue) override;
 

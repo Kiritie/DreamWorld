@@ -17,12 +17,19 @@ class DREAMWORLD_API UWidgetWorldTextComponent : public UWidgetComponent
 public:
 	UWidgetWorldTextComponent();
 
+public:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TMap<EWorldTextStyle, TSubclassOf<class UWidgetWorldText>> WorldTextMap;
+
 protected:
 	virtual void BeginPlay() override;
 
 public:
 	virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
+public:
+	void InitContent(FString InContent, EWorldTextType InContentType, EWorldTextStyle InContentStyle);
+	
 protected:
 	void RefreshVisibility();
 };

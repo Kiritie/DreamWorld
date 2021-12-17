@@ -31,7 +31,9 @@ protected:
 public:	
 	virtual void Initialize(AChunk* InOwnerChunk, FIndex InVoxelIndex) override;
 
-	virtual bool OnInteract(IInteraction* InTrigger, EInteractOption InInteractOption) override;
+	virtual bool CanInteract(IInteraction* InInteractionTarget, EInteractAction InInteractAction) override;
+
+	virtual void OnInteract(IInteraction* InTrigger, EInteractAction InInteractAction) override;
 
 	virtual void OpenDoor();
 

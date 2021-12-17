@@ -118,8 +118,10 @@ enum class ECharacterNature : uint8
  * 交互选项
  */
 UENUM(BlueprintType)
-enum class EInteractOption : uint8
+enum class EInteractAction : uint8
 {
+	// 无
+	None UMETA(DisplayName="无"),
 	// 复活
 	Revive UMETA(DisplayName="复活"),
 	// 喂食
@@ -227,18 +229,18 @@ enum class EEquipType : uint8
 UENUM(BlueprintType)
 enum class EEquipPartType : uint8
 {
-	// ???
-	Head,
-	// ???
-	Chest,
-	// ???
-	Arm,
-	// ???
-	Leg,
-	// ????
-	LeftHand,
-	// ????
-	RightHand
+	// 头部
+	Head	UMETA(DisplayName="头部"),
+	// 胸部
+	Chest UMETA(DisplayName="胸部"),
+	// 手臂
+	Arm UMETA(DisplayName="手臂"),
+	// 腿部
+	Leg UMETA(DisplayName="腿部"),
+	// 左手
+	LeftHand UMETA(DisplayName="左手"),
+	// 右手
+	RightHand UMETA(DisplayName="右手")
 };
 
 UENUM(BlueprintType)
@@ -381,17 +383,31 @@ enum class EGameTraceType : uint8
 };
 
 /**
- * ???????????
+ * 世界文本类型
  */
 UENUM(BlueprintType)
 enum class EWorldTextType : uint8
 {
-	// ??????
-	DamagePlayer,
-	// ???????
-	DamageOther,
-	// ???
-	Recover
+	// 物理伤害
+	PhysicsDamage,
+	// 魔法伤害
+	MagicDamage,
+	// 格挡伤害
+	DefendDamage,
+	// 生命回复
+	HealthRecover
+};
+
+/**
+* 世界文本风格
+*/
+UENUM(BlueprintType)
+enum class EWorldTextStyle : uint8
+{
+	// 普通
+	Normal,
+	// 强调
+	Stress
 };
 
 /**
@@ -1225,6 +1241,10 @@ public:
 	FVoxelData GetVoxelData() const;
 
 	FString GetStringData() const;
+
+	bool HasParam(FName InName) const;
+
+	FParameter& GetParam(FName InName);
 };
 
 /**
@@ -1594,6 +1614,21 @@ public:
 	FORCEINLINE FSplitSlotData()
 	{
 		Slots = TArray<UInventorySlot*>();
+	}
+};
+
+USTRUCT(BlueprintType)
+struct DREAMWORLD_API FWidgetSplitSlotData
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
+	TArray<UWidgetInventorySlot*> Slots;
+
+	FORCEINLINE FWidgetSplitSlotData()
+	{
+		Slots = TArray<UWidgetInventorySlot*>();
 	}
 };
 

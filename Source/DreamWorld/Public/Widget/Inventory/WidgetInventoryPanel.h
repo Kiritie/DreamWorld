@@ -19,6 +19,25 @@ class DREAMWORLD_API UWidgetInventoryPanel : public UWidgetInventory
 public:
 	UWidgetInventoryPanel(const FObjectInitializer& ObjectInitializer);
 
+protected:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components", meta = (BindWidget, OptionalWidget = false))
+	class UWrapBox* DefaultContent;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components", meta = (BindWidget, OptionalWidget = false))
+	class UGridPanel* LeftEquipContent;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components", meta = (BindWidget, OptionalWidget = false))
+	class UGridPanel* RightEquipContent;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TSubclassOf<class UWidgetInventorySlot> DefaultSlotClass;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TSubclassOf<class UWidgetInventoryEquipSlot> EquipSlotClass;
+
+public:
+	virtual void OnInitialize_Implementation(AActor* InOwner) override;
+	
 public:
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
 	void SetHeadInfo(const FString& InHeadInfo);

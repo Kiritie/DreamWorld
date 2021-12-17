@@ -90,6 +90,12 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FText KeyCode;
 
+public:
+	FText GetKeyCode() const { return KeyCode; }
+	
+	void SetKeyCode(const FText& InKeyCode) { this->KeyCode = InKeyCode; }
+
+protected:
 	UPROPERTY()
 	UMaterialInstanceDynamic* MaskMatInst;
 

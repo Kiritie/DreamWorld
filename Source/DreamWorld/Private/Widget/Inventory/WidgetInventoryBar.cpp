@@ -3,20 +3,131 @@
 
 #include "Widget/Inventory/WidgetInventoryBar.h"
 
+#include "Blueprint/WidgetBlueprintLibrary.h"
 #include "Widget/Inventory/Slot/WidgetInventorySlot.h"
 #include "Character/Player/DWPlayerCharacter.h"
+#include "Components/GridPanel.h"
+#include "Components/GridSlot.h"
+#include "GameFramework/InputSettings.h"
 #include "Inventory/Inventory.h"
 #include "Widget/Inventory/WidgetInventoryPanel.h"
 #include "Inventory/Slot/InventorySlot.h"
 #include "Widget/WidgetModuleBPLibrary.h"
 #include "Widget/WidgetPrimaryPanel.h"
+#include "Widget/Inventory/Slot/WidgetInventoryAuxiliarySlot.h"
+#include "Widget/Inventory/Slot/WidgetInventoryShortcutSlot.h"
+#include "Widget/Inventory/Slot/WidgetInventorySkillSlot.h"
 
 UWidgetInventoryBar::UWidgetInventoryBar(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	WidgetName = FName("InventoryBar");
 	WidgetType = EWidgetType::Permanent;
 	InputMode = EInputMode::GameOnly;
+	
 	SelectedSlotIndex = 0;
+
+	ShortcutSlotClass = LoadClass<UWidgetInventoryShortcutSlot>(nullptr, TEXT("WidgetBlueprint'/Game/Blueprints/Widget/Inventory/Slot/WB_InventoryShortcutSlot.WB_InventoryShortcutSlot_C'"));
+	AuxiliarySlotClass = LoadClass<UWidgetInventoryAuxiliarySlot>(nullptr, TEXT("WidgetBlueprint'/Game/Blueprints/Widget/Inventory/Slot/WB_InventoryAuxiliarySlot.WB_InventoryAuxiliarySlot_C'"));
+	SkillSlotClass = LoadClass<UWidgetInventorySkillSlot>(nullptr, TEXT("WidgetBlueprint'/Game/Blueprints/Widget/Inventory/Slot/WB_InventorySkillSlot.WB_InventorySkillSlot_C'"));
+
+	UISlotDatas.Add(ESplitSlotType::Shortcut);
+	UISlotDatas.Add(ESplitSlotType::Auxiliary);
+	UISlotDatas.Add(ESplitSlotType::Skill);
+}
+
+void UWidgetInventoryBar::OnInitialize_Implementation(AActor* InOwner)
+{
+	Super::OnInitialize_Implementation(InOwner);
+
+	if(!GetInventory()) return;
+	
+	if(ShortcutContent && UISlotDatas.Contains(ESplitSlotType::Shortcut))
+	{
+		const auto ShortcutSlots = GetInventory()->GetSplitSlots<UInventorySlot>(ESplitSlotType::Shortcut);
+		if(UISlotDatas[ESplitSlotType::Shortcut].Slots.Num() != ShortcutSlots.Num())
+		{
+			ShortcutContent->ClearChildren();
+			UISlotDatas[ESplitSlotType::Shortcut].Slots.Empty();
+			for(int32 i = 0; i < ShortcutSlots.Num(); i++)
+			{
+				if(UWidgetInventoryShortcutSlot* ShortcutSlot = Cast<UWidgetInventoryShortcutSlot>(UWidgetBlueprintLibrary::Create(this, ShortcutSlotClass, nullptr)))
+				{
+					ShortcutSlot->InitSlot(ShortcutSlots[i]);
+					//ShortcutSlot->SetKeyCode(UDWHelper::GetInputActionKeyCodeByName(FString::Printf(TEXT("SelectInventorySlot%d"), i + 1)));
+					ShortcutSlot->SetKeyCode(FText::FromString(FString::FromInt(i < 9 ? i + 1 : 0)));
+					if(UGridSlot* GridSlot = ShortcutContent->AddChildToGrid(ShortcutSlot))
+					{
+						GridSlot->SetPadding(FMargin(0.f, 0.f, 5.f, 0.f));
+						GridSlot->SetColumn(i);
+					}
+					UISlotDatas[ESplitSlotType::Shortcut].Slots.Add(ShortcutSlot);
+				}
+			}
+		}
+		else
+		{
+			for(int32 i = 0; i < UISlotDatas[ESplitSlotType::Shortcut].Slots.Num(); i++)
+			{
+				UISlotDatas[ESplitSlotType::Shortcut].Slots[i]->InitSlot(ShortcutSlots[i]);
+			}
+		}
+	}
+	if(AuxiliaryContent && UISlotDatas.Contains(ESplitSlotType::Auxiliary))
+	{
+		const auto AuxiliarySlots = GetInventory()->GetSplitSlots<UInventorySlot>(ESplitSlotType::Auxiliary);
+		if(UISlotDatas[ESplitSlotType::Auxiliary].Slots.Num() == 0)
+		{
+			for(int32 i = 0; i < AuxiliarySlots.Num(); i++)
+			{
+				if(UWidgetInventoryAuxiliarySlot* AuxiliarySlot = Cast<UWidgetInventoryAuxiliarySlot>(UWidgetBlueprintLibrary::Create(this, AuxiliarySlotClass, nullptr)))
+				{
+					AuxiliarySlot->InitSlot(AuxiliarySlots[i]);
+					AuxiliarySlot->SetKeyCode(UDWHelper::GetInputActionKeyCodeByName(FString::Printf(TEXT("ReleaseAuxiliaryAbility%d"), i + 1)));
+					if(UGridSlot* GridSlot = AuxiliaryContent->AddChildToGrid(AuxiliarySlot))
+					{
+						GridSlot->SetPadding(FMargin(0.f, 0.f, 5.f, 0.f));
+						GridSlot->SetColumn(i);
+					}
+					UISlotDatas[ESplitSlotType::Auxiliary].Slots.Add(AuxiliarySlot);
+				}
+			}
+		}
+		else
+		{
+			for(int32 i = 0; i < UISlotDatas[ESplitSlotType::Auxiliary].Slots.Num(); i++)
+			{
+				UISlotDatas[ESplitSlotType::Auxiliary].Slots[i]->InitSlot(AuxiliarySlots[i]);
+			}
+		}
+	}
+	if(LeftSkillContent && RightSkillContent && UISlotDatas.Contains(ESplitSlotType::Skill))
+	{
+		const auto SkillSlots = GetInventory()->GetSplitSlots<UInventorySlot>(ESplitSlotType::Skill);
+		if(UISlotDatas[ESplitSlotType::Skill].Slots.Num() == 0)
+		{
+			for(int32 i = 0; i < SkillSlots.Num(); i++)
+			{
+				if(UWidgetInventorySkillSlot* SkillSlot = Cast<UWidgetInventorySkillSlot>(UWidgetBlueprintLibrary::Create(this, SkillSlotClass, nullptr)))
+				{
+					SkillSlot->InitSlot(SkillSlots[i]);
+					SkillSlot->SetKeyCode(UDWHelper::GetInputActionKeyCodeByName(FString::Printf(TEXT("ReleaseSkillAbility%d"), i + 1)));
+					if(UGridSlot* GridSlot = i < SkillSlots.Num() / 2 ? LeftSkillContent->AddChildToGrid(SkillSlot) : RightSkillContent->AddChildToGrid(SkillSlot))
+					{
+						GridSlot->SetPadding(FMargin(0.f, 0.f, 5.f, 0.f));
+						GridSlot->SetColumn(i % (SkillSlots.Num() / 2));
+					}
+					UISlotDatas[ESplitSlotType::Skill].Slots.Add(SkillSlot);
+				}
+			}
+		}
+		else
+		{
+			for(int32 i = 0; i < UISlotDatas[ESplitSlotType::Skill].Slots.Num(); i++)
+			{
+				UISlotDatas[ESplitSlotType::Skill].Slots[i]->InitSlot(SkillSlots[i]);
+			}
+		}
+	}
 }
 
 void UWidgetInventoryBar::PrevInventorySlot()
@@ -41,7 +152,7 @@ void UWidgetInventoryBar::SelectInventorySlot(int32 InSlotIndex)
 	UpdateSelectBox();
 	GetInventory()->SetSelectedSlot(GetSelectedSlot());
 	UWidgetModuleBPLibrary::GetUserWidget<UWidgetPrimaryPanel>()->ShowMessage(GetSelectedItem().GetData().Name.ToString());
-	UWidgetModuleBPLibrary::GetUserWidget<UWidgetPrimaryPanel>()->RefreshOptions();
+	UWidgetModuleBPLibrary::GetUserWidget<UWidgetPrimaryPanel>()->RefreshActions();
 }
 
 UInventorySlot* UWidgetInventoryBar::GetSelectedSlot() const

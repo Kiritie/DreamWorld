@@ -13,14 +13,11 @@ UCLASS()
 class DREAMWORLD_API UWidgetWorldText : public UUserWidget
 {
 	GENERATED_BODY()
-	
-protected:
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Default")
-	EWorldTextType WidgetWorldTextType;
 
 public:
 	UWidgetWorldText(const FObjectInitializer& ObjectInitializer);
 
+public:
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
-	void InitWidgetWorldText(EWorldTextType InWidgetWorldTextType, const FString& InTextContent);
+	void InitContent(const FString& InContent, EWorldTextType InContentType);
 };

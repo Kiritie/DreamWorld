@@ -39,6 +39,7 @@
 #include "Abilities/Character/DWCharacterSkillAbility.h"
 #include "Abilities/Item/DWItemAbility.h"
 #include "Character/DWCharacterPart.h"
+#include "Interaction/Components/CharacterInteractionComponent.h"
 #include "Interaction/Components/InteractionComponent.h"
 #include "Scene/SceneModuleBPLibrary.h"
 #include "Scene/Object/PhysicsVolume/PhysicsVolumeBase.h"
@@ -57,9 +58,10 @@ ADWCharacter::ADWCharacter()
 	StimuliSource->RegisterForSense(UAISense_Sight::StaticClass());
 	StimuliSource->RegisterForSense(UAISense_Damage::StaticClass());
 
-	Interaction = CreateDefaultSubobject<UInteractionComponent>(FName("Interaction"));
+	Interaction = CreateDefaultSubobject<UCharacterInteractionComponent>(FName("Interaction"));
 	Interaction->SetupAttachment(RootComponent);
 	Interaction->SetRelativeLocation(FVector(0, 0, 0));
+	Interaction->AddInteractionAction(EInteractAction::Revive);
 
 	WidgetCharacterHP = CreateDefaultSubobject<UWidgetCharacterHPComponent>(FName("WidgetCharacterHP"));
 	WidgetCharacterHP->SetupAttachment(RootComponent);
@@ -138,9 +140,6 @@ ADWCharacter::ADWCharacter()
 	OwnerChunk = nullptr;
 	RidingTarget = nullptr;
 	LockedTarget = nullptr;
-	InteractingTarget = nullptr;
-
-	InteractOptions = TArray<EInteractOption>();
 
 	// local
 	AttackAbilityIndex = 0;
@@ -524,6 +523,61 @@ FCharacterSaveData ADWCharacter::ToData(bool bSaved)
 	return SaveData;
 }
 
+void ADWCharacter::ResetData(bool bRefresh)
+{
+	// states
+	bDead = false;
+	bDying = false;
+	bDodging = false;
+	bSprinting = false;
+	bCrouching = false;
+	bSwimming = false;
+	bFloating = false;
+	bAttacking = false;
+	bDefending = false;
+	bDamaging = false;
+
+	// stats
+	SetMotionRate(1, 1);
+	SetLockedTarget(nullptr);
+	OwnerRider = nullptr;
+	RidingTarget = nullptr;
+			
+	// local
+	AttackAbilityIndex = 0;
+	AIMoveLocation = Vector_Empty;
+	AIMoveStopDistance = 0;
+	InterruptRemainTime = 0;
+	NormalAttackRemainTime = 0;
+	ActionType = ECharacterActionType::None;
+
+	if(bRefresh) RefreshData();
+}
+
+void ADWCharacter::RefreshData()
+{
+	HandleEXPChanged(GetEXP());
+	HandleLevelChanged(GetLevelC());
+	HandleHealthChanged(GetHealth());
+	HandleManaChanged(GetMana());
+	HandleStaminaChanged(GetStamina());
+	HandleMoveSpeedChanged(GetMoveSpeed());
+	HandleSwimSpeedChanged(GetSwimSpeed());
+	HandleRideSpeedChanged(GetRideSpeed());
+	HandleFlySpeedChanged(GetFlySpeed());
+	HandleJumpForceChanged(GetJumpForce());
+	HandleDodgeForceChanged(GetDodgeForce());
+	HandleAttackForceChanged(GetAttackForce());
+	HandleRepulseForceChanged(GetRepulseForce());
+	HandleAttackSpeedChanged(GetAttackSpeed());
+	HandleAttackCritRateChanged(GetAttackCritRate());
+	HandleAttackStealRateChanged(GetAttackStealRate());
+	HandleDefendRateChanged(GetDefendRate());
+	HandlePhysicsDefRateChanged(GetPhysicsDefRate());
+	HandleMagicDefRateChanged(GetMagicDefRate());
+	HandleToughnessRateChanged(GetToughnessRate());
+}
+
 void ADWCharacter::Active(bool bResetData /*= false*/)
 {
 	if (!bActive)
@@ -576,22 +630,21 @@ void ADWCharacter::Revive()
 	}
 }
 
-void ADWCharacter::Death(ADWCharacter* InKiller /*= nullptr*/)
+void ADWCharacter::Death(AActor* InKiller /*= nullptr*/)
 {
 	if (!IsDead())
 	{
 		bDying = true;
 		Disable(true);
-		if(InKiller != nullptr)
+		if(IVitality* InVitality = Cast<IVitality>(InKiller))
 		{
-			InKiller->ModifyEXP(GetTotalEXP());
+			InVitality->ModifyEXP(GetTotalEXP());
 		}
 		SetEXP(0);
 		SetHealth(0.f);
 		SetMana(0.f);
 		SetStamina(0.f);
 		SetLockedTarget(nullptr);
-		InteractingTarget = nullptr;
 		OnCharacterDead.Broadcast();
 		if (!IsPlayer())
 		{
@@ -642,89 +695,33 @@ void ADWCharacter::DeathEnd()
 	}
 }
 
-bool ADWCharacter::DoInteract(IInteraction* InTarget, EInteractOption InInteractOption)
+bool ADWCharacter::CanInteract(IInteraction* InInteractionTarget, EInteractAction InInteractAction)
 {
-	if(!InTarget) return false;
-
-	return InTarget->OnInteract(this, InInteractOption);
-}
-
-bool ADWCharacter::OnInteract(IInteraction* InTrigger, EInteractOption InInteractOption)
-{
-	if (!InTrigger) return false;
-
-	if(GetInteractOptions(InTrigger).Contains(InInteractOption))
+	switch (InInteractAction)
 	{
-		switch (InInteractOption)
+		case EInteractAction::Revive:
 		{
-			case EInteractOption::Revive:
+			if(bDead)
 			{
-				if(bDead)
-				{
-					Revive();
-				}
+				return true;
 			}
-			default: break;
+			break;
 		}
-		return true;
+		default: return true;
 	}
 	return false;
 }
 
-void ADWCharacter::ResetData(bool bRefresh)
+void ADWCharacter::OnInteract(IInteraction* InInteractionTarget, EInteractAction InInteractAction)
 {
-	// states
-	bDead = false;
-	bDying = false;
-	bDodging = false;
-	bSprinting = false;
-	bCrouching = false;
-	bSwimming = false;
-	bFloating = false;
-	bAttacking = false;
-	bDefending = false;
-	bDamaging = false;
-
-	// stats
-	SetMotionRate(1, 1);
-	SetLockedTarget(nullptr);
-	SetInteractingTarget(nullptr);
-	OwnerRider = nullptr;
-	RidingTarget = nullptr;
-			
-	// local
-	AttackAbilityIndex = 0;
-	AIMoveLocation = Vector_Empty;
-	AIMoveStopDistance = 0;
-	InterruptRemainTime = 0;
-	NormalAttackRemainTime = 0;
-	ActionType = ECharacterActionType::None;
-
-	if(bRefresh) RefreshData();
-}
-
-void ADWCharacter::RefreshData()
-{
-	HandleEXPChanged(GetEXP());
-	HandleLevelChanged(GetLevelC());
-	HandleHealthChanged(GetHealth());
-	HandleManaChanged(GetMana());
-	HandleStaminaChanged(GetStamina());
-	HandleMoveSpeedChanged(GetMoveSpeed());
-	HandleSwimSpeedChanged(GetSwimSpeed());
-	HandleRideSpeedChanged(GetRideSpeed());
-	HandleFlySpeedChanged(GetFlySpeed());
-	HandleJumpForceChanged(GetJumpForce());
-	HandleDodgeForceChanged(GetDodgeForce());
-	HandleAttackForceChanged(GetAttackForce());
-	HandleRepulseForceChanged(GetRepulseForce());
-	HandleAttackSpeedChanged(GetAttackSpeed());
-	HandleAttackCritRateChanged(GetAttackCritRate());
-	HandleAttackStealRateChanged(GetAttackStealRate());
-	HandleDefendRateChanged(GetDefendRate());
-	HandlePhysicsDefRateChanged(GetPhysicsDefRate());
-	HandleMagicDefRateChanged(GetMagicDefRate());
-	HandleToughnessRateChanged(GetToughnessRate());
+	switch (InInteractAction)
+	{
+		case EInteractAction::Revive:
+		{
+			Revive();
+		}
+		default: break;
+	}
 }
 
 void ADWCharacter::FreeToAnim(bool bUnLockRotation /*= true*/)
@@ -1376,7 +1373,7 @@ bool ADWCharacter::ActiveAbility(FGameplayAbilitySpecHandle SpecHandle, bool bAl
 	return false;
 }
 
-bool ADWCharacter::ActiveAbility(TSubclassOf<UDWGameplayAbility> AbilityClass, bool bAllowRemoteActivation /*= false*/)
+bool ADWCharacter::ActiveAbilityByClass(TSubclassOf<UDWGameplayAbility> AbilityClass, bool bAllowRemoteActivation /*= false*/)
 {
 	if (AbilitySystem)
 	{
@@ -1385,7 +1382,7 @@ bool ADWCharacter::ActiveAbility(TSubclassOf<UDWGameplayAbility> AbilityClass, b
 	return false;
 }
 
-bool ADWCharacter::ActiveAbility(const FGameplayTagContainer& AbilityTags, bool bAllowRemoteActivation /*= false*/)
+bool ADWCharacter::ActiveAbilityByTag(const FGameplayTagContainer& AbilityTags, bool bAllowRemoteActivation /*= false*/)
 {
 	if (AbilitySystem)
 	{
@@ -1402,7 +1399,7 @@ void ADWCharacter::CancelAbility(UDWGameplayAbility* Ability)
 	}
 }
 
-void ADWCharacter::CancelAbility(const FGameplayAbilitySpecHandle& AbilityHandle)
+void ADWCharacter::CancelAbilityByHandle(const FGameplayAbilitySpecHandle& AbilityHandle)
 {
 	if (AbilitySystem)
 	{
@@ -1410,11 +1407,11 @@ void ADWCharacter::CancelAbility(const FGameplayAbilitySpecHandle& AbilityHandle
 	}
 }
 
-void ADWCharacter::CancelAbilities(const FGameplayTagContainer* WithTags/*=nullptr*/, const FGameplayTagContainer* WithoutTags/*=nullptr*/, UDWGameplayAbility* Ignore/*=nullptr*/)
+void ADWCharacter::CancelAbilities(const FGameplayTagContainer& WithTags, const FGameplayTagContainer& WithoutTags, UDWGameplayAbility* Ignore/*=nullptr*/)
 {
 	if (AbilitySystem)
 	{
-		AbilitySystem->CancelAbilities(WithTags, WithoutTags, Ignore);
+		AbilitySystem->CancelAbilities(&WithTags, &WithoutTags, Ignore);
 	}
 }
 
@@ -1426,7 +1423,7 @@ void ADWCharacter::CancelAllAbilities(UDWGameplayAbility* Ignore/*=nullptr*/)
 	}
 }
 
-FActiveGameplayEffectHandle ADWCharacter::ApplyEffect(TSubclassOf<UGameplayEffect> EffectClass)
+FActiveGameplayEffectHandle ADWCharacter::ApplyEffectByClass(TSubclassOf<UGameplayEffect> EffectClass)
 {
 	if (AbilitySystem)
 	{
@@ -1441,7 +1438,7 @@ FActiveGameplayEffectHandle ADWCharacter::ApplyEffect(TSubclassOf<UGameplayEffec
 	return FActiveGameplayEffectHandle();
 }
 
-FActiveGameplayEffectHandle ADWCharacter::ApplyEffect(const FGameplayEffectSpecHandle& SpecHandle)
+FActiveGameplayEffectHandle ADWCharacter::ApplyEffectBySpecHandle(const FGameplayEffectSpecHandle& SpecHandle)
 {
 	if (AbilitySystem)
 	{
@@ -1450,11 +1447,11 @@ FActiveGameplayEffectHandle ADWCharacter::ApplyEffect(const FGameplayEffectSpecH
 	return FActiveGameplayEffectHandle();
 }
 
-FActiveGameplayEffectHandle ADWCharacter::ApplyEffect(const FGameplayEffectSpec& GameplayEffect)
+FActiveGameplayEffectHandle ADWCharacter::ApplyEffectBySpec(const FGameplayEffectSpec& Spec)
 {
 	if (AbilitySystem)
 	{
-		return AbilitySystem->ApplyGameplayEffectSpecToSelf(GameplayEffect);
+		return AbilitySystem->ApplyGameplayEffectSpecToSelf(Spec);
 	}
 	return FActiveGameplayEffectHandle();
 }
@@ -1588,7 +1585,7 @@ bool ADWCharacter::StopAction(ECharacterActionType InActionType, bool bCancelAbi
 		const FDWCharacterActionAbilityData AbilityData = GetActionAbility(InActionType);
 		if (!AbilityData.bCancelable) return false;
 
-		CancelAbility(AbilityData.AbilityHandle);
+		CancelAbilityByHandle(AbilityData.AbilityHandle);
 	}
 
 	ActionType = ECharacterActionType::None;
@@ -1743,6 +1740,16 @@ UAbilitySystemComponent* ADWCharacter::GetAbilitySystemComponent() const
 	return AbilitySystem;
 }
 
+UInteractionComponent* ADWCharacter::GetInteractionComponent() const
+{
+	return Interaction;
+}
+
+UInventory* ADWCharacter::GetInventory() const
+{
+	return Inventory;
+}
+
 bool ADWCharacter::HasBehaviorTree() const
 {
 	return GetCharacterData().BehaviorTreeAsset != nullptr;
@@ -1800,26 +1807,6 @@ FTeamData* ADWCharacter::GetTeamData() const
 bool ADWCharacter::IsTargetable_Implementation() const
 {
 	return !IsDead();
-}
-
-TArray<EInteractOption> ADWCharacter::GetInteractOptions(IInteraction* InTrigger) const
-{
-	TArray<EInteractOption> RetValues;
-	if(!bDead)
-	{
-		for(auto Iter : InteractOptions)
-		{
-			// switch(Iter)
-			// {
-			// 	default: break;
-			// }
-		}
-	}
-	else
-	{
-		RetValues.Add(EInteractOption::Revive);
-	}
-	return RetValues;
 }
 
 void ADWCharacter::SetNameC(const FString& InName)
@@ -2137,11 +2124,6 @@ float ADWCharacter::GetMagicDamage() const
 	return AttributeSet->GetMagicDamage();
 }
 
-UInventory* ADWCharacter::GetInventory() const
-{
-	return Inventory;
-}
-
 FVector ADWCharacter::GetMoveVelocity(bool bIgnoreZ) const
 {
 	FVector Velocity = GetMovementComponent()->Velocity;
@@ -2441,21 +2423,14 @@ TArray<ADWCharacter*> ADWCharacter::GetTeamMates()
 	return GetTeamData()->GetMembers(this);
 }
 
-void ADWCharacter::SpawnWidgetWorldText(EWorldTextType InContextType, FString InContext)
+void ADWCharacter::AddWorldText(FString InContent, EWorldTextType InContentType, EWorldTextStyle InContentStyle)
 {
 	auto contextHUD = NewObject<UWidgetWorldTextComponent>(this);
 	contextHUD->RegisterComponent();
 	contextHUD->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
 	contextHUD->SetRelativeLocation(FVector(0, 0, 0));
 	contextHUD->SetVisibility(false);
-	if (contextHUD && contextHUD->GetUserWidgetObject())
-	{
-		auto tmpWidget = Cast<UWidgetWorldText>(contextHUD->GetUserWidgetObject());
-		if (tmpWidget)
-		{
-			tmpWidget->InitWidgetWorldText(InContextType, InContext);
-		}
-	}
+	contextHUD->InitContent(InContent, InContentType, InContentStyle);
 }
 
 bool ADWCharacter::IsPlayer() const
@@ -2525,20 +2500,26 @@ UDWCharacterPart* ADWCharacter::GetCharacterPart(ECharacterPartType InCharacterP
 	return nullptr;
 }
 
-void ADWCharacter::HandleDamage(const float LocalDamageDone, FHitResult HitResult, const struct FGameplayTagContainer& SourceTags, ADWCharacter* SourceCharacter, AActor* SourceActor)
+void ADWCharacter::HandleDamage(EDWDamageType DamageType, const float LocalDamageDone, bool bHasCrited, FHitResult HitResult, const FGameplayTagContainer& SourceTags, AActor* SourceActor)
 {
 	if (GetHealth() <= 0.f)
 	{
-		Death(SourceCharacter);
+		Death(SourceActor);
 	}
-	if(SourceCharacter && SourceCharacter != this)
+	if(SourceActor && SourceActor != this)
 	{
-		SourceCharacter->ModifyHealth(LocalDamageDone * SourceCharacter->GetAttackStealRate());
-		if(!IsDead() && !IsPlayer())
+		if(ADWCharacter* SourceCharacter = Cast<ADWCharacter>(SourceActor))
 		{
-			if(!GetController<ADWAIController>()->GetTargetCharacter())
+			if(DamageType == EDWDamageType::Physics)
 			{
-				GetController<ADWAIController>()->SetTargetCharacter(SourceCharacter);
+				SourceCharacter->ModifyHealth(LocalDamageDone * SourceCharacter->GetAttackStealRate());
+			}
+			if(!IsDead() && !IsPlayer())
+			{
+				if(!GetController<ADWAIController>()->GetTargetCharacter())
+				{
+					GetController<ADWAIController>()->SetTargetCharacter(SourceCharacter);
+				}
 			}
 		}
 	}
@@ -2596,9 +2577,9 @@ void ADWCharacter::HandleEXPChanged(int32 NewValue, int32 DeltaValue /*= 0*/)
 
 void ADWCharacter::HandleHealthChanged(float NewValue, float DeltaValue /*= 0.f*/)
 {
-	if (!FMath::IsNearlyZero(DeltaValue))
+	if(DeltaValue > 0.f)
 	{
-		SpawnWidgetWorldText(DeltaValue > 0.f ? EWorldTextType::Recover : (!IsPlayer() ? EWorldTextType::DamagePlayer : EWorldTextType::DamageOther), FString::FromInt(FMath::Abs(DeltaValue)));
+		AddWorldText(FString::FromInt(FMath::Abs(DeltaValue)), EWorldTextType::HealthRecover, DeltaValue < GetMaxHealth() ? EWorldTextStyle::Normal : EWorldTextStyle::Stress);
 	}
 	if (GetWidgetCharacterHPWidget())
 	{

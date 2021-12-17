@@ -8,6 +8,7 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "AI/DWAIBlackboard.h"
 #include "Character/Human/DWHumanCharacter.h"
+#include "Interaction/Components/CharacterInteractionComponent.h"
 #include "Inventory/Inventory.h"
 #include "Inventory/Slot/InventorySlot.h"
 
@@ -25,8 +26,8 @@ ADWMonsterCharacter::ADWMonsterCharacter()
 	AttackPoint->SetGenerateOverlapEvents(false);
 	AttackPoint->OnComponentBeginOverlap.AddDynamic(this, &ADWMonsterCharacter::OnAttackPointOverlap);
 
-	InteractOptions.Add(EInteractOption::Ride);
-	InteractOptions.Add(EInteractOption::Feed);
+	Interaction->AddInteractionAction(EInteractAction::Ride);
+	Interaction->AddInteractionAction(EInteractAction::Feed);
 }
 
 // Called when the game starts or when spawned
@@ -55,92 +56,82 @@ void ADWMonsterCharacter::SetDamaging(bool bInDamaging)
 	AttackPoint->SetGenerateOverlapEvents(bInDamaging);
 }
 
-bool ADWMonsterCharacter::OnInteract(IInteraction* InTrigger, EInteractOption InInteractOption)
+bool ADWMonsterCharacter::CanInteract(IInteraction* InInteractionTarget, EInteractAction InInteractAction)
 {
-	if(!Super::OnInteract(InTrigger, InInteractOption)) return false;
-
-	if(GetInteractOptions(InTrigger).Contains(InInteractOption))
+	if(!Super::CanInteract(InInteractionTarget, InInteractAction)) return false;
+	
+	switch (InInteractAction)
 	{
-		switch (InInteractOption)
+		case EInteractAction::Feed:
 		{
-			case EInteractOption::Feed:
+			if(ADWCharacter* InInteractionCharacter = Cast<ADWCharacter>(InInteractionTarget))
 			{
-				if(ADWCharacter* TriggerCharacter = Cast<ADWCharacter>(InTrigger))
+				if(!IsEnemy(InInteractionCharacter) && UDWHelper::LoadPropData(InInteractionCharacter->GetInventory()->GetSelectedItem().ID).PropType == EPropType::Food)
 				{
-					TriggerCharacter->GetInventory()->SetConnectInventory(GetInventory());
-					TriggerCharacter->GetInventory()->GetSelectedSlot()->MoveItem(1);
-					TriggerCharacter->GetInventory()->SetConnectInventory(nullptr);
+					return true;
 				}
-				break;
 			}
-			case EInteractOption::Ride:
-			{
-				if(ADWCharacter* TriggerCharacter = Cast<ADWCharacter>(InTrigger))
-				{
-					TriggerCharacter->Ride(this);
-				}
-				break;
-			}
-			case EInteractOption::UnRide:
-			{
-				if(ADWCharacter* TriggerCharacter = Cast<ADWCharacter>(InTrigger))
-				{
-					TriggerCharacter->UnRide();
-				}
-				break;
-			}
-			default: break;
+			break;
 		}
-		return true;
+		case EInteractAction::Ride:
+		{
+			if(ADWCharacter* InInteractionCharacter = Cast<ADWCharacter>(InInteractionTarget))
+			{
+				if(!IsEnemy(InInteractionCharacter) && InInteractionCharacter->IsA(ADWHumanCharacter::StaticClass()) && InInteractionCharacter->GetRidingTarget() != this)
+				{
+					return true;
+				}
+			}
+			break;
+		}
+		case EInteractAction::UnRide:
+		{
+			if(ADWCharacter* InInteractionCharacter = Cast<ADWCharacter>(InInteractionTarget))
+			{
+				if(!IsEnemy(InInteractionCharacter) && InInteractionCharacter->IsA(ADWHumanCharacter::StaticClass()) && InInteractionCharacter->GetRidingTarget() == this)
+				{
+					return true;
+				}
+			}
+			break;
+		}
+		default: return true;
 	}
 	return false;
 }
 
-TArray<EInteractOption> ADWMonsterCharacter::GetInteractOptions(IInteraction* InTrigger) const
+void ADWMonsterCharacter::OnInteract(IInteraction* InInteractionTarget, EInteractAction InInteractAction)
 {
-	TArray<EInteractOption> RetValues = Super::GetInteractOptions(InTrigger);
-	if(!bDead)
+	Super::OnInteract(InInteractionTarget, InInteractAction);
+
+	switch (InInteractAction)
 	{
-		for(auto Iter : InteractOptions)
+		case EInteractAction::Feed:
 		{
-			switch(Iter)
+			if(ADWCharacter* TriggerCharacter = Cast<ADWCharacter>(InInteractionTarget))
 			{
-				case EInteractOption::Feed:
-				{
-					if(ADWCharacter* InTriggerCharacter = Cast<ADWCharacter>(InTrigger))
-					{
-						if(!IsEnemy(InTriggerCharacter) && UDWHelper::LoadPropData(InTriggerCharacter->GetInventory()->GetSelectedItem().ID).PropType == EPropType::Food)
-						{
-							RetValues.Add(Iter);
-						}
-					}
-					break;
-				}
-				case EInteractOption::Ride:
-				{
-					if(ADWCharacter* InTriggerCharacter = Cast<ADWCharacter>(InTrigger))
-					{
-						if(!IsEnemy(InTriggerCharacter) && InTriggerCharacter->IsA(ADWHumanCharacter::StaticClass()) && InTriggerCharacter->GetRidingTarget() != this)
-						{
-							RetValues.Add(Iter);
-						}
-					}
-					break;
-				}
-				case EInteractOption::UnRide:
-				{
-					if(ADWCharacter* InTriggerCharacter = Cast<ADWCharacter>(InTrigger))
-					{
-						if(!IsEnemy(InTriggerCharacter) && InTriggerCharacter->IsA(ADWHumanCharacter::StaticClass()) && InTriggerCharacter->GetRidingTarget() == this)
-						{
-							RetValues.Add(Iter);
-						}
-					}
-					break;
-				}
-				default: break;
+				TriggerCharacter->GetInventory()->SetConnectInventory(GetInventory());
+				TriggerCharacter->GetInventory()->GetSelectedSlot()->MoveItem(1);
+				TriggerCharacter->GetInventory()->SetConnectInventory(nullptr);
 			}
+			break;
 		}
+		case EInteractAction::Ride:
+		{
+			if(ADWCharacter* TriggerCharacter = Cast<ADWCharacter>(InInteractionTarget))
+			{
+				TriggerCharacter->Ride(this);
+			}
+			break;
+		}
+		case EInteractAction::UnRide:
+		{
+			if(ADWCharacter* TriggerCharacter = Cast<ADWCharacter>(InInteractionTarget))
+			{
+				TriggerCharacter->UnRide();
+			}
+			break;
+		}
+		default: break;
 	}
-	return RetValues;
 }

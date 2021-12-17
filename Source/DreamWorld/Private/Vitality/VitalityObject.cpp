@@ -15,6 +15,7 @@
 #include "Abilities/DWAbilitySystemComponent.h"
 #include "Abilities/DWAttributeSet.h"
 #include "Abilities/DWGameplayAbility.h"
+#include "Interaction/Components/VitalityInteractionComponent.h"
 #include "Inventory/VitalityInventory.h"
 
 	// Sets default values
@@ -30,13 +31,9 @@ AVitalityObject::AVitalityObject()
 
 	WidgetVitalityHP = CreateDefaultSubobject<UWidgetVitalityHPComponent>(FName("WidgetVitalityHP"));
 	WidgetVitalityHP->SetupAttachment(RootComponent);
-	WidgetVitalityHP->SetWidgetClass(UDWHelper::LoadWidgetVitalityHPClass());
-	WidgetVitalityHP->SetWidgetSpace(EWidgetSpace::Screen);
-	WidgetVitalityHP->SetDrawSize(FVector2D(220, 60));
-	WidgetVitalityHP->SetPivot(FVector2D(0.5f, 1));
 	WidgetVitalityHP->SetRelativeLocation(FVector(0, 0, 50));
 
-	Interaction = CreateDefaultSubobject<UInteractionComponent>(FName("Interaction"));
+	Interaction = CreateDefaultSubobject<UVitalityInteractionComponent>(FName("Interaction"));
 	Interaction->SetupAttachment(RootComponent);
 	Interaction->SetRelativeLocation(FVector(0, 0, 0));
 
@@ -84,6 +81,35 @@ void AVitalityObject::Tick(float DeltaTime)
 	if(bDead) return;
 
 	Inventory->Refresh(DeltaTime);
+}
+
+void AVitalityObject::Serialize(FArchive& Ar)
+{
+	Super::Serialize(Ar);
+
+	if(Ar.IsSaveGame())
+	{
+		float CurrentValue;
+		if(Ar.IsLoading())
+		{
+			Ar << CurrentValue;
+			if(CurrentValue > 0)
+			{
+				SetHealth(CurrentValue);
+			}
+			else
+			{
+				Revive();
+				Ar << CurrentValue;
+				Ar << CurrentValue;
+			}
+		}
+		else if(Ar.IsSaveGame())
+		{
+			CurrentValue = GetHealth();
+			Ar << CurrentValue;
+		}
+	}
 }
 
 void AVitalityObject::LoadData(FVitalityObjectSaveData InSaveData)
@@ -147,14 +173,27 @@ FVitalityObjectSaveData AVitalityObject::ToData(bool bSaved)
 	return SaveData;
 }
 
-void AVitalityObject::Death(ADWCharacter* InKiller /*= nullptr*/)
+void AVitalityObject::ResetData(bool bRefresh)
+{
+	bDead = false;
+	if(bRefresh) ResetData();
+}
+
+void AVitalityObject::RefreshData()
+{
+	HandleHealthChanged(GetHealth());
+	HandleNameChanged(GetNameC());
+	HandleRaceIDChanged(GetRaceID());
+}
+
+void AVitalityObject::Death(AActor* InKiller /*= nullptr*/)
 {
 	if (!bDead)
 	{
 		bDead = true;
-		if(InKiller != nullptr)
+		if(IVitality* InVitality = Cast<IVitality>(InKiller))
 		{
-			InKiller->ModifyEXP(GetTotalEXP());
+			InVitality->ModifyEXP(GetTotalEXP());
 		}
 		SetEXP(0);
 		SetHealth(0.f);
@@ -176,19 +215,6 @@ void AVitalityObject::Revive()
 		ResetData();
 		SetHealth(GetMaxHealth());
 	}
-}
-
-void AVitalityObject::ResetData(bool bRefresh)
-{
-	bDead = false;
-	if(bRefresh) ResetData();
-}
-
-void AVitalityObject::RefreshData()
-{
-	HandleHealthChanged(GetHealth());
-	HandleNameChanged(GetNameC());
-	HandleRaceIDChanged(GetRaceID());
 }
 
 bool AVitalityObject::IsDead() const
@@ -280,21 +306,14 @@ FVitalityData AVitalityObject::GetVitalityData() const
 	return UDWHelper::LoadVitalityData(ID);
 }
 
-void AVitalityObject::SpawnWidgetWorldText(EWorldTextType InContextType, FString InContext)
+void AVitalityObject::AddWorldText(FString InContent, EWorldTextType InContentType, EWorldTextStyle InContentStyle)
 {
 	auto contextHUD = NewObject<UWidgetWorldTextComponent>(this);
 	contextHUD->RegisterComponent();
 	contextHUD->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
 	contextHUD->SetRelativeLocation(FVector(0, 0, 50));
 	contextHUD->SetVisibility(false);
-	if (contextHUD && contextHUD->GetUserWidgetObject())
-	{
-		auto tmpWidget = Cast<UWidgetWorldText>(contextHUD->GetUserWidgetObject());
-		if (tmpWidget)
-		{
-			tmpWidget->InitWidgetWorldText(InContextType, InContext);
-		}
-	}
+	contextHUD->InitContent(InContent, InContentType, InContentStyle);
 }
 
 FGameplayAbilitySpecHandle AVitalityObject::AcquireAbility(TSubclassOf<UDWGameplayAbility> InAbility, int32 InLevel /*= 1*/)
@@ -318,7 +337,7 @@ bool AVitalityObject::ActiveAbility(FGameplayAbilitySpecHandle SpecHandle, bool 
 	return false;
 }
 
-bool AVitalityObject::ActiveAbility(TSubclassOf<UDWGameplayAbility> AbilityClass, bool bAllowRemoteActivation /*= false*/)
+bool AVitalityObject::ActiveAbilityByClass(TSubclassOf<UDWGameplayAbility> AbilityClass, bool bAllowRemoteActivation /*= false*/)
 {
 	if (AbilitySystem)
 	{
@@ -327,7 +346,7 @@ bool AVitalityObject::ActiveAbility(TSubclassOf<UDWGameplayAbility> AbilityClass
 	return false;
 }
 
-bool AVitalityObject::ActiveAbility(const FGameplayTagContainer& GameplayTagContainer, bool bAllowRemoteActivation /*= false*/)
+bool AVitalityObject::ActiveAbilityByTag(const FGameplayTagContainer& GameplayTagContainer, bool bAllowRemoteActivation /*= false*/)
 {
 	if (AbilitySystem)
 	{
@@ -344,7 +363,7 @@ void AVitalityObject::CancelAbility(UDWGameplayAbility* Ability)
 	}
 }
 
-void AVitalityObject::CancelAbility(const FGameplayAbilitySpecHandle& AbilityHandle)
+void AVitalityObject::CancelAbilityByHandle(const FGameplayAbilitySpecHandle& AbilityHandle)
 {
 	if (AbilitySystem)
 	{
@@ -352,11 +371,11 @@ void AVitalityObject::CancelAbility(const FGameplayAbilitySpecHandle& AbilityHan
 	}
 }
 
-void AVitalityObject::CancelAbilities(const FGameplayTagContainer* WithTags/*=nullptr*/, const FGameplayTagContainer* WithoutTags/*=nullptr*/, UDWGameplayAbility* Ignore/*=nullptr*/)
+void AVitalityObject::CancelAbilities(const FGameplayTagContainer& WithTags, const FGameplayTagContainer& WithoutTags, UDWGameplayAbility* Ignore/*=nullptr*/)
 {
 	if (AbilitySystem)
 	{
-		AbilitySystem->CancelAbilities(WithTags, WithoutTags, Ignore);
+		AbilitySystem->CancelAbilities(&WithTags, &WithoutTags, Ignore);
 	}
 }
 
@@ -366,6 +385,80 @@ void AVitalityObject::CancelAllAbilities(UDWGameplayAbility* Ignore/*=nullptr*/)
 	{
 		AbilitySystem->CancelAllAbilities(Ignore);
 	}
+}
+
+FActiveGameplayEffectHandle AVitalityObject::ApplyEffectByClass(TSubclassOf<UGameplayEffect> EffectClass)
+{
+	if (AbilitySystem)
+	{
+		auto effectContext = AbilitySystem->MakeEffectContext();
+		effectContext.AddSourceObject(this);
+		auto specHandle = AbilitySystem->MakeOutgoingSpec(EffectClass, GetLevelC(), effectContext);
+		if (specHandle.IsValid())
+		{
+			return AbilitySystem->ApplyGameplayEffectSpecToSelf(*specHandle.Data.Get());
+		}
+	}
+	return FActiveGameplayEffectHandle();
+}
+
+FActiveGameplayEffectHandle AVitalityObject::ApplyEffectBySpecHandle(const FGameplayEffectSpecHandle& SpecHandle)
+{
+	if (AbilitySystem)
+	{
+		return AbilitySystem->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
+	}
+	return FActiveGameplayEffectHandle();
+}
+
+FActiveGameplayEffectHandle AVitalityObject::ApplyEffectBySpec(const FGameplayEffectSpec& Spec)
+{
+	if (AbilitySystem)
+	{
+		return AbilitySystem->ApplyGameplayEffectSpecToSelf(Spec);
+	}
+	return FActiveGameplayEffectHandle();
+}
+
+bool AVitalityObject::RemoveEffect(FActiveGameplayEffectHandle Handle, int32 StacksToRemove/*=-1*/)
+{
+	if (AbilitySystem)
+	{
+		return AbilitySystem->RemoveActiveGameplayEffect(Handle, StacksToRemove);
+	}
+	return false;
+}
+
+void AVitalityObject::GetActiveAbilities(FGameplayTagContainer AbilityTags, TArray<UDWGameplayAbility*>& ActiveAbilities)
+{
+	if (AbilitySystem)
+	{
+		AbilitySystem->GetActiveAbilitiesWithTags(AbilityTags, ActiveAbilities);
+	}
+}
+
+bool AVitalityObject::GetAbilityInfo(TSubclassOf<UDWGameplayAbility> AbilityClass, FDWAbilityInfo& OutAbilityInfo)
+{
+	if (AbilitySystem && AbilityClass != nullptr)
+	{
+		float Cost = 0;
+		float Cooldown = 0;
+		EAbilityCostType CostType = EAbilityCostType::None;
+		UDWGameplayAbility* Ability = AbilityClass.GetDefaultObject();
+		if (Ability->GetCostGameplayEffect()->Modifiers.Num() > 0)
+		{
+			const FGameplayModifierInfo ModifierInfo = Ability->GetCostGameplayEffect()->Modifiers[0];
+			ModifierInfo.ModifierMagnitude.GetStaticMagnitudeIfPossible(1, Cost);
+			if (ModifierInfo.Attribute == AttributeSet->GetHealthAttribute())
+			{
+				CostType = EAbilityCostType::Health;
+			}
+		}
+		Ability->GetCooldownGameplayEffect()->DurationMagnitude.GetStaticMagnitudeIfPossible(1, Cooldown);
+		OutAbilityInfo = FDWAbilityInfo(CostType, Cost, Cooldown);
+		return true;
+	}
+	return false;
 }
 
 void AVitalityObject::ModifyHealth(float InDeltaValue)
@@ -395,19 +488,34 @@ void AVitalityObject::ModifyEXP(float InDeltaValue)
 	HandleEXPChanged(EXP);
 }
 
-bool AVitalityObject::OnInteract(IInteraction* InTrigger, EInteractOption InInteractOption)
+bool AVitalityObject::CanInteract(IInteraction* InInteractionTarget, EInteractAction InInteractAction)
 {
-	if (!InTrigger) return false;
-
-	if(InteractOptions.Contains(InInteractOption))
+	switch (InInteractAction)
 	{
-		// switch (InInteractOption)
-		// {
-		// 	default: break;
-		// }
-		return true;
+		case EInteractAction::Revive:
+		{
+			if(bDead)
+			{
+				return true;
+			}
+			break;
+		}
+		default: return true;
 	}
 	return false;
+}
+
+void AVitalityObject::OnInteract(IInteraction* InInteractionTarget, EInteractAction InInteractAction)
+{
+	switch (InInteractAction)
+	{
+		case EInteractAction::Revive:
+		{
+			Revive();
+			break;
+		}
+		default: break;
+	}
 }
 
 UWidgetVitalityHP* AVitalityObject::GetWidgetVitalityHPWidget() const
@@ -419,15 +527,26 @@ UWidgetVitalityHP* AVitalityObject::GetWidgetVitalityHPWidget() const
 	return nullptr;
 }
 
-void AVitalityObject::HandleDamage(const float LocalDamageDone, FHitResult HitResult, const struct FGameplayTagContainer& SourceTags, ADWCharacter* SourceCharacter, AActor* SourceActor)
+UInteractionComponent* AVitalityObject::GetInteractionComponent() const
+{
+	return Interaction;
+}
+
+void AVitalityObject::HandleDamage(EDWDamageType DamageType, const float LocalDamageDone, bool bHasCrited, FHitResult HitResult, const FGameplayTagContainer& SourceTags, AActor* SourceActor)
 {
 	if (GetHealth() <= 0.f)
 	{
-		Death(SourceCharacter);
+		Death(SourceActor);
 	}
-	if(SourceCharacter)
+	if(SourceActor && SourceActor != this)
 	{
-		SourceCharacter->ModifyHealth(LocalDamageDone * SourceCharacter->GetAttackStealRate());
+		if(ADWCharacter* SourceCharacter = Cast<ADWCharacter>(SourceActor))
+		{
+			if(DamageType == EDWDamageType::Physics)
+			{
+				SourceCharacter->ModifyHealth(LocalDamageDone * SourceCharacter->GetAttackStealRate());
+			}
+		}
 	}
 }
 
@@ -465,9 +584,9 @@ void AVitalityObject::HandleEXPChanged(int32 NewValue, int32 DeltaValue /*= 0*/)
 
 void AVitalityObject::HandleHealthChanged(float NewValue, float DeltaValue /*= 0.f*/)
 {
-	if (!FMath::IsNearlyZero(DeltaValue))
+	if(DeltaValue > 0.f)
 	{
-		SpawnWidgetWorldText(DeltaValue > 0.f ? EWorldTextType::Recover : EWorldTextType::DamageOther, FString::FromInt(FMath::Abs(DeltaValue)));
+		AddWorldText(FString::FromInt(FMath::Abs(DeltaValue)), EWorldTextType::HealthRecover, DeltaValue < GetMaxHealth() ? EWorldTextStyle::Normal : EWorldTextStyle::Stress);
 	}
 	if (GetWidgetVitalityHPWidget())
 	{

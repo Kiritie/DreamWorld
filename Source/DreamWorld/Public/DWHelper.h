@@ -203,12 +203,6 @@ private:
 
 	static TSubclassOf<class UWidgetInventoryPanel> WidgetInventoryPanelClass;
 
-	static TSubclassOf<class UWidgetCharacterHP> WidgetCharacterHPClass;
-
-	static TSubclassOf<class UWidgetVitalityHP> WidgetVitalityHPClass;
-
-	static TSubclassOf<class UWidgetWorldText> WidgetWorldTextClass;
-
 public:
 	UFUNCTION(BlueprintPure, Category = "DWHelper")
 	static TSubclassOf<class UWidgetMainMenu> LoadWidgetMainMenuClass();
@@ -243,15 +237,6 @@ public:
 	UFUNCTION(BlueprintPure, Category = "DWHelper")
 	static TSubclassOf<class UWidgetInventoryPanel> LoadWidgetInventoryPanelClass();
 
-	UFUNCTION(BlueprintPure, Category = "DWHelper")
-	static TSubclassOf<class UWidgetCharacterHP> LoadWidgetCharacterHPClass();
-	
-	UFUNCTION(BlueprintPure, Category = "DWHelper")
-	static TSubclassOf<class UWidgetVitalityHP> LoadWidgetVitalityHPClass();
-
-	UFUNCTION(BlueprintPure, Category = "DWHelper")
-	static TSubclassOf<class UWidgetWorldText> LoadWidgetWorldTextClass();
-
 	//////////////////////////////////////////////////////////////////////////
 	// Index
 public:
@@ -272,4 +257,10 @@ public:
 public:
 	UFUNCTION(BlueprintPure, Category = "DWHelper")
 	static ETraceTypeQuery GetGameTrace(EGameTraceType InGameTraceType);
+
+	//////////////////////////////////////////////////////////////////////////
+	// Input
+public:
+	UFUNCTION(BlueprintPure, Category = "DWHelper")
+	static FText GetInputActionKeyCodeByName(const FString& InInputActionName);
 };

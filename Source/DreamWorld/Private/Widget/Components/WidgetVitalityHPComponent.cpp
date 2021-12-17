@@ -3,12 +3,17 @@
 
 #include "Widget/Components/WidgetVitalityHPComponent.h"
 #include "Character/Player/DWPlayerCharacter.h"
+#include "UObject/ConstructorHelpers.h"
 #include "Vitality/VitalityObject.h"
-#include "Widget/Other/WidgetCharacterHP.h"
+#include "Widget/Other/WidgetVitalityHP.h"
 
 UWidgetVitalityHPComponent::UWidgetVitalityHPComponent()
 {
-	SetWidgetClass(UDWHelper::LoadWidgetCharacterHPClass());
+	static ConstructorHelpers::FClassFinder<UWidgetVitalityHP> VitalityHPClassFinder(TEXT("WidgetBlueprint'/Game/Blueprints/Widget/Other/WB_VitalityHP.WB_VitalityHP_C'"));
+	if(VitalityHPClassFinder.Succeeded())
+	{
+		SetWidgetClass(VitalityHPClassFinder.Class);
+	}
 	SetWidgetSpace(EWidgetSpace::Screen);
 	SetDrawSize(FVector2D(220, 60));
 	SetPivot(FVector2D(0.5f, 1));

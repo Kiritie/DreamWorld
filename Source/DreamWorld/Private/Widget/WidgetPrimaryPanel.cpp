@@ -4,6 +4,7 @@
 #include "Widget/WidgetPrimaryPanel.h"
 
 #include "Character/DWCharacter.h"
+#include "Interaction/Components/InteractionComponent.h"
 #include "Main/MainModule.h"
 #include "Widget/WidgetModule.h"
 
@@ -23,17 +24,17 @@ void UWidgetPrimaryPanel::OnCreate_Implementation()
 	}
 }
 
-void UWidgetPrimaryPanel::RefreshOptions()
+void UWidgetPrimaryPanel::RefreshActions()
 {
 	if(ADWCharacter* OwnerCharacter = Cast<ADWCharacter>(GetOwnerActor()))
 	{
-		if(OwnerCharacter->GetInteractingTarget())
+		if(IInteraction* OverlappingTarget = OwnerCharacter->GetInteractionComponent()->GetOverlappingTarget())
 		{
-			ShowOptions(OwnerCharacter->GetInteractingTarget()->GetInteractOptions(OwnerCharacter));
+			ShowActions(OverlappingTarget->GetInteractionComponent()->GetValidInteractActions(OwnerCharacter));
 		}
 		else
 		{
-			HideOptions();
+			HideActions();
 		}
 	}
 }

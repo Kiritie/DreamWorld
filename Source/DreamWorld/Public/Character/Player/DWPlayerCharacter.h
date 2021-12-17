@@ -99,7 +99,7 @@ public:
 
 	virtual void Revive() override;
 
-	virtual void Death(ADWCharacter* InKiller) override;
+	virtual void Death(AActor* InKiller) override;
 
 	virtual void DeathEnd() override;
 
@@ -125,8 +125,6 @@ public:
 	virtual void UpdateVoxelMesh();
 	
 	virtual bool RaycastVoxel(FVoxelHitResult& OutHitResult) override;
-
-	virtual bool DoInteract(IInteraction* InTarget, EInteractOption InInteractOption) override;
 
 protected:
 	virtual void ToggleControlMode();
@@ -159,15 +157,15 @@ protected:
 
 	virtual void ReleaseSkillAbility4();
 
-	virtual void DoInteractOption1();
+	virtual void DoInteractAction1();
 
-	virtual void DoInteractOption2();
+	virtual void DoInteractAction2();
 
-	virtual void DoInteractOption3();
+	virtual void DoInteractAction3();
 
-	virtual void DoInteractOption4();
+	virtual void DoInteractAction4();
 
-	virtual void DoInteractOption5();
+	virtual void DoInteractAction5();
 
 public:
 	virtual void HandleNameChanged(const FString& NewValue) override;
@@ -253,6 +251,4 @@ public:
 		
 	UFUNCTION(BlueprintPure)
 	ADWPlayerController* GetPlayerController() const;
-
-	virtual void SetInteractingTarget(IInteraction* InTarget) override;
 };

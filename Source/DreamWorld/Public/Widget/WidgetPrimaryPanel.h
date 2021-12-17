@@ -42,14 +42,14 @@ public:
 	void ShowMessage(const FString& InMessage, float InDuration = 2.5f);
 				
 	UFUNCTION(BlueprintCallable)
-	void RefreshOptions();
+	void RefreshActions();
 
 protected:
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
-	void ShowOptions(const TArray<EInteractOption>& InOptions);
+	void ShowActions(const TArray<EInteractAction>& InActions);
 		
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
-	void HideOptions();
+	void HideActions();
 
 	UFUNCTION()
 	void OnChangeInputMode(EInputMode InInputMode);

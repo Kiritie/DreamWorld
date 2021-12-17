@@ -11,6 +11,8 @@
 #include "Gameplay/DWGameInstance.h"
 #include "Gameplay/DWGameState.h"
 #include "Engine/DataTable.h"
+#include "GameFramework/InputSettings.h"
+#include "GameFramework/PlayerInput.h"
 #include "Main/DWMainModule.h"
 #include "Main/MainModuleBPLibrary.h"
 #include "Widget/WidgetLoadingPanel.h"
@@ -115,12 +117,6 @@ TSubclassOf<UWidgetInventoryBar> UDWHelper::WidgetInventoryBarClass = nullptr;
 
 TSubclassOf<UWidgetInventoryPanel> UDWHelper::WidgetInventoryPanelClass = nullptr;
 
-TSubclassOf<UWidgetCharacterHP> UDWHelper::WidgetCharacterHPClass = nullptr;
-
-TSubclassOf<UWidgetVitalityHP> UDWHelper::WidgetVitalityHPClass = nullptr;
-
-TSubclassOf<UWidgetWorldText> UDWHelper::WidgetWorldTextClass = nullptr;
-
 TSubclassOf<UWidgetMainMenu> UDWHelper::LoadWidgetMainMenuClass()
 {
 	if (!WidgetMainMenuClass)
@@ -218,33 +214,6 @@ TSubclassOf<UWidgetInventoryPanel> UDWHelper::LoadWidgetInventoryPanelClass()
 		WidgetInventoryPanelClass = LoadClass<UWidgetInventoryPanel>(nullptr, TEXT("WidgetBlueprint'/Game/Blueprints/Widget/Inventory/WB_InventoryPanel.WB_InventoryPanel_C'"));
 	}
 	return WidgetInventoryPanelClass;
-}
-
-TSubclassOf<UWidgetCharacterHP> UDWHelper::LoadWidgetCharacterHPClass()
-{
-	if (!WidgetCharacterHPClass)
-	{
-		WidgetCharacterHPClass = LoadClass<UWidgetCharacterHP>(nullptr, TEXT("WidgetBlueprint'/Game/Blueprints/Widget/Other/WB_CharacterHP.WB_CharacterHP_C'"));
-	}
-	return WidgetCharacterHPClass;
-}
-
-TSubclassOf<UWidgetVitalityHP> UDWHelper::LoadWidgetVitalityHPClass()
-{
-	if (!WidgetVitalityHPClass)
-	{
-		WidgetVitalityHPClass = LoadClass<UWidgetVitalityHP>(nullptr, TEXT("WidgetBlueprint'/Game/Blueprints/Widget/Other/WB_VitalityHP.WB_VitalityHP_C'"));
-	}
-	return WidgetVitalityHPClass;
-}
-
-TSubclassOf<UWidgetWorldText> UDWHelper::LoadWidgetWorldTextClass()
-{
-	if (!WidgetWorldTextClass)
-	{
-		WidgetWorldTextClass = LoadClass<UWidgetWorldText>(nullptr, TEXT("WidgetBlueprint'/Game/Blueprints/Widget/Other/WB_WorldText.WB_WorldText_C'"));
-	}
-	return WidgetWorldTextClass;
 }
 
 UDataTable* UDWHelper::VoxelsDataTable = nullptr;
@@ -741,4 +710,15 @@ FIndex UDWHelper::GetAdjacentIndex(FIndex InIndex, EDirection InDirection, FRota
 ETraceTypeQuery UDWHelper::GetGameTrace(EGameTraceType InGameTraceType)
 {
 	return UEngineTypes::ConvertToTraceType((ECollisionChannel)InGameTraceType);
+}
+
+FText UDWHelper::GetInputActionKeyCodeByName(const FString& InInputActionName)
+{
+	TArray<FInputActionKeyMapping> KeyMappings;
+	UInputSettings::GetInputSettings()->GetActionMappingByName(*InInputActionName, KeyMappings);
+	for(auto Iter : KeyMappings)
+	{
+		return FText::FromString(Iter.Key.GetFName().ToString());
+	}
+	return FText::GetEmpty();
 }
