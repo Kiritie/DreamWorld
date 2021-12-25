@@ -9,6 +9,7 @@
 #include "World/WorldManager.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Main/MainModule.h"
+#include "SaveGame/SaveGameArchive.h"
 
 ADWGameMode::ADWGameMode()
 {
@@ -28,27 +29,38 @@ void ADWGameMode::BeginPlay()
 
 void ADWGameMode::InitializeGame()
 {
-	if(UDWGameInstance* DWGameInstance = UDWHelper::GetGameInstance(this))
-	{
-		DWGameInstance->Initialize();
-	}
+	UDWHelper::GetGameInstance(this)->Initialize();
 
 	if(ADWGameState* DWGameState = UDWHelper::GetGameState(this))
 	{
-		// DWGameState->SetCurrentState(EGameState::Initializing);
 		DWGameState->SetCurrentState(EGameState::MainMenu);
+	}
+
+	if(USaveGameArchive* SaveGameArchive = UDWHelper::GetGameInstance(this)->LoadArchiveData())
+	{
+		if(AWorldManager* WorldManager = AWorldManager::Get())
+		{
+			WorldManager->LoadWorld(SaveGameArchive->GetArchiveData().WorldData, true);
+		}
+		if(ADWPlayerController* PlayerController = UDWHelper::GetPlayerController(this))
+		{
+			PlayerController->LoadPlayer(SaveGameArchive->GetArchiveData().PlayerData);
+		}
 	}
 }
 
-void ADWGameMode::StartGame(const FString& InPlayerName, const FString& InWorldName)
+void ADWGameMode::StartGame(const FString& InArchiveName)
 {
-	if(AWorldManager* WorldManager = AWorldManager::Get())
+	if(USaveGameArchive* SaveGameArchive = UDWHelper::GetGameInstance(this)->LoadArchiveData(InArchiveName))
 	{
-		WorldManager->LoadWorld(InWorldName);
-	}
-	if(ADWPlayerController* PlayerController = UDWHelper::GetPlayerController(this))
-	{
-		PlayerController->LoadPlayer(InPlayerName);
+		if(AWorldManager* WorldManager = AWorldManager::Get())
+		{
+			WorldManager->LoadWorld(SaveGameArchive->GetArchiveData().WorldData, false);
+		}
+		if(ADWPlayerController* PlayerController = UDWHelper::GetPlayerController(this))
+		{
+			PlayerController->LoadPlayer(SaveGameArchive->GetArchiveData().PlayerData);
+		}
 	}
 }
 
@@ -56,7 +68,7 @@ void ADWGameMode::ContinueGame()
 {
 	if(UDWGameInstance* GameInstance = UDWHelper::GetGameInstance(this))
 	{
-		StartGame(GameInstance->GetCurrentPlayerName(), GameInstance->GetCurrentWorldName());
+		StartGame(GameInstance->GetCurrentArchiveName());
 	}
 }
 
@@ -86,7 +98,7 @@ void ADWGameMode::BackMainMenu()
 	}
 	if(AWorldManager* WorldManager = AWorldManager::Get())
 	{
-		WorldManager->UnloadWorld();
+		WorldManager->UnloadWorld(true);
 	}
 	if(ADWGameState* DWGameState = UDWHelper::GetGameState(this))
 	{

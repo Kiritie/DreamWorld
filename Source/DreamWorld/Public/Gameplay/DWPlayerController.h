@@ -19,12 +19,6 @@ class DREAMWORLD_API ADWPlayerController : public AWHPlayerController
 
 public:
 	ADWPlayerController();
-	
-protected:
-	static class UPlayerDataSave* DataSave;
-
-public:
-	static UPlayerDataSave* GetDataSave() { return DataSave; }
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Camera")
@@ -123,7 +117,7 @@ protected:
 public:
 	virtual void Tick(float DeltaTime) override;
 
-	void LoadPlayer(const FString& InPlayerName);
+	void LoadPlayer(FPlayerSaveData InPlayerData);
 	
 	void UnLoadPlayer();
 

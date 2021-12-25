@@ -349,33 +349,35 @@ void ADWCharacter::Serialize(FArchive& Ar)
 	}
 }
 
-void ADWCharacter::LoadData(FCharacterSaveData InSaveData)
+void ADWCharacter::LoadData(FSaveData* InSaveData)
 {
-	if (InSaveData.bSaved)
+	auto SaveData = *static_cast<FCharacterSaveData*>(InSaveData);
+	
+	if (SaveData.bSaved)
 	{
-		ID = InSaveData.ID;
-		Nature = InSaveData.Nature;
-		SetNameC(InSaveData.Name);
-		SetRaceID(InSaveData.RaceID);
-		SetTeamID(InSaveData.TeamID);
-		SetLevelC(InSaveData.Level);
-		SetEXP(InSaveData.EXP);
-		AttackDistance = InSaveData.AttackDistance;
-		InteractDistance = InSaveData.InteractDistance;
-		FollowDistance = InSaveData.FollowDistance;
-		PatrolDistance = InSaveData.PatrolDistance;
-		PatrolDuration = InSaveData.PatrolDuration;
+		ID = SaveData.ID;
+		Nature = SaveData.Nature;
+		SetNameC(SaveData.Name);
+		SetRaceID(SaveData.RaceID);
+		SetTeamID(SaveData.TeamID);
+		SetLevelC(SaveData.Level);
+		SetEXP(SaveData.EXP);
+		AttackDistance = SaveData.AttackDistance;
+		InteractDistance = SaveData.InteractDistance;
+		FollowDistance = SaveData.FollowDistance;
+		PatrolDistance = SaveData.PatrolDistance;
+		PatrolDuration = SaveData.PatrolDuration;
 
-		DefaultAbility = InSaveData.DefaultAbility;
-		FallingAttackAbility = InSaveData.FallingAttackAbility;
-		AttackAbilities = InSaveData.AttackAbilities;
-		SkillAbilities = InSaveData.SkillAbilities;
-		ActionAbilities = InSaveData.ActionAbilities;
+		DefaultAbility = SaveData.DefaultAbility;
+		FallingAttackAbility = SaveData.FallingAttackAbility;
+		AttackAbilities = SaveData.AttackAbilities;
+		SkillAbilities = SaveData.SkillAbilities;
+		ActionAbilities = SaveData.ActionAbilities;
 
-		Inventory->LoadData(InSaveData.InventoryData, this);
+		Inventory->LoadData(SaveData.InventoryData, this);
 
-		SetActorLocation(InSaveData.SpawnLocation);
-		SetActorRotation(InSaveData.SpawnRotation);
+		SetActorLocation(SaveData.SpawnLocation);
+		SetActorRotation(SaveData.SpawnRotation);
 
 		for(auto& iter : AttackAbilities)
 		{
@@ -397,17 +399,17 @@ void ADWCharacter::LoadData(FCharacterSaveData InSaveData)
 		DefaultAbility.AbilityHandle = AcquireAbility(GetCharacterData().AbilityClass, DefaultAbility.AbilityLevel);
 		ActiveAbility(DefaultAbility.AbilityHandle);
 
-		UGlobalToolsBPLibrary::LoadObjectFromMemory(this, InSaveData.Datas);
+		UGlobalToolsBPLibrary::LoadObjectFromMemory(this, SaveData.Datas);
 	}
 	else
 	{
-		ID = InSaveData.ID;
-		SetNameC(InSaveData.Name);
-		SetRaceID(InSaveData.RaceID);
-		SetLevelC(InSaveData.Level);
+		ID = SaveData.ID;
+		SetNameC(SaveData.Name);
+		SetRaceID(SaveData.RaceID);
+		SetLevelC(SaveData.Level);
 
-		SetActorLocation(InSaveData.SpawnLocation);
-		SetActorRotation(InSaveData.SpawnRotation);
+		SetActorLocation(SaveData.SpawnLocation);
+		SetActorRotation(SaveData.SpawnRotation);
 
 		const FCharacterData characterData = GetCharacterData();
 		if(characterData.IsValid())
@@ -460,7 +462,7 @@ void ADWCharacter::LoadData(FCharacterSaveData InSaveData)
 			{
 				DefaultAbility = FDWAbilityData();
 				DefaultAbility.AbilityName = FName("Default");
-				DefaultAbility.AbilityLevel = InSaveData.Level;
+				DefaultAbility.AbilityLevel = SaveData.Level;
 				DefaultAbility.AbilityHandle = AcquireAbility(characterData.AbilityClass, DefaultAbility.AbilityLevel);
 				ActiveAbility(DefaultAbility.AbilityHandle);
 			}
@@ -472,7 +474,7 @@ void ADWCharacter::LoadData(FCharacterSaveData InSaveData)
 			PatrolDistance = characterData.PatrolDistance;
 			PatrolDuration = characterData.PatrolDuration;
 			
-			InSaveData.InventoryData = characterData.InventoryData;
+			SaveData.InventoryData = characterData.InventoryData;
 		}
 
 		// if(!IsPlayer())
@@ -480,17 +482,17 @@ void ADWCharacter::LoadData(FCharacterSaveData InSaveData)
 		// 	const auto ItemDatas = UDWHelper::LoadItemDatas();
 		// 	if(ItemDatas.Num() > 0 && FMath::FRand() < 0.5f)
 		// 	{
-		// 		InSaveData.InventoryData.Items.Add(FItem(ItemDatas[FMath::RandRange(0, ItemDatas.Num() - 1)].ID, 1));
+		// 		SaveData.InventoryData.Items.Add(FItem(ItemDatas[FMath::RandRange(0, ItemDatas.Num() - 1)].ID, 1));
 		// 	}
 		// }
 
-		Inventory->LoadData(InSaveData.InventoryData, this);
+		Inventory->LoadData(SaveData.InventoryData, this);
 	}
 }
 
-FCharacterSaveData ADWCharacter::ToData(bool bSaved)
+FSaveData* ADWCharacter::ToData(bool bSaved)
 {
-	auto SaveData = FCharacterSaveData();
+	static auto SaveData = FCharacterSaveData();
 
 	SaveData.bSaved = bSaved;
 
@@ -520,7 +522,7 @@ FCharacterSaveData ADWCharacter::ToData(bool bSaved)
 
 	UGlobalToolsBPLibrary::SaveObjectToMemory(this, SaveData.Datas);
 
-	return SaveData;
+	return &SaveData;
 }
 
 void ADWCharacter::ResetData(bool bRefresh)

@@ -118,12 +118,12 @@ public:
 
 	void BuildMap();
 
-	void LoadMap(FChunkData InChunkData);
+	void LoadMap(FChunkSaveData InChunkData);
+
+	void OnGenerated(bool bPreview = false);
 
 protected:
-	void LoadActors(FChunkData InChunkData);
-
-	void OnGenerated();
+	void LoadActors(FChunkSaveData InChunkData);
 		
 	void GenerateNeighbors(FIndex InIndex);
 

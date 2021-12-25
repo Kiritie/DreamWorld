@@ -1244,7 +1244,9 @@ public:
 
 	bool HasParam(FName InName) const;
 
-	FParameter& GetParam(FName InName);
+	FParameter GetParam(FName InName);
+
+	void SetParam(FName InName, FParameter InParam);
 };
 
 /**
@@ -1377,19 +1379,23 @@ public:
 };
 
 USTRUCT(BlueprintType)
-struct DREAMWORLD_API FGameSaveData : public FSaveData
+struct DREAMWORLD_API FGeneralSaveData : public FSaveData
 {
 	GENERATED_BODY()
 
 public:
-	FORCEINLINE FGameSaveData()
+	FORCEINLINE FGeneralSaveData()
 	{
 		bAutoJump = true;
+		CameraDistance = 150.f;
 	}
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bAutoJump;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float CameraDistance;
 };
 
 USTRUCT(BlueprintType)
@@ -1400,16 +1406,16 @@ struct DREAMWORLD_API FWorldBasicSaveData : public FSaveData
 public:
 	FORCEINLINE FWorldBasicSaveData()
 	{
-		Name = TEXT("");
-		Seed = 0;
+		ArchiveName = TEXT("");
+		WorldSeed = 0;
 	}
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FString Name;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	FString ArchiveName;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 Seed;
+	int32 WorldSeed;
 };
 
 USTRUCT(BlueprintType)
@@ -1438,8 +1444,12 @@ public:
 		VitalityRaceDensity = 50.f;
 		CharacterRaceDensity = 50.f;
 
+		CurrentTimeSeconds = 0.f;
+
 		LastVitalityRaceIndex = FIndex::ZeroIndex;
 		LastCharacterRaceIndex = FIndex::ZeroIndex;
+		
+		bPreview = false;
 	}
 
 public:
@@ -1483,12 +1493,22 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	float CharacterRaceDensity;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 CurrentTimeSeconds;
 
 	FIndex LastVitalityRaceIndex;
 
 	FIndex LastCharacterRaceIndex;
 
+	bool bPreview;
+
 public:
+	FORCEINLINE bool IsSameArchive(FWorldSaveData InSaveData) const
+	{
+		return InSaveData.ArchiveName == ArchiveName;
+	}
+
 	FORCEINLINE float GetChunkLength() const
 	{
 		return ChunkSize * BlockSize;
@@ -1512,37 +1532,6 @@ public:
 	FORCEINLINE FVector GetBlockSizedNormal(FVector InNormal, float InLength = 0.25f) const
 	{
 		return BlockSize * InNormal * InLength;
-	}
-};
-
-USTRUCT(BlueprintType)
-struct DREAMWORLD_API FPlayerRecordSaveData : public FSaveData
-{
-	GENERATED_BODY()
-
-public:
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	FString Name;
-		
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	FVector Location;
-	
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	FRotator Rotation;
-			
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	float CamDistance;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	int32 TimeSeconds;
-
-	FORCEINLINE FPlayerRecordSaveData()
-	{
-		Name = TEXT("");
-		Location = FVector::ZeroVector;
-		Rotation = FRotator::ZeroRotator;
-		CamDistance = -1.f;
-		TimeSeconds = 0;
 	}
 };
 
@@ -2106,7 +2095,45 @@ public:
 };
 
 USTRUCT(BlueprintType)
-struct DREAMWORLD_API FChunkData : public FSaveData
+struct DREAMWORLD_API FPlayerSaveData : public FCharacterSaveData
+{
+	GENERATED_BODY()
+
+public:
+	FORCEINLINE FPlayerSaveData()
+	{
+		CameraRotation = FRotator::ZeroRotator;
+	}
+
+	UPROPERTY(VisibleAnywhere)
+	FRotator CameraRotation;
+};
+
+USTRUCT(BlueprintType)
+struct DREAMWORLD_API FArchiveSaveData : public FSaveData
+{
+	GENERATED_BODY()
+
+public:
+	FORCEINLINE FArchiveSaveData()
+	{
+		WorldData = FWorldSaveData();
+		PlayerData = FPlayerSaveData();
+	}
+
+public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	FString Name;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	FWorldSaveData WorldData;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	FPlayerSaveData PlayerData;
+};
+
+USTRUCT(BlueprintType)
+struct DREAMWORLD_API FChunkSaveData : public FSaveData
 {
 	GENERATED_BODY()
 
@@ -2126,7 +2153,7 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	TArray<FVitalityObjectSaveData> VitalityObjectDatas;
 
-	FORCEINLINE FChunkData()
+	FORCEINLINE FChunkSaveData()
 	{
 		Index = FIndex::ZeroIndex;
 		VoxelItems = TArray<FVoxelItem>();

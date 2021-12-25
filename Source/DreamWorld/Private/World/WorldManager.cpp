@@ -16,17 +16,15 @@
 #include "Widget/Inventory/WidgetInventoryPanel.h"
 #include "Vitality/VitalityObject.h"
 #include "Gameplay/DWGameInstance.h"
-#include "DataSave/WorldDataSave.h"
 #include "Inventory/CharacterInventory.h"
 #include "Gameplay/DWGameState.h"
-#include "DataSave/PlayerDataSave.h"
+#include "SaveGame/SaveGameArchive.h"
 #include "SpawnPool/SpawnPoolModuleBPLibrary.h"
 #include "UObject/ConstructorHelpers.h"
 #include "World/Components/WorldTimerComponent.h"
 #include "World/Components/WorldWeatherComponent.h"
 
 AWorldManager* AWorldManager::Current = nullptr;
-UWorldDataSave* AWorldManager::DataSave = nullptr;
 FWorldSaveData AWorldManager::WorldData = FWorldSaveData::Empty;
 
 // Sets default values
@@ -130,7 +128,7 @@ void AWorldManager::Tick(float DeltaTime)
 
 EVoxelType AWorldManager::GetNoiseVoxelType(FIndex InIndex)
 {
-	const FVector offsetIndex = FVector(InIndex.X + WorldData.Seed, InIndex.Y + WorldData.Seed, InIndex.Z);
+	const FVector offsetIndex = FVector(InIndex.X + WorldData.WorldSeed, InIndex.Y + WorldData.WorldSeed, InIndex.Z);
 	
 	const int plainHeight = GetNoiseTerrainHeight(offsetIndex, WorldData.TerrainPlainScale);
 	const int mountainHeight = GetNoiseTerrainHeight(offsetIndex, WorldData.TerrainMountainScale);
@@ -193,63 +191,75 @@ FVector AWorldManager::ChunkIndexToLocation(FIndex InIndex)
 	return InIndex.ToVector() * WorldData.GetChunkLength();
 }
 
-void AWorldManager::LoadWorld(const FString& InWorldName)
+void AWorldManager::LoadWorld(FWorldSaveData InWorldData, bool bPreview)
 {
 	if(ADWGameState* GameState = UDWHelper::GetGameState(this))
 	{
 		GameState->SetCurrentState(EGameState::Loading);
-		if(UDWGameInstance* GameInstance = UDWHelper::GetGameInstance(this))
+	}
+
+	if(!bPreview)
+	{
+		if(WorldData.IsSameArchive(InWorldData))
 		{
-			if(UWorldDataSave* WorldDataSave = GameInstance->LoadWorldData(InWorldName))
+			for(auto Iter : ChunkMap)
 			{
-				DataSave = WorldDataSave;
-				WorldData = DataSave->GetWorldData();
-				if(WorldData.Seed == 0)
+				if(Iter.Value && Iter.Value->IsGenerated())
 				{
-					WorldData.Seed = FMath::Rand();
+					Iter.Value->OnGenerated(false);
 				}
-				RandomStream = FRandomStream(WorldData.Seed);
 			}
 		}
+		else
+		{
+			UnloadWorld(false);
+		}
+	}
+
+	WorldData = InWorldData;
+	WorldData.bPreview = bPreview;
+	if(WorldData.WorldSeed == 0)
+	{
+		WorldData.WorldSeed = FMath::Rand();
+	}
+	RandomStream = FRandomStream(WorldData.WorldSeed);
+	if(WorldTimer)
+	{
+		WorldTimer->SetTimeSeconds(InWorldData.CurrentTimeSeconds);
 	}
 }
 
-void AWorldManager::UnloadWorld()
+void AWorldManager::UnloadWorld(bool bPreview)
 {
-	for (auto iter : ChunkMap)
+	if(!bPreview)
 	{
-		if(iter.Value)
+		for (auto iter : ChunkMap)
 		{
-			USpawnPoolModuleBPLibrary::DespawnActor(iter.Value);
+			if(iter.Value)
+			{
+				USpawnPoolModuleBPLibrary::DespawnActor(iter.Value);
+			}
 		}
+		ChunkMap.Empty();
+		
+		ChunkSpawnBatch = 0;
+		bBasicGenerated = false;
+		LastGenerateIndex = FIndex::ZeroIndex;
+		LastStayChunkIndex = FIndex::ZeroIndex;
+
+		ChunkSpawnQueue.Empty();
+		ChunkMapBuildQueue.Empty();
+		ChunkMapGenerateQueue.Empty();
+		ChunkGenerateQueue.Empty();
+		ChunkDestroyQueue.Empty();
+
+		TeamMap.Empty();
 	}
-	ChunkMap.Empty();
-
-	if(UDWGameInstance* GameInstance = UDWHelper::GetGameInstance(this))
-	{
-		GameInstance->UnloadWorldData(WorldData.Name);
-	}
-
-	DataSave = nullptr;
-	WorldData = FWorldSaveData();
-	
-	ChunkSpawnBatch = 0;
-	bBasicGenerated = false;
-	LastGenerateIndex = FIndex::ZeroIndex;
-	LastStayChunkIndex = FIndex::ZeroIndex;
-
-	ChunkSpawnQueue.Empty();
-	ChunkMapBuildQueue.Empty();
-	ChunkMapGenerateQueue.Empty();
-	ChunkGenerateQueue.Empty();
-	ChunkDestroyQueue.Empty();
-
-	TeamMap.Empty();
 }
 
 void AWorldManager::InitRandomStream(int32 InDeltaSeed)
 {
-	RandomStream.Initialize(WorldData.Seed + InDeltaSeed);
+	RandomStream.Initialize(WorldData.WorldSeed + InDeltaSeed);
 }
 
 void AWorldManager::OnPlayerSpawned(ADWPlayerCharacter* InPlayerCharacter)
@@ -458,11 +468,11 @@ void AWorldManager::BuildChunkMap(AChunk* InChunk)
 
 	if(UDWGameInstance* GameInstance = UDWHelper::GetGameInstance(this))
 	{
-		if (UWorldDataSave* WorldDataSave = GameInstance->LoadWorldData(WorldData.Name))
+		if (USaveGameArchive* SaveGameArchive = GameInstance->LoadArchiveData())
 		{
-			if (WorldDataSave->IsExistChunkData(InChunk->GetIndex()))
+			if (SaveGameArchive->IsExistChunkData(InChunk->GetIndex()))
 			{
-				InChunk->LoadMap(WorldDataSave->LoadChunkData(InChunk->GetIndex()));
+				InChunk->LoadMap(SaveGameArchive->LoadChunkData(InChunk->GetIndex()));
 			}
 			else
 			{

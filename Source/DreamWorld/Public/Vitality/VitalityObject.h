@@ -91,11 +91,9 @@ public:
 
 	virtual void Serialize(FArchive& Ar) override;
 
-	UFUNCTION(BlueprintCallable)
-	void LoadData(FVitalityObjectSaveData InSaveData);
+	virtual void LoadData(FSaveData* InSaveData) override;
 
-	UFUNCTION(BlueprintPure)
-	FVitalityObjectSaveData ToData(bool bSaved = true);
+	virtual FSaveData* ToData(bool bSaved = true) override;
 	
 	UFUNCTION(BlueprintCallable)
 	virtual void ResetData(bool bRefresh = false) override;

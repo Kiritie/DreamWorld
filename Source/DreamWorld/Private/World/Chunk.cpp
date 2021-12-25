@@ -12,16 +12,15 @@
 #include "Voxel/Components/VoxelMeshComponent.h"
 #include "Vitality/VitalityObject.h"
 #include "Gameplay/DWGameInstance.h"
-#include "DataSave/WorldDataSave.h"
 #include "Engine/World.h"
 #include "PickUp/PickUpVoxel.h"
 #include "Character/DWCharacter.h"
-#include "DataSave/GameDataSave.h"
 #include "Engine/World.h"
 #include "PickUp/PickUpEquip.h"
 #include "PickUp/PickUpProp.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "SaveGame/SaveGameArchive.h"
 #include "VoxelAuxiliary/VoxelAuxiliary.h"
 
 // Sets default values
@@ -154,7 +153,7 @@ void AChunk::OnDespawn_Implementation()
 {
 	if (bGenerated)
 	{
-		FChunkData chunkData;
+		FChunkSaveData chunkData;
 
 		chunkData.Index = Index;
 		chunkData.bSaved = true;
@@ -178,16 +177,16 @@ void AChunk::OnDespawn_Implementation()
 		{
 			if(Characters[i]->GetNature() != ECharacterNature::Player)
 			{
-				chunkData.CharacterDatas.Add(Characters[i]->ToData());
+				chunkData.CharacterDatas.Add(*static_cast<FCharacterSaveData*>(Characters[i]->ToData()));
 				Characters[i]->Destroy();
 			}
 		}
 		for (int32 i = 0; i < VitalityObjects.Num(); i++)
 		{
-			chunkData.VitalityObjectDatas.Add(VitalityObjects[i]->ToData());
+			chunkData.VitalityObjectDatas.Add(*static_cast<FVitalityObjectSaveData*>(VitalityObjects[i]->ToData()));
 			VitalityObjects[i]->Destroy();
 		}
-		if(UWorldDataSave* WorldDataSave = AWorldManager::GetDataSave())
+		if(USaveGameArchive* WorldDataSave = UDWHelper::GetGameInstance(this)->LoadArchiveData())
 		{
 			WorldDataSave->SaveChunkData(Index, chunkData);
 		}
@@ -334,7 +333,7 @@ void AChunk::Generate()
 
 	if(!bGenerated)
 	{
-		OnGenerated();
+		OnGenerated(AWorldManager::GetWorldData().bPreview);
 	}
 }
 
@@ -442,7 +441,7 @@ void AChunk::BuildMap()
 	}
 }
 
-void AChunk::LoadMap(FChunkData InChunkData)
+void AChunk::LoadMap(FChunkSaveData InChunkData)
 {
 	for (int32 i = 0; i < InChunkData.VoxelItems.Num(); i++)
 	{
@@ -451,7 +450,101 @@ void AChunk::LoadMap(FChunkData InChunkData)
 	}
 }
 
-void AChunk::LoadActors(FChunkData InChunkData)
+void AChunk::OnGenerated(bool bPreview)
+{
+	bGenerated = true;
+	
+	for (auto& iter : VoxelMap)
+	{
+		SpawnAuxiliary(iter.Value);
+	}
+
+	if(!bPreview)
+	{
+		if (USaveGameArchive* SaveGameArchive = UDWHelper::GetGameInstance(this)->LoadArchiveData())
+		{
+			if (SaveGameArchive->IsExistChunkData(Index))
+			{
+				LoadActors(SaveGameArchive->LoadChunkData(Index));
+			}
+			else if(SolidMesh || SemiMesh)
+			{
+				if (FIndex::Distance(Index, AWorldManager::GetWorldData().LastVitalityRaceIndex) > 250.f / AWorldManager::GetWorldData().VitalityRaceDensity)
+				{
+					auto raceData = UDWHelper::RandomVitalityRaceData();
+					for (int32 i = 0; i < raceData.Items.Num(); i++)
+					{
+						auto vitalityItem = raceData.Items[i];
+						auto vitalityData = UDWHelper::LoadVitalityData(vitalityItem.ID);
+						for (int32 j = 0; j < vitalityItem.Count; j++)
+						{
+							for (int32 k = 0; k < 10; k++)
+							{
+								FHitResult hitResult;
+								if (AWorldManager::Get()->ChunkTraceSingle(this, FMath::Max(vitalityData.Range.X, vitalityData.Range.Y) * 0.5f * AWorldManager::GetWorldData().BlockSize, vitalityData.Range.Z * 0.5f * AWorldManager::GetWorldData().BlockSize, hitResult))
+								{
+									auto saveData = FVitalityObjectSaveData();
+									saveData.ID = vitalityData.ID;
+									saveData.Name = vitalityData.Name.ToString();
+									saveData.RaceID = raceData.ID.ToString();
+									saveData.Level = vitalityItem.Level;
+									saveData.SpawnLocation = hitResult.Location;
+									saveData.SpawnRotation = FRotator(0, FMath::RandRange(0, 360), 0);
+									SpawnVitalityObject(saveData);
+									AWorldManager::GetWorldData().LastVitalityRaceIndex = Index;
+									break;
+								}
+							}
+						}
+					}
+				}
+				if (FIndex::Distance(Index, AWorldManager::GetWorldData().LastCharacterRaceIndex) > 300.f / AWorldManager::GetWorldData().CharacterRaceDensity)
+				{
+					ADWCharacter* captain = nullptr;
+					auto raceData = UDWHelper::RandomCharacterRaceData();
+					for (int32 i = 0; i < raceData.Items.Num(); i++)
+					{
+						auto characterItem = raceData.Items[i];
+						auto characterData = UDWHelper::LoadCharacterData(characterItem.ID);
+						for (int32 j = 0; j < characterItem.Count; j++)
+						{
+							for (int32 k = 0; k < 10; k++)
+							{
+								FHitResult hitResult;
+								if (AWorldManager::Get()->ChunkTraceSingle(this, FMath::Max(characterData.Range.X, characterData.Range.Y) * 0.5f * AWorldManager::GetWorldData().BlockSize, characterData.Range.Z * 0.5f * AWorldManager::GetWorldData().BlockSize, hitResult))
+								{
+									auto saveData = FCharacterSaveData();
+									saveData.ID = characterData.ID;
+									saveData.Name = characterData.Name.ToString();
+									saveData.RaceID = raceData.ID.ToString();
+									saveData.Level = characterItem.Level;
+									saveData.SpawnLocation = hitResult.Location;
+									saveData.SpawnRotation = FRotator(0, FMath::RandRange(0, 360), 0);
+									if(auto character = SpawnCharacter(saveData))
+									{
+										if (captain == nullptr)
+										{
+											captain = character;
+											AWorldManager::Get()->CreateTeam(captain);
+										}
+										else
+										{
+											captain->AddTeamMate(character);
+										}
+									}
+									AWorldManager::GetWorldData().LastCharacterRaceIndex = Index;
+									break;
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+void AChunk::LoadActors(FChunkSaveData InChunkData)
 {
 	for (int32 i = 0; i < InChunkData.PickUpDatas.Num(); i++)
 	{
@@ -464,97 +557,6 @@ void AChunk::LoadActors(FChunkData InChunkData)
 	for (int32 i = 0; i < InChunkData.VitalityObjectDatas.Num(); i++)
 	{
 		SpawnVitalityObject(InChunkData.VitalityObjectDatas[i]);
-	}
-}
-
-void AChunk::OnGenerated()
-{
-	bGenerated = true;
-	
-	for (auto& iter : VoxelMap)
-	{
-		SpawnAuxiliary(iter.Value);
-	}
-	
-	if (UWorldDataSave* WorldDataSave = AWorldManager::GetDataSave())
-	{
-		if (WorldDataSave->IsExistChunkData(Index))
-		{
-			LoadActors(WorldDataSave->LoadChunkData(Index));
-		}
-		else if(SolidMesh || SemiMesh)
-		{
-			if (FIndex::Distance(Index, AWorldManager::GetWorldData().LastVitalityRaceIndex) > 250.f / AWorldManager::GetWorldData().VitalityRaceDensity)
-			{
-				auto raceData = UDWHelper::RandomVitalityRaceData();
-				for (int32 i = 0; i < raceData.Items.Num(); i++)
-				{
-					auto vitalityItem = raceData.Items[i];
-					auto vitalityData = UDWHelper::LoadVitalityData(vitalityItem.ID);
-					for (int32 j = 0; j < vitalityItem.Count; j++)
-					{
-						for (int32 k = 0; k < 10; k++)
-						{
-							FHitResult hitResult;
-							if (AWorldManager::Get()->ChunkTraceSingle(this, FMath::Max(vitalityData.Range.X, vitalityData.Range.Y) * 0.5f * AWorldManager::GetWorldData().BlockSize, vitalityData.Range.Z * 0.5f * AWorldManager::GetWorldData().BlockSize, hitResult))
-							{
-								auto saveData = FVitalityObjectSaveData();
-								saveData.ID = vitalityData.ID;
-								saveData.Name = vitalityData.Name.ToString();
-								saveData.RaceID = raceData.ID.ToString();
-								saveData.Level = vitalityItem.Level;
-								saveData.SpawnLocation = hitResult.Location;
-								saveData.SpawnRotation = FRotator(0, FMath::RandRange(0, 360), 0);
-								SpawnVitalityObject(saveData);
-								AWorldManager::GetWorldData().LastVitalityRaceIndex = Index;
-								break;
-							}
-						}
-					}
-				}
-			}
-			if (FIndex::Distance(Index, AWorldManager::GetWorldData().LastCharacterRaceIndex) > 300.f / AWorldManager::GetWorldData().CharacterRaceDensity)
-			{
-				ADWCharacter* captain = nullptr;
-				auto raceData = UDWHelper::RandomCharacterRaceData();
-				for (int32 i = 0; i < raceData.Items.Num(); i++)
-				{
-					auto characterItem = raceData.Items[i];
-					auto characterData = UDWHelper::LoadCharacterData(characterItem.ID);
-					for (int32 j = 0; j < characterItem.Count; j++)
-					{
-						for (int32 k = 0; k < 10; k++)
-						{
-							FHitResult hitResult;
-							if (AWorldManager::Get()->ChunkTraceSingle(this, FMath::Max(characterData.Range.X, characterData.Range.Y) * 0.5f * AWorldManager::GetWorldData().BlockSize, characterData.Range.Z * 0.5f * AWorldManager::GetWorldData().BlockSize, hitResult))
-							{
-								auto saveData = FCharacterSaveData();
-								saveData.ID = characterData.ID;
-								saveData.Name = characterData.Name.ToString();
-								saveData.RaceID = raceData.ID.ToString();
-								saveData.Level = characterItem.Level;
-								saveData.SpawnLocation = hitResult.Location;
-								saveData.SpawnRotation = FRotator(0, FMath::RandRange(0, 360), 0);
-								if(auto character = SpawnCharacter(saveData))
-								{
-									if (captain == nullptr)
-									{
-										captain = character;
-										AWorldManager::Get()->CreateTeam(captain);
-									}
-									else
-									{
-										captain->AddTeamMate(character);
-									}
-								}
-								AWorldManager::GetWorldData().LastCharacterRaceIndex = Index;
-								break;
-							}
-						}
-					}
-				}
-			}
-		}
 	}
 }
 
@@ -1178,7 +1180,7 @@ ADWCharacter* AChunk::SpawnCharacter(FCharacterSaveData InSaveData)
 	spawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 	if (ADWCharacter* character = GetWorld()->SpawnActor<ADWCharacter>(InSaveData.GetCharacterData().Class, spawnParams))
 	{
-		character->LoadData(InSaveData);
+		character->LoadData(&InSaveData);
 		character->SpawnDefaultController();
 		AttachCharacter(character);
 		return character;
@@ -1221,7 +1223,7 @@ AVitalityObject* AChunk::SpawnVitalityObject(FVitalityObjectSaveData InSaveData)
 	spawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 	if (AVitalityObject* vitalityObject = GetWorld()->SpawnActor<AVitalityObject>(InSaveData.GetVitalityData().Class, spawnParams))
 	{
-		vitalityObject->LoadData(InSaveData);
+		vitalityObject->LoadData(&InSaveData);
 		AttachVitalityObject(vitalityObject);
 		return vitalityObject;
 	}

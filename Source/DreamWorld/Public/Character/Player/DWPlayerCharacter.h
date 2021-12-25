@@ -82,13 +82,9 @@ protected:
 public:
 	virtual void Tick(float DeltaTime) override;
 
-	virtual void LoadData(FCharacterSaveData InSaveData) override;
+	virtual void LoadData(FSaveData* InSaveData) override;
 
-	virtual FCharacterSaveData ToData(bool bSaved = true) override;
-
-	virtual void LoadRecordData(FPlayerRecordSaveData InRecordData);
-
-	virtual FPlayerRecordSaveData ToRecordData(bool bSaved = true);
+	virtual FSaveData* ToData(bool bSaved = true) override;
 
 public:
 	virtual void Active(bool bResetData = false) override;

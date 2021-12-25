@@ -19,6 +19,10 @@ class DREAMWORLD_API IVitality
 	GENERATED_BODY()
 
 public:
+	virtual void LoadData(FSaveData* InSaveData) = 0;
+
+	virtual FSaveData* ToData(bool bSaved = true) = 0;
+
 	virtual void Spawn() = 0;
 	
 	virtual void Revive() = 0;

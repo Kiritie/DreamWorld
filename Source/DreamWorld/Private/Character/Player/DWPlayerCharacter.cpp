@@ -29,6 +29,7 @@
 #include "Equip/EquipShield.h"
 #include "Inventory/Slot/InventorySkillSlot.h"
 #include "Character/Player/DWPlayerCharacterCameraManager.h"
+#include "Gameplay/DWGameInstance.h"
 #include "Interaction/Components/InteractionComponent.h"
 #include "Widget/WidgetPrimaryPanel.h"
 #include "Inventory/Slot/InventoryEquipSlot.h"
@@ -222,32 +223,19 @@ void ADWPlayerCharacter::Tick(float DeltaTime)
 	}
 }
 
-void ADWPlayerCharacter::LoadData(FCharacterSaveData InSaveData)
+void ADWPlayerCharacter::LoadData(FSaveData* InSaveData)
 {
 	Super::LoadData(InSaveData);
+
+	auto SaveData = *static_cast<FPlayerSaveData*>(InSaveData);
+	
+	GetPlayerController()->SetControlRotation(SaveData.CameraRotation);
+	GetPlayerController()->GetCameraManager()->SetCameraDistance(UDWHelper::GetGameInstance(this)->GetGeneralData().CameraDistance);
 }
 
-FCharacterSaveData ADWPlayerCharacter::ToData(bool bSaved)
+FSaveData* ADWPlayerCharacter::ToData(bool bSaved)
 {
 	return Super::ToData(bSaved);
-}
-
-void ADWPlayerCharacter::LoadRecordData(FPlayerRecordSaveData InRecordData)
-{
-	SetActorLocationAndRotation(InRecordData.Location, InRecordData.Rotation);
-	GetPlayerController()->SetControlRotation(GetActorRotation());
-	GetPlayerController()->GetCameraManager()->SetCameraDistance(InRecordData.CamDistance, true);
-}
-
-FPlayerRecordSaveData ADWPlayerCharacter::ToRecordData(bool bSaved)
-{
-	FPlayerRecordSaveData PlayerRecordData;
-	PlayerRecordData.bSaved = bSaved;
-	PlayerRecordData.Name = GetNameC();
-	PlayerRecordData.Location = GetActorLocation();
-	PlayerRecordData.Rotation = GetActorRotation();
-	PlayerRecordData.CamDistance = GetPlayerController()->GetCameraManager()->GetCameraDistance();
-	return PlayerRecordData;
 }
 
 void ADWPlayerCharacter::Active(bool bResetData)

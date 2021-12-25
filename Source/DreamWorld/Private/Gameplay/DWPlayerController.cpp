@@ -16,14 +16,10 @@
 #include "Widget/Inventory/WidgetInventoryPanel.h"
 #include "Inventory/Inventory.h"
 #include "Character/Player/DWPlayerCharacterCameraManager.h"
-#include "DataSave/PlayerDataSave.h"
-#include "DataSave/WorldDataSave.h"
 #include "Gameplay/DWGameMode.h"
 #include "Inventory/Slot/InventorySlot.h"
 #include "Widget/WidgetModuleBPLibrary.h"
 #include "World/Components/WorldTimerComponent.h"
-
-UPlayerDataSave* ADWPlayerController::DataSave = nullptr;
 
 ADWPlayerController::ADWPlayerController()
 {
@@ -169,105 +165,65 @@ void ADWPlayerController::Tick(float DeltaTime)
 	}
 }
 
-void ADWPlayerController::LoadPlayer(const FString& InPlayerName)
+void ADWPlayerController::LoadPlayer(FPlayerSaveData InPlayerData)
 {
-	if(UDWGameInstance* GameInstance = UDWHelper::GetGameInstance(this))
+	FActorSpawnParameters SpawnParams = FActorSpawnParameters();
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+	if (ADWPlayerCharacter* NewPlayerCharacter = GetWorld()->SpawnActor<ADWPlayerCharacter>(InPlayerData.GetCharacterData().Class, SpawnParams))
 	{
-		if(UPlayerDataSave* PlayerDataSave = GameInstance->LoadPlayerData(InPlayerName))
+		NewPlayerCharacter->Disable(true, true);
+		NewPlayerCharacter->LoadData(&InPlayerData);
+
+		Possess(NewPlayerCharacter);
+
+		NewPlayerCharacter->SetActorLocationAndRotation(FVector::ZeroVector, FRotator::ZeroRotator);
+		GetCameraManager()->SetCameraDistance(-1.f, true);
+		SetControlRotation(NewPlayerCharacter->GetActorRotation());
+		
+		if (!InPlayerData.bSaved)
 		{
-			DataSave = PlayerDataSave;
-
-			FActorSpawnParameters spawnParams = FActorSpawnParameters();
-			spawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-
-			if (ADWPlayerCharacter* NewPlayerCharacter = GetWorld()->SpawnActor<ADWPlayerCharacter>(PlayerDataSave->GetPlayerData().GetCharacterData().Class, spawnParams))
+			auto VoxelDatas = UDWHelper::LoadVoxelDatas();
+			for (int32 i = 0; i < VoxelDatas.Num(); i++)
 			{
-				NewPlayerCharacter->Disable(true, true);
-				NewPlayerCharacter->LoadData(PlayerDataSave->GetPlayerData());
+				FItem tmpItem = FItem(VoxelDatas[i].ID, VoxelDatas[i].MaxCount);
+				NewPlayerCharacter->GetInventory()->AdditionItemByRange(tmpItem);
+			}
 
-				Possess(NewPlayerCharacter);
+			auto EquipDatas = UDWHelper::LoadEquipDatas();
+			for (int32 i = 0; i < EquipDatas.Num(); i++)
+			{
+				FItem tmpItem = FItem(EquipDatas[i].ID, EquipDatas[i].MaxCount);
+				NewPlayerCharacter->GetInventory()->AdditionItemByRange(tmpItem);
+			}
 
-				if(AWorldManager* WorldManager = AWorldManager::Get())
-				{
-					if(UWorldDataSave* WorldDataSave = WorldManager->GetDataSave())
-					{
-						if (WorldDataSave->IsExistPlayerRecord(InPlayerName))
-						{
-							NewPlayerCharacter->LoadRecordData(WorldDataSave->LoadPlayerRecord(InPlayerName));
-						}
-						else
-						{
-							if(WorldManager->GetWorldTimer())
-							{
-								WorldManager->GetWorldTimer()->SetTimeSeconds(0);
-							}
-							NewPlayerCharacter->SetActorLocationAndRotation(FVector::ZeroVector, FRotator::ZeroRotator);
-							GetCameraManager()->SetCameraDistance(-1.f, true);
-							SetControlRotation(NewPlayerCharacter->GetActorRotation());
-						}
-					}
-				}
-				
-				if (!PlayerDataSave->GetPlayerData().InventoryData.bSaved)
-				{
-					auto VoxelDatas = UDWHelper::LoadVoxelDatas();
-					for (int32 i = 0; i < VoxelDatas.Num(); i++)
-					{
-						FItem tmpItem = FItem(VoxelDatas[i].ID, VoxelDatas[i].MaxCount);
-						NewPlayerCharacter->GetInventory()->AdditionItemByRange(tmpItem);
-					}
+			auto PropDatas = UDWHelper::LoadPropDatas();
+			for (int32 i = 0; i < PropDatas.Num(); i++)
+			{
+				FItem tmpItem = FItem(PropDatas[i].ID, PropDatas[i].MaxCount);
+				NewPlayerCharacter->GetInventory()->AdditionItemByRange(tmpItem);
+			}
 
-					auto EquipDatas = UDWHelper::LoadEquipDatas();
-					for (int32 i = 0; i < EquipDatas.Num(); i++)
-					{
-						FItem tmpItem = FItem(EquipDatas[i].ID, EquipDatas[i].MaxCount);
-						NewPlayerCharacter->GetInventory()->AdditionItemByRange(tmpItem);
-					}
-
-					auto PropDatas = UDWHelper::LoadPropDatas();
-					for (int32 i = 0; i < PropDatas.Num(); i++)
-					{
-						FItem tmpItem = FItem(PropDatas[i].ID, PropDatas[i].MaxCount);
-						NewPlayerCharacter->GetInventory()->AdditionItemByRange(tmpItem);
-					}
-
-					auto SkillDatas = UDWHelper::LoadSkillDatas();
-					for (int32 i = 0; i < SkillDatas.Num(); i++)
-					{
-						FItem tmpItem = FItem(SkillDatas[i].ID, SkillDatas[i].MaxCount);
-						NewPlayerCharacter->GetInventory()->AdditionItemByRange(tmpItem);
-					}
-				}
-
-				OnPlayerSpawned.Broadcast(NewPlayerCharacter);
+			auto SkillDatas = UDWHelper::LoadSkillDatas();
+			for (int32 i = 0; i < SkillDatas.Num(); i++)
+			{
+				FItem tmpItem = FItem(SkillDatas[i].ID, SkillDatas[i].MaxCount);
+				NewPlayerCharacter->GetInventory()->AdditionItemByRange(tmpItem);
 			}
 		}
+
+		OnPlayerSpawned.Broadcast(NewPlayerCharacter);
 	}
 }
 
 void ADWPlayerController::UnLoadPlayer()
 {
-	if(UDWGameInstance* GameInstance = UDWHelper::GetGameInstance(this))
-    {
-		DataSave = nullptr;
-		if(PlayerCharacter)
-		{
-			if(AWorldManager* WorldManager = AWorldManager::Get())
-			{
-				if(UWorldDataSave* WorldDataSave = WorldManager->GetDataSave())
-				{
-					FPlayerRecordSaveData PlayerRecordData = PlayerCharacter->ToRecordData();
-					if(UWorldTimerComponent* WorldTimer = WorldManager->GetWorldTimer())
-					{
-						PlayerRecordData.TimeSeconds = WorldTimer->GetTimeSeconds();
-					}
-					WorldDataSave->SavePlayerRecord(PlayerRecordData);
-				}
-			}
-			GameInstance->UnloadPlayerData(PlayerCharacter->GetNameC());
-		}
-   }
 	UnPossess();
+	
+	if(GetProcessedCharacter())
+	{
+		GetProcessedCharacter()->Destroy();
+	}
 }
 
 void ADWPlayerController::ResetData()

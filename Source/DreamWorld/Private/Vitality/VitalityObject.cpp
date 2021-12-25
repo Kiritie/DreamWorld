@@ -112,50 +112,51 @@ void AVitalityObject::Serialize(FArchive& Ar)
 	}
 }
 
-void AVitalityObject::LoadData(FVitalityObjectSaveData InSaveData)
+void AVitalityObject::LoadData(FSaveData* InSaveData)
 {
-	if (InSaveData.bSaved)
+	auto SaveData = *static_cast<FVitalityObjectSaveData*>(InSaveData);
+	if (SaveData.bSaved)
 	{
-		ID = InSaveData.ID;
-		SetNameC(InSaveData.Name);
-		SetRaceID(InSaveData.RaceID);
-		SetLevelC(InSaveData.Level);
-		SetEXP(InSaveData.EXP);
+		ID = SaveData.ID;
+		SetNameC(SaveData.Name);
+		SetRaceID(SaveData.RaceID);
+		SetLevelC(SaveData.Level);
+		SetEXP(SaveData.EXP);
 
-		SetActorLocation(InSaveData.SpawnLocation);
-		SetActorRotation(InSaveData.SpawnRotation);
+		SetActorLocation(SaveData.SpawnLocation);
+		SetActorRotation(SaveData.SpawnRotation);
 
-		Inventory->LoadData(InSaveData.InventoryData, this);
+		Inventory->LoadData(SaveData.InventoryData, this);
 	}
 	else
 	{
-		ID = InSaveData.ID;
-		SetNameC(InSaveData.Name);
-		SetRaceID(InSaveData.RaceID);
-		SetLevelC(InSaveData.Level);
+		ID = SaveData.ID;
+		SetNameC(SaveData.Name);
+		SetRaceID(SaveData.RaceID);
+		SetLevelC(SaveData.Level);
 
-		SetActorLocation(InSaveData.SpawnLocation);
-		SetActorRotation(InSaveData.SpawnRotation);
+		SetActorLocation(SaveData.SpawnLocation);
+		SetActorRotation(SaveData.SpawnRotation);
 
 		const FVitalityData vitalityData = GetVitalityData();
 		if(vitalityData.IsValid())
 		{
-			InSaveData.InventoryData = vitalityData.InventoryData;
+			SaveData.InventoryData = vitalityData.InventoryData;
 		}
 
 		// const auto ItemDatas = UDWHelper::LoadItemDatas();
 		// if(ItemDatas.Num() > 0 && FMath::FRand() < 0.2f)
 		// {
-		// 	InSaveData.InventoryData.Items.Add(FItem(ItemDatas[FMath::RandRange(0, ItemDatas.Num() - 1)].ID, 1));
+		// 	SaveData.InventoryData.Items.Add(FItem(ItemDatas[FMath::RandRange(0, ItemDatas.Num() - 1)].ID, 1));
 		// }
 		
-		Inventory->LoadData(InSaveData.InventoryData, this);
+		Inventory->LoadData(SaveData.InventoryData, this);
 	}
 }
 
-FVitalityObjectSaveData AVitalityObject::ToData(bool bSaved)
+FSaveData* AVitalityObject::ToData(bool bSaved)
 {
-	FVitalityObjectSaveData SaveData;
+	static FVitalityObjectSaveData SaveData;
 
 	SaveData.bSaved = bSaved;
 
@@ -170,7 +171,7 @@ FVitalityObjectSaveData AVitalityObject::ToData(bool bSaved)
 	SaveData.SpawnLocation = GetActorLocation();
 	SaveData.SpawnRotation = GetActorRotation();
 
-	return SaveData;
+	return &SaveData;
 }
 
 void AVitalityObject::ResetData(bool bRefresh)

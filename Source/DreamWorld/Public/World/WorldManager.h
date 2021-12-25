@@ -10,7 +10,7 @@
 
 class AChunk;
 class ADWCharacter;
-class UWorldDataSave;
+class USaveGameArchive;
 class UPlayerDataSave;
 class UWorldTimerComponent;
 class USceneCaptureComponent2D;
@@ -49,12 +49,8 @@ public:
 protected:
 	static FWorldSaveData WorldData;
 
-	static UWorldDataSave* DataSave;
-
 public:
 	static FWorldSaveData& GetWorldData() { return WorldData; }
-
-	static UWorldDataSave* GetDataSave() { return DataSave; }
 
 	static EVoxelType GetNoiseVoxelType(FIndex InIndex);
 
@@ -122,9 +118,9 @@ public:
 	FOnBasicGenerated OnBasicGenerated;
 
 public:
-	void LoadWorld(const FString& InWorldName);
+	void LoadWorld(FWorldSaveData InWorldData, bool bPreview = false);
 
-	void UnloadWorld();
+	void UnloadWorld(bool bPreview = false);
 
 public:
 	UFUNCTION(BlueprintPure)
@@ -142,6 +138,18 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Chunk")
 	TMap<FIndex, AChunk*> ChunkMap;
 	
+	UPROPERTY()
+	TArray<AChunk*> ChunkMapBuildQueue;
+
+	UPROPERTY()
+	TArray<AChunk*> ChunkMapGenerateQueue;
+
+	UPROPERTY()
+	TArray<AChunk*> ChunkGenerateQueue;
+
+	UPROPERTY()
+	TArray<AChunk*> ChunkDestroyQueue;
+
 private:
 	int32 ChunkSpawnBatch;
 
@@ -150,14 +158,6 @@ private:
 	FIndex LastStayChunkIndex;
 
 	TArray<FIndex> ChunkSpawnQueue;
-
-	TArray<AChunk*> ChunkMapBuildQueue;
-
-	TArray<AChunk*> ChunkMapGenerateQueue;
-
-	TArray<AChunk*> ChunkGenerateQueue;
-
-	TArray<AChunk*> ChunkDestroyQueue;
 	
 	TArray<FAsyncTask<ChunkMapBuildTask>*> ChunkMapBuildTasks;
 	

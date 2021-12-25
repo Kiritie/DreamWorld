@@ -84,13 +84,25 @@ bool FVoxelItem::HasParam(FName InName) const
 	return Params.Contains(InName);
 }
 
-FParameter& FVoxelItem::GetParam(FName InName)
+FParameter FVoxelItem::GetParam(FName InName)
 {
 	if(HasParam(InName))
 	{
 		return Params[InName];
 	}
-	return FParameter::Empty;
+	return FParameter();
+}
+
+void FVoxelItem::SetParam(FName InName, FParameter InParam)
+{
+	if(HasParam(InName))
+	{
+		Params[InName] = InParam;
+	}
+	else
+	{
+		Params.Add(InName, InParam);
+	}
 }
 
 void FTeamData::AddMember(ADWCharacter* InMember)

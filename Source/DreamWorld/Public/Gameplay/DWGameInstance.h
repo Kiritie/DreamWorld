@@ -26,32 +26,32 @@ public:
 	void Initialize();
 
 	//////////////////////////////////////////////////////////////////////////
-	// GameData
+	// GeneralData
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	class UGameDataSave* GameDataSave;
+	class USaveGameGeneral* GeneralDataSave;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	int32 UserIndex;
 
 public:
 	UFUNCTION(BlueprintCallable)
-	void ResetGameData();
+	void ResetGeneralData();
 
 	UFUNCTION(BlueprintCallable)
-	void SaveGameData(bool bRefresh = true);
+	void SaveGeneralData(bool bRefresh = true);
 
 	UFUNCTION(BlueprintCallable)
-	UGameDataSave* LoadGameData();
+	USaveGameGeneral* LoadGeneralData();
 	
 	UFUNCTION(BlueprintCallable)
-	void CreateGameData(FGameSaveData InGameData, bool bSaveData = true);
+	void CreateGeneralData(FGeneralSaveData InGeneralData, bool bSaveData = true);
 
 	UFUNCTION(BlueprintCallable)
-	void DeleteGameData();
+	void DeleteGeneralData();
 
 	UFUNCTION(BlueprintPure)
-	FGameSaveData GetGameData() const;
+	FGeneralSaveData GetGeneralData() const;
 
 	UFUNCTION(BlueprintPure)
 	int32 GetUserIndex() const { return UserIndex; }
@@ -60,76 +60,33 @@ public:
 	void SetUserIndex(int32 InUserIndex) { UserIndex = InUserIndex; }
 
 	//////////////////////////////////////////////////////////////////////////
-	// WorldData
+	// ArchiveData
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	TMap<FString, class UWorldDataSave*> WorldDataSaves;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	FString CurrentWorldName;
+	TMap<FString, class USaveGameArchive*> ArchiveDataSaves;
 
 public:
 	UFUNCTION(BlueprintCallable)
-	bool IsExistWorldData(const FString& InWorldName);
+	bool IsExistArchiveData(const FString& InArchiveName);
 	
 	UFUNCTION(BlueprintCallable)
-	void SaveWorldData(const FString& InWorldName, bool bRefresh = true);
+	void SaveArchiveData(const FString& InArchiveName, bool bRefresh = true);
 		
 	UFUNCTION(BlueprintCallable)
-	class UWorldDataSave* LoadWorldData(const FString& InWorldName = TEXT(""));
+	class USaveGameArchive* LoadArchiveData(FString InArchiveName = TEXT(""));
 	
 	UFUNCTION(BlueprintCallable)
-	void UnloadWorldData(const FString& InWorldName, bool bSaveData = true);
+	void UnloadArchiveData(const FString& InArchiveName, bool bSaveData = true);
 
 	UFUNCTION(BlueprintCallable)
-	void CreateWorldData(FWorldSaveData InWorldData, bool bSaveData = true);
+	void CreateArchiveData(FArchiveSaveData InArchiveData, bool bSaveData = true);
 
 	UFUNCTION(BlueprintCallable)
-	void RemoveWorldData(const FString& InWorldName);
+	void RemoveArchiveData(const FString& InArchiveName);
 
 	UFUNCTION(BlueprintPure)
-	TMap<FString, FWorldBasicSaveData> GetWorldDatas() const;
-	
-	UFUNCTION(BlueprintPure)
-	FString GetCurrentWorldName() const { return CurrentWorldName; }
-
-	UFUNCTION(BlueprintCallable)
-	void SetCurrentWorldName(const FString& InCurrentWorldName) { CurrentWorldName = InCurrentWorldName; }
-
-	//////////////////////////////////////////////////////////////////////////
-	// PlayerData
-protected:
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	TMap<FString, class UPlayerDataSave*> PlayerDataSaves;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	FString CurrentPlayerName;
-
-public:
-	UFUNCTION(BlueprintCallable)
-	bool IsExistPlayerData(const FString& InPlayerName);
-		
-	UFUNCTION(BlueprintCallable)
-	void SavePlayerData(const FString& InPlayerName, bool bRefresh = true);
-	
-	UFUNCTION(BlueprintCallable)
-	class UPlayerDataSave* LoadPlayerData(const FString& InPlayerName = TEXT(""));
-	
-	UFUNCTION(BlueprintCallable)
-	void UnloadPlayerData(const FString& InPlayerName, bool bSaveData = true);
-
-	UFUNCTION(BlueprintCallable)
-	void CreatePlayerData(FCharacterSaveData InPlayerData, bool bSaveData = true);
-
-	UFUNCTION(BlueprintCallable)
-	void RemovePlayerData(const FString& InPlayerName);
+	FString GetCurrentArchiveName() const;
 
 	UFUNCTION(BlueprintPure)
-	TMap<FString, FCharacterBasicSaveData> GetPlayerDatas() const;
-	
-	UFUNCTION(BlueprintPure)
-	FString GetCurrentPlayerName() const { return CurrentPlayerName; }
-
-	UFUNCTION(BlueprintCallable)
-	void SetCurrentPlayerName(const FString& InCurrentPlayerName) { CurrentPlayerName = InCurrentPlayerName; }
+	TMap<FString, FArchiveSaveData> GetArchiveDatas() const;
 };
