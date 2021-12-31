@@ -23,18 +23,21 @@ public:
 	virtual void Shutdown() override;
 
 public:
-	void Initialize();
+	void InitializeData();
 
 	//////////////////////////////////////////////////////////////////////////
 	// GeneralData
 protected:
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	class USaveGameGeneral* GeneralDataSave;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "GeneralData")
+	class UGeneralSaveGame* GeneralSaveGame;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "GeneralData")
 	int32 UserIndex;
 
 public:
+	UFUNCTION(BlueprintCallable)
+	void CreateGeneralData(FGeneralSaveData InGeneralData, bool bSaveData = true);
+
 	UFUNCTION(BlueprintCallable)
 	void ResetGeneralData();
 
@@ -42,14 +45,8 @@ public:
 	void SaveGeneralData(bool bRefresh = true);
 
 	UFUNCTION(BlueprintCallable)
-	USaveGameGeneral* LoadGeneralData();
+	UGeneralSaveGame* LoadGeneralData();
 	
-	UFUNCTION(BlueprintCallable)
-	void CreateGeneralData(FGeneralSaveData InGeneralData, bool bSaveData = true);
-
-	UFUNCTION(BlueprintCallable)
-	void DeleteGeneralData();
-
 	UFUNCTION(BlueprintPure)
 	FGeneralSaveData GetGeneralData() const;
 
@@ -62,31 +59,39 @@ public:
 	//////////////////////////////////////////////////////////////////////////
 	// ArchiveData
 protected:
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	TMap<FString, class USaveGameArchive*> ArchiveDataSaves;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ArchiveData")
+	class UArchiveSaveGame* ArchiveSaveGame;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "ArchiveData")
+	FPlayerBasicSaveData PlayerBasicData;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "ArchiveData")
+	FWorldBasicSaveData WorldBasicData;
+	
 public:
 	UFUNCTION(BlueprintCallable)
-	bool IsExistArchiveData(const FString& InArchiveName);
+	void CreateArchiveData(FArchiveSaveData InArchiveData);
+
+	UFUNCTION(BlueprintCallable)
+	void RemoveArchiveData(FName InArchiveID);
 	
 	UFUNCTION(BlueprintCallable)
-	void SaveArchiveData(const FString& InArchiveName, bool bRefresh = true);
+	void SaveArchiveData(FName InArchiveID, bool bRefresh = true);
+
+	UFUNCTION(BlueprintCallable)
+	bool IsExistArchiveData(FName InArchiveID);
 		
 	UFUNCTION(BlueprintCallable)
-	class USaveGameArchive* LoadArchiveData(FString InArchiveName = TEXT(""));
-	
-	UFUNCTION(BlueprintCallable)
-	void UnloadArchiveData(const FString& InArchiveName, bool bSaveData = true);
+	class UArchiveSaveGame* LoadArchiveData(FName InArchiveID = NAME_None);
 
-	UFUNCTION(BlueprintCallable)
-	void CreateArchiveData(FArchiveSaveData InArchiveData, bool bSaveData = true);
-
-	UFUNCTION(BlueprintCallable)
-	void RemoveArchiveData(const FString& InArchiveName);
+public:
+	UFUNCTION(BlueprintPure)
+	FName GetCurrentArchiveID() const;
 
 	UFUNCTION(BlueprintPure)
-	FString GetCurrentArchiveName() const;
+	TMap<FName, FArchiveSaveData>& GetArchiveDatas() const;
 
-	UFUNCTION(BlueprintPure)
-	TMap<FString, FArchiveSaveData> GetArchiveDatas() const;
+	FPlayerBasicSaveData GetPlayerBasicData() const { return PlayerBasicData; }
+
+	FWorldBasicSaveData GetWorldBasicData() const { return WorldBasicData; }
 };

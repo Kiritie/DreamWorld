@@ -11,8 +11,7 @@
 #include "Widget/WidgetModuleBPLibrary.h"
 #include "Widget/WidgetPausingMenu.h"
 #include "Widget/WidgetPrimaryPanel.h"
-#include "Widget/WidgetRoleChoosingPanel.h"
-#include "Widget/WidgetWorldChoosingPanel.h"
+#include "Widget/Archive/WidgetArchiveChoosingPanel.h"
 
 ADWGameState::ADWGameState()
 {
@@ -36,38 +35,34 @@ void ADWGameState::SetCurrentState(EGameState InGameState)
 		{
 			case EGameState::MainMenu:
 			{
-				UWidgetModuleBPLibrary::CloseAllUserWidget(EWidgetType::Permanent);
-				UWidgetModuleBPLibrary::OpenUserWidget<UWidgetMainMenu>(false, UDWHelper::LoadWidgetMainMenuClass());
+				UWidgetModuleBPLibrary::CloseAllUserWidget(EWidgetType::SemiPermanent);
+				UWidgetModuleBPLibrary::OpenUserWidget<UWidgetMainMenu>(false, UWidgetModuleBPLibrary::GetUserWidgetClass<UWidgetMainMenu>());
 				break;
 			}
-			case EGameState::ChoosingRole:
+			case EGameState::Preparing:
 			{
-				UWidgetModuleBPLibrary::OpenUserWidget<UWidgetRoleChoosingPanel>(false, UDWHelper::LoadWidgetRoleChoosingPanelClass());
-				break;
-			}
-			case EGameState::ChoosingWorld:
-			{
-				UWidgetModuleBPLibrary::OpenUserWidget<UWidgetWorldChoosingPanel>(false, UDWHelper::LoadWidgetWorldChoosingPanelClass());
+				UWidgetModuleBPLibrary::OpenUserWidget<UWidgetArchiveChoosingPanel>(false, UWidgetModuleBPLibrary::GetUserWidgetClass<UWidgetArchiveChoosingPanel>());
 				break;
 			}
 			case EGameState::Loading:
 			{
-				UWidgetModuleBPLibrary::OpenUserWidget<UWidgetLoadingPanel>(false, UDWHelper::LoadWidgetLoadingPanelClass());
-				UWidgetModuleBPLibrary::CreateUserWidget<UWidgetPrimaryPanel>(UDWHelper::LoadWidgetPrimaryPanelClass());
-				UWidgetModuleBPLibrary::CreateUserWidget<UWidgetInventoryBar>(UDWHelper::LoadWidgetInventoryBarClass());
-				UWidgetModuleBPLibrary::CreateUserWidget<UWidgetInventoryPanel>(UDWHelper::LoadWidgetInventoryPanelClass());
+				UWidgetModuleBPLibrary::OpenUserWidget<UWidgetLoadingPanel>(false, UWidgetModuleBPLibrary::GetUserWidgetClass<UWidgetLoadingPanel>());
+				UWidgetModuleBPLibrary::CreateUserWidget<UWidgetPrimaryPanel>(UWidgetModuleBPLibrary::GetUserWidgetClass<UWidgetPrimaryPanel>());
+				UWidgetModuleBPLibrary::CreateUserWidget<UWidgetInventoryBar>(UWidgetModuleBPLibrary::GetUserWidgetClass<UWidgetInventoryBar>());
+				UWidgetModuleBPLibrary::CreateUserWidget<UWidgetInventoryPanel>(UWidgetModuleBPLibrary::GetUserWidgetClass<UWidgetInventoryPanel>());
 				break;
 			}
 			case EGameState::Playing:
 			{
 				UWidgetModuleBPLibrary::CloseAllUserWidget(EWidgetType::Temporary);
-				UWidgetModuleBPLibrary::OpenUserWidget<UWidgetPrimaryPanel>(false, UDWHelper::LoadWidgetPrimaryPanelClass());
-				UWidgetModuleBPLibrary::OpenUserWidget<UWidgetInventoryBar>(false, UDWHelper::LoadWidgetInventoryBarClass());
+				UWidgetModuleBPLibrary::CloseAllUserWidget(EWidgetType::SemiTemporary);
+				UWidgetModuleBPLibrary::OpenUserWidget<UWidgetPrimaryPanel>(false, UWidgetModuleBPLibrary::GetUserWidgetClass<UWidgetPrimaryPanel>());
+				UWidgetModuleBPLibrary::OpenUserWidget<UWidgetInventoryBar>(false, UWidgetModuleBPLibrary::GetUserWidgetClass<UWidgetInventoryBar>());
 				break;
 			}
 			case EGameState::Pausing:
 			{
-				UWidgetModuleBPLibrary::OpenUserWidget<UWidgetPausingMenu>(false, UDWHelper::LoadWidgetPausingMenuClass());
+				UWidgetModuleBPLibrary::OpenUserWidget<UWidgetPausingMenu>(false, UWidgetModuleBPLibrary::GetUserWidgetClass<UWidgetPausingMenu>());
 				break;
 			}
 			default: break;

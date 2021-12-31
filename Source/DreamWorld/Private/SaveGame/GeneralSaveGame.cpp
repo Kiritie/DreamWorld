@@ -1,13 +1,13 @@
 // Copyright 1998-2019 Epic Games, Inc. All Rights Reserved.
 
-#include "SaveGame/SaveGameGeneral.h"
+#include "SaveGame/GeneralSaveGame.h"
 #include "Kismet/GameplayStatics.h"
 
-USaveGameGeneral::USaveGameGeneral()
+UGeneralSaveGame::UGeneralSaveGame()
 {
 	// set default pawn class to our Blueprinted character
 }
 
-void USaveGameGeneral::RefreshSaveData_Implementation()
+void UGeneralSaveGame::RefreshSaveData_Implementation()
 {
 }

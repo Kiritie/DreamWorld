@@ -20,7 +20,7 @@
 #include "PickUp/PickUpProp.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
-#include "SaveGame/SaveGameArchive.h"
+#include "SaveGame/ArchiveSaveGame.h"
 #include "VoxelAuxiliary/VoxelAuxiliary.h"
 
 // Sets default values
@@ -186,7 +186,7 @@ void AChunk::OnDespawn_Implementation()
 			chunkData.VitalityObjectDatas.Add(*static_cast<FVitalityObjectSaveData*>(VitalityObjects[i]->ToData()));
 			VitalityObjects[i]->Destroy();
 		}
-		if(USaveGameArchive* WorldDataSave = UDWHelper::GetGameInstance(this)->LoadArchiveData())
+		if(UArchiveSaveGame* WorldDataSave = UDWHelper::GetGameInstance(this)->LoadArchiveData())
 		{
 			WorldDataSave->SaveChunkData(Index, chunkData);
 		}
@@ -333,7 +333,7 @@ void AChunk::Generate()
 
 	if(!bGenerated)
 	{
-		OnGenerated(AWorldManager::GetWorldData().bPreview);
+		OnGenerated();
 	}
 }
 
@@ -450,18 +450,21 @@ void AChunk::LoadMap(FChunkSaveData InChunkData)
 	}
 }
 
-void AChunk::OnGenerated(bool bPreview)
+void AChunk::OnGenerated()
 {
-	bGenerated = true;
-	
-	for (auto& iter : VoxelMap)
+	if(!bGenerated)
 	{
-		SpawnAuxiliary(iter.Value);
+		for (auto& iter : VoxelMap)
+		{
+			SpawnAuxiliary(iter.Value);
+		}
 	}
+	
+	bGenerated = true;
 
-	if(!bPreview)
+	if(!AWorldManager::GetWorldData().bPreview)
 	{
-		if (USaveGameArchive* SaveGameArchive = UDWHelper::GetGameInstance(this)->LoadArchiveData())
+		if (UArchiveSaveGame* SaveGameArchive = UDWHelper::GetGameInstance(this)->LoadArchiveData())
 		{
 			if (SaveGameArchive->IsExistChunkData(Index))
 			{

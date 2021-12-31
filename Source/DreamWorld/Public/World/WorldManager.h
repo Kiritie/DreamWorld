@@ -10,7 +10,7 @@
 
 class AChunk;
 class ADWCharacter;
-class USaveGameArchive;
+class UArchiveSaveGame;
 class UPlayerDataSave;
 class UWorldTimerComponent;
 class USceneCaptureComponent2D;

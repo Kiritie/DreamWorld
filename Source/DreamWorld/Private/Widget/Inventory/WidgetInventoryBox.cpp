@@ -6,6 +6,6 @@
 UWidgetInventoryBox::UWidgetInventoryBox(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	WidgetName = FName("InventoryBox");
-	WidgetType = EWidgetType::Permanent;
+	WidgetType = EWidgetType::SemiPermanent;
 	InputMode = EInputMode::GameAndUI;
 }

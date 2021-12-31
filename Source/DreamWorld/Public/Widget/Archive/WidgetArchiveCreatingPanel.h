@@ -4,18 +4,18 @@
 
 #include "DreamWorld/DreamWorld.h"
 #include "Widget/User/UserWidgetBase.h"
-#include "WidgetWorldCreatingPanel.generated.h"
+#include "WidgetArchiveCreatingPanel.generated.h"
 
 /**
  * ���紴�����
  */
 UCLASS()
-class DREAMWORLD_API UWidgetWorldCreatingPanel : public UUserWidgetBase
+class DREAMWORLD_API UWidgetArchiveCreatingPanel : public UUserWidgetBase
 {
 	GENERATED_BODY()
 	
 public:
-	UWidgetWorldCreatingPanel(const FObjectInitializer& ObjectInitializer);
+	UWidgetArchiveCreatingPanel(const FObjectInitializer& ObjectInitializer);
 
 public:
 	virtual void OnRefresh_Implementation() override;

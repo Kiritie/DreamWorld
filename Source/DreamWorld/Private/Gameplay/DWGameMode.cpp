@@ -9,7 +9,7 @@
 #include "World/WorldManager.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Main/MainModule.h"
-#include "SaveGame/SaveGameArchive.h"
+#include "SaveGame/ArchiveSaveGame.h"
 
 ADWGameMode::ADWGameMode()
 {
@@ -29,14 +29,14 @@ void ADWGameMode::BeginPlay()
 
 void ADWGameMode::InitializeGame()
 {
-	UDWHelper::GetGameInstance(this)->Initialize();
+	UDWHelper::GetGameInstance(this)->InitializeData();
 
 	if(ADWGameState* DWGameState = UDWHelper::GetGameState(this))
 	{
 		DWGameState->SetCurrentState(EGameState::MainMenu);
 	}
 
-	if(USaveGameArchive* SaveGameArchive = UDWHelper::GetGameInstance(this)->LoadArchiveData())
+	if(UArchiveSaveGame* SaveGameArchive = UDWHelper::GetGameInstance(this)->LoadArchiveData())
 	{
 		if(AWorldManager* WorldManager = AWorldManager::Get())
 		{
@@ -49,9 +49,9 @@ void ADWGameMode::InitializeGame()
 	}
 }
 
-void ADWGameMode::StartGame(const FString& InArchiveName)
+void ADWGameMode::StartGame(FName InArchiveID)
 {
-	if(USaveGameArchive* SaveGameArchive = UDWHelper::GetGameInstance(this)->LoadArchiveData(InArchiveName))
+	if(UArchiveSaveGame* SaveGameArchive = UDWHelper::GetGameInstance(this)->LoadArchiveData(InArchiveID))
 	{
 		if(AWorldManager* WorldManager = AWorldManager::Get())
 		{
@@ -68,7 +68,7 @@ void ADWGameMode::ContinueGame()
 {
 	if(UDWGameInstance* GameInstance = UDWHelper::GetGameInstance(this))
 	{
-		StartGame(GameInstance->GetCurrentArchiveName());
+		StartGame(GameInstance->GetCurrentArchiveID());
 	}
 }
 

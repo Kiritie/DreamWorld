@@ -1,12 +1,12 @@
 // Copyright 1998-2019 Epic Games, Inc. All Rights Reserved.
 
-#include "SaveGame/SaveGameArchive.h"
+#include "SaveGame/ArchiveSaveGame.h"
 
 #include "Character/Player/DWPlayerCharacter.h"
 #include "Kismet/GameplayStatics.h"
 #include "World/WorldManager.h"
 
-USaveGameArchive::USaveGameArchive()
+UArchiveSaveGame::UArchiveSaveGame()
 {
 	// set default pawn class to our Blueprinted character
 	
@@ -14,7 +14,7 @@ USaveGameArchive::USaveGameArchive()
 	ChunkDatas = TMap<FVector, FChunkSaveData>();
 }
 
-void USaveGameArchive::RefreshSaveData_Implementation()
+void UArchiveSaveGame::RefreshSaveData_Implementation()
 {
 	if(ADWPlayerCharacter* PlayerCharacter = UDWHelper::GetPlayerCharacter(this))
 	{
@@ -27,12 +27,12 @@ void USaveGameArchive::RefreshSaveData_Implementation()
 	}
 }
 
-bool USaveGameArchive::IsExistChunkData(FIndex InChunkIndex)
+bool UArchiveSaveGame::IsExistChunkData(FIndex InChunkIndex)
 {
 	return ChunkDatas.Contains(InChunkIndex.ToVector());
 }
 
-void USaveGameArchive::SaveChunkData(FIndex InChunkIndex, FChunkSaveData InChunkData)
+void UArchiveSaveGame::SaveChunkData(FIndex InChunkIndex, FChunkSaveData InChunkData)
 {
 	if (!ChunkDatas.Contains(InChunkIndex.ToVector()))
 		ChunkDatas.Add(InChunkIndex.ToVector(), InChunkData);
@@ -40,7 +40,7 @@ void USaveGameArchive::SaveChunkData(FIndex InChunkIndex, FChunkSaveData InChunk
 		ChunkDatas[InChunkIndex.ToVector()] = InChunkData;
 }
 
-FChunkSaveData USaveGameArchive::LoadChunkData(FIndex InChunkIndex)
+FChunkSaveData UArchiveSaveGame::LoadChunkData(FIndex InChunkIndex)
 {
 	if (ChunkDatas.Contains(InChunkIndex.ToVector()))
 		return ChunkDatas[InChunkIndex.ToVector()];

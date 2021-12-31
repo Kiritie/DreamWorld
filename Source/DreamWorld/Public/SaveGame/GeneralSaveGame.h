@@ -5,30 +5,30 @@
 #include "DreamWorld/DreamWorld.h"
 #include "SaveGame/SaveGameBase.h"
 
-#include "SaveGameGeneral.generated.h"
+#include "GeneralSaveGame.generated.h"
 
-class USaveGameArchive;
+class UArchiveSaveGame;
 
 /**
  * 常规游戏数据存取类
  */
 UCLASS()
-class DREAMWORLD_API USaveGameGeneral : public USaveGameBase
+class DREAMWORLD_API UGeneralSaveGame : public USaveGameBase
 {
 	GENERATED_BODY()
 
 public:
-	USaveGameGeneral();
+	UGeneralSaveGame();
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	FGeneralSaveData GeneralData;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	TMap<FString, FArchiveSaveData> ArchiveDatas;
+	TMap<FName, FArchiveSaveData> ArchiveDatas;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	FString CurrentArchiveName;
+	FName CurrentArchiveID;
 
 public:
 	virtual void RefreshSaveData_Implementation() override;
@@ -37,9 +37,9 @@ public:
 
 	void SetGeneralData(FGeneralSaveData InGeneralData) { GeneralData = InGeneralData; }
 
-	TMap<FString, FArchiveSaveData>& GetArchiveDatas() { return ArchiveDatas; }
+	TMap<FName, FArchiveSaveData>& GetArchiveDatas() { return ArchiveDatas; }
 
-	FString GetCurrentArchiveName() const { return CurrentArchiveName; }
+	FName GetCurrentArchiveID() const { return CurrentArchiveID; }
 
-	void SetCurrentArchiveName(const FString& InCurrentArchiveName) { this->CurrentArchiveName = InCurrentArchiveName; }
+	void SetCurrentArchiveID(FName InCurrentArchiveID) { this->CurrentArchiveID = InCurrentArchiveID; }
 };

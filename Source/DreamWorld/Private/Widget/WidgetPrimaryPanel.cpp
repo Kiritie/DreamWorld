@@ -13,47 +13,10 @@ UWidgetPrimaryPanel::UWidgetPrimaryPanel(const FObjectInitializer& ObjectInitial
 {
 	WidgetName = FName("PrimaryPanel");
 	WidgetType = EWidgetType::Permanent;
-	InputMode = EInputMode::GameOnly;
+	InputMode = EInputMode::None;
 }
 
 void UWidgetPrimaryPanel::OnCreate_Implementation()
 {
-	if(AWidgetModule* WidgetModule = AMainModule::GetModuleByClass<AWidgetModule>())
-	{
-		WidgetModule->OnChangeInputMode.AddDynamic(this, &UWidgetPrimaryPanel::OnChangeInputMode);
-	}
-}
-
-void UWidgetPrimaryPanel::RefreshActions()
-{
-	if(ADWCharacter* OwnerCharacter = Cast<ADWCharacter>(GetOwnerActor()))
-	{
-		if(IInteraction* OverlappingTarget = OwnerCharacter->GetInteractionComponent()->GetOverlappingTarget())
-		{
-			ShowActions(OverlappingTarget->GetInteractionComponent()->GetValidInteractActions(OwnerCharacter));
-		}
-		else
-		{
-			HideActions();
-		}
-	}
-}
-
-void UWidgetPrimaryPanel::OnChangeInputMode(EInputMode InInputMode)
-{
-	if(ADWCharacter* OwnerCharacter = Cast<ADWCharacter>(OwnerActor))
-	{
-		if(!OwnerCharacter->IsDead() && InInputMode == EInputMode::GameOnly)
-		{
-			SetCrosshairVisible(true);
-		}
-		else
-		{
-			SetCrosshairVisible(true);
-		}
-	}
-	else
-	{
-		SetCrosshairVisible(true);
-	}
+	Super::OnCreate_Implementation();
 }

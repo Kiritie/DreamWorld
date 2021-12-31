@@ -18,7 +18,7 @@
 #include "Gameplay/DWGameInstance.h"
 #include "Inventory/CharacterInventory.h"
 #include "Gameplay/DWGameState.h"
-#include "SaveGame/SaveGameArchive.h"
+#include "SaveGame/ArchiveSaveGame.h"
 #include "SpawnPool/SpawnPoolModuleBPLibrary.h"
 #include "UObject/ConstructorHelpers.h"
 #include "World/Components/WorldTimerComponent.h"
@@ -104,6 +104,12 @@ void AWorldManager::Tick(float DeltaTime)
 
 	switch (UDWHelper::GetGameState(this)->GetCurrentState())
 	{
+		case EGameState::MainMenu:
+		case EGameState::Loading:
+		{
+			GenerateTerrain();
+			break;
+		}
 		case EGameState::Playing:
 		{
 			GenerateTerrain();
@@ -115,11 +121,6 @@ void AWorldManager::Tick(float DeltaTime)
 			{
 				WorldWeather->UpdateWeather();
 			}
-			break;
-		}
-		case EGameState::Loading:
-		{
-			GenerateTerrain();
 			break;
 		}
 		default: break;
@@ -193,20 +194,19 @@ FVector AWorldManager::ChunkIndexToLocation(FIndex InIndex)
 
 void AWorldManager::LoadWorld(FWorldSaveData InWorldData, bool bPreview)
 {
-	if(ADWGameState* GameState = UDWHelper::GetGameState(this))
-	{
-		GameState->SetCurrentState(EGameState::Loading);
-	}
-
 	if(!bPreview)
 	{
+		if(ADWGameState* GameState = UDWHelper::GetGameState(this))
+		{
+			GameState->SetCurrentState(EGameState::Loading);
+		}
 		if(WorldData.IsSameArchive(InWorldData))
 		{
 			for(auto Iter : ChunkMap)
 			{
 				if(Iter.Value && Iter.Value->IsGenerated())
 				{
-					Iter.Value->OnGenerated(false);
+					Iter.Value->OnGenerated();
 				}
 			}
 		}
@@ -225,7 +225,7 @@ void AWorldManager::LoadWorld(FWorldSaveData InWorldData, bool bPreview)
 	RandomStream = FRandomStream(WorldData.WorldSeed);
 	if(WorldTimer)
 	{
-		WorldTimer->SetTimeSeconds(InWorldData.CurrentTimeSeconds);
+		WorldTimer->SetTimeSeconds(InWorldData.TimeSeconds);
 	}
 }
 
@@ -419,9 +419,12 @@ void AWorldManager::GenerateTerrain()
 
 						OnBasicGenerated.Broadcast(hitResult.Location);
 
-						if(ADWGameState* GameState = UDWHelper::GetGameState(this))
+						if(!WorldData.bPreview)
 						{
-							GameState->SetCurrentState(EGameState::Playing);
+							if(ADWGameState* GameState = UDWHelper::GetGameState(this))
+							{
+								GameState->SetCurrentState(EGameState::Playing);
+							}
 						}
 					}
 				}
@@ -468,7 +471,7 @@ void AWorldManager::BuildChunkMap(AChunk* InChunk)
 
 	if(UDWGameInstance* GameInstance = UDWHelper::GetGameInstance(this))
 	{
-		if (USaveGameArchive* SaveGameArchive = GameInstance->LoadArchiveData())
+		if (UArchiveSaveGame* SaveGameArchive = GameInstance->LoadArchiveData())
 		{
 			if (SaveGameArchive->IsExistChunkData(InChunk->GetIndex()))
 			{

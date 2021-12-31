@@ -60,9 +60,7 @@ enum class EGameState : uint8
 	// ?????
 	MainMenu,
 	// ?????
-	ChoosingRole,
-	// ???????
-	ChoosingWorld,
+	Preparing,
 	// ??????
 	Loading,
 	// ??????
@@ -1406,26 +1404,6 @@ struct DREAMWORLD_API FWorldBasicSaveData : public FSaveData
 public:
 	FORCEINLINE FWorldBasicSaveData()
 	{
-		ArchiveName = TEXT("");
-		WorldSeed = 0;
-	}
-
-public:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	FString ArchiveName;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 WorldSeed;
-};
-
-USTRUCT(BlueprintType)
-struct DREAMWORLD_API FWorldSaveData : public FWorldBasicSaveData
-{
-	GENERATED_BODY()
-
-public:
-	FORCEINLINE FWorldSaveData()
-	{
 		BlockSize = 80;
 		ChunkSize = 16;
 		
@@ -1443,18 +1421,15 @@ public:
 
 		VitalityRaceDensity = 50.f;
 		CharacterRaceDensity = 50.f;
-
-		CurrentTimeSeconds = 0.f;
-
-		LastVitalityRaceIndex = FIndex::ZeroIndex;
-		LastCharacterRaceIndex = FIndex::ZeroIndex;
-		
-		bPreview = false;
 	}
 
 public:
-	static const FWorldSaveData Empty;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 WorldSeed;
 	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 TimeSeconds;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 BlockSize;
 
@@ -1493,9 +1468,64 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	float CharacterRaceDensity;
+};
+
+USTRUCT(BlueprintType)
+struct DREAMWORLD_API FWorldSaveData : public FWorldBasicSaveData
+{
+	GENERATED_BODY()
+
+public:
+	FORCEINLINE FWorldSaveData()
+	{
+		ArchiveID = TEXT("");
+		WorldSeed = 0;
+		
+		TimeSeconds = 0.f;
+
+		LastVitalityRaceIndex = FIndex::ZeroIndex;
+		LastCharacterRaceIndex = FIndex::ZeroIndex;
+		
+		bPreview = false;
+	}
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 CurrentTimeSeconds;
+	FORCEINLINE FWorldSaveData(FWorldBasicSaveData InBasicSaveData)
+	{
+		WorldSeed = InBasicSaveData.WorldSeed;
+		
+		TimeSeconds = InBasicSaveData.TimeSeconds;
+
+		BlockSize = InBasicSaveData.BlockSize;
+		ChunkSize = InBasicSaveData.ChunkSize;
+		
+		ChunkHeightRange = InBasicSaveData.ChunkHeightRange;
+
+		TerrainBaseHeight = InBasicSaveData.TerrainBaseHeight;
+		TerrainPlainScale = InBasicSaveData.TerrainPlainScale;
+		TerrainMountainScale = InBasicSaveData.TerrainMountainScale;
+		TerrainStoneVoxelScale = InBasicSaveData.TerrainStoneVoxelScale;
+		TerrainSandVoxelScale = InBasicSaveData.TerrainSandVoxelScale;
+		TerrainWaterVoxelHeight = InBasicSaveData.TerrainWaterVoxelHeight;
+		TerrainBedrockVoxelHeight = InBasicSaveData.TerrainBedrockVoxelHeight;
+
+		ChunkMaterials = InBasicSaveData.ChunkMaterials;
+
+		VitalityRaceDensity = InBasicSaveData.VitalityRaceDensity;
+		CharacterRaceDensity = InBasicSaveData.CharacterRaceDensity;
+
+		ArchiveID = NAME_None;
+
+		LastVitalityRaceIndex = FIndex::ZeroIndex;
+		LastCharacterRaceIndex = FIndex::ZeroIndex;
+		
+		bPreview = false;
+	}
+
+public:
+	static const FWorldSaveData Empty;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	FName ArchiveID;
 
 	FIndex LastVitalityRaceIndex;
 
@@ -1506,7 +1536,7 @@ public:
 public:
 	FORCEINLINE bool IsSameArchive(FWorldSaveData InSaveData) const
 	{
-		return InSaveData.ArchiveName == ArchiveName;
+		return InSaveData.ArchiveID == ArchiveID;
 	}
 
 	FORCEINLINE float GetChunkLength() const
@@ -1982,31 +2012,31 @@ public:
 	}
 
 public:
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	FName ID;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	UPROPERTY(BlueprintReadWrite)
 	FString Name;
 		
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UPROPERTY(BlueprintReadOnly)
 	FString RaceID;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	UPROPERTY(BlueprintReadWrite)
 	int32 Level;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UPROPERTY(BlueprintReadOnly)
 	int32 EXP;
 	
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY()
 	FVector SpawnLocation;
 	
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY()
 	FRotator SpawnRotation;
 
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY()
 	FDWAbilityData DefaultAbility;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	UPROPERTY(BlueprintReadWrite)
 	FInventorySaveData InventoryData;
 };
 
@@ -2036,7 +2066,7 @@ public:
 	}
 
 public:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UPROPERTY(BlueprintReadOnly)
 	FString TeamID;
 };
 
@@ -2060,34 +2090,34 @@ public:
 		ActionAbilities = TMap<ECharacterActionType, FDWCharacterActionAbilityData>();
 	}
 
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY()
 	ECharacterNature Nature;
 			
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY()
 	float AttackDistance;
 	
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY()
 	float InteractDistance;
 		
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY()
 	float FollowDistance;
 			
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY()
 	float PatrolDistance;
 			
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY()
 	float PatrolDuration;
 
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY()
 	FDWCharacterAttackAbilityData FallingAttackAbility;
 
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY()
 	TArray<FDWCharacterAttackAbilityData> AttackAbilities;
 
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY()
 	TMap<FName, FDWCharacterSkillAbilityData> SkillAbilities;
 
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY()
 	TMap<ECharacterActionType, FDWCharacterActionAbilityData> ActionAbilities;
 
 public:
@@ -2095,18 +2125,40 @@ public:
 };
 
 USTRUCT(BlueprintType)
-struct DREAMWORLD_API FPlayerSaveData : public FCharacterSaveData
+struct DREAMWORLD_API FPlayerBasicSaveData : public FCharacterSaveData
+{
+	GENERATED_BODY()
+
+public:
+	FORCEINLINE FPlayerBasicSaveData()
+	{
+		CameraRotation = FRotator::ZeroRotator;
+	}
+
+	UPROPERTY(EditDefaultsOnly)
+	FRotator CameraRotation;
+};
+
+USTRUCT(BlueprintType)
+struct DREAMWORLD_API FPlayerSaveData : public FPlayerBasicSaveData
 {
 	GENERATED_BODY()
 
 public:
 	FORCEINLINE FPlayerSaveData()
 	{
-		CameraRotation = FRotator::ZeroRotator;
+		ArchiveID = TEXT("");
+	}
+	
+	FORCEINLINE FPlayerSaveData(FPlayerBasicSaveData InBasicSaveData)
+	{
+		ID = InBasicSaveData.ID;
+
+		ArchiveID = NAME_None;
 	}
 
-	UPROPERTY(VisibleAnywhere)
-	FRotator CameraRotation;
+	UPROPERTY(BlueprintReadOnly)
+	FName ArchiveID;
 };
 
 USTRUCT(BlueprintType)
@@ -2123,13 +2175,20 @@ public:
 
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	FString Name;
+	FName ID;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	FWorldSaveData WorldData;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	FPlayerSaveData PlayerData;
+
+public:
+	void Initialize()
+	{
+		WorldData.ArchiveID = ID;
+		PlayerData.ArchiveID = ID;
+	}
 };
 
 USTRUCT(BlueprintType)

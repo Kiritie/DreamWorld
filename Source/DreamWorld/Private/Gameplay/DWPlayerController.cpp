@@ -137,7 +137,10 @@ void ADWPlayerController::OnBasicGenerated(FVector InPlayerLocation)
 		{
 			PlayerCharacter->SetActorLocation(InPlayerLocation);
 		}
-		PlayerCharacter->Active(true);
+		if(!AWorldManager::GetWorldData().bPreview)
+		{
+			PlayerCharacter->Active(true);
+		}
 	}
 }
 
@@ -172,15 +175,14 @@ void ADWPlayerController::LoadPlayer(FPlayerSaveData InPlayerData)
 
 	if (ADWPlayerCharacter* NewPlayerCharacter = GetWorld()->SpawnActor<ADWPlayerCharacter>(InPlayerData.GetCharacterData().Class, SpawnParams))
 	{
+		Possess(NewPlayerCharacter);
+
+		SetControlRotation(InPlayerData.CameraRotation);
+		GetCameraManager()->SetCameraDistance(UDWHelper::GetGameInstance(this)->GetGeneralData().CameraDistance, true);
+
 		NewPlayerCharacter->Disable(true, true);
 		NewPlayerCharacter->LoadData(&InPlayerData);
 
-		Possess(NewPlayerCharacter);
-
-		NewPlayerCharacter->SetActorLocationAndRotation(FVector::ZeroVector, FRotator::ZeroRotator);
-		GetCameraManager()->SetCameraDistance(-1.f, true);
-		SetControlRotation(NewPlayerCharacter->GetActorRotation());
-		
 		if (!InPlayerData.bSaved)
 		{
 			auto VoxelDatas = UDWHelper::LoadVoxelDatas();
@@ -381,7 +383,7 @@ void ADWPlayerController::ToggleInventoryPanel()
 	{
 		if (GameState->GetCurrentState() == EGameState::Playing)
 		{
-			UWidgetModuleBPLibrary::ToggleUserWidget<UWidgetInventoryPanel>(false, UDWHelper::LoadWidgetInventoryPanelClass());
+			UWidgetModuleBPLibrary::ToggleUserWidget<UWidgetInventoryPanel>(false);
 		}
 	}
 }

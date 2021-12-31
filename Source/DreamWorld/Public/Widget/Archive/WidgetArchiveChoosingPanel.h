@@ -4,16 +4,16 @@
 
 #include "DreamWorld/DreamWorld.h"
 #include "Widget/User/UserWidgetBase.h"
-#include "WidgetRoleChoosingPanel.generated.h"
+#include "WidgetArchiveChoosingPanel.generated.h"
 
 /**
  * ��ɫѡ�����
  */
 UCLASS()
-class DREAMWORLD_API UWidgetRoleChoosingPanel : public UUserWidgetBase
+class DREAMWORLD_API UWidgetArchiveChoosingPanel : public UUserWidgetBase
 {
 	GENERATED_BODY()
 
 public:
-	UWidgetRoleChoosingPanel(const FObjectInitializer& ObjectInitializer);
+	UWidgetArchiveChoosingPanel(const FObjectInitializer& ObjectInitializer);
 };

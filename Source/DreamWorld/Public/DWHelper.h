@@ -179,65 +179,6 @@ public:
 	static FCharacterRaceData RandomCharacterRaceData();
 
 	//////////////////////////////////////////////////////////////////////////
-	// Classes
-private:
-	static TSubclassOf<class UWidgetMainMenu> WidgetMainMenuClass;
-
-	static TSubclassOf<class UWidgetSettingPanel> WidgetSettingPanelClass;
-	
-	static TSubclassOf<class UWidgetLoadingPanel> WidgetLoadingPanelClass;
-
-	static TSubclassOf<class UWidgetPausingMenu> WidgetPausingMenuClass;
-
-	static TSubclassOf<class UWidgetPrimaryPanel> WidgetPrimaryPanelClass;
-
-	static TSubclassOf<class UWidgetRoleChoosingPanel> WidgetRoleChoosingPanelClass;
-
-	static TSubclassOf<class UWidgetRoleCreatingPanel> WidgetRoleCreatingPanelClass;
-
-	static TSubclassOf<class UWidgetWorldChoosingPanel> WidgetWorldChoosingPanelClass;
-
-	static TSubclassOf<class UWidgetWorldCreatingPanel> WidgetWorldCreatingPanelClass;
-
-	static TSubclassOf<class UWidgetInventoryBar> WidgetInventoryBarClass;
-
-	static TSubclassOf<class UWidgetInventoryPanel> WidgetInventoryPanelClass;
-
-public:
-	UFUNCTION(BlueprintPure, Category = "DWHelper")
-	static TSubclassOf<class UWidgetMainMenu> LoadWidgetMainMenuClass();
-
-	UFUNCTION(BlueprintPure, Category = "DWHelper")
-	static TSubclassOf<class UWidgetSettingPanel> LoadWidgetSettingPanelClass();
-
-	UFUNCTION(BlueprintPure, Category = "DWHelper")
-	static TSubclassOf<class UWidgetLoadingPanel> LoadWidgetLoadingPanelClass();
-
-	UFUNCTION(BlueprintPure, Category = "DWHelper")
-	static TSubclassOf<class UWidgetPausingMenu> LoadWidgetPausingMenuClass();
-
-	UFUNCTION(BlueprintPure, Category = "DWHelper")
-	static TSubclassOf<class UWidgetPrimaryPanel> LoadWidgetPrimaryPanelClass();
-
-	UFUNCTION(BlueprintPure, Category = "DWHelper")
-	static TSubclassOf<class UWidgetRoleChoosingPanel> LoadWidgetRoleChoosingPanelClass();
-
-	UFUNCTION(BlueprintPure, Category = "DWHelper")
-	static TSubclassOf<class UWidgetRoleCreatingPanel> LoadWidgetRoleCreatingPanelClass();
-
-	UFUNCTION(BlueprintPure, Category = "DWHelper")
-	static TSubclassOf<class UWidgetWorldChoosingPanel> LoadWidgetWorldChoosingPanelClass();
-
-	UFUNCTION(BlueprintPure, Category = "DWHelper")
-	static TSubclassOf<class UWidgetWorldCreatingPanel> LoadWidgetWorldCreatingPanelClass();
-
-	UFUNCTION(BlueprintPure, Category = "DWHelper")
-	static TSubclassOf<class UWidgetInventoryBar> LoadWidgetInventoryBarClass();
-
-	UFUNCTION(BlueprintPure, Category = "DWHelper")
-	static TSubclassOf<class UWidgetInventoryPanel> LoadWidgetInventoryPanelClass();
-
-	//////////////////////////////////////////////////////////////////////////
 	// Index
 public:
 	UFUNCTION(BlueprintPure, Category = "DWHelper")

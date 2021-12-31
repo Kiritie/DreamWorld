@@ -120,7 +120,7 @@ public:
 
 	void LoadMap(FChunkSaveData InChunkData);
 
-	void OnGenerated(bool bPreview = false);
+	void OnGenerated();
 
 protected:
 	void LoadActors(FChunkSaveData InChunkData);

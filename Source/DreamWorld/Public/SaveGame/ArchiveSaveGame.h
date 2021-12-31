@@ -5,18 +5,18 @@
 #include "DreamWorld/DreamWorld.h"
 #include "SaveGame/SaveGameBase.h"
 
-#include "SaveGameArchive.generated.h"
+#include "ArchiveSaveGame.generated.h"
 
 /**
  * 世界数据存取类
  */
 UCLASS()
-class DREAMWORLD_API USaveGameArchive : public USaveGameBase
+class DREAMWORLD_API UArchiveSaveGame : public USaveGameBase
 {
 	GENERATED_BODY()
 
 public:
-	USaveGameArchive();
+	UArchiveSaveGame();
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)

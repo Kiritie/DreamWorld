@@ -229,8 +229,6 @@ void ADWPlayerCharacter::LoadData(FSaveData* InSaveData)
 
 	auto SaveData = *static_cast<FPlayerSaveData*>(InSaveData);
 	
-	GetPlayerController()->SetControlRotation(SaveData.CameraRotation);
-	GetPlayerController()->GetCameraManager()->SetCameraDistance(UDWHelper::GetGameInstance(this)->GetGeneralData().CameraDistance);
 }
 
 FSaveData* ADWPlayerCharacter::ToData(bool bSaved)
@@ -272,7 +270,10 @@ void ADWPlayerCharacter::Death(AActor* InKiller)
 void ADWPlayerCharacter::DeathEnd()
 {
 	Super::DeathEnd();
-	UWidgetModuleBPLibrary::GetUserWidget<UWidgetPrimaryPanel>()->SetCrosshairVisible(false);
+	if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetPrimaryPanel>())
+	{
+		UWidgetModuleBPLibrary::GetUserWidget<UWidgetPrimaryPanel>()->SetCrosshairVisible(false);
+	}
 }
 
 void ADWPlayerCharacter::ResetData(bool bRefresh)
@@ -803,102 +804,180 @@ void ADWPlayerCharacter::DoInteractAction5()
 void ADWPlayerCharacter::HandleNameChanged(const FString& NewValue)
 {
 	Super::HandleNameChanged(NewValue);
-	UWidgetModuleBPLibrary::GetUserWidget<UWidgetPrimaryPanel>()->SetHeadInfo(GetHeadInfo());
-	UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>()->SetHeadInfo(GetHeadInfo());
+	if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetPrimaryPanel>())
+	{
+		UWidgetModuleBPLibrary::GetUserWidget<UWidgetPrimaryPanel>()->SetHeadInfo(GetHeadInfo());
+	}
+	if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>())
+	{
+		UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>()->SetHeadInfo(GetHeadInfo());
+	}
 }
 
 void ADWPlayerCharacter::HandleTeamIDChanged(const FString& NewValue)
 {
 	Super::HandleTeamIDChanged(NewValue);
-	UWidgetModuleBPLibrary::GetUserWidget<UWidgetPrimaryPanel>()->SetHeadInfo(GetHeadInfo());
-	UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>()->SetHeadInfo(GetHeadInfo());
+	if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetPrimaryPanel>())
+	{
+		UWidgetModuleBPLibrary::GetUserWidget<UWidgetPrimaryPanel>()->SetHeadInfo(GetHeadInfo());
+	}
+	if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>())
+	{
+		UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>()->SetHeadInfo(GetHeadInfo());
+	}
 }
 
 void ADWPlayerCharacter::HandleRaceIDChanged(const FString& NewValue)
 {
 	Super::HandleRaceIDChanged(NewValue);
-	UWidgetModuleBPLibrary::GetUserWidget<UWidgetPrimaryPanel>()->SetHeadInfo(GetHeadInfo());
-	UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>()->SetHeadInfo(GetHeadInfo());
+	if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetPrimaryPanel>())
+	{
+		UWidgetModuleBPLibrary::GetUserWidget<UWidgetPrimaryPanel>()->SetHeadInfo(GetHeadInfo());
+	}
+	if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>())
+	{
+		UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>()->SetHeadInfo(GetHeadInfo());
+	}
 }
 
 void ADWPlayerCharacter::HandleLevelChanged(int32 NewValue, int32 DeltaValue /*= 0*/)
 {
 	Super::HandleLevelChanged(NewValue);
-	UWidgetModuleBPLibrary::GetUserWidget<UWidgetPrimaryPanel>()->SetHeadInfo(GetHeadInfo());
-	UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>()->SetHeadInfo(GetHeadInfo());
+	if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetPrimaryPanel>())
+	{
+		UWidgetModuleBPLibrary::GetUserWidget<UWidgetPrimaryPanel>()->SetHeadInfo(GetHeadInfo());
+	}
+	if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>())
+	{
+		UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>()->SetHeadInfo(GetHeadInfo());
+	}
 }
 
 void ADWPlayerCharacter::HandleEXPChanged(int32 NewValue, int32 DeltaValue /*= 0*/)
 {
 	Super::HandleEXPChanged(NewValue);
-	UWidgetModuleBPLibrary::GetUserWidget<UWidgetPrimaryPanel>()->SetHeadInfo(GetHeadInfo());
-	UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>()->SetHeadInfo(GetHeadInfo());
+	if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetPrimaryPanel>())
+	{
+		UWidgetModuleBPLibrary::GetUserWidget<UWidgetPrimaryPanel>()->SetHeadInfo(GetHeadInfo());
+	}
+	if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>())
+	{
+		UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>()->SetHeadInfo(GetHeadInfo());
+	}
 }
 
 void ADWPlayerCharacter::HandleHealthChanged(float NewValue, float DeltaValue /*= 0.f*/)
 {
 	Super::HandleHealthChanged(NewValue, DeltaValue);
-	UWidgetModuleBPLibrary::GetUserWidget<UWidgetPrimaryPanel>()->SetHealthPercent(NewValue, GetMaxHealth());
-	UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>()->SetHealthInfo(FString::Printf(TEXT("%d/%d"), (int32)NewValue, (int32)GetMaxHealth()));
+	if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetPrimaryPanel>())
+	{
+		UWidgetModuleBPLibrary::GetUserWidget<UWidgetPrimaryPanel>()->SetHealthPercent(NewValue, GetMaxHealth());
+	}
+	if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>())
+	{
+		UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>()->SetHealthInfo(FString::Printf(TEXT("%d/%d"), (int32)NewValue, (int32)GetMaxHealth()));
+	}
 }
 
 void ADWPlayerCharacter::HandleMaxHealthChanged(float NewValue, float DeltaValue /*= 0.f*/)
 {
 	Super::HandleMaxHealthChanged(NewValue, DeltaValue);
-	UWidgetModuleBPLibrary::GetUserWidget<UWidgetPrimaryPanel>()->SetHealthPercent(NewValue, GetMaxHealth());
-	UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>()->SetHealthInfo(FString::Printf(TEXT("%d/%d"), (int32)NewValue, (int32)GetMaxHealth()));
+	if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetPrimaryPanel>())
+	{
+		UWidgetModuleBPLibrary::GetUserWidget<UWidgetPrimaryPanel>()->SetHealthPercent(NewValue, GetMaxHealth());
+	}
+	if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>())
+	{
+		UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>()->SetHealthInfo(FString::Printf(TEXT("%d/%d"), (int32)NewValue, (int32)GetMaxHealth()));
+	}
 }
 
 void ADWPlayerCharacter::HandleManaChanged(float NewValue, float DeltaValue /*= 0.f*/)
 {
 	Super::HandleManaChanged(NewValue, DeltaValue);
-	UWidgetModuleBPLibrary::GetUserWidget<UWidgetPrimaryPanel>()->SetManaPercent(NewValue, GetMaxMana());
-	UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>()->SetManaInfo(FString::Printf(TEXT("%d/%d"), (int32)NewValue, (int32)GetMaxMana()));
+	if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetPrimaryPanel>())
+	{
+		UWidgetModuleBPLibrary::GetUserWidget<UWidgetPrimaryPanel>()->SetManaPercent(NewValue, GetMaxMana());
+	}
+	if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>())
+	{
+		UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>()->SetManaInfo(FString::Printf(TEXT("%d/%d"), (int32)NewValue, (int32)GetMaxMana()));
+	}
 }
 
 void ADWPlayerCharacter::HandleMaxManaChanged(float NewValue, float DeltaValue /*= 0.f*/)
 {
 	Super::HandleMaxManaChanged(NewValue, DeltaValue);
-	UWidgetModuleBPLibrary::GetUserWidget<UWidgetPrimaryPanel>()->SetManaPercent(NewValue, GetMaxMana());
-	UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>()->SetManaInfo(FString::Printf(TEXT("%d/%d"), (int32)NewValue, (int32)GetMaxMana()));
+	if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetPrimaryPanel>())
+	{
+		UWidgetModuleBPLibrary::GetUserWidget<UWidgetPrimaryPanel>()->SetManaPercent(NewValue, GetMaxMana());
+	}
+	if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>())
+	{
+		UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>()->SetManaInfo(FString::Printf(TEXT("%d/%d"), (int32)NewValue, (int32)GetMaxMana()));
+	}
 }
 
 void ADWPlayerCharacter::HandleStaminaChanged(float NewValue, float DeltaValue /*= 0.f*/)
 {
 	Super::HandleStaminaChanged(NewValue, DeltaValue);
-	UWidgetModuleBPLibrary::GetUserWidget<UWidgetPrimaryPanel>()->SetStaminaPercent(NewValue, GetMaxStamina());
-	UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>()->SetStaminaInfo(FString::Printf(TEXT("%d/%d"), (int32)NewValue, (int32)GetMaxStamina()));
+	if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetPrimaryPanel>())
+	{
+		UWidgetModuleBPLibrary::GetUserWidget<UWidgetPrimaryPanel>()->SetStaminaPercent(NewValue, GetMaxStamina());
+	}
+	if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>())
+	{
+		UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>()->SetStaminaInfo(FString::Printf(TEXT("%d/%d"), (int32)NewValue, (int32)GetMaxStamina()));
+	}
 }
 
 void ADWPlayerCharacter::HandleMaxStaminaChanged(float NewValue, float DeltaValue /*= 0.f*/)
 {
 	Super::HandleMaxStaminaChanged(NewValue, DeltaValue);
-	UWidgetModuleBPLibrary::GetUserWidget<UWidgetPrimaryPanel>()->SetStaminaPercent(NewValue, GetMaxStamina());
-	UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>()->SetStaminaInfo(FString::Printf(TEXT("%d/%d"), (int32)NewValue, (int32)GetMaxStamina()));
+	if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetPrimaryPanel>())
+	{
+		UWidgetModuleBPLibrary::GetUserWidget<UWidgetPrimaryPanel>()->SetStaminaPercent(NewValue, GetMaxStamina());
+	}
+	if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>())
+	{
+		UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>()->SetStaminaInfo(FString::Printf(TEXT("%d/%d"), (int32)NewValue, (int32)GetMaxStamina()));
+	}
 }
 
 void ADWPlayerCharacter::HandleMoveSpeedChanged(float NewValue, float DeltaValue /*= 0.f*/)
 {
 	Super::HandleMoveSpeedChanged(NewValue, DeltaValue);
-	UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>()->SetMoveSpeed(FString::FromInt(NewValue));
+	if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>())
+	{
+		UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>()->SetMoveSpeed(FString::FromInt(NewValue));
+	}
 }
 
 void ADWPlayerCharacter::HandleSwimSpeedChanged(float NewValue, float DeltaValue /*= 0.f*/)
 {
 	Super::HandleSwimSpeedChanged(NewValue, DeltaValue);
-	UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>()->SetSwimSpeed(FString::FromInt(NewValue));
+	if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>())
+	{
+		UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>()->SetSwimSpeed(FString::FromInt(NewValue));
+	}
 }
 
 void ADWPlayerCharacter::HandleRideSpeedChanged(float NewValue, float DeltaValue /*= 0.f*/)
 {
 	Super::HandleRideSpeedChanged(NewValue, DeltaValue);
-	UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>()->SetRideSpeed(FString::FromInt(NewValue));
+	if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>())
+	{
+		UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>()->SetRideSpeed(FString::FromInt(NewValue));
+	}
 }
 
 void ADWPlayerCharacter::HandleFlySpeedChanged(float NewValue, float DeltaValue /*= 0.f*/)
 {
 	Super::HandleFlySpeedChanged(NewValue, DeltaValue);
-	UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>()->SetFlySpeed(FString::FromInt(NewValue));
+	if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>())
+	{
+		UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>()->SetFlySpeed(FString::FromInt(NewValue));
+	}
 }
 
 void ADWPlayerCharacter::HandleRotationSpeedChanged(float NewValue, float DeltaValue /*= 0.f*/)
@@ -919,60 +998,91 @@ void ADWPlayerCharacter::HandleDodgeForceChanged(float NewValue, float DeltaValu
 void ADWPlayerCharacter::HandleAttackForceChanged(float NewValue, float DeltaValue /*= 0.f*/)
 {
 	Super::HandleAttackForceChanged(NewValue, DeltaValue);
-	UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>()->SetAttackForce(FString::FromInt(NewValue));
+	if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>())
+	{
+		UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>()->SetAttackForce(FString::FromInt(NewValue));
+	}
 }
 
 void ADWPlayerCharacter::HandleRepulseForceChanged(float NewValue, float DeltaValue /*= 0.f*/)
 {
 	Super::HandleRepulseForceChanged(NewValue, DeltaValue);
-	UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>()->SetRepulseForce(FString::FromInt(NewValue));
+	if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>())
+	{
+		UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>()->SetRepulseForce(FString::FromInt(NewValue));
+	}
 }
 
 void ADWPlayerCharacter::HandleAttackSpeedChanged(float NewValue, float DeltaValue /*= 0.f*/)
 {
 	Super::HandleAttackSpeedChanged(NewValue, DeltaValue);
-	UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>()->SetAttackSpeed(FString::SanitizeFloat(NewValue, 1));
+	if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>())
+	{
+		UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>()->SetAttackSpeed(FString::SanitizeFloat(NewValue, 1));
+	}
 }
 
 void ADWPlayerCharacter::HandleAttackCritRateChanged(float NewValue, float DeltaValue /*= 0.f*/)
 {
 	Super::HandleAttackCritRateChanged(NewValue, DeltaValue);
-	UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>()->SetAttackCritRate(FString::Printf(TEXT("%d%%"), (int32)(NewValue * 100)));
+	if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>())
+	{
+		UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>()->SetAttackCritRate(FString::Printf(TEXT("%d%%"), (int32)(NewValue * 100)));
+	}
 }
 
 void ADWPlayerCharacter::HandleAttackStealRateChanged(float NewValue, float DeltaValue /*= 0.f*/)
 {
 	Super::HandleAttackStealRateChanged(NewValue, DeltaValue);
-	UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>()->SetAttackStealRate(FString::Printf(TEXT("%d%%"), (int32)(NewValue * 100)));
+	if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>())
+	{
+		UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>()->SetAttackStealRate(FString::Printf(TEXT("%d%%"), (int32)(NewValue * 100)));
+	}
 }
 
 void ADWPlayerCharacter::HandleDefendRateChanged(float NewValue, float DeltaValue /*= 0.f*/)
 {
 	Super::HandleDefendRateChanged(NewValue, DeltaValue);
-	UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>()->SetDefendRate(FString::Printf(TEXT("%d%%"), (int32)(NewValue * 100)));
+	if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>())
+	{
+		UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>()->SetDefendRate(FString::Printf(TEXT("%d%%"), (int32)(NewValue * 100)));
+	}
 }
 
 void ADWPlayerCharacter::HandleDefendScopeChanged(float NewValue, float DeltaValue /*= 0.f*/)
 {
 	Super::HandleDefendScopeChanged(NewValue, DeltaValue);
+	if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>())
+	{
+		Super::HandleDefendScopeChanged(NewValue, DeltaValue);
+	}
 }
 
 void ADWPlayerCharacter::HandlePhysicsDefRateChanged(float NewValue, float DeltaValue /*= 0.f*/)
 {
 	Super::HandlePhysicsDefRateChanged(NewValue, DeltaValue);
-	UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>()->SetPhysicsDefRate(FString::Printf(TEXT("%d%%"), (int32)(NewValue * 100)));
+	if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>())
+	{
+		UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>()->SetPhysicsDefRate(FString::Printf(TEXT("%d%%"), (int32)(NewValue * 100)));
+	}
 }
 
 void ADWPlayerCharacter::HandleMagicDefRateChanged(float NewValue, float DeltaValue /*= 0.f*/)
 {
 	Super::HandleMagicDefRateChanged(NewValue, DeltaValue);
-	UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>()->SetMagicDefRate(FString::Printf(TEXT("%d%%"), (int32)(NewValue * 100)));
+	if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>())
+	{
+		UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>()->SetMagicDefRate(FString::Printf(TEXT("%d%%"), (int32)(NewValue * 100)));
+	}
 }
 
 void ADWPlayerCharacter::HandleToughnessRateChanged(float NewValue, float DeltaValue /*= 0.f*/)
 {
 	Super::HandleToughnessRateChanged(NewValue, DeltaValue);
-	UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>()->SetToughnessRate(FString::Printf(TEXT("%d%%"), (int32)(NewValue * 100)));
+	if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>())
+	{
+		UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>()->SetToughnessRate(FString::Printf(TEXT("%d%%"), (int32)(NewValue * 100)));
+	}
 }
 
 void ADWPlayerCharacter::HandleRegenSpeedAttribute(float NewValue, float DeltaValue /*= 0.f*/)
