@@ -18,30 +18,12 @@ class DREAMWORLD_API UArchiveSaveGame : public USaveGameBase
 public:
 	UArchiveSaveGame();
 
-protected:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	FArchiveSaveData ArchiveData;
-
 public:
-	virtual void RefreshSaveData_Implementation() override;
+	virtual void OnCreate_Implementation(USaveGameDataBase* InSaveGameData) override;
 
-	FArchiveSaveData& GetArchiveData() { return ArchiveData; }
+	virtual void OnLoad_Implementation() override;
 
-	void SetArchiveData(const FArchiveSaveData& InArchiveSaveData) { this->ArchiveData = InArchiveSaveData; }
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	TMap<FVector, FChunkSaveData> ChunkDatas;
-
-public:
-	UFUNCTION(BlueprintCallable, BlueprintPure)
-	bool IsExistChunkData(FIndex InChunkIndex);
-
-	UFUNCTION(BlueprintCallable)
-	void SaveChunkData(FIndex InChunkIndex, FChunkSaveData InChunkData);
+	virtual void OnUnload_Implementation() override;
 	
-	UFUNCTION(BlueprintCallable, BlueprintPure)
-	FChunkSaveData LoadChunkData(FIndex InChunkIndex);
-
-	UFUNCTION(BlueprintCallable, BlueprintPure)
-	TMap<FVector, FChunkSaveData>& GetChunkDatas() { return ChunkDatas; }
+	virtual void OnRefresh_Implementation() override;
 };

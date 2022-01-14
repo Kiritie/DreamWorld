@@ -13,12 +13,12 @@
 #include "Engine/DataTable.h"
 #include "GameFramework/InputSettings.h"
 #include "GameFramework/PlayerInput.h"
-#include "Main/DWMainModule.h"
+#include "Module/DWMainModule.h"
 #include "Main/MainModuleBPLibrary.h"
 #include "Widget/WidgetLoadingPanel.h"
 #include "Widget/WidgetMainMenu.h"
 #include "Widget/WidgetPausingMenu.h"
-#include "Widget/WidgetPrimaryPanel.h"
+#include "Widget/WidgetGameHUD.h"
 #include "Widget/WidgetSettingPanel.h"
 #include "Widget/Archive/WidgetArchiveChoosingPanel.h"
 #include "Widget/Archive/WidgetArchiveCreatingPanel.h"
@@ -28,7 +28,7 @@
 #include "Widget/Other/WidgetWorldText.h"
 #include "Widget/Other/WidgetVitalityHP.h"
 #include "Widget/Other/WidgetCharacterHP.h"
-#include "Widget/WidgetPrimaryPanel.h"
+#include "Widget/WidgetGameHUD.h"
 
 ADWGameState* UDWHelper::CurrentGameState = nullptr;
 
@@ -37,6 +37,11 @@ ADWGameMode* UDWHelper::CurrentGameMode = nullptr;
 UDWGameInstance* UDWHelper::CurrentGameInstance = nullptr;
 
 ADWPlayerController* UDWHelper::CurrentPlayerController = nullptr;
+
+UDWHelper::UDWHelper(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
+{
+	LoadItemDatas();
+}
 
 ADWGameMode* UDWHelper::GetGameMode(const UObject* InWorldContext)
 {

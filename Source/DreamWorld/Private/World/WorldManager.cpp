@@ -72,7 +72,7 @@ AWorldManager::AWorldManager()
 
 	bBasicGenerated = false;
 	ChunkSpawnBatch = 0;
-	LastGenerateIndex = FIndex::ZeroIndex;
+	LastGenerateIndex = FIndex(-1, -1, -1);
 	LastStayChunkIndex = FIndex::ZeroIndex;
 	TeamMap = TMap<FName, FTeamData>();
 	ChunkMap = TMap<FIndex, AChunk*>();
@@ -88,11 +88,6 @@ AWorldManager::AWorldManager()
 void AWorldManager::BeginPlay()
 {
 	Super::BeginPlay();
-
-	if(ADWPlayerController* PlayerController = UDWHelper::GetPlayerController(this))
-	{
-		PlayerController->OnPlayerSpawned.AddDynamic(this, &AWorldManager::OnPlayerSpawned);
-	}
 
 	//GeneratePreviews();
 }
@@ -192,9 +187,16 @@ FVector AWorldManager::ChunkIndexToLocation(FIndex InIndex)
 	return InIndex.ToVector() * WorldData.GetChunkLength();
 }
 
-void AWorldManager::LoadWorld(FWorldSaveData InWorldData, bool bPreview)
+void AWorldManager::LoadData(FWorldSaveData InWorldData)
 {
-	if(!bPreview)
+	WorldData = InWorldData;
+	RandomStream = FRandomStream(WorldData.WorldSeed);
+	if(WorldTimer)
+	{
+		WorldTimer->SetTimeSeconds(InWorldData.TimeSeconds);
+	}
+
+	if(!InWorldData.GetArchiveData().bPreview)
 	{
 		if(ADWGameState* GameState = UDWHelper::GetGameState(this))
 		{
@@ -206,30 +208,30 @@ void AWorldManager::LoadWorld(FWorldSaveData InWorldData, bool bPreview)
 			{
 				if(Iter.Value && Iter.Value->IsGenerated())
 				{
-					Iter.Value->OnGenerated();
+					Iter.Value->SpawnActors();
 				}
 			}
 		}
 		else
 		{
-			UnloadWorld(false);
+			UnloadData();
 		}
-	}
-
-	WorldData = InWorldData;
-	WorldData.bPreview = bPreview;
-	if(WorldData.WorldSeed == 0)
-	{
-		WorldData.WorldSeed = FMath::Rand();
-	}
-	RandomStream = FRandomStream(WorldData.WorldSeed);
-	if(WorldTimer)
-	{
-		WorldTimer->SetTimeSeconds(InWorldData.TimeSeconds);
 	}
 }
 
-void AWorldManager::UnloadWorld(bool bPreview)
+FWorldSaveData AWorldManager::ToData(bool bSaved) const
+{
+	for(auto Iter : ChunkMap)
+	{
+		if(Iter.Value)
+		{
+			WorldData.SetChunkData(Iter.Key, Iter.Value->ToData(bSaved));
+		}
+	}
+	return WorldData;
+}
+
+void AWorldManager::UnloadData(bool bPreview)
 {
 	if(!bPreview)
 	{
@@ -241,10 +243,10 @@ void AWorldManager::UnloadWorld(bool bPreview)
 			}
 		}
 		ChunkMap.Empty();
-		
+	
 		ChunkSpawnBatch = 0;
 		bBasicGenerated = false;
-		LastGenerateIndex = FIndex::ZeroIndex;
+		LastGenerateIndex = FIndex(-1, -1, -1);
 		LastStayChunkIndex = FIndex::ZeroIndex;
 
 		ChunkSpawnQueue.Empty();
@@ -254,17 +256,24 @@ void AWorldManager::UnloadWorld(bool bPreview)
 		ChunkDestroyQueue.Empty();
 
 		TeamMap.Empty();
+
+		WorldData = FWorldSaveData();
+	}
+	else
+	{
+		for(auto Iter : ChunkMap)
+		{
+			if(Iter.Value && Iter.Value->IsGenerated())
+			{
+				Iter.Value->DestroyActors();
+			}
+		}
 	}
 }
 
 void AWorldManager::InitRandomStream(int32 InDeltaSeed)
 {
 	RandomStream.Initialize(WorldData.WorldSeed + InDeltaSeed);
-}
-
-void AWorldManager::OnPlayerSpawned(ADWPlayerCharacter* InPlayerCharacter)
-{
-	GenerateChunks(LocationToChunkIndex(InPlayerCharacter->GetActorLocation(), true));
 }
 
 void AWorldManager::GeneratePreviews()
@@ -306,7 +315,7 @@ void AWorldManager::GenerateTerrain()
 	{
 		FIndex chunkIndex = LocationToChunkIndex(PlayerCharacter->GetActorLocation(), true);
 
-		if (FIndex::Distance(chunkIndex, LastGenerateIndex, true) >= ChunkSpawnDistance)
+		if (LastGenerateIndex == FIndex(-1, -1, -1) || FIndex::Distance(chunkIndex, LastGenerateIndex, true) >= ChunkSpawnDistance)
 		{
 			GenerateChunks(chunkIndex);
 		}
@@ -417,9 +426,9 @@ void AWorldManager::GenerateTerrain()
 					{
 						bBasicGenerated = true;
 
-						OnBasicGenerated.Broadcast(hitResult.Location);
+						OnWorldGenerated.Broadcast(hitResult.Location, WorldData.GetArchiveData().bPreview);
 
-						if(!WorldData.bPreview)
+						if(!WorldData.GetArchiveData().bPreview)
 						{
 							if(ADWGameState* GameState = UDWHelper::GetGameState(this))
 							{
@@ -469,19 +478,13 @@ void AWorldManager::BuildChunkMap(AChunk* InChunk)
 {
 	if (!InChunk || !ChunkMap.Contains(InChunk->GetIndex())) return;
 
-	if(UDWGameInstance* GameInstance = UDWHelper::GetGameInstance(this))
+	if (WorldData.IsExistChunkData(InChunk->GetIndex()))
 	{
-		if (UArchiveSaveGame* SaveGameArchive = GameInstance->LoadArchiveData())
-		{
-			if (SaveGameArchive->IsExistChunkData(InChunk->GetIndex()))
-			{
-				InChunk->LoadMap(SaveGameArchive->LoadChunkData(InChunk->GetIndex()));
-			}
-			else
-			{
-				InChunk->BuildMap();
-			}
-		}
+		InChunk->LoadData(WorldData.GetChunkData(InChunk->GetIndex()));
+	}
+	else
+	{
+		InChunk->BuildMap();
 	}
 
 	AddToMapGenerateQueue(InChunk);
@@ -500,7 +503,7 @@ void AWorldManager::GenerateChunk(AChunk* InChunk)
 {
 	if (!InChunk || !ChunkMap.Contains(InChunk->GetIndex())) return;
 	
-	InChunk->Generate();
+	InChunk->Generate(WorldData.GetArchiveData().bPreview);
 }
 
 void AWorldManager::DestroyChunk(AChunk* InChunk)

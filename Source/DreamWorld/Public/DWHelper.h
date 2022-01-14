@@ -18,6 +18,9 @@ UCLASS()
 class DREAMWORLD_API UDWHelper : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
+	
+public:
+	UDWHelper(const FObjectInitializer& ObjectInitializer);
 
 	//////////////////////////////////////////////////////////////////////////
 	// References
@@ -30,6 +33,8 @@ private:
 
 	static class ADWPlayerController* CurrentPlayerController;
 
+	static class ADWPlayerController* CurrentWorldManager;
+	
 public:
 	UFUNCTION(BlueprintPure, meta = (WorldContext = "InWorldContext"), Category = "DWHelper")
 	static class ADWGameMode* GetGameMode(const UObject* InWorldContext);

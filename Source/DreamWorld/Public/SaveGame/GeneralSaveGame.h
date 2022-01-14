@@ -20,26 +20,17 @@ class DREAMWORLD_API UGeneralSaveGame : public USaveGameBase
 public:
 	UGeneralSaveGame();
 
-protected:
+public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	FGeneralSaveData GeneralData;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	TMap<FName, FArchiveSaveData> ArchiveDatas;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	FName CurrentArchiveID;
+	TArray<FArchiveBasicSaveData> ArchiveBasicDatas;
 
 public:
-	virtual void RefreshSaveData_Implementation() override;
-
-	FGeneralSaveData& GetGeneralData() { return GeneralData; }
-
-	void SetGeneralData(FGeneralSaveData InGeneralData) { GeneralData = InGeneralData; }
-
-	TMap<FName, FArchiveSaveData>& GetArchiveDatas() { return ArchiveDatas; }
-
-	FName GetCurrentArchiveID() const { return CurrentArchiveID; }
-
-	void SetCurrentArchiveID(FName InCurrentArchiveID) { this->CurrentArchiveID = InCurrentArchiveID; }
+	virtual void OnCreate_Implementation(USaveGameDataBase* InSaveGameData) override;
+	
+	virtual void OnLoad_Implementation() override;
+	
+	virtual void OnRefresh_Implementation() override;
 };

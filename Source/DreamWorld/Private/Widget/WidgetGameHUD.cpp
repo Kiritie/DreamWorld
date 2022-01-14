@@ -20,10 +20,29 @@ void UWidgetGameHUD::OnCreate_Implementation()
 {
 	Super::OnCreate_Implementation();
 	
-	if(AWidgetModule* WidgetModule = AMainModule::GetModuleByClass<AWidgetModule>())
+	if(AInputModule* InputModule = AMainModule::GetModuleByClass<AInputModule>())
 	{
-		WidgetModule->OnChangeInputMode.AddDynamic(this, &UWidgetGameHUD::OnChangeInputMode);
+		InputModule->OnChangeInputMode.AddDynamic(this, &UWidgetGameHUD::OnChangeInputMode);
 	}
+}
+
+void UWidgetGameHUD::OnInitialize_Implementation(AActor* InOwner)
+{
+	Super::OnInitialize_Implementation(InOwner);
+}
+
+void UWidgetGameHUD::OnOpen_Implementation(const TArray<FParameter>& InParams, bool bInstant)
+{
+	Super::OnOpen_Implementation(InParams, bInstant);
+
+	FinishOpen(bInstant);
+}
+
+void UWidgetGameHUD::OnClose_Implementation(bool bInstant)
+{
+	Super::OnClose_Implementation(bInstant);
+
+	FinishClose(bInstant);
 }
 
 void UWidgetGameHUD::RefreshActions()

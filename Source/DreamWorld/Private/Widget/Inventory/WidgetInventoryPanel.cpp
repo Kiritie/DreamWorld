@@ -19,7 +19,7 @@
 UWidgetInventoryPanel::UWidgetInventoryPanel(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	WidgetName = FName("InventoryPanel");
-	WidgetType = EWidgetType::SemiTemporary;
+	WidgetType = EWidgetType::SemiPermanent;
 	InputMode = EInputMode::GameAndUI;
 
 	DefaultSlotClass = LoadClass<UWidgetInventorySlot>(nullptr, TEXT("WidgetBlueprint'/Game/Blueprints/Widget/Inventory/Slot/WB_InventorySlot.WB_InventorySlot_C'"));
@@ -91,4 +91,14 @@ void UWidgetInventoryPanel::OnInitialize_Implementation(AActor* InOwner)
 			}
 		}
 	}
+}
+
+void UWidgetInventoryPanel::OnOpen_Implementation(const TArray<FParameter>& InParams, bool bInstant)
+{
+	Super::OnOpen_Implementation(InParams, bInstant);
+}
+
+void UWidgetInventoryPanel::OnClose_Implementation(bool bInstant)
+{
+	Super::OnClose_Implementation(bInstant);
 }

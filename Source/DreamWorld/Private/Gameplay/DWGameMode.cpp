@@ -9,7 +9,11 @@
 #include "World/WorldManager.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Main/MainModule.h"
+#include "Module/DWSaveGameModule.h"
 #include "SaveGame/ArchiveSaveGame.h"
+#include "SaveGame/ArchiveSaveGameData.h"
+#include "SaveGame/GeneralSaveGame.h"
+#include "SaveGame/SaveGameModuleBPLibrary.h"
 
 ADWGameMode::ADWGameMode()
 {
@@ -29,47 +33,29 @@ void ADWGameMode::BeginPlay()
 
 void ADWGameMode::InitializeGame()
 {
-	UDWHelper::GetGameInstance(this)->InitializeData();
-
 	if(ADWGameState* DWGameState = UDWHelper::GetGameState(this))
 	{
 		DWGameState->SetCurrentState(EGameState::MainMenu);
-	}
-
-	if(UArchiveSaveGame* SaveGameArchive = UDWHelper::GetGameInstance(this)->LoadArchiveData())
-	{
-		if(AWorldManager* WorldManager = AWorldManager::Get())
-		{
-			WorldManager->LoadWorld(SaveGameArchive->GetArchiveData().WorldData, true);
-		}
-		if(ADWPlayerController* PlayerController = UDWHelper::GetPlayerController(this))
-		{
-			PlayerController->LoadPlayer(SaveGameArchive->GetArchiveData().PlayerData);
-		}
 	}
 }
 
 void ADWGameMode::StartGame(FName InArchiveID)
 {
-	if(UArchiveSaveGame* SaveGameArchive = UDWHelper::GetGameInstance(this)->LoadArchiveData(InArchiveID))
-	{
-		if(AWorldManager* WorldManager = AWorldManager::Get())
-		{
-			WorldManager->LoadWorld(SaveGameArchive->GetArchiveData().WorldData, false);
-		}
-		if(ADWPlayerController* PlayerController = UDWHelper::GetPlayerController(this))
-		{
-			PlayerController->LoadPlayer(SaveGameArchive->GetArchiveData().PlayerData);
-		}
-	}
+	// if(ADWSaveGameModule* SaveGameModule = AMainModule::GetModuleByClass<ADWSaveGameModule>())
+	// {
+	// 	SaveGameModule->LoadArchiveData(InArchiveID, true);
+	// }
 }
 
 void ADWGameMode::ContinueGame()
 {
-	if(UDWGameInstance* GameInstance = UDWHelper::GetGameInstance(this))
-	{
-		StartGame(GameInstance->GetCurrentArchiveID());
-	}
+	// if(ADWSaveGameModule* SaveGameModule = AMainModule::GetModuleByClass<ADWSaveGameModule>())
+	// {
+	// 	if(UGeneralSaveGame* GeneralSaveGame = SaveGameModule->GetGeneralSaveGame())
+	// 	{
+	// 		SaveGameModule->LoadArchiveData(GeneralSaveGame->GeneralData.CurrentArchiveID, true);
+	// 	}
+	// }
 }
 
 void ADWGameMode::PauseGame()
@@ -78,6 +64,10 @@ void ADWGameMode::PauseGame()
 	if(ADWGameState* DWGameState = UDWHelper::GetGameState(this))
 	{
 		DWGameState->SetCurrentState(EGameState::Pausing);
+	}
+	if(AMainModule* MainModule = AMainModule::Get())
+	{
+		MainModule->PauseModules();
 	}
 }
 
@@ -88,17 +78,20 @@ void ADWGameMode::UnPauseGame()
 	{
 		DWGameState->SetCurrentState(EGameState::Playing);
 	}
+	if(AMainModule* MainModule = AMainModule::Get())
+	{
+		MainModule->UnPauseModules();
+	}
 }
 
 void ADWGameMode::BackMainMenu()
 {
-	if(ADWPlayerController* PlayerController = UDWHelper::GetPlayerController(this))
+	if(UArchiveSaveGame* ArchiveSaveGame = USaveGameModuleBPLibrary::GetSaveGame<UArchiveSaveGame>())
 	{
-		PlayerController->UnLoadPlayer();
-	}
-	if(AWorldManager* WorldManager = AWorldManager::Get())
-	{
-		WorldManager->UnloadWorld(true);
+		if(UArchiveSaveGameData* ArchiveSaveGameData = ArchiveSaveGame->GetSaveGameData<UArchiveSaveGameData>())
+		{
+			USaveGameModuleBPLibrary::SaveSaveGame<UArchiveSaveGame>(ArchiveSaveGameData->ArchiveData.ID);
+		}
 	}
 	if(ADWGameState* DWGameState = UDWHelper::GetGameState(this))
 	{
@@ -112,13 +105,12 @@ void ADWGameMode::BackMainMenu()
 
 void ADWGameMode::QuitGame()
 {
-	if(ADWPlayerController* PlayerController = UDWHelper::GetPlayerController(this))
+	if(UArchiveSaveGame* ArchiveSaveGame = USaveGameModuleBPLibrary::GetSaveGame<UArchiveSaveGame>())
 	{
-		PlayerController->UnLoadPlayer();
-	}
-	if(AWorldManager* WorldManager = AWorldManager::Get())
-	{
-		WorldManager->UnloadWorld();
+		if(UArchiveSaveGameData* ArchiveSaveGameData = ArchiveSaveGame->GetSaveGameData<UArchiveSaveGameData>())
+		{
+			USaveGameModuleBPLibrary::SaveSaveGame<UArchiveSaveGame>(ArchiveSaveGameData->ArchiveData.ID);
+		}
 	}
 	UKismetSystemLibrary::QuitGame(this, nullptr, EQuitPreference::Quit, true);
 }

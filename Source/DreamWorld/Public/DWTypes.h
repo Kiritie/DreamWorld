@@ -1353,12 +1353,12 @@ public:
 	FORCEINLINE FChunkMaterial()
 	{
 		Material = nullptr;
-		BlockUVSize = FVector2D(0.0625f, 0.0625f);
+		BlockUVSize = FVector2D(0.0625f, 0.5f);
 	}
 };
 
 USTRUCT(BlueprintType)
-struct DREAMWORLD_API FSaveData
+struct WHFRAMEWORK_API FSaveData
 {
 	GENERATED_BODY()
 
@@ -1386,6 +1386,7 @@ public:
 	{
 		bAutoJump = true;
 		CameraDistance = 150.f;
+		CurrentArchiveID = -1;
 	}
 
 public:
@@ -1394,194 +1395,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float CameraDistance;
-};
-
-USTRUCT(BlueprintType)
-struct DREAMWORLD_API FWorldBasicSaveData : public FSaveData
-{
-	GENERATED_BODY()
-
-public:
-	FORCEINLINE FWorldBasicSaveData()
-	{
-		BlockSize = 80;
-		ChunkSize = 16;
-		
-		ChunkHeightRange = 3;
-
-		TerrainBaseHeight = 0.1f;
-		TerrainPlainScale = FVector(0.005f, 0.005f, 0.2f);
-		TerrainMountainScale = FVector(0.03f, 0.03f, 0.25f);
-		TerrainStoneVoxelScale = FVector(0.05f, 0.05f, 0.18f);
-		TerrainSandVoxelScale = FVector(0.04f, 0.04f, 0.21f);
-		TerrainWaterVoxelHeight = 0.3f;
-		TerrainBedrockVoxelHeight = 0.02f;
-
-		ChunkMaterials = TArray<FChunkMaterial>();
-
-		VitalityRaceDensity = 50.f;
-		CharacterRaceDensity = 50.f;
-	}
-
-public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 WorldSeed;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 TimeSeconds;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 BlockSize;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 ChunkSize;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 ChunkHeightRange;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float TerrainBaseHeight;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float TerrainBedrockVoxelHeight;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float TerrainWaterVoxelHeight;
-		
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FVector TerrainPlainScale;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FVector TerrainMountainScale;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FVector TerrainStoneVoxelScale;
-				
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FVector TerrainSandVoxelScale;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TArray<FChunkMaterial> ChunkMaterials;
-							
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	float VitalityRaceDensity;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	float CharacterRaceDensity;
-};
-
-USTRUCT(BlueprintType)
-struct DREAMWORLD_API FWorldSaveData : public FWorldBasicSaveData
-{
-	GENERATED_BODY()
-
-public:
-	FORCEINLINE FWorldSaveData()
-	{
-		ArchiveID = TEXT("");
-		WorldSeed = 0;
-		
-		TimeSeconds = 0.f;
-
-		LastVitalityRaceIndex = FIndex::ZeroIndex;
-		LastCharacterRaceIndex = FIndex::ZeroIndex;
-		
-		bPreview = false;
-	}
-	
-	FORCEINLINE FWorldSaveData(FWorldBasicSaveData InBasicSaveData)
-	{
-		WorldSeed = InBasicSaveData.WorldSeed;
-		
-		TimeSeconds = InBasicSaveData.TimeSeconds;
-
-		BlockSize = InBasicSaveData.BlockSize;
-		ChunkSize = InBasicSaveData.ChunkSize;
-		
-		ChunkHeightRange = InBasicSaveData.ChunkHeightRange;
-
-		TerrainBaseHeight = InBasicSaveData.TerrainBaseHeight;
-		TerrainPlainScale = InBasicSaveData.TerrainPlainScale;
-		TerrainMountainScale = InBasicSaveData.TerrainMountainScale;
-		TerrainStoneVoxelScale = InBasicSaveData.TerrainStoneVoxelScale;
-		TerrainSandVoxelScale = InBasicSaveData.TerrainSandVoxelScale;
-		TerrainWaterVoxelHeight = InBasicSaveData.TerrainWaterVoxelHeight;
-		TerrainBedrockVoxelHeight = InBasicSaveData.TerrainBedrockVoxelHeight;
-
-		ChunkMaterials = InBasicSaveData.ChunkMaterials;
-
-		VitalityRaceDensity = InBasicSaveData.VitalityRaceDensity;
-		CharacterRaceDensity = InBasicSaveData.CharacterRaceDensity;
-
-		ArchiveID = NAME_None;
-
-		LastVitalityRaceIndex = FIndex::ZeroIndex;
-		LastCharacterRaceIndex = FIndex::ZeroIndex;
-		
-		bPreview = false;
-	}
-
-public:
-	static const FWorldSaveData Empty;
-	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	FName ArchiveID;
-
-	FIndex LastVitalityRaceIndex;
-
-	FIndex LastCharacterRaceIndex;
-
-	bool bPreview;
-
-public:
-	FORCEINLINE bool IsSameArchive(FWorldSaveData InSaveData) const
-	{
-		return InSaveData.ArchiveID == ArchiveID;
-	}
-
-	FORCEINLINE float GetChunkLength() const
-	{
-		return ChunkSize * BlockSize;
-	}
-
-	FORCEINLINE int32 GetWorldHeight() const
-	{
-		return ChunkSize * ChunkHeightRange;
-	}
-
-	FORCEINLINE FChunkMaterial GetChunkMaterial(ETransparency Transparency) const
-	{
-		const int32 Index = FMath::Clamp((int32)Transparency, 0, ChunkMaterials.Num());
-		if(ChunkMaterials.IsValidIndex(Index))
-		{
-			return ChunkMaterials[Index];
-		}
-		return FChunkMaterial();
-	}
-
-	FORCEINLINE FVector GetBlockSizedNormal(FVector InNormal, float InLength = 0.25f) const
-	{
-		return BlockSize * InNormal * InLength;
-	}
-};
-
-USTRUCT(BlueprintType)
-struct DREAMWORLD_API FPickUpSaveData : public FSaveData
-{
-	GENERATED_BODY()
-
-public:
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	FItem Item;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	FVector Location;
-	
-	FORCEINLINE FPickUpSaveData()
-	{
-		Item = FItem::Empty;
-		Location = FVector::ZeroVector;
-	}
+	int32 CurrentArchiveID;
 };
 
 UENUM(BlueprintType)
@@ -1891,6 +1707,50 @@ public:
 };
 
 USTRUCT(BlueprintType)
+struct DREAMWORLD_API FDWEffectData : public FTableRowBase
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FName EffectName;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 AbilityLevel;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSubclassOf<UGameplayEffect> EffectClass;
+
+	FActiveGameplayEffectHandle EffectHandle;
+
+	FORCEINLINE FDWEffectData()
+	{
+		EffectName = NAME_None;
+		AbilityLevel = 1;
+		EffectHandle = FActiveGameplayEffectHandle();
+	}
+};
+
+USTRUCT(BlueprintType)
+struct DREAMWORLD_API FPickUpSaveData : public FSaveData
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	FItem Item;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	FVector Location;
+	
+	FORCEINLINE FPickUpSaveData()
+	{
+		Item = FItem::Empty;
+		Location = FVector::ZeroVector;
+	}
+};
+
+USTRUCT(BlueprintType)
 struct DREAMWORLD_API FVitalityBasicData : public FItemData
 {
 	GENERATED_BODY()
@@ -2005,14 +1865,17 @@ struct DREAMWORLD_API FVitalityBasicSaveData : public FSaveData
 public:
 	FORCEINLINE FVitalityBasicSaveData()
 	{
+		ID = NAME_None;
 		Name = TEXT("");
 		RaceID = TEXT("");
 		Level = 0;
 		EXP = 0;
+		SpawnLocation = FVector::ZeroVector;
+		SpawnRotation = FRotator::ZeroRotator;
 	}
 
 public:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FName ID;
 
 	UPROPERTY(BlueprintReadWrite)
@@ -2147,48 +2010,20 @@ struct DREAMWORLD_API FPlayerSaveData : public FPlayerBasicSaveData
 public:
 	FORCEINLINE FPlayerSaveData()
 	{
-		ArchiveID = TEXT("");
+		ArchiveID = 0;
 	}
 	
 	FORCEINLINE FPlayerSaveData(FPlayerBasicSaveData InBasicSaveData)
 	{
 		ID = InBasicSaveData.ID;
-
-		ArchiveID = NAME_None;
+	
+		ArchiveID = 0;
 	}
+	
+	struct FArchiveBasicSaveData GetArchiveData() const;
 
 	UPROPERTY(BlueprintReadOnly)
-	FName ArchiveID;
-};
-
-USTRUCT(BlueprintType)
-struct DREAMWORLD_API FArchiveSaveData : public FSaveData
-{
-	GENERATED_BODY()
-
-public:
-	FORCEINLINE FArchiveSaveData()
-	{
-		WorldData = FWorldSaveData();
-		PlayerData = FPlayerSaveData();
-	}
-
-public:
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	FName ID;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	FWorldSaveData WorldData;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	FPlayerSaveData PlayerData;
-
-public:
-	void Initialize()
-	{
-		WorldData.ArchiveID = ID;
-		PlayerData.ArchiveID = ID;
-	}
+	int32 ArchiveID;
 };
 
 USTRUCT(BlueprintType)
@@ -2223,26 +2058,249 @@ public:
 };
 
 USTRUCT(BlueprintType)
-struct DREAMWORLD_API FDWEffectData : public FTableRowBase
+struct DREAMWORLD_API FWorldBasicSaveData : public FSaveData
 {
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FName EffectName;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 AbilityLevel;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TSubclassOf<UGameplayEffect> EffectClass;
-
-	FActiveGameplayEffectHandle EffectHandle;
-
-	FORCEINLINE FDWEffectData()
+	FORCEINLINE FWorldBasicSaveData()
 	{
-		EffectName = NAME_None;
-		AbilityLevel = 1;
-		EffectHandle = FActiveGameplayEffectHandle();
+		BlockSize = 80;
+		ChunkSize = 16;
+		
+		ChunkHeightRange = 3;
+
+		TerrainBaseHeight = 0.1f;
+		TerrainPlainScale = FVector(0.005f, 0.005f, 0.2f);
+		TerrainMountainScale = FVector(0.03f, 0.03f, 0.25f);
+		TerrainStoneVoxelScale = FVector(0.05f, 0.05f, 0.18f);
+		TerrainSandVoxelScale = FVector(0.04f, 0.04f, 0.21f);
+		TerrainWaterVoxelHeight = 0.3f;
+		TerrainBedrockVoxelHeight = 0.02f;
+
+		ChunkMaterials = TArray<FChunkMaterial>();
+
+		VitalityRaceDensity = 50.f;
+		CharacterRaceDensity = 50.f;
+	}
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	int32 BlockSize;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	int32 ChunkSize;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	int32 ChunkHeightRange;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float TerrainBaseHeight;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float TerrainBedrockVoxelHeight;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float TerrainWaterVoxelHeight;
+		
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FVector TerrainPlainScale;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FVector TerrainMountainScale;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FVector TerrainStoneVoxelScale;
+				
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FVector TerrainSandVoxelScale;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TArray<FChunkMaterial> ChunkMaterials;
+							
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float VitalityRaceDensity;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float CharacterRaceDensity;
+};
+
+USTRUCT(BlueprintType)
+struct DREAMWORLD_API FWorldSaveData : public FWorldBasicSaveData
+{
+	GENERATED_BODY()
+
+public:
+	FORCEINLINE FWorldSaveData()
+	{
+		ArchiveID = 0;
+		WorldSeed = 0;
+		TimeSeconds = 0.f;
+
+		LastVitalityRaceIndex = FIndex::ZeroIndex;
+		LastCharacterRaceIndex = FIndex::ZeroIndex;
+	}
+	
+	FORCEINLINE FWorldSaveData(FWorldBasicSaveData InBasicSaveData)
+	{
+		WorldSeed = 0;
+		TimeSeconds = 0;
+
+		BlockSize = InBasicSaveData.BlockSize;
+		ChunkSize = InBasicSaveData.ChunkSize;
+		
+		ChunkHeightRange = InBasicSaveData.ChunkHeightRange;
+
+		TerrainBaseHeight = InBasicSaveData.TerrainBaseHeight;
+		TerrainPlainScale = InBasicSaveData.TerrainPlainScale;
+		TerrainMountainScale = InBasicSaveData.TerrainMountainScale;
+		TerrainStoneVoxelScale = InBasicSaveData.TerrainStoneVoxelScale;
+		TerrainSandVoxelScale = InBasicSaveData.TerrainSandVoxelScale;
+		TerrainWaterVoxelHeight = InBasicSaveData.TerrainWaterVoxelHeight;
+		TerrainBedrockVoxelHeight = InBasicSaveData.TerrainBedrockVoxelHeight;
+
+		ChunkMaterials = InBasicSaveData.ChunkMaterials;
+
+		VitalityRaceDensity = InBasicSaveData.VitalityRaceDensity;
+		CharacterRaceDensity = InBasicSaveData.CharacterRaceDensity;
+
+		ArchiveID = 0;
+
+		LastVitalityRaceIndex = FIndex::ZeroIndex;
+		LastCharacterRaceIndex = FIndex::ZeroIndex;
+	}
+
+public:
+	static const FWorldSaveData Empty;
+
+	UPROPERTY(BlueprintReadOnly)
+	int32 ArchiveID;
+	
+	UPROPERTY(BlueprintReadOnly)
+	int32 WorldSeed;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	int32 TimeSeconds;
+	
+	UPROPERTY(BlueprintReadOnly)
+	TMap<FVector, FChunkSaveData> ChunkDatas;
+
+	FIndex LastVitalityRaceIndex;
+
+	FIndex LastCharacterRaceIndex;
+
+public:
+	FArchiveBasicSaveData GetArchiveData() const;
+
+	FORCEINLINE bool IsSameArchive(FWorldSaveData InSaveData) const
+	{
+		return InSaveData.ArchiveID == ArchiveID;
+	}
+
+	FORCEINLINE float GetChunkLength() const
+	{
+		return ChunkSize * BlockSize;
+	}
+
+	FORCEINLINE int32 GetWorldHeight() const
+	{
+		return ChunkSize * ChunkHeightRange;
+	}
+
+	FORCEINLINE FChunkMaterial GetChunkMaterial(ETransparency Transparency) const
+	{
+		const int32 Index = FMath::Clamp((int32)Transparency, 0, ChunkMaterials.Num());
+		if(ChunkMaterials.IsValidIndex(Index))
+		{
+			return ChunkMaterials[Index];
+		}
+		return FChunkMaterial();
+	}
+
+	FORCEINLINE FVector GetBlockSizedNormal(FVector InNormal, float InLength = 0.25f) const
+	{
+		return BlockSize * InNormal * InLength;
+	}
+	
+	bool IsExistChunkData(FIndex InChunkIndex) const
+	{
+		return ChunkDatas.Contains(InChunkIndex.ToVector());
+	}
+
+	FChunkSaveData& GetChunkData(FIndex InChunkIndex) const
+	{
+		static FChunkSaveData ChunkData;
+		if (ChunkDatas.Contains(InChunkIndex.ToVector()))
+		{
+			ChunkData = ChunkDatas[InChunkIndex.ToVector()];
+		}
+		return ChunkData;
+	}
+
+	void SetChunkData(FIndex InChunkIndex, FChunkSaveData InChunkData)
+	{
+		if (!ChunkDatas.Contains(InChunkIndex.ToVector()))
+			ChunkDatas.Add(InChunkIndex.ToVector(), InChunkData);
+		else
+			ChunkDatas[InChunkIndex.ToVector()] = InChunkData;
+	}
+};
+
+USTRUCT(BlueprintType)
+struct DREAMWORLD_API FArchiveBasicSaveData : public FSaveData
+{
+	GENERATED_BODY()
+
+public:
+	FORCEINLINE FArchiveBasicSaveData()
+	{
+		ID = -1;
+		PlayerBasicData = FPlayerBasicSaveData();
+		WorldBasicData = FWorldBasicSaveData();
+		bPreview = false;
+	}
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	int32 ID;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FPlayerBasicSaveData PlayerBasicData;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FWorldBasicSaveData WorldBasicData;
+
+	UPROPERTY(BlueprintReadOnly)
+	bool bPreview;
+};
+
+USTRUCT(BlueprintType)
+struct DREAMWORLD_API FArchiveSaveData : public FArchiveBasicSaveData
+{
+	GENERATED_BODY()
+
+public:
+	FORCEINLINE FArchiveSaveData()
+	{
+		PlayerData = FPlayerSaveData();
+		WorldData = FWorldSaveData();
+	}
+
+public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	FPlayerSaveData PlayerData;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	FWorldSaveData WorldData;
+
+public:
+	void Initialize()
+	{
+		PlayerData.ArchiveID = ID;
+		WorldData.ArchiveID = ID;
+		if(WorldData.WorldSeed == 0)
+		{
+			WorldData.WorldSeed = FMath::Rand();
+		}
 	}
 };

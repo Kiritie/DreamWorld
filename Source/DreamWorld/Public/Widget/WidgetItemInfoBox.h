@@ -4,21 +4,24 @@
 
 #include "DreamWorld/DreamWorld.h"
 #include "Widget/User/UserWidgetBase.h"
+#include "WidgetItemInfoBox.generated.h"
 
-#include "WidgetLoadingPanel.generated.h"
+class ADWPlayerCharacter;
 
 /**
- * ���ؽ���
+ * 主界面
  */
 UCLASS()
-class DREAMWORLD_API UWidgetLoadingPanel : public UUserWidgetBase
+class DREAMWORLD_API UWidgetItemInfoBox : public UUserWidgetBase
 {
 	GENERATED_BODY()
 
 public:
-	UWidgetLoadingPanel(const FObjectInitializer& ObjectInitializer);
-	
+	UWidgetItemInfoBox(const FObjectInitializer& ObjectInitializer);
+
 public:
+	virtual void OnCreate_Implementation() override;
+
 	virtual void OnInitialize_Implementation(AActor* InOwner) override;
 
 	virtual void OnOpen_Implementation(const TArray<FParameter>& InParams, bool bInstant) override;

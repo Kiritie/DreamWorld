@@ -5,6 +5,10 @@
 #include "Voxel/Voxel.h"
 #include "Character/Player/DWPlayerCharacter.h"
 #include "Kismet/GameplayStatics.h"
+#include "Main/MainModule.h"
+#include "Module/DWSaveGameModule.h"
+#include "SaveGame/GeneralSaveGame.h"
+#include "SaveGame/SaveGameModuleBPLibrary.h"
 #include "Voxel/VoxelPlant.h"
 
 FItem FItem::Empty = FItem(NAME_None, 0, 0);
@@ -39,6 +43,30 @@ FVitalityData FVitalityObjectSaveData::GetVitalityData() const
 FCharacterData FCharacterSaveData::GetCharacterData() const
 {
 	return UDWHelper::LoadCharacterData(ID);
+}
+
+FArchiveBasicSaveData FPlayerSaveData::GetArchiveData() const
+{
+	if(UGeneralSaveGame* GeneralSaveGame = USaveGameModuleBPLibrary::GetSaveGame<UGeneralSaveGame>())
+	{
+		if(GeneralSaveGame->ArchiveBasicDatas.IsValidIndex(ArchiveID))
+		{
+			return GeneralSaveGame->ArchiveBasicDatas[ArchiveID];
+		}
+	}
+	return FArchiveBasicSaveData();
+}
+
+FArchiveBasicSaveData FWorldSaveData::GetArchiveData() const
+{
+	if(UGeneralSaveGame* GeneralSaveGame = USaveGameModuleBPLibrary::GetSaveGame<UGeneralSaveGame>())
+	{
+		if(GeneralSaveGame->ArchiveBasicDatas.IsValidIndex(ArchiveID))
+		{
+			return GeneralSaveGame->ArchiveBasicDatas[ArchiveID];
+		}
+	}
+	return FArchiveBasicSaveData();
 }
 
 bool FVoxelItem::IsValid() const

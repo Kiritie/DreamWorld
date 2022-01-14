@@ -10,13 +10,11 @@
 
 class AChunk;
 class ADWCharacter;
-class UArchiveSaveGame;
-class UPlayerDataSave;
 class UWorldTimerComponent;
 class USceneCaptureComponent2D;
 class UWorldWeatherComponent;
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnBasicGenerated, FVector, InPlayerLocation);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnWorldGenerated, FVector, InPlayerLocation, bool, bPreview);
 
 /**
  * 世界管理器
@@ -39,7 +37,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	//////////////////////////////////////////////////////////////////////////
-	// Instance
+	// Static
 protected:
 	static AWorldManager* Current;
 
@@ -115,12 +113,14 @@ protected:
 
 public:
 	UPROPERTY(BlueprintAssignable)
-	FOnBasicGenerated OnBasicGenerated;
+	FOnWorldGenerated OnWorldGenerated;
 
 public:
-	void LoadWorld(FWorldSaveData InWorldData, bool bPreview = false);
+	void LoadData(FWorldSaveData InWorldData);
 
-	void UnloadWorld(bool bPreview = false);
+	FWorldSaveData ToData(bool bSaved = true) const;
+
+	void UnloadData(bool bPreview = false);
 
 public:
 	UFUNCTION(BlueprintPure)
@@ -164,9 +164,6 @@ private:
 	TArray<FAsyncTask<ChunkMapGenerateTask>*> ChunkMapGenerateTasks;
 
 protected:
-	UFUNCTION()
-	void OnPlayerSpawned(ADWPlayerCharacter* InPlayerCharacter);
-
 	void GeneratePreviews();
 
 	void GenerateTerrain();

@@ -13,7 +13,8 @@
 #include "Widget/Inventory/WidgetInventoryPanel.h"
 #include "Inventory/Slot/InventorySlot.h"
 #include "Widget/WidgetModuleBPLibrary.h"
-#include "Widget/WidgetPrimaryPanel.h"
+#include "Widget/WidgetGameHUD.h"
+#include "Widget/WidgetItemInfoBox.h"
 #include "Widget/Inventory/Slot/WidgetInventoryAuxiliarySlot.h"
 #include "Widget/Inventory/Slot/WidgetInventoryShortcutSlot.h"
 #include "Widget/Inventory/Slot/WidgetInventorySkillSlot.h"
@@ -130,6 +131,20 @@ void UWidgetInventoryBar::OnInitialize_Implementation(AActor* InOwner)
 	}
 }
 
+void UWidgetInventoryBar::OnOpen_Implementation(const TArray<FParameter>& InParams, bool bInstant)
+{
+	Super::OnOpen_Implementation(InParams, bInstant);
+
+	FinishOpen(bInstant);
+}
+
+void UWidgetInventoryBar::OnClose_Implementation(bool bInstant)
+{
+	Super::OnClose_Implementation(bInstant);
+
+	FinishClose(bInstant);
+}
+
 void UWidgetInventoryBar::PrevInventorySlot()
 {
 	if(SelectedSlotIndex > 0)
@@ -151,8 +166,9 @@ void UWidgetInventoryBar::SelectInventorySlot(int32 InSlotIndex)
 	SelectedSlotIndex = InSlotIndex;
 	UpdateSelectBox();
 	GetInventory()->SetSelectedSlot(GetSelectedSlot());
-	UWidgetModuleBPLibrary::GetUserWidget<UWidgetPrimaryPanel>()->ShowMessage(GetSelectedItem().GetData().Name.ToString());
-	UWidgetModuleBPLibrary::GetUserWidget<UWidgetPrimaryPanel>()->RefreshActions();
+	TArray<FParameter> Params { FParameter::MakeString(GetSelectedItem().GetData().Name.ToString()) };
+	UWidgetModuleBPLibrary::OpenUserWidget<UWidgetItemInfoBox>(&Params);
+	UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>()->RefreshActions();
 }
 
 UInventorySlot* UWidgetInventoryBar::GetSelectedSlot() const

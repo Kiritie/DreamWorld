@@ -6,7 +6,7 @@
 #include "Inventory/Inventory.h"
 #include "Inventory/Slot/InventorySlot.h"
 #include "Widget/WidgetModuleBPLibrary.h"
-#include "Widget/WidgetPrimaryPanel.h"
+#include "Widget/WidgetGameHUD.h"
 
 UInventoryShortcutSlot::UInventoryShortcutSlot()
 {
@@ -26,7 +26,7 @@ void UInventoryShortcutSlot::Refresh()
 		if (PlayerCharacter->GetInventory()->GetSelectedSlot() == this)
 		{
 			PlayerCharacter->UpdateVoxelMesh();
-			UWidgetModuleBPLibrary::GetUserWidget<UWidgetPrimaryPanel>()->RefreshActions();
+			UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>()->RefreshActions();
 		}
 	}
 }

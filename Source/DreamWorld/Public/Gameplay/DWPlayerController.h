@@ -7,8 +7,6 @@
 
 #include "DWPlayerController.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPlayerSpawned, class ADWPlayerCharacter*, InPlayerCharacter);
-
 /**
  * 玩家角色控制器
  */
@@ -39,10 +37,6 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Inputs")
 	float DoubleJumpTime;
 
-public:
-	UPROPERTY(BlueprintAssignable)
-	FOnPlayerSpawned OnPlayerSpawned;
-
 protected:
 	virtual void BeginPlay() override;
 
@@ -53,7 +47,18 @@ protected:
 	virtual void OnUnPossess() override;
 
 	UFUNCTION()
-	virtual void OnBasicGenerated(FVector InPlayerLocation);
+	virtual void OnWorldGenerated(FVector InPlayerLocation, bool bPreview);
+
+public:
+	virtual void Tick(float DeltaTime) override;
+
+	void LoadData(FPlayerSaveData InPlayerData);
+
+	void UnloadData(bool bPreview = false);
+
+	void ResetData();
+
+	bool RaycastFromAimPoint(FHitResult& OutHitResult, EGameTraceType InGameTraceType, float InRayDistance = 1000) const;
 
 protected:
 	virtual void TurnCam(float InRate);
@@ -113,18 +118,7 @@ protected:
 	virtual void SelectInventorySlot10();
 
 	virtual void PauseOrContinueGame();
-
-public:
-	virtual void Tick(float DeltaTime) override;
-
-	void LoadPlayer(FPlayerSaveData InPlayerData);
 	
-	void UnLoadPlayer();
-
-	void ResetData();
-
-	bool RaycastFromAimPoint(FHitResult& OutHitResult, EGameTraceType InGameTraceType, float InRayDistance = 1000) const;
-
 public:
 	UFUNCTION(BlueprintPure)
 	float GetCameraTurnRate() const { return CameraTurnRate; }

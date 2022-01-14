@@ -18,8 +18,11 @@ public:
 	UWidgetArchiveCreatingPanel(const FObjectInitializer& ObjectInitializer);
 
 public:
-	virtual void OnRefresh_Implementation() override;
+	virtual void OnInitialize_Implementation(AActor* InOwner) override;
 
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
-	void ResetData();
+	virtual void OnOpen_Implementation(const TArray<FParameter>& InParams, bool bInstant) override;
+
+	virtual void OnClose_Implementation(bool bInstant) override;
+
+	virtual void OnRefresh_Implementation() override;
 };

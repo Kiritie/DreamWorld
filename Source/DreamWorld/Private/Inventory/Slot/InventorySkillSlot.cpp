@@ -8,7 +8,8 @@
 #include "Widget/Inventory/Slot/WidgetInventorySkillSlot.h"
 #include "Abilities/Character/DWCharacterSkillAbility.h"
 #include "Widget/WidgetModuleBPLibrary.h"
-#include "Widget/WidgetPrimaryPanel.h"
+#include "Widget/WidgetGameHUD.h"
+#include "Widget/WidgetItemInfoBox.h"
 
 UInventorySkillSlot::UInventorySkillSlot()
 {
@@ -53,7 +54,8 @@ bool UInventorySkillSlot::ActiveItem()
 		}
 		else if(CooldownInfo.bCooldowning)
 		{
-			UWidgetModuleBPLibrary::GetUserWidget<UWidgetPrimaryPanel>()->ShowMessage(TEXT("该技能处于冷却中！"));
+			TArray<FParameter> Params { FParameter::MakeString(TEXT("该技能处于冷却中！")) };
+			UWidgetModuleBPLibrary::OpenUserWidget<UWidgetItemInfoBox>(&Params);
 		}
 	}
 	return false;

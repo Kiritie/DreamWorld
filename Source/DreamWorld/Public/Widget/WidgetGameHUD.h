@@ -22,6 +22,12 @@ public:
 public:
 	virtual void OnCreate_Implementation() override;
 
+	virtual void OnInitialize_Implementation(AActor* InOwner) override;
+
+	virtual void OnOpen_Implementation(const TArray<FParameter>& InParams, bool bInstant) override;
+
+	virtual void OnClose_Implementation(bool bInstant) override;
+
 public:
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
 	void SetHeadInfo(const FString& InHeadInfo);
@@ -37,9 +43,6 @@ public:
 	
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
 	void SetCrosshairVisible(bool bValue);
-
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
-	void ShowMessage(const FString& InMessage, float InDuration = 2.5f);
 				
 	UFUNCTION(BlueprintCallable)
 	void RefreshActions();

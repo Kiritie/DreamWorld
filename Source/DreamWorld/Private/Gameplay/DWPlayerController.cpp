@@ -9,7 +9,7 @@
 #include "World/Chunk.h"
 #include "Voxel/Voxel.h"
 #include "Engine.h"
-#include "Widget/WidgetPrimaryPanel.h"
+#include "Widget/WidgetGameHUD.h"
 #include "Gameplay/DWGameInstance.h"
 #include "Gameplay/DWGameState.h"
 #include "Widget/Inventory/WidgetInventoryBar.h"
@@ -18,6 +18,9 @@
 #include "Character/Player/DWPlayerCharacterCameraManager.h"
 #include "Gameplay/DWGameMode.h"
 #include "Inventory/Slot/InventorySlot.h"
+#include "Module/DWSaveGameModule.h"
+#include "SaveGame/GeneralSaveGame.h"
+#include "SaveGame/SaveGameModuleBPLibrary.h"
 #include "Widget/WidgetModuleBPLibrary.h"
 #include "World/Components/WorldTimerComponent.h"
 
@@ -45,7 +48,7 @@ void ADWPlayerController::BeginPlay()
 
 	if(AWorldManager* WorldManager = AWorldManager::Get())
 	{
-		WorldManager->OnBasicGenerated.AddDynamic(this, &ADWPlayerController::OnBasicGenerated);
+		WorldManager->OnWorldGenerated.AddDynamic(this, &ADWPlayerController::OnWorldGenerated);
 	}
 }
 
@@ -105,7 +108,7 @@ void ADWPlayerController::OnPossess(APawn* InPawn)
 		{
 			PlayerCharacter = InCharacter;
 			PlayerCharacter->SetOwnerController(this);
-			UWidgetModuleBPLibrary::InitializeUserWidget<UWidgetPrimaryPanel>(PlayerCharacter);
+			UWidgetModuleBPLibrary::InitializeUserWidget<UWidgetGameHUD>(PlayerCharacter);
 			UWidgetModuleBPLibrary::InitializeUserWidget<UWidgetInventoryBar>(PlayerCharacter);
 			UWidgetModuleBPLibrary::InitializeUserWidget<UWidgetInventoryPanel>(PlayerCharacter);
 			PlayerCharacter->RefreshData();
@@ -121,7 +124,7 @@ void ADWPlayerController::OnUnPossess()
 		{
 			PlayerCharacter->SetOwnerController(nullptr);
 			PlayerCharacter = nullptr;
-			UWidgetModuleBPLibrary::InitializeUserWidget<UWidgetPrimaryPanel>(nullptr);
+			UWidgetModuleBPLibrary::InitializeUserWidget<UWidgetGameHUD>(nullptr);
 			UWidgetModuleBPLibrary::InitializeUserWidget<UWidgetInventoryBar>(nullptr);
 			UWidgetModuleBPLibrary::InitializeUserWidget<UWidgetInventoryPanel>(nullptr);
 		}
@@ -129,18 +132,17 @@ void ADWPlayerController::OnUnPossess()
 	Super::OnUnPossess();
 }
 
-void ADWPlayerController::OnBasicGenerated(FVector InPlayerLocation)
+void ADWPlayerController::OnWorldGenerated(FVector InPlayerLocation, bool bPreview)
 {
-	if(PlayerCharacter)
+	if(!GetProcessedCharacter()) return;
+
+	if(GetProcessedCharacter()->GetActorLocation().Size2D() < 1.f)
 	{
-		if(PlayerCharacter->GetActorLocation().IsNearlyZero())
-		{
-			PlayerCharacter->SetActorLocation(InPlayerLocation);
-		}
-		if(!AWorldManager::GetWorldData().bPreview)
-		{
-			PlayerCharacter->Active(true);
-		}
+		GetProcessedCharacter()->SetActorLocation(InPlayerLocation);
+	}
+	if(!bPreview)
+	{
+		GetProcessedCharacter()->Active();
 	}
 }
 
@@ -168,8 +170,10 @@ void ADWPlayerController::Tick(float DeltaTime)
 	}
 }
 
-void ADWPlayerController::LoadPlayer(FPlayerSaveData InPlayerData)
+void ADWPlayerController::LoadData(FPlayerSaveData InPlayerData)
 {
+	if(GetProcessedCharacter()) return;
+	
 	FActorSpawnParameters SpawnParams = FActorSpawnParameters();
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
@@ -178,7 +182,10 @@ void ADWPlayerController::LoadPlayer(FPlayerSaveData InPlayerData)
 		Possess(NewPlayerCharacter);
 
 		SetControlRotation(InPlayerData.CameraRotation);
-		GetCameraManager()->SetCameraDistance(UDWHelper::GetGameInstance(this)->GetGeneralData().CameraDistance, true);
+		if(UGeneralSaveGame* GeneralSaveGame = USaveGameModuleBPLibrary::GetSaveGame<UGeneralSaveGame>())
+		{
+			GetCameraManager()->SetCameraDistance(GeneralSaveGame->GeneralData.CameraDistance, true);
+		}
 
 		NewPlayerCharacter->Disable(true, true);
 		NewPlayerCharacter->LoadData(&InPlayerData);
@@ -213,18 +220,21 @@ void ADWPlayerController::LoadPlayer(FPlayerSaveData InPlayerData)
 				NewPlayerCharacter->GetInventory()->AdditionItemByRange(tmpItem);
 			}
 		}
-
-		OnPlayerSpawned.Broadcast(NewPlayerCharacter);
 	}
 }
 
-void ADWPlayerController::UnLoadPlayer()
+void ADWPlayerController::UnloadData(bool bPreview)
 {
-	UnPossess();
-	
-	if(GetProcessedCharacter())
+	if(!GetProcessedCharacter()) return;
+
+	if(!bPreview)
 	{
+		UnPossess();
 		GetProcessedCharacter()->Destroy();
+	}
+	else
+	{
+		GetProcessedCharacter()->Disable(true, true);
 	}
 }
 

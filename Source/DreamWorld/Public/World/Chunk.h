@@ -112,19 +112,23 @@ public:
 public:
 	void Initialize(FIndex InIndex, int32 InBatch);
 
-	void Generate();
+	void LoadData(FChunkSaveData InChunkData);
 
-	void GenerateMap();
+	FChunkSaveData ToData(bool bSaved = true);
+
+	void Generate(bool bPreview = false);
 
 	void BuildMap();
 
-	void LoadMap(FChunkSaveData InChunkData);
+	void GenerateMap();
 
-	void OnGenerated();
+	void SpawnActors();
+
+	void DestroyActors();
 
 protected:
-	void LoadActors(FChunkSaveData InChunkData);
-		
+	void OnGenerated(bool bPreview = false);
+
 	void GenerateNeighbors(FIndex InIndex);
 
 	void GenerateNeighbors(int32 InX, int32 InY, int32 InZ);

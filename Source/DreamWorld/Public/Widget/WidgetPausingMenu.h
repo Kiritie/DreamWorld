@@ -18,4 +18,10 @@ class DREAMWORLD_API UWidgetPausingMenu : public UUserWidgetBase
 public:
 	UWidgetPausingMenu(const FObjectInitializer& ObjectInitializer);
 
+public:
+	virtual void OnInitialize_Implementation(AActor* InOwner) override;
+
+	virtual void OnOpen_Implementation(const TArray<FParameter>& InParams, bool bInstant) override;
+
+	virtual void OnClose_Implementation(bool bInstant) override;
 };

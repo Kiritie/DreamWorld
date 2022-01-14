@@ -6,7 +6,7 @@
 #include "Character/DWCharacter.h"
 #include "Interaction/Interaction.h"
 #include "Widget/WidgetModuleBPLibrary.h"
-#include "Widget/WidgetPrimaryPanel.h"
+#include "Widget/WidgetGameHUD.h"
 
 UInteractionComponent::UInteractionComponent(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -36,7 +36,7 @@ void UInteractionComponent::OnBeginOverlap(UPrimitiveComponent* OverlappedCompon
 		{
 			if(OtherCharacter->IsPlayer())
 			{
-				UWidgetModuleBPLibrary::GetUserWidget<UWidgetPrimaryPanel>()->RefreshActions();
+				UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>()->RefreshActions();
 			}
 		}
 	}
@@ -57,7 +57,7 @@ void UInteractionComponent::OnEndOverlap(UPrimitiveComponent* OverlappedComponen
 			{
 				if(OtherCharacter->IsPlayer())
 				{
-					UWidgetModuleBPLibrary::GetUserWidget<UWidgetPrimaryPanel>()->RefreshActions();
+					UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>()->RefreshActions();
 				}
 			}
 		}

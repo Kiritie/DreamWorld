@@ -9,3 +9,22 @@ UWidgetArchiveChoosingPanel::UWidgetArchiveChoosingPanel(const FObjectInitialize
 	WidgetType = EWidgetType::Temporary;
 	InputMode = EInputMode::UIOnly;
 }
+
+void UWidgetArchiveChoosingPanel::OnInitialize_Implementation(AActor* InOwner)
+{
+	Super::OnInitialize_Implementation(InOwner);
+}
+
+void UWidgetArchiveChoosingPanel::OnOpen_Implementation(const TArray<FParameter>& InParams, bool bInstant)
+{
+	Super::OnOpen_Implementation(InParams, bInstant);
+
+	FinishOpen(bInstant);
+}
+
+void UWidgetArchiveChoosingPanel::OnClose_Implementation(bool bInstant)
+{
+	Super::OnClose_Implementation(bInstant);
+
+	FinishClose(bInstant);
+}

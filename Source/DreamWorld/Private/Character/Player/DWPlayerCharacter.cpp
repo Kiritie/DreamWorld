@@ -30,8 +30,9 @@
 #include "Inventory/Slot/InventorySkillSlot.h"
 #include "Character/Player/DWPlayerCharacterCameraManager.h"
 #include "Gameplay/DWGameInstance.h"
+#include "Input/InputModuleBPLibrary.h"
 #include "Interaction/Components/InteractionComponent.h"
-#include "Widget/WidgetPrimaryPanel.h"
+#include "Widget/WidgetGameHUD.h"
 #include "Inventory/Slot/InventoryEquipSlot.h"
 #include "Widget/WidgetModuleBPLibrary.h"
 
@@ -270,9 +271,9 @@ void ADWPlayerCharacter::Death(AActor* InKiller)
 void ADWPlayerCharacter::DeathEnd()
 {
 	Super::DeathEnd();
-	if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetPrimaryPanel>())
+	if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>())
 	{
-		UWidgetModuleBPLibrary::GetUserWidget<UWidgetPrimaryPanel>()->SetCrosshairVisible(false);
+		UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>()->SetCrosshairVisible(false);
 	}
 }
 
@@ -536,7 +537,7 @@ bool ADWPlayerCharacter::UseItem(FItem& InItem)
 
 void ADWPlayerCharacter::OnAttackDestroyPressed()
 {
-	if (bBreakAllInput || UWidgetModuleBPLibrary::GetInputMode() != EInputMode::GameOnly) return;
+	if (bBreakAllInput || UInputModuleBPLibrary::GetInputMode() != EInputMode::GameOnly) return;
 
 	switch (ControlMode)
 	{
@@ -570,7 +571,7 @@ void ADWPlayerCharacter::OnAttackDestroyPressed()
 
 void ADWPlayerCharacter::OnAttackDestroyRepeat()
 {
-	if (bBreakAllInput || UWidgetModuleBPLibrary::GetInputMode() != EInputMode::GameOnly) return;
+	if (bBreakAllInput || UInputModuleBPLibrary::GetInputMode() != EInputMode::GameOnly) return;
 
 	switch (ControlMode)
 	{
@@ -597,7 +598,7 @@ void ADWPlayerCharacter::OnAttackDestroyRepeat()
 
 void ADWPlayerCharacter::OnAttackDestroyReleased()
 {
-	if (bBreakAllInput || UWidgetModuleBPLibrary::GetInputMode() != EInputMode::GameOnly) return;
+	if (bBreakAllInput || UInputModuleBPLibrary::GetInputMode() != EInputMode::GameOnly) return;
 
 	switch (ControlMode)
 	{
@@ -624,7 +625,7 @@ void ADWPlayerCharacter::OnAttackDestroyReleased()
 
 void ADWPlayerCharacter::OnDefendGeneratePressed()
 {
-	if (bBreakAllInput || UWidgetModuleBPLibrary::GetInputMode() != EInputMode::GameOnly) return;
+	if (bBreakAllInput || UInputModuleBPLibrary::GetInputMode() != EInputMode::GameOnly) return;
 
 	switch (ControlMode)
 	{
@@ -654,7 +655,7 @@ void ADWPlayerCharacter::OnDefendGeneratePressed()
 
 void ADWPlayerCharacter::OnDefendGenerateRepeat()
 {
-	if (bBreakAllInput || UWidgetModuleBPLibrary::GetInputMode() != EInputMode::GameOnly) return;
+	if (bBreakAllInput || UInputModuleBPLibrary::GetInputMode() != EInputMode::GameOnly) return;
 
 	switch (ControlMode)
 	{
@@ -681,7 +682,7 @@ void ADWPlayerCharacter::OnDefendGenerateRepeat()
 
 void ADWPlayerCharacter::OnDefendGenerateReleased()
 {
-	if (bBreakAllInput || UWidgetModuleBPLibrary::GetInputMode() != EInputMode::GameOnly) return;
+	if (bBreakAllInput || UInputModuleBPLibrary::GetInputMode() != EInputMode::GameOnly) return;
 
 	switch (ControlMode)
 	{
@@ -804,9 +805,9 @@ void ADWPlayerCharacter::DoInteractAction5()
 void ADWPlayerCharacter::HandleNameChanged(const FString& NewValue)
 {
 	Super::HandleNameChanged(NewValue);
-	if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetPrimaryPanel>())
+	if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>())
 	{
-		UWidgetModuleBPLibrary::GetUserWidget<UWidgetPrimaryPanel>()->SetHeadInfo(GetHeadInfo());
+		UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>()->SetHeadInfo(GetHeadInfo());
 	}
 	if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>())
 	{
@@ -817,9 +818,9 @@ void ADWPlayerCharacter::HandleNameChanged(const FString& NewValue)
 void ADWPlayerCharacter::HandleTeamIDChanged(const FString& NewValue)
 {
 	Super::HandleTeamIDChanged(NewValue);
-	if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetPrimaryPanel>())
+	if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>())
 	{
-		UWidgetModuleBPLibrary::GetUserWidget<UWidgetPrimaryPanel>()->SetHeadInfo(GetHeadInfo());
+		UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>()->SetHeadInfo(GetHeadInfo());
 	}
 	if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>())
 	{
@@ -830,9 +831,9 @@ void ADWPlayerCharacter::HandleTeamIDChanged(const FString& NewValue)
 void ADWPlayerCharacter::HandleRaceIDChanged(const FString& NewValue)
 {
 	Super::HandleRaceIDChanged(NewValue);
-	if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetPrimaryPanel>())
+	if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>())
 	{
-		UWidgetModuleBPLibrary::GetUserWidget<UWidgetPrimaryPanel>()->SetHeadInfo(GetHeadInfo());
+		UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>()->SetHeadInfo(GetHeadInfo());
 	}
 	if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>())
 	{
@@ -843,9 +844,9 @@ void ADWPlayerCharacter::HandleRaceIDChanged(const FString& NewValue)
 void ADWPlayerCharacter::HandleLevelChanged(int32 NewValue, int32 DeltaValue /*= 0*/)
 {
 	Super::HandleLevelChanged(NewValue);
-	if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetPrimaryPanel>())
+	if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>())
 	{
-		UWidgetModuleBPLibrary::GetUserWidget<UWidgetPrimaryPanel>()->SetHeadInfo(GetHeadInfo());
+		UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>()->SetHeadInfo(GetHeadInfo());
 	}
 	if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>())
 	{
@@ -856,9 +857,9 @@ void ADWPlayerCharacter::HandleLevelChanged(int32 NewValue, int32 DeltaValue /*=
 void ADWPlayerCharacter::HandleEXPChanged(int32 NewValue, int32 DeltaValue /*= 0*/)
 {
 	Super::HandleEXPChanged(NewValue);
-	if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetPrimaryPanel>())
+	if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>())
 	{
-		UWidgetModuleBPLibrary::GetUserWidget<UWidgetPrimaryPanel>()->SetHeadInfo(GetHeadInfo());
+		UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>()->SetHeadInfo(GetHeadInfo());
 	}
 	if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>())
 	{
@@ -869,9 +870,9 @@ void ADWPlayerCharacter::HandleEXPChanged(int32 NewValue, int32 DeltaValue /*= 0
 void ADWPlayerCharacter::HandleHealthChanged(float NewValue, float DeltaValue /*= 0.f*/)
 {
 	Super::HandleHealthChanged(NewValue, DeltaValue);
-	if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetPrimaryPanel>())
+	if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>())
 	{
-		UWidgetModuleBPLibrary::GetUserWidget<UWidgetPrimaryPanel>()->SetHealthPercent(NewValue, GetMaxHealth());
+		UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>()->SetHealthPercent(NewValue, GetMaxHealth());
 	}
 	if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>())
 	{
@@ -882,9 +883,9 @@ void ADWPlayerCharacter::HandleHealthChanged(float NewValue, float DeltaValue /*
 void ADWPlayerCharacter::HandleMaxHealthChanged(float NewValue, float DeltaValue /*= 0.f*/)
 {
 	Super::HandleMaxHealthChanged(NewValue, DeltaValue);
-	if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetPrimaryPanel>())
+	if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>())
 	{
-		UWidgetModuleBPLibrary::GetUserWidget<UWidgetPrimaryPanel>()->SetHealthPercent(NewValue, GetMaxHealth());
+		UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>()->SetHealthPercent(NewValue, GetMaxHealth());
 	}
 	if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>())
 	{
@@ -895,9 +896,9 @@ void ADWPlayerCharacter::HandleMaxHealthChanged(float NewValue, float DeltaValue
 void ADWPlayerCharacter::HandleManaChanged(float NewValue, float DeltaValue /*= 0.f*/)
 {
 	Super::HandleManaChanged(NewValue, DeltaValue);
-	if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetPrimaryPanel>())
+	if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>())
 	{
-		UWidgetModuleBPLibrary::GetUserWidget<UWidgetPrimaryPanel>()->SetManaPercent(NewValue, GetMaxMana());
+		UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>()->SetManaPercent(NewValue, GetMaxMana());
 	}
 	if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>())
 	{
@@ -908,9 +909,9 @@ void ADWPlayerCharacter::HandleManaChanged(float NewValue, float DeltaValue /*= 
 void ADWPlayerCharacter::HandleMaxManaChanged(float NewValue, float DeltaValue /*= 0.f*/)
 {
 	Super::HandleMaxManaChanged(NewValue, DeltaValue);
-	if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetPrimaryPanel>())
+	if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>())
 	{
-		UWidgetModuleBPLibrary::GetUserWidget<UWidgetPrimaryPanel>()->SetManaPercent(NewValue, GetMaxMana());
+		UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>()->SetManaPercent(NewValue, GetMaxMana());
 	}
 	if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>())
 	{
@@ -921,9 +922,9 @@ void ADWPlayerCharacter::HandleMaxManaChanged(float NewValue, float DeltaValue /
 void ADWPlayerCharacter::HandleStaminaChanged(float NewValue, float DeltaValue /*= 0.f*/)
 {
 	Super::HandleStaminaChanged(NewValue, DeltaValue);
-	if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetPrimaryPanel>())
+	if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>())
 	{
-		UWidgetModuleBPLibrary::GetUserWidget<UWidgetPrimaryPanel>()->SetStaminaPercent(NewValue, GetMaxStamina());
+		UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>()->SetStaminaPercent(NewValue, GetMaxStamina());
 	}
 	if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>())
 	{
@@ -934,9 +935,9 @@ void ADWPlayerCharacter::HandleStaminaChanged(float NewValue, float DeltaValue /
 void ADWPlayerCharacter::HandleMaxStaminaChanged(float NewValue, float DeltaValue /*= 0.f*/)
 {
 	Super::HandleMaxStaminaChanged(NewValue, DeltaValue);
-	if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetPrimaryPanel>())
+	if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>())
 	{
-		UWidgetModuleBPLibrary::GetUserWidget<UWidgetPrimaryPanel>()->SetStaminaPercent(NewValue, GetMaxStamina());
+		UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>()->SetStaminaPercent(NewValue, GetMaxStamina());
 	}
 	if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>())
 	{

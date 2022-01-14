@@ -9,3 +9,22 @@ UWidgetLoadingPanel::UWidgetLoadingPanel(const FObjectInitializer& ObjectInitial
 	WidgetType = EWidgetType::Temporary;
 	InputMode = EInputMode::None;
 }
+
+void UWidgetLoadingPanel::OnInitialize_Implementation(AActor* InOwner)
+{
+	Super::OnInitialize_Implementation(InOwner);
+}
+
+void UWidgetLoadingPanel::OnOpen_Implementation(const TArray<FParameter>& InParams, bool bInstant)
+{
+	Super::OnOpen_Implementation(InParams, bInstant);
+
+	FinishOpen(bInstant);
+}
+
+void UWidgetLoadingPanel::OnClose_Implementation(bool bInstant)
+{
+	Super::OnClose_Implementation(bInstant);
+
+	FinishClose(bInstant);
+}
