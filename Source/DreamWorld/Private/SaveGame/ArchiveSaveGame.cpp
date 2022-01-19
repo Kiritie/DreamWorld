@@ -102,3 +102,13 @@ void UArchiveSaveGame::OnRefresh_Implementation()
 		}
 	}
 }
+
+UArchiveSaveGameData::UArchiveSaveGameData()
+{
+	ArchiveData = FArchiveSaveData();
+}
+
+void UArchiveSaveGameData::OnInitialize_Implementation()
+{
+	
+}

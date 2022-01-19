@@ -24,7 +24,7 @@ public:
 	void InitializeGame();
 
 	UFUNCTION(BlueprintCallable)
-	void StartGame(FName InArchiveID);
+	void StartGame(int32 InArchiveID);
 
 	UFUNCTION(BlueprintCallable)
 	void ContinueGame();

@@ -1358,7 +1358,7 @@ public:
 };
 
 USTRUCT(BlueprintType)
-struct WHFRAMEWORK_API FSaveData
+struct DREAMWORLD_API FSaveData
 {
 	GENERATED_BODY()
 

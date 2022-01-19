@@ -2,6 +2,8 @@
 
 #include "Gameplay/DWGameMode.h"
 #include "Character/Player/DWPlayerCharacter.h"
+#include "Event/EventModuleBPLibrary.h"
+#include "Event/Handle/Main/EventHandle_ModuleInitialized.h"
 #include "Gameplay/DWPlayerController.h"
 #include "Gameplay/DWGameState.h"
 #include "Gameplay/DWGameInstance.h"
@@ -24,11 +26,8 @@ ADWGameMode::ADWGameMode()
 void ADWGameMode::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	if(AMainModule* MainModule = AMainModule::Get())
-	{
-		MainModule->OnModuleInitialized.AddDynamic(this, &ADWGameMode::InitializeGame);
-	}
+
+	UEventModuleBPLibrary::SubscribeEvent(UEventHandle_ModuleInitialized::StaticClass(), this, FName("InitializeGame"));
 }
 
 void ADWGameMode::InitializeGame()
@@ -39,23 +38,20 @@ void ADWGameMode::InitializeGame()
 	}
 }
 
-void ADWGameMode::StartGame(FName InArchiveID)
+void ADWGameMode::StartGame(int32 InArchiveID)
 {
-	// if(ADWSaveGameModule* SaveGameModule = AMainModule::GetModuleByClass<ADWSaveGameModule>())
-	// {
-	// 	SaveGameModule->LoadArchiveData(InArchiveID, true);
-	// }
+	if(UArchiveSaveGame* ArchiveSaveGame = USaveGameModuleBPLibrary::LoadSaveGame<UArchiveSaveGame>(InArchiveID))
+	{
+		ArchiveSaveGame->OnLoad();
+	}
 }
 
 void ADWGameMode::ContinueGame()
 {
-	// if(ADWSaveGameModule* SaveGameModule = AMainModule::GetModuleByClass<ADWSaveGameModule>())
-	// {
-	// 	if(UGeneralSaveGame* GeneralSaveGame = SaveGameModule->GetGeneralSaveGame())
-	// 	{
-	// 		SaveGameModule->LoadArchiveData(GeneralSaveGame->GeneralData.CurrentArchiveID, true);
-	// 	}
-	// }
+	if(UArchiveSaveGame* ArchiveSaveGame = USaveGameModuleBPLibrary::LoadSaveGame<UArchiveSaveGame>(InArchiveID))
+	{
+		ArchiveSaveGame->OnLoad();
+	}
 }
 
 void ADWGameMode::PauseGame()
