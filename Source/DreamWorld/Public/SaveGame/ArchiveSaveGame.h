@@ -4,7 +4,6 @@
 
 #include "DreamWorld/DreamWorld.h"
 #include "SaveGame/SaveGameBase.h"
-#include "SaveGame/SaveGameDataBase.h"
 
 #include "ArchiveSaveGame.generated.h"
 
@@ -20,26 +19,14 @@ public:
 	UArchiveSaveGame();
 
 public:
-	virtual void OnCreate_Implementation(USaveGameDataBase* InSaveGameData) override;
+	virtual void OnCreate_Implementation() override;
 
 	virtual void OnLoad_Implementation() override;
 
 	virtual void OnUnload_Implementation() override;
 	
 	virtual void OnRefresh_Implementation() override;
-};
-
-UCLASS()
-class DREAMWORLD_API UArchiveSaveGameData : public USaveGameDataBase
-{
-	GENERATED_BODY()
-
-public:
-	UArchiveSaveGameData();
-
-public:
-	virtual void OnInitialize_Implementation() override;
-
+	
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (InstanceEditable, ExposeOnSpawn))
 	FArchiveSaveData ArchiveData;

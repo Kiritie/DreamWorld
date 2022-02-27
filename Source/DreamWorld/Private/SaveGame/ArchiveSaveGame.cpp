@@ -8,7 +8,6 @@
 #include "Kismet/GameplayStatics.h"
 #include "Main/MainModule.h"
 #include "Module/DWSaveGameModule.h"
-#include "SaveGame/ArchiveSaveGameData.h"
 #include "SaveGame/GeneralSaveGame.h"
 #include "SaveGame/SaveGameModuleBPLibrary.h"
 #include "World/WorldManager.h"
@@ -16,31 +15,29 @@
 UArchiveSaveGame::UArchiveSaveGame()
 {
 	// set default pawn class to our Blueprinted character
-	
+
+	ArchiveData = FArchiveSaveData();
 }
 
-void UArchiveSaveGame::OnCreate_Implementation(USaveGameDataBase* InSaveGameData)
+void UArchiveSaveGame::OnCreate_Implementation()
 {
-	Super::OnCreate_Implementation(InSaveGameData);
+	Super::OnCreate_Implementation();
 
 	if(UGeneralSaveGame* GeneralSaveGame = USaveGameModuleBPLibrary::GetSaveGame<UGeneralSaveGame>())
 	{
-		if(UArchiveSaveGameData* ArchiveSaveGameData = GetSaveGameData<UArchiveSaveGameData>())
+		if(ArchiveData.ID == -1)
 		{
-			if(ArchiveSaveGameData->ArchiveData.ID == -1)
+			ArchiveData.ID = GeneralSaveGame->ArchiveBasicDatas.Num() - 1;
+			if(ADWSaveGameModule* SaveGameModule = AMainModule::GetModuleByClass<ADWSaveGameModule>())
 			{
-				ArchiveSaveGameData->ArchiveData.ID = GeneralSaveGame->ArchiveBasicDatas.Num() - 1;
-				if(ADWSaveGameModule* SaveGameModule = AMainModule::GetModuleByClass<ADWSaveGameModule>())
-				{
-					ArchiveSaveGameData->ArchiveData.WorldData = SaveGameModule->GetDefaultWorldData();
-					ArchiveSaveGameData->ArchiveData.PlayerData = SaveGameModule->GetDefaultPlayerData();
-				}
-				ArchiveSaveGameData->ArchiveData.bPreview = true;
-				ArchiveSaveGameData->ArchiveData.Initialize();
+				ArchiveData.WorldData = SaveGameModule->GetDefaultWorldData();
+				ArchiveData.PlayerData = SaveGameModule->GetDefaultPlayerData();
 			}
-			GeneralSaveGame->ArchiveBasicDatas.Add(ArchiveSaveGameData->ArchiveData);
+			ArchiveData.bPreview = true;
+			ArchiveData.Initialize();
 		}
-	}
+		GeneralSaveGame->ArchiveBasicDatas.Add(ArchiveData);
+}
 }
 
 void UArchiveSaveGame::OnLoad_Implementation()
@@ -49,20 +46,17 @@ void UArchiveSaveGame::OnLoad_Implementation()
 
 	if(UGeneralSaveGame* GeneralSaveGame = USaveGameModuleBPLibrary::GetSaveGame<UGeneralSaveGame>())
 	{
-		if(UArchiveSaveGameData* ArchiveSaveGameData = GetSaveGameData<UArchiveSaveGameData>())
-		{
-			GeneralSaveGame->GeneralData.CurrentArchiveID = ArchiveSaveGameData->ArchiveData.ID;
+		GeneralSaveGame->GeneralData.CurrentArchiveID = ArchiveData.ID;
 
-			WHDebug(FString::Printf(TEXT("Loading archive : %d"), ArchiveSaveGameData->ArchiveData.ID), FColor::Cyan);
-	
-			if(AWorldManager* WorldManager = AWorldManager::Get())
-			{
-				WorldManager->LoadData(ArchiveSaveGameData->ArchiveData.WorldData);
-			}
-			if(ADWPlayerController* PlayerController = UDWHelper::GetPlayerController(this))
-			{
-				PlayerController->LoadData(ArchiveSaveGameData->ArchiveData.PlayerData);
-			}
+		WHDebug(FString::Printf(TEXT("Loading archive : %d"), ArchiveData.ID), FColor::Cyan);
+
+		if(AWorldManager* WorldManager = AWorldManager::Get())
+		{
+			WorldManager->LoadData(ArchiveData.WorldData);
+		}
+		if(ADWPlayerController* PlayerController = UDWHelper::GetPlayerController(this))
+		{
+			PlayerController->LoadData(ArchiveData.PlayerData);
 		}
 	}
 }
@@ -71,18 +65,15 @@ void UArchiveSaveGame::OnUnload_Implementation()
 {
 	Super::OnUnload_Implementation();
 
-	if(UArchiveSaveGameData* ArchiveSaveGameData = GetSaveGameData<UArchiveSaveGameData>())
-	{
-		WHDebug(FString::Printf(TEXT("UnLoading archive : %d"), ArchiveSaveGameData->ArchiveData.ID), FColor::Cyan);
+	WHDebug(FString::Printf(TEXT("UnLoading archive : %d"), ArchiveData.ID), FColor::Cyan);
 
-		if(ADWPlayerController* PlayerController = UDWHelper::GetPlayerController(this))
-		{
-			PlayerController->UnloadData(true);
-		}
-		if(AWorldManager* WorldManager = AWorldManager::Get())
-		{
-			WorldManager->UnloadData(true);
-		}
+	if(ADWPlayerController* PlayerController = UDWHelper::GetPlayerController(this))
+	{
+		PlayerController->UnloadData(true);
+	}
+	if(AWorldManager* WorldManager = AWorldManager::Get())
+	{
+		WorldManager->UnloadData(true);
 	}
 }
 
@@ -90,25 +81,12 @@ void UArchiveSaveGame::OnRefresh_Implementation()
 {
 	Super::OnRefresh_Implementation();
 	
-	if(UArchiveSaveGameData* ArchiveSaveGameData = GetSaveGameData<UArchiveSaveGameData>())
+	if(ADWPlayerCharacter* PlayerCharacter = UDWHelper::GetPlayerCharacter(this))
 	{
-		if(ADWPlayerCharacter* PlayerCharacter = UDWHelper::GetPlayerCharacter(this))
-		{
-			ArchiveSaveGameData->ArchiveData.PlayerData = *static_cast<FPlayerSaveData*>(PlayerCharacter->ToData());
-		}
-		if(AWorldManager* WorldManager = AWorldManager::Get())
-		{
-			ArchiveSaveGameData->ArchiveData.WorldData = WorldManager->ToData();
-		}
+		ArchiveData.PlayerData = *static_cast<FPlayerSaveData*>(PlayerCharacter->ToData());
 	}
-}
-
-UArchiveSaveGameData::UArchiveSaveGameData()
-{
-	ArchiveData = FArchiveSaveData();
-}
-
-void UArchiveSaveGameData::OnInitialize_Implementation()
-{
-	
+	if(AWorldManager* WorldManager = AWorldManager::Get())
+	{
+		ArchiveData.WorldData = WorldManager->ToData();
+	}
 }

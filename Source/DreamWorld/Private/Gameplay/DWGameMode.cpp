@@ -13,7 +13,6 @@
 #include "Main/MainModule.h"
 #include "Module/DWSaveGameModule.h"
 #include "SaveGame/ArchiveSaveGame.h"
-#include "SaveGame/ArchiveSaveGameData.h"
 #include "SaveGame/GeneralSaveGame.h"
 #include "SaveGame/SaveGameModuleBPLibrary.h"
 
@@ -27,7 +26,7 @@ void ADWGameMode::BeginPlay()
 {
 	Super::BeginPlay();
 
-	UEventModuleBPLibrary::SubscribeEvent(UEventHandle_ModuleInitialized::StaticClass(), this, FName("InitializeGame"));
+	InitializeGame();
 }
 
 void ADWGameMode::InitializeGame()
@@ -48,9 +47,12 @@ void ADWGameMode::StartGame(int32 InArchiveID)
 
 void ADWGameMode::ContinueGame()
 {
-	if(UArchiveSaveGame* ArchiveSaveGame = USaveGameModuleBPLibrary::LoadSaveGame<UArchiveSaveGame>(InArchiveID))
+	if(UGeneralSaveGame* GeneralSaveGame = USaveGameModuleBPLibrary::LoadSaveGame<UGeneralSaveGame>(0))
 	{
-		ArchiveSaveGame->OnLoad();
+		if(UArchiveSaveGame* ArchiveSaveGame = USaveGameModuleBPLibrary::LoadSaveGame<UArchiveSaveGame>(GeneralSaveGame->GeneralData.CurrentArchiveID))
+		{
+			ArchiveSaveGame->OnLoad();
+		}
 	}
 }
 
@@ -84,10 +86,7 @@ void ADWGameMode::BackMainMenu()
 {
 	if(UArchiveSaveGame* ArchiveSaveGame = USaveGameModuleBPLibrary::GetSaveGame<UArchiveSaveGame>())
 	{
-		if(UArchiveSaveGameData* ArchiveSaveGameData = ArchiveSaveGame->GetSaveGameData<UArchiveSaveGameData>())
-		{
-			USaveGameModuleBPLibrary::SaveSaveGame<UArchiveSaveGame>(ArchiveSaveGameData->ArchiveData.ID);
-		}
+		USaveGameModuleBPLibrary::SaveSaveGame<UArchiveSaveGame>(ArchiveSaveGame->ArchiveData.ID);
 	}
 	if(ADWGameState* DWGameState = UDWHelper::GetGameState(this))
 	{
@@ -103,10 +102,7 @@ void ADWGameMode::QuitGame()
 {
 	if(UArchiveSaveGame* ArchiveSaveGame = USaveGameModuleBPLibrary::GetSaveGame<UArchiveSaveGame>())
 	{
-		if(UArchiveSaveGameData* ArchiveSaveGameData = ArchiveSaveGame->GetSaveGameData<UArchiveSaveGameData>())
-		{
-			USaveGameModuleBPLibrary::SaveSaveGame<UArchiveSaveGame>(ArchiveSaveGameData->ArchiveData.ID);
-		}
+		USaveGameModuleBPLibrary::SaveSaveGame<UArchiveSaveGame>(ArchiveSaveGame->ArchiveData.ID);
 	}
 	UKismetSystemLibrary::QuitGame(this, nullptr, EQuitPreference::Quit, true);
 }

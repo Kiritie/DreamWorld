@@ -6,7 +6,6 @@
 #include "Main/MainModule.h"
 #include "Module/DWSaveGameModule.h"
 #include "SaveGame/ArchiveSaveGame.h"
-#include "SaveGame/ArchiveSaveGameData.h"
 #include "SaveGame/GeneralSaveGame.h"
 #include "SaveGame/SaveGameModuleBPLibrary.h"
 
@@ -32,10 +31,7 @@ void UWidgetMainMenu::OnOpen_Implementation(const TArray<FParameter>& InParams, 
 	{
 		if(GeneralSaveGame->GeneralData.CurrentArchiveID == -1)
 		{
-			if(UArchiveSaveGameData* ArchiveSaveGameData = NewObject<UArchiveSaveGameData>(this))
-			{
-				USaveGameModuleBPLibrary::CreateSaveGame<UArchiveSaveGame>(ArchiveSaveGameData);
-			}
+			USaveGameModuleBPLibrary::CreateSaveGame<UArchiveSaveGame>();
 		}
 		else
 		{

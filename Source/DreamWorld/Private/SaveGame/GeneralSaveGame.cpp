@@ -12,9 +12,9 @@ UGeneralSaveGame::UGeneralSaveGame()
 	// set default pawn class to our Blueprinted character
 }
 
-void UGeneralSaveGame::OnCreate_Implementation(USaveGameDataBase* InSaveGameData)
+void UGeneralSaveGame::OnCreate_Implementation()
 {
-	Super::OnCreate_Implementation(InSaveGameData);
+	Super::OnCreate_Implementation();
 }
 
 void UGeneralSaveGame::OnLoad_Implementation()

@@ -28,7 +28,7 @@ public:
 	TArray<FArchiveBasicSaveData> ArchiveBasicDatas;
 
 public:
-	virtual void OnCreate_Implementation(USaveGameDataBase* InSaveGameData) override;
+	virtual void OnCreate_Implementation() override;
 	
 	virtual void OnLoad_Implementation() override;
 	

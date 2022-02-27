@@ -8,7 +8,6 @@
 #include "Kismet/GameplayStatics.h"
 #include "SaveGame/ArchiveSaveGame.h"
 #include "SaveGame/GeneralSaveGame.h"
-#include "SaveGame/SaveGameDataBase.h"
 #include "SaveGame/SaveGameModuleBPLibrary.h"
 #include "World/WorldManager.h"
 
@@ -40,7 +39,7 @@ void ADWSaveGameModule::OnInitialize_Implementation()
 	}
 	else
 	{
-		USaveGameModuleBPLibrary::CreateSaveGame<UGeneralSaveGame>(NewObject<USaveGameDataBase>());
+		USaveGameModuleBPLibrary::CreateSaveGame<UGeneralSaveGame>();
 	}
 }
 
