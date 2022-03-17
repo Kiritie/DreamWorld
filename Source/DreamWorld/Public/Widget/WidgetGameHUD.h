@@ -3,7 +3,7 @@
 #pragma once
 
 #include "DreamWorld/DreamWorld.h"
-#include "Widget/User/UserWidgetBase.h"
+#include "Widget/UMG/UserWidgetBase.h"
 #include "WidgetGameHUD.generated.h"
 
 class ADWPlayerCharacter;

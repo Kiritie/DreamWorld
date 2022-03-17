@@ -3,7 +3,7 @@
 #pragma once
 
 #include "DreamWorld/DreamWorld.h"
-#include "Widget/User/UserWidgetBase.h"
+#include "Widget/UMG/UserWidgetBase.h"
 #include "WidgetItemInfoBox.generated.h"
 
 class ADWPlayerCharacter;
