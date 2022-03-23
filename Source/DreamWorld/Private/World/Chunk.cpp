@@ -370,20 +370,20 @@ void AChunk::BuildMap()
 						// grass
 						case EVoxelType::Grass:
 						{
-							const float tmpNum = FMath::FRandRange(0, 1);
+							const float tmpNum = FMath::FRandRange(0.f, 1.f);
 							// plant
 							if (tmpNum < 0.2f)
 							{
-								SetVoxelComplex(FIndex(x, y, z + 1), FVoxelItem(FMath::FRandRange(0, 1) > 0.2f ? EVoxelType::Tall_Grass : (EVoxelType)FMath::RandRange((int32)EVoxelType::Flower_Allium, (int32)EVoxelType::Flower_Tulip_White)));
+								SetVoxelComplex(FIndex(x, y, z + 1), FVoxelItem(FMath::FRandRange(0.f, 1.f) > 0.2f ? EVoxelType::Tall_Grass : (EVoxelType)FMath::RandRange((int32)EVoxelType::Flower_Allium, (int32)EVoxelType::Flower_Tulip_White)));
 							}
 							// tree
 							else if (tmpNum < 0.21f)
 							{
 								if ((x > 2 && x <= AWorldManager::GetWorldData().ChunkSize - 2) && (y > 2 && y <= AWorldManager::GetWorldData().ChunkSize - 2))
 								{
-									const int32 treeHeight = FMath::RandRange(4, 5);
+									const int32 treeHeight = FMath::RandRange(4.f, 5.f);
 									const int32 leavesHeight = 2/*FMath::RandRange(2, 2)*/;
-									const int32 leavesWidth = FMath::FRandRange(0, 1) < 0.5f ? 3 : 5;
+									const int32 leavesWidth = FMath::FRandRange(0.f, 1.f) < 0.5f ? 3 : 5;
 									for (int32 trunkHeight = 0; trunkHeight < treeHeight; trunkHeight++)
 									{
 										SetVoxelComplex(FIndex(x, y, z + trunkHeight + 1), FVoxelItem(EVoxelType::Oak));

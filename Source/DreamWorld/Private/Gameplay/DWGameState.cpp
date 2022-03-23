@@ -14,6 +14,7 @@
 #include "Widget/WidgetPausingMenu.h"
 #include "Widget/WidgetGameHUD.h"
 #include "Widget/Archive/WidgetArchiveChoosingPanel.h"
+#include "Widget/Archive/WidgetArchiveCreatingPanel.h"
 
 ADWGameState::ADWGameState()
 {
@@ -37,20 +38,22 @@ void ADWGameState::SetCurrentState(EGameState InGameState)
 		{
 			case EGameState::MainMenu:
 			{
-				UWidgetModuleBPLibrary::CloseAllUserWidget(EWidgetType::SemiPermanent, true);
-				UWidgetModuleBPLibrary::CloseAllUserWidget(EWidgetType::Temporary, true);
-				UWidgetModuleBPLibrary::CloseAllUserWidget(EWidgetType::SemiTemporary, true);
 				UWidgetModuleBPLibrary::OpenUserWidget<UWidgetMainMenu>();
+				
+				UWidgetModuleBPLibrary::CreateUserWidget<UWidgetArchiveChoosingPanel>();
 				break;
 			}
 			case EGameState::Preparing:
 			{
 				UWidgetModuleBPLibrary::OpenUserWidget<UWidgetArchiveChoosingPanel>();
+
+				UWidgetModuleBPLibrary::CreateUserWidget<UWidgetArchiveCreatingPanel>();
 				break;
 			}
 			case EGameState::Loading:
 			{
 				UWidgetModuleBPLibrary::OpenUserWidget<UWidgetLoadingPanel>();
+				
 				UWidgetModuleBPLibrary::CreateUserWidget<UWidgetGameHUD>();
 				UWidgetModuleBPLibrary::CreateUserWidget<UWidgetInventoryBar>();
 				UWidgetModuleBPLibrary::CreateUserWidget<UWidgetInventoryPanel>();
@@ -58,7 +61,8 @@ void ADWGameState::SetCurrentState(EGameState InGameState)
 			}
 			case EGameState::Playing:
 			{
-				UWidgetModuleBPLibrary::CloseAllUserWidget(EWidgetType::Temporary, true);
+				UWidgetModuleBPLibrary::CloseAllUserWidget(EWidgetType::Temporary);
+				
 				UWidgetModuleBPLibrary::OpenUserWidget<UWidgetGameHUD>();
 				UWidgetModuleBPLibrary::OpenUserWidget<UWidgetInventoryBar>();
 				break;

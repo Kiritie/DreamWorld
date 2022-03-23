@@ -43,6 +43,11 @@ void ADWSaveGameModule::OnInitialize_Implementation()
 	}
 }
 
+void ADWSaveGameModule::OnPreparatory_Implementation()
+{
+	Super::OnPreparatory_Implementation();
+}
+
 void ADWSaveGameModule::OnRefresh_Implementation(float DeltaSeconds)
 {
 	Super::OnRefresh_Implementation(DeltaSeconds);
@@ -62,7 +67,7 @@ int32 ADWSaveGameModule::GetNewValidArchiveID() const
 {
 	if(UGeneralSaveGame* GeneralSaveGame = USaveGameModuleBPLibrary::GetSaveGame<UGeneralSaveGame>())
 	{
-		return GeneralSaveGame->ArchiveBasicDatas.Num() - 1;
+		return GeneralSaveGame->SaveData.ArchiveBasicDatas.Num() - 1;
 	}
 	return -1;
 }

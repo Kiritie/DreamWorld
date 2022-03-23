@@ -22,15 +22,14 @@ public:
 
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	FGeneralSaveData GeneralData;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	TArray<FArchiveBasicSaveData> ArchiveBasicDatas;
-
+	FGeneralSaveData SaveData;
+	
 public:
 	virtual void OnCreate_Implementation() override;
 	
 	virtual void OnLoad_Implementation() override;
 	
+	virtual void OnUnload_Implementation() override;
+
 	virtual void OnRefresh_Implementation() override;
 };

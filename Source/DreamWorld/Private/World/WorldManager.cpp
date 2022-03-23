@@ -311,6 +311,7 @@ void AWorldManager::GeneratePreviews()
 
 void AWorldManager::GenerateTerrain()
 {
+	if()
 	if(ADWPlayerCharacter* PlayerCharacter = UDWHelper::GetPlayerCharacter(this))
 	{
 		FIndex chunkIndex = LocationToChunkIndex(PlayerCharacter->GetActorLocation(), true);

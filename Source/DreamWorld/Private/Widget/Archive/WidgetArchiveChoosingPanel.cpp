@@ -5,7 +5,7 @@
 
 UWidgetArchiveChoosingPanel::UWidgetArchiveChoosingPanel(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
-	WidgetName = FName("RoleChoosingPanel");
+	WidgetName = FName("ArchiveChoosingPanel");
 	WidgetType = EWidgetType::Temporary;
 	InputMode = EInputMode::UIOnly;
 }

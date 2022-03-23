@@ -1376,30 +1376,6 @@ public:
 	}
 };
 
-USTRUCT(BlueprintType)
-struct DREAMWORLD_API FGeneralSaveData : public FSaveData
-{
-	GENERATED_BODY()
-
-public:
-	FORCEINLINE FGeneralSaveData()
-	{
-		bAutoJump = true;
-		CameraDistance = 150.f;
-		CurrentArchiveID = -1;
-	}
-
-public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	bool bAutoJump;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float CameraDistance;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 CurrentArchiveID;
-};
-
 UENUM(BlueprintType)
 enum class ESplitSlotType : uint8
 {
@@ -2303,4 +2279,31 @@ public:
 			WorldData.WorldSeed = FMath::Rand();
 		}
 	}
+};
+
+USTRUCT(BlueprintType)
+struct DREAMWORLD_API FGeneralSaveData : public FSaveData
+{
+	GENERATED_BODY()
+
+public:
+	FORCEINLINE FGeneralSaveData()
+	{
+		bAutoJump = true;
+		CameraDistance = 150.f;
+		CurrentArchiveID = -1;
+	}
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bAutoJump;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float CameraDistance;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 CurrentArchiveID;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TArray<FArchiveBasicSaveData> ArchiveBasicDatas;
 };

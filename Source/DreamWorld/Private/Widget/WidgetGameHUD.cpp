@@ -4,6 +4,8 @@
 #include "Widget/WidgetGameHUD.h"
 
 #include "Character/DWCharacter.h"
+#include "Event/EventModuleBPLibrary.h"
+#include "Event/Handle/Input/EventHandle_ChangeInputMode.h"
 #include "Interaction/Components/InteractionComponent.h"
 #include "Main/MainModule.h"
 #include "Widget/WidgetModule.h"
@@ -12,18 +14,15 @@
 UWidgetGameHUD::UWidgetGameHUD(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	WidgetName = FName("GameHUD");
-	WidgetType = EWidgetType::SemiPermanent;
+	WidgetType = EWidgetType::Permanent;
 	InputMode = EInputMode::GameOnly;
 }
 
 void UWidgetGameHUD::OnCreate_Implementation()
 {
 	Super::OnCreate_Implementation();
-	
-	if(AInputModule* InputModule = AMainModule::GetModuleByClass<AInputModule>())
-	{
-		InputModule->OnChangeInputMode.AddDynamic(this, &UWidgetGameHUD::OnChangeInputMode);
-	}
+
+	UEventModuleBPLibrary::SubscribeEvent(UEventHandle_ChangeInputMode::StaticClass(), this, FName("OnChangeInputMode"));
 }
 
 void UWidgetGameHUD::OnInitialize_Implementation(AActor* InOwner)
@@ -60,11 +59,11 @@ void UWidgetGameHUD::RefreshActions()
 	}
 }
 
-void UWidgetGameHUD::OnChangeInputMode(EInputMode InInputMode)
+void UWidgetGameHUD::OnChangeInputMode(UObject* InSender, UEventHandle_ChangeInputMode* InEventHandle)
 {
 	if(ADWCharacter* OwnerCharacter = Cast<ADWCharacter>(OwnerActor))
 	{
-		if(!OwnerCharacter->IsDead() && InInputMode == EInputMode::GameOnly)
+		if(!OwnerCharacter->IsDead() && InEventHandle->InputMode == EInputMode::GameOnly)
 		{
 			SetCrosshairVisible(true);
 		}

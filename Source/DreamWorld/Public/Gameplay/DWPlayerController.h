@@ -19,15 +19,6 @@ public:
 	ADWPlayerController();
 
 protected:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Camera")
-	float CameraTurnRate;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Camera")
-	float CameraLookUpRate;
-		
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Camera")
-	FVector2D CameraDistanceRange;
-
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class ADWPlayerCharacter* PlayerCharacter;
 
@@ -61,14 +52,6 @@ public:
 	bool RaycastFromAimPoint(FHitResult& OutHitResult, EGameTraceType InGameTraceType, float InRayDistance = 1000) const;
 
 protected:
-	virtual void TurnCam(float InRate);
-
-	virtual void LookUpCam(float InRate);
-	
-	virtual void ZoomNear();
-	
-	virtual void ZoomFar();
-
 	virtual void MoveForward(float InValue);
 
 	virtual void MoveRight(float InValue);
@@ -121,20 +104,8 @@ protected:
 	
 public:
 	UFUNCTION(BlueprintPure)
-	float GetCameraTurnRate() const { return CameraTurnRate; }
-
-	UFUNCTION(BlueprintPure)
-	float GetCameraLookUpRate() const { return CameraLookUpRate; }
-
-	UFUNCTION(BlueprintPure)
-	FVector2D GetCameraDistanceRange() const { return CameraDistanceRange; }
-
-	UFUNCTION(BlueprintPure)
 	class ADWPlayerCharacter* GetPlayerCharacter() const {return PlayerCharacter; }
 
 	UFUNCTION(BlueprintPure)
 	class ADWCharacter* GetProcessedCharacter() const;
-
-	UFUNCTION(BlueprintPure)
-	class ADWPlayerCharacterCameraManager* GetCameraManager() const;
 };

@@ -49,9 +49,9 @@ FArchiveBasicSaveData FPlayerSaveData::GetArchiveData() const
 {
 	if(UGeneralSaveGame* GeneralSaveGame = USaveGameModuleBPLibrary::GetSaveGame<UGeneralSaveGame>())
 	{
-		if(GeneralSaveGame->ArchiveBasicDatas.IsValidIndex(ArchiveID))
+		if(GeneralSaveGame->SaveData.ArchiveBasicDatas.IsValidIndex(ArchiveID))
 		{
-			return GeneralSaveGame->ArchiveBasicDatas[ArchiveID];
+			return GeneralSaveGame->SaveData.ArchiveBasicDatas[ArchiveID];
 		}
 	}
 	return FArchiveBasicSaveData();
@@ -61,9 +61,9 @@ FArchiveBasicSaveData FWorldSaveData::GetArchiveData() const
 {
 	if(UGeneralSaveGame* GeneralSaveGame = USaveGameModuleBPLibrary::GetSaveGame<UGeneralSaveGame>())
 	{
-		if(GeneralSaveGame->ArchiveBasicDatas.IsValidIndex(ArchiveID))
+		if(GeneralSaveGame->SaveData.ArchiveBasicDatas.IsValidIndex(ArchiveID))
 		{
-			return GeneralSaveGame->ArchiveBasicDatas[ArchiveID];
+			return GeneralSaveGame->SaveData.ArchiveBasicDatas[ArchiveID];
 		}
 	}
 	return FArchiveBasicSaveData();

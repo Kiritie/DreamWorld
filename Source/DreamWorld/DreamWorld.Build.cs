@@ -31,6 +31,7 @@ public class DreamWorld : ModuleRules
 		PrivateDependencyModuleNames.AddRange(
 			new string[] {
 				"InputCore",
+				"SlateCore",
 				"UMG",
 				"AIModule",
 				"GameplayAbilities",

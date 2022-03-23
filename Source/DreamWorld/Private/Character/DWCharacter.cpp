@@ -39,11 +39,11 @@
 #include "Abilities/Character/DWCharacterSkillAbility.h"
 #include "Abilities/Item/DWItemAbility.h"
 #include "Character/DWCharacterPart.h"
+#include "Global/GlobalBPLibrary.h"
 #include "Interaction/Components/CharacterInteractionComponent.h"
 #include "Interaction/Components/InteractionComponent.h"
 #include "Scene/SceneModuleBPLibrary.h"
 #include "Scene/Object/PhysicsVolume/PhysicsVolumeBase.h"
-#include "Tool/GlobalToolsBPLibrary.h"
 #include "Widget/Components/WidgetWorldTextComponent.h"
 
 //////////////////////////////////////////////////////////////////////////
@@ -399,7 +399,7 @@ void ADWCharacter::LoadData(FSaveData* InSaveData)
 		DefaultAbility.AbilityHandle = AcquireAbility(GetCharacterData().AbilityClass, DefaultAbility.AbilityLevel);
 		ActiveAbility(DefaultAbility.AbilityHandle);
 
-		UGlobalToolsBPLibrary::LoadObjectFromMemory(this, SaveData.Datas);
+		UGlobalBPLibrary::LoadObjectFromMemory(this, SaveData.Datas);
 	}
 	else
 	{
@@ -520,7 +520,7 @@ FSaveData* ADWCharacter::ToData(bool bSaved)
 	SaveData.SpawnLocation = GetActorLocation();
 	SaveData.SpawnRotation = GetActorRotation();
 
-	UGlobalToolsBPLibrary::SaveObjectToMemory(this, SaveData.Datas);
+	UGlobalBPLibrary::SaveObjectToMemory(this, SaveData.Datas);
 
 	return &SaveData;
 }

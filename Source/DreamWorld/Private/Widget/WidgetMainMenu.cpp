@@ -29,13 +29,13 @@ void UWidgetMainMenu::OnOpen_Implementation(const TArray<FParameter>& InParams, 
 
 	if(UGeneralSaveGame* GeneralSaveGame = USaveGameModuleBPLibrary::GetSaveGame<UGeneralSaveGame>())
 	{
-		if(GeneralSaveGame->GeneralData.CurrentArchiveID == -1)
+		if(GeneralSaveGame->SaveData.CurrentArchiveID == -1)
 		{
-			USaveGameModuleBPLibrary::CreateSaveGame<UArchiveSaveGame>();
+			USaveGameModuleBPLibrary::CreateSaveGame<UArchiveSaveGame>()->Load();
 		}
 		else
 		{
-			USaveGameModuleBPLibrary::LoadSaveGame<UArchiveSaveGame>(GeneralSaveGame->GeneralData.CurrentArchiveID);
+			USaveGameModuleBPLibrary::LoadSaveGame<UArchiveSaveGame>(GeneralSaveGame->SaveData.CurrentArchiveID);
 		}
 	}
 }

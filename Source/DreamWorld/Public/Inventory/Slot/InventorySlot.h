@@ -46,7 +46,7 @@ public:
 	/// Initialize
 public:
 	UFUNCTION(BlueprintCallable)
-	virtual void InitSlot(UInventory* InOwner, FItem InItem, EItemType InLimitType = EItemType::None, ESplitSlotType InSplitType = ESplitSlotType::Default);
+	virtual void InitSlot(UInventory* InOwner, FItem InItem, EItemType InLimitType/* = EItemType::None*/, ESplitSlotType InSplitType/* = ESplitSlotType::Default*/);
 
 	//////////////////////////////////////////////////////////////////////////
 	/// Checks

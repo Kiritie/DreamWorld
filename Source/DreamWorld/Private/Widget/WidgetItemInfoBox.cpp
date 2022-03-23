@@ -12,7 +12,7 @@
 UWidgetItemInfoBox::UWidgetItemInfoBox(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	WidgetName = FName("ItemInfoBox");
-	WidgetType = EWidgetType::SemiTemporary;
+	WidgetType = EWidgetType::Permanent;
 	InputMode = EInputMode::None;
 }
 

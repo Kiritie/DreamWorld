@@ -13,7 +13,7 @@ UDWAITask_AIDefend::UDWAITask_AIDefend(const FObjectInitializer& ObjectInitializ
 
 	DefendTarget = nullptr;
 	DefendTargetKey.AddObjectFilter(this, GET_MEMBER_NAME_CHECKED(UDWAITask_AIDefend, DefendTargetKey), ADWCharacter::StaticClass());
-	AIMoveRemainTime = FMath::FRandRange(1, 2);
+	AIMoveRemainTime = FMath::FRandRange(1.f, 2.f);
 	AIMoveLocation = FVector::ZeroVector;
 }
 
@@ -36,7 +36,7 @@ void UDWAITask_AIDefend::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* Node
 	}
 	if (OwnerCharacter->DoAIMove(AIMoveLocation))
 	{
-		AIMoveRemainTime = FMath::FRandRange(1, 2);
+		AIMoveRemainTime = FMath::FRandRange(1.f, 2.f);
 	}
 }
 

@@ -28,7 +28,6 @@
 #include "Equip/EquipWeapon.h"
 #include "Equip/EquipShield.h"
 #include "Inventory/Slot/InventorySkillSlot.h"
-#include "Character/Player/DWPlayerCharacterCameraManager.h"
 #include "Gameplay/DWGameInstance.h"
 #include "Input/InputModuleBPLibrary.h"
 #include "Interaction/Components/InteractionComponent.h"
@@ -537,7 +536,7 @@ bool ADWPlayerCharacter::UseItem(FItem& InItem)
 
 void ADWPlayerCharacter::OnAttackDestroyPressed()
 {
-	if (bBreakAllInput || UInputModuleBPLibrary::GetInputMode() != EInputMode::GameOnly) return;
+	if (bBreakAllInput || UInputModuleBPLibrary::GetGlobalInputMode() != EInputMode::GameOnly) return;
 
 	switch (ControlMode)
 	{
@@ -571,7 +570,7 @@ void ADWPlayerCharacter::OnAttackDestroyPressed()
 
 void ADWPlayerCharacter::OnAttackDestroyRepeat()
 {
-	if (bBreakAllInput || UInputModuleBPLibrary::GetInputMode() != EInputMode::GameOnly) return;
+	if (bBreakAllInput || UInputModuleBPLibrary::GetGlobalInputMode() != EInputMode::GameOnly) return;
 
 	switch (ControlMode)
 	{
@@ -598,7 +597,7 @@ void ADWPlayerCharacter::OnAttackDestroyRepeat()
 
 void ADWPlayerCharacter::OnAttackDestroyReleased()
 {
-	if (bBreakAllInput || UInputModuleBPLibrary::GetInputMode() != EInputMode::GameOnly) return;
+	if (bBreakAllInput || UInputModuleBPLibrary::GetGlobalInputMode() != EInputMode::GameOnly) return;
 
 	switch (ControlMode)
 	{
@@ -625,7 +624,7 @@ void ADWPlayerCharacter::OnAttackDestroyReleased()
 
 void ADWPlayerCharacter::OnDefendGeneratePressed()
 {
-	if (bBreakAllInput || UInputModuleBPLibrary::GetInputMode() != EInputMode::GameOnly) return;
+	if (bBreakAllInput || UInputModuleBPLibrary::GetGlobalInputMode() != EInputMode::GameOnly) return;
 
 	switch (ControlMode)
 	{
@@ -655,7 +654,7 @@ void ADWPlayerCharacter::OnDefendGeneratePressed()
 
 void ADWPlayerCharacter::OnDefendGenerateRepeat()
 {
-	if (bBreakAllInput || UInputModuleBPLibrary::GetInputMode() != EInputMode::GameOnly) return;
+	if (bBreakAllInput || UInputModuleBPLibrary::GetGlobalInputMode() != EInputMode::GameOnly) return;
 
 	switch (ControlMode)
 	{
@@ -682,7 +681,7 @@ void ADWPlayerCharacter::OnDefendGenerateRepeat()
 
 void ADWPlayerCharacter::OnDefendGenerateReleased()
 {
-	if (bBreakAllInput || UInputModuleBPLibrary::GetInputMode() != EInputMode::GameOnly) return;
+	if (bBreakAllInput || UInputModuleBPLibrary::GetGlobalInputMode() != EInputMode::GameOnly) return;
 
 	switch (ControlMode)
 	{

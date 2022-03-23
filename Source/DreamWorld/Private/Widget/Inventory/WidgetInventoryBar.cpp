@@ -22,7 +22,7 @@
 UWidgetInventoryBar::UWidgetInventoryBar(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	WidgetName = FName("InventoryBar");
-	WidgetType = EWidgetType::SemiPermanent;
+	WidgetType = EWidgetType::Permanent;
 	InputMode = EInputMode::GameOnly;
 	
 	SelectedSlotIndex = 0;

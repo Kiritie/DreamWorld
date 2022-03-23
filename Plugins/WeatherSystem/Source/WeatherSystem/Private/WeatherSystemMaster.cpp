@@ -334,7 +334,7 @@ void AWeatherSystemMaster::SetupDefaults()
 	DirectionalLight->bEnableLightShaftBloom = true;
 	DirectionalLight->BloomScale = 0.5f;
 	DirectionalLight->BloomMaxBrightness = 5.0f;
-	DirectionalLight->bUsedAsAtmosphereSunLight = true;
+	DirectionalLight->bUsedAsAtmosphereSunLight_DEPRECATED = true;
 	DirectionalLight->DynamicShadowDistanceMovableLight = 200000.0f;
 	DirectionalLight->DynamicShadowCascades = 5.0f;
 	DirectionalLight->CascadeDistributionExponent = 4.0f;
@@ -352,7 +352,7 @@ void AWeatherSystemMaster::SetupDefaults()
 	SkyAtmosphere = CreateDefaultSubobject<USkyAtmosphereComponent>(TEXT("SkyAtmosphere"));
 	SkyAtmosphere->SetupAttachment(RootComponent);
 	SkyAtmosphere->SetMobility(EComponentMobility::Movable);
-	SkyAtmosphere->SetSkyLuminanceFactor(FVector(0.5f, 0.625f, 1.0f));
+	SkyAtmosphere->SetSkyLuminanceFactor(FLinearColor(0.5f, 0.625f, 1.0f));
 	//����
 	PostProcessComp = CreateDefaultSubobject<UPostProcessComponent>(TEXT("PostProcess"));
 	PostProcessComp->SetupAttachment(RootComponent);

@@ -11,15 +11,15 @@
 #include "Components/GridSlot.h"
 #include "Components/WrapBox.h"
 #include "Components/WrapBoxSlot.h"
+#include "Global/GlobalBPLibrary.h"
 #include "Inventory/CharacterInventory.h"
 #include "Inventory/Slot/InventorySlot.h"
-#include "Tool/GlobalToolsBPLibrary.h"
 #include "Widget/Inventory/Slot/WidgetInventoryEquipSlot.h"
 
 UWidgetInventoryPanel::UWidgetInventoryPanel(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	WidgetName = FName("InventoryPanel");
-	WidgetType = EWidgetType::SemiPermanent;
+	WidgetType = EWidgetType::Permanent;
 	InputMode = EInputMode::GameAndUI;
 
 	DefaultSlotClass = LoadClass<UWidgetInventorySlot>(nullptr, TEXT("WidgetBlueprint'/Game/Blueprints/Widget/Inventory/Slot/WB_InventorySlot.WB_InventorySlot_C'"));
@@ -73,7 +73,7 @@ void UWidgetInventoryPanel::OnInitialize_Implementation(AActor* InOwner)
 				if(UWidgetInventoryEquipSlot* EquipSlot = Cast<UWidgetInventoryEquipSlot>(UWidgetBlueprintLibrary::Create(this, EquipSlotClass, nullptr)))
 				{
 					EquipSlot->InitSlot(EquipSlots[i]);
-					EquipSlot->SetEquipPartType(UGlobalToolsBPLibrary::GetEnumValueDisplayName(TEXT("EEquipPartType"), i));
+					EquipSlot->SetEquipPartType(UGlobalBPLibrary::GetEnumValueDisplayName(TEXT("EEquipPartType"), i));
 					if(UGridSlot* GridSlot = i % 2 == 0 ? LeftEquipContent->AddChildToGrid(EquipSlot) : RightEquipContent->AddChildToGrid(EquipSlot))
 					{
 						GridSlot->SetPadding(FMargin(2.5f, 2.5f, 2.5f, 2.5f));

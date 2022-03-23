@@ -4,6 +4,7 @@
 
 #include "Asset/AssetModule.h"
 #include "Audio/AudioModule.h"
+#include "Camera/CameraModule.h"
 #include "Character/CharacterModule.h"
 #include "Debug/DebugModule.h"
 #include "Event/EventModule.h"
@@ -30,6 +31,7 @@ ADWMainModule::ADWMainModule()
 	ModuleClasses.Add(AAssetModule::StaticClass());
 	ModuleClasses.Add(AAudioModule::StaticClass());
 	ModuleClasses.Add(ACharacterModule::StaticClass());
+	ModuleClasses.Add(ACameraModule::StaticClass());
 	ModuleClasses.Add(ADebugModule::StaticClass());
 	ModuleClasses.Add(AEventModule::StaticClass());
 	ModuleClasses.Add(AInputModule::StaticClass());

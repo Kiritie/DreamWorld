@@ -6,9 +6,9 @@
 #include "Components/StaticMeshComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Character/DWCharacter.h"
+#include "Global/GlobalBPLibrary.h"
 #include "Inventory/Inventory.h"
 #include "Inventory/Slot/InventoryEquipSlot.h"
-#include "Tool/GlobalToolsBPLibrary.h"
 
 // Sets default values
 AEquip::AEquip()
@@ -45,7 +45,7 @@ void AEquip::Initialize(ADWCharacter* InOwnerCharacter)
 	if (OwnerCharacter)
 	{
 		OwnerCharacter->GetInventory()->GetSplitSlots<UInventoryEquipSlot>(ESplitSlotType::Equip)[(int32)GetEquipData().PartType];
-		AttachToComponent(OwnerCharacter->GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, *UGlobalToolsBPLibrary::GetEnumValueAuthoredName(TEXT("EEquipPartType"), (int32)GetEquipData().PartType));
+		AttachToComponent(OwnerCharacter->GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, *UGlobalBPLibrary::GetEnumValueAuthoredName(TEXT("EEquipPartType"), (int32)GetEquipData().PartType));
 	}
 }
 

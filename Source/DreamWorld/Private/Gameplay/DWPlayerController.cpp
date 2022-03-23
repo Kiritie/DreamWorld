@@ -15,7 +15,6 @@
 #include "Widget/Inventory/WidgetInventoryBar.h"
 #include "Widget/Inventory/WidgetInventoryPanel.h"
 #include "Inventory/Inventory.h"
-#include "Character/Player/DWPlayerCharacterCameraManager.h"
 #include "Gameplay/DWGameMode.h"
 #include "Inventory/Slot/InventorySlot.h"
 #include "Module/DWSaveGameModule.h"
@@ -26,16 +25,13 @@
 
 ADWPlayerController::ADWPlayerController()
 {
-	static ConstructorHelpers::FClassFinder<ADWPlayerCharacterCameraManager> ClassFinder(TEXT("Blueprint'/Game/Blueprints/Character/Player/BP_PlayerCameraManager.BP_PlayerCameraManager_C'"));
-	if (ClassFinder.Succeeded())
-	{
-		PlayerCameraManagerClass = ClassFinder.Class;
-	}
-	
 	// camera
-	CameraTurnRate = 45;
-	CameraLookUpRate = 45;
-	CameraDistanceRange = FVector2D(100, 300);
+	CameraTurnRate = 45.f;
+	CameraLookUpRate = 45.f;
+	InitCameraPinch = -20.f;
+	MinCameraDistance = 100.f;
+	MaxCameraDistance = 300.f;
+	InitCameraDistance = 150.f;
 
 	// inputs
 	bPressedSprint = false;
@@ -60,12 +56,6 @@ void ADWPlayerController::SetupInputComponent()
 	check(InputComponent);
 
 	InputComponent->SetTickableWhenPaused(true);
-
-	InputComponent->BindAxis("Turn", this, &ADWPlayerController::TurnCam);
-	InputComponent->BindAxis("LookUp", this, &ADWPlayerController::LookUpCam);
-	
-	InputComponent->BindAction("ZoomNear", IE_Pressed, this, &ADWPlayerController::ZoomNear);
-	InputComponent->BindAction("ZoomFar", IE_Pressed, this, &ADWPlayerController::ZoomFar);
 
 	InputComponent->BindAxis("MoveForward", this, &ADWPlayerController::MoveForward);
 	InputComponent->BindAxis("MoveRight", this, &ADWPlayerController::MoveRight);
@@ -184,7 +174,7 @@ void ADWPlayerController::LoadData(FPlayerSaveData InPlayerData)
 		SetControlRotation(InPlayerData.CameraRotation);
 		if(UGeneralSaveGame* GeneralSaveGame = USaveGameModuleBPLibrary::GetSaveGame<UGeneralSaveGame>())
 		{
-			GetCameraManager()->SetCameraDistance(GeneralSaveGame->GeneralData.CameraDistance, true);
+			SetCameraDistance(GeneralSaveGame->SaveData.CameraDistance, true);
 		}
 
 		NewPlayerCharacter->Disable(true, true);
@@ -256,54 +246,6 @@ bool ADWPlayerController::RaycastFromAimPoint(FHitResult& OutHitResult, EGameTra
 		return UKismetSystemLibrary::LineTraceSingle(PlayerCharacter, rayStart, rayEnd, UDWHelper::GetGameTrace(InGameTraceType), false, TArray<AActor*>(), EDrawDebugTrace::None, OutHitResult, true);
 	}
 	return false;
-}
-
-void ADWPlayerController::TurnCam(float InRate)
-{
-	if (ADWGameState* GameState = UDWHelper::GetGameState(this))
-	{
-		if (GameState->GetCurrentState() == EGameState::Playing)
-		{
-			AddYawInput(InRate * CameraTurnRate * GetWorld()->GetDeltaSeconds());
-			if(GetPlayerCharacter())
-			{
-				GetPlayerCharacter()->GetTargetSystem()->TargetActorWithAxisInput(InRate);
-			}
-		}
-	}
-}
-
-void ADWPlayerController::LookUpCam(float InRate)
-{
-	if (ADWGameState* GameState = UDWHelper::GetGameState(this))
-	{
-		if (GameState->GetCurrentState() == EGameState::Playing)
-		{
-			AddPitchInput(InRate * CameraLookUpRate * GetWorld()->GetDeltaSeconds());
-		}
-	}
-}
-
-void ADWPlayerController::ZoomNear()
-{
-	if (ADWGameState* GameState = UDWHelper::GetGameState(this))
-	{
-		if (GameState->GetCurrentState() == EGameState::Playing)
-		{
-			GetCameraManager()->ZoomCamera(-50);
-		}
-	}
-}
-
-void ADWPlayerController::ZoomFar()
-{
-	if (ADWGameState* GameState = UDWHelper::GetGameState(this))
-	{
-		if (GameState->GetCurrentState() == EGameState::Playing)
-		{
-			GetCameraManager()->ZoomCamera(50);
-		}
-	}
 }
 
 void ADWPlayerController::MoveForward(float InValue)
@@ -603,9 +545,4 @@ void ADWPlayerController::PauseOrContinueGame()
 ADWCharacter* ADWPlayerController::GetProcessedCharacter() const
 {
 	return Cast<ADWCharacter>(GetPawn());
-}
-
-ADWPlayerCharacterCameraManager* ADWPlayerController::GetCameraManager() const
-{
-	return Cast<ADWPlayerCharacterCameraManager>(PlayerCameraManager.Get());
 }

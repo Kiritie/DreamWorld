@@ -16,7 +16,9 @@ UArchiveSaveGame::UArchiveSaveGame()
 {
 	// set default pawn class to our Blueprinted character
 
-	ArchiveData = FArchiveSaveData();
+	SaveName = FName("Archive");
+	
+	SaveData = FArchiveSaveData();
 }
 
 void UArchiveSaveGame::OnCreate_Implementation()
@@ -25,19 +27,19 @@ void UArchiveSaveGame::OnCreate_Implementation()
 
 	if(UGeneralSaveGame* GeneralSaveGame = USaveGameModuleBPLibrary::GetSaveGame<UGeneralSaveGame>())
 	{
-		if(ArchiveData.ID == -1)
+		if(SaveData.ID == -1)
 		{
-			ArchiveData.ID = GeneralSaveGame->ArchiveBasicDatas.Num() - 1;
+			SaveData.ID = GeneralSaveGame->SaveData.ArchiveBasicDatas.Num();
 			if(ADWSaveGameModule* SaveGameModule = AMainModule::GetModuleByClass<ADWSaveGameModule>())
 			{
-				ArchiveData.WorldData = SaveGameModule->GetDefaultWorldData();
-				ArchiveData.PlayerData = SaveGameModule->GetDefaultPlayerData();
+				SaveData.WorldData = SaveGameModule->GetDefaultWorldData();
+				SaveData.PlayerData = SaveGameModule->GetDefaultPlayerData();
 			}
-			ArchiveData.bPreview = true;
-			ArchiveData.Initialize();
+			SaveData.bPreview = true;
+			SaveData.Initialize();
 		}
-		GeneralSaveGame->ArchiveBasicDatas.Add(ArchiveData);
-}
+		GeneralSaveGame->SaveData.ArchiveBasicDatas.Add(SaveData);
+	}
 }
 
 void UArchiveSaveGame::OnLoad_Implementation()
@@ -46,17 +48,17 @@ void UArchiveSaveGame::OnLoad_Implementation()
 
 	if(UGeneralSaveGame* GeneralSaveGame = USaveGameModuleBPLibrary::GetSaveGame<UGeneralSaveGame>())
 	{
-		GeneralSaveGame->GeneralData.CurrentArchiveID = ArchiveData.ID;
+		GeneralSaveGame->SaveData.CurrentArchiveID = SaveData.ID;
 
-		WHDebug(FString::Printf(TEXT("Loading archive : %d"), ArchiveData.ID), FColor::Cyan);
+		WHDebug(FString::Printf(TEXT("Loading archive : %d"), SaveData.ID), FColor::Cyan);
 
 		if(AWorldManager* WorldManager = AWorldManager::Get())
 		{
-			WorldManager->LoadData(ArchiveData.WorldData);
+			WorldManager->LoadData(SaveData.WorldData);
 		}
 		if(ADWPlayerController* PlayerController = UDWHelper::GetPlayerController(this))
 		{
-			PlayerController->LoadData(ArchiveData.PlayerData);
+			PlayerController->LoadData(SaveData.PlayerData);
 		}
 	}
 }
@@ -65,7 +67,7 @@ void UArchiveSaveGame::OnUnload_Implementation()
 {
 	Super::OnUnload_Implementation();
 
-	WHDebug(FString::Printf(TEXT("UnLoading archive : %d"), ArchiveData.ID), FColor::Cyan);
+	WHDebug(FString::Printf(TEXT("UnLoading archive : %d"), SaveData.ID), FColor::Cyan);
 
 	if(ADWPlayerController* PlayerController = UDWHelper::GetPlayerController(this))
 	{
@@ -83,10 +85,10 @@ void UArchiveSaveGame::OnRefresh_Implementation()
 	
 	if(ADWPlayerCharacter* PlayerCharacter = UDWHelper::GetPlayerCharacter(this))
 	{
-		ArchiveData.PlayerData = *static_cast<FPlayerSaveData*>(PlayerCharacter->ToData());
+		SaveData.PlayerData = *static_cast<FPlayerSaveData*>(PlayerCharacter->ToData());
 	}
 	if(AWorldManager* WorldManager = AWorldManager::Get())
 	{
-		ArchiveData.WorldData = WorldManager->ToData();
+		SaveData.WorldData = WorldManager->ToData();
 	}
 }

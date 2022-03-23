@@ -55,5 +55,5 @@ protected:
 	void HideActions();
 
 	UFUNCTION()
-	void OnChangeInputMode(EInputMode InInputMode);
+	void OnChangeInputMode(UObject* InSender, class UEventHandle_ChangeInputMode* InEventHandle);
 };

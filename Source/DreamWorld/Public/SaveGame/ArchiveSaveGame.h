@@ -17,6 +17,10 @@ class DREAMWORLD_API UArchiveSaveGame : public USaveGameBase
 
 public:
 	UArchiveSaveGame();
+	
+public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	FArchiveSaveData SaveData;
 
 public:
 	virtual void OnCreate_Implementation() override;
@@ -26,8 +30,4 @@ public:
 	virtual void OnUnload_Implementation() override;
 	
 	virtual void OnRefresh_Implementation() override;
-	
-public:
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (InstanceEditable, ExposeOnSpawn))
-	FArchiveSaveData ArchiveData;
 };
