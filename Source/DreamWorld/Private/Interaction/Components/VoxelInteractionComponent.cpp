@@ -4,13 +4,13 @@
 #include "Interaction/Components/VoxelInteractionComponent.h"
 
 #include "Character/DWCharacter.h"
-#include "Interaction/Interaction.h"
+#include "Interaction/InteractionInterface.h"
 
 UVoxelInteractionComponent::UVoxelInteractionComponent(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 }
 
-bool UVoxelInteractionComponent::DoInteract(IInteraction* InInteractionTarget, EInteractAction InInteractAction)
+bool UVoxelInteractionComponent::DoInteract(IInteractionInterface* InInteractionTarget, EInteractAction InInteractAction)
 {
 	if(!Super::DoInteract(InInteractionTarget, InInteractAction)) return false;
 

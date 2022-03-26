@@ -29,10 +29,10 @@ void UDWCharacterPart::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 	
 	if(!GetOwnerCharacter() || !GetOwnerCharacter()->IsActive()) return;
 
-	if(AChunk* Chunk = GetOwnerCharacter()->GetOwnerChunk())
+	if(AVoxelChunk* Chunk = GetOwnerCharacter()->GetOwnerChunk())
 	{
 		const FVoxelItem& VoxelItem = Chunk->GetVoxelItem(Chunk->LocationToIndex(GetComponentLocation()));
-		const FVoxelData VoxelData = VoxelItem.GetVoxelData();
+		const UVoxelAssetBase VoxelData = VoxelItem.GetVoxelData();
 		const FVoxelHitResult VoxelHitResult = FVoxelHitResult(VoxelItem, GetComponentLocation(), GetOwnerCharacter()->GetMoveDirection(false));
 		if(VoxelItem.IsValid())
 		{

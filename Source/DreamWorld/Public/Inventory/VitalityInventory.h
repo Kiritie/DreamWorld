@@ -10,12 +10,12 @@
  * �����Ʒ��
  */
 UCLASS()
-class DREAMWORLD_API UVitalityInventory : public UInventory
+class DREAMWORLD_API UAbilityVitalityInventory : public UInventory
 {
 	GENERATED_BODY()
 
 public:
-	UVitalityInventory();
+	UAbilityVitalityInventory();
 
 public:
 	virtual void Initialize(AActor* InOwner, TMap<ESplitSlotType, FSplitSlotInfo> InSplitInfos) override;
@@ -32,5 +32,5 @@ public:
 
 public:
 	UFUNCTION(BlueprintPure)
-	AVitalityObject* GetOwnerVitality() const;
+	AAbilityVitalityBase* GetOwnerVitality() const;
 };

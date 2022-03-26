@@ -75,9 +75,9 @@ bool UInventorySkillSlot::CancelItem()
 	return false;
 }
 
-FDWAbilityInfo UInventorySkillSlot::GetAbilityInfo() const
+FAbilityInfo UInventorySkillSlot::GetAbilityInfo() const
 {
-	FDWAbilityInfo AbilityInfo;
+	FAbilityInfo AbilityInfo;
 	if(ADWCharacter* Character = Cast<ADWCharacter>(Owner->GetOwnerActor()))
 	{
 		Character->GetAbilityInfo(GetSkillData().AbilityClass, AbilityInfo);

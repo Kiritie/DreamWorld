@@ -56,7 +56,7 @@ void ADWMonsterCharacter::SetDamaging(bool bInDamaging)
 	AttackPoint->SetGenerateOverlapEvents(bInDamaging);
 }
 
-bool ADWMonsterCharacter::CanInteract(IInteraction* InInteractionTarget, EInteractAction InInteractAction)
+bool ADWMonsterCharacter::CanInteract(IInteractionInterface* InInteractionTarget, EInteractAction InInteractAction)
 {
 	if(!Super::CanInteract(InInteractionTarget, InInteractAction)) return false;
 	
@@ -100,7 +100,7 @@ bool ADWMonsterCharacter::CanInteract(IInteraction* InInteractionTarget, EIntera
 	return false;
 }
 
-void ADWMonsterCharacter::OnInteract(IInteraction* InInteractionTarget, EInteractAction InInteractAction)
+void ADWMonsterCharacter::OnInteract(IInteractionInterface* InInteractionTarget, EInteractAction InInteractAction)
 {
 	Super::OnInteract(InInteractionTarget, InInteractAction);
 

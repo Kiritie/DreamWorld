@@ -38,7 +38,7 @@ public:
 
 	virtual void SetDamaging(bool bInDamaging) override;
 
-	virtual bool CanInteract(IInteraction* InInteractionTarget, EInteractAction InInteractAction) override;
+	virtual bool CanInteract(IInteractionInterface* InInteractionTarget, EInteractAction InInteractAction) override;
 	
-	virtual void OnInteract(IInteraction* InInteractionTarget, EInteractAction InInteractAction) override;
+	virtual void OnInteract(IInteractionInterface* InInteractionTarget, EInteractAction InInteractAction) override;
 };

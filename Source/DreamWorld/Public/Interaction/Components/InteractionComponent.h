@@ -6,7 +6,7 @@
 #include "Components/BoxComponent.h"
 #include "InteractionComponent.generated.h"
 
-class IInteraction;
+class IInteractionInterface;
 /**
  * 
  */
@@ -25,9 +25,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	EInteractAction InteractingAction;
 	
-	IInteraction* OverlappingTarget;
+	IInteractionInterface* OverlappingTarget;
 
-	IInteraction* InteractionTarget;
+	IInteractionInterface* InteractionTarget;
 
 protected:
 	// Called when the game starts or when spawned
@@ -40,22 +40,22 @@ protected:
 	virtual void OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
 public:
-	virtual bool DoInteract(IInteraction* InInteractionTarget, EInteractAction InInteractAction);
+	virtual bool DoInteract(IInteractionInterface* InInteractionTarget, EInteractAction InInteractAction);
 
 public:
 	void AddInteractionAction(EInteractAction InInteractAction);
 		
 	void RemoveInteractionAction(EInteractAction InInteractAction);
 		
-	TArray<EInteractAction> GetValidInteractActions(IInteraction* InInteractionTarget) const;
+	TArray<EInteractAction> GetValidInteractActions(IInteractionInterface* InInteractionTarget) const;
 	
 	EInteractAction GetInteractingAction() const { return InteractingAction; }
 
-	IInteraction* GetOverlappingTarget() const { return OverlappingTarget; }
+	IInteractionInterface* GetOverlappingTarget() const { return OverlappingTarget; }
 
-	IInteraction* GetInteractionOwner() const;
+	IInteractionInterface* GetInteractionOwner() const;
 
-	IInteraction* GetInteractionTarget() const { return InteractionTarget; }
+	IInteractionInterface* GetInteractionTarget() const { return InteractionTarget; }
 	
-	void SetInteractionTarget(IInteraction* InInteractionTarget);
+	void SetInteractionTarget(IInteractionInterface* InInteractionTarget);
 };

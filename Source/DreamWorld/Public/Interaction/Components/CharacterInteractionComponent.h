@@ -7,7 +7,7 @@
 #include "InteractionComponent.h"
 #include "CharacterInteractionComponent.generated.h"
 
-class IInteraction;
+class IInteractionInterface;
 /**
  * 
  */
@@ -20,5 +20,5 @@ public:
 	UCharacterInteractionComponent(const FObjectInitializer& ObjectInitializer);
 
 public:
-	virtual bool DoInteract(IInteraction* InInteractionTarget, EInteractAction InInteractAction) override;
+	virtual bool DoInteract(IInteractionInterface* InInteractionTarget, EInteractAction InInteractAction) override;
 };

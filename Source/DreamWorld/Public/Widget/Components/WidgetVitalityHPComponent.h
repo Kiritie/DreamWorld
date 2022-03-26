@@ -6,7 +6,7 @@
 #include "DreamWorld/DreamWorld.h"
 #include "WidgetVitalityHPComponent.generated.h"
 
-class AVitalityObject;
+class AAbilityVitalityBase;
 
 /**
  * 生命体血条组件
@@ -21,7 +21,7 @@ public:
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Default")
-	AVitalityObject* OwnerVitality;
+	AAbilityVitalityBase* OwnerVitality;
 
 protected:
 	virtual void BeginPlay() override;

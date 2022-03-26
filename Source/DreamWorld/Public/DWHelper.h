@@ -33,7 +33,7 @@ private:
 
 	static class ADWPlayerController* CurrentPlayerController;
 
-	static class ADWPlayerController* CurrentWorldManager;
+	static class ADWPlayerController* CurrentVoxelModule;
 	
 public:
 	UFUNCTION(BlueprintPure, meta = (WorldContext = "InWorldContext"), Category = "DWHelper")
@@ -53,160 +53,17 @@ public:
 
 	UFUNCTION(BlueprintPure, Category = "DWHelper")
 	static class ADWMainModule* GetMainModule();
-
-	UFUNCTION(BlueprintPure, Category = "DWHelper")
-	static class AWorldManager* GetWorldManager();
-
+	
 	//////////////////////////////////////////////////////////////////////////
-	// Datas
-private:
-	static UDataTable* VoxelsDataTable;
-	
-	static UDataTable* PropsDataTable;
-
-	static UDataTable* SkillsDataTable;
-
-	static UDataTable* WeaponsDataTable;
-
-	static UDataTable* ShieldsDataTable;
-
-	static UDataTable* ArmorsDataTable;
-
-	static UDataTable* VitalitiesDataTable;
-
-	static UDataTable* CharactersDataTable;
-
-	static UDataTable* VitalityRacesDataTable;
-
-	static UDataTable* CharacterRacesDataTable;
-
-	static TMap<FName, FItemData> ItemDatas;
-
-	static TMap<FName, FVoxelData> VoxelDatas;
-
-	static TMap<FName, FPropData> PropDatas;
-		
-	static TMap<FName, FSkillData> SkillDatas;
-
-	static TMap<FName, FEquipData> EquipDatas;
-
-	static TMap<FName, FEquipWeaponData> WeaponDatas;
-
-	static TMap<FName, FEquipShieldData> ShieldDatas;
-
-	static TMap<FName, FEquipArmorData> ArmorDatas;
-
-	static TMap<FName, FVitalityData> VitalityDatas;
-
-	static TMap<FName, FCharacterData> CharacterDatas;
-
-	static TMap<FName, FVitalityRaceData> VitalityRaceDatas;
-
-	static TMap<FName, FCharacterRaceData> CharacterRaceDatas;
-
+	// Race
 public:
-	UFUNCTION(BlueprintPure, Category = "DWHelper")
-	static TArray<FItemData> LoadItemDatas();
-
-	UFUNCTION(BlueprintPure, Category = "DWHelper")
-	static FItemData LoadItemData(const FName& InItemID);
-	
-	UFUNCTION(BlueprintPure, Category = "DWHelper")
-	static TArray<FVoxelData> LoadVoxelDatas();
-
-	UFUNCTION(BlueprintPure, Category = "DWHelper")
-	static FVoxelData LoadVoxelData(const FName& InVoxelID);
-
-	UFUNCTION(BlueprintPure, Category = "DWHelper")
-	static TArray<FPropData> LoadPropDatas();
-
-	UFUNCTION(BlueprintPure, Category = "DWHelper")
-	static FPropData LoadPropData(const FName& InPropID);
-	
-	UFUNCTION(BlueprintPure, Category = "DWHelper")
-	static TArray<FSkillData> LoadSkillDatas();
-
-	UFUNCTION(BlueprintPure, Category = "DWHelper")
-	static FSkillData LoadSkillData(const FName& InSkillID);
-		
-	UFUNCTION(BlueprintPure, Category = "DWHelper")
-	static TArray<FEquipData> LoadEquipDatas();
-
-	UFUNCTION(BlueprintPure, Category = "DWHelper")
-	static FEquipData LoadEquipData(const FName& InEquipID);
-	
-	UFUNCTION(BlueprintPure, Category = "DWHelper")
-	static TArray<FEquipWeaponData> LoadWeaponDatas();
-
-	UFUNCTION(BlueprintPure, Category = "DWHelper")
-	static FEquipWeaponData LoadWeaponData(const FName& InWeaponID);
-	
-	UFUNCTION(BlueprintPure, Category = "DWHelper")
-	static TArray<FEquipShieldData> LoadShieldDatas();
-
-	UFUNCTION(BlueprintPure, Category = "DWHelper")
-	static FEquipShieldData LoadShieldData(const FName& InShieldID);
-	
-	UFUNCTION(BlueprintPure, Category = "DWHelper")
-	static TArray<FEquipArmorData> LoadArmorDatas();
-
-	UFUNCTION(BlueprintPure, Category = "DWHelper")
-	static FEquipArmorData LoadArmorData(const FName& InArmorID);
-						
-	UFUNCTION(BlueprintPure, Category = "DWHelper")
-	static TArray<FVitalityData> LoadVitalityDatas();
-
-	UFUNCTION(BlueprintPure, Category = "DWHelper")
-	static FVitalityData LoadVitalityData(const FName& InVitalityID);
-		
-	UFUNCTION(BlueprintPure, Category = "DWHelper")
-	static TArray<FCharacterData> LoadCharacterDatas();
-
-	UFUNCTION(BlueprintPure, Category = "DWHelper")
-	static FCharacterData LoadCharacterData(const FName& InCharacterID);
-
-	UFUNCTION(BlueprintPure, Category = "DWHelper")
-	static TArray<FVitalityRaceData> LoadVitalityRaceDatas();
-
-	UFUNCTION(BlueprintPure, Category = "DWHelper")
-	static FVitalityRaceData LoadVitalityRaceData(const FName& InRaceID);
-
-	UFUNCTION(BlueprintPure, Category = "DWHelper")
 	static FVitalityRaceData RandomVitalityRaceData();
-		
-	UFUNCTION(BlueprintPure, Category = "DWHelper")
-	static TArray<FCharacterRaceData> LoadCharacterRaceDatas();
-
-	UFUNCTION(BlueprintPure, Category = "DWHelper")
-	static FCharacterRaceData LoadCharacterRaceData(const FName& InRaceID);
-
-	UFUNCTION(BlueprintPure, Category = "DWHelper")
+	
 	static FCharacterRaceData RandomCharacterRaceData();
-
-	//////////////////////////////////////////////////////////////////////////
-	// Index
-public:
-	UFUNCTION(BlueprintPure, Category = "DWHelper")
-	static EDirection InvertDirection(EDirection InDirection);
-
-	UFUNCTION(BlueprintPure, Category = "DWHelper")
-	static FVector DirectionToVector(EDirection InDirection, FRotator InRotation = FRotator::ZeroRotator);
-
-	UFUNCTION(BlueprintPure, Category = "DWHelper")
-	static FIndex DirectionToIndex(EDirection InDirection, FRotator InRotation = FRotator::ZeroRotator);
-
-	UFUNCTION(BlueprintPure, Category = "DWHelper")
-	static FIndex GetAdjacentIndex(FIndex InIndex, EDirection InDirection, FRotator InRotation = FRotator::ZeroRotator);
 
 	//////////////////////////////////////////////////////////////////////////
 	// Trace
 public:
 	UFUNCTION(BlueprintPure, Category = "DWHelper")
 	static ETraceTypeQuery GetGameTrace(EGameTraceType InGameTraceType);
-
-	//////////////////////////////////////////////////////////////////////////
-	// Input
-public:
-	UFUNCTION(BlueprintPure, Category = "DWHelper")
-	static FText GetInputActionKeyCodeByName(const FString& InInputActionName);
 };

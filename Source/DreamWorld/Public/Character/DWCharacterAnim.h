@@ -4,6 +4,7 @@
 
 #include "DreamWorld/DreamWorld.h"
 #include "Animation/AnimInstance.h"
+#include "Character/Base/CharacterAnim.h"
 #include "DWCharacterAnim.generated.h"
 
 class ADWCharacter;
@@ -12,7 +13,7 @@ class ADWCharacter;
  * 角色动画控制器
  */
 UCLASS()
-class DREAMWORLD_API UDWCharacterAnim : public UAnimInstance
+class DREAMWORLD_API UDWCharacterAnim : public UCharacterAnim
 {
 	GENERATED_BODY()
 

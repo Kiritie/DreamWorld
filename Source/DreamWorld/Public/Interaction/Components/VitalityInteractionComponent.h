@@ -7,18 +7,18 @@
 #include "InteractionComponent.h"
 #include "VitalityInteractionComponent.generated.h"
 
-class IInteraction;
+class IInteractionInterface;
 /**
 * 
 */
 UCLASS()
-class DREAMWORLD_API UVitalityInteractionComponent : public UInteractionComponent
+class DREAMWORLD_API UAbilityVitalityInteractionComponent : public UInteractionComponent
 {
 	GENERATED_BODY()
 		
-	public:
-	UVitalityInteractionComponent(const FObjectInitializer& ObjectInitializer);
+public:
+	UAbilityVitalityInteractionComponent(const FObjectInitializer& ObjectInitializer);
 
-	public:
-	virtual bool DoInteract(IInteraction* InInteractionTarget, EInteractAction InInteractAction) override;
+public:
+	virtual bool DoInteract(IInteractionInterface* InInteractionTarget, EInteractAction InInteractAction) override;
 };

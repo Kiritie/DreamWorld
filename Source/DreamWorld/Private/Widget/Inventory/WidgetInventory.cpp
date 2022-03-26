@@ -22,7 +22,7 @@ void UWidgetInventory::OnRefresh_Implementation()
 
 UInventory* UWidgetInventory::GetInventory() const
 {
-	if(IVitality* Vitality = Cast<IVitality>(OwnerActor))
+	if(IAbilityVitality* Vitality = Cast<IAbilityVitality>(OwnerActor))
 	{
 		return Vitality->GetInventory();
 	}

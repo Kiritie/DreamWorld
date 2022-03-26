@@ -4,7 +4,7 @@
 #include "Interaction/Components/InteractionComponent.h"
 
 #include "Character/DWCharacter.h"
-#include "Interaction/Interaction.h"
+#include "Interaction/InteractionInterface.h"
 #include "Widget/WidgetModuleBPLibrary.h"
 #include "Widget/WidgetGameHUD.h"
 
@@ -29,7 +29,7 @@ void UInteractionComponent::OnBeginOverlap(UPrimitiveComponent* OverlappedCompon
 
 	if(OverlappingTarget) return;
 	
-	if(IInteraction* OtherInteraction = Cast<IInteraction>(OtherActor))
+	if(IInteractionInterface* OtherInteraction = Cast<IInteractionInterface>(OtherActor))
 	{
 		OverlappingTarget = OtherInteraction;
 		if(ADWCharacter* OtherCharacter = Cast<ADWCharacter>(OtherActor))
@@ -48,7 +48,7 @@ void UInteractionComponent::OnEndOverlap(UPrimitiveComponent* OverlappedComponen
 
 	if(!OverlappingTarget) return;
 
-	if(IInteraction* OtherInteraction = Cast<IInteraction>(OtherActor))
+	if(IInteractionInterface* OtherInteraction = Cast<IInteractionInterface>(OtherActor))
 	{
 		if(OverlappingTarget == OtherInteraction)
 		{
@@ -64,7 +64,7 @@ void UInteractionComponent::OnEndOverlap(UPrimitiveComponent* OverlappedComponen
 	}
 }
 
-bool UInteractionComponent::DoInteract(IInteraction* InInteractionTarget, EInteractAction InInteractAction)
+bool UInteractionComponent::DoInteract(IInteractionInterface* InInteractionTarget, EInteractAction InInteractAction)
 {
 	if(!InInteractionTarget || InInteractAction == EInteractAction::None || !InteractActions.Contains(InInteractAction) || InteractingAction != EInteractAction::None) return false;
 	
@@ -92,7 +92,7 @@ void UInteractionComponent::RemoveInteractionAction(EInteractAction InInteractAc
 	}
 }
 
-TArray<EInteractAction> UInteractionComponent::GetValidInteractActions(IInteraction* InInteractionTarget) const
+TArray<EInteractAction> UInteractionComponent::GetValidInteractActions(IInteractionInterface* InInteractionTarget) const
 {
 	TArray<EInteractAction> ReturnValues;
 	for(auto Iter : InteractActions)
@@ -105,12 +105,12 @@ TArray<EInteractAction> UInteractionComponent::GetValidInteractActions(IInteract
 	return ReturnValues;
 }
 
-IInteraction* UInteractionComponent::GetInteractionOwner() const
+IInteractionInterface* UInteractionComponent::GetInteractionOwner() const
 {
-	return Cast<IInteraction>(GetOwner());
+	return Cast<IInteractionInterface>(GetOwner());
 }
 
-void UInteractionComponent::SetInteractionTarget(IInteraction* InInteractionTarget)
+void UInteractionComponent::SetInteractionTarget(IInteractionInterface* InInteractionTarget)
 {
 	InteractionTarget = InInteractionTarget;
 	if(InteractionTarget)

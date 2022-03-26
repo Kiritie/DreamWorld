@@ -187,7 +187,7 @@ void UWidgetInventorySlot::RefreshCooldown()
 {
 	if(OwnerSlot)
 	{
-		const FDWCooldownInfo CooldownInfo = OwnerSlot->GetCooldownInfo();
+		const FCooldownInfo CooldownInfo = OwnerSlot->GetCooldownInfo();
 		if(CooldownInfo.bCooldowning)
 		{
 			ImgMask->SetVisibility(ESlateVisibility::Visible);

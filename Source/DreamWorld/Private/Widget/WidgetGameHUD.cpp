@@ -48,7 +48,7 @@ void UWidgetGameHUD::RefreshActions()
 {
 	if(ADWCharacter* OwnerCharacter = Cast<ADWCharacter>(GetOwnerActor()))
 	{
-		if(IInteraction* OverlappingTarget = OwnerCharacter->GetInteractionComponent()->GetOverlappingTarget())
+		if(IInteractionInterface* OverlappingTarget = OwnerCharacter->GetInteractionComponent()->GetOverlappingTarget())
 		{
 			ShowActions(OverlappingTarget->GetInteractionComponent()->GetValidInteractActions(OwnerCharacter));
 		}

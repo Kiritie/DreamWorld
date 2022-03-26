@@ -5,8 +5,8 @@
 
 #include "Main/MainModule.h"
 #include "Module/DWSaveGameModule.h"
-#include "SaveGame/ArchiveSaveGame.h"
-#include "SaveGame/GeneralSaveGame.h"
+#include "SaveGame/DWArchiveSaveGame.h"
+#include "SaveGame/DWGeneralSaveGame.h"
 #include "SaveGame/SaveGameModuleBPLibrary.h"
 
 UWidgetMainMenu::UWidgetMainMenu(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
@@ -27,15 +27,15 @@ void UWidgetMainMenu::OnOpen_Implementation(const TArray<FParameter>& InParams, 
 
 	FinishOpen(bInstant);
 
-	if(UGeneralSaveGame* GeneralSaveGame = USaveGameModuleBPLibrary::GetSaveGame<UGeneralSaveGame>())
+	if(UDWGeneralSaveGame* GeneralSaveGame = USaveGameModuleBPLibrary::GetSaveGame<UDWGeneralSaveGame>())
 	{
 		if(GeneralSaveGame->SaveData.CurrentArchiveID == -1)
 		{
-			USaveGameModuleBPLibrary::CreateSaveGame<UArchiveSaveGame>()->Load();
+			USaveGameModuleBPLibrary::CreateSaveGame<UDWArchiveSaveGame>()->Load();
 		}
 		else
 		{
-			USaveGameModuleBPLibrary::LoadSaveGame<UArchiveSaveGame>(GeneralSaveGame->SaveData.CurrentArchiveID);
+			USaveGameModuleBPLibrary::LoadSaveGame<UDWArchiveSaveGame>(GeneralSaveGame->SaveData.CurrentArchiveID);
 		}
 	}
 }

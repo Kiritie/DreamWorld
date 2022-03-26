@@ -7,7 +7,7 @@
 #include "InteractionComponent.h"
 #include "VoxelInteractionComponent.generated.h"
 
-class IInteraction;
+class IInteractionInterface;
 /**
 * 
 */
@@ -16,9 +16,9 @@ class DREAMWORLD_API UVoxelInteractionComponent : public UInteractionComponent
 {
 	GENERATED_BODY()
 		
-	public:
+public:
 	UVoxelInteractionComponent(const FObjectInitializer& ObjectInitializer);
 
-	public:
-	virtual bool DoInteract(IInteraction* InInteractionTarget, EInteractAction InInteractAction) override;
+public:
+	virtual bool DoInteract(IInteractionInterface* InInteractionTarget, EInteractAction InInteractAction) override;
 };

@@ -4,43 +4,43 @@
 
 #include "DreamWorld/DreamWorld.h"
 #include "GameFramework/Character.h"
-#include "Vitality/Vitality.h"
 #include "AbilitySystemInterface.h"
 #include "TargetSystemComponent.h"
 #include "TargetSystemTargetableInterface.h"
-#include "Interaction/Interaction.h"
+#include "Ability/Character/AbilityCharacterBase.h"
+#include "Interaction/InteractionInterface.h"
+#include "Voxel/Agent/VoxelAgentInterface.h"
 
 #include "DWCharacter.generated.h"
 
+class UDWCharacterAsset;
+class ADWVoxelChunk;
 class UCharacterInteractionComponent;
 class UInteractionComponent;
-class UBoxComponent;
 class UDWCharacterPart;
-class AEquipArmor;
-class AEquipShield;
-class AEquipWeapon;
+class AAbilityEquipArmor;
+class AAbilityEquipShield;
+class AAbilityEquipWeapon;
 class UInventoryEquipSlot;
-class AChunk;
+class AVoxelChunk;
 class UVoxel;
 class AController;
 class UDWCharacterAnim;
 class UWidgetCharacterHPComponent;
-class UDWGameplayAbility;
-class UDWAbilitySystemComponent;
+class UAbilityBase;
+class UAbilitySystemComponentBase;
 class UAIPerceptionStimuliSourceComponent;
 class UCharacterInventory;
 class UBehaviorTree;
 class UDWAIBlackboard;
 class UInventorySlot;
-class ASkill;
-
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnCharacterDead);
+class AAbilitySkillBase;
 
 /**
  * 角色
  */
 UCLASS()
-class DREAMWORLD_API ADWCharacter : public ACharacter, public IVitality, public IInteraction, public IAbilitySystemInterface, public ITargetSystemTargetableInterface
+class DREAMWORLD_API ADWCharacter : public AAbilityCharacterBase, public IVoxelAgentInterface, public IInteractionInterface, public ITargetSystemTargetableInterface
 {
 	GENERATED_BODY()
 
@@ -49,10 +49,6 @@ public:
 	
 protected:
 	// states
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CharacterStates")
-	bool bDead;
-
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CharacterStates")
 	bool bDying;
 
@@ -110,31 +106,10 @@ protected:
 protected:
 	// stats
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CharacterStats")
-	FName ID;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CharacterStats")
-	FString Name;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CharacterStats")
 	ECharacterNature Nature;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CharacterStats")
-	FString RaceID;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CharacterStats")
 	FString TeamID;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CharacterStats")
-	int32 Level;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CharacterStats")
-	int32 EXP;
-	
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CharacterStats")
-	int32 BaseEXP;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CharacterStats")
-	int32 EXPFactor;
 			
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CharacterStats")
 	float AttackDistance;
@@ -153,19 +128,10 @@ protected:
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CharacterStats")
-	float MovementRate;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CharacterStats")
-	float RotationRate;
-	
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CharacterStats")
 	FVector BirthLocation;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CharacterStats")
-	AChunk* OwnerChunk;
-	
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CharacterStats")
-	AController* OwnerController;
+	ADWVoxelChunk* OwnerChunk;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CharacterStats")
 	ADWCharacter* OwnerRider;
@@ -187,23 +153,10 @@ protected:
 	UCharacterInteractionComponent* Interaction;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-	UDWCharacterAnim* AnimInstance;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Components")
-	UDWAbilitySystemComponent* AbilitySystem;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Components")
-	UDWCharacterAttributeSet* AttributeSet;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	UBehaviorTree* BehaviorTree;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	UCharacterInventory* Inventory;
-
-public:
-	UPROPERTY(BlueprintAssignable)
-	FOnCharacterDead OnCharacterDead;
 
 protected:
 	float DefaultGravityScale;
@@ -215,8 +168,6 @@ protected:
 	float InterruptRemainTime;
 
 	float NormalAttackRemainTime;
-
-	FVector MoveDirection;
 
 	FVector AIMoveLocation;
 
@@ -231,9 +182,7 @@ protected:
 	FTimerHandle AttackHurtTimer;
 
 	UPROPERTY()
-	TMap<EEquipPartType, AEquip*> Equips;
-
-	FDWAbilityData DefaultAbility;
+	TMap<EEquipPartType, AAbilityEquipBase*> Equips;
 	
 	FDWCharacterAttackAbilityData FallingAttackAbility;
 
@@ -282,9 +231,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual void DeathEnd();
 
-	virtual bool CanInteract(IInteraction* InInteractionTarget, EInteractAction InInteractAction) override;
+	virtual bool CanInteract(IInteractionInterface* InInteractionTarget, EInteractAction InInteractAction) override;
 
-	virtual void OnInteract(IInteraction* InInteractionTarget, EInteractAction InInteractAction) override;
+	virtual void OnInteract(IInteractionInterface* InInteractionTarget, EInteractAction InInteractAction) override;
 
 	UFUNCTION(BlueprintCallable)
 	virtual void FreeToAnim(bool bUnLockRotation = true);
@@ -300,8 +249,7 @@ public:
 	
 	virtual void Jump() override;
 
-	UFUNCTION(BlueprintCallable)
-	virtual void UnJump();
+	virtual void UnJump() override;
 
 	UFUNCTION(BlueprintCallable)
 	virtual void Dodge();
@@ -393,47 +341,7 @@ public:
 	virtual void RefreshEquip(EEquipPartType InPartType, UInventoryEquipSlot* EquipSlot);
 
 public:
-	UFUNCTION(BlueprintCallable)
-	virtual FGameplayAbilitySpecHandle AcquireAbility(TSubclassOf<UDWGameplayAbility> InAbility, int32 InLevel = 1) override;
-
-	UFUNCTION(BlueprintCallable)
-	virtual bool ActiveAbility(FGameplayAbilitySpecHandle AbilityHandle, bool bAllowRemoteActivation = false) override;
-
-	UFUNCTION(BlueprintCallable)
-	virtual bool ActiveAbilityByClass(TSubclassOf<UDWGameplayAbility> AbilityClass, bool bAllowRemoteActivation = false) override;
-
-	UFUNCTION(BlueprintCallable)
-	virtual bool ActiveAbilityByTag(const FGameplayTagContainer& AbilityTags, bool bAllowRemoteActivation = false) override;
-
-	UFUNCTION(BlueprintCallable)
-	virtual void CancelAbility(UDWGameplayAbility* Ability) override;
-
-	UFUNCTION(BlueprintCallable)
-	virtual void CancelAbilityByHandle(const FGameplayAbilitySpecHandle& AbilityHandle) override;
-
-	UFUNCTION(BlueprintCallable)
-	virtual void CancelAbilities(const FGameplayTagContainer& WithTags, const FGameplayTagContainer& WithoutTags, UDWGameplayAbility* Ignore = nullptr) override;
-	
-	UFUNCTION(BlueprintCallable)
-	virtual void CancelAllAbilities(UDWGameplayAbility* Ignore = nullptr) override;
-	
-	UFUNCTION(BlueprintCallable)
-	virtual FActiveGameplayEffectHandle ApplyEffectByClass(TSubclassOf<UGameplayEffect> EffectClass) override;
-	
-	UFUNCTION(BlueprintCallable)
-	virtual FActiveGameplayEffectHandle ApplyEffectBySpecHandle(const FGameplayEffectSpecHandle& SpecHandle) override;
-		
-	UFUNCTION(BlueprintCallable)
-	virtual FActiveGameplayEffectHandle ApplyEffectBySpec(const FGameplayEffectSpec& Spec) override;
-
-	UFUNCTION(BlueprintCallable)
-	virtual bool RemoveEffect(FActiveGameplayEffectHandle Handle, int32 StacksToRemove=-1) override;
-
-	UFUNCTION(BlueprintPure)
-	virtual void GetActiveAbilities(FGameplayTagContainer AbilityTags, TArray<UDWGameplayAbility*>& ActiveAbilities) override;
-
-	UFUNCTION(BlueprintPure)
-	virtual bool GetAbilityInfo(TSubclassOf<UDWGameplayAbility> AbilityClass, FDWAbilityInfo& OutAbilityInfo) override;
+	virtual bool GetAbilityInfo(TSubclassOf<UAbilityBase> AbilityClass, FAbilityInfo& OutAbilityInfo) override;
 
 	UFUNCTION(BlueprintCallable)
 	virtual bool DoAction(ECharacterActionType InActionType);
@@ -522,23 +430,15 @@ public:
 	UFUNCTION(BlueprintCallable)
 	TArray<ADWCharacter*> GetTeamMates();
 
-	UFUNCTION(BlueprintCallable)
-	virtual void AddWorldText(FString InContent, EWorldTextType InContentType, EWorldTextStyle InContentStyle) override;
+	UFUNCTION(BlueprintPure)
+	virtual bool IsPlayer() const;
 	
 	UFUNCTION(BlueprintPure)
-	bool IsPlayer() const;
-	
-	UFUNCTION(BlueprintPure)
-	bool IsEnemy(ADWCharacter* InTargetCharacter) const;
+	virtual bool IsEnemy(ADWCharacter* InTargetCharacter) const;
 
-	UFUNCTION(BlueprintCallable)
-	float Distance(ADWCharacter* InTargetCharacter, bool bIgnoreRadius = true, bool bIgnoreZAxis = true);
-
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
-	void SetVisible(bool bVisible);
+	virtual void SetVisible_Implementation(bool bVisible) override;
 									
-	UFUNCTION(BlueprintCallable)
-	void SetMotionRate(float InMovementRate, float InRotationRate);
+	virtual void SetMotionRate_Implementation(float InMovementRate, float InRotationRate) override;
 
 public:
 	UFUNCTION(BlueprintPure)
@@ -546,9 +446,6 @@ public:
 	
 	UFUNCTION(BlueprintPure)
 	UWidgetCharacterHPComponent* GetWidgetCharacterHP() const { return WidgetCharacterHP; }
-
-	UFUNCTION(BlueprintPure)
-	UDWCharacterAnim* GetAnimInstance() const { return AnimInstance; }
 	
 	UFUNCTION(BlueprintPure)
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
@@ -557,10 +454,7 @@ public:
 	virtual UInteractionComponent* GetInteractionComponent() const override;
 
 	UFUNCTION(BlueprintPure)
-	UDWCharacterAttributeSet* GetAttributeSet() const { return AttributeSet; }
-
-	UFUNCTION(BlueprintPure)
-	virtual class UInventory* GetInventory() const override;
+	virtual class UInventory* GetInventory() const;
 
 	UFUNCTION(BlueprintPure)
 	bool HasBehaviorTree() const;
@@ -633,16 +527,10 @@ public:
 
 public:
 	UFUNCTION(BlueprintPure)
-	virtual FString GetNameC() const override { return Name; }
-
-	UFUNCTION(BlueprintCallable)
-	virtual void SetNameC(const FString& InName) override;
-	
-	UFUNCTION(BlueprintPure)
 	ECharacterNature GetNature() const { return Nature; }
 						
 	UFUNCTION(BlueprintPure)
-	FCharacterData GetCharacterData() const;
+	UDWCharacterAsset& GetCharacterData() const;
 
 	//UFUNCTION(BlueprintPure)
 	FTeamData* GetTeamData() const;
@@ -652,51 +540,6 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void SetTeamID(const FString& InTeamID);
-
-	UFUNCTION(BlueprintPure)
-	virtual FString GetRaceID() const override { return RaceID; }
-
-	UFUNCTION(BlueprintCallable)
-	virtual void SetRaceID(const FString& InRaceID) override;
-
-	UFUNCTION(BlueprintPure)
-	virtual int32 GetLevelC() const override { return Level; }
-	
-	UFUNCTION(BlueprintCallable)
-	virtual void SetLevelC(int32 InLevel) override;
-
-	UFUNCTION(BlueprintPure)
-	virtual int32 GetEXP() const override { return EXP; }
-		
-	UFUNCTION(BlueprintCallable)
-	virtual void SetEXP(int32 InEXP) override;
-	
-	UFUNCTION(BlueprintPure)
-	virtual int32 GetBaseEXP() const override { return BaseEXP; }
-	
-	UFUNCTION(BlueprintPure)
-	virtual int32 GetEXPFactor() const override { return EXPFactor; }
-
-	UFUNCTION(BlueprintPure)
-	virtual int32 GetMaxEXP() const override;
-
-	UFUNCTION(BlueprintPure)
-	virtual int32 GetTotalEXP() const override;
-
-	UFUNCTION(BlueprintPure)
-	virtual FString GetHeadInfo() const override;
-		
-	UFUNCTION(BlueprintPure)
-	virtual float GetHealth() const override;
-		
-	UFUNCTION(BlueprintCallable)
-	virtual void SetHealth(float InValue) override;
-
-	UFUNCTION(BlueprintPure)
-	virtual float GetMaxHealth() const override;
-		
-	UFUNCTION(BlueprintCallable)
-	virtual void SetMaxHealth(float InValue) override;
 			
 	UFUNCTION(BlueprintPure)
 	float GetMana() const;
@@ -723,12 +566,6 @@ public:
 	void SetMaxStamina(float InValue);
 			
 	UFUNCTION(BlueprintPure)
-	float GetMoveSpeed() const;
-		
-	UFUNCTION(BlueprintCallable)
-	void SetMoveSpeed(float InValue);
-			
-	UFUNCTION(BlueprintPure)
 	float GetSwimSpeed() const;
 		
 	UFUNCTION(BlueprintCallable)
@@ -745,18 +582,6 @@ public:
 		
 	UFUNCTION(BlueprintCallable)
 	void SetFlySpeed(float InValue);
-			
-	UFUNCTION(BlueprintPure)
-	float GetRotationSpeed() const;
-		
-	UFUNCTION(BlueprintCallable)
-	void SetRotationSpeed(float InValue);
-			
-	UFUNCTION(BlueprintPure)
-	float GetJumpForce() const;
-		
-	UFUNCTION(BlueprintCallable)
-	void SetJumpForce(float InValue);
 			
 	UFUNCTION(BlueprintPure)
 	float GetDodgeForce() const;
@@ -843,22 +668,10 @@ public:
 	virtual float GetMagicDamage() const override;
 
 	UFUNCTION(BlueprintPure)
-	FVector GetMoveVelocity(bool bIgnoreZ = true) const;
-
-	UFUNCTION(BlueprintPure)
-	FVector GetMoveDirection(bool bIgnoreZ = true) const;
-
-	UFUNCTION(BlueprintPure)
-	AChunk* GetOwnerChunk() const { return OwnerChunk; }
+	virtual AVoxelChunk* GetOwnerChunk() const override { return OwnerChunk; }
 
 	UFUNCTION(BlueprintCallable)
-	void SetOwnerChunk(AChunk* val) { OwnerChunk = val; }
-	
-	UFUNCTION(BlueprintPure)
-	AController* GetOwnerController() const { return OwnerController; }
-
-	UFUNCTION(BlueprintCallable)
-	void SetOwnerController(AController* InOwnerController) { this->OwnerController = InOwnerController; }
+	virtual void SetOwnerChunk(AVoxelChunk* InOwnerChunk) override { OwnerChunk = InOwnerChunk; }
 
 	UFUNCTION(BlueprintPure)
 	ADWCharacter* GetOwnerRider() const { return OwnerRider; }
@@ -886,12 +699,6 @@ public:
 
 	UFUNCTION(BlueprintPure)
 	float GetPatrolDuration() const { return PatrolDuration; }
-		
-	UFUNCTION(BlueprintPure)
-	float GetRadius() const;
-
-	UFUNCTION(BlueprintPure)
-	float GetHalfHeight() const;
 	
 	UFUNCTION(BlueprintPure)
 	bool HasWeapon(EWeaponType InWeaponType);
@@ -900,25 +707,25 @@ public:
 	bool HasShield(EShieldType InShieldType);
 		
 	UFUNCTION(BlueprintPure)
-	AEquipWeapon* GetWeapon();
+	AAbilityEquipWeapon* GetWeapon();
 	
 	UFUNCTION(BlueprintPure)
-	AEquipShield* GetShield();
+	AAbilityEquipShield* GetShield();
 		
 	UFUNCTION(BlueprintPure)
 	bool HasArmor(EEquipPartType InPartType);
 	
 	UFUNCTION(BlueprintPure)
-	AEquipArmor* GetArmor(EEquipPartType InPartType);
+	AAbilityEquipArmor* GetArmor(EEquipPartType InPartType);
 
 	UFUNCTION(BlueprintPure)
 	bool HasEquip(EEquipPartType InPartType);
 	
 	UFUNCTION(BlueprintPure)
-	AEquip* GetEquip(EEquipPartType InPartType);
+	AAbilityEquipBase* GetEquip(EEquipPartType InPartType);
 	
 	UFUNCTION(BlueprintPure)
-	TMap<EEquipPartType, AEquip*> GetEquips() const { return Equips; }
+	TMap<EEquipPartType, AAbilityEquipBase*> GetEquips() const { return Equips; }
 
 	UFUNCTION(BlueprintPure)
 	FDWCharacterAttackAbilityData GetAttackAbility(int32 InAbilityIndex = -1);
@@ -944,7 +751,7 @@ public:
 	UDWCharacterPart* GetCharacterPart(ECharacterPartType InCharacterPartType) const;
 
 public:
-	virtual void HandleDamage(EDWDamageType DamageType, const float LocalDamageDone, bool bHasCrited, FHitResult HitResult, const FGameplayTagContainer& SourceTags, AActor* SourceActor) override;
+	virtual void HandleDamage(EDamageType DamageType, const float LocalDamageDone, bool bHasCrited, FHitResult HitResult, const FGameplayTagContainer& SourceTags, AActor* SourceActor) override;
 	
 	virtual void HandleInterrupt(float InterruptDuration);
 	
@@ -970,7 +777,7 @@ public:
 	
 	virtual void HandleMaxStaminaChanged(float NewValue, float DeltaValue = 0.f);
 
-	virtual void HandleMoveSpeedChanged(float NewValue, float DeltaValue = 0.f);
+	virtual void HandleMoveSpeedChanged(float NewValue, float DeltaValue = 0.f) override;
 
 	virtual void HandleSwimSpeedChanged(float NewValue, float DeltaValue = 0.f);
 
@@ -978,9 +785,9 @@ public:
 
 	virtual void HandleFlySpeedChanged(float NewValue, float DeltaValue = 0.f);
 
-	virtual void HandleRotationSpeedChanged(float NewValue, float DeltaValue = 0.f);
+	virtual void HandleRotationSpeedChanged(float NewValue, float DeltaValue = 0.f) override;
 
-	virtual void HandleJumpForceChanged(float NewValue, float DeltaValue = 0.f);
+	virtual void HandleJumpForceChanged(float NewValue, float DeltaValue = 0.f) override;
 
 	virtual void HandleDodgeForceChanged(float NewValue, float DeltaValue = 0.f);
 

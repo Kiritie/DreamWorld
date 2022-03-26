@@ -5,44 +5,44 @@
 #include "Widget/Inventory/WidgetInventoryBar.h"
 #include "Inventory/Slot/InventoryEquipSlot.h"
 #include "Gameplay/DWGameInstance.h"
-#include "Vitality/VitalityObject.h"
+#include "Vitality/AbilityVitalityBase.h"
 
-UVitalityInventory::UVitalityInventory()
+UAbilityVitalityInventory::UAbilityVitalityInventory()
 {
 	
 }
 
-void UVitalityInventory::Initialize(AActor* InOwner, TMap<ESplitSlotType, FSplitSlotInfo> InSplitInfos)
+void UAbilityVitalityInventory::Initialize(AActor* InOwner, TMap<ESplitSlotType, FSplitSlotInfo> InSplitInfos)
 {
 	Super::Initialize(InOwner, InSplitInfos);
 }
 
-void UVitalityInventory::LoadData(FInventorySaveData InInventoryData, AActor* InOwner)
+void UAbilityVitalityInventory::LoadData(FInventorySaveData InInventoryData, AActor* InOwner)
 {
 	Super::LoadData(InInventoryData, InOwner);
 }
 
-FInventorySaveData UVitalityInventory::ToData(bool bSaved)
+FInventorySaveData UAbilityVitalityInventory::ToData(bool bSaved)
 {
 	return Super::ToData();
 }
 
-void UVitalityInventory::DiscardAllItem()
+void UAbilityVitalityInventory::DiscardAllItem()
 {
 	Super::DiscardAllItem();
 }
 
-void UVitalityInventory::ClearAllItem()
+void UAbilityVitalityInventory::ClearAllItem()
 {
 	Super::ClearAllItem();
 }
 
-FQueryItemInfo UVitalityInventory::GetItemInfoByRange(EQueryItemType InActionType, FItem InItem, int32 InStartIndex, int32 InEndIndex)
+FQueryItemInfo UAbilityVitalityInventory::GetItemInfoByRange(EQueryItemType InActionType, FItem InItem, int32 InStartIndex, int32 InEndIndex)
 {
 	return Super::GetItemInfoByRange(InActionType, InItem, InStartIndex, InEndIndex);
 }
 
-AVitalityObject* UVitalityInventory::GetOwnerVitality() const
+AAbilityVitalityBase* UAbilityVitalityInventory::GetOwnerVitality() const
 {
-	return Cast<AVitalityObject>(OwnerActor);
+	return Cast<AAbilityVitalityBase>(OwnerActor);
 }

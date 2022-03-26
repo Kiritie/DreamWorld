@@ -2,7 +2,7 @@
 
 #include "Inventory/Slot/InventorySlot.h"
 #include "Inventory/Inventory.h"
-#include "World/WorldManager.h"
+#include "World/VoxelModule.h"
 #include "World/Chunk.h"
 #include "Character/Player/DWPlayerCharacter.h"
 #include "Vitality/Vitality.h"
@@ -59,7 +59,7 @@ void UInventorySlot::EndSet()
 {
 	if(Item.IsValid())
 	{
-		IVitality* vitality = Cast<IVitality>(Owner->GetOwnerActor());
+		IAbilityVitalityInterface* vitality = Cast<IAbilityVitalityInterface>(Owner->GetOwnerActor());
 		if (vitality && Item.GetData().AbilityClass)
 		{
 			AbilityHandle = vitality->AcquireAbility(Item.GetData().AbilityClass, Item.Level);
@@ -272,7 +272,7 @@ void UInventorySlot::DiscardItem(int InCount /*= -1*/)
 
 	if (InCount == -1) InCount = Item.Count;
 	FItem tmpItem = FItem(Item, InCount);
-	auto chunk = AWorldManager::Get()->FindChunk(Owner->GetOwnerActor()->GetActorLocation());
+	auto chunk = AVoxelModule::Get()->FindChunk(Owner->GetOwnerActor()->GetActorLocation());
 	if (chunk != nullptr)
 	{
 		chunk->SpawnPickUp(tmpItem, Owner->GetOwnerActor()->GetActorLocation() + FMath::RandPointInBox(FBox(FVector(-20, -20, -10), FVector(20, 20, 10))));
@@ -288,7 +288,7 @@ bool UInventorySlot::ActiveItem()
 {
 	if(AbilityHandle.IsValid())
 	{
-		if(IVitality* Vitality = Cast<IVitality>(GetOwner()->GetOwnerActor()))
+		if(IAbilityVitalityInterface* Vitality = Cast<IAbilityVitalityInterface>(GetOwner()->GetOwnerActor()))
 		{
 			return Vitality->ActiveAbility(AbilityHandle);
 		}
@@ -300,7 +300,7 @@ bool UInventorySlot::CancelItem()
 {
 	if(AbilityHandle.IsValid())
 	{
-		if(IVitality* Vitality = Cast<IVitality>(GetOwner()->GetOwnerActor()))
+		if(IAbilityVitalityInterface* Vitality = Cast<IAbilityVitalityInterface>(GetOwner()->GetOwnerActor()))
 		{
 			Vitality->CancelAbilityByHandle(AbilityHandle);
 			return true;
@@ -357,9 +357,9 @@ int UInventorySlot::GetMaxVolume() const
 	return Item.IsValid() ? Item.GetData().MaxCount : 0;
 }
 
-FDWAbilityInfo UInventorySlot::GetAbilityInfo() const
+FAbilityInfo UInventorySlot::GetAbilityInfo() const
 {
-	FDWAbilityInfo AbilityInfo;
+	FAbilityInfo AbilityInfo;
 	if(ADWCharacter* Character = Cast<ADWCharacter>(Owner->GetOwnerActor()))
 	{
 		Character->GetAbilityInfo(Item.GetData().AbilityClass, AbilityInfo);

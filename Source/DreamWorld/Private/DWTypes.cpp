@@ -1,53 +1,26 @@
 #include "DWTypes.h"
 
-#include "World/Chunk.h"
-#include "World/WorldManager.h"
-#include "Voxel/Voxel.h"
 #include "Character/Player/DWPlayerCharacter.h"
 #include "Kismet/GameplayStatics.h"
 #include "Main/MainModule.h"
-#include "Module/DWSaveGameModule.h"
-#include "SaveGame/GeneralSaveGame.h"
+#include "SaveGame/DWGeneralSaveGame.h"
 #include "SaveGame/SaveGameModuleBPLibrary.h"
-#include "Voxel/VoxelPlant.h"
-
-FItem FItem::Empty = FItem(NAME_None, 0, 0);
-
-const FIndex FIndex::ZeroIndex = FIndex(0, 0, 0);
-
-const FIndex FIndex::OneIndex = FIndex(1, 1, 1);
 
 FTeamData FTeamData::Empty = FTeamData();
 
-const FWorldSaveData FWorldSaveData::Empty = FWorldSaveData();
-
-FVoxelItem FVoxelItem::EmptyVoxel = FVoxelItem(FName("Empty"));
-
-FVoxelItem FVoxelItem::UnknownVoxel = FVoxelItem(FName("Unknown"));
-
-FItemData FItem::GetData() const
+UVitalityAssetBase& FVitalitySaveData::GetVitalityData() const
 {
-	return UDWHelper::LoadItemData(ID);
+	return UPrimaryAssetManager::LoadItemAsset<UVitalityAssetBase>(ID);
 }
 
-FSkillData FDWCharacterSkillAbilityData::GetItemData() const
+UCharacterAssetBase& FCharacterSaveData::GetCharacterData() const
 {
-	return UDWHelper::LoadSkillData(AbilityName);
-}
-
-FVitalityData FVitalityObjectSaveData::GetVitalityData() const
-{
-	return UDWHelper::LoadVitalityData(ID);
-}
-
-FCharacterData FCharacterSaveData::GetCharacterData() const
-{
-	return UDWHelper::LoadCharacterData(ID);
+	return UPrimaryAssetManager::LoadItemAsset<UCharacterAssetBase>(ID);
 }
 
 FArchiveBasicSaveData FPlayerSaveData::GetArchiveData() const
 {
-	if(UGeneralSaveGame* GeneralSaveGame = USaveGameModuleBPLibrary::GetSaveGame<UGeneralSaveGame>())
+	if(UDWGeneralSaveGame* GeneralSaveGame = USaveGameModuleBPLibrary::GetSaveGame<UDWGeneralSaveGame>())
 	{
 		if(GeneralSaveGame->SaveData.ArchiveBasicDatas.IsValidIndex(ArchiveID))
 		{
@@ -55,82 +28,6 @@ FArchiveBasicSaveData FPlayerSaveData::GetArchiveData() const
 		}
 	}
 	return FArchiveBasicSaveData();
-}
-
-FArchiveBasicSaveData FWorldSaveData::GetArchiveData() const
-{
-	if(UGeneralSaveGame* GeneralSaveGame = USaveGameModuleBPLibrary::GetSaveGame<UGeneralSaveGame>())
-	{
-		if(GeneralSaveGame->SaveData.ArchiveBasicDatas.IsValidIndex(ArchiveID))
-		{
-			return GeneralSaveGame->SaveData.ArchiveBasicDatas[ArchiveID];
-		}
-	}
-	return FArchiveBasicSaveData();
-}
-
-bool FVoxelItem::IsValid() const
-{
-	return Super::IsValid() && !IsEmpty() && !IsUnknown();
-}
-
-bool FVoxelItem::IsEmpty() const
-{
-	return *this == EmptyVoxel;
-}
-
-bool FVoxelItem::IsUnknown() const
-{
-	return *this == UnknownVoxel;
-}
-
-UVoxel* FVoxelItem::GetVoxel() const
-{
-	if(IsEmpty()) return UVoxel::EmptyVoxel;
-	if(IsUnknown()) return UVoxel::UnknownVoxel;
-	return UVoxel::LoadVoxel(Owner, *this);
-}
-
-FVoxelData FVoxelItem::GetVoxelData() const
-{
-	return UDWHelper::LoadVoxelData(ID);
-}
-
-FString FVoxelItem::GetStringData() const
-{
-	FString tmpData;
-	if(UVoxel* tmpVoxel = GetVoxel())
-	{
-		tmpData = tmpVoxel->ToData();
-		UVoxel::DespawnVoxel(tmpVoxel);
-	}
-	return tmpData;
-}
-
-bool FVoxelItem::HasParam(FName InName) const
-{
-	return Params.Contains(InName);
-}
-
-FParameter FVoxelItem::GetParam(FName InName)
-{
-	if(HasParam(InName))
-	{
-		return Params[InName];
-	}
-	return FParameter();
-}
-
-void FVoxelItem::SetParam(FName InName, FParameter InParam)
-{
-	if(HasParam(InName))
-	{
-		Params[InName] = InParam;
-	}
-	else
-	{
-		Params.Add(InName, InParam);
-	}
 }
 
 void FTeamData::AddMember(ADWCharacter* InMember)
@@ -181,71 +78,17 @@ TArray<ADWCharacter*> FTeamData::GetMembers(ADWCharacter* InMember)
 	return tmpArr;
 }
 
-FVoxelHitResult::FVoxelHitResult()
-{
-	FMemory::Memzero(this, sizeof(FVoxelHitResult));
-	VoxelItem = FVoxelItem();
-	Point = FVector();
-	Normal = FVector();
-}
-
-FVoxelHitResult::FVoxelHitResult(const FVoxelItem& InVoxelItem, FVector InPoint, FVector InNormal)
-{
-	FMemory::Memzero(this, sizeof(FVoxelHitResult));
-	VoxelItem = InVoxelItem;
-	Point = InPoint;
-	Normal = InNormal;
-}
-
-UVoxel* FVoxelHitResult::GetVoxel() const
-{
-	return VoxelItem.GetVoxel();
-}
-
-AChunk* FVoxelHitResult::GetOwner() const
-{
-	return VoxelItem.Owner;
-}
-
-bool FVoxelData::GetMeshDatas(TArray<FVector>& OutMeshVertices, TArray<FVector>& OutMeshNormals, FRotator InRotation, FVector InScale) const
-{
-	if(VoxelClass == UVoxelPlant::StaticClass())
-	{
-		const FVector range = GetFinalRange(InRotation, InScale);
-
-		OutMeshVertices = TArray<FVector>();
-		OutMeshVertices.Add(FVector(-0.5f, -0.5f, -0.5f) * range);
-		OutMeshVertices.Add(FVector(-0.5f, -0.5f, 0.5f) * range);
-		OutMeshVertices.Add(FVector(0.5f, 0.5f, 0.5f) * range);
-		OutMeshVertices.Add(FVector(0.5f, 0.5f, -0.5f) * range);
-		OutMeshVertices.Add(FVector(0.5f, -0.5f, -0.5f) * range);
-		OutMeshVertices.Add(FVector(0.5f, -0.5f, 0.5f) * range);
-		OutMeshVertices.Add(FVector(-0.5f, 0.5f, 0.5f) * range);
-		OutMeshVertices.Add(FVector(-0.5f, 0.5f, -0.5f) * range);
-
-		OutMeshNormals = TArray<FVector>();
-		OutMeshNormals.Add(FVector(1, -1, 0).GetSafeNormal());
-		OutMeshNormals.Add(FVector(-1, -1, 0).GetSafeNormal());
-	}
-	else
-	{
-		OutMeshVertices = MeshVertices;
-		OutMeshNormals = MeshNormals;
-	}
-	return OutMeshVertices.Num() > 0;
-}
-
-bool FDWGameplayEffectContainerSpec::HasValidTargets() const
+bool FGameplayEffectContainerSpec::HasValidTargets() const
 {
 	return TargetGameplayEffectSpecs.Num() > 0;
 }
 
-bool FDWGameplayEffectContainerSpec::HasValidEffects() const
+bool FGameplayEffectContainerSpec::HasValidEffects() const
 {
 	return TargetData.Num() > 0;
 }
 
-void FDWGameplayEffectContainerSpec::AddTargets(const TArray<FHitResult>& HitResults, const TArray<AActor*>& TargetActors)
+void FGameplayEffectContainerSpec::AddTargets(const TArray<FHitResult>& HitResults, const TArray<AActor*>& TargetActors)
 {
 	for (const FHitResult& HitResult : HitResults)
 	{

@@ -4,13 +4,13 @@
 #include "Interaction/Components/CharacterInteractionComponent.h"
 
 #include "Character/DWCharacter.h"
-#include "Interaction/Interaction.h"
+#include "Interaction/InteractionInterface.h"
 
 UCharacterInteractionComponent::UCharacterInteractionComponent(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 }
 
-bool UCharacterInteractionComponent::DoInteract(IInteraction* InInteractionTarget, EInteractAction InInteractAction)
+bool UCharacterInteractionComponent::DoInteract(IInteractionInterface* InInteractionTarget, EInteractAction InInteractAction)
 {
 	if(!Super::DoInteract(InInteractionTarget, InInteractAction)) return false;
 

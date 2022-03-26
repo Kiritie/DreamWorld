@@ -1,59 +1,37 @@
 // Copyright 1998-2019 Epic Games, Inc. All Rights Reserved.
 
 #include "Character/DWCharacter.h"
+
+#include "Ability/Character/DWCharacterAttributeSet.h"
+#include "Ability/Components/DWAbilitySystemComponent.h"
 #include "Character/DWCharacterAnim.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "World/WorldManager.h"
-#include "Kismet/KismetSystemLibrary.h"
-#include "TimerManager.h"
+#include "Ability/Item/Equip/AbilityEquipBase.h"
 #include "AI/DWAIController.h"
-#include "Widget/Components/WidgetWorldTextComponent.h"
-#include "Widget/Components/WidgetCharacterHPComponent.h"
-#include "Widget/Other/WidgetCharacterHP.h"
-#include "Widget/Other/WidgetWorldText.h"
-#include "Inventory/CharacterInventory.h"
-#include "World/Chunk.h"
-#include "Skill/Skill.h"
-#include "AIModule/Classes/Perception/AIPerceptionStimuliSourceComponent.h"
-#include "AIModule/Classes/Perception/AISense_Sight.h"
-#include "AIModule/Classes/Perception/AISense_Damage.h"
-#include "AIModule/Classes/BehaviorTree/BehaviorTree.h"
-#include "Abilities/DWAbilitySystemComponent.h"
-#include "Abilities/GameplayAbility.h"
-#include "Abilities/Character/DWCharacterAttributeSet.h"
-#include "Equip/Equip.h"
-#include "Equip/EquipWeapon.h"
-#include "Equip/EquipShield.h"
-#include "Equip/EquipArmor.h"
-#include "Inventory/Slot/InventoryEquipSlot.h"
-#include "Abilities/DWGameplayAbility.h"
-#include "Inventory/Slot/InventorySkillSlot.h"
-#include "AIController.h"
-#include "AI/DWAIBlackboard.h"
-#include "GameFramework/PhysicsVolume.h"
-#include "Voxel/Voxel.h"
-#include "Abilities/Character/DWCharacterActionAbility.h"
-#include "Abilities/Character/DWCharacterAttackAbility.h"
-#include "Abilities/Character/DWCharacterSkillAbility.h"
-#include "Abilities/Item/DWItemAbility.h"
 #include "Character/DWCharacterPart.h"
 #include "Global/GlobalBPLibrary.h"
 #include "Interaction/Components/CharacterInteractionComponent.h"
 #include "Interaction/Components/InteractionComponent.h"
+#include "Inventory/CharacterInventory.h"
+#include "Perception/AIPerceptionStimuliSourceComponent.h"
+#include "Perception/AISense_Damage.h"
+#include "Perception/AISense_Sight.h"
 #include "Scene/SceneModuleBPLibrary.h"
 #include "Scene/Object/PhysicsVolume/PhysicsVolumeBase.h"
-#include "Widget/Components/WidgetWorldTextComponent.h"
+#include "Voxel/DWVoxelChunk.h"
+#include "Voxel/DWVoxelModule.h"
+#include "Voxel/VoxelModule.h"
+#include "Voxel/Chunks/VoxelChunk.h"
+#include "Widget/Components/WidgetCharacterHPComponent.h"
+#include "Widget/Other/WidgetCharacterHP.h"
 
 //////////////////////////////////////////////////////////////////////////
 // ADWCharacter
 
 ADWCharacter::ADWCharacter()
 {
-	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
-
 	StimuliSource = CreateDefaultSubobject<UAIPerceptionStimuliSourceComponent>(FName("StimuliSource"));
 	StimuliSource->RegisterForSense(UAISense_Sight::StaticClass());
 	StimuliSource->RegisterForSense(UAISense_Damage::StaticClass());
@@ -73,7 +51,6 @@ ADWCharacter::ADWCharacter()
 
 	Inventory = CreateDefaultSubobject<UCharacterInventory>(FName("Inventory"));
 
-	AnimInstance = nullptr;
 	BehaviorTree = nullptr;
 
 	// Set size for collision capsule
@@ -92,7 +69,6 @@ ADWCharacter::ADWCharacter()
 	GetCharacterMovement()->bComponentShouldUpdatePhysicsVolume = false;
 
 	// states
-	bDead = true;
 	bDying = false;
 	bActive = false;
 
@@ -114,29 +90,20 @@ ADWCharacter::ADWCharacter()
 	bBreakAllInput = false;
 
 	// stats
-	Name = TEXT("");
 	Nature = ECharacterNature::AIHostile;
-	ID = NAME_None;
 	TeamID = TEXT("");
-	RaceID = TEXT("");
-	Level = 0;
-	EXP = 0;
-	BaseEXP = 100;
-	EXPFactor = 2.f;
 	AttackDistance = 100.f;
 	InteractDistance = 500.f;
 	FollowDistance = 500.f;
 	PatrolDistance = 1000.f;
 	PatrolDuration = 10.f;
 	
-	Equips = TMap<EEquipPartType, AEquip*>();
+	Equips = TMap<EEquipPartType, AAbilityEquipBase*>();
 	for (int32 i = 0; i < 6; i++)
 	{
 		Equips.Add((EEquipPartType)i, nullptr);
 	}
 
-	MovementRate = 1;
-	RotationRate = 1;
 	OwnerChunk = nullptr;
 	RidingTarget = nullptr;
 	LockedTarget = nullptr;
@@ -152,17 +119,11 @@ ADWCharacter::ADWCharacter()
 	InterruptRemainTime = 0;
 	NormalAttackRemainTime = 0;
 
-	DefaultAbility = FDWAbilityData();
+	DefaultAbility = FAbilityData();
 	AttackAbilities = TArray<FDWCharacterAttackAbilityData>();
 	SkillAbilities = TMap<FName, FDWCharacterSkillAbilityData>();
 	ActionAbilities = TMap<ECharacterActionType, FDWCharacterActionAbilityData>();
 
-	// Don't rotate when the controller rotates. Let that just affect the camera.
-	bUseControllerRotationPitch = false;
-	bUseControllerRotationYaw = false;
-	bUseControllerRotationRoll = false;
-
-	AutoPossessAI = EAutoPossessAI::Disabled;
 	AIControllerClass = ADWAIController::StaticClass();
 }
 
@@ -176,7 +137,6 @@ void ADWCharacter::BeginPlay()
 
 	AbilitySystem->InitAbilityActorInfo(this, this);
 
-	AnimInstance = Cast<UDWCharacterAnim>(GetMesh()->GetAnimInstance());
 	BirthLocation = GetActorLocation();
 
 	if (GetWidgetCharacterHPWidget() && !GetWidgetCharacterHPWidget()->GetOwnerCharacter())
@@ -234,9 +194,9 @@ void ADWCharacter::Tick(float DeltaTime)
 
 		const FVector Location = GetMesh()->GetSocketLocation(FName("Foot"));
 
-		if(AWorldManager* WorldManager = AWorldManager::Get())
+		if(AVoxelModule* VoxelModule = AVoxelModule::Get())
 		{
-			if(AChunk* Chunk = WorldManager->FindChunk(Location))
+			if(ADWVoxelChunk* Chunk = Cast<ADWVoxelChunk>(VoxelModule->FindChunk(Location)))
 			{
 				if(Chunk != OwnerChunk)
 				{
@@ -357,10 +317,10 @@ void ADWCharacter::LoadData(FSaveData* InSaveData)
 	{
 		ID = SaveData.ID;
 		Nature = SaveData.Nature;
-		SetNameC(SaveData.Name);
+		SetNameV(SaveData.Name);
 		SetRaceID(SaveData.RaceID);
 		SetTeamID(SaveData.TeamID);
-		SetLevelC(SaveData.Level);
+		SetLevelV(SaveData.Level);
 		SetEXP(SaveData.EXP);
 		AttackDistance = SaveData.AttackDistance;
 		InteractDistance = SaveData.InteractDistance;
@@ -404,9 +364,9 @@ void ADWCharacter::LoadData(FSaveData* InSaveData)
 	else
 	{
 		ID = SaveData.ID;
-		SetNameC(SaveData.Name);
+		SetNameV(SaveData.Name);
 		SetRaceID(SaveData.RaceID);
-		SetLevelC(SaveData.Level);
+		SetLevelV(SaveData.Level);
 
 		SetActorLocation(SaveData.SpawnLocation);
 		SetActorRotation(SaveData.SpawnRotation);
@@ -460,7 +420,7 @@ void ADWCharacter::LoadData(FSaveData* InSaveData)
 
 			if(characterData.AbilityClass != nullptr)
 			{
-				DefaultAbility = FDWAbilityData();
+				DefaultAbility = FAbilityData();
 				DefaultAbility.AbilityName = FName("Default");
 				DefaultAbility.AbilityLevel = SaveData.Level;
 				DefaultAbility.AbilityHandle = AcquireAbility(characterData.AbilityClass, DefaultAbility.AbilityLevel);
@@ -638,7 +598,7 @@ void ADWCharacter::Death(AActor* InKiller /*= nullptr*/)
 	{
 		bDying = true;
 		Disable(true);
-		if(IVitality* InVitality = Cast<IVitality>(InKiller))
+		if(IAbilityVitalityInterface* InVitality = Cast<IAbilityVitalityInterface>(InKiller))
 		{
 			InVitality->ModifyEXP(GetTotalEXP());
 		}
@@ -697,7 +657,7 @@ void ADWCharacter::DeathEnd()
 	}
 }
 
-bool ADWCharacter::CanInteract(IInteraction* InInteractionTarget, EInteractAction InInteractAction)
+bool ADWCharacter::CanInteract(IInteractionInterface* InInteractionTarget, EInteractAction InInteractAction)
 {
 	switch (InInteractAction)
 	{
@@ -714,7 +674,7 @@ bool ADWCharacter::CanInteract(IInteraction* InInteractionTarget, EInteractActio
 	return false;
 }
 
-void ADWCharacter::OnInteract(IInteraction* InInteractionTarget, EInteractAction InInteractAction)
+void ADWCharacter::OnInteract(IInteractionInterface* InInteractionTarget, EInteractAction InInteractAction)
 {
 	switch (InInteractAction)
 	{
@@ -980,9 +940,9 @@ void ADWCharacter::UnRide()
 			}
 			FHitResult hitResult;
 			const FVector offset = GetActorRightVector() * (GetRadius() + RidingTarget->GetRadius());
-			const FVector rayStart = FVector(GetActorLocation().X, GetActorLocation().Y, AWorldManager::GetWorldData().ChunkHeightRange * AWorldManager::GetWorldData().GetChunkLength() + 500) + offset;
+			const FVector rayStart = FVector(GetActorLocation().X, GetActorLocation().Y, AVoxelModule::GetWorldData().ChunkHeightRange * AVoxelModule::GetWorldData().GetChunkLength() + 500) + offset;
 			const FVector rayEnd = FVector(GetActorLocation().X, GetActorLocation().Y, 0) + offset;
-			if (AWorldManager::Get()->ChunkTraceSingle(rayStart, rayEnd, GetRadius(), GetHalfHeight(), hitResult))
+			if (AVoxelModule::Get()->ChunkTraceSingle(rayStart, rayEnd, GetRadius(), GetHalfHeight(), hitResult))
 			{
 				SetActorLocation(hitResult.Location);
 			}
@@ -1132,7 +1092,7 @@ void ADWCharacter::AttackStart()
 				{
 					FActorSpawnParameters spawnParams = FActorSpawnParameters();
 					spawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-					ASkill* tmpSkill = GetWorld()->SpawnActor<ASkill>(GetSkillAbility(SkillAbilityIndex).GetItemData().SkillClass, spawnParams);
+					AAbilitySkillBase* tmpSkill = GetWorld()->SpawnActor<AAbilitySkillBase>(GetSkillAbility(SkillAbilityIndex).GetItemData().SkillClass, spawnParams);
 					if(tmpSkill) tmpSkill->Initialize(this, SkillAbilityIndex);
 				}
 				break;
@@ -1289,20 +1249,20 @@ bool ADWCharacter::GenerateVoxel(const FVoxelHitResult& InVoxelHitResult, FItem&
 {
 	if(DoAction(ECharacterActionType::Generate))
 	{
-		AChunk* chunk = InVoxelHitResult.GetOwner();
-		const FIndex index = chunk->LocationToIndex(InVoxelHitResult.Point - AWorldManager::GetWorldData().GetBlockSizedNormal(InVoxelHitResult.Normal)) + FIndex(InVoxelHitResult.Normal);
+		AVoxelChunk* chunk = InVoxelHitResult.GetOwner();
+		const FIndex index = chunk->LocationToIndex(InVoxelHitResult.Point - AVoxelModule::GetWorldData().GetBlockSizedNormal(InVoxelHitResult.Normal)) + FIndex(InVoxelHitResult.Normal);
 		const FVoxelItem& voxelItem = chunk->GetVoxelItem(index);
 
 		if(!voxelItem.IsValid() || voxelItem.GetVoxelData().Transparency == ETransparency::Transparent && voxelItem != InVoxelHitResult.VoxelItem)
 		{
 			const FVoxelItem _voxelItem = FVoxelItem(InItem.ID);
 
-			//FRotator rotation = (Owner->VoxelIndexToLocation(index) + tmpVoxel->GetVoxelData().GetCeilRange() * 0.5f * AWorldManager::GetWorldInfo().BlockSize - UDWHelper::GetPlayerCharacter(this)->GetActorLocation()).ToOrientationRotator();
+			//FRotator rotation = (Owner->VoxelIndexToLocation(index) + tmpVoxel->GetVoxelData().GetCeilRange() * 0.5f * AVoxelModule::GetWorldInfo().BlockSize - UDWHelper::GetPlayerCharacter(this)->GetActorLocation()).ToOrientationRotator();
 			//rotation = FRotator(FRotator::ClampAxis(FMath::RoundToInt(rotation.Pitch / 90) * 90.f), FRotator::ClampAxis(FMath::RoundToInt(rotation.Yaw / 90) * 90.f), FRotator::ClampAxis(FMath::RoundToInt(rotation.Roll / 90) * 90.f));
 			//tmpVoxel->Rotation = rotation;
 
 			FHitResult HitResult;
-			if (!AWorldManager::Get()->VoxelTraceSingle(_voxelItem, chunk->IndexToLocation(index), HitResult))
+			if (!AVoxelModule::Get()->VoxelTraceSingle(_voxelItem, chunk->IndexToLocation(index), HitResult))
 			{
 				if(voxelItem.IsValid())
 				{
@@ -1322,7 +1282,7 @@ bool ADWCharacter::DestroyVoxel(const FVoxelHitResult& InVoxelHitResult)
 {
 	if(DoAction(ECharacterActionType::Destroy))
 	{
-		AChunk* chunk = InVoxelHitResult.GetOwner();
+		AVoxelChunk* chunk = InVoxelHitResult.GetOwner();
 		const FVoxelItem& voxelItem = InVoxelHitResult.VoxelItem;
 
 		if (voxelItem.GetVoxelData().VoxelType != EVoxelType::Bedrock)
@@ -1335,11 +1295,12 @@ bool ADWCharacter::DestroyVoxel(const FVoxelHitResult& InVoxelHitResult)
 
 void ADWCharacter::RefreshEquip(EEquipPartType InPartType, UInventoryEquipSlot* EquipSlot)
 {
+	Super::RefreshEquip(InPartType, EquipSlot);
 	if (!EquipSlot->IsEmpty())
 	{
 		FActorSpawnParameters spawnParams = FActorSpawnParameters();
 		spawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-		Equips[InPartType] = GetWorld()->SpawnActor<AEquip>(UDWHelper::LoadEquipData(EquipSlot->GetItem().ID).EquipClass, spawnParams);
+		Equips[InPartType] = GetWorld()->SpawnActor<AAbilityEquipBase>(UDWHelper::LoadEquipData(EquipSlot->GetItem().ID).EquipClass, spawnParams);
 		if (Equips[InPartType])
 		{
 			Equips[InPartType]->Initialize(this);
@@ -1354,135 +1315,14 @@ void ADWCharacter::RefreshEquip(EEquipPartType InPartType, UInventoryEquipSlot* 
 	}
 }
 
-FGameplayAbilitySpecHandle ADWCharacter::AcquireAbility(TSubclassOf<UDWGameplayAbility> InAbility, int32 InLevel /*= 1*/)
-{
-	if (AbilitySystem && InAbility)
-	{
-		FGameplayAbilitySpecDef SpecDef = FGameplayAbilitySpecDef();
-		SpecDef.Ability = InAbility;
-		FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(SpecDef, InLevel);
-		return AbilitySystem->GiveAbility(AbilitySpec);
-	}
-	return FGameplayAbilitySpecHandle();
-}
-
-bool ADWCharacter::ActiveAbility(FGameplayAbilitySpecHandle SpecHandle, bool bAllowRemoteActivation /*= false*/)
-{
-	if (AbilitySystem)
-	{
-		return AbilitySystem->TryActivateAbility(SpecHandle, bAllowRemoteActivation);
-	}
-	return false;
-}
-
-bool ADWCharacter::ActiveAbilityByClass(TSubclassOf<UDWGameplayAbility> AbilityClass, bool bAllowRemoteActivation /*= false*/)
-{
-	if (AbilitySystem)
-	{
-		return AbilitySystem->TryActivateAbilityByClass(AbilityClass, bAllowRemoteActivation);
-	}
-	return false;
-}
-
-bool ADWCharacter::ActiveAbilityByTag(const FGameplayTagContainer& AbilityTags, bool bAllowRemoteActivation /*= false*/)
-{
-	if (AbilitySystem)
-	{
-		return AbilitySystem->TryActivateAbilitiesByTag(AbilityTags, bAllowRemoteActivation);
-	}
-	return false;
-}
-
-void ADWCharacter::CancelAbility(UDWGameplayAbility* Ability)
-{
-	if (AbilitySystem)
-	{
-		AbilitySystem->CancelAbility(Ability);
-	}
-}
-
-void ADWCharacter::CancelAbilityByHandle(const FGameplayAbilitySpecHandle& AbilityHandle)
-{
-	if (AbilitySystem)
-	{
-		AbilitySystem->CancelAbilityHandle(AbilityHandle);
-	}
-}
-
-void ADWCharacter::CancelAbilities(const FGameplayTagContainer& WithTags, const FGameplayTagContainer& WithoutTags, UDWGameplayAbility* Ignore/*=nullptr*/)
-{
-	if (AbilitySystem)
-	{
-		AbilitySystem->CancelAbilities(&WithTags, &WithoutTags, Ignore);
-	}
-}
-
-void ADWCharacter::CancelAllAbilities(UDWGameplayAbility* Ignore/*=nullptr*/)
-{
-	if (AbilitySystem)
-	{
-		AbilitySystem->CancelAllAbilities(Ignore);
-	}
-}
-
-FActiveGameplayEffectHandle ADWCharacter::ApplyEffectByClass(TSubclassOf<UGameplayEffect> EffectClass)
-{
-	if (AbilitySystem)
-	{
-		auto effectContext = AbilitySystem->MakeEffectContext();
-		effectContext.AddSourceObject(this);
-		auto specHandle = AbilitySystem->MakeOutgoingSpec(EffectClass, GetLevelC(), effectContext);
-		if (specHandle.IsValid())
-		{
-			return AbilitySystem->ApplyGameplayEffectSpecToSelf(*specHandle.Data.Get());
-		}
-	}
-	return FActiveGameplayEffectHandle();
-}
-
-FActiveGameplayEffectHandle ADWCharacter::ApplyEffectBySpecHandle(const FGameplayEffectSpecHandle& SpecHandle)
-{
-	if (AbilitySystem)
-	{
-		return AbilitySystem->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
-	}
-	return FActiveGameplayEffectHandle();
-}
-
-FActiveGameplayEffectHandle ADWCharacter::ApplyEffectBySpec(const FGameplayEffectSpec& Spec)
-{
-	if (AbilitySystem)
-	{
-		return AbilitySystem->ApplyGameplayEffectSpecToSelf(Spec);
-	}
-	return FActiveGameplayEffectHandle();
-}
-
-bool ADWCharacter::RemoveEffect(FActiveGameplayEffectHandle Handle, int32 StacksToRemove/*=-1*/)
-{
-	if (AbilitySystem)
-	{
-		return AbilitySystem->RemoveActiveGameplayEffect(Handle, StacksToRemove);
-	}
-	return false;
-}
-
-void ADWCharacter::GetActiveAbilities(FGameplayTagContainer AbilityTags, TArray<UDWGameplayAbility*>& ActiveAbilities)
-{
-	if (AbilitySystem)
-	{
-		AbilitySystem->GetActiveAbilitiesWithTags(AbilityTags, ActiveAbilities);
-	}
-}
-
-bool ADWCharacter::GetAbilityInfo(TSubclassOf<UDWGameplayAbility> AbilityClass, FDWAbilityInfo& OutAbilityInfo)
+bool ADWCharacter::GetAbilityInfo(TSubclassOf<UAbilityBase> AbilityClass, FAbilityInfo& OutAbilityInfo)
 {
 	if (AbilitySystem && AbilityClass != nullptr)
 	{
 		float Cost = 0;
 		float Cooldown = 0;
 		EAbilityCostType CostType = EAbilityCostType::None;
-		UDWGameplayAbility* Ability = AbilityClass.GetDefaultObject();
+		UAbilityBase* Ability = AbilityClass.GetDefaultObject();
 		if (Ability->GetCostGameplayEffect()->Modifiers.Num() > 0)
 		{
 			const FGameplayModifierInfo ModifierInfo = Ability->GetCostGameplayEffect()->Modifiers[0];
@@ -1501,7 +1341,7 @@ bool ADWCharacter::GetAbilityInfo(TSubclassOf<UDWGameplayAbility> AbilityClass, 
 			}
 		}
 		Ability->GetCooldownGameplayEffect()->DurationMagnitude.GetStaticMagnitudeIfPossible(1, Cooldown);
-		OutAbilityInfo = FDWAbilityInfo(CostType, Cost, Cooldown);
+		OutAbilityInfo = FAbilityInfo(CostType, Cost, Cooldown);
 		return true;
 	}
 	return false;
@@ -1796,14 +1636,14 @@ bool ADWCharacter::IsDead() const
 	return bDead || bDying;
 }
 
-FCharacterData ADWCharacter::GetCharacterData() const
+UDWCharacterAsset& ADWCharacter::GetCharacterData() const
 {
-	return UDWHelper::LoadCharacterData(ID);
+	return UPrimaryAssetManager::LoadItemAsset<UDWCharacterAsset>(ID);
 }
 
 FTeamData* ADWCharacter::GetTeamData() const
 {
-	return AWorldManager::Get()->GetTeamData(*TeamID);
+	return AVoxelModule::Get()->GetTeamData(*TeamID);
 }
 
 bool ADWCharacter::IsTargetable_Implementation() const
@@ -2158,7 +1998,7 @@ bool ADWCharacter::HasWeapon(EWeaponType InWeaponType)
 	
 	if(HasEquip(EEquipPartType::RightHand))
 	{
-		if(AEquipWeapon* Weapon = Cast<AEquipWeapon>(GetEquip(EEquipPartType::RightHand)))
+		if(AAbilityEquipWeapon* Weapon = Cast<AAbilityEquipWeapon>(GetEquip(EEquipPartType::RightHand)))
 		{
 			return Weapon->GetWeaponData().WeaponType == InWeaponType;
 		}
@@ -2172,7 +2012,7 @@ bool ADWCharacter::HasShield(EShieldType InShieldType)
 	
 	if(HasEquip(EEquipPartType::LeftHand))
 	{
-		if(AEquipShield* Weapon = Cast<AEquipShield>(GetEquip(EEquipPartType::LeftHand)))
+		if(AAbilityEquipShield* Weapon = Cast<AAbilityEquipShield>(GetEquip(EEquipPartType::LeftHand)))
 		{
 			return Weapon->GetShieldData().ShieldType == InShieldType;
 		}
@@ -2180,26 +2020,26 @@ bool ADWCharacter::HasShield(EShieldType InShieldType)
 	return false;
 }
 
-AEquipWeapon* ADWCharacter::GetWeapon()
+AAbilityEquipWeapon* ADWCharacter::GetWeapon()
 {
-	return Cast<AEquipWeapon>(GetEquip(EEquipPartType::RightHand));
+	return Cast<AAbilityEquipWeapon>(GetEquip(EEquipPartType::RightHand));
 }
 
-AEquipShield* ADWCharacter::GetShield()
+AAbilityEquipShield* ADWCharacter::GetShield()
 {
-	return Cast<AEquipShield>(GetEquip(EEquipPartType::LeftHand));
+	return Cast<AAbilityEquipShield>(GetEquip(EEquipPartType::LeftHand));
 }
 
 bool ADWCharacter::HasArmor(EEquipPartType InPartType)
 {
-	return HasEquip(InPartType) && GetEquip(InPartType)->IsA(AEquipArmor::StaticClass());
+	return HasEquip(InPartType) && GetEquip(InPartType)->IsA(AAbilityEquipArmor::StaticClass());
 }
 
-AEquipArmor* ADWCharacter::GetArmor(EEquipPartType InPartType)
+AAbilityEquipArmor* ADWCharacter::GetArmor(EEquipPartType InPartType)
 {
 	if (HasArmor(InPartType))
 	{
-		return Cast<AEquipArmor>(GetEquip(InPartType));
+		return Cast<AAbilityEquipArmor>(GetEquip(InPartType));
 	}
 	return nullptr;
 }
@@ -2209,7 +2049,7 @@ bool ADWCharacter::HasEquip(EEquipPartType InPartType)
 	return Equips.Contains(InPartType) && Equips[InPartType];
 }
 
-AEquip* ADWCharacter::GetEquip(EEquipPartType InPartType)
+AAbilityEquipBase* ADWCharacter::GetEquip(EEquipPartType InPartType)
 {
 	if (HasEquip(InPartType))
 	{
@@ -2266,7 +2106,7 @@ FDWCharacterActionAbilityData ADWCharacter::GetActionAbility(ECharacterActionTyp
 bool ADWCharacter::RaycastStep(FHitResult& OutHitResult)
 {
 	const FVector rayStart = GetActorLocation() + FVector::DownVector * (GetHalfHeight() - GetCharacterMovement()->MaxStepHeight);
-	const FVector rayEnd = rayStart + GetMoveDirection() * (GetRadius() + AWorldManager::GetWorldData().BlockSize * FMath::Clamp(GetMoveDirection().Size() * 0.005f, 0.5f, 1.3f));
+	const FVector rayEnd = rayStart + GetMoveDirection() * (GetRadius() + AVoxelModule::GetWorldData().BlockSize * FMath::Clamp(GetMoveDirection().Size() * 0.005f, 0.5f, 1.3f));
 	return UKismetSystemLibrary::LineTraceSingle(this, rayStart, rayEnd, UDWHelper::GetGameTrace(EGameTraceType::Step), false, TArray<AActor*>(), EDrawDebugTrace::None, OutHitResult, true);
 }
 
@@ -2277,12 +2117,12 @@ bool ADWCharacter::RaycastVoxel(FVoxelHitResult& OutHitResult)
 	const FVector rayEnd = rayStart + GetActorForwardVector() * InteractDistance;
 	if (UKismetSystemLibrary::LineTraceSingle(this, rayStart, rayEnd, UDWHelper::GetGameTrace(EGameTraceType::Voxel), false, TArray<AActor*>(), EDrawDebugTrace::None, hitResult, true))
 	{
-		if (hitResult.GetActor()->IsA(AChunk::StaticClass()))
+		if (hitResult.GetActor()->IsA(AVoxelChunk::StaticClass()))
 		{
-			AChunk* chunk = Cast<AChunk>(hitResult.GetActor());
+			AVoxelChunk* chunk = Cast<AVoxelChunk>(hitResult.GetActor());
 			if (chunk != nullptr)
 			{
-				const FVoxelItem& voxelItem = chunk->GetVoxelItem(chunk->LocationToIndex(hitResult.ImpactPoint - AWorldManager::GetWorldData().GetBlockSizedNormal(hitResult.ImpactNormal, 0.01f)));
+				const FVoxelItem& voxelItem = chunk->GetVoxelItem(chunk->LocationToIndex(hitResult.ImpactPoint - AVoxelModule::GetWorldData().GetBlockSizedNormal(hitResult.ImpactNormal, 0.01f)));
 				if (voxelItem.IsValid())
 				{
 					OutHitResult = FVoxelHitResult(voxelItem, hitResult.ImpactPoint, hitResult.ImpactNormal);
@@ -2367,19 +2207,19 @@ bool ADWCharacter::HasActionAbility(ECharacterActionType InActionType)
 
 bool ADWCharacter::CreateTeam(const FName& InTeamName /*= MANE_None*/, FString InTeamDetail /*= TEXT("")*/)
 {
-	return AWorldManager::Get()->CreateTeam(this, InTeamName, InTeamDetail);
+	return AVoxelModule::Get()->CreateTeam(this, InTeamName, InTeamDetail);
 }
 
 bool ADWCharacter::DissolveTeam()
 {
-	return AWorldManager::Get()->DissolveTeam(*TeamID, this);
+	return AVoxelModule::Get()->DissolveTeam(*TeamID, this);
 }
 
 bool ADWCharacter::JoinTeam(const FName& InTeamID)
 {
-	if (AWorldManager::Get()->IsExistTeam(InTeamID))
+	if (AVoxelModule::Get()->IsExistTeam(InTeamID))
 	{
-		AWorldManager::Get()->GetTeamData(InTeamID)->AddMember(this);
+		AVoxelModule::Get()->GetTeamData(InTeamID)->AddMember(this);
 		return true;
 	}
 	return false;
@@ -2425,16 +2265,6 @@ TArray<ADWCharacter*> ADWCharacter::GetTeamMates()
 	return GetTeamData()->GetMembers(this);
 }
 
-void ADWCharacter::AddWorldText(FString InContent, EWorldTextType InContentType, EWorldTextStyle InContentStyle)
-{
-	auto contextHUD = NewObject<UWidgetWorldTextComponent>(this);
-	contextHUD->RegisterComponent();
-	contextHUD->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
-	contextHUD->SetRelativeLocation(FVector(0, 0, 0));
-	contextHUD->SetVisibility(false);
-	contextHUD->InitContent(InContent, InContentType, InContentStyle);
-}
-
 bool ADWCharacter::IsPlayer() const
 {
 	return Nature == ECharacterNature::Player;
@@ -2466,18 +2296,12 @@ bool ADWCharacter::IsEnemy(ADWCharacter* InTargetCharacter) const
 	return !IsTeamMate(InTargetCharacter) && !InTargetCharacter->GetRaceID().Equals(RaceID);
 }
 
-float ADWCharacter::Distance(ADWCharacter* InTargetCharacter, bool bIgnoreRadius /*= true*/, bool bIgnoreZAxis /*= true*/)
-{
-	if(!InTargetCharacter || !InTargetCharacter->IsValidLowLevel()) return -1;
-	return FVector::Distance(FVector(GetActorLocation().X, GetActorLocation().Y, bIgnoreZAxis ? 0 : GetActorLocation().Z), FVector(InTargetCharacter->GetActorLocation().X, InTargetCharacter->GetActorLocation().Y, bIgnoreZAxis ? 0 : InTargetCharacter->GetActorLocation().Z)) - (bIgnoreRadius ? 0 : InTargetCharacter->GetRadius());
-}
-
 void ADWCharacter::SetVisible_Implementation(bool bVisible)
 {
-	GetRootComponent()->SetVisibility(bVisible, true);
+	Super::SetVisible_Implementation(bVisible);
 }
 
-void ADWCharacter::SetMotionRate(float InMovementRate, float InRotationRate)
+void ADWCharacter::SetMotionRate_Implementation(float InMovementRate, float InRotationRate)
 {
 	MovementRate = InMovementRate;
 	RotationRate = InRotationRate;
@@ -2502,7 +2326,7 @@ UDWCharacterPart* ADWCharacter::GetCharacterPart(ECharacterPartType InCharacterP
 	return nullptr;
 }
 
-void ADWCharacter::HandleDamage(EDWDamageType DamageType, const float LocalDamageDone, bool bHasCrited, FHitResult HitResult, const FGameplayTagContainer& SourceTags, AActor* SourceActor)
+void ADWCharacter::HandleDamage(EDamageType DamageType, const float LocalDamageDone, bool bHasCrited, FHitResult HitResult, const FGameplayTagContainer& SourceTags, AActor* SourceActor)
 {
 	if (GetHealth() <= 0.f)
 	{
@@ -2512,7 +2336,7 @@ void ADWCharacter::HandleDamage(EDWDamageType DamageType, const float LocalDamag
 	{
 		if(ADWCharacter* SourceCharacter = Cast<ADWCharacter>(SourceActor))
 		{
-			if(DamageType == EDWDamageType::Physics)
+			if(DamageType == EDamageType::Physics)
 			{
 				SourceCharacter->ModifyHealth(LocalDamageDone * SourceCharacter->GetAttackStealRate());
 			}
@@ -2654,9 +2478,9 @@ void ADWCharacter::HandleRotationSpeedChanged(float NewValue, float DeltaValue /
 	GetCharacterMovement()->RotationRate = FRotator(0, NewValue * (bSprinting ? 1.5f : 1), 0) * RotationRate;
 }
 
-void ADWCharacter::HandleJumpForceChanged(float NewValue, float DeltaValue /*= 0.f*/)
+void ADWCharacter::HandleJumpForceChanged(float NewValue, float DeltaValue)
 {
-	GetCharacterMovement()->JumpZVelocity = NewValue;
+	Super::HandleJumpForceChanged(NewValue, DeltaValue);
 }
 
 void ADWCharacter::HandleDodgeForceChanged(float NewValue, float DeltaValue /*= 0.f*/)

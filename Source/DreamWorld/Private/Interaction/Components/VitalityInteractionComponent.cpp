@@ -4,13 +4,13 @@
 #include "Interaction/Components/VitalityInteractionComponent.h"
 
 #include "Character/DWCharacter.h"
-#include "Interaction/Interaction.h"
+#include "Interaction/InteractionInterface.h"
 
-UVitalityInteractionComponent::UVitalityInteractionComponent(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
+UAbilityVitalityInteractionComponent::UAbilityVitalityInteractionComponent(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 }
 
-bool UVitalityInteractionComponent::DoInteract(IInteraction* InInteractionTarget, EInteractAction InInteractAction)
+bool UAbilityVitalityInteractionComponent::DoInteract(IInteractionInterface* InInteractionTarget, EInteractAction InInteractAction)
 {
 	if(!Super::DoInteract(InInteractionTarget, InInteractAction)) return false;
 

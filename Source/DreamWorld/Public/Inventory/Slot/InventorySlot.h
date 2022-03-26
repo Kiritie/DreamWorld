@@ -116,14 +116,14 @@ public:
 
 protected:
 	UPROPERTY(BlueprintReadOnly)
-	FDWCooldownInfo CooldownInfo;
+	FCooldownInfo CooldownInfo;
 
 public:
 	UFUNCTION(BlueprintPure)
-	FDWCooldownInfo GetCooldownInfo() const { return CooldownInfo; }
+	FCooldownInfo GetCooldownInfo() const { return CooldownInfo; }
 
 	UFUNCTION(BlueprintCallable)
-	void SetCooldownInfo(const FDWCooldownInfo& InCooldownInfo) { CooldownInfo = InCooldownInfo; }
+	void SetCooldownInfo(const FCooldownInfo& InCooldownInfo) { CooldownInfo = InCooldownInfo; }
 
 	//////////////////////////////////////////////////////////////////////////
 	/// Getter/Setter
@@ -153,7 +153,7 @@ public:
 	ESplitSlotType GetSplitType() const { return SplitType; }
 
 	UFUNCTION(BlueprintPure)
-	virtual FDWAbilityInfo GetAbilityInfo() const;
+	virtual FAbilityInfo GetAbilityInfo() const;
 
 	UFUNCTION(BlueprintPure)
 	FGameplayAbilitySpecHandle& GetAbilityHandle() { return AbilityHandle; }

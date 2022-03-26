@@ -13,7 +13,7 @@
 #include "Components/BoxComponent.h"
 #include "World/Chunk.h"
 #include "Voxel/Voxel.h"
-#include "World/WorldManager.h"
+#include "World/VoxelModule.h"
 #include "Voxel/Components/VoxelMeshComponent.h"
 #include "Gameplay/DWGameMode.h"
 #include "Perception/PawnSensingComponent.h"
@@ -165,7 +165,7 @@ void ADWPlayerCharacter::BeginPlay()
 
 	PreviewCapture->ShowOnlyActors.Add(this);
 
-	//AWorldManager::GetCurrent()->CreateTeam();
+	//AVoxelModule::GetCurrent()->CreateTeam();
 }
 
 // Called every frame
@@ -424,12 +424,12 @@ bool ADWPlayerCharacter::RaycastVoxel(FVoxelHitResult& OutHitResult)
 		FHitResult hitResult;
 		if (GetPlayerController()->RaycastFromAimPoint(hitResult, EGameTraceType::Voxel, InteractDistance))
 		{
-			if (hitResult.GetActor()->IsA(AChunk::StaticClass()))
+			if (hitResult.GetActor()->IsA(AVoxelChunk::StaticClass()))
 			{
-				AChunk* chunk = Cast<AChunk>(hitResult.GetActor());
+				AVoxelChunk* chunk = Cast<AVoxelChunk>(hitResult.GetActor());
 				if (chunk != nullptr)
 				{
-					const FVoxelItem& voxelItem = chunk->GetVoxelItem(chunk->LocationToIndex(hitResult.ImpactPoint - AWorldManager::GetWorldData().GetBlockSizedNormal(hitResult.ImpactNormal, 0.01f)));
+					const FVoxelItem& voxelItem = chunk->GetVoxelItem(chunk->LocationToIndex(hitResult.ImpactPoint - AVoxelModule::GetWorldData().GetBlockSizedNormal(hitResult.ImpactNormal, 0.01f)));
 					if (voxelItem.IsValid())
 					{
 						OutHitResult = FVoxelHitResult(voxelItem, hitResult.ImpactPoint, hitResult.ImpactNormal);

@@ -4,7 +4,7 @@
 #include "Widget/Components/WidgetVitalityHPComponent.h"
 #include "Character/Player/DWPlayerCharacter.h"
 #include "UObject/ConstructorHelpers.h"
-#include "Vitality/VitalityObject.h"
+#include "Vitality/AbilityVitalityBase.h"
 #include "Widget/Other/WidgetVitalityHP.h"
 
 UWidgetVitalityHPComponent::UWidgetVitalityHPComponent()
@@ -23,7 +23,7 @@ void UWidgetVitalityHPComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	OwnerVitality = Cast<AVitalityObject>(GetOwner());
+	OwnerVitality = Cast<AAbilityVitalityBase>(GetOwner());
 }
 
 void UWidgetVitalityHPComponent::TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)

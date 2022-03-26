@@ -4,7 +4,7 @@
 #include "Gameplay/DWPlayerController.h"
 
 #include "Character/Player/DWPlayerCharacter.h"
-#include "World/WorldManager.h"
+#include "World/VoxelModule.h"
 #include "Engine/World.h"
 #include "World/Chunk.h"
 #include "Voxel/Voxel.h"
@@ -18,7 +18,7 @@
 #include "Gameplay/DWGameMode.h"
 #include "Inventory/Slot/InventorySlot.h"
 #include "Module/DWSaveGameModule.h"
-#include "SaveGame/GeneralSaveGame.h"
+#include "SaveGame/DWGeneralSaveGame.h"
 #include "SaveGame/SaveGameModuleBPLibrary.h"
 #include "Widget/WidgetModuleBPLibrary.h"
 #include "World/Components/WorldTimerComponent.h"
@@ -42,9 +42,9 @@ void ADWPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if(AWorldManager* WorldManager = AWorldManager::Get())
+	if(AVoxelModule* VoxelModule = AVoxelModule::Get())
 	{
-		WorldManager->OnWorldGenerated.AddDynamic(this, &ADWPlayerController::OnWorldGenerated);
+		VoxelModule->OnWorldGenerated.AddDynamic(this, &ADWPlayerController::OnWorldGenerated);
 	}
 }
 
@@ -172,7 +172,7 @@ void ADWPlayerController::LoadData(FPlayerSaveData InPlayerData)
 		Possess(NewPlayerCharacter);
 
 		SetControlRotation(InPlayerData.CameraRotation);
-		if(UGeneralSaveGame* GeneralSaveGame = USaveGameModuleBPLibrary::GetSaveGame<UGeneralSaveGame>())
+		if(UDWGeneralSaveGame* GeneralSaveGame = USaveGameModuleBPLibrary::GetSaveGame<UDWGeneralSaveGame>())
 		{
 			SetCameraDistance(GeneralSaveGame->SaveData.CameraDistance, true);
 		}

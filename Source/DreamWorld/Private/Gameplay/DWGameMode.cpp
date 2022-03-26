@@ -7,12 +7,12 @@
 #include "Gameplay/DWGameState.h"
 #include "Gameplay/DWGameInstance.h"
 #include "Kismet/GameplayStatics.h"
-#include "World/WorldManager.h"
+#include "World/VoxelModule.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Main/MainModule.h"
 #include "Module/DWSaveGameModule.h"
-#include "SaveGame/ArchiveSaveGame.h"
-#include "SaveGame/GeneralSaveGame.h"
+#include "SaveGame/DWArchiveSaveGame.h"
+#include "SaveGame/DWGeneralSaveGame.h"
 #include "SaveGame/SaveGameModuleBPLibrary.h"
 
 ADWGameMode::ADWGameMode()
@@ -38,7 +38,7 @@ void ADWGameMode::InitializeGame()
 
 void ADWGameMode::StartGame(int32 InArchiveID)
 {
-	if(UArchiveSaveGame* ArchiveSaveGame = USaveGameModuleBPLibrary::LoadSaveGame<UArchiveSaveGame>(InArchiveID))
+	if(UDWArchiveSaveGame* ArchiveSaveGame = USaveGameModuleBPLibrary::LoadSaveGame<UDWArchiveSaveGame>(InArchiveID))
 	{
 		ArchiveSaveGame->OnLoad();
 	}
@@ -46,9 +46,9 @@ void ADWGameMode::StartGame(int32 InArchiveID)
 
 void ADWGameMode::ContinueGame()
 {
-	if(UGeneralSaveGame* GeneralSaveGame = USaveGameModuleBPLibrary::LoadSaveGame<UGeneralSaveGame>(0))
+	if(UDWGeneralSaveGame* GeneralSaveGame = USaveGameModuleBPLibrary::LoadSaveGame<UDWGeneralSaveGame>(0))
 	{
-		if(UArchiveSaveGame* ArchiveSaveGame = USaveGameModuleBPLibrary::LoadSaveGame<UArchiveSaveGame>(GeneralSaveGame->SaveData.CurrentArchiveID))
+		if(UDWArchiveSaveGame* ArchiveSaveGame = USaveGameModuleBPLibrary::LoadSaveGame<UDWArchiveSaveGame>(GeneralSaveGame->SaveData.CurrentArchiveID))
 		{
 			ArchiveSaveGame->OnLoad();
 		}
@@ -83,9 +83,9 @@ void ADWGameMode::UnPauseGame()
 
 void ADWGameMode::BackMainMenu()
 {
-	if(UArchiveSaveGame* ArchiveSaveGame = USaveGameModuleBPLibrary::GetSaveGame<UArchiveSaveGame>())
+	if(UDWArchiveSaveGame* ArchiveSaveGame = USaveGameModuleBPLibrary::GetSaveGame<UDWArchiveSaveGame>())
 	{
-		USaveGameModuleBPLibrary::SaveSaveGame<UArchiveSaveGame>(ArchiveSaveGame->SaveData.ID);
+		USaveGameModuleBPLibrary::SaveSaveGame<UDWArchiveSaveGame>(ArchiveSaveGame->SaveData.ID);
 	}
 	if(ADWGameState* DWGameState = UDWHelper::GetGameState(this))
 	{
@@ -99,9 +99,9 @@ void ADWGameMode::BackMainMenu()
 
 void ADWGameMode::QuitGame()
 {
-	if(UArchiveSaveGame* ArchiveSaveGame = USaveGameModuleBPLibrary::GetSaveGame<UArchiveSaveGame>())
+	if(UDWArchiveSaveGame* ArchiveSaveGame = USaveGameModuleBPLibrary::GetSaveGame<UDWArchiveSaveGame>())
 	{
-		USaveGameModuleBPLibrary::SaveSaveGame<UArchiveSaveGame>(ArchiveSaveGame->SaveData.ID);
+		USaveGameModuleBPLibrary::SaveSaveGame<UDWArchiveSaveGame>(ArchiveSaveGame->SaveData.ID);
 	}
 	UKismetSystemLibrary::QuitGame(this, nullptr, EQuitPreference::Quit, true);
 }

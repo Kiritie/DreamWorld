@@ -31,7 +31,7 @@ public:
 	virtual bool CancelItem() override;
 
 public:
-	virtual FDWAbilityInfo GetAbilityInfo() const override;
+	virtual FAbilityInfo GetAbilityInfo() const override;
 	
 	UFUNCTION(BlueprintPure)
 	FDWCharacterSkillAbilityData GetSkillData() const;
