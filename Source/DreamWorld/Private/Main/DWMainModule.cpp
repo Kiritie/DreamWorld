@@ -1,6 +1,6 @@
 // Copyright 1998-2019 Epic Games, Inc. All Rights Reserved.
 
-#include "Module/DWMainModule.h"
+#include "Main/DWMainModule.h"
 
 #include "Asset/AssetModule.h"
 #include "Audio/AudioModule.h"
@@ -11,17 +11,17 @@
 #include "Input/InputModule.h"
 #include "LatentAction/LatentActionModule.h"
 #include "Media/MediaModule.h"
-#include "Module/DWSaveGameModule.h"
 #include "Network/NetworkModule.h"
 #include "ObjectPool/ObjectPoolModule.h"
 #include "Parameter/ParameterModule.h"
 #include "Procedure/ProcedureModule.h"
+#include "SaveGame/DWSaveGameModule.h"
 #include "Scene/SceneModule.h"
 #include "SpawnPool/SpawnPoolModuleBPLibrary.h"
-#include "Voxel/Voxel.h"
+#include "Team/DWTeamModule.h"
+#include "Voxel/Voxels/Voxel.h"
 #include "WebRequest/WebRequestModule.h"
 #include "Widget/WidgetModule.h"
-#include "World/Chunk.h"
 
 ADWMainModule::ADWMainModule()
 {
@@ -41,19 +41,15 @@ ADWMainModule::ADWMainModule()
 	ModuleClasses.Add(AObjectPoolModule::StaticClass());
 	ModuleClasses.Add(AParameterModule::StaticClass());
 	ModuleClasses.Add(AProcedureModule::StaticClass());
-	ModuleClasses.Add(ADWSaveGameModule::StaticClass());
 	ModuleClasses.Add(ASceneModule::StaticClass());
 	ModuleClasses.Add(ASpawnPoolModule::StaticClass());
 	ModuleClasses.Add(AWebRequestModule::StaticClass());
 	ModuleClasses.Add(AWidgetModule::StaticClass());
+	ModuleClasses.Add(ADWTeamModule::StaticClass());
+	ModuleClasses.Add(ADWSaveGameModule::StaticClass());
 }
 
 void ADWMainModule::InitializeModules_Implementation()
 {
 	Super::InitializeModules_Implementation();
-	
-	UVoxel::EmptyVoxel = UVoxel::SpawnVoxel(EVoxelType::Empty);
-	UVoxel::UnknownVoxel = UVoxel::SpawnVoxel(EVoxelType::Unknown);
-	
-	USpawnPoolModuleBPLibrary::DespawnActor(USpawnPoolModuleBPLibrary::SpawnActor<AVoxelChunk>());
 }

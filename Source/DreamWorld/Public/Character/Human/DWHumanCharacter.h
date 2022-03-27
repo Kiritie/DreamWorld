@@ -8,9 +8,9 @@
 
 class UBoxComponent;
 class UStaticMeshComponent;
-class AAbilityEquipWeapon;
-class AAbilityEquipShield;
-class AAbilityEquipArmor;
+class ADWEquipWeapon;
+class ADWEquipShield;
+class ADWEquipArmor;
 class UInventoryEquipSlot;
 
 /**

@@ -3,14 +3,15 @@
 #pragma once
 
 #include "DreamWorld/DreamWorld.h"
-#include "Blueprint/UserWidget.h"
+#include "Widget/World/WorldWidgetBase.h"
+
 #include "WidgetCharacterHP.generated.h"
 
 /**
  * ��ɫѪ��
  */
 UCLASS()
-class DREAMWORLD_API UWidgetCharacterHP : public UUserWidget
+class DREAMWORLD_API UWidgetCharacterHP : public UWorldWidgetBase
 {
 	GENERATED_BODY()
 

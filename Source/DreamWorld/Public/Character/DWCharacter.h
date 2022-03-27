@@ -9,6 +9,7 @@
 #include "TargetSystemTargetableInterface.h"
 #include "Ability/Character/AbilityCharacterBase.h"
 #include "Interaction/InteractionInterface.h"
+#include "Scene/Object/PickUp/PickerInterface.h"
 #include "Voxel/Agent/VoxelAgentInterface.h"
 
 #include "DWCharacter.generated.h"
@@ -18,9 +19,9 @@ class ADWVoxelChunk;
 class UCharacterInteractionComponent;
 class UInteractionComponent;
 class UDWCharacterPart;
-class AAbilityEquipArmor;
-class AAbilityEquipShield;
-class AAbilityEquipWeapon;
+class ADWEquipArmor;
+class ADWEquipShield;
+class ADWEquipWeapon;
 class UInventoryEquipSlot;
 class AVoxelChunk;
 class UVoxel;
@@ -40,7 +41,7 @@ class AAbilitySkillBase;
  * 角色
  */
 UCLASS()
-class DREAMWORLD_API ADWCharacter : public AAbilityCharacterBase, public IVoxelAgentInterface, public IInteractionInterface, public ITargetSystemTargetableInterface
+class DREAMWORLD_API ADWCharacter : public AAbilityCharacterBase, public IVoxelAgentInterface, public IInteractionInterface, public ITargetSystemTargetableInterface, public IPickerInterface
 {
 	GENERATED_BODY()
 
@@ -131,7 +132,7 @@ protected:
 	FVector BirthLocation;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CharacterStats")
-	ADWVoxelChunk* OwnerChunk;
+	AVoxelChunk* OwnerChunk;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CharacterStats")
 	ADWCharacter* OwnerRider;
@@ -173,7 +174,7 @@ protected:
 
 	int32 AttackAbilityIndex;
 
-	FName SkillAbilityIndex;
+	FPrimaryAssetId SkillAbilityID;
 
 	EAttackType AttackType;
 
@@ -188,7 +189,7 @@ protected:
 
 	TArray<FDWCharacterAttackAbilityData> AttackAbilities;
 
-	TMap<FName, FDWCharacterSkillAbilityData> SkillAbilities;
+	TMap<FPrimaryAssetId, FDWCharacterSkillAbilityData> SkillAbilities;
 
 	TMap<ECharacterActionType, FDWCharacterActionAbilityData> ActionAbilities;
 
@@ -301,7 +302,7 @@ public:
 	virtual bool Attack(int32 InAbilityIndex = -1);
 
 	UFUNCTION(BlueprintCallable)
-	virtual bool SkillAttack(const FName& InSkillID);
+	virtual bool SkillAttack(const FPrimaryAssetId& InSkillID);
 
 	virtual bool SkillAttack(ESkillType InSkillType, int32 InAbilityIndex = -1);
 		
@@ -331,11 +332,13 @@ public:
 	
 	virtual bool UseItem(FItem& InItem);
 
-	UFUNCTION(BlueprintCallable)
-	virtual bool GenerateVoxel(const FVoxelHitResult& InVoxelHitResult, FItem& InItem);
+	virtual void PickUp(APickUp* InPickUp) override;
 
 	UFUNCTION(BlueprintCallable)
-	virtual bool DestroyVoxel(const FVoxelHitResult& InVoxelHitResult);
+	virtual bool GenerateVoxel(const FVoxelHitResult& InVoxelHitResult, FItem& InItem) override;
+
+	UFUNCTION(BlueprintCallable)
+	virtual bool DestroyVoxel(const FVoxelHitResult& InVoxelHitResult) override;
 
 	UFUNCTION(BlueprintCallable)
 	virtual void RefreshEquip(EEquipPartType InPartType, UInventoryEquipSlot* EquipSlot);
@@ -400,7 +403,7 @@ public:
 	bool HasAttackAbility(int32 InAbilityIndex = -1) const;
 
 	UFUNCTION(BlueprintCallable)
-	bool HasSkillAbility(const FName& InSkillID);
+	bool HasSkillAbility(const FPrimaryAssetId& InSkillID);
 
 	bool HasSkillAbility(ESkillType InSkillType, int32 InAbilityIndex = -1);
 	
@@ -528,9 +531,6 @@ public:
 public:
 	UFUNCTION(BlueprintPure)
 	ECharacterNature GetNature() const { return Nature; }
-						
-	UFUNCTION(BlueprintPure)
-	UDWCharacterAsset& GetCharacterData() const;
 
 	//UFUNCTION(BlueprintPure)
 	FTeamData* GetTeamData() const;
@@ -707,16 +707,16 @@ public:
 	bool HasShield(EShieldType InShieldType);
 		
 	UFUNCTION(BlueprintPure)
-	AAbilityEquipWeapon* GetWeapon();
+	ADWEquipWeapon* GetWeapon();
 	
 	UFUNCTION(BlueprintPure)
-	AAbilityEquipShield* GetShield();
+	ADWEquipShield* GetShield();
 		
 	UFUNCTION(BlueprintPure)
 	bool HasArmor(EEquipPartType InPartType);
 	
 	UFUNCTION(BlueprintPure)
-	AAbilityEquipArmor* GetArmor(EEquipPartType InPartType);
+	ADWEquipArmor* GetArmor(EEquipPartType InPartType);
 
 	UFUNCTION(BlueprintPure)
 	bool HasEquip(EEquipPartType InPartType);
@@ -731,7 +731,7 @@ public:
 	FDWCharacterAttackAbilityData GetAttackAbility(int32 InAbilityIndex = -1);
 		
 	UFUNCTION(BlueprintPure)
-	FDWCharacterSkillAbilityData GetSkillAbility(const FName& InSkillID);
+	FDWCharacterSkillAbilityData GetSkillAbility(const FPrimaryAssetId& InSkillID);
 		
 	FDWCharacterSkillAbilityData GetSkillAbility(ESkillType InSkillType, int32 InAbilityIndex = -1);
 			
@@ -742,7 +742,7 @@ public:
 	TArray<FDWCharacterAttackAbilityData> GetAttackAbilities() const { return AttackAbilities; }
 
 	UFUNCTION(BlueprintPure)
-	TMap<FName, FDWCharacterSkillAbilityData> GetSkillAbilities() const { return SkillAbilities; }
+	TMap<FPrimaryAssetId, FDWCharacterSkillAbilityData> GetSkillAbilities() const { return SkillAbilities; }
 
 	UFUNCTION(BlueprintPure)
 	TMap<ECharacterActionType, FDWCharacterActionAbilityData> GetActionAbilities() const { return ActionAbilities; }

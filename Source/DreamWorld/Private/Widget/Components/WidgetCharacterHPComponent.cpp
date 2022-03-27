@@ -5,11 +5,11 @@
 #include "Character/Player/DWPlayerCharacter.h"
 #include "Character/DWCharacter.h"
 #include "UObject/ConstructorHelpers.h"
-#include "Widget/Other/WidgetCharacterHP.h"
+#include "Widget/World/WidgetCharacterHP.h"
 
 UWidgetCharacterHPComponent::UWidgetCharacterHPComponent()
 {
-	static ConstructorHelpers::FClassFinder<UWidgetCharacterHP> CharacterHPClassFinder(TEXT("WidgetBlueprint'/Game/Blueprints/Widget/Other/WB_CharacterHP.WB_CharacterHP_C'"));
+	static ConstructorHelpers::FClassFinder<UWidgetCharacterHP> CharacterHPClassFinder(TEXT("WidgetBlueprint'/Game/Blueprints/Widget/World/WB_CharacterHP.WB_CharacterHP_C'"));
 	if(CharacterHPClassFinder.Succeeded())
 	{
 		SetWidgetClass(CharacterHPClassFinder.Class);

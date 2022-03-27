@@ -16,8 +16,6 @@ ADWVoxelModule::ADWVoxelModule()
 	BoundsMesh->SetRelativeScale3D(FVector::ZeroVector);
 	BoundsMesh->SetRelativeRotation(FRotator(0, 0, 0));
 	BoundsMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-
-	TeamMap = TMap<FName, FTeamData>();
 }
 
 #if WITH_EDITOR
@@ -121,7 +119,7 @@ void ADWVoxelModule::UnloadData(bool bPreview)
 	
 	if(!bPreview)
 	{
-		TeamMap.Empty();
+		// TeamMap.Empty();
 	}
 }
 
@@ -230,50 +228,6 @@ bool ADWVoxelModule::ChunkTraceSingle(FVector RayStart, FVector RayEnd, float In
 
 bool ADWVoxelModule::VoxelTraceSingle(const FVoxelItem& InVoxelItem, FVector InPoint, FHitResult& OutHitResult)
 {
-	FVector size = InVoxelItem.GetVoxelData().GetCeilRange(InVoxelItem.Rotation, InVoxelItem.Scale) * GetWorldData().BlockSize * 0.5f;
+	FVector size = InVoxelItem.GetData<UVoxelAssetBase>().GetCeilRange(InVoxelItem.Rotation, InVoxelItem.Scale) * GetWorldData().BlockSize * 0.5f;
 	return UKismetSystemLibrary::BoxTraceSingle(this, InPoint + size, InPoint + size, size * 0.95f, FRotator::ZeroRotator, UDWHelper::GetGameTrace(EGameTraceType::Voxel), false, TArray<AActor*>(), EDrawDebugTrace::None, OutHitResult, true);
-}
-
-bool ADWVoxelModule::IsExistTeam(const FName& InTeamID) const
-{
-	return TeamMap.Contains(InTeamID);
-}
-
-bool ADWVoxelModule::CreateTeam(ADWCharacter* InCaptain, FName InTeamName /*= NAME_None*/, FString InTeamDetail /*= TEXT("")*/)
-{
-	if (InCaptain->GetTeamID().IsEmpty())
-	{
-		auto tmpData = FTeamData();
-		tmpData.ID = *FString::Printf(TEXT("Team_%d"), TeamMap.Num());
-		if (!IsExistTeam(tmpData.ID))
-		{
-			tmpData.Name = !InTeamName.IsNone() ? InTeamName : *FString::Printf(TEXT("%s �� Team"), *InCaptain->GetNameC());
-			tmpData.Detail = !InTeamDetail.IsEmpty() ? InTeamDetail : tmpData.Name.ToString();
-			tmpData.Captain = InCaptain;
-			tmpData.AddMember(InCaptain);
-			TeamMap.Add(tmpData.ID, tmpData);
-			return true;
-		}
-	}
-	return false;
-}
-
-bool ADWVoxelModule::DissolveTeam(const FName& InTeamID, ADWCharacter* InCaptain)
-{
-	if (IsExistTeam(InTeamID) && TeamMap[InTeamID].IsCaptain(InCaptain))
-	{
-		TeamMap[InTeamID].DissolveTeam();
-		TeamMap.Remove(InTeamID);
-		return true;
-	}
-	return false;
-}
-
-FTeamData* ADWVoxelModule::GetTeamData(const FName& InTeamID)
-{
-	if (TeamMap.Contains(InTeamID))
-	{
-		return &TeamMap[InTeamID];
-	}
-	return &FTeamData::Empty;
 }

@@ -2,7 +2,7 @@
 
 #include "Character/DWCharacter.h"
 
-#include "Ability/Character/DWCharacterAttributeSet.h"
+#include "TimerManager.h"
 #include "Ability/Components/DWAbilitySystemComponent.h"
 #include "Character/DWCharacterAnim.h"
 #include "Components/CapsuleComponent.h"
@@ -25,7 +25,34 @@
 #include "Voxel/VoxelModule.h"
 #include "Voxel/Chunks/VoxelChunk.h"
 #include "Widget/Components/WidgetCharacterHPComponent.h"
-#include "Widget/Other/WidgetCharacterHP.h"
+#include "Widget/World/WidgetCharacterHP.h"
+#include "Ability/Character/DWCharacterAbility.h"
+#include "Ability/Character/DWCharacterActionAbility.h"
+#include "Ability/Character/DWCharacterAttackAbility.h"
+#include "Ability/Character/DWCharacterAttributeSet.h"
+#include "Ability/Character/DWCharacterSkillAbility.h"
+#include "Ability/Item/ItemAbilityBase.h"
+#include "Ability/Item/Equip/Armor/DWEquipArmor.h"
+#include "Ability/Item/Equip/Shield/DWEquipShield.h"
+#include "Ability/Item/Equip/Shield/DWEquipShieldAsset.h"
+#include "Ability/Item/Equip/Weapon/DWEquipWeapon.h"
+#include "Ability/Item/Equip/Weapon/DWEquipWeaponAsset.h"
+#include "Ability/Item/Prop/DWPropAsset.h"
+#include "Ability/Item/Prop/PropAssetBase.h"
+#include "Ability/Item/Skill/AbilitySkillBase.h"
+#include "Ability/Item/Skill/DWSkillAsset.h"
+#include "Ability/Item/Skill/SkillAssetBase.h"
+#include "BehaviorTree/BehaviorTree.h"
+#include "Character/DWCharacterAsset.h"
+#include "Inventory/Slot/InventoryEquipSlot.h"
+#include "Inventory/Slot/InventorySkillSlot.h"
+#include "Main/MainModuleBPLibrary.h"
+#include "Scene/Object/PickUp/PickUp.h"
+#include "Team/DWTeamModule.h"
+#include "Voxel/Voxels/VoxelAssetBase.h"
+#include "Voxel/DWVoxelChunk.h"
+#include "Widget/WidgetModuleBPLibrary.h"
+#include "Widget/Inventory/WidgetInventoryBar.h"
 
 //////////////////////////////////////////////////////////////////////////
 // ADWCharacter
@@ -110,7 +137,7 @@ ADWCharacter::ADWCharacter()
 
 	// local
 	AttackAbilityIndex = 0;
-	SkillAbilityIndex = NAME_None;
+	SkillAbilityID = FPrimaryAssetId();
 	AttackType = EAttackType::None;
 	ActionType = ECharacterActionType::None;
 	BirthLocation = FVector(0, 0, 0);
@@ -121,7 +148,7 @@ ADWCharacter::ADWCharacter()
 
 	DefaultAbility = FAbilityData();
 	AttackAbilities = TArray<FDWCharacterAttackAbilityData>();
-	SkillAbilities = TMap<FName, FDWCharacterSkillAbilityData>();
+	SkillAbilities = TMap<FPrimaryAssetId, FDWCharacterSkillAbilityData>();
 	ActionAbilities = TMap<ECharacterActionType, FDWCharacterActionAbilityData>();
 
 	AIControllerClass = ADWAIController::StaticClass();
@@ -196,20 +223,20 @@ void ADWCharacter::Tick(float DeltaTime)
 
 		if(AVoxelModule* VoxelModule = AVoxelModule::Get())
 		{
-			if(ADWVoxelChunk* Chunk = Cast<ADWVoxelChunk>(VoxelModule->FindChunk(Location)))
+			if(AVoxelChunk* Chunk = VoxelModule->FindChunk(Location))
 			{
 				if(Chunk != OwnerChunk)
 				{
 					if(OwnerChunk)
 					{
-						OwnerChunk->DetachCharacter(this);
+						OwnerChunk->RemoveSceneObject(this);
 					}
-					Chunk->AttachCharacter(this);
+					Chunk->AddSceneObject(this);
 				}
 			}
 			else if(OwnerChunk)
 			{
-				OwnerChunk->DetachCharacter(this);
+				OwnerChunk->RemoveSceneObject(this);
 			}
 		}
 
@@ -315,7 +342,7 @@ void ADWCharacter::LoadData(FSaveData* InSaveData)
 	
 	if (SaveData.bSaved)
 	{
-		ID = SaveData.ID;
+		AssetID = SaveData.ID;
 		Nature = SaveData.Nature;
 		SetNameV(SaveData.Name);
 		SetRaceID(SaveData.RaceID);
@@ -363,7 +390,7 @@ void ADWCharacter::LoadData(FSaveData* InSaveData)
 	}
 	else
 	{
-		ID = SaveData.ID;
+		AssetID = SaveData.ID;
 		SetNameV(SaveData.Name);
 		SetRaceID(SaveData.RaceID);
 		SetLevelV(SaveData.Level);
@@ -371,15 +398,15 @@ void ADWCharacter::LoadData(FSaveData* InSaveData)
 		SetActorLocation(SaveData.SpawnLocation);
 		SetActorRotation(SaveData.SpawnRotation);
 
-		const FCharacterData characterData = GetCharacterData();
-		if(characterData.IsValid())
+		const UDWCharacterAsset& CharacterData = GetCharacterData<UDWCharacterAsset>();
+		if(CharacterData.IsValid())
 		{
 			FString contextString;
 			
-			if (characterData.AttackAbilityTable != nullptr)
+			if (CharacterData.AttackAbilityTable != nullptr)
 			{
 				TArray<FDWCharacterAttackAbilityData*> attackAbilities;
-				characterData.AttackAbilityTable->GetAllRows(contextString, attackAbilities);
+				CharacterData.AttackAbilityTable->GetAllRows(contextString, attackAbilities);
 				for (int i = 0; i < attackAbilities.Num(); i++)
 				{
 					auto abilityData = *attackAbilities[i];
@@ -388,22 +415,22 @@ void ADWCharacter::LoadData(FSaveData* InSaveData)
 				}
 			}
 
-			if (characterData.SkillAbilityTable != nullptr)
+			if (CharacterData.SkillAbilityTable != nullptr)
 			{
 				TArray<FDWCharacterSkillAbilityData*> skillAbilities;
-				characterData.SkillAbilityTable->GetAllRows(contextString, skillAbilities);
+				CharacterData.SkillAbilityTable->GetAllRows(contextString, skillAbilities);
 				for (int i = 0; i < skillAbilities.Num(); i++)
 				{
 					auto abilityData = *skillAbilities[i];
 					abilityData.AbilityHandle = AcquireAbility(abilityData.AbilityClass, abilityData.AbilityLevel);
-					SkillAbilities.Add(abilityData.AbilityName, abilityData);
+					SkillAbilities.Add(abilityData.AbilityID, abilityData);
 				}
 			}
 
-			if (characterData.ActionAbilityTable != nullptr)
+			if (CharacterData.ActionAbilityTable != nullptr)
 			{
 				TArray<FDWCharacterActionAbilityData*> actionAbilities;
-				characterData.ActionAbilityTable->GetAllRows(contextString, actionAbilities);
+				CharacterData.ActionAbilityTable->GetAllRows(contextString, actionAbilities);
 				for (int i = 0; i < actionAbilities.Num(); i++)
 				{
 					auto abilityData = *actionAbilities[i];
@@ -412,29 +439,28 @@ void ADWCharacter::LoadData(FSaveData* InSaveData)
 				}
 			}
 
-			if (characterData.FallingAttackAbility.AbilityClass != nullptr)
+			if (CharacterData.FallingAttackAbility.AbilityClass != nullptr)
 			{
-				FallingAttackAbility = characterData.FallingAttackAbility;
+				FallingAttackAbility = CharacterData.FallingAttackAbility;
 				FallingAttackAbility.AbilityHandle = AcquireAbility(FallingAttackAbility.AbilityClass, FallingAttackAbility.AbilityLevel);
 			}
 
-			if(characterData.AbilityClass != nullptr)
+			if(CharacterData.AbilityClass != nullptr)
 			{
 				DefaultAbility = FAbilityData();
-				DefaultAbility.AbilityName = FName("Default");
 				DefaultAbility.AbilityLevel = SaveData.Level;
-				DefaultAbility.AbilityHandle = AcquireAbility(characterData.AbilityClass, DefaultAbility.AbilityLevel);
+				DefaultAbility.AbilityHandle = AcquireAbility(CharacterData.AbilityClass, DefaultAbility.AbilityLevel);
 				ActiveAbility(DefaultAbility.AbilityHandle);
 			}
 
-			Nature = characterData.Nature;
-			AttackDistance = characterData.AttackDistance;
-			InteractDistance = characterData.InteractDistance;
-			FollowDistance = characterData.FollowDistance;
-			PatrolDistance = characterData.PatrolDistance;
-			PatrolDuration = characterData.PatrolDuration;
+			Nature = CharacterData.Nature;
+			AttackDistance = CharacterData.AttackDistance;
+			InteractDistance = CharacterData.InteractDistance;
+			FollowDistance = CharacterData.FollowDistance;
+			PatrolDistance = CharacterData.PatrolDistance;
+			PatrolDuration = CharacterData.PatrolDuration;
 			
-			SaveData.InventoryData = characterData.InventoryData;
+			SaveData.InventoryData = CharacterData.InventoryData;
 		}
 
 		// if(!IsPlayer())
@@ -456,7 +482,7 @@ FSaveData* ADWCharacter::ToData(bool bSaved)
 
 	SaveData.bSaved = bSaved;
 
-	SaveData.ID = ID;
+	SaveData.ID = AssetID;
 	SaveData.Nature = Nature;
 	SaveData.Name = Name;
 	SaveData.TeamID = TeamID;
@@ -519,7 +545,7 @@ void ADWCharacter::ResetData(bool bRefresh)
 void ADWCharacter::RefreshData()
 {
 	HandleEXPChanged(GetEXP());
-	HandleLevelChanged(GetLevelC());
+	HandleLevelChanged(GetLevelV());
 	HandleHealthChanged(GetHealth());
 	HandleManaChanged(GetMana());
 	HandleStaminaChanged(GetStamina());
@@ -637,7 +663,7 @@ void ADWCharacter::DeathEnd()
 		}
 		if (OwnerChunk && OwnerChunk->IsValidLowLevel())
 		{
-			OwnerChunk->DestroyCharacter(this);
+			OwnerChunk->DestroySceneObject(this);
 		}
 		else
 		{
@@ -1009,25 +1035,25 @@ bool ADWCharacter::Attack(int32 InAbilityIndex /*= -1*/)
 	return false;
 }
 
-bool ADWCharacter::SkillAttack(const FName& InSkillID)
+bool ADWCharacter::SkillAttack(const FPrimaryAssetId& InSkillID)
 {
 	if (IsFreeToAnim())
 	{
 		if (HasSkillAbility(InSkillID))
 		{
 			const auto AbilityData = GetSkillAbility(InSkillID);
-			switch(AbilityData.GetItemData().SkillMode)
+			switch(AbilityData.GetItemData<USkillAssetBase>().SkillMode)
 			{
 				case ESkillMode::Initiative:
 				{
-					if(AbilityData.WeaponType == EWeaponType::None || AbilityData.WeaponType == GetWeapon()->GetWeaponData().WeaponType)
+					if(AbilityData.WeaponType == EWeaponType::None || AbilityData.WeaponType == GetWeapon()->GetItemData<UDWEquipWeaponAsset>().WeaponType)
 					{
 						if(ActiveAbility(AbilityData.AbilityHandle))
 						{
 							bAttacking = true;
 							LimitToAnim(true, true);
 							SetMotionRate(0, 0);
-							SkillAbilityIndex = InSkillID;
+							SkillAbilityID = InSkillID;
 							AttackType = EAttackType::SkillAttack;
 							return true;
 						}
@@ -1052,7 +1078,7 @@ bool ADWCharacter::SkillAttack(ESkillType InSkillType, int32 InAbilityIndex)
 		if (HasSkillAbility(InSkillType, InAbilityIndex))
 		{
 			const auto AbilityData = GetSkillAbility(InSkillType, InAbilityIndex);
-			SkillAttack(AbilityData.AbilityName);
+			SkillAttack(AbilityData.AbilityID);
 		}
 	}
 	return false;
@@ -1088,12 +1114,12 @@ void ADWCharacter::AttackStart()
 			}
 			case EAttackType::SkillAttack:
 			{
-				if (GetSkillAbility(SkillAbilityIndex).GetItemData().SkillClass != nullptr)
+				if (GetSkillAbility(SkillAbilityID).GetItemData<USkillAssetBase>().SkillClass != nullptr)
 				{
 					FActorSpawnParameters spawnParams = FActorSpawnParameters();
 					spawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-					AAbilitySkillBase* tmpSkill = GetWorld()->SpawnActor<AAbilitySkillBase>(GetSkillAbility(SkillAbilityIndex).GetItemData().SkillClass, spawnParams);
-					if(tmpSkill) tmpSkill->Initialize(this, SkillAbilityIndex);
+					AAbilitySkillBase* tmpSkill = GetWorld()->SpawnActor<AAbilitySkillBase>(GetSkillAbility(SkillAbilityID).GetItemData<USkillAssetBase>().SkillClass, spawnParams);
+					if(tmpSkill) tmpSkill->Initialize(this, SkillAbilityID);
 				}
 				break;
 			}
@@ -1153,7 +1179,7 @@ void ADWCharacter::UnAttack()
 		SetMotionRate(1, 1);
 		SetDamaging(false);
 		AttackAbilityIndex = 0;
-		SkillAbilityIndex = NAME_None;
+		SkillAbilityID = FPrimaryAssetId();
 		AttackType = EAttackType::None;
 	}
 }
@@ -1213,7 +1239,7 @@ bool ADWCharacter::UseItem(FItem& InItem)
 		}
 		case EItemType::Prop:
 		{
-			const FPropData PropData = UDWHelper::LoadPropData(InItem.ID);
+			const UDWPropAsset& PropData = InItem.GetData<UDWPropAsset>();
 			switch (PropData.PropType)
 			{
 				case EPropType::Potion:
@@ -1245,19 +1271,37 @@ bool ADWCharacter::UseItem(FItem& InItem)
 	return false;
 }
 
+void ADWCharacter::PickUp(APickUp* InPickUp)
+{
+	if(InPickUp)
+	{
+		Inventory->AdditionItemByRange(InPickUp->GetItem(), -1);
+	}
+}
+
 bool ADWCharacter::GenerateVoxel(const FVoxelHitResult& InVoxelHitResult, FItem& InItem)
 {
-	if(DoAction(ECharacterActionType::Generate))
+	bool bSuccess = false;
+	FQueryItemInfo QueryItemInfo;
+	if(!IsPlayer())
+	{
+		QueryItemInfo = Inventory->GetItemInfoByRange(EQueryItemType::Remove, InItem);
+	}
+	else if(Inventory->GetSelectedItem().EqualType(InItem))
+	{
+		QueryItemInfo = FQueryItemInfo(Inventory->GetSelectedItem(), TArray<UInventorySlot*>{ Inventory->GetSelectedSlot() });
+	}
+	if(QueryItemInfo.Item.IsValid() && DoAction(ECharacterActionType::Generate))
 	{
 		AVoxelChunk* chunk = InVoxelHitResult.GetOwner();
 		const FIndex index = chunk->LocationToIndex(InVoxelHitResult.Point - AVoxelModule::GetWorldData().GetBlockSizedNormal(InVoxelHitResult.Normal)) + FIndex(InVoxelHitResult.Normal);
 		const FVoxelItem& voxelItem = chunk->GetVoxelItem(index);
 
-		if(!voxelItem.IsValid() || voxelItem.GetVoxelData().Transparency == ETransparency::Transparent && voxelItem != InVoxelHitResult.VoxelItem)
+		if(!voxelItem.IsValid() || voxelItem.GetData<UVoxelAssetBase>().Transparency == ETransparency::Transparent && voxelItem != InVoxelHitResult.VoxelItem)
 		{
 			const FVoxelItem _voxelItem = FVoxelItem(InItem.ID);
 
-			//FRotator rotation = (Owner->VoxelIndexToLocation(index) + tmpVoxel->GetVoxelData().GetCeilRange() * 0.5f * AVoxelModule::GetWorldInfo().BlockSize - UDWHelper::GetPlayerCharacter(this)->GetActorLocation()).ToOrientationRotator();
+			//FRotator rotation = (Owner->VoxelIndexToLocation(index) + tmpVoxel->GetData<UVoxelAssetBase>().GetCeilRange() * 0.5f * AVoxelModule::GetWorldInfo().BlockSize - UDWHelper::GetPlayerCharacter(this)->GetActorLocation()).ToOrientationRotator();
 			//rotation = FRotator(FRotator::ClampAxis(FMath::RoundToInt(rotation.Pitch / 90) * 90.f), FRotator::ClampAxis(FMath::RoundToInt(rotation.Yaw / 90) * 90.f), FRotator::ClampAxis(FMath::RoundToInt(rotation.Roll / 90) * 90.f));
 			//tmpVoxel->Rotation = rotation;
 
@@ -1266,16 +1310,17 @@ bool ADWCharacter::GenerateVoxel(const FVoxelHitResult& InVoxelHitResult, FItem&
 			{
 				if(voxelItem.IsValid())
 				{
-					return chunk->ReplaceVoxel(voxelItem, _voxelItem);
+					bSuccess = chunk->ReplaceVoxel(voxelItem, _voxelItem);
 				}
 				else
 				{
-					return chunk->GenerateVoxel(index, _voxelItem);
+					bSuccess = chunk->GenerateVoxel(index, _voxelItem);
 				}
 			}
 		}
 	}
-	return false;
+	if(bSuccess) Inventory->RemoveItemBySlots(QueryItemInfo.Item, QueryItemInfo.Slots);
+	return bSuccess;
 }
 
 bool ADWCharacter::DestroyVoxel(const FVoxelHitResult& InVoxelHitResult)
@@ -1285,7 +1330,7 @@ bool ADWCharacter::DestroyVoxel(const FVoxelHitResult& InVoxelHitResult)
 		AVoxelChunk* chunk = InVoxelHitResult.GetOwner();
 		const FVoxelItem& voxelItem = InVoxelHitResult.VoxelItem;
 
-		if (voxelItem.GetVoxelData().VoxelType != EVoxelType::Bedrock)
+		if (voxelItem.GetData<UVoxelAssetBase>().VoxelType != EVoxelType::Bedrock)
 		{
 			return chunk->DestroyVoxel(voxelItem);
 		}
@@ -1295,12 +1340,11 @@ bool ADWCharacter::DestroyVoxel(const FVoxelHitResult& InVoxelHitResult)
 
 void ADWCharacter::RefreshEquip(EEquipPartType InPartType, UInventoryEquipSlot* EquipSlot)
 {
-	Super::RefreshEquip(InPartType, EquipSlot);
 	if (!EquipSlot->IsEmpty())
 	{
 		FActorSpawnParameters spawnParams = FActorSpawnParameters();
 		spawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-		Equips[InPartType] = GetWorld()->SpawnActor<AAbilityEquipBase>(UDWHelper::LoadEquipData(EquipSlot->GetItem().ID).EquipClass, spawnParams);
+		Equips[InPartType] = GetWorld()->SpawnActor<AAbilityEquipBase>(EquipSlot->GetItem().GetData<UEquipAssetBase>().EquipClass, spawnParams);
 		if (Equips[InPartType])
 		{
 			Equips[InPartType]->Initialize(this);
@@ -1327,15 +1371,15 @@ bool ADWCharacter::GetAbilityInfo(TSubclassOf<UAbilityBase> AbilityClass, FAbili
 		{
 			const FGameplayModifierInfo ModifierInfo = Ability->GetCostGameplayEffect()->Modifiers[0];
 			ModifierInfo.ModifierMagnitude.GetStaticMagnitudeIfPossible(1, Cost);
-			if (ModifierInfo.Attribute == AttributeSet->GetHealthAttribute())
+			if (ModifierInfo.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetHealthAttribute())
 			{
 				CostType = EAbilityCostType::Health;
 			}
-			else if (ModifierInfo.Attribute == AttributeSet->GetManaAttribute())
+			else if (ModifierInfo.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetManaAttribute())
 			{
 				CostType = EAbilityCostType::Mana;
 			}
-			else if (ModifierInfo.Attribute == AttributeSet->GetStaminaAttribute())
+			else if (ModifierInfo.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetStaminaAttribute())
 			{
 				CostType = EAbilityCostType::Stamina;
 			}
@@ -1465,7 +1509,7 @@ void ADWCharacter::ModifyHealth(float InDeltaValue)
 {
 	if(InDeltaValue < 0.f && GetHealth() > 0.f || InDeltaValue > 0.f && GetHealth() < GetMaxHealth())
 	{
-		AbilitySystem->ApplyModToAttributeUnsafe(AttributeSet->GetHealthAttribute(), EGameplayModOp::Additive, InDeltaValue);
+		AbilitySystem->ApplyModToAttributeUnsafe(GetAttributeSet<UDWCharacterAttributeSet>()->GetHealthAttribute(), EGameplayModOp::Additive, InDeltaValue);
 	}
 }
 
@@ -1473,7 +1517,7 @@ void ADWCharacter::ModifyMana(float InDeltaValue)
 {
 	if(InDeltaValue < 0.f && GetMana() > 0.f || InDeltaValue > 0.f && GetMana() < GetMaxMana())
 	{
-		AbilitySystem->ApplyModToAttributeUnsafe(AttributeSet->GetManaAttribute(), EGameplayModOp::Additive, InDeltaValue);
+		AbilitySystem->ApplyModToAttributeUnsafe(GetAttributeSet<UDWCharacterAttributeSet>()->GetManaAttribute(), EGameplayModOp::Additive, InDeltaValue);
 	}
 }
 
@@ -1481,7 +1525,7 @@ void ADWCharacter::ModifyStamina(float InDeltaValue)
 {
 	if(InDeltaValue < 0.f && GetStamina() > 0.f || InDeltaValue > 0.f && GetStamina() < GetMaxStamina())
 	{
-		AbilitySystem->ApplyModToAttributeUnsafe(AttributeSet->GetStaminaAttribute(), EGameplayModOp::Additive, InDeltaValue);
+		AbilitySystem->ApplyModToAttributeUnsafe(GetAttributeSet<UDWCharacterAttributeSet>()->GetStaminaAttribute(), EGameplayModOp::Additive, InDeltaValue);
 	}
 }
 
@@ -1594,12 +1638,12 @@ UInventory* ADWCharacter::GetInventory() const
 
 bool ADWCharacter::HasBehaviorTree() const
 {
-	return GetCharacterData().BehaviorTreeAsset != nullptr;
+	return GetCharacterData<UDWCharacterAsset>().BehaviorTreeAsset != nullptr;
 }
 
 UBehaviorTree* ADWCharacter::GetBehaviorTree()
 {
-	const FCharacterData CharacterData = GetCharacterData();
+	const UDWCharacterAsset& CharacterData = GetCharacterData<UDWCharacterAsset>();
 	if (!BehaviorTree)
 	{
 		BehaviorTree = DuplicateObject<UBehaviorTree>(CharacterData.BehaviorTreeAsset, this);
@@ -1636,25 +1680,18 @@ bool ADWCharacter::IsDead() const
 	return bDead || bDying;
 }
 
-UDWCharacterAsset& ADWCharacter::GetCharacterData() const
-{
-	return UPrimaryAssetManager::LoadItemAsset<UDWCharacterAsset>(ID);
-}
-
 FTeamData* ADWCharacter::GetTeamData() const
 {
-	return AVoxelModule::Get()->GetTeamData(*TeamID);
+	if(ADWTeamModule* TeamModule = AMainModule::GetModuleByClass<ADWTeamModule>())
+	{
+		return TeamModule->GetTeamData(*TeamID);
+	}
+	return nullptr;
 }
 
 bool ADWCharacter::IsTargetable_Implementation() const
 {
 	return !IsDead();
-}
-
-void ADWCharacter::SetNameC(const FString& InName)
-{
-	Name = InName;
-	HandleNameChanged(InName);
 }
 
 void ADWCharacter::SetTeamID(const FString& InTeamID)
@@ -1663,333 +1700,214 @@ void ADWCharacter::SetTeamID(const FString& InTeamID)
 	HandleTeamIDChanged(InTeamID);
 }
 
-void ADWCharacter::SetRaceID(const FString& InRaceID)
-{
-	RaceID = InRaceID;
-	HandleRaceIDChanged(InRaceID);
-}
-
-void ADWCharacter::SetLevelC(int32 InLevel)
-{
-	Level = InLevel;
-	HandleLevelChanged(InLevel);
-}
-
-void ADWCharacter::SetEXP(int32 InEXP)
-{
-	EXP = InEXP;
-	HandleEXPChanged(InEXP);
-}
-
-int32 ADWCharacter::GetMaxEXP() const
-{
-	int32 MaxEXP = BaseEXP;
-	for (int i = 0; i < Level - 1; i++)
-	{
-		MaxEXP *= EXPFactor;
-	}
-	return MaxEXP;
-}
-
-int32 ADWCharacter::GetTotalEXP() const
-{
-	int32 TotalEXP = BaseEXP;
-	for (int i = 0; i < Level - 1; i++)
-	{
-		TotalEXP += TotalEXP * EXPFactor;
-	}
-	return EXP + TotalEXP - GetMaxEXP();
-}
-
-FString ADWCharacter::GetHeadInfo() const
-{
-	return FString::Printf(TEXT("Lv.%d \"%s\" "), Level, *Name);
-}
-
-float ADWCharacter::GetHealth() const
-{
-	return AttributeSet->GetHealth();
-}
-
-void ADWCharacter::SetHealth(float InValue)
-{
-	AbilitySystem->ApplyModToAttributeUnsafe(AttributeSet->GetHealthAttribute(), EGameplayModOp::Override, InValue);
-}
-
-float ADWCharacter::GetMaxHealth() const
-{
-	return AttributeSet->GetMaxHealth();
-}
-
-void ADWCharacter::SetMaxHealth(float InValue)
-{
-	AbilitySystem->ApplyModToAttributeUnsafe(AttributeSet->GetMaxHealthAttribute(), EGameplayModOp::Override, InValue);
-}
-
 float ADWCharacter::GetMana() const
 {
-	return AttributeSet->GetMana();
+	return GetAttributeSet<UDWCharacterAttributeSet>()->GetMana();
 }
 
 void ADWCharacter::SetMana(float InValue)
 {
-	AbilitySystem->ApplyModToAttributeUnsafe(AttributeSet->GetManaAttribute(), EGameplayModOp::Override, InValue);
+	AbilitySystem->ApplyModToAttributeUnsafe(GetAttributeSet<UDWCharacterAttributeSet>()->GetManaAttribute(), EGameplayModOp::Override, InValue);
 }
 
 float ADWCharacter::GetMaxMana() const
 {
-	return AttributeSet->GetMaxMana();
+	return GetAttributeSet<UDWCharacterAttributeSet>()->GetMaxMana();
 }
 
 void ADWCharacter::SetMaxMana(float InValue)
 {
-	AbilitySystem->ApplyModToAttributeUnsafe(AttributeSet->GetMaxManaAttribute(), EGameplayModOp::Override, InValue);
+	AbilitySystem->ApplyModToAttributeUnsafe(GetAttributeSet<UDWCharacterAttributeSet>()->GetMaxManaAttribute(), EGameplayModOp::Override, InValue);
 }
 
 float ADWCharacter::GetStamina() const
 {
-	return AttributeSet->GetStamina();
+	return GetAttributeSet<UDWCharacterAttributeSet>()->GetStamina();
 }
 
 void ADWCharacter::SetStamina(float InValue)
 {
-	AbilitySystem->ApplyModToAttributeUnsafe(AttributeSet->GetStaminaAttribute(), EGameplayModOp::Override, InValue);
+	AbilitySystem->ApplyModToAttributeUnsafe(GetAttributeSet<UDWCharacterAttributeSet>()->GetStaminaAttribute(), EGameplayModOp::Override, InValue);
 }
 
 float ADWCharacter::GetMaxStamina() const
 {
-	return AttributeSet->GetMaxStamina();
+	return GetAttributeSet<UDWCharacterAttributeSet>()->GetMaxStamina();
 }
 
 void ADWCharacter::SetMaxStamina(float InValue)
 {
-	AbilitySystem->ApplyModToAttributeUnsafe(AttributeSet->GetMaxStaminaAttribute(), EGameplayModOp::Override, InValue);
-}
-
-float ADWCharacter::GetMoveSpeed() const
-{
-	return AttributeSet->GetMoveSpeed();
-}
-
-void ADWCharacter::SetMoveSpeed(float InValue)
-{
-	AbilitySystem->ApplyModToAttributeUnsafe(AttributeSet->GetMoveSpeedAttribute(), EGameplayModOp::Override, InValue);
+	AbilitySystem->ApplyModToAttributeUnsafe(GetAttributeSet<UDWCharacterAttributeSet>()->GetMaxStaminaAttribute(), EGameplayModOp::Override, InValue);
 }
 
 float ADWCharacter::GetSwimSpeed() const
 {
-	return AttributeSet->GetSwimSpeed();
+	return GetAttributeSet<UDWCharacterAttributeSet>()->GetSwimSpeed();
 }
 
 void ADWCharacter::SetSwimSpeed(float InValue)
 {
-	AbilitySystem->ApplyModToAttributeUnsafe(AttributeSet->GetSwimSpeedAttribute(), EGameplayModOp::Override, InValue);
+	AbilitySystem->ApplyModToAttributeUnsafe(GetAttributeSet<UDWCharacterAttributeSet>()->GetSwimSpeedAttribute(), EGameplayModOp::Override, InValue);
 }
 
 float ADWCharacter::GetRideSpeed() const
 {
-	return AttributeSet->GetRideSpeed();
+	return GetAttributeSet<UDWCharacterAttributeSet>()->GetRideSpeed();
 }
 
 void ADWCharacter::SetRideSpeed(float InValue)
 {
-	AbilitySystem->ApplyModToAttributeUnsafe(AttributeSet->GetRideSpeedAttribute(), EGameplayModOp::Override, InValue);
+	AbilitySystem->ApplyModToAttributeUnsafe(GetAttributeSet<UDWCharacterAttributeSet>()->GetRideSpeedAttribute(), EGameplayModOp::Override, InValue);
 }
 
 float ADWCharacter::GetFlySpeed() const
 {
-	return AttributeSet->GetFlySpeed();
+	return GetAttributeSet<UDWCharacterAttributeSet>()->GetFlySpeed();
 }
 
 void ADWCharacter::SetFlySpeed(float InValue)
 {
-	AbilitySystem->ApplyModToAttributeUnsafe(AttributeSet->GetFlySpeedAttribute(), EGameplayModOp::Override, InValue);
-}
-
-float ADWCharacter::GetRotationSpeed() const
-{
-	return AttributeSet->GetRotationSpeed();
-}
-
-void ADWCharacter::SetRotationSpeed(float InValue)
-{
-	AbilitySystem->ApplyModToAttributeUnsafe(AttributeSet->GetRotationSpeedAttribute(), EGameplayModOp::Override, InValue);
-}
-
-float ADWCharacter::GetJumpForce() const
-{
-	return AttributeSet->GetJumpForce();
-}
-
-void ADWCharacter::SetJumpForce(float InValue)
-{
-	AbilitySystem->ApplyModToAttributeUnsafe(AttributeSet->GetJumpForceAttribute(), EGameplayModOp::Override, InValue);
+	AbilitySystem->ApplyModToAttributeUnsafe(GetAttributeSet<UDWCharacterAttributeSet>()->GetFlySpeedAttribute(), EGameplayModOp::Override, InValue);
 }
 
 float ADWCharacter::GetDodgeForce() const
 {
-	return AttributeSet->GetDodgeForce();
+	return GetAttributeSet<UDWCharacterAttributeSet>()->GetDodgeForce();
 }
 
 void ADWCharacter::SetDodgeForce(float InValue)
 {
-	AbilitySystem->ApplyModToAttributeUnsafe(AttributeSet->GetDodgeForceAttribute(), EGameplayModOp::Override, InValue);
+	AbilitySystem->ApplyModToAttributeUnsafe(GetAttributeSet<UDWCharacterAttributeSet>()->GetDodgeForceAttribute(), EGameplayModOp::Override, InValue);
 }
 
 float ADWCharacter::GetAttackForce() const
 {
-	return AttributeSet->GetAttackForce();
+	return GetAttributeSet<UDWCharacterAttributeSet>()->GetAttackForce();
 }
 
 void ADWCharacter::SetAttackForce(float InValue)
 {
-	AbilitySystem->ApplyModToAttributeUnsafe(AttributeSet->GetAttackForceAttribute(), EGameplayModOp::Override, InValue);
+	AbilitySystem->ApplyModToAttributeUnsafe(GetAttributeSet<UDWCharacterAttributeSet>()->GetAttackForceAttribute(), EGameplayModOp::Override, InValue);
 }
 
 float ADWCharacter::GetRepulseForce() const
 {
-	return AttributeSet->GetRepulseForce();
+	return GetAttributeSet<UDWCharacterAttributeSet>()->GetRepulseForce();
 }
 
 void ADWCharacter::SetRepulseForce(float InValue)
 {
-	AbilitySystem->ApplyModToAttributeUnsafe(AttributeSet->GetRepulseForceAttribute(), EGameplayModOp::Override, InValue);
+	AbilitySystem->ApplyModToAttributeUnsafe(GetAttributeSet<UDWCharacterAttributeSet>()->GetRepulseForceAttribute(), EGameplayModOp::Override, InValue);
 }
 
 float ADWCharacter::GetAttackSpeed() const
 {
-	return AttributeSet->GetAttackSpeed();
+	return GetAttributeSet<UDWCharacterAttributeSet>()->GetAttackSpeed();
 }
 
 void ADWCharacter::SetAttackSpeed(float InValue)
 {
-	AbilitySystem->ApplyModToAttributeUnsafe(AttributeSet->GetAttackSpeedAttribute(), EGameplayModOp::Override, InValue);
+	AbilitySystem->ApplyModToAttributeUnsafe(GetAttributeSet<UDWCharacterAttributeSet>()->GetAttackSpeedAttribute(), EGameplayModOp::Override, InValue);
 }
 
 float ADWCharacter::GetAttackCritRate() const
 {
-	return AttributeSet->GetAttackCritRate();
+	return GetAttributeSet<UDWCharacterAttributeSet>()->GetAttackCritRate();
 }
 
 void ADWCharacter::SetAttackCritRate(float InValue)
 {
-	AbilitySystem->ApplyModToAttributeUnsafe(AttributeSet->GetAttackCritRateAttribute(), EGameplayModOp::Override, InValue);
+	AbilitySystem->ApplyModToAttributeUnsafe(GetAttributeSet<UDWCharacterAttributeSet>()->GetAttackCritRateAttribute(), EGameplayModOp::Override, InValue);
 }
 
 float ADWCharacter::GetAttackStealRate() const
 {
-	return AttributeSet->GetAttackStealRate();
+	return GetAttributeSet<UDWCharacterAttributeSet>()->GetAttackStealRate();
 }
 
 void ADWCharacter::SetAttackStealRate(float InValue)
 {
-	AbilitySystem->ApplyModToAttributeUnsafe(AttributeSet->GetAttackStealRateAttribute(), EGameplayModOp::Override, InValue);
+	AbilitySystem->ApplyModToAttributeUnsafe(GetAttributeSet<UDWCharacterAttributeSet>()->GetAttackStealRateAttribute(), EGameplayModOp::Override, InValue);
 }
 
 float ADWCharacter::GetDefendRate() const
 {
-	return AttributeSet->GetDefendRate();
+	return GetAttributeSet<UDWCharacterAttributeSet>()->GetDefendRate();
 }
 
 void ADWCharacter::SetDefendRate(float InValue)
 {
-	AbilitySystem->ApplyModToAttributeUnsafe(AttributeSet->GetDefendRateAttribute(), EGameplayModOp::Override, InValue);
+	AbilitySystem->ApplyModToAttributeUnsafe(GetAttributeSet<UDWCharacterAttributeSet>()->GetDefendRateAttribute(), EGameplayModOp::Override, InValue);
 }
 
 float ADWCharacter::GetDefendScope() const
 {
-	return AttributeSet->GetDefendScope();
+	return GetAttributeSet<UDWCharacterAttributeSet>()->GetDefendScope();
 }
 
 void ADWCharacter::SetDefendScope(float InValue)
 {
-	AbilitySystem->ApplyModToAttributeUnsafe(AttributeSet->GetDefendScopeAttribute(), EGameplayModOp::Override, InValue);
+	AbilitySystem->ApplyModToAttributeUnsafe(GetAttributeSet<UDWCharacterAttributeSet>()->GetDefendScopeAttribute(), EGameplayModOp::Override, InValue);
 }
 
 float ADWCharacter::GetPhysicsDefRate() const
 {
-	return AttributeSet->GetPhysicsDefRate();
+	return GetAttributeSet<UDWCharacterAttributeSet>()->GetPhysicsDefRate();
 }
 
 void ADWCharacter::SetPhysicsDefRate(float InValue)
 {
-	AbilitySystem->ApplyModToAttributeUnsafe(AttributeSet->GetPhysicsDefRateAttribute(), EGameplayModOp::Override, InValue);
+	AbilitySystem->ApplyModToAttributeUnsafe(GetAttributeSet<UDWCharacterAttributeSet>()->GetPhysicsDefRateAttribute(), EGameplayModOp::Override, InValue);
 }
 
 float ADWCharacter::GetMagicDefRate() const
 {
-	return AttributeSet->GetMagicDefRate();
+	return GetAttributeSet<UDWCharacterAttributeSet>()->GetMagicDefRate();
 }
 
 void ADWCharacter::SetMagicDefRate(float InValue)
 {
-	AbilitySystem->ApplyModToAttributeUnsafe(AttributeSet->GetMagicDefRateAttribute(), EGameplayModOp::Override, InValue);
+	AbilitySystem->ApplyModToAttributeUnsafe(GetAttributeSet<UDWCharacterAttributeSet>()->GetMagicDefRateAttribute(), EGameplayModOp::Override, InValue);
 }
 
 float ADWCharacter::GetToughnessRate() const
 {
-	return AttributeSet->GetToughnessRate();
+	return GetAttributeSet<UDWCharacterAttributeSet>()->GetToughnessRate();
 }
 
 void ADWCharacter::SetToughnessRate(float InValue)
 {
-	AbilitySystem->ApplyModToAttributeUnsafe(AttributeSet->GetToughnessRateAttribute(), EGameplayModOp::Override, InValue);
+	AbilitySystem->ApplyModToAttributeUnsafe(GetAttributeSet<UDWCharacterAttributeSet>()->GetToughnessRateAttribute(), EGameplayModOp::Override, InValue);
 }
 
 float ADWCharacter::GetStaminaRegenSpeed() const
 {
-	return AttributeSet->GetStaminaRegenSpeed();
+	return GetAttributeSet<UDWCharacterAttributeSet>()->GetStaminaRegenSpeed();
 }
 
 void ADWCharacter::SetStaminaRegenSpeed(float InValue)
 {
-	AbilitySystem->ApplyModToAttributeUnsafe(AttributeSet->GetStaminaRegenSpeedAttribute(), EGameplayModOp::Override, InValue);
+	AbilitySystem->ApplyModToAttributeUnsafe(GetAttributeSet<UDWCharacterAttributeSet>()->GetStaminaRegenSpeedAttribute(), EGameplayModOp::Override, InValue);
 }
 
 float ADWCharacter::GetStaminaExpendSpeed() const
 {
-	return AttributeSet->GetStaminaExpendSpeed();
+	return GetAttributeSet<UDWCharacterAttributeSet>()->GetStaminaExpendSpeed();
 }
 
 void ADWCharacter::SetStaminaExpendSpeed(float InValue)
 {
-	AbilitySystem->ApplyModToAttributeUnsafe(AttributeSet->GetStaminaExpendSpeedAttribute(), EGameplayModOp::Override, InValue);
+	AbilitySystem->ApplyModToAttributeUnsafe(GetAttributeSet<UDWCharacterAttributeSet>()->GetStaminaExpendSpeedAttribute(), EGameplayModOp::Override, InValue);
 }
 
 float ADWCharacter::GetPhysicsDamage() const
 {
-	return AttributeSet->GetPhysicsDamage();
+	return GetAttributeSet<UDWCharacterAttributeSet>()->GetPhysicsDamage();
 }
 
 float ADWCharacter::GetMagicDamage() const
 {
-	return AttributeSet->GetMagicDamage();
-}
-
-FVector ADWCharacter::GetMoveVelocity(bool bIgnoreZ) const
-{
-	FVector Velocity = GetMovementComponent()->Velocity;
-	if(bIgnoreZ) Velocity.Z = 0;
-	return Velocity;
-}
-
-FVector ADWCharacter::GetMoveDirection(bool bIgnoreZ) const
-{
-	return GetMoveVelocity(bIgnoreZ).GetSafeNormal();
-}
-
-float ADWCharacter::GetRadius() const
-{
-	if(!GetCapsuleComponent()) return 0.f;
-
-	return GetCapsuleComponent()->GetScaledCapsuleRadius();
-}
-
-float ADWCharacter::GetHalfHeight() const
-{
-	if(!GetCapsuleComponent()) return 0.f;
-
-	return GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
+	return GetAttributeSet<UDWCharacterAttributeSet>()->GetMagicDamage();
 }
 
 bool ADWCharacter::HasWeapon(EWeaponType InWeaponType)
@@ -1998,9 +1916,9 @@ bool ADWCharacter::HasWeapon(EWeaponType InWeaponType)
 	
 	if(HasEquip(EEquipPartType::RightHand))
 	{
-		if(AAbilityEquipWeapon* Weapon = Cast<AAbilityEquipWeapon>(GetEquip(EEquipPartType::RightHand)))
+		if(ADWEquipWeapon* Weapon = Cast<ADWEquipWeapon>(GetEquip(EEquipPartType::RightHand)))
 		{
-			return Weapon->GetWeaponData().WeaponType == InWeaponType;
+			return Weapon->GetItemData<UDWEquipWeaponAsset>().WeaponType == InWeaponType;
 		}
 	}
 	return false;
@@ -2012,34 +1930,34 @@ bool ADWCharacter::HasShield(EShieldType InShieldType)
 	
 	if(HasEquip(EEquipPartType::LeftHand))
 	{
-		if(AAbilityEquipShield* Weapon = Cast<AAbilityEquipShield>(GetEquip(EEquipPartType::LeftHand)))
+		if(ADWEquipShield* Weapon = Cast<ADWEquipShield>(GetEquip(EEquipPartType::LeftHand)))
 		{
-			return Weapon->GetShieldData().ShieldType == InShieldType;
+			return Weapon->GetItemData<UDWEquipShieldAsset>().ShieldType == InShieldType;
 		}
 	}
 	return false;
 }
 
-AAbilityEquipWeapon* ADWCharacter::GetWeapon()
+ADWEquipWeapon* ADWCharacter::GetWeapon()
 {
-	return Cast<AAbilityEquipWeapon>(GetEquip(EEquipPartType::RightHand));
+	return Cast<ADWEquipWeapon>(GetEquip(EEquipPartType::RightHand));
 }
 
-AAbilityEquipShield* ADWCharacter::GetShield()
+ADWEquipShield* ADWCharacter::GetShield()
 {
-	return Cast<AAbilityEquipShield>(GetEquip(EEquipPartType::LeftHand));
+	return Cast<ADWEquipShield>(GetEquip(EEquipPartType::LeftHand));
 }
 
 bool ADWCharacter::HasArmor(EEquipPartType InPartType)
 {
-	return HasEquip(InPartType) && GetEquip(InPartType)->IsA(AAbilityEquipArmor::StaticClass());
+	return HasEquip(InPartType) && GetEquip(InPartType)->IsA(ADWEquipArmor::StaticClass());
 }
 
-AAbilityEquipArmor* ADWCharacter::GetArmor(EEquipPartType InPartType)
+ADWEquipArmor* ADWCharacter::GetArmor(EEquipPartType InPartType)
 {
 	if (HasArmor(InPartType))
 	{
-		return Cast<AAbilityEquipArmor>(GetEquip(InPartType));
+		return Cast<ADWEquipArmor>(GetEquip(InPartType));
 	}
 	return nullptr;
 }
@@ -2067,7 +1985,7 @@ FDWCharacterAttackAbilityData ADWCharacter::GetAttackAbility(int32 InAbilityInde
 	return FDWCharacterAttackAbilityData();
 }
 
-FDWCharacterSkillAbilityData ADWCharacter::GetSkillAbility(const FName& InSkillID)
+FDWCharacterSkillAbilityData ADWCharacter::GetSkillAbility(const FPrimaryAssetId& InSkillID)
 {
 	if(HasSkillAbility(InSkillID))
 	{
@@ -2083,7 +2001,7 @@ FDWCharacterSkillAbilityData ADWCharacter::GetSkillAbility(ESkillType InSkillTyp
 		TArray<FDWCharacterSkillAbilityData> Abilities = TArray<FDWCharacterSkillAbilityData>();
 		for (auto Iter : SkillAbilities)
 		{
-			if(Iter.Value.GetItemData().SkillType == InSkillType)
+			if(Iter.Value.GetItemData<USkillAssetBase>().SkillType == InSkillType)
 			{
 				Abilities.Add(Iter.Value);
 			}
@@ -2156,7 +2074,7 @@ bool ADWCharacter::HasAttackAbility(int32 InAbilityIndex /*= -1*/) const
 	}
 }
 
-bool ADWCharacter::HasSkillAbility(const FName& InSkillID)
+bool ADWCharacter::HasSkillAbility(const FPrimaryAssetId& InSkillID)
 {
 	if(SkillAbilities.Contains(InSkillID))
 	{
@@ -2177,7 +2095,7 @@ bool ADWCharacter::HasSkillAbility(ESkillType InSkillType, int32 InAbilityIndex)
 	TArray<FDWCharacterSkillAbilityData> Abilities = TArray<FDWCharacterSkillAbilityData>();
 	for (auto Iter : SkillAbilities)
 	{
-		if(Iter.Value.GetItemData().SkillType == InSkillType)
+		if(Iter.Value.GetItemData<UDWSkillAsset>().SkillType == InSkillType)
 		{
 			Abilities.Add(Iter.Value);
 		}
@@ -2187,7 +2105,7 @@ bool ADWCharacter::HasSkillAbility(ESkillType InSkillType, int32 InAbilityIndex)
 		auto SkillSlots = Inventory->GetSplitSlots<UInventorySkillSlot>(ESplitSlotType::Skill);
 		for (int32 i = 0; i < SkillSlots.Num(); i++)
 		{
-			if(SkillSlots[i]->GetItem().ID == Abilities[InAbilityIndex != -1 ? InAbilityIndex : 0].AbilityName)
+			if(SkillSlots[i]->GetItem().ID == Abilities[InAbilityIndex != -1 ? InAbilityIndex : 0].AbilityID)
 			{
 				return true;
 			}
@@ -2207,20 +2125,31 @@ bool ADWCharacter::HasActionAbility(ECharacterActionType InActionType)
 
 bool ADWCharacter::CreateTeam(const FName& InTeamName /*= MANE_None*/, FString InTeamDetail /*= TEXT("")*/)
 {
-	return AVoxelModule::Get()->CreateTeam(this, InTeamName, InTeamDetail);
+	if(ADWTeamModule* TeamModule = AMainModule::GetModuleByClass<ADWTeamModule>())
+	{
+		return TeamModule->CreateTeam(this, InTeamName, InTeamDetail);
+	}
+	return false;
 }
 
 bool ADWCharacter::DissolveTeam()
 {
-	return AVoxelModule::Get()->DissolveTeam(*TeamID, this);
+	if(ADWTeamModule* TeamModule = AMainModule::GetModuleByClass<ADWTeamModule>())
+	{
+		return TeamModule->DissolveTeam(*TeamID, this);
+	}
+	return false;
 }
 
 bool ADWCharacter::JoinTeam(const FName& InTeamID)
 {
-	if (AVoxelModule::Get()->IsExistTeam(InTeamID))
+	if(ADWTeamModule* TeamModule = AMainModule::GetModuleByClass<ADWTeamModule>())
 	{
-		AVoxelModule::Get()->GetTeamData(InTeamID)->AddMember(this);
-		return true;
+		if(TeamModule->IsExistTeam(InTeamID))
+		{
+			TeamModule->GetTeamData(InTeamID)->AddMember(this);
+			return true;
+		}
 	}
 	return false;
 }
@@ -2328,10 +2257,8 @@ UDWCharacterPart* ADWCharacter::GetCharacterPart(ECharacterPartType InCharacterP
 
 void ADWCharacter::HandleDamage(EDamageType DamageType, const float LocalDamageDone, bool bHasCrited, FHitResult HitResult, const FGameplayTagContainer& SourceTags, AActor* SourceActor)
 {
-	if (GetHealth() <= 0.f)
-	{
-		Death(SourceActor);
-	}
+	Super::HandleDamage(DamageType, LocalDamageDone, bHasCrited, HitResult, SourceTags, SourceActor);
+	
 	if(SourceActor && SourceActor != this)
 	{
 		if(ADWCharacter* SourceCharacter = Cast<ADWCharacter>(SourceActor))
@@ -2361,6 +2288,8 @@ void ADWCharacter::HandleInterrupt(float InterruptDuration)
 
 void ADWCharacter::HandleNameChanged(const FString& NewValue)
 {
+	Super::HandleNameChanged(NewValue);
+	
 	if (GetWidgetCharacterHPWidget())
 	{
 		GetWidgetCharacterHPWidget()->SetHeadInfo(GetHeadInfo());
@@ -2377,6 +2306,8 @@ void ADWCharacter::HandleTeamIDChanged(const FString& NewValue)
 
 void ADWCharacter::HandleRaceIDChanged(const FString& NewValue)
 {
+	Super::HandleRaceIDChanged(NewValue);
+	
 	if (GetWidgetCharacterHPWidget())
 	{
 		GetWidgetCharacterHPWidget()->SetHeadInfo(GetHeadInfo());
@@ -2385,7 +2316,8 @@ void ADWCharacter::HandleRaceIDChanged(const FString& NewValue)
 
 void ADWCharacter::HandleLevelChanged(int32 NewValue, int32 DeltaValue /*= 0*/)
 {
-	DefaultAbility.AbilityLevel = NewValue;
+	Super::HandleLevelChanged(NewValue, DeltaValue);
+	
 	FallingAttackAbility.AbilityLevel = NewValue;
 	if (GetWidgetCharacterHPWidget())
 	{
@@ -2395,6 +2327,8 @@ void ADWCharacter::HandleLevelChanged(int32 NewValue, int32 DeltaValue /*= 0*/)
 
 void ADWCharacter::HandleEXPChanged(int32 NewValue, int32 DeltaValue /*= 0*/)
 {
+	Super::HandleEXPChanged(NewValue, DeltaValue);
+	
 	if (GetWidgetCharacterHPWidget())
 	{
 		GetWidgetCharacterHPWidget()->SetHeadInfo(GetHeadInfo());
@@ -2403,10 +2337,8 @@ void ADWCharacter::HandleEXPChanged(int32 NewValue, int32 DeltaValue /*= 0*/)
 
 void ADWCharacter::HandleHealthChanged(float NewValue, float DeltaValue /*= 0.f*/)
 {
-	if(DeltaValue > 0.f)
-	{
-		AddWorldText(FString::FromInt(FMath::Abs(DeltaValue)), EWorldTextType::HealthRecover, DeltaValue < GetMaxHealth() ? EWorldTextStyle::Normal : EWorldTextStyle::Stress);
-	}
+	Super::HandleHealthChanged(NewValue, DeltaValue);
+	
 	if (GetWidgetCharacterHPWidget())
 	{
 		GetWidgetCharacterHPWidget()->SetHealthPercent(NewValue, GetMaxHealth());
@@ -2415,6 +2347,8 @@ void ADWCharacter::HandleHealthChanged(float NewValue, float DeltaValue /*= 0.f*
 
 void ADWCharacter::HandleMaxHealthChanged(float NewValue, float DeltaValue /*= 0.f*/)
 {
+	Super::HandleMaxHealthChanged(NewValue, DeltaValue);
+	
 	if (GetWidgetCharacterHPWidget())
 	{
 		GetWidgetCharacterHPWidget()->SetHealthPercent(NewValue, GetMaxHealth());

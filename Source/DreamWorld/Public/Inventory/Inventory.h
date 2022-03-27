@@ -55,12 +55,18 @@ public:
 
 	UFUNCTION(BlueprintPure)
 	virtual FQueryItemInfo GetItemInfoBySplitType(EQueryItemType InQueryType, FItem InItem, ESplitSlotType InSplitSlotType);
-	
+		
+	UFUNCTION(BlueprintCallable)
+	virtual void AdditionItemBySlots(FItem& InItem, const TArray<UInventorySlot*>& InSlots);
+
 	UFUNCTION(BlueprintCallable)
 	virtual void AdditionItemByRange(FItem& InItem, int32 InStartIndex = 0, int32 InEndIndex = -1);
 
 	UFUNCTION(BlueprintCallable)
 	virtual void AdditionItemBySplitType(FItem& InItem, ESplitSlotType InSplitSlotType);
+		
+	UFUNCTION(BlueprintCallable)
+	virtual void RemoveItemBySlots(FItem& InItem, const TArray<UInventorySlot*>& InSlots);
 
 	UFUNCTION(BlueprintCallable)
 	virtual void RemoveItemByRange(FItem& InItem, int32 InStartIndex = 0, int32 InEndIndex = -1);

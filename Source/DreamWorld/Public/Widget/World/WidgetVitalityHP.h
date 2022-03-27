@@ -3,7 +3,8 @@
 #pragma once
 
 #include "DreamWorld/DreamWorld.h"
-#include "Blueprint/UserWidget.h"
+#include "Widget/World/WorldWidgetBase.h"
+
 #include "WidgetVitalityHP.generated.h"
 
 class AAbilityVitalityBase;
@@ -12,7 +13,7 @@ class AAbilityVitalityBase;
  * ������Ѫ��
  */
 UCLASS()
-class DREAMWORLD_API UWidgetVitalityHP : public UUserWidget
+class DREAMWORLD_API UWidgetVitalityHP : public UWorldWidgetBase
 {
 	GENERATED_BODY()
 

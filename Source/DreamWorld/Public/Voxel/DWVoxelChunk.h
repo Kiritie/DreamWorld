@@ -61,7 +61,7 @@ protected:
 public:
 	virtual void Initialize(FIndex InIndex, int32 InBatch) override;
 
-	virtual void LoadData(FSaveData* InChunkData) override;
+	virtual void LoadData(FSaveData* InSaveData) override;
 
 	virtual FSaveData* ToData(bool bSaved = true) override;
 
@@ -79,15 +79,24 @@ protected:
 	virtual void OnGenerated(bool bPreview = false) override;
 
 	//////////////////////////////////////////////////////////////////////////
+	// SceneContainer
+public:
+	virtual void AddSceneObject(ISceneObjectInterface* InSceneObject) override;
+
+	virtual void RemoveSceneObject(ISceneObjectInterface* InSceneObject) override;
+
+	virtual void DestroySceneObject(ISceneObjectInterface* InSceneObject) override;
+
+	//////////////////////////////////////////////////////////////////////////
 	// Character
 public:
-	ACharacterBase* SpawnCharacter(FCharacterSaveData InSaveData);
+	ADWCharacter* SpawnCharacter(FCharacterSaveData InSaveData);
 
-	void AttachCharacter(ACharacterBase* InCharacter);
+	void AttachCharacter(ADWCharacter* InCharacter);
 
-	void DetachCharacter(ACharacterBase* InCharacter);
+	void DetachCharacter(ADWCharacter* InCharacter);
 
-	void DestroyCharacter(ACharacterBase* InCharacter);
+	void DestroyCharacter(ADWCharacter* InCharacter);
 
 	//////////////////////////////////////////////////////////////////////////
 	// Vitality

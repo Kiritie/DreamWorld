@@ -207,6 +207,15 @@ FQueryItemInfo UInventory::GetItemInfoBySplitType(EQueryItemType InQueryType, FI
 	return GetItemInfoByRange(InQueryType, InItem, SplitSlotInfo.StartIndex, SplitSlotInfo.StartIndex + SplitSlotInfo.TotalCount);
 }
 
+void UInventory::AdditionItemBySlots(FItem& InItem, const TArray<UInventorySlot*>& InSlots)
+{
+	for (int i = 0; i < InSlots.Num(); i++)
+	{
+		InSlots[i]->AddItem(InItem);
+		if (InItem.Count <= 0) break;
+	}
+}
+
 void UInventory::AdditionItemByRange(FItem& InItem, int32 InStartIndex, int32 InEndIndex)
 {
 	auto QueryItemInfo = GetItemInfoByRange(EQueryItemType::Addition, InItem, InStartIndex, InEndIndex);
@@ -223,6 +232,15 @@ void UInventory::AdditionItemBySplitType(FItem& InItem, ESplitSlotType InSplitSl
 	for (int i = 0; i < QueryItemInfo.Slots.Num(); i++)
 	{
 		QueryItemInfo.Slots[i]->AddItem(InItem);
+		if (InItem.Count <= 0) break;
+	}
+}
+
+void UInventory::RemoveItemBySlots(FItem& InItem, const TArray<UInventorySlot*>& InSlots)
+{
+	for (int i = 0; i < InSlots.Num(); i++)
+	{
+		InSlots[i]->SubItem(InItem);
 		if (InItem.Count <= 0) break;
 	}
 }

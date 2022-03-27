@@ -5,11 +5,11 @@
 #include "Character/Player/DWPlayerCharacter.h"
 #include "UObject/ConstructorHelpers.h"
 #include "Vitality/AbilityVitalityBase.h"
-#include "Widget/Other/WidgetVitalityHP.h"
+#include "Widget/World/WidgetVitalityHP.h"
 
 UWidgetVitalityHPComponent::UWidgetVitalityHPComponent()
 {
-	static ConstructorHelpers::FClassFinder<UWidgetVitalityHP> VitalityHPClassFinder(TEXT("WidgetBlueprint'/Game/Blueprints/Widget/Other/WB_VitalityHP.WB_VitalityHP_C'"));
+	static ConstructorHelpers::FClassFinder<UWidgetVitalityHP> VitalityHPClassFinder(TEXT("WidgetBlueprint'/Game/Blueprints/Widget/World/WB_VitalityHP.WB_VitalityHP_C'"));
 	if(VitalityHPClassFinder.Succeeded())
 	{
 		SetWidgetClass(VitalityHPClassFinder.Class);

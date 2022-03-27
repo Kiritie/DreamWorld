@@ -26,9 +26,9 @@
 #include "Widget/Inventory/WidgetInventoryBar.h"
 #include "Widget/Inventory/WidgetInventoryBox.h"
 #include "Widget/Inventory/WidgetInventoryPanel.h"
-#include "Widget/Other/WidgetWorldText.h"
-#include "Widget/Other/WidgetVitalityHP.h"
-#include "Widget/Other/WidgetCharacterHP.h"
+#include "Widget/World/WidgetWorldText.h"
+#include "Widget/World/WidgetVitalityHP.h"
+#include "Widget/World/WidgetCharacterHP.h"
 #include "Widget/WidgetGameHUD.h"
 
 ADWGameState* UDWHelper::CurrentGameState = nullptr;

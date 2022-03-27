@@ -330,6 +330,12 @@ public:
 		Item = FItem();
 		Slots = TArray<UInventorySlot*>();
 	}
+
+	FORCEINLINE FQueryItemInfo(FItem InItem, TArray<UInventorySlot*> InSlots)
+	{
+		Item = InItem;
+		Slots = InSlots;
+	}
 };
 
 /**
@@ -691,7 +697,7 @@ public:
 		PatrolDuration = 10.f;
 		FallingAttackAbility = FDWCharacterAttackAbilityData();
 		AttackAbilities = TArray<FDWCharacterAttackAbilityData>();
-		SkillAbilities = TMap<FName, FDWCharacterSkillAbilityData>();
+		SkillAbilities = TMap<FPrimaryAssetId, FDWCharacterSkillAbilityData>();
 		ActionAbilities = TMap<ECharacterActionType, FDWCharacterActionAbilityData>();
 	}
 
@@ -720,7 +726,7 @@ public:
 	TArray<FDWCharacterAttackAbilityData> AttackAbilities;
 
 	UPROPERTY()
-	TMap<FName, FDWCharacterSkillAbilityData> SkillAbilities;
+	TMap<FPrimaryAssetId, FDWCharacterSkillAbilityData> SkillAbilities;
 
 	UPROPERTY()
 	TMap<ECharacterActionType, FDWCharacterActionAbilityData> ActionAbilities;

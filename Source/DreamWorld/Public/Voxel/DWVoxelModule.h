@@ -78,19 +78,4 @@ public:
 	virtual bool ChunkTraceSingle(FVector RayStart, FVector RayEnd, float InRadius, float InHalfHeight, FHitResult& OutHitResult) override;
 
 	virtual bool VoxelTraceSingle(const FVoxelItem& InVoxelItem, FVector InPoint, FHitResult& OutHitResult) override;
-
-	//////////////////////////////////////////////////////////////////////////
-	// Team
-protected:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Team")
-	TMap<FName, FTeamData> TeamMap;
-
-public:
-	virtual bool IsExistTeam(const FName& InTeamID) const;
-
-	virtual bool CreateTeam(ADWCharacter* InCaptain, FName InTeamName = NAME_None, FString InTeamDetail = TEXT(""));
-
-	virtual bool DissolveTeam(const FName& InTeamID, ADWCharacter* InCaptain = nullptr);
-
-	virtual FTeamData* GetTeamData(const FName& InTeamID);
 };
