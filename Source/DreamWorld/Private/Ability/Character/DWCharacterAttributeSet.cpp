@@ -206,14 +206,93 @@ void UDWCharacterAttributeSet::PostGameplayEffectExecute(const struct FGameplayE
 	const FGameplayTagContainer& SourceTags = *Data.EffectSpec.CapturedSourceTags.GetAggregatedTags();
 
 	AActor* TargetActor = nullptr;
-	ADWCharacter* TargetCharacter = nullptr;
+	IAbilityVitalityInterface* TargetVitality = nullptr;
+	ADWCharacter* TargetCharacter = Cast<ADWCharacter>(TargetActor);
 	if (Data.Target.AbilityActorInfo.IsValid() && Data.Target.AbilityActorInfo->AvatarActor.IsValid())
 	{
 		TargetActor = Data.Target.AbilityActorInfo->AvatarActor.Get();
+		TargetVitality = Cast<IAbilityVitalityInterface>(TargetActor);
 		TargetCharacter = Cast<ADWCharacter>(TargetActor);
 	}
+	
+	if (Data.EvaluatedData.Attribute.GetName().EndsWith("Damage"))
+	{
+		float SourceAttackForce = 0.f;
+		float SourceAttackCritRate = 0.f;
+		float SourceDefendRate = 0.f;
+		float SourceDefendScope = 0.f;
+		float SourcePhysicsDefRate = 0.f;
+		float SourceMagicDefRate = 0.f;
 
-	if (Data.EvaluatedData.Attribute == GetInterruptAttribute())
+		float LocalDamageDone = 0.f;
+		float DefendRateDone = 0.f;
+		
+		AActor* SourceActor = nullptr;
+		ADWCharacter* SourceCharacter = nullptr;
+		if (Source && Source->AbilityActorInfo.IsValid() && Source->AbilityActorInfo->AvatarActor.IsValid())
+		{
+			SourceActor = Source->AbilityActorInfo->AvatarActor.Get();
+			SourceCharacter = Cast<ADWCharacter>(SourceActor);
+			if(SourceCharacter)
+			{
+				SourceAttackForce = SourceCharacter->GetAttackForce();
+				SourceAttackCritRate = SourceCharacter->GetAttackCritRate();
+			}
+		}
+		if (TargetCharacter)
+		{
+			SourceDefendRate = TargetCharacter->GetDefendRate();
+			SourceDefendScope = TargetCharacter->GetDefendScope();
+			SourcePhysicsDefRate = TargetCharacter->GetPhysicsDefRate();
+			SourceMagicDefRate = TargetCharacter->GetMagicDefRate();
+
+			FVector DamageDirection = SourceActor->GetActorLocation() - TargetActor->GetActorLocation();
+			if (FVector::DotProduct(DamageDirection, TargetActor->GetActorForwardVector()) / 90 > (1 - SourceDefendScope))
+			{
+				DefendRateDone = SourceDefendRate * (TargetCharacter->IsDefending() ? 1 : 0);
+				if(DefendRateDone > 0.f && !TargetCharacter->DoAction(ECharacterActionType::DefendBlock))
+				{
+					DefendRateDone = 0.f;
+				}
+			}
+		}
+
+		if(Data.EvaluatedData.Attribute.GetName().StartsWith("Physics"))
+		{
+			LocalDamageDone = SourceAttackForce * GetPhysicsDamage() * (1 - SourcePhysicsDefRate) * (1 - DefendRateDone) * (FMath::FRand() <= SourceAttackCritRate ? 2 : 1);
+			if(SourceCharacter)
+			{
+				SourceCharacter->DoAction(LocalDamageDone > 0.f ? ECharacterActionType::AttackHit : ECharacterActionType::AttackMiss);
+			}
+			SetPhysicsDamage(0.f);
+		}
+		else if(Data.EvaluatedData.Attribute.GetName().StartsWith("Magic"))
+		{
+			LocalDamageDone = GetMagicDamage() * (1 - SourceMagicDefRate) * (1 - DefendRateDone) * (FMath::FRand() <= SourceAttackCritRate ? 2 : 1);
+			SetMagicDamage(0.f);
+		}
+
+		if (LocalDamageDone > 0.f)
+		{
+			if (TargetVitality && !TargetVitality->IsDead())
+			{
+				TargetVitality->ModifyHealth(-LocalDamageDone);
+
+				FHitResult HitResult;
+				if (Context.GetHitResult())
+				{
+					HitResult = *Context.GetHitResult();
+				}
+				TargetVitality->HandleDamage(EDamageType::Physics, LocalDamageDone, true, HitResult, SourceTags, SourceActor);
+
+				if(TargetCharacter && DefendRateDone == 0.f)
+				{
+					TargetCharacter->DoAction(ECharacterActionType::GetHit);
+				}
+			}
+		}
+	}
+	else if (Data.EvaluatedData.Attribute == GetInterruptAttribute())
 	{
 		if (TargetCharacter)
 		{

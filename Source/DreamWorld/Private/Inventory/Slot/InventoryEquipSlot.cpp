@@ -2,6 +2,8 @@
 
 
 #include "Inventory/Slot/InventoryEquipSlot.h"
+
+#include "Ability/Item/Equip/DWEquipAsset.h"
 #include "Inventory/Inventory.h"
 #include "Character/DWCharacter.h"
 
@@ -18,7 +20,7 @@ void UInventoryEquipSlot::InitSlot(UInventory* InOwner, FItem InItem, EItemType 
 
 bool UInventoryEquipSlot::CheckSlot(FItem& InItem) const
 {
-	return Super::CheckSlot(InItem) && UDWHelper::LoadEquipData(InItem.ID).PartType == PartType;
+	return Super::CheckSlot(InItem) && InItem.GetData<UDWEquipAsset>()->PartType == PartType;
 }
 
 void UInventoryEquipSlot::Refresh()

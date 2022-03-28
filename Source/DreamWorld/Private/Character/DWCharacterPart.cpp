@@ -4,8 +4,10 @@
 #include "Character/DWCharacterPart.h"
 
 #include "Character/DWCharacter.h"
-#include "Voxel/Voxel.h"
-#include "World/Chunk.h"
+#include "Voxel/VoxelModule.h"
+#include "Voxel/Chunks/VoxelChunk.h"
+#include "Voxel/Voxels/Voxel.h"
+#include "Voxel/Voxels/VoxelAssetBase.h"
 
 UDWCharacterPart::UDWCharacterPart(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -32,7 +34,7 @@ void UDWCharacterPart::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 	if(AVoxelChunk* Chunk = GetOwnerCharacter()->GetOwnerChunk())
 	{
 		const FVoxelItem& VoxelItem = Chunk->GetVoxelItem(Chunk->LocationToIndex(GetComponentLocation()));
-		const UVoxelAssetBase VoxelData = VoxelItem.GetData<UVoxelAssetBase>();
+		const UVoxelAssetBase* VoxelData = VoxelItem.GetData<UVoxelAssetBase>();
 		const FVoxelHitResult VoxelHitResult = FVoxelHitResult(VoxelItem, GetComponentLocation(), GetOwnerCharacter()->GetMoveDirection(false));
 		if(VoxelItem.IsValid())
 		{
@@ -40,23 +42,102 @@ void UDWCharacterPart::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 			{
 				if(LastOverlapVoxel)
 				{
-					LastOverlapVoxel->OnTargetExit(this, VoxelHitResult);
+					OnExitVoxel(LastOverlapVoxel, VoxelHitResult);
+					LastOverlapVoxel->OnTargetExit(GetOwnerCharacter(), VoxelHitResult);
 					UVoxel::DespawnVoxel(LastOverlapVoxel);
 					LastOverlapVoxel = nullptr;
 				}
 				if(UVoxel* Voxel = VoxelItem.GetVoxel())
 				{
 					LastOverlapVoxel = Voxel;
-					Voxel->OnTargetEnter(this, VoxelHitResult);
+					Voxel->OnTargetEnter(GetOwnerCharacter(), VoxelHitResult);
 				}
+			}
+			if(LastOverlapVoxel)
+			{
+				OnStayVoxel(LastOverlapVoxel, VoxelHitResult);
 			}
 		}
 		else if(LastOverlapVoxel)
 		{
-			LastOverlapVoxel->OnTargetExit(this, VoxelHitResult);
+			LastOverlapVoxel->OnTargetExit(GetOwnerCharacter(), VoxelHitResult);
 			UVoxel::DespawnVoxel(LastOverlapVoxel);
 			LastOverlapVoxel = nullptr;
 		}
+	}
+}
+
+void UDWCharacterPart::OnHitVoxel(UVoxel* InVoxel, const FVoxelHitResult& InHitResult)
+{
+	InVoxel->OnTargetHit(GetOwnerCharacter(), InHitResult);
+}
+
+void UDWCharacterPart::OnEnterVoxel(UVoxel* InVoxel, const FVoxelHitResult& InHitResult)
+{
+	InVoxel->OnTargetEnter(GetOwnerCharacter(), InHitResult);
+
+	UVoxelAssetBase* VoxelData = InVoxel->GetData();
+	switch (VoxelData->VoxelType)
+	{
+		case EVoxelType::Water:
+		{
+			switch (CharacterPartType)
+			{
+				case ECharacterPartType::Chest:
+				{
+					GetOwnerCharacter()->Swim();
+					break;
+				}
+				case ECharacterPartType::Neck:
+				{
+					GetOwnerCharacter()->UnFloat();
+					break;
+				}
+				default: break;
+			}
+			break;
+		}
+		default: break;
+	}
+}
+
+void UDWCharacterPart::OnStayVoxel(UVoxel* InVoxel, const FVoxelHitResult& InHitResult)
+{
+	InVoxel->OnTargetStay(GetOwnerCharacter(), InHitResult);
+}
+
+void UDWCharacterPart::OnExitVoxel(UVoxel* InVoxel, const FVoxelHitResult& InHitResult)
+{
+	InVoxel->OnTargetExit(GetOwnerCharacter(), InHitResult);
+
+	UVoxelAssetBase* VoxelData = InVoxel->GetData();
+	switch (VoxelData->VoxelType)
+	{
+		case EVoxelType::Water:
+		{
+			switch (CharacterPartType)
+			{
+				case ECharacterPartType::Chest:
+				{
+					if(InHitResult.VoxelItem.GetData<UVoxelAssetBase>()->VoxelType != EVoxelType::Water)
+					{
+						GetOwnerCharacter()->UnSwim();
+					}
+					break;
+				}
+				case ECharacterPartType::Neck:
+				{
+					if(InHitResult.VoxelItem.GetData<UVoxelAssetBase>()->VoxelType != EVoxelType::Water)
+					{
+						GetOwnerCharacter()->Float(InVoxel->GetOwner()->IndexToLocation(InVoxel->GetIndex()).Z + AVoxelModule::GetWorldData()->BlockSize);
+					}
+					break;
+				}
+				default: break;
+			}
+			break;
+		}
+		default: break;
 	}
 }
 

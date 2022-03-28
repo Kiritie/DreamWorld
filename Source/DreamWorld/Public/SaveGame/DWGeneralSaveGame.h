@@ -3,7 +3,7 @@
 #pragma once
 
 #include "DreamWorld/DreamWorld.h"
-#include "SaveGame/SaveGameBase.h"
+#include "SaveGame/Base/SaveGameBase.h"
 
 #include "DWGeneralSaveGame.generated.h"
 

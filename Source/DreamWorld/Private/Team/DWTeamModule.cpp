@@ -39,21 +39,7 @@ void ADWTeamModule::OnPreparatory_Implementation()
 
 void ADWTeamModule::OnRefresh_Implementation(float DeltaSeconds)
 {
-	switch (UDWHelper::GetGameState(this)->GetCurrentState())
-	{
-		case EGameState::MainMenu:
-		case EGameState::Loading:
-		{
-			GenerateTerrain();
-			break;
-		}
-		case EGameState::Playing:
-		{
-			GenerateTerrain();
-			break;
-		}
-		default: break;
-	}
+	Super::OnRefresh_Implementation(DeltaSeconds);
 }
 
 void ADWTeamModule::OnPause_Implementation()

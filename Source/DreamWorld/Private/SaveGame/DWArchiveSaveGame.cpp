@@ -7,10 +7,10 @@
 #include "Gameplay/DWPlayerController.h"
 #include "Kismet/GameplayStatics.h"
 #include "Main/MainModule.h"
-#include "Module/DWSaveGameModule.h"
 #include "SaveGame/DWGeneralSaveGame.h"
+#include "SaveGame/DWSaveGameModule.h"
 #include "SaveGame/SaveGameModuleBPLibrary.h"
-#include "World/VoxelModule.h"
+#include "Voxel/VoxelModule.h"
 
 UDWArchiveSaveGame::UDWArchiveSaveGame()
 {
@@ -54,7 +54,7 @@ void UDWArchiveSaveGame::OnLoad_Implementation()
 
 		if(AVoxelModule* VoxelModule = AVoxelModule::Get())
 		{
-			VoxelModule->LoadData(SaveData.WorldData);
+			VoxelModule->LoadData(&SaveData.WorldData);
 		}
 		if(ADWPlayerController* PlayerController = UDWHelper::GetPlayerController(this))
 		{
@@ -89,6 +89,6 @@ void UDWArchiveSaveGame::OnRefresh_Implementation()
 	}
 	if(AVoxelModule* VoxelModule = AVoxelModule::Get())
 	{
-		SaveData.WorldData = VoxelModule->ToData();
+		SaveData.WorldData = *static_cast<FDWWorldSaveData*>(VoxelModule->ToData());
 	}
 }

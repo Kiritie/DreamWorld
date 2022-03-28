@@ -1,6 +1,12 @@
 // Copyright 1998-2019 Epic Games, Inc. All Rights Reserved.
 
 #include "Character/Player/DWPlayerCharacter.h"
+
+#include "Ability/Components/InteractionComponent.h"
+#include "Ability/Item/Equip/Shield/DWEquipShield.h"
+#include "Ability/Item/Equip/Weapon/DWEquipWeapon.h"
+#include "Asset/AssetModuleBPLibrary.h"
+#include "Asset/Primary/Item/ItemAssetBase.h"
 #include "Character/Player/DWPlayerCharacterAnim.h"
 #include "Gameplay/DWPlayerController.h"
 #include "Camera/CameraComponent.h"
@@ -11,9 +17,6 @@
 #include "Components/SceneCaptureComponent2D.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/BoxComponent.h"
-#include "World/Chunk.h"
-#include "Voxel/Voxel.h"
-#include "World/VoxelModule.h"
 #include "Voxel/Components/VoxelMeshComponent.h"
 #include "Gameplay/DWGameMode.h"
 #include "Perception/PawnSensingComponent.h"
@@ -25,14 +28,14 @@
 #include "Inventory/CharacterInventory.h"
 #include "Inventory/Slot/InventorySlot.h"
 #include "Gameplay/DWGameState.h"
-#include "Equip/EquipWeapon.h"
-#include "Equip/EquipShield.h"
 #include "Inventory/Slot/InventorySkillSlot.h"
 #include "Gameplay/DWGameInstance.h"
 #include "Input/InputModuleBPLibrary.h"
-#include "Interaction/Components/InteractionComponent.h"
 #include "Widget/WidgetGameHUD.h"
 #include "Inventory/Slot/InventoryEquipSlot.h"
+#include "Voxel/VoxelModule.h"
+#include "Voxel/Chunks/VoxelChunk.h"
+#include "Voxel/Voxels/Voxel.h"
 #include "Widget/WidgetModuleBPLibrary.h"
 
 //////////////////////////////////////////////////////////////////////////
@@ -403,7 +406,7 @@ void ADWPlayerCharacter::UpdateVoxelMesh()
 	const FItem tmpItem = UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryBar>()->GetSelectedItem();
 	if(!VoxelItem.IsValid() || !VoxelItem.EqualType(tmpItem))
 	{
-		if (tmpItem.IsValid() && tmpItem.GetData().Type == EItemType::Voxel)
+		if (tmpItem.IsValid() && tmpItem.GetData()->EqualType(EItemType::Voxel))
 		{
 			VoxelItem = FVoxelItem(tmpItem.ID);
 			VoxelMesh->BuildVoxel(VoxelItem);
@@ -422,24 +425,35 @@ bool ADWPlayerCharacter::RaycastVoxel(FVoxelHitResult& OutHitResult)
 	if (GetPlayerController() != nullptr)
 	{
 		FHitResult hitResult;
-		if (GetPlayerController()->RaycastFromAimPoint(hitResult, EGameTraceType::Voxel, InteractDistance))
+		if (GetPlayerController()->RaycastFromAimPoint(hitResult, EGameTraceType::Voxel, InteractDistance) && hitResult.GetActor()->IsA(AVoxelChunk::StaticClass()))
 		{
-			if (hitResult.GetActor()->IsA(AVoxelChunk::StaticClass()))
+			AVoxelChunk* chunk = Cast<AVoxelChunk>(hitResult.GetActor());
+			if (chunk != nullptr)
 			{
-				AVoxelChunk* chunk = Cast<AVoxelChunk>(hitResult.GetActor());
-				if (chunk != nullptr)
+				const FVoxelItem& voxelItem = chunk->GetVoxelItem(chunk->LocationToIndex(hitResult.ImpactPoint - AVoxelModule::GetWorldData()->GetBlockSizedNormal(hitResult.ImpactNormal, 0.01f)));
+				if (voxelItem.IsValid())
 				{
-					const FVoxelItem& voxelItem = chunk->GetVoxelItem(chunk->LocationToIndex(hitResult.ImpactPoint - AVoxelModule::GetWorldData().GetBlockSizedNormal(hitResult.ImpactNormal, 0.01f)));
-					if (voxelItem.IsValid())
-					{
-						OutHitResult = FVoxelHitResult(voxelItem, hitResult.ImpactPoint, hitResult.ImpactNormal);
-						return true;
-					}
+					OutHitResult = FVoxelHitResult(voxelItem, hitResult.ImpactPoint, hitResult.ImpactNormal);
+					return true;
 				}
 			}
 		}
 	}
 	return false;
+}
+
+void ADWPlayerCharacter::OnEnterInteract(IInteractionAgentInterface* InInteractionAgent)
+{
+	Super::OnEnterInteract(InInteractionAgent);
+
+	UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>()->RefreshActions();
+}
+
+void ADWPlayerCharacter::OnLeaveInteract(IInteractionAgentInterface* InInteractionAgent)
+{
+	Super::OnLeaveInteract(InInteractionAgent);
+
+	UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>()->RefreshActions();
 }
 
 void ADWPlayerCharacter::ToggleControlMode()
@@ -515,21 +529,16 @@ void ADWPlayerCharacter::OnDodgeReleased()
 
 bool ADWPlayerCharacter::UseItem(FItem& InItem)
 {
-	switch (InItem.GetData().Type)
+	if((InItem.GetData()->EqualType(EItemType::Voxel)))
 	{
-		case EItemType::Voxel:
-		{
-			if(ControlMode == EControlMode::Creating)
-			{
-				return Super::UseItem(InItem);
-			}
-			break;
-		}
-		case EItemType::Prop:
+		if(ControlMode == EControlMode::Creating)
 		{
 			return Super::UseItem(InItem);
 		}
-		default: break;
+	}
+	else if((InItem.GetData()->EqualType(EItemType::Prop)))
+	{
+		return Super::UseItem(InItem);
 	}
 	return false;
 }
@@ -748,55 +757,55 @@ void ADWPlayerCharacter::ReleaseSkillAbility4()
 
 void ADWPlayerCharacter::DoInteractAction1()
 {
-	if(UInteractionComponent* InteractionTarget = GetInteractionComponent()->GetInteractionTarget()->GetInteractionComponent())
+	if(UInteractionComponent* InteractionAgent = GetInteractionComponent()->GetInteractionAgent()->GetInteractionComponent())
 	{
-		if(InteractionTarget->GetValidInteractActions(this).IsValidIndex(0))
+		if(InteractionAgent->GetValidInteractActions(this).IsValidIndex(0))
 		{
-			InteractionTarget->DoInteract(this, InteractionTarget->GetValidInteractActions(this)[0]);
+			InteractionAgent->DoInteract(this, InteractionAgent->GetValidInteractActions(this)[0]);
 		}
 	}
 }
 
 void ADWPlayerCharacter::DoInteractAction2()
 {
-	if(UInteractionComponent* InteractionTarget = GetInteractionComponent()->GetInteractionTarget()->GetInteractionComponent())
+	if(UInteractionComponent* InteractionAgent = GetInteractionComponent()->GetInteractionAgent()->GetInteractionComponent())
 	{
-		if(InteractionTarget->GetValidInteractActions(this).IsValidIndex(1))
+		if(InteractionAgent->GetValidInteractActions(this).IsValidIndex(1))
 		{
-			InteractionTarget->DoInteract(this, InteractionTarget->GetValidInteractActions(this)[1]);
+			InteractionAgent->DoInteract(this, InteractionAgent->GetValidInteractActions(this)[1]);
 		}
 	}
 }
 
 void ADWPlayerCharacter::DoInteractAction3()
 {
-	if(UInteractionComponent* InteractionTarget = GetInteractionComponent()->GetInteractionTarget()->GetInteractionComponent())
+	if(UInteractionComponent* InteractionAgent = GetInteractionComponent()->GetInteractionAgent()->GetInteractionComponent())
 	{
-		if(InteractionTarget->GetValidInteractActions(this).IsValidIndex(2))
+		if(InteractionAgent->GetValidInteractActions(this).IsValidIndex(2))
 		{
-			InteractionTarget->DoInteract(this, InteractionTarget->GetValidInteractActions(this)[2]);
+			InteractionAgent->DoInteract(this, InteractionAgent->GetValidInteractActions(this)[2]);
 		}
 	}
 }
 
 void ADWPlayerCharacter::DoInteractAction4()
 {
-	if(UInteractionComponent* InteractionTarget = GetInteractionComponent()->GetInteractionTarget()->GetInteractionComponent())
+	if(UInteractionComponent* InteractionAgent = GetInteractionComponent()->GetInteractionAgent()->GetInteractionComponent())
 	{
-		if(InteractionTarget->GetValidInteractActions(this).IsValidIndex(3))
+		if(InteractionAgent->GetValidInteractActions(this).IsValidIndex(3))
 		{
-			InteractionTarget->DoInteract(this, InteractionTarget->GetValidInteractActions(this)[3]);
+			InteractionAgent->DoInteract(this, InteractionAgent->GetValidInteractActions(this)[3]);
 		}
 	}
 }
 
 void ADWPlayerCharacter::DoInteractAction5()
 {
-	if(UInteractionComponent* InteractionTarget = GetInteractionComponent()->GetInteractionTarget()->GetInteractionComponent())
+	if(UInteractionComponent* InteractionAgent = GetInteractionComponent()->GetInteractionAgent()->GetInteractionComponent())
 	{
-		if(InteractionTarget->GetValidInteractActions(this).IsValidIndex(4))
+		if(InteractionAgent->GetValidInteractActions(this).IsValidIndex(4))
 		{
-			InteractionTarget->DoInteract(this, InteractionTarget->GetValidInteractActions(this)[4]);
+			InteractionAgent->DoInteract(this, InteractionAgent->GetValidInteractActions(this)[4]);
 		}
 	}
 }

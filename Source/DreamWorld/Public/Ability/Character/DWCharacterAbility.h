@@ -14,11 +14,4 @@ class DREAMWORLD_API UDWCharacterAbility : public UCharacterAbilityBase
 
 public:
 	UDWCharacterAbility();
-
-protected:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	UAnimMontage* AnimMontage;
-	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	bool bAutoEndAbility;
 };

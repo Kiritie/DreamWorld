@@ -2,13 +2,14 @@
 
 
 #include "Character/Human/DWHumanCharacter.h"
+
+#include "Ability/Item/Equip/Weapon/DWEquipWeapon.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/BoxComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Character/Human/DWHumanCharacterAnim.h"
-#include "Equip/EquipWeapon.h"
 #include "BehaviorTree/BehaviorTree.h"
 #include "AI/DWAIBlackboard.h"
 

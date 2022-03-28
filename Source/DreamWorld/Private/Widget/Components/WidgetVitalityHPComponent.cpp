@@ -2,9 +2,10 @@
 
 
 #include "Widget/Components/WidgetVitalityHPComponent.h"
+
+#include "Ability/Vitality/AbilityVitalityBase.h"
 #include "Character/Player/DWPlayerCharacter.h"
 #include "UObject/ConstructorHelpers.h"
-#include "Vitality/AbilityVitalityBase.h"
 #include "Widget/World/WidgetVitalityHP.h"
 
 UWidgetVitalityHPComponent::UWidgetVitalityHPComponent()

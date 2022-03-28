@@ -2,9 +2,9 @@
 
 #pragma once
 
+#include "DWVitalityVoxel.h"
 #include "DreamWorld/DreamWorld.h"
-#include "Vitality/VitalityVoxel.h"
-#include "VitalityPlant.generated.h"
+#include "DWVitalityPlant.generated.h"
 
 class UVoxelMeshComponent;
 

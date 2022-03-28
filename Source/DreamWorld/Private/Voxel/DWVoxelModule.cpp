@@ -74,17 +74,17 @@ void ADWVoxelModule::OnTermination_Implementation()
 	Super::OnTermination_Implementation();
 }
 
-void ADWVoxelModule::LoadData(FWorldSaveData* InWorldData)
+void ADWVoxelModule::LoadData(FSaveData* InWorldData)
 {
 	Super::LoadData(InWorldData);
 
-	if(!GetWorldData<FDWWorldSaveData>().GetArchiveData().bPreview)
+	if(!GetWorldData<FDWWorldSaveData>()->GetArchiveData().bPreview)
 	{
 		if(ADWGameState* GameState = UDWHelper::GetGameState(this))
 		{
 			GameState->SetCurrentState(EGameState::Loading);
 		}
-		if(GetWorldData<FDWWorldSaveData>().IsSameArchive(*static_cast<FDWWorldSaveData*>(InWorldData)))
+		if(GetWorldData<FDWWorldSaveData>()->IsSameArchive(*static_cast<FDWWorldSaveData*>(InWorldData)))
 		{
 			for(auto Iter : ChunkMap)
 			{
@@ -101,13 +101,13 @@ void ADWVoxelModule::LoadData(FWorldSaveData* InWorldData)
 	}
 }
 
-FWorldSaveData* ADWVoxelModule::ToData(bool bSaved) const
+FSaveData* ADWVoxelModule::ToData(bool bSaved)
 {
 	for(auto Iter : ChunkMap)
 	{
 		if(Iter.Value)
 		{
-			GetWorldData<FDWWorldSaveData>().SetChunkData(Iter.Key, *static_cast<FDWChunkSaveData*>(Iter.Value->ToData(bSaved)));
+			GetWorldData<FDWWorldSaveData>()->SetChunkData(Iter.Key, *static_cast<FDWChunkSaveData*>(Iter.Value->ToData(bSaved)));
 		}
 	}
 	return WorldData;
@@ -136,17 +136,17 @@ void ADWVoxelModule::GenerateTerrain()
 	{
 		if(bBasicGenerated)
 		{
-			const float BasicNum = FMath::Square(ChunkSpawnRange * 2) * GetWorldData().ChunkHeightRange;
+			const float BasicNum = FMath::Square(ChunkSpawnRange * 2) * GetWorldData()->ChunkHeightRange;
 			if(BasicNum - ChunkGenerateQueue.Num() >= BasicNum * BasicPercentage)
 			{
 				FHitResult hitResult;
-				const FVector rayStart = FVector(PlayerCharacter->GetActorLocation().X, PlayerCharacter->GetActorLocation().Y, GetWorldData().ChunkHeightRange * GetWorldData().GetChunkLength() + 500);
+				const FVector rayStart = FVector(PlayerCharacter->GetActorLocation().X, PlayerCharacter->GetActorLocation().Y, GetWorldData()->ChunkHeightRange * GetWorldData()->GetChunkLength() + 500);
 				const FVector rayEnd = FVector(PlayerCharacter->GetActorLocation().X, PlayerCharacter->GetActorLocation().Y, 0);
 				if (ChunkTraceSingle(rayStart, rayEnd, PlayerCharacter->GetRadius(), PlayerCharacter->GetHalfHeight(), hitResult))
 				{
-					OnWorldGenerated.Broadcast(hitResult.Location, GetWorldData<FDWWorldSaveData>().GetArchiveData().bPreview);
+					OnWorldGenerated.Broadcast(hitResult.Location, GetWorldData<FDWWorldSaveData>()->GetArchiveData().bPreview);
 
-					if(!GetWorldData<FDWWorldSaveData>().GetArchiveData().bPreview)
+					if(!GetWorldData<FDWWorldSaveData>()->GetArchiveData().bPreview)
 					{
 						if(ADWGameState* GameState = UDWHelper::GetGameState(this))
 						{
@@ -168,7 +168,7 @@ void ADWVoxelModule::GenerateChunks(FIndex InIndex)
 	if(BoundsMesh != nullptr)
 	{
 		BoundsMesh->SetRelativeLocation(ChunkIndexToLocation(InIndex));
-		BoundsMesh->SetRelativeScale3D(FVector(GetWorldLength() * GetWorldData().BlockSize * 0.01f, GetWorldLength() * GetWorldData().BlockSize * 0.01f, 15.f));
+		BoundsMesh->SetRelativeScale3D(FVector(GetWorldLength() * GetWorldData()->BlockSize * 0.01f, GetWorldLength() * GetWorldData()->BlockSize * 0.01f, 15.f));
 	}
 }
 
@@ -176,9 +176,9 @@ void ADWVoxelModule::BuildChunkMap(AVoxelChunk* InChunk)
 {
 	if (!InChunk || !ChunkMap.Contains(InChunk->GetIndex())) return;
 
-	if (GetWorldData<FDWWorldSaveData>().IsExistChunkData(InChunk->GetIndex()))
+	if (GetWorldData<FDWWorldSaveData>()->IsExistChunkData(InChunk->GetIndex()))
 	{
-		InChunk->LoadData(&GetWorldData<FDWWorldSaveData>().GetChunkData(InChunk->GetIndex()));
+		InChunk->LoadData(&GetWorldData<FDWWorldSaveData>()->GetChunkData(InChunk->GetIndex()));
 	}
 	else
 	{
@@ -197,7 +197,7 @@ void ADWVoxelModule::GenerateChunk(AVoxelChunk* InChunk)
 {
 	if (!InChunk || !ChunkMap.Contains(InChunk->GetIndex())) return;
 	
-	InChunk->Generate(GetWorldData<FDWWorldSaveData>().GetArchiveData().bPreview);
+	InChunk->Generate(GetWorldData<FDWWorldSaveData>()->GetArchiveData().bPreview);
 }
 
 void ADWVoxelModule::DestroyChunk(AVoxelChunk* InChunk)
@@ -212,10 +212,10 @@ AVoxelChunk* ADWVoxelModule::SpawnChunk(FIndex InIndex, bool bAddToQueue)
 
 bool ADWVoxelModule::ChunkTraceSingle(AVoxelChunk* InChunk, float InRadius, float InHalfHeight, FHitResult& OutHitResult)
 {
-	FVector rayStart = InChunk->GetActorLocation() + FVector(FMath::FRandRange(1, GetWorldData().ChunkSize - 1), FMath::FRandRange(1, GetWorldData().ChunkSize), GetWorldData().ChunkSize) * GetWorldData().BlockSize;
-	rayStart.X = ((int32)(rayStart.X / GetWorldData().BlockSize) + 0.5f) * GetWorldData().BlockSize;
-	rayStart.Y = ((int32)(rayStart.Y / GetWorldData().BlockSize) + 0.5f) * GetWorldData().BlockSize;
-	FVector rayEnd = rayStart + FVector::DownVector * GetWorldData().GetChunkLength();
+	FVector rayStart = InChunk->GetActorLocation() + FVector(FMath::FRandRange(1.f, GetWorldData()->ChunkSize - 1), FMath::FRandRange(1.f, GetWorldData()->ChunkSize), GetWorldData()->ChunkSize) * GetWorldData()->BlockSize;
+	rayStart.X = ((int32)(rayStart.X / GetWorldData()->BlockSize) + 0.5f) * GetWorldData()->BlockSize;
+	rayStart.Y = ((int32)(rayStart.Y / GetWorldData()->BlockSize) + 0.5f) * GetWorldData()->BlockSize;
+	FVector rayEnd = rayStart + FVector::DownVector * GetWorldData()->GetChunkLength();
 	return ChunkTraceSingle(rayStart, rayEnd, InRadius * 0.95f, InHalfHeight * 0.95f, OutHitResult);
 }
 
@@ -228,6 +228,6 @@ bool ADWVoxelModule::ChunkTraceSingle(FVector RayStart, FVector RayEnd, float In
 
 bool ADWVoxelModule::VoxelTraceSingle(const FVoxelItem& InVoxelItem, FVector InPoint, FHitResult& OutHitResult)
 {
-	FVector size = InVoxelItem.GetData<UVoxelAssetBase>().GetCeilRange(InVoxelItem.Rotation, InVoxelItem.Scale) * GetWorldData().BlockSize * 0.5f;
+	FVector size = InVoxelItem.GetData<UVoxelAssetBase>()->GetCeilRange(InVoxelItem.Rotation, InVoxelItem.Scale) * GetWorldData()->BlockSize * 0.5f;
 	return UKismetSystemLibrary::BoxTraceSingle(this, InPoint + size, InPoint + size, size * 0.95f, FRotator::ZeroRotator, UDWHelper::GetGameTrace(EGameTraceType::Voxel), false, TArray<AActor*>(), EDrawDebugTrace::None, OutHitResult, true);
 }

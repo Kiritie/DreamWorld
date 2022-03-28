@@ -4,11 +4,9 @@
 #include "Gameplay/DWPlayerController.h"
 
 #include "Character/Player/DWPlayerCharacter.h"
-#include "World/VoxelModule.h"
 #include "Engine/World.h"
-#include "World/Chunk.h"
-#include "Voxel/Voxel.h"
 #include "Engine.h"
+#include "Ability/Character/CharacterAssetBase.h"
 #include "Widget/WidgetGameHUD.h"
 #include "Gameplay/DWGameInstance.h"
 #include "Gameplay/DWGameState.h"
@@ -17,11 +15,10 @@
 #include "Inventory/Inventory.h"
 #include "Gameplay/DWGameMode.h"
 #include "Inventory/Slot/InventorySlot.h"
-#include "Module/DWSaveGameModule.h"
 #include "SaveGame/DWGeneralSaveGame.h"
 #include "SaveGame/SaveGameModuleBPLibrary.h"
+#include "Voxel/VoxelModule.h"
 #include "Widget/WidgetModuleBPLibrary.h"
-#include "World/Components/WorldTimerComponent.h"
 
 ADWPlayerController::ADWPlayerController()
 {
@@ -167,7 +164,7 @@ void ADWPlayerController::LoadData(FPlayerSaveData InPlayerData)
 	FActorSpawnParameters SpawnParams = FActorSpawnParameters();
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
-	if (ADWPlayerCharacter* NewPlayerCharacter = GetWorld()->SpawnActor<ADWPlayerCharacter>(InPlayerData.GetCharacterData().Class, SpawnParams))
+	if (ADWPlayerCharacter* NewPlayerCharacter = GetWorld()->SpawnActor<ADWPlayerCharacter>(InPlayerData.GetCharacterData()->Class, SpawnParams))
 	{
 		Possess(NewPlayerCharacter);
 
@@ -182,33 +179,33 @@ void ADWPlayerController::LoadData(FPlayerSaveData InPlayerData)
 
 		if (!InPlayerData.bSaved)
 		{
-			auto VoxelDatas = UDWHelper::LoadVoxelDatas();
-			for (int32 i = 0; i < VoxelDatas.Num(); i++)
-			{
-				FItem tmpItem = FItem(VoxelDatas[i].ID, VoxelDatas[i].MaxCount);
-				NewPlayerCharacter->GetInventory()->AdditionItemByRange(tmpItem);
-			}
-
-			auto EquipDatas = UDWHelper::LoadEquipDatas();
-			for (int32 i = 0; i < EquipDatas.Num(); i++)
-			{
-				FItem tmpItem = FItem(EquipDatas[i].ID, EquipDatas[i].MaxCount);
-				NewPlayerCharacter->GetInventory()->AdditionItemByRange(tmpItem);
-			}
-
-			auto PropDatas = UDWHelper::LoadPropDatas();
-			for (int32 i = 0; i < PropDatas.Num(); i++)
-			{
-				FItem tmpItem = FItem(PropDatas[i].ID, PropDatas[i].MaxCount);
-				NewPlayerCharacter->GetInventory()->AdditionItemByRange(tmpItem);
-			}
-
-			auto SkillDatas = UDWHelper::LoadSkillDatas();
-			for (int32 i = 0; i < SkillDatas.Num(); i++)
-			{
-				FItem tmpItem = FItem(SkillDatas[i].ID, SkillDatas[i].MaxCount);
-				NewPlayerCharacter->GetInventory()->AdditionItemByRange(tmpItem);
-			}
+			// auto VoxelDatas = UDWHelper::LoadVoxelDatas();
+			// for (int32 i = 0; i < VoxelDatas.Num(); i++)
+			// {
+			// 	FItem tmpItem = FItem(VoxelDatas[i].ID, VoxelDatas[i].MaxCount);
+			// 	NewPlayerCharacter->GetInventory()->AdditionItemByRange(tmpItem);
+			// }
+			//
+			// auto EquipDatas = UDWHelper::LoadEquipDatas();
+			// for (int32 i = 0; i < EquipDatas.Num(); i++)
+			// {
+			// 	FItem tmpItem = FItem(EquipDatas[i].ID, EquipDatas[i].MaxCount);
+			// 	NewPlayerCharacter->GetInventory()->AdditionItemByRange(tmpItem);
+			// }
+			//
+			// auto PropDatas = UDWHelper::LoadPropDatas();
+			// for (int32 i = 0; i < PropDatas.Num(); i++)
+			// {
+			// 	FItem tmpItem = FItem(PropDatas[i].ID, PropDatas[i].MaxCount);
+			// 	NewPlayerCharacter->GetInventory()->AdditionItemByRange(tmpItem);
+			// }
+			//
+			// auto SkillDatas = UDWHelper::LoadSkillDatas();
+			// for (int32 i = 0; i < SkillDatas.Num(); i++)
+			// {
+			// 	FItem tmpItem = FItem(SkillDatas[i].ID, SkillDatas[i].MaxCount);
+			// 	NewPlayerCharacter->GetInventory()->AdditionItemByRange(tmpItem);
+			// }
 		}
 	}
 }

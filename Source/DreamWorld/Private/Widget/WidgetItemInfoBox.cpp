@@ -4,7 +4,6 @@
 #include "Widget/WidgetItemInfoBox.h"
 
 #include "Character/DWCharacter.h"
-#include "Interaction/Components/InteractionComponent.h"
 #include "Main/MainModule.h"
 #include "Widget/WidgetModule.h"
 

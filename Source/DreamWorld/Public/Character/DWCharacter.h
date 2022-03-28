@@ -8,7 +8,6 @@
 #include "TargetSystemComponent.h"
 #include "TargetSystemTargetableInterface.h"
 #include "Ability/Character/AbilityCharacterBase.h"
-#include "Interaction/InteractionInterface.h"
 #include "Scene/Object/PickUp/PickerInterface.h"
 #include "Voxel/Agent/VoxelAgentInterface.h"
 
@@ -41,7 +40,7 @@ class AAbilitySkillBase;
  * 角色
  */
 UCLASS()
-class DREAMWORLD_API ADWCharacter : public AAbilityCharacterBase, public IVoxelAgentInterface, public IInteractionInterface, public ITargetSystemTargetableInterface, public IPickerInterface
+class DREAMWORLD_API ADWCharacter : public AAbilityCharacterBase, public IVoxelAgentInterface, public ITargetSystemTargetableInterface, public IPickerInterface
 {
 	GENERATED_BODY()
 
@@ -151,9 +150,6 @@ protected:
 	UWidgetCharacterHPComponent* WidgetCharacterHP;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-	UCharacterInteractionComponent* Interaction;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	UBehaviorTree* BehaviorTree;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
@@ -182,6 +178,8 @@ protected:
 
 	FTimerHandle AttackHurtTimer;
 
+	FVoxelItem SelectedVoxelItem;
+
 	UPROPERTY()
 	TMap<EEquipPartType, AAbilityEquipBase*> Equips;
 	
@@ -205,10 +203,8 @@ public:
 
 	virtual FSaveData* ToData(bool bSaved = true) override;
 
-	UFUNCTION(BlueprintCallable)
 	virtual void ResetData(bool bRefresh = false) override;
 
-	UFUNCTION(BlueprintCallable)
 	virtual void RefreshData() override;
 
 public:
@@ -218,13 +214,10 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual void Disable(bool bDisableMovement = false, bool bDisableCollision = false);
 						
-	UFUNCTION(BlueprintCallable)
 	virtual void Spawn() override;
 		
-	UFUNCTION(BlueprintCallable)
 	virtual void Revive() override;
 			
-	UFUNCTION(BlueprintCallable)
 	virtual void Death(AActor* InKiller = nullptr) override;
 			
 	virtual void DeathStart();
@@ -232,9 +225,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual void DeathEnd();
 
-	virtual bool CanInteract(IInteractionInterface* InInteractionTarget, EInteractAction InInteractAction) override;
+	virtual bool CanInteract(IInteractionAgentInterface* InInteractionAgent, EInteractAction InInteractAction) override;
 
-	virtual void OnInteract(IInteractionInterface* InInteractionTarget, EInteractAction InInteractAction) override;
+	virtual void OnInteract(IInteractionAgentInterface* InInteractionAgent, EInteractAction InInteractAction) override;
 
 	UFUNCTION(BlueprintCallable)
 	virtual void FreeToAnim(bool bUnLockRotation = true);
@@ -354,12 +347,6 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	virtual bool StopAction(ECharacterActionType InActionType = ECharacterActionType::None, bool bCancelAbility = true, bool bEndAction = false);
-				
-	UFUNCTION(BlueprintCallable)
-	virtual void ModifyEXP(float InDeltaValue) override;
-				
-	UFUNCTION(BlueprintCallable)
-	virtual void ModifyHealth(float InDeltaValue) override;
 					
 	UFUNCTION(BlueprintCallable)
 	virtual void ModifyMana(float InDeltaValue);
@@ -374,15 +361,14 @@ public:
 	virtual void LookAtTarget(ADWCharacter* InTargetCharacter);
 
 	UFUNCTION(BlueprintCallable)
-	virtual void AIMoveTo(FVector InTargetLocation, float InMoveStopDistance = 10);
+	virtual void AIMoveTo(FVector InTargetLocation, float InMoveStopDistance = 10.f, bool bMulticast = false);
 
 	UFUNCTION(BlueprintCallable)
-	virtual bool DoAIMove(FVector InTargetLocation, float InMoveStopDistance = 10);
+	virtual bool DoAIMove(FVector InTargetLocation, float InMoveStopDistance = 10.f);
 	
-	virtual bool DoAIMove(ADWCharacter* InTargetCharacter, float InMoveStopDistance = 10, bool bLookAtTarget = false);
+	virtual bool DoAIMove(ADWCharacter* InTargetCharacter, float InMoveStopDistance = 10.f, bool bLookAtTarget = false);
 
-	UFUNCTION(BlueprintCallable)
-	virtual void StopAIMove();
+	virtual void StopAIMove(bool bMulticast = false) override;
 
 	virtual void AddMovementInput(FVector WorldDirection, float ScaleValue = 1.0f, bool bForce = false) override;
 
@@ -449,12 +435,6 @@ public:
 	
 	UFUNCTION(BlueprintPure)
 	UWidgetCharacterHPComponent* GetWidgetCharacterHP() const { return WidgetCharacterHP; }
-	
-	UFUNCTION(BlueprintPure)
-	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
-	
-	UFUNCTION(BlueprintPure)
-	virtual UInteractionComponent* GetInteractionComponent() const override;
 
 	UFUNCTION(BlueprintPure)
 	virtual class UInventory* GetInventory() const;
@@ -475,7 +455,6 @@ public:
 	UFUNCTION(BlueprintPure)
 	bool IsFreeToAnim(bool bCheckStates = true) const;
 	
-	UFUNCTION(BlueprintPure)
 	virtual bool IsDead() const override;
 
 	UFUNCTION(BlueprintPure)
@@ -662,16 +641,16 @@ public:
 	void SetStaminaExpendSpeed(float InValue);
 
 	UFUNCTION(BlueprintPure)
-	virtual float GetPhysicsDamage() const override;
-	
-	UFUNCTION(BlueprintPure)
-	virtual float GetMagicDamage() const override;
-
-	UFUNCTION(BlueprintPure)
 	virtual AVoxelChunk* GetOwnerChunk() const override { return OwnerChunk; }
 
 	UFUNCTION(BlueprintCallable)
 	virtual void SetOwnerChunk(AVoxelChunk* InOwnerChunk) override { OwnerChunk = InOwnerChunk; }
+
+	UFUNCTION(BlueprintPure)
+	virtual FItem& GetGeneratingVoxelItem() override;
+
+	UFUNCTION(BlueprintPure)
+	virtual FVoxelItem& GetSelectedVoxelItem() override;
 
 	UFUNCTION(BlueprintPure)
 	ADWCharacter* GetOwnerRider() const { return OwnerRider; }

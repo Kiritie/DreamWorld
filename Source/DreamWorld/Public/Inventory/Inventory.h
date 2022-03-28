@@ -5,8 +5,6 @@
 #include "DreamWorld/DreamWorld.h"
 #include "Inventory.generated.h"
 
-class UInventorySlot;
-
 /**
  * ��Ʒ��
  */

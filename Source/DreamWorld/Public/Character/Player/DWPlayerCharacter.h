@@ -122,6 +122,10 @@ public:
 	
 	virtual bool RaycastVoxel(FVoxelHitResult& OutHitResult) override;
 
+	virtual void OnEnterInteract(IInteractionAgentInterface* InInteractionAgent) override;
+
+	virtual void OnLeaveInteract(IInteractionAgentInterface* InInteractionAgent) override;
+
 protected:
 	virtual void ToggleControlMode();
 

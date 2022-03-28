@@ -9,7 +9,7 @@ class UAbilityBase;
  * AbilitySystem组件
  */
 UCLASS()
-class WHFRAMEWORK_API UDWAbilitySystemComponent : public UAbilitySystemComponentBase
+class DREAMWORLD_API UDWAbilitySystemComponent : public UAbilitySystemComponentBase
 {
 	GENERATED_BODY()
 

@@ -6,7 +6,7 @@
 #include "DWEquipWeaponAsset.generated.h"
 
 UCLASS(BlueprintType)
-class WHFRAMEWORK_API UDWEquipWeaponAsset : public UDWEquipAsset
+class DREAMWORLD_API UDWEquipWeaponAsset : public UDWEquipAsset
 {
 	GENERATED_BODY()
 

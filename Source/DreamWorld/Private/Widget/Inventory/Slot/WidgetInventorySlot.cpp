@@ -3,6 +3,7 @@
 
 #include "Widget/Inventory/Slot/WidgetInventorySlot.h"
 
+#include "Asset/Primary/Item/ItemAssetBase.h"
 #include "Blueprint/DragDropOperation.h"
 #include "Components/Border.h"
 #include "Components/Image.h"
@@ -159,7 +160,7 @@ void UWidgetInventorySlot::Refresh()
 	if(!IsEmpty())
 	{
 		ImgIcon->SetVisibility(ESlateVisibility::Visible);
-		ImgIcon->SetBrushFromTexture(GetItem().GetData().Icon);
+		ImgIcon->SetBrushFromTexture(GetItem().GetData()->Icon);
 		if(TxtCount)
 		{
 			if(GetItem().Count > 1)

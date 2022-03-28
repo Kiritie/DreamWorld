@@ -11,7 +11,7 @@
  * 体素模块
  */
 UCLASS(hidecategories = (Tick, Replication, Rendering, Collision, Actor, Input, LOD, Cooking, Hidden, WorldPartition, Hlod))
-class WHFRAMEWORK_API ADWTeamModule : public AVoxelModule
+class DREAMWORLD_API ADWTeamModule : public AVoxelModule
 {
 	GENERATED_BODY()
 	

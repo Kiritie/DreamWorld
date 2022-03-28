@@ -65,7 +65,7 @@ void ADWVoxelChunk::OnDespawn_Implementation()
 {
 	Super::OnDespawn_Implementation();
 	
-	AVoxelModule::GetWorldData<FDWWorldSaveData>().SetChunkData(Index, *static_cast<FDWChunkSaveData*>(ToData()));
+	AVoxelModule::GetWorldData<FDWWorldSaveData>()->SetChunkData(Index, *static_cast<FDWChunkSaveData*>(ToData()));
 	
 	Characters.Empty();
 	Vitalitys.Empty();
@@ -88,7 +88,7 @@ void ADWVoxelChunk::LoadData(FSaveData* InSaveData)
 
 FSaveData* ADWVoxelChunk::ToData(bool bSaved)
 {
-	FDWChunkSaveData ChunkData;
+	static FDWChunkSaveData ChunkData;
 
 	ChunkData.Index = Index;
 	ChunkData.bSaved = bSaved;
@@ -187,9 +187,9 @@ void ADWVoxelChunk::GenerateMap()
 void ADWVoxelChunk::SpawnActors()
 {
 	Super::SpawnActors();
-	if (AVoxelModule::GetWorldData<FDWWorldSaveData>().IsExistChunkData(Index))
+	if (AVoxelModule::GetWorldData<FDWWorldSaveData>()->IsExistChunkData(Index))
 	{
-		FDWChunkSaveData ChunkData = AVoxelModule::GetWorldData<FDWWorldSaveData>().GetChunkData(Index);
+		FDWChunkSaveData ChunkData = AVoxelModule::GetWorldData<FDWWorldSaveData>()->GetChunkData(Index);
 		for (int32 i = 0; i < ChunkData.PickUpDatas.Num(); i++)
 		{
 			SpawnPickUp(ChunkData.PickUpDatas[i]);
@@ -205,53 +205,53 @@ void ADWVoxelChunk::SpawnActors()
 	}
 	else if(SolidMesh || SemiMesh)
 	{
-		if (FIndex::Distance(Index, AVoxelModule::GetWorldData<FDWWorldSaveData>().LastVitalityRaceIndex) > 250.f / AVoxelModule::GetWorldData().VitalityRaceDensity)
+		if (FIndex::Distance(Index, AVoxelModule::GetWorldData<FDWWorldSaveData>()->LastVitalityRaceIndex) > 250.f / AVoxelModule::GetWorldData()->VitalityRaceDensity)
 		{
 			auto raceData = UDWHelper::RandomVitalityRaceData();
 			for (int32 i = 0; i < raceData.Items.Num(); i++)
 			{
 				auto vitalityItem = raceData.Items[i];
-				auto vitalityData = UDWHelper::LoadVitalityData(vitalityItem.ID);
+				auto vitalityData = vitalityItem.GetData<UVitalityAssetBase>();
 				for (int32 j = 0; j < vitalityItem.Count; j++)
 				{
 					for (int32 k = 0; k < 10; k++)
 					{
 						FHitResult hitResult;
-						if (AVoxelModule::Get()->ChunkTraceSingle(this, FMath::Max(vitalityData.Range.X, vitalityData.Range.Y) * 0.5f * AVoxelModule::GetWorldData().BlockSize, vitalityData.Range.Z * 0.5f * AVoxelModule::GetWorldData().BlockSize, hitResult))
+						if (AVoxelModule::Get()->ChunkTraceSingle(this, FMath::Max(vitalityData->Range.X, vitalityData->Range.Y) * 0.5f * AVoxelModule::GetWorldData()->BlockSize, vitalityData->Range.Z * 0.5f * AVoxelModule::GetWorldData()->BlockSize, hitResult))
 						{
 							auto saveData = FVitalitySaveData();
-							saveData.ID = vitalityData.ID;
-							saveData.Name = vitalityData.Name.ToString();
+							saveData.ID = vitalityData->GetPrimaryAssetId();
+							saveData.Name = vitalityData->Name.ToString();
 							saveData.RaceID = raceData.ID.ToString();
 							saveData.Level = vitalityItem.Level;
 							saveData.SpawnLocation = hitResult.Location;
 							saveData.SpawnRotation = FRotator(0, FMath::RandRange(0, 360), 0);
 							SpawnVitality(saveData);
-							AVoxelModule::GetWorldData<FDWWorldSaveData>().LastVitalityRaceIndex = Index;
+							AVoxelModule::GetWorldData<FDWWorldSaveData>()->LastVitalityRaceIndex = Index;
 							break;
 						}
 					}
 				}
 			}
 		}
-		if (FIndex::Distance(Index, AVoxelModule::GetWorldData<FDWWorldSaveData>().LastCharacterRaceIndex) > 300.f / AVoxelModule::GetWorldData().CharacterRaceDensity)
+		if (FIndex::Distance(Index, AVoxelModule::GetWorldData<FDWWorldSaveData>()->LastCharacterRaceIndex) > 300.f / AVoxelModule::GetWorldData()->CharacterRaceDensity)
 		{
 			ADWCharacter* captain = nullptr;
 			auto raceData = UDWHelper::RandomCharacterRaceData();
 			for (int32 i = 0; i < raceData.Items.Num(); i++)
 			{
 				auto characterItem = raceData.Items[i];
-				auto characterData = UDWHelper::LoadCharacterData(characterItem.ID);
+				auto characterData = characterItem.GetData<UCharacterAssetBase>();
 				for (int32 j = 0; j < characterItem.Count; j++)
 				{
 					for (int32 k = 0; k < 10; k++)
 					{
 						FHitResult hitResult;
-						if (AVoxelModule::Get()->ChunkTraceSingle(this, FMath::Max(characterData.Range.X, characterData.Range.Y) * 0.5f * AVoxelModule::GetWorldData().BlockSize, characterData.Range.Z * 0.5f * AVoxelModule::GetWorldData().BlockSize, hitResult))
+						if (AVoxelModule::Get()->ChunkTraceSingle(this, FMath::Max(characterData->Range.X, characterData->Range.Y) * 0.5f * AVoxelModule::GetWorldData()->BlockSize, characterData->Range.Z * 0.5f * AVoxelModule::GetWorldData()->BlockSize, hitResult))
 						{
 							auto saveData = FCharacterSaveData();
-							saveData.ID = characterData.ID;
-							saveData.Name = characterData.Name.ToString();
+							saveData.ID = characterData->GetPrimaryAssetId();
+							saveData.Name = characterData->Name.ToString();
 							saveData.RaceID = raceData.ID.ToString();
 							saveData.Level = characterItem.Level;
 							saveData.SpawnLocation = hitResult.Location;
@@ -271,7 +271,7 @@ void ADWVoxelChunk::SpawnActors()
 									captain->AddTeamMate(character);
 								}
 							}
-							AVoxelModule::GetWorldData<FDWWorldSaveData>().LastCharacterRaceIndex = Index;
+							AVoxelModule::GetWorldData<FDWWorldSaveData>()->LastCharacterRaceIndex = Index;
 							break;
 						}
 					}
@@ -358,7 +358,7 @@ ADWCharacter* ADWVoxelChunk::SpawnCharacter(FCharacterSaveData InSaveData)
 {
 	FActorSpawnParameters spawnParams = FActorSpawnParameters();
 	spawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	if (ADWCharacter* character = GetWorld()->SpawnActor<ADWCharacter>(InSaveData.GetCharacterData().Class, spawnParams))
+	if (ADWCharacter* character = GetWorld()->SpawnActor<ADWCharacter>(InSaveData.GetCharacterData()->Class, spawnParams))
 	{
 		character->LoadData(&InSaveData);
 		character->SpawnDefaultController();
@@ -401,7 +401,7 @@ ADWVitality* ADWVoxelChunk::SpawnVitality(FVitalitySaveData InSaveData)
 {
 	FActorSpawnParameters spawnParams = FActorSpawnParameters();
 	spawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	if (ADWVitality* Vitality = GetWorld()->SpawnActor<ADWVitality>(InSaveData.GetVitalityData().Class, spawnParams))
+	if (ADWVitality* Vitality = GetWorld()->SpawnActor<ADWVitality>(InSaveData.GetVitalityData()->Class, spawnParams))
 	{
 		Vitality->LoadData(&InSaveData);
 		AttachVitality(Vitality);

@@ -6,7 +6,7 @@
 
 class AAbilityVitalityBase;
 UCLASS(BlueprintType)
-class WHFRAMEWORK_API UDWVitalityAsset : public UItemAssetBase
+class DREAMWORLD_API UDWVitalityAsset : public UItemAssetBase
 {
 	GENERATED_BODY()
 

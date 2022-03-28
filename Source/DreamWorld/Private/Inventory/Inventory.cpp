@@ -3,8 +3,6 @@
 #include "Inventory/Inventory.h"
 
 #include "Inventory/Slot/InventorySlot.h"
-#include "Vitality/Vitality.h"
-#include "Abilities/Item/DWItemAbility.h"
 #include "Inventory/Slot/InventoryAuxiliarySlot.h"
 #include "Inventory/Slot/InventoryEquipSlot.h"
 #include "Inventory/Slot/InventoryGenerateSlot.h"
@@ -73,6 +71,7 @@ void UInventory::Initialize(AActor* InOwner, TMap<ESplitSlotType, FSplitSlotInfo
 					Slot->InitSlot(this, FItem::Empty, EItemType::Skill, Iter.Key);
 					break;
 				}
+				default: break;
 			}
 			Slots.Add(Slot);
 		}

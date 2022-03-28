@@ -3,10 +3,10 @@
 
 #include "Widget/Inventory/Slot/WidgetInventorySkillSlot.h"
 
+#include "Asset/Primary/Item/ItemAssetBase.h"
 #include "Character/DWCharacter.h"
 #include "Inventory/Slot/InventorySlot.h"
 #include "Inventory/Slot/InventorySkillSlot.h"
-#include "Abilities/Character/DWCharacterSkillAbility.h"
 #include "Components/TextBlock.h"
 #include "Kismet/KismetTextLibrary.h"
 
@@ -35,7 +35,7 @@ void UWidgetInventorySkillSlot::Refresh()
 	if(!IsEmpty())
 	{
 		TxtName->SetVisibility(ESlateVisibility::Visible);
-		TxtName->SetText(GetItem().GetData().Name);
+		TxtName->SetText(GetItem().GetData()->Name);
 
 		TxtCost->SetVisibility(ESlateVisibility::Visible);
 		if(OwnerSlot)

@@ -49,5 +49,5 @@ public:
 	FPlayerSaveData GetDefaultPlayerData() const;
 
 	UFUNCTION(BlueprintPure)
-	FWorldSaveData GetDefaultWorldData() const;
+	FDWWorldSaveData GetDefaultWorldData() const;
 };

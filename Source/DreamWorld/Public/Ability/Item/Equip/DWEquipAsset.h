@@ -6,7 +6,7 @@
 
 
 UCLASS(BlueprintType)
-class WHFRAMEWORK_API UDWEquipAsset : public UEquipAssetBase
+class DREAMWORLD_API UDWEquipAsset : public UEquipAssetBase
 {
 	GENERATED_BODY()
 

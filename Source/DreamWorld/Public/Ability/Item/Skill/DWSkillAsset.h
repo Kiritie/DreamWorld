@@ -6,7 +6,7 @@
 
 
 UCLASS(BlueprintType)
-class WHFRAMEWORK_API UDWSkillAsset : public USkillAssetBase
+class DREAMWORLD_API UDWSkillAsset : public USkillAssetBase
 {
 	GENERATED_BODY()
 

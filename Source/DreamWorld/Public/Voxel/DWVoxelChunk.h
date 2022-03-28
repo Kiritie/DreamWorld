@@ -18,7 +18,7 @@ class UVoxelMeshComponent;
  * 体素块
  */
 UCLASS()
-class WHFRAMEWORK_API ADWVoxelChunk : public AVoxelChunk, public ISpawnPoolInterface
+class DREAMWORLD_API ADWVoxelChunk : public AVoxelChunk
 {
 	GENERATED_BODY()
 	
@@ -30,13 +30,10 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	UFUNCTION()
 	virtual void OnCollision(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit) override;
 	
-	UFUNCTION()
 	virtual void OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) override;
 
-	UFUNCTION()
 	virtual void OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex) override;
 
 public:

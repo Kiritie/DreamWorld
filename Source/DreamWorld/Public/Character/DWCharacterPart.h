@@ -25,6 +25,15 @@ protected:
 public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
+public:
+	virtual void OnHitVoxel(UVoxel* InVoxel, const FVoxelHitResult& InHitResult);
+
+	virtual void OnEnterVoxel(UVoxel* InVoxel, const FVoxelHitResult& InHitResult);
+
+	virtual void OnStayVoxel(UVoxel* InVoxel, const FVoxelHitResult& InHitResult);
+
+	virtual void OnExitVoxel(UVoxel* InVoxel, const FVoxelHitResult& InHitResult);
+
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	ECharacterPartType CharacterPartType;

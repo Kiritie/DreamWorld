@@ -1,5 +1,6 @@
 #include "DWTypes.h"
 
+#include "Asset/AssetModuleBPLibrary.h"
 #include "Character/Player/DWPlayerCharacter.h"
 #include "Kismet/GameplayStatics.h"
 #include "Main/MainModule.h"
@@ -8,14 +9,14 @@
 
 FTeamData FTeamData::Empty = FTeamData();
 
-UVitalityAssetBase& FVitalitySaveData::GetVitalityData() const
+UVitalityAssetBase* FVitalitySaveData::GetVitalityData() const
 {
-	return UPrimaryAssetManager::LoadItemAsset<UVitalityAssetBase>(ID);
+	return UAssetModuleBPLibrary::LoadPrimaryAsset<UVitalityAssetBase>(ID);
 }
 
-UCharacterAssetBase& FCharacterSaveData::GetCharacterData() const
+UCharacterAssetBase* FCharacterSaveData::GetCharacterData() const
 {
-	return UPrimaryAssetManager::LoadItemAsset<UCharacterAssetBase>(ID);
+	return UAssetModuleBPLibrary::LoadPrimaryAsset<UCharacterAssetBase>(ID);
 }
 
 FArchiveBasicSaveData FPlayerSaveData::GetArchiveData() const

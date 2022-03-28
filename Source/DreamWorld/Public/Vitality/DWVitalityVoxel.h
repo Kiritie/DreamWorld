@@ -3,8 +3,9 @@
 #pragma once
 
 #include "DreamWorld/DreamWorld.h"
-#include "Vitality/AbilityVitalityBase.h"
-#include "VitalityVoxel.generated.h"
+#include "Ability/Vitality/AbilityVitalityBase.h"
+
+#include "DWVitalityVoxel.generated.h"
 
 class UVoxelMeshComponent;
 
@@ -22,7 +23,7 @@ public:
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Default")
-	FName VoxelID;
+	FPrimaryAssetId VoxelID;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Components")
 	UVoxelMeshComponent* VoxelMesh;
@@ -35,6 +36,5 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	UFUNCTION(BlueprintPure)
-	UVoxelAssetBase GetData<UVoxelAssetBase>() const;
+	UVoxelAssetBase* GetVoxelData() const;
 };

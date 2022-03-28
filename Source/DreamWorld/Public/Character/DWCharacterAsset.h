@@ -5,7 +5,7 @@
 #include "DWCharacterAsset.generated.h"
 
 UCLASS(BlueprintType)
-class WHFRAMEWORK_API UDWCharacterAsset : public UCharacterAssetBase
+class DREAMWORLD_API UDWCharacterAsset : public UCharacterAssetBase
 {
 	GENERATED_BODY()
 

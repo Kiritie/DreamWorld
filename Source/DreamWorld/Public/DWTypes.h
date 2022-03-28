@@ -87,34 +87,6 @@ enum class EControlMode : uint8
 };
 
 /**
- * 交互选项
- */
-UENUM(BlueprintType)
-enum class EInteractAction : uint8
-{
-	// 无
-	None UMETA(DisplayName="无"),
-	// 复活
-	Revive UMETA(DisplayName="复活"),
-	// 喂食
-	Feed UMETA(DisplayName="喂食"),
-	// 骑乘
-	Ride UMETA(DisplayName="骑乘"),
-	// 取消骑乘
-	UnRide UMETA(DisplayName="取消骑乘"),
-	// 战斗
-	Fight UMETA(DisplayName="战斗"),
-	// 对话
-	Dialogue UMETA(DisplayName="对话"),
-	// 交易
-	Transaction UMETA(DisplayName="交易"),
-	// 打开
-	Open UMETA(DisplayName="打开"),
-	// 关闭
-	Close UMETA(DisplayName="关闭")
-};
-
-/**
  * ???????
  */
 UENUM(BlueprintType)
@@ -662,7 +634,7 @@ public:
 	}
 
 public:
-	class UVitalityAssetBase& GetVitalityData() const;
+	class UVitalityAssetBase* GetVitalityData() const;
 };
 
 USTRUCT(BlueprintType)
@@ -732,7 +704,7 @@ public:
 	TMap<ECharacterActionType, FDWCharacterActionAbilityData> ActionAbilities;
 
 public:
-	class UCharacterAssetBase& GetCharacterData() const;
+	class UCharacterAssetBase* GetCharacterData() const;
 };
 
 USTRUCT(BlueprintType)
@@ -794,7 +766,7 @@ public:
 };
 
 USTRUCT(BlueprintType)
-struct WHFRAMEWORK_API FDWWorldSaveData : public FWorldSaveData
+struct DREAMWORLD_API FDWWorldSaveData : public FWorldSaveData
 {
 	GENERATED_BODY()
 

@@ -5,7 +5,7 @@
 #include "DWPropAsset.generated.h"
 
 UCLASS(BlueprintType)
-class WHFRAMEWORK_API UDWPropAsset : public UPropAssetBase
+class DREAMWORLD_API UDWPropAsset : public UPropAssetBase
 {
 	GENERATED_BODY()
 

@@ -3,6 +3,7 @@
 
 #include "Widget/Inventory/WidgetInventoryBar.h"
 
+#include "Asset/Primary/Item/ItemAssetBase.h"
 #include "Blueprint/WidgetBlueprintLibrary.h"
 #include "Widget/Inventory/Slot/WidgetInventorySlot.h"
 #include "Character/Player/DWPlayerCharacter.h"
@@ -83,7 +84,7 @@ void UWidgetInventoryBar::OnInitialize_Implementation(AActor* InOwner)
 				if(UWidgetInventoryAuxiliarySlot* AuxiliarySlot = Cast<UWidgetInventoryAuxiliarySlot>(UWidgetBlueprintLibrary::Create(this, AuxiliarySlotClass, nullptr)))
 				{
 					AuxiliarySlot->InitSlot(AuxiliarySlots[i]);
-					AuxiliarySlot->SetKeyCode(UDWHelper::GetInputActionKeyCodeByName(FString::Printf(TEXT("ReleaseAuxiliaryAbility%d"), i + 1)));
+					AuxiliarySlot->SetKeyCode(UGlobalBPLibrary::GetInputActionKeyCodeByName(FString::Printf(TEXT("ReleaseAuxiliaryAbility%d"), i + 1)));
 					if(UGridSlot* GridSlot = AuxiliaryContent->AddChildToGrid(AuxiliarySlot))
 					{
 						GridSlot->SetPadding(FMargin(0.f, 0.f, 5.f, 0.f));
@@ -111,7 +112,7 @@ void UWidgetInventoryBar::OnInitialize_Implementation(AActor* InOwner)
 				if(UWidgetInventorySkillSlot* SkillSlot = Cast<UWidgetInventorySkillSlot>(UWidgetBlueprintLibrary::Create(this, SkillSlotClass, nullptr)))
 				{
 					SkillSlot->InitSlot(SkillSlots[i]);
-					SkillSlot->SetKeyCode(UDWHelper::GetInputActionKeyCodeByName(FString::Printf(TEXT("ReleaseSkillAbility%d"), i + 1)));
+					SkillSlot->SetKeyCode(UGlobalBPLibrary::GetInputActionKeyCodeByName(FString::Printf(TEXT("ReleaseSkillAbility%d"), i + 1)));
 					if(UGridSlot* GridSlot = i < SkillSlots.Num() / 2 ? LeftSkillContent->AddChildToGrid(SkillSlot) : RightSkillContent->AddChildToGrid(SkillSlot))
 					{
 						GridSlot->SetPadding(FMargin(0.f, 0.f, 5.f, 0.f));
@@ -166,7 +167,7 @@ void UWidgetInventoryBar::SelectInventorySlot(int32 InSlotIndex)
 	SelectedSlotIndex = InSlotIndex;
 	UpdateSelectBox();
 	GetInventory()->SetSelectedSlot(GetSelectedSlot());
-	TArray<FParameter> Params { FParameter::MakeString(GetSelectedItem().GetData().Name.ToString()) };
+	TArray<FParameter> Params { FParameter::MakeString(GetSelectedItem().GetData()->Name.ToString()) };
 	UWidgetModuleBPLibrary::OpenUserWidget<UWidgetItemInfoBox>(&Params);
 	UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>()->RefreshActions();
 }

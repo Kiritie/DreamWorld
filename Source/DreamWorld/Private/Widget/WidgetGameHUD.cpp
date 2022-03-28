@@ -3,10 +3,10 @@
 
 #include "Widget/WidgetGameHUD.h"
 
+#include "Ability/Components/InteractionComponent.h"
 #include "Character/DWCharacter.h"
 #include "Event/EventModuleBPLibrary.h"
 #include "Event/Handle/Input/EventHandle_ChangeInputMode.h"
-#include "Interaction/Components/InteractionComponent.h"
 #include "Main/MainModule.h"
 #include "Widget/WidgetModule.h"
 
@@ -48,9 +48,9 @@ void UWidgetGameHUD::RefreshActions()
 {
 	if(ADWCharacter* OwnerCharacter = Cast<ADWCharacter>(GetOwnerActor()))
 	{
-		if(IInteractionInterface* OverlappingTarget = OwnerCharacter->GetInteractionComponent()->GetOverlappingTarget())
+		if(IInteractionAgentInterface* OverlappingAgent = OwnerCharacter->GetInteractionComponent()->GetOverlappingAgent())
 		{
-			ShowActions(OverlappingTarget->GetInteractionComponent()->GetValidInteractActions(OwnerCharacter));
+			ShowActions(OverlappingAgent->GetInteractionComponent()->GetValidInteractActions(OwnerCharacter));
 		}
 		else
 		{

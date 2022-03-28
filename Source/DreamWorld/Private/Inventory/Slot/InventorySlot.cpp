@@ -1,13 +1,14 @@
 // Copyright 1998-2019 Epic Games, Inc. All Rights Reserved.
 
 #include "Inventory/Slot/InventorySlot.h"
+
+#include "Ability/Item/ItemAbilityBase.h"
+#include "Asset/Primary/Item/ItemAssetBase.h"
 #include "Inventory/Inventory.h"
-#include "World/VoxelModule.h"
-#include "World/Chunk.h"
 #include "Character/Player/DWPlayerCharacter.h"
-#include "Vitality/Vitality.h"
+#include "Voxel/VoxelModule.h"
+#include "Voxel/Chunks/VoxelChunk.h"
 #include "Widget/Inventory/Slot/WidgetInventorySlot.h"
-#include "Abilities/Item/DWItemAbility.h"
 
 UInventorySlot::UInventorySlot()
 {
@@ -28,7 +29,7 @@ void UInventorySlot::InitSlot(UInventory* InOwner, FItem InItem, EItemType InLim
 
 bool UInventorySlot::CheckSlot(FItem& InItem) const
 {
-	return LimitType == EItemType::None || LimitType == InItem.GetData().Type;
+	return LimitType == EItemType::None || InItem.GetData()->EqualType(LimitType);
 }
 
 bool UInventorySlot::CanPutIn(FItem& InItem) const
@@ -60,9 +61,9 @@ void UInventorySlot::EndSet()
 	if(Item.IsValid())
 	{
 		IAbilityVitalityInterface* vitality = Cast<IAbilityVitalityInterface>(Owner->GetOwnerActor());
-		if (vitality && Item.GetData().AbilityClass)
+		if (vitality && Item.GetData()->AbilityClass)
 		{
-			AbilityHandle = vitality->AcquireAbility(Item.GetData().AbilityClass, Item.Level);
+			AbilityHandle = vitality->AcquireAbility(Item.GetData()->AbilityClass, Item.Level);
 		}
 	}
 	else
@@ -204,65 +205,57 @@ void UInventorySlot::UseItem(int InCount /*= -1*/)
 
 	if (InCount == -1) InCount = Item.Count;
 	
-	switch (Item.GetData().Type)
+	if(Item.GetData()->EqualType(EItemType::Voxel))
 	{
-		case EItemType::Voxel:
+		if(ADWCharacter* OwnerCharacter = Cast<ADWCharacter>(GetOwner()->GetOwnerActor()))
 		{
-			if(ADWCharacter* OwnerCharacter = Cast<ADWCharacter>(GetOwner()->GetOwnerActor()))
+			for(int32 i = 0; i < InCount; i ++)
 			{
-				for(int32 i = 0; i < InCount; i ++)
+				FItem tmpItem = FItem(Item, 1);
+				if(OwnerCharacter->UseItem(tmpItem))
 				{
-					FItem tmpItem = FItem(Item, 1);
-					if(OwnerCharacter->UseItem(tmpItem))
-					{
-						OwnerCharacter->DoAction(ECharacterActionType::Use);
-						SubItem(tmpItem);
-					}
-					else break;
+					OwnerCharacter->DoAction(ECharacterActionType::Use);
+					SubItem(tmpItem);
 				}
+				else break;
 			}
-			break;
 		}
-		case EItemType::Prop:
+	}
+	else if(Item.GetData()->EqualType(EItemType::Prop))
+	{
+		if(ADWCharacter* OwnerCharacter = Cast<ADWCharacter>(GetOwner()->GetOwnerActor()))
 		{
-			if(ADWCharacter* OwnerCharacter = Cast<ADWCharacter>(GetOwner()->GetOwnerActor()))
+			for(int32 i = 0; i < InCount; i ++)
 			{
-				for(int32 i = 0; i < InCount; i ++)
+				FItem tmpItem = FItem(Item, 1);
+				if(OwnerCharacter->UseItem(tmpItem) && ActiveItem())
 				{
-					FItem tmpItem = FItem(Item, 1);
-					if(OwnerCharacter->UseItem(tmpItem) && ActiveItem())
-					{
-						OwnerCharacter->DoAction(ECharacterActionType::Use);
-						SubItem(tmpItem);
-					}
-					else break;
+					OwnerCharacter->DoAction(ECharacterActionType::Use);
+					SubItem(tmpItem);
 				}
+				else break;
 			}
-			break;
 		}
-		case EItemType::Equip:
+	}
+	else if(Item.GetData()->EqualType(EItemType::Equip))
+	{
+		if(GetSplitType() != ESplitSlotType::Equip)
 		{
-			if(GetSplitType() != ESplitSlotType::Equip)
-			{
-				Owner->AdditionItemBySplitType(Item, ESplitSlotType::Equip); 
-				Refresh();
-			}
-			break;
+			Owner->AdditionItemBySplitType(Item, ESplitSlotType::Equip); 
+			Refresh();
 		}
-		case EItemType::Skill:
+	}
+	else if(Item.GetData()->EqualType(EItemType::Skill))
+	{
+		if(GetSplitType() != ESplitSlotType::Skill)
 		{
-			if(GetSplitType() != ESplitSlotType::Skill)
-			{
-				Owner->AdditionItemBySplitType(Item, ESplitSlotType::Skill);
-				Refresh();
-			}
-			else
-			{
-				ActiveItem();
-			}
-			break;
+			Owner->AdditionItemBySplitType(Item, ESplitSlotType::Skill);
+			Refresh();
 		}
-		default: break;
+		else
+		{
+			ActiveItem();
+		}
 	}
 }
 
@@ -354,7 +347,7 @@ int UInventorySlot::GetRemainVolume() const
 
 int UInventorySlot::GetMaxVolume() const
 {
-	return Item.IsValid() ? Item.GetData().MaxCount : 0;
+	return Item.IsValid() ? Item.GetData()->MaxCount : 0;
 }
 
 FAbilityInfo UInventorySlot::GetAbilityInfo() const
@@ -362,7 +355,7 @@ FAbilityInfo UInventorySlot::GetAbilityInfo() const
 	FAbilityInfo AbilityInfo;
 	if(ADWCharacter* Character = Cast<ADWCharacter>(Owner->GetOwnerActor()))
 	{
-		Character->GetAbilityInfo(Item.GetData().AbilityClass, AbilityInfo);
+		Character->GetAbilityInfo(Item.GetData()->AbilityClass, AbilityInfo);
 	}
 	return AbilityInfo;
 }

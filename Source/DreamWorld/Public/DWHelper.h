@@ -20,8 +20,6 @@ class DREAMWORLD_API UDWHelper : public UBlueprintFunctionLibrary
 	GENERATED_BODY()
 	
 public:
-	UDWHelper(const FObjectInitializer& ObjectInitializer);
-
 	//////////////////////////////////////////////////////////////////////////
 	// References
 private:

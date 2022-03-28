@@ -11,7 +11,7 @@
  * 体素模块
  */
 UCLASS(hidecategories = (Tick, Replication, Rendering, Collision, Actor, Input, LOD, Cooking, Hidden, WorldPartition, Hlod))
-class WHFRAMEWORK_API ADWVoxelModule : public AVoxelModule
+class DREAMWORLD_API ADWVoxelModule : public AVoxelModule
 {
 	GENERATED_BODY()
 	
@@ -47,9 +47,9 @@ protected:
 	UStaticMeshComponent* BoundsMesh;
 
 public:
-	virtual void LoadData(FWorldSaveData* InWorldData) override;
+	virtual void LoadData(FSaveData* InWorldData) override;
 
-	virtual FWorldSaveData* ToData(bool bSaved = true) const override;
+	virtual FSaveData* ToData(bool bSaved = true) override;
 
 	virtual void UnloadData(bool bPreview = false) override;
 

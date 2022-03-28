@@ -3,14 +3,17 @@
 
 #include "Character/Monster/DWMonsterCharacter.h"
 
+#include "Ability/Components/CharacterInteractionComponent.h"
+#include "Ability/Item/Prop/DWPropAsset.h"
+#include "Ability/Item/Prop/PropAssetBase.h"
 #include "Components/BoxComponent.h"
 #include "BehaviorTree/BehaviorTree.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "AI/DWAIBlackboard.h"
 #include "Character/Human/DWHumanCharacter.h"
-#include "Interaction/Components/CharacterInteractionComponent.h"
 #include "Inventory/Inventory.h"
 #include "Inventory/Slot/InventorySlot.h"
+#include "Voxel/Voxels/VoxelAssetBase.h"
 
 ADWMonsterCharacter::ADWMonsterCharacter()
 {
@@ -56,17 +59,17 @@ void ADWMonsterCharacter::SetDamaging(bool bInDamaging)
 	AttackPoint->SetGenerateOverlapEvents(bInDamaging);
 }
 
-bool ADWMonsterCharacter::CanInteract(IInteractionInterface* InInteractionTarget, EInteractAction InInteractAction)
+bool ADWMonsterCharacter::CanInteract(IInteractionAgentInterface* InInteractionAgent, EInteractAction InInteractAction)
 {
-	if(!Super::CanInteract(InInteractionTarget, InInteractAction)) return false;
+	if(!Super::CanInteract(InInteractionAgent, InInteractAction)) return false;
 	
 	switch (InInteractAction)
 	{
 		case EInteractAction::Feed:
 		{
-			if(ADWCharacter* InInteractionCharacter = Cast<ADWCharacter>(InInteractionTarget))
+			if(ADWCharacter* InInteractionCharacter = Cast<ADWCharacter>(InInteractionAgent))
 			{
-				if(!IsEnemy(InInteractionCharacter) && UDWHelper::LoadPropData(InInteractionCharacter->GetInventory()->GetSelectedItem().ID).PropType == EPropType::Food)
+				if(!IsEnemy(InInteractionCharacter) && InInteractionCharacter->GetInventory()->GetSelectedItem().GetData<UDWPropAsset>()->PropType == EPropType::Food)
 				{
 					return true;
 				}
@@ -75,7 +78,7 @@ bool ADWMonsterCharacter::CanInteract(IInteractionInterface* InInteractionTarget
 		}
 		case EInteractAction::Ride:
 		{
-			if(ADWCharacter* InInteractionCharacter = Cast<ADWCharacter>(InInteractionTarget))
+			if(ADWCharacter* InInteractionCharacter = Cast<ADWCharacter>(InInteractionAgent))
 			{
 				if(!IsEnemy(InInteractionCharacter) && InInteractionCharacter->IsA(ADWHumanCharacter::StaticClass()) && InInteractionCharacter->GetRidingTarget() != this)
 				{
@@ -86,7 +89,7 @@ bool ADWMonsterCharacter::CanInteract(IInteractionInterface* InInteractionTarget
 		}
 		case EInteractAction::UnRide:
 		{
-			if(ADWCharacter* InInteractionCharacter = Cast<ADWCharacter>(InInteractionTarget))
+			if(ADWCharacter* InInteractionCharacter = Cast<ADWCharacter>(InInteractionAgent))
 			{
 				if(!IsEnemy(InInteractionCharacter) && InInteractionCharacter->IsA(ADWHumanCharacter::StaticClass()) && InInteractionCharacter->GetRidingTarget() == this)
 				{
@@ -100,15 +103,15 @@ bool ADWMonsterCharacter::CanInteract(IInteractionInterface* InInteractionTarget
 	return false;
 }
 
-void ADWMonsterCharacter::OnInteract(IInteractionInterface* InInteractionTarget, EInteractAction InInteractAction)
+void ADWMonsterCharacter::OnInteract(IInteractionAgentInterface* InInteractionAgent, EInteractAction InInteractAction)
 {
-	Super::OnInteract(InInteractionTarget, InInteractAction);
+	Super::OnInteract(InInteractionAgent, InInteractAction);
 
 	switch (InInteractAction)
 	{
 		case EInteractAction::Feed:
 		{
-			if(ADWCharacter* TriggerCharacter = Cast<ADWCharacter>(InInteractionTarget))
+			if(ADWCharacter* TriggerCharacter = Cast<ADWCharacter>(InInteractionAgent))
 			{
 				TriggerCharacter->GetInventory()->SetConnectInventory(GetInventory());
 				TriggerCharacter->GetInventory()->GetSelectedSlot()->MoveItem(1);
@@ -118,7 +121,7 @@ void ADWMonsterCharacter::OnInteract(IInteractionInterface* InInteractionTarget,
 		}
 		case EInteractAction::Ride:
 		{
-			if(ADWCharacter* TriggerCharacter = Cast<ADWCharacter>(InInteractionTarget))
+			if(ADWCharacter* TriggerCharacter = Cast<ADWCharacter>(InInteractionAgent))
 			{
 				TriggerCharacter->Ride(this);
 			}
@@ -126,7 +129,7 @@ void ADWMonsterCharacter::OnInteract(IInteractionInterface* InInteractionTarget,
 		}
 		case EInteractAction::UnRide:
 		{
-			if(ADWCharacter* TriggerCharacter = Cast<ADWCharacter>(InInteractionTarget))
+			if(ADWCharacter* TriggerCharacter = Cast<ADWCharacter>(InInteractionAgent))
 			{
 				TriggerCharacter->UnRide();
 			}

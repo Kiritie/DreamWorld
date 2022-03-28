@@ -4,7 +4,6 @@
 
 #include "Gameplay/DWPlayerController.h"
 #include "Kismet/GameplayStatics.h"
-#include "World/VoxelModule.h"
 
 UDWGeneralSaveGame::UDWGeneralSaveGame()
 {

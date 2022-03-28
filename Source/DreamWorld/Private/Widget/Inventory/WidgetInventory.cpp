@@ -1,9 +1,9 @@
 #include "Widget/Inventory/WidgetInventory.h"
 
 #include "Components/GridPanel.h"
+#include "Inventory/InventoryAgentInterface.h"
 #include "Inventory/Slot/InventorySkillSlot.h"
 #include "Inventory/Slot/InventorySlot.h"
-#include "Vitality/Vitality.h"
 
 UWidgetInventory::UWidgetInventory(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -22,9 +22,9 @@ void UWidgetInventory::OnRefresh_Implementation()
 
 UInventory* UWidgetInventory::GetInventory() const
 {
-	if(IAbilityVitality* Vitality = Cast<IAbilityVitality>(OwnerActor))
+	if(IInventoryAgentInterface* InventoryAgent = Cast<IInventoryAgentInterface>(OwnerActor))
 	{
-		return Vitality->GetInventory();
+		return InventoryAgent->GetInventory();
 	}
 	return nullptr;
 }

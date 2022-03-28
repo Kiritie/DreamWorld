@@ -1,48 +1,50 @@
 // Copyright 1998-2019 Epic Games, Inc. All Rights Reserved.
 
 #include "Inventory/VitalityInventory.h"
+
+#include "Ability/Vitality/AbilityVitalityBase.h"
 #include "Inventory/Slot/InventorySlot.h"
 #include "Widget/Inventory/WidgetInventoryBar.h"
 #include "Inventory/Slot/InventoryEquipSlot.h"
 #include "Gameplay/DWGameInstance.h"
-#include "Vitality/AbilityVitalityBase.h"
+#include "Vitality/DWVitality.h"
 
-UAbilityVitalityInventory::UAbilityVitalityInventory()
+UVitalityInventory::UVitalityInventory()
 {
 	
 }
 
-void UAbilityVitalityInventory::Initialize(AActor* InOwner, TMap<ESplitSlotType, FSplitSlotInfo> InSplitInfos)
+void UVitalityInventory::Initialize(AActor* InOwner, TMap<ESplitSlotType, FSplitSlotInfo> InSplitInfos)
 {
 	Super::Initialize(InOwner, InSplitInfos);
 }
 
-void UAbilityVitalityInventory::LoadData(FInventorySaveData InInventoryData, AActor* InOwner)
+void UVitalityInventory::LoadData(FInventorySaveData InInventoryData, AActor* InOwner)
 {
 	Super::LoadData(InInventoryData, InOwner);
 }
 
-FInventorySaveData UAbilityVitalityInventory::ToData(bool bSaved)
+FInventorySaveData UVitalityInventory::ToData(bool bSaved)
 {
 	return Super::ToData();
 }
 
-void UAbilityVitalityInventory::DiscardAllItem()
+void UVitalityInventory::DiscardAllItem()
 {
 	Super::DiscardAllItem();
 }
 
-void UAbilityVitalityInventory::ClearAllItem()
+void UVitalityInventory::ClearAllItem()
 {
 	Super::ClearAllItem();
 }
 
-FQueryItemInfo UAbilityVitalityInventory::GetItemInfoByRange(EQueryItemType InActionType, FItem InItem, int32 InStartIndex, int32 InEndIndex)
+FQueryItemInfo UVitalityInventory::GetItemInfoByRange(EQueryItemType InActionType, FItem InItem, int32 InStartIndex, int32 InEndIndex)
 {
 	return Super::GetItemInfoByRange(InActionType, InItem, InStartIndex, InEndIndex);
 }
 
-AAbilityVitalityBase* UAbilityVitalityInventory::GetOwnerVitality() const
+ADWVitality* UVitalityInventory::GetOwnerVitality() const
 {
-	return Cast<AAbilityVitalityBase>(OwnerActor);
+	return Cast<ADWVitality>(OwnerActor);
 }

@@ -6,16 +6,17 @@
 #include "Inventory/Inventory.h"
 #include "VitalityInventory.generated.h"
 
+class ADWVitality;
 /**
  * �����Ʒ��
  */
 UCLASS()
-class DREAMWORLD_API UAbilityVitalityInventory : public UInventory
+class DREAMWORLD_API UVitalityInventory : public UInventory
 {
 	GENERATED_BODY()
 
 public:
-	UAbilityVitalityInventory();
+	UVitalityInventory();
 
 public:
 	virtual void Initialize(AActor* InOwner, TMap<ESplitSlotType, FSplitSlotInfo> InSplitInfos) override;
@@ -32,5 +33,5 @@ public:
 
 public:
 	UFUNCTION(BlueprintPure)
-	AAbilityVitalityBase* GetOwnerVitality() const;
+	ADWVitality* GetOwnerVitality() const;
 };

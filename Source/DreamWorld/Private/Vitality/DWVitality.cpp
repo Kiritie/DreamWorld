@@ -9,7 +9,6 @@
 #include "Components/BoxComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Character/DWCharacter.h"
-#include "Interaction/Components/VitalityInteractionComponent.h"
 #include "Inventory/VitalityInventory.h"
 #include "Vitality/DWVitalityAsset.h"
 #include "Voxel/DWVoxelChunk.h"
@@ -24,15 +23,11 @@ ADWVitality::ADWVitality()
 	WidgetVitalityHP->SetupAttachment(RootComponent);
 	WidgetVitalityHP->SetRelativeLocation(FVector(0, 0, 50));
 
-	Interaction = CreateDefaultSubobject<UAbilityVitalityInteractionComponent>(FName("Interaction"));
-	Interaction->SetupAttachment(RootComponent);
-	Interaction->SetRelativeLocation(FVector(0, 0, 0));
-
 	AbilitySystem = CreateDefaultSubobject<UDWAbilitySystemComponent>(FName("AbilitySystem"));
 
 	AttributeSet = CreateDefaultSubobject<UDWVitalityAttributeSet>(FName("AttributeSet"));
 	
-	Inventory = CreateDefaultSubobject<UAbilityVitalityInventory>(FName("Inventory"));
+	Inventory = CreateDefaultSubobject<UVitalityInventory>(FName("Inventory"));
 
 	OwnerChunk = nullptr;
 }
@@ -91,10 +86,10 @@ void ADWVitality::LoadData(FSaveData* InSaveData)
 		SetActorLocation(SaveData.SpawnLocation);
 		SetActorRotation(SaveData.SpawnRotation);
 
-		const UDWVitalityAsset& vitalityData = GetVitalityData<UDWVitalityAsset>();
-		if(vitalityData.IsValid())
+		const UDWVitalityAsset* vitalityData = GetVitalityData<UDWVitalityAsset>();
+		if(vitalityData->IsValid())
 		{
-			SaveData.InventoryData = vitalityData.InventoryData;
+			SaveData.InventoryData = vitalityData->InventoryData;
 		}
 
 		// const auto ItemDatas = UDWHelper::LoadItemDatas();
@@ -157,7 +152,17 @@ void ADWVitality::Revive()
 	Super::Revive();
 }
 
-bool ADWVitality::CanInteract(IInteractionInterface* InInteractionTarget, EInteractAction InInteractAction)
+bool ADWVitality::GenerateVoxel(const FVoxelHitResult& InVoxelHitResult, FItem& InItem)
+{
+	return false;
+}
+
+bool ADWVitality::DestroyVoxel(const FVoxelHitResult& InVoxelHitResult)
+{
+	return false;
+}
+
+bool ADWVitality::CanInteract(IInteractionAgentInterface* InInteractionAgent, EInteractAction InInteractAction)
 {
 	switch (InInteractAction)
 	{
@@ -171,11 +176,12 @@ bool ADWVitality::CanInteract(IInteractionInterface* InInteractionTarget, EInter
 		}
 		default: return true;
 	}
-	return false;
+	return Super::CanInteract(InInteractionAgent, InInteractAction);
 }
 
-void ADWVitality::OnInteract(IInteractionInterface* InInteractionTarget, EInteractAction InInteractAction)
+void ADWVitality::OnInteract(IInteractionAgentInterface* InInteractionAgent, EInteractAction InInteractAction)
 {
+	Super::OnInteract(InInteractionAgent, InInteractAction);
 	switch (InInteractAction)
 	{
 		case EInteractAction::Revive:
@@ -187,6 +193,21 @@ void ADWVitality::OnInteract(IInteractionInterface* InInteractionTarget, EIntera
 	}
 }
 
+FItem& ADWVitality::GetGeneratingVoxelItem()
+{
+	FItem tmpItem = Inventory->GetSelectedItem();
+	if(tmpItem.IsValid() && tmpItem.GetData()->EqualType(EItemType::Voxel))
+	{
+		return tmpItem;
+	}
+	return FItem::Empty;
+}
+
+FVoxelItem& ADWVitality::GetSelectedVoxelItem()
+{
+	return SelectedVoxelItem;
+}
+
 UWidgetVitalityHP* ADWVitality::GetWidgetVitalityHPWidget() const
 {
 	if (WidgetVitalityHP->GetUserWidgetObject())
@@ -194,11 +215,6 @@ UWidgetVitalityHP* ADWVitality::GetWidgetVitalityHPWidget() const
 		return Cast<UWidgetVitalityHP>(WidgetVitalityHP->GetUserWidgetObject());
 	}
 	return nullptr;
-}
-
-UInteractionComponent* ADWVitality::GetInteractionComponent() const
-{
-	return Interaction;
 }
 
 void ADWVitality::HandleDamage(EDamageType DamageType, const float LocalDamageDone, bool bHasCrited, FHitResult HitResult, const FGameplayTagContainer& SourceTags, AActor* SourceActor)

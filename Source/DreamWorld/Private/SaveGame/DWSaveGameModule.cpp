@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Module/DWSaveGameModule.h"
+#include "SaveGame/DWSaveGameModule.h"
 
 #include "Debug/DebugModuleTypes.h"
 #include "Gameplay/DWPlayerController.h"
@@ -9,7 +9,6 @@
 #include "SaveGame/DWArchiveSaveGame.h"
 #include "SaveGame/DWGeneralSaveGame.h"
 #include "SaveGame/SaveGameModuleBPLibrary.h"
-#include "World/VoxelModule.h"
 
 // ParamSets default values
 ADWSaveGameModule::ADWSaveGameModule()
@@ -77,7 +76,7 @@ FPlayerSaveData ADWSaveGameModule::GetDefaultPlayerData() const
 	return FPlayerSaveData(ArchiveBasicData.PlayerBasicData);
 }
 
-FWorldSaveData ADWSaveGameModule::GetDefaultWorldData() const
+FDWWorldSaveData ADWSaveGameModule::GetDefaultWorldData() const
 {
-	return FWorldSaveData(ArchiveBasicData.WorldBasicData);
+	return FDWWorldSaveData(ArchiveBasicData.WorldBasicData);
 }

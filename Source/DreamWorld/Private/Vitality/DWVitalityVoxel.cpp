@@ -1,24 +1,23 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Vitality/VitalityVoxel.h"
+#include "Vitality/DWVitalityVoxel.h"
+
+#include "Asset/AssetModuleBPLibrary.h"
 #include "Components/BoxComponent.h"
+#include "Voxel/VoxelModule.h"
 #include "Voxel/Components/VoxelMeshComponent.h"
-#include "Voxel/Voxel.h"
-#include "World/VoxelModule.h"
+#include "Voxel/Voxels/VoxelAssetBase.h"
 
 // Sets default values
 ADWVitalityVoxel::ADWVitalityVoxel()
 {
-	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = false;
-
 	VoxelMesh = CreateDefaultSubobject<UVoxelMeshComponent>(FName("VoxelMesh"));
 	VoxelMesh->SetupAttachment(RootComponent, FName("VoxelMesh"));
 	VoxelMesh->SetRelativeLocationAndRotation(FVector(0, 0, 0), FRotator(0, 0, 0));
 	VoxelMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
-	VoxelID = NAME_None;
+	VoxelID = FPrimaryAssetId();
 }
 
 // Called when the game starts or when spawned
@@ -26,11 +25,11 @@ void ADWVitalityVoxel::BeginPlay()
 {
 	Super::BeginPlay();
 
-	FVector range = GetData<UVoxelAssetBase>().GetFinalRange();
-	BoxComponent->SetBoxExtent(range * AVoxelModule::GetWorldData().BlockSize);
+	FVector range = GetVoxelData()->GetFinalRange();
+	BoxComponent->SetBoxExtent(range * AVoxelModule::GetWorldData()->BlockSize);
 	//AddActorLocalOffset(FVector::UpVector * range.Z * VoxelMesh->BlockScale * 0.5f);
 
-	if (GetData<UVoxelAssetBase>().IsValid())
+	if (GetVoxelData()->IsValid())
 	{
 		VoxelMesh->Initialize(EVoxelMeshType::VitalityVoxel);
 		VoxelMesh->BuildVoxel(FVoxelItem(VoxelID));
@@ -49,7 +48,7 @@ void ADWVitalityVoxel::Tick(float DeltaTime)
 
 }
 
-UVoxelAssetBase ADWVitalityVoxel::GetData<UVoxelAssetBase>() const
+UVoxelAssetBase* ADWVitalityVoxel::GetVoxelData() const
 {
-	return UDWHelper::LoadVoxelData(VoxelID);
+	return UAssetModuleBPLibrary::LoadPrimaryAsset<UVoxelAssetBase>(VoxelID);
 }

@@ -2,14 +2,15 @@
 
 #include "Inventory/Slot/InventorySkillSlot.h"
 
+#include "Ability/Item/Skill/DWSkillAsset.h"
 #include "Inventory/Inventory.h"
 #include "Inventory/Slot/InventorySlot.h"
 #include "Character/Player/DWPlayerCharacter.h"
 #include "Widget/Inventory/Slot/WidgetInventorySkillSlot.h"
-#include "Abilities/Character/DWCharacterSkillAbility.h"
 #include "Widget/WidgetModuleBPLibrary.h"
 #include "Widget/WidgetGameHUD.h"
 #include "Widget/WidgetItemInfoBox.h"
+#include "Ability/Character/DWCharacterSkillAbility.h"
 
 UInventorySkillSlot::UInventorySkillSlot()
 {
@@ -24,7 +25,7 @@ void UInventorySkillSlot::InitSlot(UInventory* InOwner, FItem InItem, EItemType 
 void UInventorySkillSlot::PreSet(FItem& InItem)
 {
 	Super::PreSet(InItem);
-	if(GetSkillData().GetItemData().SkillMode == ESkillMode::Passive)
+	if(GetSkillData().GetItemData<UDWSkillAsset>()->SkillMode == ESkillMode::Passive)
 	{
 		CancelItem();
 	}
@@ -33,7 +34,7 @@ void UInventorySkillSlot::PreSet(FItem& InItem)
 void UInventorySkillSlot::EndSet()
 {
 	Super::EndSet();
-	if(GetSkillData().GetItemData().SkillMode == ESkillMode::Passive)
+	if(GetSkillData().GetItemData<UDWSkillAsset>()->SkillMode == ESkillMode::Passive)
 	{
 		ActiveItem();
 	}
@@ -46,7 +47,7 @@ bool UInventorySkillSlot::ActiveItem()
 		if (Character->SkillAttack(Item.ID))
 		{
 			Super::ActiveItem();
-			if(GetSkillData().GetItemData().SkillMode == ESkillMode::Initiative)
+			if(GetSkillData().GetItemData<UDWSkillAsset>()->SkillMode == ESkillMode::Initiative)
 			{
 				StartCooldown();
 			}
@@ -66,7 +67,7 @@ bool UInventorySkillSlot::CancelItem()
 	if (GetSkillData().bCancelable)
 	{
 		Super::CancelItem();
-		if(GetSkillData().GetItemData().SkillMode == ESkillMode::Initiative)
+		if(GetSkillData().GetItemData<UDWSkillAsset>()->SkillMode == ESkillMode::Initiative)
 		{
 			StopCooldown();
 		}
