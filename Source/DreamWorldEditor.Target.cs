@@ -8,6 +8,7 @@ public class DreamWorldEditorTarget : TargetRules
 	public DreamWorldEditorTarget(TargetInfo InTarget) : base(InTarget)
 	{
 		Type = TargetType.Editor;
+		DefaultBuildSettings = BuildSettingsVersion.V2;
 		ExtraModuleNames.Add("DreamWorld");
 	}
 }

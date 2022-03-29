@@ -3,8 +3,6 @@
 #include "Ability/Components/AbilitySystemComponentBase.h"
 #include "DWAbilitySystemComponent.generated.h"
 
-class UAbilityBase;
-
 /**
  * AbilitySystem组件
  */

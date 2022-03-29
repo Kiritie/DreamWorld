@@ -23,9 +23,9 @@ ADWVitality::ADWVitality()
 	WidgetVitalityHP->SetupAttachment(RootComponent);
 	WidgetVitalityHP->SetRelativeLocation(FVector(0, 0, 50));
 
-	AbilitySystem = CreateDefaultSubobject<UDWAbilitySystemComponent>(FName("AbilitySystem"));
-
-	AttributeSet = CreateDefaultSubobject<UDWVitalityAttributeSet>(FName("AttributeSet"));
+	// AbilitySystem = CreateDefaultSubobject<UDWAbilitySystemComponent>(FName("AbilitySystem"));
+	//
+	// AttributeSet = CreateDefaultSubobject<UDWVitalityAttributeSet>(FName("AttributeSet"));
 	
 	Inventory = CreateDefaultSubobject<UVitalityInventory>(FName("Inventory"));
 

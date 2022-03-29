@@ -43,6 +43,7 @@
 #include "Ability/Item/Skill/SkillAssetBase.h"
 #include "Asset/AssetModuleBPLibrary.h"
 #include "BehaviorTree/BehaviorTree.h"
+#include "BehaviorTree/BlackboardData.h"
 #include "Character/DWCharacterAsset.h"
 #include "Inventory/Slot/InventoryEquipSlot.h"
 #include "Inventory/Slot/InventorySkillSlot.h"
@@ -67,9 +68,9 @@ ADWCharacter::ADWCharacter()
 	WidgetCharacterHP->SetupAttachment(RootComponent);
 	WidgetCharacterHP->SetRelativeLocation(FVector(0, 0, 70));
 
-	AbilitySystem = CreateDefaultSubobject<UDWAbilitySystemComponent>(FName("AbilitySystem"));
+	// AbilitySystem = CreateDefaultSubobject<UDWAbilitySystemComponent>(FName("AbilitySystem"));
 
-	AttributeSet = CreateDefaultSubobject<UDWCharacterAttributeSet>(FName("AttributeSet"));
+	// AttributeSet = CreateDefaultSubobject<UDWCharacterAttributeSet>(FName("AttributeSet"));
 
 	Inventory = CreateDefaultSubobject<UCharacterInventory>(FName("Inventory"));
 

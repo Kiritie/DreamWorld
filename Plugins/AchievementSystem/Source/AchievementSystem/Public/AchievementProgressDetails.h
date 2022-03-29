@@ -19,11 +19,11 @@ class ACHIEVEMENTSYSTEM_API UAchievementProgressDetails : public UUserWidget
 {
 	GENERATED_BODY()
 public:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Components", meta = (BindWidget))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (BindWidget))
 	UTextBlock* Title;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Components", meta = (BindWidget))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (BindWidget))
 	UTextBlock* ProgressText;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Components", meta = (BindWidget))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (BindWidget))
 	UProgressBar* AchievementProgressBar;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Details")
