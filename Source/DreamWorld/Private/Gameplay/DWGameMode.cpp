@@ -28,9 +28,9 @@ void ADWGameMode::BeginPlay()
 
 void ADWGameMode::InitializeGame()
 {
-	if(ADWGameState* DWGameState = UDWHelper::GetGameState(this))
+	if(ADWGameState* DWGameState = UGlobalBPLibrary::GetGameState<ADWGameState>(this))
 	{
-		DWGameState->SetCurrentState(EGameState::MainMenu);
+		DWGameState->SetCurrentState(EDWGameState::MainMenu);
 	}
 }
 
@@ -56,9 +56,9 @@ void ADWGameMode::ContinueGame()
 void ADWGameMode::PauseGame()
 {
 	UGameplayStatics::SetGamePaused(this, true);
-	if(ADWGameState* DWGameState = UDWHelper::GetGameState(this))
+	if(ADWGameState* DWGameState = UGlobalBPLibrary::GetGameState<ADWGameState>(this))
 	{
-		DWGameState->SetCurrentState(EGameState::Pausing);
+		DWGameState->SetCurrentState(EDWGameState::Pausing);
 	}
 	if(AMainModule* MainModule = AMainModule::Get())
 	{
@@ -69,9 +69,9 @@ void ADWGameMode::PauseGame()
 void ADWGameMode::UnPauseGame()
 {
 	UGameplayStatics::SetGamePaused(this, false);
-	if(ADWGameState* DWGameState = UDWHelper::GetGameState(this))
+	if(ADWGameState* DWGameState = UGlobalBPLibrary::GetGameState<ADWGameState>(this))
 	{
-		DWGameState->SetCurrentState(EGameState::Playing);
+		DWGameState->SetCurrentState(EDWGameState::Playing);
 	}
 	if(AMainModule* MainModule = AMainModule::Get())
 	{
@@ -85,13 +85,13 @@ void ADWGameMode::BackMainMenu()
 	{
 		USaveGameModuleBPLibrary::SaveSaveGame<UDWArchiveSaveGame>(ArchiveSaveGame->SaveData.ID);
 	}
-	if(ADWGameState* DWGameState = UDWHelper::GetGameState(this))
+	if(ADWGameState* DWGameState = UGlobalBPLibrary::GetGameState<ADWGameState>(this))
 	{
-		if (DWGameState->GetCurrentState() == EGameState::Pausing)
+		if (DWGameState->GetCurrentState() == EDWGameState::Pausing)
 		{
 			UGameplayStatics::SetGamePaused(this, false);
 		}
-		DWGameState->SetCurrentState(EGameState::MainMenu);
+		DWGameState->SetCurrentState(EDWGameState::MainMenu);
 	}
 }
 

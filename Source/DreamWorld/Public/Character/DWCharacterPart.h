@@ -36,17 +36,17 @@ public:
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	ECharacterPartType CharacterPartType;
+	EDWCharacterPartType CharacterPartType;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	UVoxel* LastOverlapVoxel;
 
 public:
 	UFUNCTION(BlueprintPure)
-	ECharacterPartType GetCharacterPartType() const { return CharacterPartType; }
+	EDWCharacterPartType GetCharacterPartType() const { return CharacterPartType; }
 
 	UFUNCTION(BlueprintCallable)
-	void SetCharacterPartType(ECharacterPartType InCharacterPartType) { this->CharacterPartType = InCharacterPartType; }
+	void SetCharacterPartType(EDWCharacterPartType InCharacterPartType) { this->CharacterPartType = InCharacterPartType; }
 
 	UFUNCTION(BlueprintPure)
 	UVoxel* GetLastOverlapVoxel() const { return LastOverlapVoxel; }

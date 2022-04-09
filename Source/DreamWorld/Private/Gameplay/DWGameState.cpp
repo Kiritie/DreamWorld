@@ -19,7 +19,7 @@ ADWGameState::ADWGameState()
 {
 	// set default pawn class to our Blueprinted character
 	
-	CurrentState = EGameState::None;
+	CurrentState = EDWGameState::None;
 }
 
 void ADWGameState::BeginPlay()
@@ -28,28 +28,28 @@ void ADWGameState::BeginPlay()
 
 }
 
-void ADWGameState::SetCurrentState(EGameState InGameState)
+void ADWGameState::SetCurrentState(EDWGameState InGameState)
 {
 	if (CurrentState != InGameState)
 	{
 		CurrentState = InGameState;
 		switch (InGameState)
 		{
-			case EGameState::MainMenu:
+			case EDWGameState::MainMenu:
 			{
 				UWidgetModuleBPLibrary::OpenUserWidget<UWidgetMainMenu>();
 				
 				UWidgetModuleBPLibrary::CreateUserWidget<UWidgetArchiveChoosingPanel>();
 				break;
 			}
-			case EGameState::Preparing:
+			case EDWGameState::Preparing:
 			{
 				UWidgetModuleBPLibrary::OpenUserWidget<UWidgetArchiveChoosingPanel>();
 
 				UWidgetModuleBPLibrary::CreateUserWidget<UWidgetArchiveCreatingPanel>();
 				break;
 			}
-			case EGameState::Loading:
+			case EDWGameState::Loading:
 			{
 				UWidgetModuleBPLibrary::OpenUserWidget<UWidgetLoadingPanel>();
 				
@@ -58,7 +58,7 @@ void ADWGameState::SetCurrentState(EGameState InGameState)
 				UWidgetModuleBPLibrary::CreateUserWidget<UWidgetInventoryPanel>();
 				break;
 			}
-			case EGameState::Playing:
+			case EDWGameState::Playing:
 			{
 				UWidgetModuleBPLibrary::CloseAllUserWidget(EWidgetType::Temporary);
 				
@@ -66,7 +66,7 @@ void ADWGameState::SetCurrentState(EGameState InGameState)
 				UWidgetModuleBPLibrary::OpenUserWidget<UWidgetInventoryBar>();
 				break;
 			}
-			case EGameState::Pausing:
+			case EDWGameState::Pausing:
 			{
 				UWidgetModuleBPLibrary::OpenUserWidget<UWidgetPausingMenu>();
 				break;

@@ -87,7 +87,7 @@ public:
 	//////////////////////////////////////////////////////////////////////////
 	// Character
 public:
-	ADWCharacter* SpawnCharacter(FCharacterSaveData InSaveData);
+	ADWCharacter* SpawnCharacter(FDWCharacterSaveData InSaveData);
 
 	void AttachCharacter(ADWCharacter* InCharacter);
 
@@ -98,7 +98,7 @@ public:
 	//////////////////////////////////////////////////////////////////////////
 	// Vitality
 public:
-	ADWVitality* SpawnVitality(FVitalitySaveData InSaveData);
+	ADWVitality* SpawnVitality(FDWVitalitySaveData InSaveData);
 
 	void AttachVitality(ADWVitality* InVitality);
 

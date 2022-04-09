@@ -40,7 +40,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	UWidgetVitalityHPComponent* WidgetVitalityHP;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	UInventory* Inventory;
 
 protected:
@@ -70,7 +70,7 @@ public:
 
 	virtual void Revive() override;
 
-	virtual bool GenerateVoxel(const FVoxelHitResult& InVoxelHitResult, FItem& InItem) override;
+	virtual bool GenerateVoxel(const FVoxelHitResult& InVoxelHitResult, FAbilityItem& InItem) override;
 
 	virtual bool DestroyVoxel(const FVoxelHitResult& InVoxelHitResult) override;
 
@@ -85,7 +85,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual void SetOwnerChunk(AVoxelChunk* InOwnerChunk) override { OwnerChunk = InOwnerChunk; }
 
-	virtual FItem& GetGeneratingVoxelItem() override;
+	virtual FAbilityItem& GetGeneratingVoxelItem() override;
 
 	virtual FVoxelItem& GetSelectedVoxelItem() override;
 

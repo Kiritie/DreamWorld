@@ -10,8 +10,8 @@
 /**
  * 体素模块
  */
-UCLASS(hidecategories = (Tick, Replication, Rendering, Collision, Actor, Input, LOD, Cooking, Hidden, WorldPartition, Hlod))
-class DREAMWORLD_API ADWTeamModule : public AVoxelModule
+UCLASS()
+class DREAMWORLD_API ADWTeamModule : public AModuleBase
 {
 	GENERATED_BODY()
 	
@@ -44,7 +44,7 @@ public:
 	// Team
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Team")
-	TMap<FName, FTeamData> TeamMap;
+	TMap<FName, FDWTeamData> TeamMap;
 
 public:
 	virtual bool IsExistTeam(const FName& InTeamID) const;
@@ -53,5 +53,5 @@ public:
 
 	virtual bool DissolveTeam(const FName& InTeamID, ADWCharacter* InCaptain = nullptr);
 
-	virtual FTeamData* GetTeamData(const FName& InTeamID);
+	virtual FDWTeamData* GetTeamData(const FName& InTeamID);
 };

@@ -116,14 +116,14 @@ void ADWAIController::OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimu
 	}
 }
 
-ECharacterNature ADWAIController::GetCharacterNature() const
+EDWCharacterNature ADWAIController::GetCharacterNature() const
 {
-	if(!GetBlackboardComponent()) return ECharacterNature::AIFriendly;
+	if(!GetBlackboardComponent()) return EDWCharacterNature::AIFriendly;
 
-	return (ECharacterNature)GetBlackboardComponent()->GetValueAsEnum(FName("CharacterNature"));
+	return (EDWCharacterNature)GetBlackboardComponent()->GetValueAsEnum(FName("CharacterNature"));
 }
 
-void ADWAIController::SetCharacterNature(ECharacterNature InCharacterNature)
+void ADWAIController::SetCharacterNature(EDWCharacterNature InCharacterNature)
 {
 	if(!GetBlackboardComponent()) return;
 

@@ -22,7 +22,7 @@ public:
 
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	FGeneralSaveData SaveData;
+	FDWGeneralSaveData SaveData;
 	
 public:
 	virtual void OnCreate_Implementation() override;

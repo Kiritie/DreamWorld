@@ -7,7 +7,7 @@
 #include "Components/BoxComponent.h"
 #include "Voxel/VoxelModule.h"
 #include "Voxel/Components/VoxelMeshComponent.h"
-#include "Voxel/Voxels/VoxelAssetBase.h"
+#include "Voxel/Datas/VoxelData.h"
 
 // Sets default values
 ADWVitalityVoxel::ADWVitalityVoxel()
@@ -31,7 +31,7 @@ void ADWVitalityVoxel::BeginPlay()
 
 	if (GetVoxelData()->IsValid())
 	{
-		VoxelMesh->Initialize(EVoxelMeshType::VitalityVoxel);
+		VoxelMesh->Initialize(EVoxelMeshType::Vitality);
 		VoxelMesh->BuildVoxel(FVoxelItem(VoxelID));
 		VoxelMesh->CreateMesh(0, false);
 	}
@@ -48,7 +48,7 @@ void ADWVitalityVoxel::Tick(float DeltaTime)
 
 }
 
-UVoxelAssetBase* ADWVitalityVoxel::GetVoxelData() const
+UVoxelData* ADWVitalityVoxel::GetVoxelData() const
 {
-	return UAssetModuleBPLibrary::LoadPrimaryAsset<UVoxelAssetBase>(VoxelID);
+	return UAssetModuleBPLibrary::LoadPrimaryAsset<UVoxelData>(VoxelID);
 }

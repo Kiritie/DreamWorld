@@ -10,10 +10,10 @@
 
 UInventoryShortcutSlot::UInventoryShortcutSlot()
 {
-	LimitType = EItemType::Skill;
+	LimitType = EAbilityItemType::Skill;
 }
 
-void UInventoryShortcutSlot::InitSlot(UInventory* InOwner, FItem InItem, EItemType InLimitType /* = EItemType::None */, ESplitSlotType InSplitType /*= ESplitSlotType::Default*/)
+void UInventoryShortcutSlot::InitSlot(UInventory* InOwner, FAbilityItem InItem, EAbilityItemType InLimitType /* = EAbilityItemType::None */, ESplitSlotType InSplitType /*= ESplitSlotType::Default*/)
 {
 	Super::InitSlot(InOwner, InItem, InLimitType, InSplitType);
 }

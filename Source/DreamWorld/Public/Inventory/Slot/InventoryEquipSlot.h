@@ -19,22 +19,22 @@ public:
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Default")
-	EEquipPartType PartType;
+	EDWEquipPartType PartType;
 
 public:
-	virtual void InitSlot(UInventory* InOwner, FItem InItem, EItemType InLimitType /* = EItemType::None */, ESplitSlotType InSplitType /*= ESplitSlotType::Default*/) override;
+	virtual void InitSlot(UInventory* InOwner, FAbilityItem InItem, EAbilityItemType InLimitType /* = EAbilityItemType::None */, ESplitSlotType InSplitType /*= ESplitSlotType::Default*/) override;
 
-	virtual bool CheckSlot(FItem& InItem) const override;
+	virtual bool CheckSlot(FAbilityItem& InItem) const override;
 	
 	virtual void Refresh() override;
 
-	virtual void PreSet(FItem& InItem) override;
+	virtual void PreSet(FAbilityItem& InItem) override;
 
 	virtual void EndSet() override;
 
 	UFUNCTION(BlueprintPure)
-	EEquipPartType GetPartType() const { return PartType; }
+	EDWEquipPartType GetPartType() const { return PartType; }
 
 	UFUNCTION(BlueprintCallable)
-	void SetPartType(EEquipPartType val) { PartType = val; }
+	void SetPartType(EDWEquipPartType val) { PartType = val; }
 };

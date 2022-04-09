@@ -3,7 +3,7 @@
 
 #include "Widget/Inventory/Slot/WidgetInventorySkillSlot.h"
 
-#include "Asset/Primary/Item/ItemAssetBase.h"
+#include "Ability/Item/ItemDataBase.h"
 #include "Character/DWCharacter.h"
 #include "Inventory/Slot/InventorySlot.h"
 #include "Inventory/Slot/InventorySkillSlot.h"

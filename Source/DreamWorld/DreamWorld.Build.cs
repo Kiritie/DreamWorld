@@ -23,7 +23,8 @@ public class DreamWorld : ModuleRules
 			new string[] {
 				"Core",
 				"CoreUObject",
-				"Engine"
+				"Engine",
+				"WHFramework"
 			}
 		);
 

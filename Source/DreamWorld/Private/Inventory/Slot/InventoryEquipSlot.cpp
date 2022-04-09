@@ -3,24 +3,24 @@
 
 #include "Inventory/Slot/InventoryEquipSlot.h"
 
-#include "Ability/Item/Equip/DWEquipAsset.h"
+#include "Ability/Item/Equip/DWEquipData.h"
 #include "Inventory/Inventory.h"
 #include "Character/DWCharacter.h"
 
 UInventoryEquipSlot::UInventoryEquipSlot()
 {
-	LimitType = EItemType::Equip;
-	PartType = EEquipPartType::Head;
+	LimitType = EAbilityItemType::Equip;
+	PartType = EDWEquipPartType::Head;
 }
 
-void UInventoryEquipSlot::InitSlot(UInventory* InOwner, FItem InItem, EItemType InLimitType /* = EItemType::None */, ESplitSlotType InSplitType /*= ESplitSlotType::Default*/)
+void UInventoryEquipSlot::InitSlot(UInventory* InOwner, FAbilityItem InItem, EAbilityItemType InLimitType /* = EAbilityItemType::None */, ESplitSlotType InSplitType /*= ESplitSlotType::Default*/)
 {
 	Super::InitSlot(InOwner, InItem, InLimitType, InSplitType);
 }
 
-bool UInventoryEquipSlot::CheckSlot(FItem& InItem) const
+bool UInventoryEquipSlot::CheckSlot(FAbilityItem& InItem) const
 {
-	return Super::CheckSlot(InItem) && InItem.GetData<UDWEquipAsset>()->PartType == PartType;
+	return Super::CheckSlot(InItem) && InItem.GetData<UDWEquipData>()->PartType == PartType;
 }
 
 void UInventoryEquipSlot::Refresh()
@@ -33,7 +33,7 @@ void UInventoryEquipSlot::Refresh()
 	}
 }
 
-void UInventoryEquipSlot::PreSet(FItem& InItem)
+void UInventoryEquipSlot::PreSet(FAbilityItem& InItem)
 {
 	Super::PreSet(InItem);
 	CancelItem();

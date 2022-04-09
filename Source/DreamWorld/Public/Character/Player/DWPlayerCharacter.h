@@ -4,6 +4,7 @@
 
 #include "DreamWorld/DreamWorld.h"
 #include "Character/Human/DWHumanCharacter.h"
+#include "Gameplay/WHPlayerInterface.h"
 #include "DWPlayerCharacter.generated.h"
 
 class UVoxel;
@@ -21,8 +22,8 @@ class UTargetSystemComponent;
 /**
  * ��ҽ�ɫ
  */
-UCLASS(config=Game)
-class ADWPlayerCharacter : public ADWHumanCharacter
+UCLASS()
+class ADWPlayerCharacter : public ADWHumanCharacter, public IWHPlayerInterface
 {
 	GENERATED_BODY()
 
@@ -33,7 +34,7 @@ protected:
 	// states
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "CharacterStates")
-	EControlMode ControlMode;
+	EDWControlMode ControlMode;
 	
 	// stats
 	
@@ -113,9 +114,9 @@ public:
 
 	virtual void AttackStart() override;
 
-	virtual bool UseItem(FItem& InItem) override;
+	virtual bool UseItem(FAbilityItem& InItem) override;
 
-	virtual void RefreshEquip(EEquipPartType InPartType, UInventoryEquipSlot* EquipSlot) override;
+	virtual void RefreshEquip(EDWEquipPartType InPartType, UInventoryEquipSlot* EquipSlot) override;
 
 	UFUNCTION(BlueprintCallable)
 	virtual void UpdateVoxelMesh();
@@ -127,6 +128,12 @@ public:
 	virtual void OnLeaveInteract(IInteractionAgentInterface* InInteractionAgent) override;
 
 protected:
+	virtual void MoveForward(float InValue, bool b2DMode) override;
+
+	virtual void MoveRight(float InValue, bool b2DMode) override;
+
+	virtual void MoveUp(float InValue, bool b2DMode) override;
+	
 	virtual void ToggleControlMode();
 
 	virtual void ToggleCrouch();
@@ -232,10 +239,10 @@ public:
 	virtual FString GetHeadInfo() const override;
 
 	UFUNCTION(BlueprintPure)
-	EControlMode GetControlMode() const { return ControlMode; }
+	EDWControlMode GetControlMode() const { return ControlMode; }
 		
 	UFUNCTION(BlueprintCallable)
-	virtual void SetControlMode(EControlMode InControlMode);
+	virtual void SetControlMode(EDWControlMode InControlMode);
 	
 	UFUNCTION(BlueprintPure)
 	float GetInteractDistance() const { return InteractDistance; }

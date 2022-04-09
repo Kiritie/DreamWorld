@@ -104,7 +104,7 @@ public:
 	bool IsEmpty() const;
 
 	UFUNCTION(BlueprintPure)
-	FItem& GetItem() const;
+	FAbilityItem& GetItem() const;
 
 	UFUNCTION(BlueprintPure)
 	UInventorySlot* GetOwnerSlot() const { return OwnerSlot; }

@@ -25,13 +25,13 @@ public:
 	/// Properties
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Default")
-	FItem Item;
+	FAbilityItem Item;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Default")
 	UInventory* Owner;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Default")
-	EItemType LimitType;
+	EAbilityItemType LimitType;
 		
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Default")
 	ESplitSlotType SplitType;
@@ -46,19 +46,19 @@ public:
 	/// Initialize
 public:
 	UFUNCTION(BlueprintCallable)
-	virtual void InitSlot(UInventory* InOwner, FItem InItem, EItemType InLimitType/* = EItemType::None*/, ESplitSlotType InSplitType/* = ESplitSlotType::Default*/);
+	virtual void InitSlot(UInventory* InOwner, FAbilityItem InItem, EAbilityItemType InLimitType/* = EAbilityItemType::None*/, ESplitSlotType InSplitType/* = ESplitSlotType::Default*/);
 
 	//////////////////////////////////////////////////////////////////////////
 	/// Checks
 public:
 	UFUNCTION(BlueprintPure)
-	virtual bool CheckSlot(FItem& InItem) const;
+	virtual bool CheckSlot(FAbilityItem& InItem) const;
 
 	UFUNCTION(BlueprintPure)
-	virtual bool CanPutIn(FItem& InItem) const;
+	virtual bool CanPutIn(FAbilityItem& InItem) const;
 					
 	UFUNCTION(BlueprintPure)
-	virtual bool Contains(FItem& InItem) const;
+	virtual bool Contains(FAbilityItem& InItem) const;
 
 	//////////////////////////////////////////////////////////////////////////
 	/// Actions
@@ -67,7 +67,7 @@ public:
 	virtual void Refresh();
 
 	UFUNCTION(BlueprintCallable)
-	virtual void PreSet(FItem& InItem);
+	virtual void PreSet(FAbilityItem& InItem);
 		
 	UFUNCTION(BlueprintCallable)
 	virtual void EndSet();
@@ -76,13 +76,13 @@ public:
 	virtual void Replace(UInventorySlot* InSlot);
 
 	UFUNCTION(BlueprintCallable)
-	virtual void SetItem(FItem& InItem, bool bRefresh = true);
+	virtual void SetItem(FAbilityItem& InItem, bool bRefresh = true);
 
 	UFUNCTION(BlueprintCallable)
-	virtual void AddItem(FItem& InItem);
+	virtual void AddItem(FAbilityItem& InItem);
 
 	UFUNCTION(BlueprintCallable)
-	virtual void SubItem(FItem& InItem);
+	virtual void SubItem(FAbilityItem& InItem);
 			
 	UFUNCTION(BlueprintCallable)
 	virtual void SplitItem(int InCount = -1);
@@ -138,16 +138,16 @@ public:
 	int GetMaxVolume() const;
 
 	UFUNCTION(BlueprintPure)
-	FItem& GetItem()  { return Item; }
+	FAbilityItem& GetItem()  { return Item; }
 	
 	UFUNCTION(BlueprintPure)
 	UInventory* GetOwner() const { return Owner; }
 	
 	UFUNCTION(BlueprintPure)
-	EItemType GetLimitType() const { return LimitType; }
+	EAbilityItemType GetLimitType() const { return LimitType; }
 
 	UFUNCTION(BlueprintCallable)
-	void SetLimitType(EItemType val) { LimitType = val; }
+	void SetLimitType(EAbilityItemType val) { LimitType = val; }
 	
 	UFUNCTION(BlueprintPure)
 	ESplitSlotType GetSplitType() const { return SplitType; }

@@ -69,7 +69,7 @@ public:
 	UInventorySlot* GetSelectedSlot() const;
 	
 	UFUNCTION(BlueprintPure)
-	FItem GetSelectedItem() const;
+	FAbilityItem GetSelectedItem() const;
 
 	UFUNCTION(BlueprintPure)
 	int32 GetSelectedSlotIndex() const { return SelectedSlotIndex; }

@@ -20,7 +20,7 @@ public:
 	
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	FArchiveSaveData SaveData;
+	FDWArchiveSaveData SaveData;
 
 public:
 	virtual void OnCreate_Implementation() override;

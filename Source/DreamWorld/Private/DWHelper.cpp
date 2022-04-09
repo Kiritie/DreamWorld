@@ -28,65 +28,7 @@
 #include "Widget/World/WidgetCharacterHP.h"
 #include "Widget/WidgetGameHUD.h"
 
-ADWGameState* UDWHelper::CurrentGameState = nullptr;
-
-ADWGameMode* UDWHelper::CurrentGameMode = nullptr;
-
-UDWGameInstance* UDWHelper::CurrentGameInstance = nullptr;
-
-ADWPlayerController* UDWHelper::CurrentPlayerController = nullptr;
-
-ADWGameMode* UDWHelper::GetGameMode(const UObject* InWorldContext)
-{
-	if ((!CurrentGameMode || !CurrentGameMode->IsValidLowLevel()) && (InWorldContext && InWorldContext->IsValidLowLevel()))
-	{
-		CurrentGameMode = Cast<ADWGameMode>(UGameplayStatics::GetGameMode(InWorldContext));
-	}
-	return CurrentGameMode;
-}
-
-ADWGameState* UDWHelper::GetGameState(const UObject* InWorldContext)
-{
-	if ((!CurrentGameState || !CurrentGameState->IsValidLowLevel()) && (InWorldContext && InWorldContext->IsValidLowLevel()))
-	{
-		CurrentGameState = Cast<ADWGameState>(UGameplayStatics::GetGameState(InWorldContext));
-	}
-	return CurrentGameState;
-}
-
-UDWGameInstance* UDWHelper::GetGameInstance(const UObject* InWorldContext)
-{
-	if ((!CurrentGameInstance || !CurrentGameInstance->IsValidLowLevel()) && (InWorldContext && InWorldContext->IsValidLowLevel()))
-	{
-		CurrentGameInstance = Cast<UDWGameInstance>(UGameplayStatics::GetGameInstance(InWorldContext));
-	}
-	return CurrentGameInstance;
-}
-
-ADWPlayerController* UDWHelper::GetPlayerController(const UObject* InWorldContext)
-{
-	if ((!CurrentPlayerController || !CurrentPlayerController->IsValidLowLevel()) && (InWorldContext && InWorldContext->IsValidLowLevel()))
-	{
-		CurrentPlayerController = Cast<ADWPlayerController>(UGameplayStatics::GetPlayerController(InWorldContext, 0));
-	}
-	return CurrentPlayerController;
-}
-
-ADWPlayerCharacter* UDWHelper::GetPlayerCharacter(const UObject* InWorldContext)
-{
-	if (ADWPlayerController* PlayerController = GetPlayerController(InWorldContext))
-	{
-		return PlayerController->GetPlayerCharacter();
-	}
-	return nullptr;
-}
-
-ADWMainModule* UDWHelper::GetMainModule()
-{
-	return Cast<ADWMainModule>(UMainModuleBPLibrary::GetMainModule());
-}
-
-FVitalityRaceData UDWHelper::RandomVitalityRaceData()
+FDWVitalityRaceData UDWHelper::RandomVitalityRaceData()
 {
 	// auto raceDatas = UDWHelper::LoadVitalityRaceDatas();
 	// float tmpNum1 = 0;
@@ -104,10 +46,10 @@ FVitalityRaceData UDWHelper::RandomVitalityRaceData()
 	// 		return raceDatas[i];
 	// 	}
 	// }
-	return FVitalityRaceData();
+	return FDWVitalityRaceData();
 }
 
-FCharacterRaceData UDWHelper::RandomCharacterRaceData()
+FDWCharacterRaceData UDWHelper::RandomCharacterRaceData()
 {
 	// auto RaceDatas = UDWHelper::LoadCharacterRaceDatas();
 	// float TmpNum1 = 0;
@@ -126,10 +68,10 @@ FCharacterRaceData UDWHelper::RandomCharacterRaceData()
 	// 		return RaceDatas[i];
 	// 	}
 	// }
-	return FCharacterRaceData();
+	return FDWCharacterRaceData();
 }
 
-ETraceTypeQuery UDWHelper::GetGameTrace(EGameTraceType InGameTraceType)
+ETraceTypeQuery UDWHelper::GetGameTrace(EDWGameTraceType InGameTraceType)
 {
 	return UEngineTypes::ConvertToTraceType((ECollisionChannel)InGameTraceType);
 }

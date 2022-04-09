@@ -5,6 +5,7 @@
 
 #include "Ability/Vitality/AbilityVitalityBase.h"
 #include "Character/Player/DWPlayerCharacter.h"
+#include "Global/GlobalBPLibrary.h"
 #include "UObject/ConstructorHelpers.h"
 #include "Widget/World/WidgetVitalityHP.h"
 
@@ -40,7 +41,7 @@ void UWidgetVitalityHPComponent::RefreshVisibility() const
 {
 	if(GetUserWidgetObject())
 	{
-		ADWPlayerCharacter* PlayerCharacter = UDWHelper::GetPlayerCharacter(this);
+		ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>(this);
 		if(!OwnerVitality->IsDead() && PlayerCharacter && FVector::Distance(OwnerVitality->GetActorLocation(), PlayerCharacter->GetActorLocation()) < 1000)
 		{
 			GetUserWidgetObject()->SetVisibility(ESlateVisibility::SelfHitTestInvisible);

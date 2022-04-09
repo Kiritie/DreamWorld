@@ -10,7 +10,7 @@
 /**
  * 体素模块
  */
-UCLASS(hidecategories = (Tick, Replication, Rendering, Collision, Actor, Input, LOD, Cooking, Hidden, WorldPartition, Hlod))
+UCLASS()
 class DREAMWORLD_API ADWVoxelModule : public AVoxelModule
 {
 	GENERATED_BODY()
@@ -43,9 +43,14 @@ public:
 	//////////////////////////////////////////////////////////////////////////
 	// Components
 protected:
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Components")
 	UStaticMeshComponent* BoundsMesh;
 
+	//////////////////////////////////////////////////////////////////////////
+	// World
+protected:
+	virtual bool ChangeWorldState(EVoxelWorldState InWorldState) override;
+	
 public:
 	virtual void LoadData(FSaveData* InWorldData) override;
 

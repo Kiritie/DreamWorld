@@ -9,31 +9,19 @@
 #include "Ability/Vitality/AbilityVitalityBase.h"
 #include "Ability/Character/CharacterAbilityBase.h"
 
-FTeamData FTeamData::Empty = FTeamData();
+FDWTeamData FDWTeamData::Empty = FDWTeamData();
 
-UVitalityAssetBase* FVitalitySaveData::GetVitalityData() const
+UVitalityDataBase* FDWVitalitySaveData::GetVitalityData() const
 {
-	return UAssetModuleBPLibrary::LoadPrimaryAsset<UVitalityAssetBase>(ID);
+	return UAssetModuleBPLibrary::LoadPrimaryAsset<UVitalityDataBase>(ID);
 }
 
-UCharacterAssetBase* FCharacterSaveData::GetCharacterData() const
+UCharacterDataBase* FDWCharacterSaveData::GetCharacterData() const
 {
-	return UAssetModuleBPLibrary::LoadPrimaryAsset<UCharacterAssetBase>(ID);
+	return UAssetModuleBPLibrary::LoadPrimaryAsset<UCharacterDataBase>(ID);
 }
 
-FArchiveBasicSaveData FPlayerSaveData::GetArchiveData() const
-{
-	if(UDWGeneralSaveGame* GeneralSaveGame = USaveGameModuleBPLibrary::GetSaveGame<UDWGeneralSaveGame>())
-	{
-		if(GeneralSaveGame->SaveData.ArchiveBasicDatas.IsValidIndex(ArchiveID))
-		{
-			return GeneralSaveGame->SaveData.ArchiveBasicDatas[ArchiveID];
-		}
-	}
-	return FArchiveBasicSaveData();
-}
-
-FArchiveBasicSaveData FDWWorldSaveData::GetArchiveData() const
+FDWArchiveBasicSaveData FDWPlayerSaveData::GetArchiveData() const
 {
 	if(UDWGeneralSaveGame* GeneralSaveGame = USaveGameModuleBPLibrary::GetSaveGame<UDWGeneralSaveGame>())
 	{
@@ -42,10 +30,22 @@ FArchiveBasicSaveData FDWWorldSaveData::GetArchiveData() const
 			return GeneralSaveGame->SaveData.ArchiveBasicDatas[ArchiveID];
 		}
 	}
-	return FArchiveBasicSaveData();
+	return FDWArchiveBasicSaveData();
 }
 
-void FTeamData::AddMember(ADWCharacter* InMember)
+FDWArchiveBasicSaveData FDWVoxelWorldSaveData::GetArchiveData() const
+{
+	if(UDWGeneralSaveGame* GeneralSaveGame = USaveGameModuleBPLibrary::GetSaveGame<UDWGeneralSaveGame>())
+	{
+		if(GeneralSaveGame->SaveData.ArchiveBasicDatas.IsValidIndex(ArchiveID))
+		{
+			return GeneralSaveGame->SaveData.ArchiveBasicDatas[ArchiveID];
+		}
+	}
+	return FDWArchiveBasicSaveData();
+}
+
+void FDWTeamData::AddMember(ADWCharacter* InMember)
 {
 	if (!Members.Contains(InMember))
 	{
@@ -54,7 +54,7 @@ void FTeamData::AddMember(ADWCharacter* InMember)
 	}
 }
 
-void FTeamData::RemoveMember(ADWCharacter* InMember)
+void FDWTeamData::RemoveMember(ADWCharacter* InMember)
 {
 	if (Members.Contains(InMember))
 	{
@@ -70,7 +70,7 @@ void FTeamData::RemoveMember(ADWCharacter* InMember)
 	}
 }
 
-void FTeamData::DissolveTeam()
+void FDWTeamData::DissolveTeam()
 {
 	for (int i = 0; i < Members.Num(); i++)
 	{
@@ -82,7 +82,7 @@ void FTeamData::DissolveTeam()
 	Members.Empty();
 }
 
-TArray<ADWCharacter*> FTeamData::GetMembers(ADWCharacter* InMember)
+TArray<ADWCharacter*> FDWTeamData::GetMembers(ADWCharacter* InMember)
 {
 	auto tmpArr = TArray<ADWCharacter*>();
 	for (int i = 0; i < Members.Num(); i++)

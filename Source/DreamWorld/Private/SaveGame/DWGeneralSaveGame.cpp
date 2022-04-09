@@ -3,6 +3,7 @@
 #include "SaveGame/DWGeneralSaveGame.h"
 
 #include "Gameplay/DWPlayerController.h"
+#include "Global/GlobalBPLibrary.h"
 #include "Kismet/GameplayStatics.h"
 
 UDWGeneralSaveGame::UDWGeneralSaveGame()
@@ -29,7 +30,7 @@ void UDWGeneralSaveGame::OnRefresh_Implementation()
 {
 	Super::OnRefresh_Implementation();
 	
-	if(ADWPlayerController* PlayerController = UDWHelper::GetPlayerController(this))
+	if(ADWPlayerController* PlayerController = UGlobalBPLibrary::GetPlayerController<ADWPlayerController>(this))
 	{
 		SaveData.CameraDistance = PlayerController->GetCameraDistance(false);
 	}

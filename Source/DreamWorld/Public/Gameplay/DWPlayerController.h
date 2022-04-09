@@ -37,27 +37,18 @@ protected:
 
 	virtual void OnUnPossess() override;
 
-	UFUNCTION()
-	virtual void OnWorldGenerated(FVector InPlayerLocation, bool bPreview);
-
 public:
 	virtual void Tick(float DeltaTime) override;
 
-	void LoadData(FPlayerSaveData InPlayerData);
+	void LoadData(FDWPlayerSaveData InPlayerData);
 
 	void UnloadData(bool bPreview = false);
 
 	void ResetData();
 
-	bool RaycastFromAimPoint(FHitResult& OutHitResult, EGameTraceType InGameTraceType, float InRayDistance = 1000) const;
+	bool RaycastFromAimPoint(FHitResult& OutHitResult, EDWGameTraceType InGameTraceType, float InRayDistance = 1000) const;
 
 protected:
-	virtual void MoveForward(float InValue);
-
-	virtual void MoveRight(float InValue);
-
-	virtual void MoveUp(float InValue);
-
 	virtual void OnJumpPressed();
 
 	virtual void OnJumpReleased();

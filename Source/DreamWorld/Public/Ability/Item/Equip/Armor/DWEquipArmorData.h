@@ -1,15 +1,15 @@
 #pragma once
 
-#include "Ability/Item/Equip/DWEquipAsset.h"
-#include "DWEquipArmorAsset.generated.h"
+#include "Ability/Item/Equip/DWEquipData.h"
+#include "DWEquipArmorData.generated.h"
 
 UCLASS(BlueprintType)
-class DREAMWORLD_API UDWEquipArmorAsset : public UDWEquipAsset
+class DREAMWORLD_API UDWEquipArmorData : public UDWEquipData
 {
 	GENERATED_BODY()
 
 public:
-	UDWEquipArmorAsset();
+	UDWEquipArmorData();
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)

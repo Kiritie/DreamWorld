@@ -13,7 +13,7 @@
 
 #include "DWCharacter.generated.h"
 
-class UDWCharacterAsset;
+class UDWCharacterData;
 class ADWVoxelChunk;
 class UCharacterInteractionComponent;
 class UInteractionComponent;
@@ -106,7 +106,7 @@ protected:
 protected:
 	// stats
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CharacterStats")
-	ECharacterNature Nature;
+	EDWCharacterNature Nature;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CharacterStats")
 	FString TeamID;
@@ -172,16 +172,16 @@ protected:
 
 	FPrimaryAssetId SkillAbilityID;
 
-	EAttackType AttackType;
+	EDWAttackType AttackType;
 
-	ECharacterActionType ActionType;
+	EDWCharacterActionType ActionType;
 
 	FTimerHandle AttackHurtTimer;
 
 	FVoxelItem SelectedVoxelItem;
 
 	UPROPERTY()
-	TMap<EEquipPartType, AAbilityEquipBase*> Equips;
+	TMap<EDWEquipPartType, AAbilityEquipBase*> Equips;
 	
 	FDWCharacterAttackAbilityData FallingAttackAbility;
 
@@ -189,7 +189,7 @@ protected:
 
 	TMap<FPrimaryAssetId, FDWCharacterSkillAbilityData> SkillAbilities;
 
-	TMap<ECharacterActionType, FDWCharacterActionAbilityData> ActionAbilities;
+	TMap<EDWCharacterActionType, FDWCharacterActionAbilityData> ActionAbilities;
 
 protected:
 	virtual void BeginPlay() override;
@@ -323,30 +323,30 @@ public:
 
 	virtual void FallEnd();
 	
-	virtual bool UseItem(FItem& InItem);
+	virtual bool UseItem(FAbilityItem& InItem);
 
 	virtual void PickUp(APickUp* InPickUp) override;
 
 	UFUNCTION(BlueprintCallable)
-	virtual bool GenerateVoxel(const FVoxelHitResult& InVoxelHitResult, FItem& InItem) override;
+	virtual bool GenerateVoxel(const FVoxelHitResult& InVoxelHitResult, FAbilityItem& InItem) override;
 
 	UFUNCTION(BlueprintCallable)
 	virtual bool DestroyVoxel(const FVoxelHitResult& InVoxelHitResult) override;
 
 	UFUNCTION(BlueprintCallable)
-	virtual void RefreshEquip(EEquipPartType InPartType, UInventoryEquipSlot* EquipSlot);
+	virtual void RefreshEquip(EDWEquipPartType InPartType, UInventoryEquipSlot* EquipSlot);
 
 public:
 	virtual bool GetAbilityInfo(TSubclassOf<UAbilityBase> AbilityClass, FAbilityInfo& OutAbilityInfo) override;
 
 	UFUNCTION(BlueprintCallable)
-	virtual bool DoAction(ECharacterActionType InActionType);
+	virtual bool DoAction(EDWCharacterActionType InActionType);
 
 	UFUNCTION(BlueprintCallable)
-	virtual void EndAction(ECharacterActionType InActionType);
+	virtual void EndAction(EDWCharacterActionType InActionType);
 
 	UFUNCTION(BlueprintCallable)
-	virtual bool StopAction(ECharacterActionType InActionType = ECharacterActionType::None, bool bCancelAbility = true, bool bEndAction = false);
+	virtual bool StopAction(EDWCharacterActionType InActionType = EDWCharacterActionType::None, bool bCancelAbility = true, bool bEndAction = false);
 					
 	UFUNCTION(BlueprintCallable)
 	virtual void ModifyMana(float InDeltaValue);
@@ -394,7 +394,7 @@ public:
 	bool HasSkillAbility(ESkillType InSkillType, int32 InAbilityIndex = -1);
 	
 	UFUNCTION(BlueprintCallable)
-	bool HasActionAbility(ECharacterActionType InActionType);
+	bool HasActionAbility(EDWCharacterActionType InActionType);
 
 	UFUNCTION(BlueprintCallable)
 	bool CreateTeam(const FName& InTeamName = NAME_None, FString InTeamDetail = TEXT(""));
@@ -509,10 +509,10 @@ public:
 
 public:
 	UFUNCTION(BlueprintPure)
-	ECharacterNature GetNature() const { return Nature; }
+	EDWCharacterNature GetNature() const { return Nature; }
 
 	//UFUNCTION(BlueprintPure)
-	FTeamData* GetTeamData() const;
+	FDWTeamData* GetTeamData() const;
 
 	UFUNCTION(BlueprintPure)
 	FString GetTeamID() const { return TeamID; }
@@ -647,7 +647,7 @@ public:
 	virtual void SetOwnerChunk(AVoxelChunk* InOwnerChunk) override { OwnerChunk = InOwnerChunk; }
 
 	UFUNCTION(BlueprintPure)
-	virtual FItem& GetGeneratingVoxelItem() override;
+	virtual FAbilityItem& GetGeneratingVoxelItem() override;
 
 	UFUNCTION(BlueprintPure)
 	virtual FVoxelItem& GetSelectedVoxelItem() override;
@@ -680,10 +680,10 @@ public:
 	float GetPatrolDuration() const { return PatrolDuration; }
 	
 	UFUNCTION(BlueprintPure)
-	bool HasWeapon(EWeaponType InWeaponType);
+	bool HasWeapon(EDWWeaponType InWeaponType);
 		
 	UFUNCTION(BlueprintPure)
-	bool HasShield(EShieldType InShieldType);
+	bool HasShield(EDWShieldType InShieldType);
 		
 	UFUNCTION(BlueprintPure)
 	ADWEquipWeapon* GetWeapon();
@@ -692,19 +692,19 @@ public:
 	ADWEquipShield* GetShield();
 		
 	UFUNCTION(BlueprintPure)
-	bool HasArmor(EEquipPartType InPartType);
+	bool HasArmor(EDWEquipPartType InPartType);
 	
 	UFUNCTION(BlueprintPure)
-	ADWEquipArmor* GetArmor(EEquipPartType InPartType);
+	ADWEquipArmor* GetArmor(EDWEquipPartType InPartType);
 
 	UFUNCTION(BlueprintPure)
-	bool HasEquip(EEquipPartType InPartType);
+	bool HasEquip(EDWEquipPartType InPartType);
 	
 	UFUNCTION(BlueprintPure)
-	AAbilityEquipBase* GetEquip(EEquipPartType InPartType);
+	AAbilityEquipBase* GetEquip(EDWEquipPartType InPartType);
 	
 	UFUNCTION(BlueprintPure)
-	TMap<EEquipPartType, AAbilityEquipBase*> GetEquips() const { return Equips; }
+	TMap<EDWEquipPartType, AAbilityEquipBase*> GetEquips() const { return Equips; }
 
 	UFUNCTION(BlueprintPure)
 	FDWCharacterAttackAbilityData GetAttackAbility(int32 InAbilityIndex = -1);
@@ -715,7 +715,7 @@ public:
 	FDWCharacterSkillAbilityData GetSkillAbility(ESkillType InSkillType, int32 InAbilityIndex = -1);
 			
 	UFUNCTION(BlueprintPure)
-	FDWCharacterActionAbilityData GetActionAbility(ECharacterActionType InActionType = ECharacterActionType::None);
+	FDWCharacterActionAbilityData GetActionAbility(EDWCharacterActionType InActionType = EDWCharacterActionType::None);
 
 	UFUNCTION(BlueprintPure)
 	TArray<FDWCharacterAttackAbilityData> GetAttackAbilities() const { return AttackAbilities; }
@@ -724,10 +724,10 @@ public:
 	TMap<FPrimaryAssetId, FDWCharacterSkillAbilityData> GetSkillAbilities() const { return SkillAbilities; }
 
 	UFUNCTION(BlueprintPure)
-	TMap<ECharacterActionType, FDWCharacterActionAbilityData> GetActionAbilities() const { return ActionAbilities; }
+	TMap<EDWCharacterActionType, FDWCharacterActionAbilityData> GetActionAbilities() const { return ActionAbilities; }
 
 	UFUNCTION(BlueprintPure)
-	UDWCharacterPart* GetCharacterPart(ECharacterPartType InCharacterPartType) const;
+	UDWCharacterPart* GetCharacterPart(EDWCharacterPartType InCharacterPartType) const;
 
 public:
 	virtual void HandleDamage(EDamageType DamageType, const float LocalDamageDone, bool bHasCrited, FHitResult HitResult, const FGameplayTagContainer& SourceTags, AActor* SourceActor) override;

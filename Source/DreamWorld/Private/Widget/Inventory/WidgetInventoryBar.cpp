@@ -3,7 +3,7 @@
 
 #include "Widget/Inventory/WidgetInventoryBar.h"
 
-#include "Asset/Primary/Item/ItemAssetBase.h"
+#include "Ability/Item/ItemDataBase.h"
 #include "Blueprint/WidgetBlueprintLibrary.h"
 #include "Widget/Inventory/Slot/WidgetInventorySlot.h"
 #include "Character/Player/DWPlayerCharacter.h"
@@ -182,11 +182,11 @@ UInventorySlot* UWidgetInventoryBar::GetSelectedSlot() const
 	return nullptr;
 }
 
-FItem UWidgetInventoryBar::GetSelectedItem() const
+FAbilityItem UWidgetInventoryBar::GetSelectedItem() const
 {
 	if (GetSelectedSlot())
 	{
 		return GetSelectedSlot()->GetItem();
 	}
-	return FItem::Empty;
+	return FAbilityItem::Empty;
 }

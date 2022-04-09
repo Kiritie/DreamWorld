@@ -18,7 +18,7 @@ UDWArchiveSaveGame::UDWArchiveSaveGame()
 
 	SaveName = FName("Archive");
 	
-	SaveData = FArchiveSaveData();
+	SaveData = FDWArchiveSaveData();
 }
 
 void UDWArchiveSaveGame::OnCreate_Implementation()
@@ -56,7 +56,7 @@ void UDWArchiveSaveGame::OnLoad_Implementation()
 		{
 			VoxelModule->LoadData(&SaveData.WorldData);
 		}
-		if(ADWPlayerController* PlayerController = UDWHelper::GetPlayerController(this))
+		if(ADWPlayerController* PlayerController = UGlobalBPLibrary::GetPlayerController<ADWPlayerController>(this))
 		{
 			PlayerController->LoadData(SaveData.PlayerData);
 		}
@@ -69,7 +69,7 @@ void UDWArchiveSaveGame::OnUnload_Implementation()
 
 	WHDebug(FString::Printf(TEXT("UnLoading archive : %d"), SaveData.ID), FColor::Cyan);
 
-	if(ADWPlayerController* PlayerController = UDWHelper::GetPlayerController(this))
+	if(ADWPlayerController* PlayerController = UGlobalBPLibrary::GetPlayerController<ADWPlayerController>(this))
 	{
 		PlayerController->UnloadData(true);
 	}
@@ -83,12 +83,12 @@ void UDWArchiveSaveGame::OnRefresh_Implementation()
 {
 	Super::OnRefresh_Implementation();
 	
-	if(ADWPlayerCharacter* PlayerCharacter = UDWHelper::GetPlayerCharacter(this))
+	if(ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>(this))
 	{
-		SaveData.PlayerData = *static_cast<FPlayerSaveData*>(PlayerCharacter->ToData());
+		SaveData.PlayerData = *static_cast<FDWPlayerSaveData*>(PlayerCharacter->ToData());
 	}
 	if(AVoxelModule* VoxelModule = AVoxelModule::Get())
 	{
-		SaveData.WorldData = *static_cast<FDWWorldSaveData*>(VoxelModule->ToData());
+		SaveData.WorldData = *static_cast<FDWVoxelWorldSaveData*>(VoxelModule->ToData());
 	}
 }

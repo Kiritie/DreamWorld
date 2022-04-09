@@ -5,6 +5,7 @@
 #include "GameplayAbilitySpec.h"
 #include "GameplayEffectTypes.h"
 #include "Ability/AbilityModuleTypes.h"
+#include "Inventory/InventoryTypes.h"
 #include "Parameter/ParameterModuleTypes.h"
 #include "SaveGame/SaveGameModuleTypes.h"
 #include "Voxel/VoxelModuleTypes.h"
@@ -54,7 +55,7 @@ class UInventorySlot;
  * 游戏状态
  */
 UENUM(BlueprintType)
-enum class EGameState : uint8
+enum class EDWGameState : uint8
 {
 	// ??
 	None,
@@ -78,7 +79,7 @@ enum class EGameState : uint8
  * ??????
  */
 UENUM(BlueprintType)
-enum class EControlMode : uint8
+enum class EDWControlMode : uint8
 {
 	// ???
 	Fighting,
@@ -90,7 +91,7 @@ enum class EControlMode : uint8
  * ???????
  */
 UENUM(BlueprintType)
-enum class ECharacterNature : uint8
+enum class EDWCharacterNature : uint8
 {
 	// ???
 	Player,
@@ -105,7 +106,7 @@ enum class ECharacterNature : uint8
 };
 
 USTRUCT(BlueprintType)
-struct DREAMWORLD_API FTeamData
+struct DREAMWORLD_API FDWTeamData
 {
 	GENERATED_BODY()
 
@@ -125,9 +126,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<ADWCharacter*> Members;
 	
-	static FTeamData Empty;
+	static FDWTeamData Empty;
 
-	FORCEINLINE FTeamData()
+	FORCEINLINE FDWTeamData()
 	{
 		ID = NAME_None;
 		Name = NAME_None;
@@ -164,7 +165,7 @@ public:
  * ??????????
  */
 UENUM(BlueprintType)
-enum class ECharacterActionType : uint8
+enum class EDWCharacterActionType : uint8
 {
 	// ??
 	None,
@@ -211,7 +212,7 @@ enum class ECharacterActionType : uint8
 };
 
 UENUM(BlueprintType)
-enum class EPropType : uint8
+enum class EDWPropType : uint8
 {
 	// ??
 	Potion,
@@ -222,7 +223,7 @@ enum class EPropType : uint8
 };
 
 UENUM(BlueprintType)
-enum class EEquipType : uint8
+enum class EDWEquipType : uint8
 {
 	// ????
 	Weapon,
@@ -233,7 +234,7 @@ enum class EEquipType : uint8
 };
 
 UENUM(BlueprintType)
-enum class EEquipPartType : uint8
+enum class EDWEquipPartType : uint8
 {
 	// 头部
 	Head	UMETA(DisplayName="头部"),
@@ -250,7 +251,7 @@ enum class EEquipPartType : uint8
 };
 
 UENUM(BlueprintType)
-enum class EWeaponType : uint8
+enum class EDWWeaponType : uint8
 {
 	// 无
 	None,
@@ -265,7 +266,7 @@ enum class EWeaponType : uint8
 };
 
 UENUM(BlueprintType)
-enum class EShieldType : uint8
+enum class EDWShieldType : uint8
 {
 	// 无
 	None,
@@ -276,7 +277,7 @@ enum class EShieldType : uint8
 };
 
 UENUM(BlueprintType)
-enum class EWeaponHandType : uint8
+enum class EDWWeaponHandType : uint8
 {
 	// ????
 	Single,
@@ -284,37 +285,11 @@ enum class EWeaponHandType : uint8
 	Both
 };
 
-USTRUCT(BlueprintType)
-struct DREAMWORLD_API FQueryItemInfo
-{
-	GENERATED_BODY()
-
-public:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	FItem Item;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TArray<UInventorySlot*> Slots;
-
-public:
-	FORCEINLINE FQueryItemInfo()
-	{
-		Item = FItem();
-		Slots = TArray<UInventorySlot*>();
-	}
-
-	FORCEINLINE FQueryItemInfo(FItem InItem, TArray<UInventorySlot*> InSlots)
-	{
-		Item = InItem;
-		Slots = InSlots;
-	}
-};
-
 /**
  * ???????
  */
 USTRUCT(BlueprintType)
-struct DREAMWORLD_API FRaceData : public FTableRowBase
+struct DREAMWORLD_API FDWRaceData : public FTableRowBase
 {
 	GENERATED_BODY()
 
@@ -331,7 +306,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float Proportion;
 
-	FORCEINLINE FRaceData()
+	FORCEINLINE FDWRaceData()
 	{
 		ID = NAME_None;
 		Name = NAME_None;
@@ -346,118 +321,32 @@ public:
 };
 
 USTRUCT(BlueprintType)
-struct DREAMWORLD_API FVitalityRaceData : public FRaceData
+struct DREAMWORLD_API FDWVitalityRaceData : public FDWRaceData
 {
 	GENERATED_BODY()
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TArray<FItem> Items;
+	TArray<FAbilityItem> Items;
 
-	FORCEINLINE FVitalityRaceData()
+	FORCEINLINE FDWVitalityRaceData()
 	{
-		Items = TArray<FItem>();
+		Items = TArray<FAbilityItem>();
 	}
 };
 
 USTRUCT(BlueprintType)
-struct DREAMWORLD_API FCharacterRaceData : public FRaceData
+struct DREAMWORLD_API FDWCharacterRaceData : public FDWRaceData
 {
 	GENERATED_BODY()
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TArray<FItem> Items;
+	TArray<FAbilityItem> Items;
 
-	FORCEINLINE FCharacterRaceData()
+	FORCEINLINE FDWCharacterRaceData()
 	{
-		Items = TArray<FItem>();
-	}
-};
-
-UENUM(BlueprintType)
-enum class ESplitSlotType : uint8
-{
-	None,
-	Default,
-	Shortcut,
-	Auxiliary,
-	Generate,
-	Equip,
-	Skill
-};
-
-USTRUCT(BlueprintType)
-struct DREAMWORLD_API FSplitSlotInfo
-{
-	GENERATED_BODY()
-
-public:
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
-	int32 StartIndex;
-
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
-	int32 TotalCount;
-
-	FORCEINLINE FSplitSlotInfo()
-	{
-		StartIndex = 0;
-		TotalCount = 0;
-	}
-
-	FORCEINLINE FSplitSlotInfo(int32 InStartIndex, int32 InTotalCount)
-	{
-		StartIndex = InStartIndex;
-		TotalCount = InTotalCount;
-	}
-};
-
-USTRUCT(BlueprintType)
-struct DREAMWORLD_API FSplitSlotData
-{
-	GENERATED_BODY()
-
-public:
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
-	TArray<UInventorySlot*> Slots;
-
-	FORCEINLINE FSplitSlotData()
-	{
-		Slots = TArray<UInventorySlot*>();
-	}
-};
-
-USTRUCT(BlueprintType)
-struct DREAMWORLD_API FWidgetSplitSlotData
-{
-	GENERATED_BODY()
-
-public:
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
-	TArray<UWidgetInventorySlot*> Slots;
-
-	FORCEINLINE FWidgetSplitSlotData()
-	{
-		Slots = TArray<UWidgetInventorySlot*>();
-	}
-};
-
-USTRUCT(BlueprintType)
-struct DREAMWORLD_API FInventorySaveData : public FSaveData
-{
-	GENERATED_BODY()
-
-public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TMap<ESplitSlotType, FSplitSlotInfo> SplitInfos;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TArray<FItem> Items;
-		
-	FORCEINLINE FInventorySaveData()
-	{
-		SplitInfos = TMap<ESplitSlotType, FSplitSlotInfo>();
-		Items = TArray<FItem>();
+		Items = TArray<FAbilityItem>();
 	}
 };
 
@@ -468,7 +357,7 @@ struct DREAMWORLD_API FDWCharacterActionAbilityData : public FAbilityData
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	ECharacterActionType ActionType;
+	EDWCharacterActionType ActionType;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSubclassOf<UDWCharacterActionAbility> AbilityClass;
@@ -484,30 +373,11 @@ public:
 
 	FORCEINLINE FDWCharacterActionAbilityData()
 	{
-		ActionType = ECharacterActionType::None;
+		ActionType = EDWCharacterActionType::None;
 		AbilityClass = nullptr;
 		bCancelable = true;
 		bNeedActive = true;
 		bNeedFreeToAnim = false;
-	}
-};
-
-USTRUCT(BlueprintType)
-struct DREAMWORLD_API FCharacterAttackAbilityData : public FAbilityData
-{
-	GENERATED_BODY()
-
-	public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	EWeaponType WeaponType;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TSubclassOf<UDWCharacterAttackAbility> AbilityClass;
-
-	FORCEINLINE FCharacterAttackAbilityData()
-	{
-		WeaponType = EWeaponType::None;
-		AbilityClass = nullptr;
 	}
 };
 
@@ -518,14 +388,14 @@ struct DREAMWORLD_API FDWCharacterAttackAbilityData : public FAbilityData
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	EWeaponType WeaponType;
+	EDWWeaponType WeaponType;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSubclassOf<UDWCharacterAttackAbility> AbilityClass;
 
 	FORCEINLINE FDWCharacterAttackAbilityData()
 	{
-		WeaponType = EWeaponType::None;
+		WeaponType = EDWWeaponType::None;
 		AbilityClass = nullptr;
 	}
 };
@@ -537,7 +407,7 @@ struct DREAMWORLD_API FDWCharacterSkillAbilityData : public FAbilityData
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	EWeaponType WeaponType;
+	EDWWeaponType WeaponType;
 		
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSubclassOf<UDWCharacterSkillAbility> AbilityClass;
@@ -547,7 +417,7 @@ public:
 
 	FORCEINLINE FDWCharacterSkillAbilityData()
 	{
-		WeaponType = EWeaponType::None;
+		WeaponType = EDWWeaponType::None;
 		AbilityClass = nullptr;
 		bCancelable = false;
 	}
@@ -579,12 +449,12 @@ public:
 };
 
 USTRUCT(BlueprintType)
-struct DREAMWORLD_API FVitalityBasicSaveData : public FSaveData
+struct DREAMWORLD_API FDWVitalityBasicSaveData : public FSaveData
 {
 	GENERATED_BODY()
 
 public:
-	FORCEINLINE FVitalityBasicSaveData()
+	FORCEINLINE FDWVitalityBasicSaveData()
 	{
 		Name = TEXT("");
 		RaceID = TEXT("");
@@ -624,26 +494,26 @@ public:
 };
 
 USTRUCT(BlueprintType)
-struct DREAMWORLD_API FVitalitySaveData : public FVitalityBasicSaveData
+struct DREAMWORLD_API FDWVitalitySaveData : public FDWVitalityBasicSaveData
 {
 	GENERATED_BODY()
 
 public:
-	FORCEINLINE FVitalitySaveData()
+	FORCEINLINE FDWVitalitySaveData()
 	{
 	}
 
 public:
-	class UVitalityAssetBase* GetVitalityData() const;
+	class UVitalityDataBase* GetVitalityData() const;
 };
 
 USTRUCT(BlueprintType)
-struct DREAMWORLD_API FCharacterBasicSaveData : public FVitalityBasicSaveData
+struct DREAMWORLD_API FDWCharacterBasicSaveData : public FDWVitalityBasicSaveData
 {
 	GENERATED_BODY()
 
 public:
-	FORCEINLINE FCharacterBasicSaveData()
+	FORCEINLINE FDWCharacterBasicSaveData()
 	{
 		TeamID = TEXT("");
 	}
@@ -654,14 +524,14 @@ public:
 };
 
 USTRUCT(BlueprintType)
-struct DREAMWORLD_API FCharacterSaveData : public FCharacterBasicSaveData
+struct DREAMWORLD_API FDWCharacterSaveData : public FDWCharacterBasicSaveData
 {
 	GENERATED_BODY()
 
 public:
-	FORCEINLINE FCharacterSaveData()
+	FORCEINLINE FDWCharacterSaveData()
 	{
-		Nature = ECharacterNature::AIHostile;
+		Nature = EDWCharacterNature::AIHostile;
 		AttackDistance = 100.f;
 		InteractDistance = 500.f;
 		FollowDistance = 500.f;
@@ -670,12 +540,12 @@ public:
 		FallingAttackAbility = FDWCharacterAttackAbilityData();
 		AttackAbilities = TArray<FDWCharacterAttackAbilityData>();
 		SkillAbilities = TMap<FPrimaryAssetId, FDWCharacterSkillAbilityData>();
-		ActionAbilities = TMap<ECharacterActionType, FDWCharacterActionAbilityData>();
+		ActionAbilities = TMap<EDWCharacterActionType, FDWCharacterActionAbilityData>();
 	}
 
 	UPROPERTY()
-	ECharacterNature Nature;
-			
+	EDWCharacterNature Nature;
+	
 	UPROPERTY()
 	float AttackDistance;
 	
@@ -701,19 +571,19 @@ public:
 	TMap<FPrimaryAssetId, FDWCharacterSkillAbilityData> SkillAbilities;
 
 	UPROPERTY()
-	TMap<ECharacterActionType, FDWCharacterActionAbilityData> ActionAbilities;
+	TMap<EDWCharacterActionType, FDWCharacterActionAbilityData> ActionAbilities;
 
 public:
-	class UCharacterAssetBase* GetCharacterData() const;
+	class UCharacterDataBase* GetCharacterData() const;
 };
 
 USTRUCT(BlueprintType)
-struct DREAMWORLD_API FPlayerBasicSaveData : public FCharacterSaveData
+struct DREAMWORLD_API FDWPlayerBasicSaveData : public FDWCharacterSaveData
 {
 	GENERATED_BODY()
 
 public:
-	FORCEINLINE FPlayerBasicSaveData()
+	FORCEINLINE FDWPlayerBasicSaveData()
 	{
 		CameraRotation = FRotator::ZeroRotator;
 	}
@@ -723,55 +593,55 @@ public:
 };
 
 USTRUCT(BlueprintType)
-struct DREAMWORLD_API FPlayerSaveData : public FPlayerBasicSaveData
+struct DREAMWORLD_API FDWPlayerSaveData : public FDWPlayerBasicSaveData
 {
 	GENERATED_BODY()
 
 public:
-	FORCEINLINE FPlayerSaveData()
+	FORCEINLINE FDWPlayerSaveData()
 	{
 		ArchiveID = 0;
 	}
 	
-	FORCEINLINE FPlayerSaveData(FPlayerBasicSaveData InBasicSaveData)
+	FORCEINLINE FDWPlayerSaveData(FDWPlayerBasicSaveData InBasicSaveData)
 	{
 		ID = InBasicSaveData.ID;
 	
 		ArchiveID = 0;
 	}
 	
-	struct FArchiveBasicSaveData GetArchiveData() const;
+	struct FDWArchiveBasicSaveData GetArchiveData() const;
 
 	UPROPERTY(BlueprintReadOnly)
 	int32 ArchiveID;
 };
 
 USTRUCT(BlueprintType)
-struct DREAMWORLD_API FDWChunkSaveData : public FChunkSaveData
+struct DREAMWORLD_API FDWVoxelChunkSaveData : public FVoxelChunkSaveData
 {
 	GENERATED_BODY()
 
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	TArray<FCharacterSaveData> CharacterDatas;
+	TArray<FDWCharacterSaveData> CharacterDatas;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	TArray<FVitalitySaveData> VitalityDatas;
+	TArray<FDWVitalitySaveData> VitalityDatas;
 
-	FORCEINLINE FDWChunkSaveData()
+	FORCEINLINE FDWVoxelChunkSaveData()
 	{
-		CharacterDatas = TArray<FCharacterSaveData>();
-		VitalityDatas = TArray<FVitalitySaveData>();
+		CharacterDatas = TArray<FDWCharacterSaveData>();
+		VitalityDatas = TArray<FDWVitalitySaveData>();
 	}
 };
 
 USTRUCT(BlueprintType)
-struct DREAMWORLD_API FDWWorldSaveData : public FWorldSaveData
+struct DREAMWORLD_API FDWVoxelWorldSaveData : public FVoxelWorldSaveData
 {
 	GENERATED_BODY()
 
 public:
-	FORCEINLINE FDWWorldSaveData()
+	FORCEINLINE FDWVoxelWorldSaveData()
 	{
 		ArchiveID = 0;
 		WorldSeed = 0;
@@ -781,7 +651,7 @@ public:
 		LastCharacterRaceIndex = FIndex::ZeroIndex;
 	}
 	
-	FORCEINLINE FDWWorldSaveData(FWorldBasicSaveData InBasicSaveData)
+	FORCEINLINE FDWVoxelWorldSaveData(FVoxelWorldBasicSaveData InBasicSaveData)
 	{
 		WorldSeed = 0;
 		TimeSeconds = 0;
@@ -811,22 +681,22 @@ public:
 	}
 
 public:
-	static const FDWWorldSaveData Empty;
+	static const FDWVoxelWorldSaveData Empty;
 
 	UPROPERTY(BlueprintReadOnly)
 	int32 ArchiveID;
 	
 	UPROPERTY(BlueprintReadOnly)
-	TMap<FVector, FDWChunkSaveData> ChunkDatas;
+	TMap<FVector, FDWVoxelChunkSaveData> ChunkDatas;
 
 	FIndex LastVitalityRaceIndex;
 
 	FIndex LastCharacterRaceIndex;
 
 public:
-	FArchiveBasicSaveData GetArchiveData() const;
+	FDWArchiveBasicSaveData GetArchiveData() const;
 
-	FORCEINLINE bool IsSameArchive(FDWWorldSaveData InSaveData) const
+	FORCEINLINE bool IsSameArchive(FDWVoxelWorldSaveData InSaveData) const
 	{
 		return InSaveData.ArchiveID == ArchiveID;
 	}
@@ -841,14 +711,14 @@ public:
 		return ChunkSize * ChunkHeightRange;
 	}
 
-	FORCEINLINE FChunkMaterial GetChunkMaterial(ETransparency Transparency) const
+	FORCEINLINE FVoxelChunkMaterial GetChunkMaterial(EVoxelTransparency Transparency) const
 	{
 		const int32 Index = FMath::Clamp((int32)Transparency, 0, ChunkMaterials.Num());
 		if(ChunkMaterials.IsValidIndex(Index))
 		{
 			return ChunkMaterials[Index];
 		}
-		return FChunkMaterial();
+		return FVoxelChunkMaterial();
 	}
 
 	FORCEINLINE FVector GetBlockSizedNormal(FVector InNormal, float InLength = 0.25f) const
@@ -861,9 +731,9 @@ public:
 		return ChunkDatas.Contains(InChunkIndex.ToVector());
 	}
 
-	FDWChunkSaveData& GetChunkData(FIndex InChunkIndex) const
+	FDWVoxelChunkSaveData& GetChunkData(FIndex InChunkIndex) const
 	{
-		static FDWChunkSaveData ChunkData;
+		static FDWVoxelChunkSaveData ChunkData;
 		if (ChunkDatas.Contains(InChunkIndex.ToVector()))
 		{
 			ChunkData = ChunkDatas[InChunkIndex.ToVector()];
@@ -871,7 +741,7 @@ public:
 		return ChunkData;
 	}
 
-	void SetChunkData(FIndex InChunkIndex, FDWChunkSaveData InChunkData)
+	void SetChunkData(FIndex InChunkIndex, FDWVoxelChunkSaveData InChunkData)
 	{
 		if (!ChunkDatas.Contains(InChunkIndex.ToVector()))
 			ChunkDatas.Add(InChunkIndex.ToVector(), InChunkData);
@@ -881,16 +751,16 @@ public:
 };
 
 USTRUCT(BlueprintType)
-struct DREAMWORLD_API FArchiveBasicSaveData : public FSaveData
+struct DREAMWORLD_API FDWArchiveBasicSaveData : public FSaveData
 {
 	GENERATED_BODY()
 
 public:
-	FORCEINLINE FArchiveBasicSaveData()
+	FORCEINLINE FDWArchiveBasicSaveData()
 	{
 		ID = -1;
-		PlayerBasicData = FPlayerBasicSaveData();
-		WorldBasicData = FWorldBasicSaveData();
+		PlayerBasicData = FDWPlayerBasicSaveData();
+		WorldBasicData = FVoxelWorldBasicSaveData();
 		bPreview = false;
 	}
 
@@ -899,33 +769,33 @@ public:
 	int32 ID;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	FPlayerBasicSaveData PlayerBasicData;
+	FDWPlayerBasicSaveData PlayerBasicData;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	FWorldBasicSaveData WorldBasicData;
+	FVoxelWorldBasicSaveData WorldBasicData;
 
 	UPROPERTY(BlueprintReadOnly)
 	bool bPreview;
 };
 
 USTRUCT(BlueprintType)
-struct DREAMWORLD_API FArchiveSaveData : public FArchiveBasicSaveData
+struct DREAMWORLD_API FDWArchiveSaveData : public FDWArchiveBasicSaveData
 {
 	GENERATED_BODY()
 
 public:
-	FORCEINLINE FArchiveSaveData()
+	FORCEINLINE FDWArchiveSaveData()
 	{
-		PlayerData = FPlayerSaveData();
-		WorldData = FDWWorldSaveData();
+		PlayerData = FDWPlayerSaveData();
+		WorldData = FDWVoxelWorldSaveData();
 	}
 
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	FPlayerSaveData PlayerData;
+	FDWPlayerSaveData PlayerData;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	FDWWorldSaveData WorldData;
+	FDWVoxelWorldSaveData WorldData;
 
 public:
 	void Initialize()
@@ -940,12 +810,12 @@ public:
 };
 
 USTRUCT(BlueprintType)
-struct DREAMWORLD_API FGeneralSaveData : public FSaveData
+struct DREAMWORLD_API FDWGeneralSaveData : public FSaveData
 {
 	GENERATED_BODY()
 
 public:
-	FORCEINLINE FGeneralSaveData()
+	FORCEINLINE FDWGeneralSaveData()
 	{
 		bAutoJump = true;
 		CameraDistance = 150.f;
@@ -963,14 +833,14 @@ public:
 	int32 CurrentArchiveID;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	TArray<FArchiveBasicSaveData> ArchiveBasicDatas;
+	TArray<FDWArchiveBasicSaveData> ArchiveBasicDatas;
 };
 
 /**
  * ???????????
  */
 UENUM(BlueprintType)
-enum class EGameTraceType : uint8
+enum class EDWGameTraceType : uint8
 {
 	// ??
 	None = 0,
@@ -985,24 +855,10 @@ enum class EGameTraceType : uint8
 };
 
 /**
- * ?????????????
- */
-UENUM(BlueprintType)
-enum class EQueryItemType : uint8
-{
-	// ???
-	Addition,
-	// ???
-	Remove,
-	// ???
-	Clear
-};
-
-/**
  * ???AI??
  */
 UENUM(BlueprintType)
-enum class ECharacterAIState : uint8
+enum class EDWCharacterAIState : uint8
 {
 	// ??
 	None,
@@ -1022,7 +878,7 @@ enum class ECharacterAIState : uint8
  * ????????
  */
 UENUM(BlueprintType)
-enum class EAttackType : uint8
+enum class EDWAttackType : uint8
 {
 	// ??
 	None,
@@ -1037,7 +893,7 @@ enum class EAttackType : uint8
 };
 
 UENUM(BlueprintType)
-enum class ECharacterPartType : uint8
+enum class EDWCharacterPartType : uint8
 {
 	// 无
 	None,

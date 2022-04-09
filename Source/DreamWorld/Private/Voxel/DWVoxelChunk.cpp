@@ -3,8 +3,8 @@
 
 #include "Voxel/DWVoxelChunk.h"
 
-#include "Ability/Character/CharacterAssetBase.h"
-#include "Ability/Vitality/VitalityAssetBase.h"
+#include "Ability/Character/CharacterDataBase.h"
+#include "Ability/Vitality/VitalityDataBase.h"
 #include "Character/DWCharacter.h"
 #include "Character/Base/CharacterBase.h"
 #include "Components/BoxComponent.h"
@@ -65,7 +65,7 @@ void ADWVoxelChunk::OnDespawn_Implementation()
 {
 	Super::OnDespawn_Implementation();
 	
-	AVoxelModule::GetWorldData<FDWWorldSaveData>()->SetChunkData(Index, *static_cast<FDWChunkSaveData*>(ToData()));
+	AVoxelModule::GetWorldData<FDWVoxelWorldSaveData>()->SetChunkData(Index, *static_cast<FDWVoxelChunkSaveData*>(ToData()));
 	
 	Characters.Empty();
 	Vitalitys.Empty();
@@ -78,7 +78,7 @@ void ADWVoxelChunk::Initialize(FIndex InIndex, int32 InBatch)
 
 void ADWVoxelChunk::LoadData(FSaveData* InSaveData)
 {
-	FDWChunkSaveData ChunkData = *static_cast<FDWChunkSaveData*>(InSaveData);
+	FDWVoxelChunkSaveData ChunkData = *static_cast<FDWVoxelChunkSaveData*>(InSaveData);
 	for (int32 i = 0; i < ChunkData.VoxelItems.Num(); i++)
 	{
 		const FVoxelItem& voxelItem = ChunkData.VoxelItems[i];
@@ -88,7 +88,7 @@ void ADWVoxelChunk::LoadData(FSaveData* InSaveData)
 
 FSaveData* ADWVoxelChunk::ToData(bool bSaved)
 {
-	static FDWChunkSaveData ChunkData;
+	static FDWVoxelChunkSaveData ChunkData;
 
 	ChunkData.Index = Index;
 	ChunkData.bSaved = bSaved;
@@ -105,15 +105,15 @@ FSaveData* ADWVoxelChunk::ToData(bool bSaved)
 	
 	for (int32 i = 0; i < Characters.Num(); i++)
 	{
-		if(Characters[i]->GetNature() != ECharacterNature::Player)
+		if(Characters[i]->GetNature() != EDWCharacterNature::Player)
 		{
-			ChunkData.CharacterDatas.Add(*static_cast<FCharacterSaveData*>(Characters[i]->ToData()));
+			ChunkData.CharacterDatas.Add(*static_cast<FDWCharacterSaveData*>(Characters[i]->ToData()));
 		}
 	}
 	
 	for (int32 i = 0; i < Vitalitys.Num(); i++)
 	{
-		ChunkData.VitalityDatas.Add(*static_cast<FVitalitySaveData*>(Vitalitys[i]->ToData()));
+		ChunkData.VitalityDatas.Add(*static_cast<FDWVitalitySaveData*>(Vitalitys[i]->ToData()));
 	}
 
 	return &ChunkData;
@@ -187,9 +187,9 @@ void ADWVoxelChunk::GenerateMap()
 void ADWVoxelChunk::SpawnActors()
 {
 	Super::SpawnActors();
-	if (AVoxelModule::GetWorldData<FDWWorldSaveData>()->IsExistChunkData(Index))
+	if (AVoxelModule::GetWorldData<FDWVoxelWorldSaveData>()->IsExistChunkData(Index))
 	{
-		FDWChunkSaveData ChunkData = AVoxelModule::GetWorldData<FDWWorldSaveData>()->GetChunkData(Index);
+		FDWVoxelChunkSaveData ChunkData = AVoxelModule::GetWorldData<FDWVoxelWorldSaveData>()->GetChunkData(Index);
 		for (int32 i = 0; i < ChunkData.PickUpDatas.Num(); i++)
 		{
 			SpawnPickUp(ChunkData.PickUpDatas[i]);
@@ -205,13 +205,13 @@ void ADWVoxelChunk::SpawnActors()
 	}
 	else if(SolidMesh || SemiMesh)
 	{
-		if (FIndex::Distance(Index, AVoxelModule::GetWorldData<FDWWorldSaveData>()->LastVitalityRaceIndex) > 250.f / AVoxelModule::GetWorldData()->VitalityRaceDensity)
+		if (FIndex::Distance(Index, AVoxelModule::GetWorldData<FDWVoxelWorldSaveData>()->LastVitalityRaceIndex) > 250.f / AVoxelModule::GetWorldData()->VitalityRaceDensity)
 		{
 			auto raceData = UDWHelper::RandomVitalityRaceData();
 			for (int32 i = 0; i < raceData.Items.Num(); i++)
 			{
 				auto vitalityItem = raceData.Items[i];
-				auto vitalityData = vitalityItem.GetData<UVitalityAssetBase>();
+				auto vitalityData = vitalityItem.GetData<UVitalityDataBase>();
 				for (int32 j = 0; j < vitalityItem.Count; j++)
 				{
 					for (int32 k = 0; k < 10; k++)
@@ -219,7 +219,7 @@ void ADWVoxelChunk::SpawnActors()
 						FHitResult hitResult;
 						if (AVoxelModule::Get()->ChunkTraceSingle(this, FMath::Max(vitalityData->Range.X, vitalityData->Range.Y) * 0.5f * AVoxelModule::GetWorldData()->BlockSize, vitalityData->Range.Z * 0.5f * AVoxelModule::GetWorldData()->BlockSize, hitResult))
 						{
-							auto saveData = FVitalitySaveData();
+							auto saveData = FDWVitalitySaveData();
 							saveData.ID = vitalityData->GetPrimaryAssetId();
 							saveData.Name = vitalityData->Name.ToString();
 							saveData.RaceID = raceData.ID.ToString();
@@ -227,21 +227,21 @@ void ADWVoxelChunk::SpawnActors()
 							saveData.SpawnLocation = hitResult.Location;
 							saveData.SpawnRotation = FRotator(0, FMath::RandRange(0, 360), 0);
 							SpawnVitality(saveData);
-							AVoxelModule::GetWorldData<FDWWorldSaveData>()->LastVitalityRaceIndex = Index;
+							AVoxelModule::GetWorldData<FDWVoxelWorldSaveData>()->LastVitalityRaceIndex = Index;
 							break;
 						}
 					}
 				}
 			}
 		}
-		if (FIndex::Distance(Index, AVoxelModule::GetWorldData<FDWWorldSaveData>()->LastCharacterRaceIndex) > 300.f / AVoxelModule::GetWorldData()->CharacterRaceDensity)
+		if (FIndex::Distance(Index, AVoxelModule::GetWorldData<FDWVoxelWorldSaveData>()->LastCharacterRaceIndex) > 300.f / AVoxelModule::GetWorldData()->CharacterRaceDensity)
 		{
 			ADWCharacter* captain = nullptr;
 			auto raceData = UDWHelper::RandomCharacterRaceData();
 			for (int32 i = 0; i < raceData.Items.Num(); i++)
 			{
 				auto characterItem = raceData.Items[i];
-				auto characterData = characterItem.GetData<UCharacterAssetBase>();
+				auto characterData = characterItem.GetData<UCharacterDataBase>();
 				for (int32 j = 0; j < characterItem.Count; j++)
 				{
 					for (int32 k = 0; k < 10; k++)
@@ -249,7 +249,7 @@ void ADWVoxelChunk::SpawnActors()
 						FHitResult hitResult;
 						if (AVoxelModule::Get()->ChunkTraceSingle(this, FMath::Max(characterData->Range.X, characterData->Range.Y) * 0.5f * AVoxelModule::GetWorldData()->BlockSize, characterData->Range.Z * 0.5f * AVoxelModule::GetWorldData()->BlockSize, hitResult))
 						{
-							auto saveData = FCharacterSaveData();
+							auto saveData = FDWCharacterSaveData();
 							saveData.ID = characterData->GetPrimaryAssetId();
 							saveData.Name = characterData->Name.ToString();
 							saveData.RaceID = raceData.ID.ToString();
@@ -271,7 +271,7 @@ void ADWVoxelChunk::SpawnActors()
 									captain->AddTeamMate(character);
 								}
 							}
-							AVoxelModule::GetWorldData<FDWWorldSaveData>()->LastCharacterRaceIndex = Index;
+							AVoxelModule::GetWorldData<FDWVoxelWorldSaveData>()->LastCharacterRaceIndex = Index;
 							break;
 						}
 					}
@@ -354,7 +354,7 @@ void ADWVoxelChunk::DestroySceneObject(ISceneObjectInterface* InSceneObject)
 	}
 }
 
-ADWCharacter* ADWVoxelChunk::SpawnCharacter(FCharacterSaveData InSaveData)
+ADWCharacter* ADWVoxelChunk::SpawnCharacter(FDWCharacterSaveData InSaveData)
 {
 	FActorSpawnParameters spawnParams = FActorSpawnParameters();
 	spawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
@@ -397,7 +397,7 @@ void ADWVoxelChunk::DestroyCharacter(ADWCharacter* InCharacter)
 	}
 }
 
-ADWVitality* ADWVoxelChunk::SpawnVitality(FVitalitySaveData InSaveData)
+ADWVitality* ADWVoxelChunk::SpawnVitality(FDWVitalitySaveData InSaveData)
 {
 	FActorSpawnParameters spawnParams = FActorSpawnParameters();
 	spawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;

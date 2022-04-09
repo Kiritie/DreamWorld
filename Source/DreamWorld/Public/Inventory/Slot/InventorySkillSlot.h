@@ -20,9 +20,9 @@ public:
 	UInventorySkillSlot();
 
 public:
-	virtual void InitSlot(UInventory* InOwner, FItem InItem, EItemType InLimitType /* = EItemType::None */, ESplitSlotType InSplitType /*= ESplitSlotType::Default*/) override;
+	virtual void InitSlot(UInventory* InOwner, FAbilityItem InItem, EAbilityItemType InLimitType /* = EAbilityItemType::None */, ESplitSlotType InSplitType /*= ESplitSlotType::Default*/) override;
 
-	virtual void PreSet(FItem& InItem) override;
+	virtual void PreSet(FAbilityItem& InItem) override;
 
 	virtual void EndSet() override;
 	

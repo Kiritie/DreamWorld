@@ -1,8 +1,8 @@
-#include "Vitality/DWVitalityAsset.h"
+#include "Vitality/DWVitalityData.h"
 
 #include "Ability/AbilityModuleBPLibrary.h"
 
-UDWVitalityAsset::UDWVitalityAsset()
+UDWVitalityData::UDWVitalityData()
 {
 	InventoryData = FInventorySaveData();
 }

@@ -47,10 +47,10 @@ public:
 	virtual void OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus);
 
 	UFUNCTION(BlueprintPure)
-	ECharacterNature GetCharacterNature() const;
+	EDWCharacterNature GetCharacterNature() const;
 
 	UFUNCTION(BlueprintCallable)
-	void SetCharacterNature(ECharacterNature InCharacterNature);
+	void SetCharacterNature(EDWCharacterNature InCharacterNature);
 	
 	UFUNCTION(BlueprintPure)
 	float GetAttackDistance() const;

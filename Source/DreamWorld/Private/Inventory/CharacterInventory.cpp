@@ -26,7 +26,7 @@ FInventorySaveData UCharacterInventory::ToData(bool bSaved)
 	return Super::ToData();
 }
 
-FQueryItemInfo UCharacterInventory::GetItemInfoByRange(EQueryItemType InActionType, FItem InItem, int32 InStartIndex, int32 InEndIndex)
+FQueryItemInfo UCharacterInventory::GetItemInfoByRange(EQueryItemType InActionType, FAbilityItem InItem, int32 InStartIndex, int32 InEndIndex)
 {
 	if (InStartIndex == -1 && HasSplitSlotInfo(ESplitSlotType::Shortcut) && GetOwnerCharacter() && GetOwnerCharacter()->IsPlayer())
 	{

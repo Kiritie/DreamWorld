@@ -2,6 +2,7 @@
 
 #include "Main/DWMainModule.h"
 
+#include "Ability/AbilityModule.h"
 #include "Asset/AssetModule.h"
 #include "Audio/AudioModule.h"
 #include "Camera/CameraModule.h"
@@ -19,6 +20,7 @@
 #include "Scene/SceneModule.h"
 #include "SpawnPool/SpawnPoolModuleBPLibrary.h"
 #include "Team/DWTeamModule.h"
+#include "Voxel/DWVoxelModule.h"
 #include "Voxel/Voxels/Voxel.h"
 #include "WebRequest/WebRequestModule.h"
 #include "Widget/WidgetModule.h"
@@ -28,6 +30,7 @@ ADWMainModule::ADWMainModule()
 	// set default pawn class to our Blueprinted character
 
 	ModuleClasses = TArray<TSubclassOf<AModuleBase>>();
+	ModuleClasses.Add(AAbilityModule::StaticClass());
 	ModuleClasses.Add(AAssetModule::StaticClass());
 	ModuleClasses.Add(AAudioModule::StaticClass());
 	ModuleClasses.Add(ACharacterModule::StaticClass());
@@ -43,6 +46,7 @@ ADWMainModule::ADWMainModule()
 	ModuleClasses.Add(AProcedureModule::StaticClass());
 	ModuleClasses.Add(ASceneModule::StaticClass());
 	ModuleClasses.Add(ASpawnPoolModule::StaticClass());
+	ModuleClasses.Add(ADWVoxelModule::StaticClass());
 	ModuleClasses.Add(AWebRequestModule::StaticClass());
 	ModuleClasses.Add(AWidgetModule::StaticClass());
 	ModuleClasses.Add(ADWTeamModule::StaticClass());

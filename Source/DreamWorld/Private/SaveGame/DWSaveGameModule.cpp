@@ -13,7 +13,7 @@
 // ParamSets default values
 ADWSaveGameModule::ADWSaveGameModule()
 {
-	ArchiveBasicData = FArchiveBasicSaveData();
+	ArchiveBasicData = FDWArchiveBasicSaveData();
 }
 
 #if WITH_EDITOR
@@ -71,12 +71,12 @@ int32 ADWSaveGameModule::GetNewValidArchiveID() const
 	return -1;
 }
 
-FPlayerSaveData ADWSaveGameModule::GetDefaultPlayerData() const
+FDWPlayerSaveData ADWSaveGameModule::GetDefaultPlayerData() const
 {
-	return FPlayerSaveData(ArchiveBasicData.PlayerBasicData);
+	return FDWPlayerSaveData(ArchiveBasicData.PlayerBasicData);
 }
 
-FDWWorldSaveData ADWSaveGameModule::GetDefaultWorldData() const
+FDWVoxelWorldSaveData ADWSaveGameModule::GetDefaultWorldData() const
 {
-	return FDWWorldSaveData(ArchiveBasicData.WorldBasicData);
+	return FDWVoxelWorldSaveData(ArchiveBasicData.WorldBasicData);
 }

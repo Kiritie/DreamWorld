@@ -7,7 +7,7 @@
 #include "Gameplay/DWGameState.h"
 #include "SpawnPool/SpawnPoolModuleBPLibrary.h"
 #include "Voxel/Chunks/VoxelChunk.h"
-#include "Voxel/Voxels/VoxelAssetBase.h"
+#include "Voxel/Datas/VoxelData.h"
 
 // Sets default values
 ADWVoxelModule::ADWVoxelModule()
@@ -42,15 +42,15 @@ void ADWVoxelModule::OnPreparatory_Implementation()
 
 void ADWVoxelModule::OnRefresh_Implementation(float DeltaSeconds)
 {
-	switch (UDWHelper::GetGameState(this)->GetCurrentState())
+	switch (UGlobalBPLibrary::GetGameState<ADWGameState>(this)->GetCurrentState())
 	{
-		case EGameState::MainMenu:
-		case EGameState::Loading:
+		case EDWGameState::MainMenu:
+		case EDWGameState::Loading:
 		{
 			GenerateTerrain();
 			break;
 		}
-		case EGameState::Playing:
+		case EDWGameState::Playing:
 		{
 			GenerateTerrain();
 			break;
@@ -74,17 +74,59 @@ void ADWVoxelModule::OnTermination_Implementation()
 	Super::OnTermination_Implementation();
 }
 
+bool ADWVoxelModule::ChangeWorldState(EVoxelWorldState InWorldState)
+{
+	if(Super::ChangeWorldState(InWorldState))
+	{
+		switch(WorldState)
+		{
+			case EVoxelWorldState::BasicGenerated:
+			{
+				if(ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>(this))
+				{
+					FHitResult hitResult;
+					const FVector rayStart = FVector(PlayerCharacter->GetActorLocation().X, PlayerCharacter->GetActorLocation().Y, GetWorldData()->ChunkHeightRange * GetWorldData()->GetChunkLength() + 500);
+					const FVector rayEnd = FVector(PlayerCharacter->GetActorLocation().X, PlayerCharacter->GetActorLocation().Y, 0);
+					if (ChunkTraceSingle(rayStart, rayEnd, PlayerCharacter->GetRadius(), PlayerCharacter->GetHalfHeight(), hitResult))
+					{
+						if(PlayerCharacter->GetActorLocation().Size2D() < 1.f)
+						{
+							PlayerCharacter->SetActorLocation(hitResult.Location);
+						}
+						if(!GetWorldData<FDWVoxelWorldSaveData>()->GetArchiveData().bPreview)
+						{
+							if(ADWGameState* GameState = UGlobalBPLibrary::GetGameState<ADWGameState>(this))
+							{
+								GameState->SetCurrentState(EDWGameState::Playing);
+							}
+							PlayerCharacter->Active();
+						}
+					}
+				}
+				break;
+			}
+			case EVoxelWorldState::FullGenerated:
+			{
+				break;
+			}
+			default: break;
+		}
+		return true;
+	}
+	return false;
+}
+
 void ADWVoxelModule::LoadData(FSaveData* InWorldData)
 {
 	Super::LoadData(InWorldData);
 
-	if(!GetWorldData<FDWWorldSaveData>()->GetArchiveData().bPreview)
+	if(!GetWorldData<FDWVoxelWorldSaveData>()->GetArchiveData().bPreview)
 	{
-		if(ADWGameState* GameState = UDWHelper::GetGameState(this))
+		if(ADWGameState* GameState = UGlobalBPLibrary::GetGameState<ADWGameState>(this))
 		{
-			GameState->SetCurrentState(EGameState::Loading);
+			GameState->SetCurrentState(EDWGameState::Loading);
 		}
-		if(GetWorldData<FDWWorldSaveData>()->IsSameArchive(*static_cast<FDWWorldSaveData*>(InWorldData)))
+		if(GetWorldData<FDWVoxelWorldSaveData>()->IsSameArchive(*static_cast<FDWVoxelWorldSaveData*>(InWorldData)))
 		{
 			for(auto Iter : ChunkMap)
 			{
@@ -107,7 +149,7 @@ FSaveData* ADWVoxelModule::ToData(bool bSaved)
 	{
 		if(Iter.Value)
 		{
-			GetWorldData<FDWWorldSaveData>()->SetChunkData(Iter.Key, *static_cast<FDWChunkSaveData*>(Iter.Value->ToData(bSaved)));
+			GetWorldData<FDWVoxelWorldSaveData>()->SetChunkData(Iter.Key, *static_cast<FDWVoxelChunkSaveData*>(Iter.Value->ToData(bSaved)));
 		}
 	}
 	return WorldData;
@@ -131,32 +173,6 @@ void ADWVoxelModule::GeneratePreviews()
 void ADWVoxelModule::GenerateTerrain()
 {
 	Super::GenerateTerrain();
-	
-	if(ADWPlayerCharacter* PlayerCharacter = UDWHelper::GetPlayerCharacter(this))
-	{
-		if(bBasicGenerated)
-		{
-			const float BasicNum = FMath::Square(ChunkSpawnRange * 2) * GetWorldData()->ChunkHeightRange;
-			if(BasicNum - ChunkGenerateQueue.Num() >= BasicNum * BasicPercentage)
-			{
-				FHitResult hitResult;
-				const FVector rayStart = FVector(PlayerCharacter->GetActorLocation().X, PlayerCharacter->GetActorLocation().Y, GetWorldData()->ChunkHeightRange * GetWorldData()->GetChunkLength() + 500);
-				const FVector rayEnd = FVector(PlayerCharacter->GetActorLocation().X, PlayerCharacter->GetActorLocation().Y, 0);
-				if (ChunkTraceSingle(rayStart, rayEnd, PlayerCharacter->GetRadius(), PlayerCharacter->GetHalfHeight(), hitResult))
-				{
-					OnWorldGenerated.Broadcast(hitResult.Location, GetWorldData<FDWWorldSaveData>()->GetArchiveData().bPreview);
-
-					if(!GetWorldData<FDWWorldSaveData>()->GetArchiveData().bPreview)
-					{
-						if(ADWGameState* GameState = UDWHelper::GetGameState(this))
-						{
-							GameState->SetCurrentState(EGameState::Playing);
-						}
-					}
-				}
-			}
-		}
-	}
 }
 
 void ADWVoxelModule::GenerateChunks(FIndex InIndex)
@@ -176,9 +192,9 @@ void ADWVoxelModule::BuildChunkMap(AVoxelChunk* InChunk)
 {
 	if (!InChunk || !ChunkMap.Contains(InChunk->GetIndex())) return;
 
-	if (GetWorldData<FDWWorldSaveData>()->IsExistChunkData(InChunk->GetIndex()))
+	if (GetWorldData<FDWVoxelWorldSaveData>()->IsExistChunkData(InChunk->GetIndex()))
 	{
-		InChunk->LoadData(&GetWorldData<FDWWorldSaveData>()->GetChunkData(InChunk->GetIndex()));
+		InChunk->LoadData(&GetWorldData<FDWVoxelWorldSaveData>()->GetChunkData(InChunk->GetIndex()));
 	}
 	else
 	{
@@ -197,7 +213,7 @@ void ADWVoxelModule::GenerateChunk(AVoxelChunk* InChunk)
 {
 	if (!InChunk || !ChunkMap.Contains(InChunk->GetIndex())) return;
 	
-	InChunk->Generate(GetWorldData<FDWWorldSaveData>()->GetArchiveData().bPreview);
+	InChunk->Generate(GetWorldData<FDWVoxelWorldSaveData>()->GetArchiveData().bPreview);
 }
 
 void ADWVoxelModule::DestroyChunk(AVoxelChunk* InChunk)
@@ -221,13 +237,13 @@ bool ADWVoxelModule::ChunkTraceSingle(AVoxelChunk* InChunk, float InRadius, floa
 
 bool ADWVoxelModule::ChunkTraceSingle(FVector RayStart, FVector RayEnd, float InRadius, float InHalfHeight, FHitResult& OutHitResult)
 {
-	if (UKismetSystemLibrary::CapsuleTraceSingle(this, RayStart, RayEnd, InRadius, InHalfHeight, UDWHelper::GetGameTrace(EGameTraceType::Chunk), false, TArray<AActor*>(), EDrawDebugTrace::None, OutHitResult, true))
+	if (UKismetSystemLibrary::CapsuleTraceSingle(this, RayStart, RayEnd, InRadius, InHalfHeight, UDWHelper::GetGameTrace(EDWGameTraceType::Chunk), false, TArray<AActor*>(), EDrawDebugTrace::None, OutHitResult, true))
 		return OutHitResult.ImpactPoint.Z > 0;
 	return false;
 }
 
 bool ADWVoxelModule::VoxelTraceSingle(const FVoxelItem& InVoxelItem, FVector InPoint, FHitResult& OutHitResult)
 {
-	FVector size = InVoxelItem.GetData<UVoxelAssetBase>()->GetCeilRange(InVoxelItem.Rotation, InVoxelItem.Scale) * GetWorldData()->BlockSize * 0.5f;
-	return UKismetSystemLibrary::BoxTraceSingle(this, InPoint + size, InPoint + size, size * 0.95f, FRotator::ZeroRotator, UDWHelper::GetGameTrace(EGameTraceType::Voxel), false, TArray<AActor*>(), EDrawDebugTrace::None, OutHitResult, true);
+	FVector size = InVoxelItem.GetData<UVoxelData>()->GetCeilRange(InVoxelItem.Rotation, InVoxelItem.Scale) * GetWorldData()->BlockSize * 0.5f;
+	return UKismetSystemLibrary::BoxTraceSingle(this, InPoint + size, InPoint + size, size * 0.95f, FRotator::ZeroRotator, UDWHelper::GetGameTrace(EDWGameTraceType::Voxel), false, TArray<AActor*>(), EDrawDebugTrace::None, OutHitResult, true);
 }

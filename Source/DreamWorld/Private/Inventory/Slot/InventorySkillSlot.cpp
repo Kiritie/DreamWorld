@@ -2,7 +2,7 @@
 
 #include "Inventory/Slot/InventorySkillSlot.h"
 
-#include "Ability/Item/Skill/DWSkillAsset.h"
+#include "Ability/Item/Skill/DWSkillData.h"
 #include "Inventory/Inventory.h"
 #include "Inventory/Slot/InventorySlot.h"
 #include "Character/Player/DWPlayerCharacter.h"
@@ -14,18 +14,18 @@
 
 UInventorySkillSlot::UInventorySkillSlot()
 {
-	LimitType = EItemType::Skill;
+	LimitType = EAbilityItemType::Skill;
 }
 
-void UInventorySkillSlot::InitSlot(UInventory* InOwner, FItem InItem, EItemType InLimitType /* = EItemType::None */, ESplitSlotType InSplitType /*= ESplitSlotType::Default*/)
+void UInventorySkillSlot::InitSlot(UInventory* InOwner, FAbilityItem InItem, EAbilityItemType InLimitType /* = EAbilityItemType::None */, ESplitSlotType InSplitType /*= ESplitSlotType::Default*/)
 {
 	Super::InitSlot(InOwner, InItem, InLimitType, InSplitType);
 }
 
-void UInventorySkillSlot::PreSet(FItem& InItem)
+void UInventorySkillSlot::PreSet(FAbilityItem& InItem)
 {
 	Super::PreSet(InItem);
-	if(GetSkillData().GetItemData<UDWSkillAsset>()->SkillMode == ESkillMode::Passive)
+	if(GetSkillData().GetItemData<UDWSkillData>()->SkillMode == ESkillMode::Passive)
 	{
 		CancelItem();
 	}
@@ -34,7 +34,7 @@ void UInventorySkillSlot::PreSet(FItem& InItem)
 void UInventorySkillSlot::EndSet()
 {
 	Super::EndSet();
-	if(GetSkillData().GetItemData<UDWSkillAsset>()->SkillMode == ESkillMode::Passive)
+	if(GetSkillData().GetItemData<UDWSkillData>()->SkillMode == ESkillMode::Passive)
 	{
 		ActiveItem();
 	}
@@ -47,7 +47,7 @@ bool UInventorySkillSlot::ActiveItem()
 		if (Character->SkillAttack(Item.ID))
 		{
 			Super::ActiveItem();
-			if(GetSkillData().GetItemData<UDWSkillAsset>()->SkillMode == ESkillMode::Initiative)
+			if(GetSkillData().GetItemData<UDWSkillData>()->SkillMode == ESkillMode::Initiative)
 			{
 				StartCooldown();
 			}
@@ -67,7 +67,7 @@ bool UInventorySkillSlot::CancelItem()
 	if (GetSkillData().bCancelable)
 	{
 		Super::CancelItem();
-		if(GetSkillData().GetItemData<UDWSkillAsset>()->SkillMode == ESkillMode::Initiative)
+		if(GetSkillData().GetItemData<UDWSkillData>()->SkillMode == ESkillMode::Initiative)
 		{
 			StopCooldown();
 		}

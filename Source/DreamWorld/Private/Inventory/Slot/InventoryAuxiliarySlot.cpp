@@ -9,7 +9,7 @@ UInventoryAuxiliarySlot::UInventoryAuxiliarySlot()
 	
 }
 
-void UInventoryAuxiliarySlot::InitSlot(UInventory* InOwner, FItem InItem, EItemType InLimitType /* = EItemType::None */, ESplitSlotType InSplitType /*= ESplitSlotType::Default*/)
+void UInventoryAuxiliarySlot::InitSlot(UInventory* InOwner, FAbilityItem InItem, EAbilityItemType InLimitType /* = EAbilityItemType::None */, ESplitSlotType InSplitType /*= ESplitSlotType::Default*/)
 {
 	Super::InitSlot(InOwner, InItem, InLimitType, InSplitType);
 }

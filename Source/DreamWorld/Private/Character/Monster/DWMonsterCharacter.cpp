@@ -4,8 +4,8 @@
 #include "Character/Monster/DWMonsterCharacter.h"
 
 #include "Ability/Components/CharacterInteractionComponent.h"
-#include "Ability/Item/Prop/DWPropAsset.h"
-#include "Ability/Item/Prop/PropAssetBase.h"
+#include "Ability/Item/Prop/DWPropData.h"
+#include "Ability/Item/Prop/PropDataBase.h"
 #include "Components/BoxComponent.h"
 #include "BehaviorTree/BehaviorTree.h"
 #include "Components/SkeletalMeshComponent.h"
@@ -13,7 +13,7 @@
 #include "Character/Human/DWHumanCharacter.h"
 #include "Inventory/Inventory.h"
 #include "Inventory/Slot/InventorySlot.h"
-#include "Voxel/Voxels/VoxelAssetBase.h"
+#include "Voxel/Datas/VoxelData.h"
 
 ADWMonsterCharacter::ADWMonsterCharacter()
 {
@@ -69,7 +69,7 @@ bool ADWMonsterCharacter::CanInteract(IInteractionAgentInterface* InInteractionA
 		{
 			if(ADWCharacter* InInteractionCharacter = Cast<ADWCharacter>(InInteractionAgent))
 			{
-				if(!IsEnemy(InInteractionCharacter) && InInteractionCharacter->GetInventory()->GetSelectedItem().GetData<UDWPropAsset>()->PropType == EPropType::Food)
+				if(!IsEnemy(InInteractionCharacter) && InInteractionCharacter->GetInventory()->GetSelectedItem().GetData<UDWPropData>()->PropType == EDWPropType::Food)
 				{
 					return true;
 				}

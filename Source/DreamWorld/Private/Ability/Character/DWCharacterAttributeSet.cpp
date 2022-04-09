@@ -250,7 +250,7 @@ void UDWCharacterAttributeSet::PostGameplayEffectExecute(const struct FGameplayE
 			if (FVector::DotProduct(DamageDirection, TargetActor->GetActorForwardVector()) / 90 > (1 - SourceDefendScope))
 			{
 				DefendRateDone = SourceDefendRate * (TargetCharacter->IsDefending() ? 1 : 0);
-				if(DefendRateDone > 0.f && !TargetCharacter->DoAction(ECharacterActionType::DefendBlock))
+				if(DefendRateDone > 0.f && !TargetCharacter->DoAction(EDWCharacterActionType::DefendBlock))
 				{
 					DefendRateDone = 0.f;
 				}
@@ -262,7 +262,7 @@ void UDWCharacterAttributeSet::PostGameplayEffectExecute(const struct FGameplayE
 			LocalDamageDone = SourceAttackForce * GetPhysicsDamage() * (1 - SourcePhysicsDefRate) * (1 - DefendRateDone) * (FMath::FRand() <= SourceAttackCritRate ? 2 : 1);
 			if(SourceCharacter)
 			{
-				SourceCharacter->DoAction(LocalDamageDone > 0.f ? ECharacterActionType::AttackHit : ECharacterActionType::AttackMiss);
+				SourceCharacter->DoAction(LocalDamageDone > 0.f ? EDWCharacterActionType::AttackHit : EDWCharacterActionType::AttackMiss);
 			}
 			SetPhysicsDamage(0.f);
 		}
@@ -287,7 +287,7 @@ void UDWCharacterAttributeSet::PostGameplayEffectExecute(const struct FGameplayE
 
 				if(TargetCharacter && DefendRateDone == 0.f)
 				{
-					TargetCharacter->DoAction(ECharacterActionType::GetHit);
+					TargetCharacter->DoAction(EDWCharacterActionType::GetHit);
 				}
 			}
 		}

@@ -1,10 +1,10 @@
-#include "Character/DWCharacterAsset.h"
+#include "Character/DWCharacterData.h"
 
 #include "Ability/AbilityModuleBPLibrary.h"
 
-UDWCharacterAsset::UDWCharacterAsset()
+UDWCharacterData::UDWCharacterData()
 {
-	Nature = ECharacterNature::AIHostile;
+	Nature = EDWCharacterNature::AIHostile;
 	AttackDistance = 100.f;
 	InteractDistance = 500.f;
 	FollowDistance = 500.f;

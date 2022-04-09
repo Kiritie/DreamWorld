@@ -39,7 +39,7 @@ void UVitalityInventory::ClearAllItem()
 	Super::ClearAllItem();
 }
 
-FQueryItemInfo UVitalityInventory::GetItemInfoByRange(EQueryItemType InActionType, FItem InItem, int32 InStartIndex, int32 InEndIndex)
+FQueryItemInfo UVitalityInventory::GetItemInfoByRange(EQueryItemType InActionType, FAbilityItem InItem, int32 InStartIndex, int32 InEndIndex)
 {
 	return Super::GetItemInfoByRange(InActionType, InItem, InStartIndex, InEndIndex);
 }

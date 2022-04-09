@@ -1,20 +1,20 @@
 #pragma once
 
-#include "Ability/Character/CharacterAssetBase.h"
+#include "Ability/Character/CharacterDataBase.h"
 
-#include "DWCharacterAsset.generated.h"
+#include "DWCharacterData.generated.h"
 
 UCLASS(BlueprintType)
-class DREAMWORLD_API UDWCharacterAsset : public UCharacterAssetBase
+class DREAMWORLD_API UDWCharacterData : public UCharacterDataBase
 {
 	GENERATED_BODY()
 
 public:
-	UDWCharacterAsset();
+	UDWCharacterData();
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	ECharacterNature Nature;
+	EDWCharacterNature Nature;
 			
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float AttackDistance;

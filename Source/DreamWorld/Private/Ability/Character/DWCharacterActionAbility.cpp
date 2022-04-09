@@ -4,7 +4,7 @@
 
 UDWCharacterActionAbility::UDWCharacterActionAbility()
 {
-	ActionType = ECharacterActionType::None;
+	ActionType = EDWCharacterActionType::None;
 }
 
 void UDWCharacterActionAbility::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)

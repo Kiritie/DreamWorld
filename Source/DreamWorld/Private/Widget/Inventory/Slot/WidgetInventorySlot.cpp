@@ -3,7 +3,7 @@
 
 #include "Widget/Inventory/Slot/WidgetInventorySlot.h"
 
-#include "Asset/Primary/Item/ItemAssetBase.h"
+#include "Ability/Item/ItemDataBase.h"
 #include "Blueprint/DragDropOperation.h"
 #include "Components/Border.h"
 #include "Components/Image.h"
@@ -37,7 +37,7 @@ bool UWidgetInventorySlot::NativeOnDrop(const FGeometry& InGeometry, const FDrag
 	auto payloadSlot = Cast<UWidgetInventorySlot>(InOperation->Payload);
 	if (payloadSlot && payloadSlot != this && !payloadSlot->IsEmpty())
 	{
-		FItem& tmpItem = payloadSlot->GetItem();
+		FAbilityItem& tmpItem = payloadSlot->GetItem();
 		if(OwnerSlot->CheckSlot(tmpItem))
 		{
 			if (OwnerSlot->Contains(tmpItem))
@@ -215,8 +215,8 @@ bool UWidgetInventorySlot::IsEmpty() const
 	return true;
 }
 
-FItem& UWidgetInventorySlot::GetItem() const
+FAbilityItem& UWidgetInventorySlot::GetItem() const
 {
 	if(OwnerSlot) return OwnerSlot->GetItem();
-	return FItem::Empty;
+	return FAbilityItem::Empty;
 }

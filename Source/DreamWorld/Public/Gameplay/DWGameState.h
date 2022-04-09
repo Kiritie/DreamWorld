@@ -20,7 +20,7 @@ public:
 protected:
 	// ��ǰ״̬
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	EGameState CurrentState;
+	EDWGameState CurrentState;
 
 protected:
 	virtual void BeginPlay() override;
@@ -28,9 +28,9 @@ protected:
 public:
 	/** ���õ�ǰ״̬ */
 	UFUNCTION(BlueprintCallable)
-	void SetCurrentState(EGameState InGameState);
+	void SetCurrentState(EDWGameState InGameState);
 
 	/** ��ȡ��ǰ״̬ */
 	UFUNCTION(BlueprintPure)
-	EGameState GetCurrentState() const { return CurrentState; }
+	EDWGameState GetCurrentState() const { return CurrentState; }
 };

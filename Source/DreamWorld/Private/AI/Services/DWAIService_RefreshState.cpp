@@ -12,7 +12,7 @@ UDWAIService_RefreshState::UDWAIService_RefreshState(const FObjectInitializer& O
 	TargetCharacterKey.AddObjectFilter(this, GET_MEMBER_NAME_CHECKED(UDWAIService_RefreshState, TargetCharacterKey.SelectedKeyName), ADWCharacter::StaticClass());
 	IsLostTargetKey.AddBoolFilter(this, GET_MEMBER_NAME_CHECKED(UDWAIService_RefreshState, IsLostTargetKey.SelectedKeyName));
 
-	CharacterAIState = ECharacterAIState::None;
+	CharacterAIState = EDWCharacterAIState::None;
 	TargetCharacter = nullptr;
 }
 
@@ -27,7 +27,7 @@ void UDWAIService_RefreshState::OnBecomeRelevant(UBehaviorTreeComponent& OwnerCo
 
 	Super::OnBecomeRelevant(OwnerComp, NodeMemory);
 
-	SetCharacterAIState(OwnerComp, ECharacterAIState::None);
+	SetCharacterAIState(OwnerComp, EDWCharacterAIState::None);
 }
 
 void UDWAIService_RefreshState::OnCeaseRelevant(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
@@ -52,12 +52,12 @@ void UDWAIService_RefreshState::TickNode(UBehaviorTreeComponent& OwnerComp, uint
 		{
 			switch (OwnerCharacter->GetNature())
 			{
-				case ECharacterNature::AIFriendly:
+				case EDWCharacterNature::AIFriendly:
 				{
-					SetCharacterAIState(OwnerComp, ECharacterAIState::AIFollow);
+					SetCharacterAIState(OwnerComp, EDWCharacterAIState::AIFollow);
 					break;
 				}
-				case ECharacterNature::AIHostile:
+				case EDWCharacterNature::AIHostile:
 				{
 					if (OwnerCharacter->IsEnemy(TargetCharacter))
 					{
@@ -83,7 +83,7 @@ void UDWAIService_RefreshState::TickNode(UBehaviorTreeComponent& OwnerComp, uint
 		}
 		else
 		{
-			SetCharacterAIState(OwnerComp, ECharacterAIState::AITrack);
+			SetCharacterAIState(OwnerComp, EDWCharacterAIState::AITrack);
 		}
 		if (TargetCharacter->IsDead())
 		{
@@ -97,7 +97,7 @@ void UDWAIService_RefreshState::TickNode(UBehaviorTreeComponent& OwnerComp, uint
 	}
 }
 
-void UDWAIService_RefreshState::SetCharacterAIState(UBehaviorTreeComponent& OwnerComp, ECharacterAIState InAIState)
+void UDWAIService_RefreshState::SetCharacterAIState(UBehaviorTreeComponent& OwnerComp, EDWCharacterAIState InAIState)
 {
 	OwnerComp.GetBlackboardComponent()->SetValueAsEnum(CharacterAIStateKey.SelectedKeyName, (uint8)InAIState);
 }

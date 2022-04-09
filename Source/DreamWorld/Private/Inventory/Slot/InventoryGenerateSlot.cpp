@@ -9,7 +9,7 @@ UInventoryGenerateSlot::UInventoryGenerateSlot()
 	
 }
 
-void UInventoryGenerateSlot::InitSlot(UInventory* InOwner, FItem InItem, EItemType InLimitType /* = EItemType::None */, ESplitSlotType InSplitType /*= ESplitSlotType::Default*/)
+void UInventoryGenerateSlot::InitSlot(UInventory* InOwner, FAbilityItem InItem, EAbilityItemType InLimitType /* = EAbilityItemType::None */, ESplitSlotType InSplitType /*= ESplitSlotType::Default*/)
 {
 	Super::InitSlot(InOwner, InItem, InLimitType, InSplitType);
 }

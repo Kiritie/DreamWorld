@@ -28,7 +28,7 @@ protected:
 	FBlackboardKeySelector IsLostTargetKey;
 
 private:
-	ECharacterAIState CharacterAIState;
+	EDWCharacterAIState CharacterAIState;
 
 	ADWCharacter* TargetCharacter;
 
@@ -43,7 +43,7 @@ protected:
 
 	virtual void TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds) override;
 
-	void SetCharacterAIState(UBehaviorTreeComponent& OwnerComp, ECharacterAIState InAIState);
+	void SetCharacterAIState(UBehaviorTreeComponent& OwnerComp, EDWCharacterAIState InAIState);
 
 	void SetTargetCharacter(UBehaviorTreeComponent& OwnerComp, ADWCharacter* InTargetCharacter);
 

@@ -39,15 +39,15 @@ public:
 	// ArchiveData
 protected:
 	UPROPERTY(EditAnywhere, Category = "ArchiveData")
-	FArchiveBasicSaveData ArchiveBasicData;
+	FDWArchiveBasicSaveData ArchiveBasicData;
 
 public:
 	UFUNCTION(BlueprintPure)
 	int32 GetNewValidArchiveID() const;
 
 	UFUNCTION(BlueprintPure)
-	FPlayerSaveData GetDefaultPlayerData() const;
+	FDWPlayerSaveData GetDefaultPlayerData() const;
 
 	UFUNCTION(BlueprintPure)
-	FDWWorldSaveData GetDefaultWorldData() const;
+	FDWVoxelWorldSaveData GetDefaultWorldData() const;
 };

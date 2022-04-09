@@ -5,12 +5,12 @@
 
 #include "Ability/Components/DWAbilitySystemComponent.h"
 #include "Ability/Vitality/DWVitalityAttributeSet.h"
-#include "Ability/Vitality/VitalityAssetBase.h"
+#include "Ability/Vitality/VitalityDataBase.h"
 #include "Components/BoxComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Character/DWCharacter.h"
 #include "Inventory/VitalityInventory.h"
-#include "Vitality/DWVitalityAsset.h"
+#include "Vitality/DWVitalityData.h"
 #include "Voxel/DWVoxelChunk.h"
 #include "Voxel/Chunks/VoxelChunk.h"
 #include "Widget/Components/WidgetVitalityHPComponent.h"
@@ -62,7 +62,7 @@ void ADWVitality::Serialize(FArchive& Ar)
 
 void ADWVitality::LoadData(FSaveData* InSaveData)
 {
-	auto SaveData = *static_cast<FVitalitySaveData*>(InSaveData);
+	auto SaveData = *static_cast<FDWVitalitySaveData*>(InSaveData);
 	if (SaveData.bSaved)
 	{
 		AssetID = SaveData.ID;
@@ -86,7 +86,7 @@ void ADWVitality::LoadData(FSaveData* InSaveData)
 		SetActorLocation(SaveData.SpawnLocation);
 		SetActorRotation(SaveData.SpawnRotation);
 
-		const UDWVitalityAsset* vitalityData = GetVitalityData<UDWVitalityAsset>();
+		const UDWVitalityData* vitalityData = GetVitalityData<UDWVitalityData>();
 		if(vitalityData->IsValid())
 		{
 			SaveData.InventoryData = vitalityData->InventoryData;
@@ -95,7 +95,7 @@ void ADWVitality::LoadData(FSaveData* InSaveData)
 		// const auto ItemDatas = UDWHelper::LoadItemDatas();
 		// if(ItemDatas.Num() > 0 && FMath::FRand() < 0.2f)
 		// {
-		// 	SaveData.InventoryData.Items.Add(FItem(ItemDatas[FMath::RandRange(0, ItemDatas.Num() - 1)].ID, 1));
+		// 	SaveData.InventoryData.Items.Add(FAbilityItem(ItemDatas[FMath::RandRange(0, ItemDatas.Num() - 1)].ID, 1));
 		// }
 		
 		Inventory->LoadData(SaveData.InventoryData, this);
@@ -104,7 +104,7 @@ void ADWVitality::LoadData(FSaveData* InSaveData)
 
 FSaveData* ADWVitality::ToData(bool bSaved)
 {
-	static FVitalitySaveData SaveData;
+	static FDWVitalitySaveData SaveData;
 
 	SaveData.bSaved = bSaved;
 
@@ -152,7 +152,7 @@ void ADWVitality::Revive()
 	Super::Revive();
 }
 
-bool ADWVitality::GenerateVoxel(const FVoxelHitResult& InVoxelHitResult, FItem& InItem)
+bool ADWVitality::GenerateVoxel(const FVoxelHitResult& InVoxelHitResult, FAbilityItem& InItem)
 {
 	return false;
 }
@@ -193,14 +193,14 @@ void ADWVitality::OnInteract(IInteractionAgentInterface* InInteractionAgent, EIn
 	}
 }
 
-FItem& ADWVitality::GetGeneratingVoxelItem()
+FAbilityItem& ADWVitality::GetGeneratingVoxelItem()
 {
-	FItem tmpItem = Inventory->GetSelectedItem();
-	if(tmpItem.IsValid() && tmpItem.GetData()->EqualType(EItemType::Voxel))
+	FAbilityItem tmpItem = Inventory->GetSelectedItem();
+	if(tmpItem.IsValid() && tmpItem.GetData()->EqualType(EAbilityItemType::Voxel))
 	{
 		return tmpItem;
 	}
-	return FItem::Empty;
+	return FAbilityItem::Empty;
 }
 
 FVoxelItem& ADWVitality::GetSelectedVoxelItem()

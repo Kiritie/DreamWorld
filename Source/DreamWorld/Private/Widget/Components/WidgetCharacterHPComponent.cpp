@@ -4,6 +4,7 @@
 #include "Widget/Components/WidgetCharacterHPComponent.h"
 #include "Character/Player/DWPlayerCharacter.h"
 #include "Character/DWCharacter.h"
+#include "Global/GlobalBPLibrary.h"
 #include "UObject/ConstructorHelpers.h"
 #include "Widget/World/WidgetCharacterHP.h"
 
@@ -39,7 +40,7 @@ void UWidgetCharacterHPComponent::RefreshVisibility() const
 {
 	if(GetUserWidgetObject())
 	{
-		ADWPlayerCharacter* PlayerCharacter = UDWHelper::GetPlayerCharacter(this);
+		ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>(this);
 		if(!OwnerCharacter->IsDead() && PlayerCharacter && FVector::Distance(OwnerCharacter->GetActorLocation(), PlayerCharacter->GetActorLocation()) < 1000)
 		{
 			GetUserWidgetObject()->SetVisibility(ESlateVisibility::SelfHitTestInvisible);

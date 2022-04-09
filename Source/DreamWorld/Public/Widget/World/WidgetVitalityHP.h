@@ -7,7 +7,7 @@
 
 #include "WidgetVitalityHP.generated.h"
 
-class AAbilityVitalityBase;
+class ADWVitality;
 
 /**
  * ������Ѫ��
@@ -22,7 +22,7 @@ public:
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Default")
-	AAbilityVitalityBase* OwnerObject;
+	ADWVitality* OwnerObject;
 	
 public:
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
@@ -31,7 +31,7 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
 	void SetHealthPercent(float InHealth, float InMaxHealth);
 
-	AAbilityVitalityBase* GetOwnerObject() const { return OwnerObject; }
+	ADWVitality* GetOwnerObject() const { return OwnerObject; }
 
-	void SetOwnerObject(AAbilityVitalityBase* val) { OwnerObject = val; }
+	void SetOwnerObject(ADWVitality* val) { OwnerObject = val; }
 };

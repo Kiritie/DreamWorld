@@ -7,12 +7,14 @@
 #include "Gameplay/DWGameState.h"
 #include "SpawnPool/SpawnPoolModuleBPLibrary.h"
 #include "Voxel/Chunks/VoxelChunk.h"
-#include "Voxel/Voxels/VoxelAssetBase.h"
+#include "Voxel/Datas/VoxelData.h"
 
 // Sets default values
 ADWTeamModule::ADWTeamModule()
 {
-	TeamMap = TMap<FName, FTeamData>();
+	ModuleName = FName("TeamModule");
+
+	TeamMap = TMap<FName, FDWTeamData>();
 }
 
 #if WITH_EDITOR
@@ -66,7 +68,7 @@ bool ADWTeamModule::CreateTeam(ADWCharacter* InCaptain, FName InTeamName /*= NAM
 {
 	if (InCaptain->GetTeamID().IsEmpty())
 	{
-		auto tmpData = FTeamData();
+		auto tmpData = FDWTeamData();
 		tmpData.ID = *FString::Printf(TEXT("Team_%d"), TeamMap.Num());
 		if (!IsExistTeam(tmpData.ID))
 		{
@@ -92,11 +94,11 @@ bool ADWTeamModule::DissolveTeam(const FName& InTeamID, ADWCharacter* InCaptain)
 	return false;
 }
 
-FTeamData* ADWTeamModule::GetTeamData(const FName& InTeamID)
+FDWTeamData* ADWTeamModule::GetTeamData(const FName& InTeamID)
 {
 	if (TeamMap.Contains(InTeamID))
 	{
 		return &TeamMap[InTeamID];
 	}
-	return &FTeamData::Empty;
+	return &FDWTeamData::Empty;
 }
