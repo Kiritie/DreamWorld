@@ -3,7 +3,7 @@
 #pragma once
 
 #include "DreamWorld/DreamWorld.h"
-#include "Widget/UMG/UserWidgetBase.h"
+#include "Widget/Screen/UMG/UserWidgetBase.h"
 #include "WidgetItemInfoBox.generated.h"
 
 class ADWPlayerCharacter;
@@ -20,7 +20,7 @@ public:
 	UWidgetItemInfoBox(const FObjectInitializer& ObjectInitializer);
 
 public:
-	virtual void OnCreate_Implementation() override;
+	virtual void OnCreate_Implementation(AActor* InOwner) override;
 
 	virtual void OnInitialize_Implementation(AActor* InOwner) override;
 

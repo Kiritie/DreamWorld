@@ -6,7 +6,7 @@
 UWidgetLoadingPanel::UWidgetLoadingPanel(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	WidgetName = FName("LoadingPanel");
-	WidgetType = EWidgetType::Temporary;
+	WidgetCategory = EWidgetCategory::Temporary;
 	InputMode = EInputMode::None;
 }
 

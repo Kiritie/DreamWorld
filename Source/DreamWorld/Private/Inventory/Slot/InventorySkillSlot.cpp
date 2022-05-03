@@ -25,7 +25,7 @@ void UInventorySkillSlot::InitSlot(UInventory* InOwner, FAbilityItem InItem, EAb
 void UInventorySkillSlot::PreSet(FAbilityItem& InItem)
 {
 	Super::PreSet(InItem);
-	if(GetSkillData().GetItemData<UDWSkillData>()->SkillMode == ESkillMode::Passive)
+	if(InItem.IsValid() && GetSkillData().GetItemData<UDWSkillData>()->SkillMode == ESkillMode::Passive)
 	{
 		CancelItem();
 	}
@@ -34,7 +34,7 @@ void UInventorySkillSlot::PreSet(FAbilityItem& InItem)
 void UInventorySkillSlot::EndSet()
 {
 	Super::EndSet();
-	if(GetSkillData().GetItemData<UDWSkillData>()->SkillMode == ESkillMode::Passive)
+	if(Item.IsValid() &&  GetSkillData().GetItemData<UDWSkillData>()->SkillMode == ESkillMode::Passive)
 	{
 		ActiveItem();
 	}

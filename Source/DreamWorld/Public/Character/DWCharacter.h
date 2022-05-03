@@ -8,7 +8,7 @@
 #include "TargetSystemComponent.h"
 #include "TargetSystemTargetableInterface.h"
 #include "Ability/Character/AbilityCharacterBase.h"
-#include "Scene/Object/PickUp/PickerInterface.h"
+#include "Scene/Actor/PickUp/PickerInterface.h"
 #include "Voxel/Agent/VoxelAgentInterface.h"
 
 #include "DWCharacter.generated.h"
@@ -109,7 +109,7 @@ protected:
 	EDWCharacterNature Nature;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CharacterStats")
-	FString TeamID;
+	FName TeamID;
 			
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CharacterStats")
 	float AttackDistance;
@@ -515,10 +515,10 @@ public:
 	FDWTeamData* GetTeamData() const;
 
 	UFUNCTION(BlueprintPure)
-	FString GetTeamID() const { return TeamID; }
+	FName GetTeamID() const { return TeamID; }
 
 	UFUNCTION(BlueprintCallable)
-	void SetTeamID(const FString& InTeamID);
+	void SetTeamID(FName InTeamID);
 			
 	UFUNCTION(BlueprintPure)
 	float GetMana() const;
@@ -734,11 +734,11 @@ public:
 	
 	virtual void HandleInterrupt(float InterruptDuration);
 	
-	virtual void HandleNameChanged(const FString& NewValue) override;
+	virtual void HandleNameChanged(FName NewValue) override;
 
-	virtual void HandleTeamIDChanged(const FString& NewValue);
+	virtual void HandleTeamIDChanged(FName NewValue);
 
-	virtual void HandleRaceIDChanged(const FString& NewValue) override;
+	virtual void HandleRaceIDChanged(FName NewValue) override;
 
 	virtual void HandleLevelChanged(int32 NewValue, int32 DeltaValue = 0) override;
 

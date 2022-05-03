@@ -6,7 +6,7 @@
 UWidgetPausingMenu::UWidgetPausingMenu(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	WidgetName = FName("PausingMenu");
-	WidgetType = EWidgetType::Temporary;
+	WidgetCategory = EWidgetCategory::Temporary;
 	InputMode = EInputMode::GameAndUI;
 }
 

@@ -30,8 +30,8 @@ void UDWGeneralSaveGame::OnRefresh_Implementation()
 {
 	Super::OnRefresh_Implementation();
 	
-	if(ADWPlayerController* PlayerController = UGlobalBPLibrary::GetPlayerController<ADWPlayerController>(this))
+	if(ADWPlayerController* PlayerController = UGlobalBPLibrary::GetPlayerController<ADWPlayerController>(GWorld))
 	{
-		SaveData.CameraDistance = PlayerController->GetCameraDistance(false);
+		SaveData.CameraDistance = PlayerController->GetCurrentCameraDistance();
 	}
 }

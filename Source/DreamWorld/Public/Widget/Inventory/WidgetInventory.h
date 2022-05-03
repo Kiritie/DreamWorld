@@ -3,7 +3,7 @@
 #pragma once
 
 #include "DreamWorld/DreamWorld.h"
-#include "Widget/UMG/UserWidgetBase.h"
+#include "Widget/Screen/UMG/UserWidgetBase.h"
 
 #include "WidgetInventory.generated.h"
 

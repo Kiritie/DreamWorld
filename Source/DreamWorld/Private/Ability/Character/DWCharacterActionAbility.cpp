@@ -12,7 +12,7 @@ void UDWCharacterActionAbility::EndAbility(const FGameplayAbilitySpecHandle Hand
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 	if(!bWasCancelled)
 	{
-		if(ADWCharacter* OwnerCharacter = Cast<ADWCharacter>(GetOwnerCharacter()))
+		if(ADWCharacter* OwnerCharacter = GetOwnerCharacter<ADWCharacter>())
 		{
 			OwnerCharacter->StopAction(ActionType, false, true);
 		}

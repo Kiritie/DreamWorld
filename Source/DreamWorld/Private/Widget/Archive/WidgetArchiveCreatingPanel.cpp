@@ -6,7 +6,7 @@
 UWidgetArchiveCreatingPanel::UWidgetArchiveCreatingPanel(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	WidgetName = FName("ArchiveCreatingPanel");
-	WidgetType = EWidgetType::Temporary;
+	WidgetCategory = EWidgetCategory::Temporary;
 	InputMode = EInputMode::UIOnly;
 }
 

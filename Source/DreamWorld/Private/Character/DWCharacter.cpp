@@ -18,7 +18,7 @@
 #include "Perception/AISense_Damage.h"
 #include "Perception/AISense_Sight.h"
 #include "Scene/SceneModuleBPLibrary.h"
-#include "Scene/Object/PhysicsVolume/PhysicsVolumeBase.h"
+#include "Scene/Actor/PhysicsVolume/PhysicsVolumeBase.h"
 #include "Voxel/DWVoxelChunk.h"
 #include "Voxel/DWVoxelModule.h"
 #include "Voxel/VoxelModule.h"
@@ -48,7 +48,7 @@
 #include "Inventory/Slot/InventoryEquipSlot.h"
 #include "Inventory/Slot/InventorySkillSlot.h"
 #include "Main/MainModuleBPLibrary.h"
-#include "Scene/Object/PickUp/PickUp.h"
+#include "Scene/Actor/PickUp/PickUp.h"
 #include "Team/DWTeamModule.h"
 #include "Voxel/Datas/VoxelData.h"
 #include "Voxel/DWVoxelChunk.h"
@@ -68,9 +68,9 @@ ADWCharacter::ADWCharacter()
 	WidgetCharacterHP->SetupAttachment(RootComponent);
 	WidgetCharacterHP->SetRelativeLocation(FVector(0, 0, 70));
 
-	// AbilitySystem = CreateDefaultSubobject<UDWAbilitySystemComponent>(FName("AbilitySystem"));
+	AbilitySystem = CreateDefaultSubobject<UDWAbilitySystemComponent>(FName("AbilitySystem"));
 
-	// AttributeSet = CreateDefaultSubobject<UDWCharacterAttributeSet>(FName("AttributeSet"));
+	AttributeSet = CreateDefaultSubobject<UDWCharacterAttributeSet>(FName("AttributeSet"));
 
 	Inventory = CreateDefaultSubobject<UCharacterInventory>(FName("Inventory"));
 
@@ -114,7 +114,7 @@ ADWCharacter::ADWCharacter()
 
 	// stats
 	Nature = EDWCharacterNature::AIHostile;
-	TeamID = TEXT("");
+	TeamID = NAME_None;
 	AttackDistance = 100.f;
 	InteractDistance = 500.f;
 	FollowDistance = 500.f;
@@ -225,14 +225,14 @@ void ADWCharacter::Tick(float DeltaTime)
 				{
 					if(OwnerChunk)
 					{
-						OwnerChunk->RemoveSceneObject(this);
+						OwnerChunk->RemoveSceneActor(this);
 					}
-					Chunk->AddSceneObject(this);
+					Chunk->RemoveSceneActor(this);
 				}
 			}
 			else if(OwnerChunk)
 			{
-				OwnerChunk->RemoveSceneObject(this);
+				OwnerChunk->RemoveSceneActor(this);
 			}
 		}
 
@@ -659,7 +659,7 @@ void ADWCharacter::DeathEnd()
 		}
 		if (OwnerChunk && OwnerChunk->IsValidLowLevel())
 		{
-			OwnerChunk->DestroySceneObject(this);
+			OwnerChunk->DestroySceneActor(this);
 		}
 		else
 		{
@@ -858,11 +858,11 @@ void ADWCharacter::Swim()
 	{
 		bSwimming = true;
 		GetCharacterMovement()->SetMovementMode(MOVE_Swimming);
- 		if(USceneModuleBPLibrary::HasPhysicsVolume(FName("Water")))
+ 		if(USceneModuleBPLibrary::HasPhysicsVolumeByName(FName("Water")))
 		{
 			if(GetCharacterMovement()->UpdatedComponent)
 			{
-				GetCharacterMovement()->UpdatedComponent->SetPhysicsVolume(USceneModuleBPLibrary::GetPhysicsVolume(FName("Water")), true);
+				GetCharacterMovement()->UpdatedComponent->SetPhysicsVolume(USceneModuleBPLibrary::GetPhysicsVolumeByName(FName("Water")), true);
 			}
 		}
 		//FVector Velocity = GetMovementComponent()->Velocity;
@@ -1634,7 +1634,7 @@ FDWTeamData* ADWCharacter::GetTeamData() const
 {
 	if(ADWTeamModule* TeamModule = AMainModule::GetModuleByClass<ADWTeamModule>())
 	{
-		return TeamModule->GetTeamData(*TeamID);
+		return TeamModule->GetTeamData(TeamID);
 	}
 	return nullptr;
 }
@@ -1644,7 +1644,7 @@ bool ADWCharacter::IsTargetable_Implementation() const
 	return !IsDead();
 }
 
-void ADWCharacter::SetTeamID(const FString& InTeamID)
+void ADWCharacter::SetTeamID(FName InTeamID)
 {
 	TeamID = InTeamID;
 	HandleTeamIDChanged(InTeamID);
@@ -2091,7 +2091,7 @@ bool ADWCharacter::DissolveTeam()
 {
 	if(ADWTeamModule* TeamModule = AMainModule::GetModuleByClass<ADWTeamModule>())
 	{
-		return TeamModule->DissolveTeam(*TeamID, this);
+		return TeamModule->DissolveTeam(TeamID, this);
 	}
 	return false;
 }
@@ -2111,7 +2111,7 @@ bool ADWCharacter::JoinTeam(const FName& InTeamID)
 
 bool ADWCharacter::JoinTeam(ADWCharacter* InTargetCharacter)
 {
-	return JoinTeam(*InTargetCharacter->GetTeamID());
+	return JoinTeam(InTargetCharacter->GetTeamID());
 }
 
 bool ADWCharacter::LeaveTeam()
@@ -2177,7 +2177,7 @@ bool ADWCharacter::IsEnemy(ADWCharacter* InTargetCharacter) const
 			break;
 		}
 	}
-	return !IsTeamMate(InTargetCharacter) && !InTargetCharacter->GetRaceID().Equals(RaceID);
+	return !IsTeamMate(InTargetCharacter) && !InTargetCharacter->GetRaceID().IsEqual(RaceID);
 }
 
 void ADWCharacter::SetVisible_Implementation(bool bVisible)
@@ -2241,7 +2241,7 @@ void ADWCharacter::HandleInterrupt(float InterruptDuration)
 	}
 }
 
-void ADWCharacter::HandleNameChanged(const FString& NewValue)
+void ADWCharacter::HandleNameChanged(FName NewValue)
 {
 	Super::HandleNameChanged(NewValue);
 	
@@ -2251,7 +2251,7 @@ void ADWCharacter::HandleNameChanged(const FString& NewValue)
 	}
 }
 
-void ADWCharacter::HandleTeamIDChanged(const FString& NewValue)
+void ADWCharacter::HandleTeamIDChanged(FName NewValue)
 {
 	if (GetWidgetCharacterHPWidget())
 	{
@@ -2259,7 +2259,7 @@ void ADWCharacter::HandleTeamIDChanged(const FString& NewValue)
 	}
 }
 
-void ADWCharacter::HandleRaceIDChanged(const FString& NewValue)
+void ADWCharacter::HandleRaceIDChanged(FName NewValue)
 {
 	Super::HandleRaceIDChanged(NewValue);
 	

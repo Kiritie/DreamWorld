@@ -11,13 +11,13 @@
 UWidgetItemInfoBox::UWidgetItemInfoBox(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	WidgetName = FName("ItemInfoBox");
-	WidgetType = EWidgetType::Permanent;
+	WidgetCategory = EWidgetCategory::Permanent;
 	InputMode = EInputMode::None;
 }
 
-void UWidgetItemInfoBox::OnCreate_Implementation()
+void UWidgetItemInfoBox::OnCreate_Implementation(AActor* InOwner)
 {
-	Super::OnCreate_Implementation();
+	Super::OnCreate_Implementation(InOwner);
 }
 
 void UWidgetItemInfoBox::OnInitialize_Implementation(AActor* InOwner)

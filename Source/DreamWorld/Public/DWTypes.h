@@ -456,8 +456,8 @@ struct DREAMWORLD_API FDWVitalityBasicSaveData : public FSaveData
 public:
 	FORCEINLINE FDWVitalityBasicSaveData()
 	{
-		Name = TEXT("");
-		RaceID = TEXT("");
+		Name = NAME_None;
+		RaceID = NAME_None;
 		Level = 0;
 		EXP = 0;
 		SpawnLocation = FVector::ZeroVector;
@@ -469,10 +469,10 @@ public:
 	FPrimaryAssetId ID;
 
 	UPROPERTY(BlueprintReadWrite)
-	FString Name;
+	FName Name;
 		
 	UPROPERTY(BlueprintReadOnly)
-	FString RaceID;
+	FName RaceID;
 
 	UPROPERTY(BlueprintReadWrite)
 	int32 Level;
@@ -515,12 +515,12 @@ struct DREAMWORLD_API FDWCharacterBasicSaveData : public FDWVitalityBasicSaveDat
 public:
 	FORCEINLINE FDWCharacterBasicSaveData()
 	{
-		TeamID = TEXT("");
+		TeamID = NAME_None;
 	}
 
 public:
 	UPROPERTY(BlueprintReadOnly)
-	FString TeamID;
+	FName TeamID;
 };
 
 USTRUCT(BlueprintType)

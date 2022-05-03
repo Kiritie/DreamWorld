@@ -14,13 +14,13 @@
 UWidgetGameHUD::UWidgetGameHUD(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	WidgetName = FName("GameHUD");
-	WidgetType = EWidgetType::Permanent;
+	WidgetCategory = EWidgetCategory::Permanent;
 	InputMode = EInputMode::GameOnly;
 }
 
-void UWidgetGameHUD::OnCreate_Implementation()
+void UWidgetGameHUD::OnCreate_Implementation(AActor* InOwner)
 {
-	Super::OnCreate_Implementation();
+	Super::OnCreate_Implementation(InOwner);
 
 	UEventModuleBPLibrary::SubscribeEvent(UEventHandle_ChangeInputMode::StaticClass(), this, FName("OnChangeInputMode"));
 }

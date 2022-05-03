@@ -175,11 +175,11 @@ protected:
 	virtual void DoInteractAction5();
 
 public:
-	virtual void HandleNameChanged(const FString& NewValue) override;
+	virtual void HandleNameChanged(FName NewValue) override;
 
-	virtual void HandleTeamIDChanged(const FString& NewValue) override;
+	virtual void HandleTeamIDChanged(FName NewValue) override;
 
-	virtual void HandleRaceIDChanged(const FString& NewValue) override;
+	virtual void HandleRaceIDChanged(FName NewValue) override;
 
 	virtual void HandleLevelChanged(int32 NewValue, int32 DeltaValue = 0) override;
 

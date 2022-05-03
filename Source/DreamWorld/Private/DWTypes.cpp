@@ -49,7 +49,7 @@ void FDWTeamData::AddMember(ADWCharacter* InMember)
 {
 	if (!Members.Contains(InMember))
 	{
-		InMember->SetTeamID(ID.ToString());
+		InMember->SetTeamID(ID);
 		Members.Add(InMember);
 	}
 }

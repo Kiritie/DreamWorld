@@ -3,7 +3,7 @@
 #pragma once
 
 #include "DWTypes.h"
-#include "SpawnPool/SpawnPoolInterface.h"
+#include "ReferencePool/ReferencePoolInterface.h"
 #include "GameFramework/Actor.h"
 #include "Voxel/VoxelModuleTypes.h"
 #include "Voxel/Chunks/VoxelChunk.h"
@@ -78,11 +78,11 @@ protected:
 	//////////////////////////////////////////////////////////////////////////
 	// SceneContainer
 public:
-	virtual void AddSceneObject(ISceneObjectInterface* InSceneObject) override;
+	virtual void AddSceneActor(AActor* InActor) override;
 
-	virtual void RemoveSceneObject(ISceneObjectInterface* InSceneObject) override;
+	virtual void RemoveSceneActor(AActor* InActor) override;
 
-	virtual void DestroySceneObject(ISceneObjectInterface* InSceneObject) override;
+	virtual void DestroySceneActor(AActor* InActor) override;
 
 	//////////////////////////////////////////////////////////////////////////
 	// Character

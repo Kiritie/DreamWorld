@@ -23,9 +23,9 @@ ADWVitality::ADWVitality()
 	WidgetVitalityHP->SetupAttachment(RootComponent);
 	WidgetVitalityHP->SetRelativeLocation(FVector(0, 0, 50));
 
-	// AbilitySystem = CreateDefaultSubobject<UDWAbilitySystemComponent>(FName("AbilitySystem"));
-	//
-	// AttributeSet = CreateDefaultSubobject<UDWVitalityAttributeSet>(FName("AttributeSet"));
+	AbilitySystem = CreateDefaultSubobject<UDWAbilitySystemComponent>(FName("AbilitySystem"));
+	
+	AttributeSet = CreateDefaultSubobject<UDWVitalityAttributeSet>(FName("AttributeSet"));
 	
 	Inventory = CreateDefaultSubobject<UVitalityInventory>(FName("Inventory"));
 
@@ -137,7 +137,7 @@ void ADWVitality::Death(AActor* InKiller /*= nullptr*/)
 	if (!bDead)
 	{
 		Inventory->DiscardAllItem();
-		OwnerChunk->DestroySceneObject(this);
+		OwnerChunk->DestroySceneActor(this);
 	}
 	Super::Death(InKiller);
 }
@@ -233,7 +233,7 @@ void ADWVitality::HandleDamage(EDamageType DamageType, const float LocalDamageDo
 	}
 }
 
-void ADWVitality::HandleNameChanged(const FString& NewValue)
+void ADWVitality::HandleNameChanged(FName NewValue)
 {
 	Super::HandleNameChanged(NewValue);
 	
@@ -243,7 +243,7 @@ void ADWVitality::HandleNameChanged(const FString& NewValue)
 	}
 }
 
-void ADWVitality::HandleRaceIDChanged(const FString& NewValue)
+void ADWVitality::HandleRaceIDChanged(FName NewValue)
 {
 	Super::HandleRaceIDChanged(NewValue);
 	

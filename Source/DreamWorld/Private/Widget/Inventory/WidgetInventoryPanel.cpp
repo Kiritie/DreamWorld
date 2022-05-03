@@ -19,7 +19,7 @@
 UWidgetInventoryPanel::UWidgetInventoryPanel(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	WidgetName = FName("InventoryPanel");
-	WidgetType = EWidgetType::Permanent;
+	WidgetCategory = EWidgetCategory::Permanent;
 	InputMode = EInputMode::GameAndUI;
 
 	DefaultSlotClass = LoadClass<UWidgetInventorySlot>(nullptr, TEXT("WidgetBlueprint'/Game/Blueprints/Widget/Inventory/Slot/WB_InventorySlot.WB_InventorySlot_C'"));

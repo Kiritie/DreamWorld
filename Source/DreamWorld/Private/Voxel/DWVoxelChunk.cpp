@@ -9,7 +9,7 @@
 #include "Character/Base/CharacterBase.h"
 #include "Components/BoxComponent.h"
 #include "Main/MainModule.h"
-#include "Scene/Object/PickUp/PickUp.h"
+#include "Scene/Actor/PickUp/PickUp.h"
 #include "Team/DWTeamModule.h"
 #include "Vitality/DWVitality.h"
 #include "Voxel/VoxelModule.h"
@@ -221,8 +221,8 @@ void ADWVoxelChunk::SpawnActors()
 						{
 							auto saveData = FDWVitalitySaveData();
 							saveData.ID = vitalityData->GetPrimaryAssetId();
-							saveData.Name = vitalityData->Name.ToString();
-							saveData.RaceID = raceData.ID.ToString();
+							saveData.Name = *vitalityData->Name.ToString();
+							saveData.RaceID = raceData.ID;
 							saveData.Level = vitalityItem.Level;
 							saveData.SpawnLocation = hitResult.Location;
 							saveData.SpawnRotation = FRotator(0, FMath::RandRange(0, 360), 0);
@@ -251,8 +251,8 @@ void ADWVoxelChunk::SpawnActors()
 						{
 							auto saveData = FDWCharacterSaveData();
 							saveData.ID = characterData->GetPrimaryAssetId();
-							saveData.Name = characterData->Name.ToString();
-							saveData.RaceID = raceData.ID.ToString();
+							saveData.Name = *characterData->Name.ToString();
+							saveData.RaceID = raceData.ID;
 							saveData.Level = characterItem.Level;
 							saveData.SpawnLocation = hitResult.Location;
 							saveData.SpawnRotation = FRotator(0, FMath::RandRange(0, 360), 0);
@@ -312,43 +312,43 @@ void ADWVoxelChunk::OnGenerated(bool bPreview)
 	}
 }
 
-void ADWVoxelChunk::AddSceneObject(ISceneObjectInterface* InSceneObject)
+void ADWVoxelChunk::AddSceneActor(AActor* InActor)
 {
-	Super::AddSceneObject(InSceneObject);
+	Super::AddSceneActor(InActor);
 
-	if(ADWCharacter* Character = Cast<ADWCharacter>(InSceneObject))
+	if(ADWCharacter* Character = Cast<ADWCharacter>(InActor))
 	{
 		AttachCharacter(Character);
 	}
-	else if(ADWVitality* Vitality = Cast<ADWVitality>(InSceneObject))
+	else if(ADWVitality* Vitality = Cast<ADWVitality>(InActor))
 	{
 		AttachVitality(Vitality);
 	}
 }
 
-void ADWVoxelChunk::RemoveSceneObject(ISceneObjectInterface* InSceneObject)
+void ADWVoxelChunk::RemoveSceneActor(AActor* InActor)
 {
-	Super::RemoveSceneObject(InSceneObject);
+	Super::RemoveSceneActor(InActor);
 
-	if(ADWCharacter* Character = Cast<ADWCharacter>(InSceneObject))
+	if(ADWCharacter* Character = Cast<ADWCharacter>(InActor))
 	{
 		DetachCharacter(Character);
 	}
-	else if(ADWVitality* Vitality = Cast<ADWVitality>(InSceneObject))
+	else if(ADWVitality* Vitality = Cast<ADWVitality>(InActor))
 	{
 		DetachVitality(Vitality);
 	}
 }
 
-void ADWVoxelChunk::DestroySceneObject(ISceneObjectInterface* InSceneObject)
+void ADWVoxelChunk::DestroySceneActor(AActor* InActor)
 {
-	Super::DestroySceneObject(InSceneObject);
+	Super::DestroySceneActor(InActor);
 
-	if(ADWCharacter* Character = Cast<ADWCharacter>(InSceneObject))
+	if(ADWCharacter* Character = Cast<ADWCharacter>(InActor))
 	{
 		DestroyCharacter(Character);
 	}
-	else if(ADWVitality* Vitality = Cast<ADWVitality>(InSceneObject))
+	else if(ADWVitality* Vitality = Cast<ADWVitality>(InActor))
 	{
 		DestroyVitality(Vitality);
 	}

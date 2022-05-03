@@ -5,7 +5,8 @@
 
 #include "Character/Player/DWPlayerCharacter.h"
 #include "Gameplay/DWGameState.h"
-#include "SpawnPool/SpawnPoolModuleBPLibrary.h"
+#include "ReferencePool/ReferencePoolModuleBPLibrary.h"
+#include "Voxel/VoxelModuleBPLibrary.h"
 #include "Voxel/Chunks/VoxelChunk.h"
 #include "Voxel/Datas/VoxelData.h"
 
@@ -183,7 +184,7 @@ void ADWVoxelModule::GenerateChunks(FIndex InIndex)
 
 	if(BoundsMesh != nullptr)
 	{
-		BoundsMesh->SetRelativeLocation(ChunkIndexToLocation(InIndex));
+		BoundsMesh->SetRelativeLocation(UVoxelModuleBPLibrary::ChunkIndexToLocation(InIndex));
 		BoundsMesh->SetRelativeScale3D(FVector(GetWorldLength() * GetWorldData()->BlockSize * 0.01f, GetWorldLength() * GetWorldData()->BlockSize * 0.01f, 15.f));
 	}
 }

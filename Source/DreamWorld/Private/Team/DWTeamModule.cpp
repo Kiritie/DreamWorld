@@ -5,7 +5,7 @@
 
 #include "Character/Player/DWPlayerCharacter.h"
 #include "Gameplay/DWGameState.h"
-#include "SpawnPool/SpawnPoolModuleBPLibrary.h"
+#include "ReferencePool/ReferencePoolModuleBPLibrary.h"
 #include "Voxel/Chunks/VoxelChunk.h"
 #include "Voxel/Datas/VoxelData.h"
 
@@ -66,13 +66,13 @@ bool ADWTeamModule::IsExistTeam(const FName& InTeamID) const
 
 bool ADWTeamModule::CreateTeam(ADWCharacter* InCaptain, FName InTeamName /*= NAME_None*/, FString InTeamDetail /*= TEXT("")*/)
 {
-	if (InCaptain->GetTeamID().IsEmpty())
+	if (InCaptain->GetTeamID().IsNone())
 	{
 		auto tmpData = FDWTeamData();
 		tmpData.ID = *FString::Printf(TEXT("Team_%d"), TeamMap.Num());
 		if (!IsExistTeam(tmpData.ID))
 		{
-			tmpData.Name = !InTeamName.IsNone() ? InTeamName : *FString::Printf(TEXT("%s �� Team"), *InCaptain->GetNameC());
+			tmpData.Name = !InTeamName.IsNone() ? InTeamName : *FString::Printf(TEXT("%s �� Team"), *InCaptain->GetNameC().ToString());
 			tmpData.Detail = !InTeamDetail.IsEmpty() ? InTeamDetail : tmpData.Name.ToString();
 			tmpData.Captain = InCaptain;
 			tmpData.AddMember(InCaptain);

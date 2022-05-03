@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
-#include "Widget/UMG/UserWidgetBase.h"
+#include "Widget/Screen/UMG/UserWidgetBase.h"
 
 #include "WidgetSettingPanel.generated.h"
 

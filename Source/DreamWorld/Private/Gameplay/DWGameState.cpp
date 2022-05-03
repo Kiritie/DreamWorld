@@ -39,6 +39,9 @@ void ADWGameState::SetCurrentState(EDWGameState InGameState)
 			{
 				UWidgetModuleBPLibrary::OpenUserWidget<UWidgetMainMenu>();
 				
+				UWidgetModuleBPLibrary::CloseUserWidget<UWidgetGameHUD>();
+				UWidgetModuleBPLibrary::CloseUserWidget<UWidgetInventoryBar>();
+				
 				UWidgetModuleBPLibrary::CreateUserWidget<UWidgetArchiveChoosingPanel>();
 				break;
 			}
@@ -60,7 +63,10 @@ void ADWGameState::SetCurrentState(EDWGameState InGameState)
 			}
 			case EDWGameState::Playing:
 			{
-				UWidgetModuleBPLibrary::CloseAllUserWidget(EWidgetType::Temporary);
+				if(UWidgetModuleBPLibrary::GetTemporaryUserWidget<UUserWidgetBase>())
+				{
+					UWidgetModuleBPLibrary::GetTemporaryUserWidget<UUserWidgetBase>()->Close();
+				}
 				
 				UWidgetModuleBPLibrary::OpenUserWidget<UWidgetGameHUD>();
 				UWidgetModuleBPLibrary::OpenUserWidget<UWidgetInventoryBar>();

@@ -18,7 +18,7 @@
 #include "Procedure/ProcedureModule.h"
 #include "SaveGame/DWSaveGameModule.h"
 #include "Scene/SceneModule.h"
-#include "SpawnPool/SpawnPoolModuleBPLibrary.h"
+#include "ReferencePool/ReferencePoolModuleBPLibrary.h"
 #include "Team/DWTeamModule.h"
 #include "Voxel/DWVoxelModule.h"
 #include "Voxel/Voxels/Voxel.h"
@@ -44,13 +44,13 @@ ADWMainModule::ADWMainModule()
 	ModuleClasses.Add(AObjectPoolModule::StaticClass());
 	ModuleClasses.Add(AParameterModule::StaticClass());
 	ModuleClasses.Add(AProcedureModule::StaticClass());
+	ModuleClasses.Add(AReferencePoolModule::StaticClass());
+	ModuleClasses.Add(ADWSaveGameModule::StaticClass());
 	ModuleClasses.Add(ASceneModule::StaticClass());
-	ModuleClasses.Add(ASpawnPoolModule::StaticClass());
 	ModuleClasses.Add(ADWVoxelModule::StaticClass());
 	ModuleClasses.Add(AWebRequestModule::StaticClass());
 	ModuleClasses.Add(AWidgetModule::StaticClass());
 	ModuleClasses.Add(ADWTeamModule::StaticClass());
-	ModuleClasses.Add(ADWSaveGameModule::StaticClass());
 }
 
 void ADWMainModule::InitializeModules_Implementation()

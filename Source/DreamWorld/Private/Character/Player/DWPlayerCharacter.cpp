@@ -327,7 +327,7 @@ void ADWPlayerCharacter::LookAtTarget(ADWCharacter* InTargetCharacter)
 
 FString ADWPlayerCharacter::GetHeadInfo() const
 {
-	return FString::Printf(TEXT("Lv.%d \"%s\" (Exp: %d/%d)"), Level, *Name, EXP, GetMaxEXP());
+	return FString::Printf(TEXT("Lv.%d \"%s\" (Exp: %d/%d)"), Level, *Name.ToString(), EXP, GetMaxEXP());
 }
 
 void ADWPlayerCharacter::SetControlMode(EDWControlMode InControlMode)
@@ -851,7 +851,7 @@ void ADWPlayerCharacter::DoInteractAction5()
 	}
 }
 
-void ADWPlayerCharacter::HandleNameChanged(const FString& NewValue)
+void ADWPlayerCharacter::HandleNameChanged(FName NewValue)
 {
 	Super::HandleNameChanged(NewValue);
 	if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>())
@@ -864,7 +864,7 @@ void ADWPlayerCharacter::HandleNameChanged(const FString& NewValue)
 	}
 }
 
-void ADWPlayerCharacter::HandleTeamIDChanged(const FString& NewValue)
+void ADWPlayerCharacter::HandleTeamIDChanged(FName NewValue)
 {
 	Super::HandleTeamIDChanged(NewValue);
 	if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>())
@@ -877,7 +877,7 @@ void ADWPlayerCharacter::HandleTeamIDChanged(const FString& NewValue)
 	}
 }
 
-void ADWPlayerCharacter::HandleRaceIDChanged(const FString& NewValue)
+void ADWPlayerCharacter::HandleRaceIDChanged(FName NewValue)
 {
 	Super::HandleRaceIDChanged(NewValue);
 	if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>())
