@@ -25,11 +25,11 @@ void ADWVitalityVoxel::BeginPlay()
 {
 	Super::BeginPlay();
 
-	FVector range = GetVoxelData()->GetFinalRange();
+	FVector range = GetVoxelData().GetFinalRange();
 	BoxComponent->SetBoxExtent(range * AVoxelModule::GetWorldData()->BlockSize);
 	//AddActorLocalOffset(FVector::UpVector * range.Z * VoxelMesh->BlockScale * 0.5f);
 
-	if (GetVoxelData()->IsValid())
+	if (GetVoxelData().IsValid())
 	{
 		VoxelMesh->Initialize(EVoxelMeshType::Vitality);
 		VoxelMesh->BuildVoxel(FVoxelItem(VoxelID));
@@ -48,7 +48,7 @@ void ADWVitalityVoxel::Tick(float DeltaTime)
 
 }
 
-UVoxelData* ADWVitalityVoxel::GetVoxelData() const
+UVoxelData& ADWVitalityVoxel::GetVoxelData() const
 {
-	return UAssetModuleBPLibrary::LoadPrimaryAsset<UVoxelData>(VoxelID);
+	return UAssetModuleBPLibrary::LoadPrimaryAssetRef<UVoxelData>(VoxelID);
 }

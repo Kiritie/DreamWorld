@@ -28,3 +28,8 @@ void UWidgetInventoryBox::OnClose_Implementation(bool bInstant)
 
 	FinishClose(bInstant);
 }
+
+void UWidgetInventoryBox::OnRefresh_Implementation()
+{
+	Super::OnRefresh_Implementation();
+}

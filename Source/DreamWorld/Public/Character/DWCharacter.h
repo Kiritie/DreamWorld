@@ -8,6 +8,7 @@
 #include "TargetSystemComponent.h"
 #include "TargetSystemTargetableInterface.h"
 #include "Ability/Character/AbilityCharacterBase.h"
+#include "Inventory/InventoryAgentInterface.h"
 #include "Scene/Actor/PickUp/PickerInterface.h"
 #include "Voxel/Agent/VoxelAgentInterface.h"
 
@@ -40,7 +41,7 @@ class AAbilitySkillBase;
  * 角色
  */
 UCLASS()
-class DREAMWORLD_API ADWCharacter : public AAbilityCharacterBase, public IVoxelAgentInterface, public ITargetSystemTargetableInterface, public IPickerInterface
+class DREAMWORLD_API ADWCharacter : public AAbilityCharacterBase, public IVoxelAgentInterface, public ITargetSystemTargetableInterface, public IPickerInterface, public IInventoryAgentInterface
 {
 	GENERATED_BODY()
 
@@ -437,7 +438,7 @@ public:
 	UWidgetCharacterHPComponent* GetWidgetCharacterHP() const { return WidgetCharacterHP; }
 
 	UFUNCTION(BlueprintPure)
-	virtual class UInventory* GetInventory() const;
+	virtual UInventory* GetInventory() const override;
 
 	UFUNCTION(BlueprintPure)
 	bool HasBehaviorTree() const;

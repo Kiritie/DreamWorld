@@ -19,6 +19,7 @@
 #include "SaveGame/DWSaveGameModule.h"
 #include "Scene/SceneModule.h"
 #include "ReferencePool/ReferencePoolModuleBPLibrary.h"
+#include "Step/StepModule.h"
 #include "Team/DWTeamModule.h"
 #include "Voxel/DWVoxelModule.h"
 #include "Voxel/Voxels/Voxel.h"
@@ -33,8 +34,8 @@ ADWMainModule::ADWMainModule()
 	ModuleClasses.Add(AAbilityModule::StaticClass());
 	ModuleClasses.Add(AAssetModule::StaticClass());
 	ModuleClasses.Add(AAudioModule::StaticClass());
-	ModuleClasses.Add(ACharacterModule::StaticClass());
 	ModuleClasses.Add(ACameraModule::StaticClass());
+	ModuleClasses.Add(ACharacterModule::StaticClass());
 	ModuleClasses.Add(ADebugModule::StaticClass());
 	ModuleClasses.Add(AEventModule::StaticClass());
 	ModuleClasses.Add(AInputModule::StaticClass());
@@ -47,6 +48,7 @@ ADWMainModule::ADWMainModule()
 	ModuleClasses.Add(AReferencePoolModule::StaticClass());
 	ModuleClasses.Add(ADWSaveGameModule::StaticClass());
 	ModuleClasses.Add(ASceneModule::StaticClass());
+	ModuleClasses.Add(AStepModule::StaticClass());
 	ModuleClasses.Add(ADWVoxelModule::StaticClass());
 	ModuleClasses.Add(AWebRequestModule::StaticClass());
 	ModuleClasses.Add(AWidgetModule::StaticClass());

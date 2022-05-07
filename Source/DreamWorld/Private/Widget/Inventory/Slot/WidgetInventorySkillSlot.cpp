@@ -35,7 +35,7 @@ void UWidgetInventorySkillSlot::Refresh()
 	if(!IsEmpty())
 	{
 		TxtName->SetVisibility(ESlateVisibility::Visible);
-		TxtName->SetText(GetItem().GetData()->Name);
+		TxtName->SetText(GetItem().GetData().Name);
 
 		TxtCost->SetVisibility(ESlateVisibility::Visible);
 		if(OwnerSlot)

@@ -5,6 +5,7 @@
 #include "GameplayAbilitySpec.h"
 #include "GameplayEffectTypes.h"
 #include "Ability/AbilityModuleTypes.h"
+#include "Asset/AssetModuleBPLibrary.h"
 #include "Inventory/InventoryTypes.h"
 #include "Parameter/ParameterModuleTypes.h"
 #include "SaveGame/SaveGameModuleTypes.h"
@@ -491,6 +492,9 @@ public:
 
 	UPROPERTY(BlueprintReadWrite)
 	FInventorySaveData InventoryData;
+
+public:
+	virtual void Initialize();
 };
 
 USTRUCT(BlueprintType)
@@ -504,7 +508,9 @@ public:
 	}
 
 public:
-	class UVitalityDataBase* GetVitalityData() const;
+	virtual void Initialize() override;
+	
+	class UDWVitalityData& GetVitalityData() const;
 };
 
 USTRUCT(BlueprintType)
@@ -574,7 +580,9 @@ public:
 	TMap<EDWCharacterActionType, FDWCharacterActionAbilityData> ActionAbilities;
 
 public:
-	class UCharacterDataBase* GetCharacterData() const;
+	virtual void Initialize() override;
+
+	class UDWCharacterData& GetCharacterData() const;
 };
 
 USTRUCT(BlueprintType)
@@ -694,36 +702,13 @@ public:
 	FIndex LastCharacterRaceIndex;
 
 public:
+	virtual void Initialize() override;
+	
 	FDWArchiveBasicSaveData GetArchiveData() const;
 
 	FORCEINLINE bool IsSameArchive(FDWVoxelWorldSaveData InSaveData) const
 	{
 		return InSaveData.ArchiveID == ArchiveID;
-	}
-
-	FORCEINLINE float GetChunkLength() const
-	{
-		return ChunkSize * BlockSize;
-	}
-
-	FORCEINLINE int32 GetWorldHeight() const
-	{
-		return ChunkSize * ChunkHeightRange;
-	}
-
-	FORCEINLINE FVoxelChunkMaterial GetChunkMaterial(EVoxelTransparency Transparency) const
-	{
-		const int32 Index = FMath::Clamp((int32)Transparency, 0, ChunkMaterials.Num());
-		if(ChunkMaterials.IsValidIndex(Index))
-		{
-			return ChunkMaterials[Index];
-		}
-		return FVoxelChunkMaterial();
-	}
-
-	FORCEINLINE FVector GetBlockSizedNormal(FVector InNormal, float InLength = 0.25f) const
-	{
-		return BlockSize * InNormal * InLength;
 	}
 	
 	bool IsExistChunkData(FIndex InChunkIndex) const
@@ -761,7 +746,6 @@ public:
 		ID = -1;
 		PlayerBasicData = FDWPlayerBasicSaveData();
 		WorldBasicData = FVoxelWorldBasicSaveData();
-		bPreview = false;
 	}
 
 public:
@@ -773,9 +757,6 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FVoxelWorldBasicSaveData WorldBasicData;
-
-	UPROPERTY(BlueprintReadOnly)
-	bool bPreview;
 };
 
 USTRUCT(BlueprintType)
@@ -801,11 +782,10 @@ public:
 	void Initialize()
 	{
 		PlayerData.ArchiveID = ID;
+		PlayerData.Initialize();
+		
 		WorldData.ArchiveID = ID;
-		if(WorldData.WorldSeed == 0)
-		{
-			WorldData.WorldSeed = FMath::Rand();
-		}
+		WorldData.Initialize();
 	}
 };
 

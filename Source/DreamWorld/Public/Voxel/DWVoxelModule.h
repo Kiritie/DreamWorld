@@ -49,14 +49,14 @@ protected:
 	//////////////////////////////////////////////////////////////////////////
 	// World
 protected:
-	virtual bool ChangeWorldState(EVoxelWorldState InWorldState) override;
+	virtual void OnWorldStateChanged() override;
 	
 public:
 	virtual void LoadData(FSaveData* InWorldData) override;
 
 	virtual FSaveData* ToData(bool bSaved = true) override;
 
-	virtual void UnloadData(bool bPreview = false) override;
+	virtual void UnloadData() override;
 
 protected:
 	virtual void GeneratePreviews() override;

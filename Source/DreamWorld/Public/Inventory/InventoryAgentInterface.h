@@ -7,6 +7,8 @@
 #include "UObject/Interface.h"
 #include "InventoryAgentInterface.generated.h"
 
+class UInventory;
+
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI)
 class UInventoryAgentInterface : public UInterface
@@ -23,5 +25,5 @@ class DREAMWORLD_API IInventoryAgentInterface
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
-	virtual class UInventory* GetInventory() const = 0;
+	virtual UInventory* GetInventory() const = 0;
 };

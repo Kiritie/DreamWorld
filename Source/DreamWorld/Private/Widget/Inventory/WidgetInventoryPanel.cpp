@@ -32,7 +32,7 @@ UWidgetInventoryPanel::UWidgetInventoryPanel(const FObjectInitializer& ObjectIni
 void UWidgetInventoryPanel::OnInitialize_Implementation(AActor* InOwner)
 {
 	Super::OnInitialize_Implementation(InOwner);
-
+	
 	if(!GetInventory()) return;
 
 	if(DefaultContent && UISlotDatas.Contains(ESplitSlotType::Default))
@@ -101,4 +101,9 @@ void UWidgetInventoryPanel::OnOpen_Implementation(const TArray<FParameter>& InPa
 void UWidgetInventoryPanel::OnClose_Implementation(bool bInstant)
 {
 	Super::OnClose_Implementation(bInstant);
+}
+
+void UWidgetInventoryPanel::OnRefresh_Implementation()
+{
+	Super::OnRefresh_Implementation();
 }

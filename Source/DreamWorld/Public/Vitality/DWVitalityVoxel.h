@@ -36,5 +36,5 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	UVoxelData* GetVoxelData() const;
+	UVoxelData& GetVoxelData() const;
 };

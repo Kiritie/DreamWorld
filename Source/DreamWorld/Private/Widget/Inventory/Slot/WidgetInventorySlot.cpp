@@ -160,7 +160,7 @@ void UWidgetInventorySlot::Refresh()
 	if(!IsEmpty())
 	{
 		ImgIcon->SetVisibility(ESlateVisibility::Visible);
-		ImgIcon->SetBrushFromTexture(GetItem().GetData()->Icon);
+		ImgIcon->SetBrushFromTexture(GetItem().GetData().Icon);
 		if(TxtCount)
 		{
 			if(GetItem().Count > 1)

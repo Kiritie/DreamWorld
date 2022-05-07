@@ -69,7 +69,7 @@ bool ADWMonsterCharacter::CanInteract(IInteractionAgentInterface* InInteractionA
 		{
 			if(ADWCharacter* InInteractionCharacter = Cast<ADWCharacter>(InInteractionAgent))
 			{
-				if(!IsEnemy(InInteractionCharacter) && InInteractionCharacter->GetInventory()->GetSelectedItem().GetData<UDWPropData>()->PropType == EDWPropType::Food)
+				if(!IsEnemy(InInteractionCharacter) && InInteractionCharacter->GetInventory()->GetSelectedItem().GetData<UDWPropData>().PropType == EDWPropType::Food)
 				{
 					return true;
 				}

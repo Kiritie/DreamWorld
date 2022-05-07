@@ -40,7 +40,7 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	virtual void OnSpawn_Implementation() override;
+	virtual void OnSpawn_Implementation(const TArray<FParameter>& InParams) override;
 		
 	virtual void OnDespawn_Implementation() override;
 
@@ -62,7 +62,7 @@ public:
 
 	virtual FSaveData* ToData(bool bSaved = true) override;
 
-	virtual void Generate(bool bPreview = false) override;
+	virtual void Generate() override;
 
 	virtual void BuildMap() override;
 
@@ -73,7 +73,7 @@ public:
 	virtual void DestroyActors() override;
 
 protected:
-	virtual void OnGenerated(bool bPreview = false) override;
+	virtual void OnGenerated() override;
 
 	//////////////////////////////////////////////////////////////////////////
 	// SceneContainer

@@ -4,7 +4,10 @@
 #include "Character/Player/DWPlayerCharacter.h"
 #include "Engine/World.h"
 #include "Gameplay/DWGameInstance.h"
+#include "SaveGame/DWArchiveSaveGame.h"
 #include "SaveGame/DWGeneralSaveGame.h"
+#include "SaveGame/SaveGameModuleBPLibrary.h"
+#include "Voxel/DWVoxelModule.h"
 #include "Widget/Inventory/WidgetInventoryBar.h"
 #include "Widget/Inventory/WidgetInventoryPanel.h"
 #include "Widget/WidgetLoadingPanel.h"
@@ -43,6 +46,26 @@ void ADWGameState::SetCurrentState(EDWGameState InGameState)
 				UWidgetModuleBPLibrary::CloseUserWidget<UWidgetInventoryBar>();
 				
 				UWidgetModuleBPLibrary::CreateUserWidget<UWidgetArchiveChoosingPanel>();
+
+				if(ADWVoxelModule* VoxelModule = AMainModule::GetModuleByClass<ADWVoxelModule>())
+				{
+					VoxelModule->SetWorldMode(EVoxelWorldMode::Preview);
+				}
+
+				if(UDWGeneralSaveGame* GeneralSaveGame = USaveGameModuleBPLibrary::GetSaveGame<UDWGeneralSaveGame>())
+				{
+					if(GeneralSaveGame->SaveData.CurrentArchiveID == -1)
+					{
+						if(UDWArchiveSaveGame* ArchiveSaveGame = USaveGameModuleBPLibrary::HasSaveGame<UDWArchiveSaveGame>() ? USaveGameModuleBPLibrary::GetSaveGame<UDWArchiveSaveGame>() : USaveGameModuleBPLibrary::CreateSaveGame<UDWArchiveSaveGame>(-1))
+						{
+							ArchiveSaveGame->Load();
+						}
+					}
+					else
+					{
+						USaveGameModuleBPLibrary::LoadSaveGame<UDWArchiveSaveGame>(GeneralSaveGame->SaveData.CurrentArchiveID);
+					}
+				}
 				break;
 			}
 			case EDWGameState::Preparing:
@@ -59,6 +82,16 @@ void ADWGameState::SetCurrentState(EDWGameState InGameState)
 				UWidgetModuleBPLibrary::CreateUserWidget<UWidgetGameHUD>();
 				UWidgetModuleBPLibrary::CreateUserWidget<UWidgetInventoryBar>();
 				UWidgetModuleBPLibrary::CreateUserWidget<UWidgetInventoryPanel>();
+
+				if(ADWVoxelModule* VoxelModule = AMainModule::GetModuleByClass<ADWVoxelModule>())
+				{
+					VoxelModule->SetWorldMode(EVoxelWorldMode::Game);
+				}
+
+				if(UDWGeneralSaveGame* GeneralSaveGame = USaveGameModuleBPLibrary::LoadSaveGame<UDWGeneralSaveGame>())
+				{
+					USaveGameModuleBPLibrary::LoadSaveGame<UDWArchiveSaveGame>(GeneralSaveGame->SaveData.CurrentArchiveID);
+				}
 				break;
 			}
 			case EDWGameState::Playing:

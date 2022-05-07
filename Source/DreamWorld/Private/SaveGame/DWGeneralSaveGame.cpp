@@ -11,9 +11,9 @@ UDWGeneralSaveGame::UDWGeneralSaveGame()
 	SaveName = FName("General");
 }
 
-void UDWGeneralSaveGame::OnCreate_Implementation()
+void UDWGeneralSaveGame::OnCreate_Implementation(int32 InSaveIndex)
 {
-	Super::OnCreate_Implementation();
+	Super::OnCreate_Implementation(InSaveIndex);
 }
 
 void UDWGeneralSaveGame::OnLoad_Implementation()

@@ -43,9 +43,6 @@ protected:
 
 public:
 	UFUNCTION(BlueprintPure)
-	int32 GetNewValidArchiveID() const;
-
-	UFUNCTION(BlueprintPure)
 	FDWPlayerSaveData GetDefaultPlayerData() const;
 
 	UFUNCTION(BlueprintPure)

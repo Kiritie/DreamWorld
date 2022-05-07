@@ -52,6 +52,8 @@ public:
 
 	virtual void OnClose_Implementation(bool bInstant) override;
 
+	virtual void OnRefresh_Implementation() override;
+
 public:
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
 	void UpdateSelectBox();

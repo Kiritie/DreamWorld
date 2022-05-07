@@ -40,8 +40,8 @@ void ADWAbilityEquip::Initialize(AAbilityCharacterBase* InOwnerCharacter)
 	Super::Initialize(InOwnerCharacter);
 	if (GetOwnerCharacter<ADWCharacter>())
 	{
-		GetOwnerCharacter<ADWCharacter>()->GetInventory()->GetSplitSlots<UInventoryEquipSlot>(ESplitSlotType::Equip)[(int32)GetItemData<UDWEquipData>()->PartType];
-		AttachToComponent(OwnerCharacter->GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, *UGlobalBPLibrary::GetEnumValueAuthoredName(TEXT("EEquipPartType"), (int32)GetItemData<UDWEquipData>()->PartType));
+		GetOwnerCharacter<ADWCharacter>()->GetInventory()->GetSplitSlots<UInventoryEquipSlot>(ESplitSlotType::Equip)[(int32)GetItemData<UDWEquipData>().PartType];
+		AttachToComponent(OwnerCharacter->GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, *UGlobalBPLibrary::GetEnumValueAuthoredName(TEXT("EEquipPartType"), (int32)GetItemData<UDWEquipData>().PartType));
 	}
 }
 

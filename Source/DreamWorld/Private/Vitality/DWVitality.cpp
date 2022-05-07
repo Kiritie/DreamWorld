@@ -86,10 +86,10 @@ void ADWVitality::LoadData(FSaveData* InSaveData)
 		SetActorLocation(SaveData.SpawnLocation);
 		SetActorRotation(SaveData.SpawnRotation);
 
-		const UDWVitalityData* vitalityData = GetVitalityData<UDWVitalityData>();
-		if(vitalityData->IsValid())
+		const UDWVitalityData& vitalityData = GetVitalityData<UDWVitalityData>();
+		if(vitalityData.IsValid())
 		{
-			SaveData.InventoryData = vitalityData->InventoryData;
+			SaveData.InventoryData = vitalityData.InventoryData;
 		}
 
 		// const auto ItemDatas = UDWHelper::LoadItemDatas();
@@ -196,7 +196,7 @@ void ADWVitality::OnInteract(IInteractionAgentInterface* InInteractionAgent, EIn
 FAbilityItem& ADWVitality::GetGeneratingVoxelItem()
 {
 	FAbilityItem tmpItem = Inventory->GetSelectedItem();
-	if(tmpItem.IsValid() && tmpItem.GetData()->EqualType(EAbilityItemType::Voxel))
+	if(tmpItem.IsValid() && tmpItem.GetData().EqualType(EAbilityItemType::Voxel))
 	{
 		return tmpItem;
 	}

@@ -34,7 +34,7 @@ void UDWCharacterPart::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 	if(AVoxelChunk* Chunk = GetOwnerCharacter()->GetOwnerChunk())
 	{
 		const FVoxelItem& VoxelItem = Chunk->GetVoxelItem(Chunk->LocationToIndex(GetComponentLocation()));
-		const UVoxelData* VoxelData = VoxelItem.GetData<UVoxelData>();
+		const UVoxelData& VoxelData = VoxelItem.GetData<UVoxelData>();
 		const FVoxelHitResult VoxelHitResult = FVoxelHitResult(VoxelItem, GetComponentLocation(), GetOwnerCharacter()->GetMoveDirection(false));
 		if(VoxelItem.IsValid())
 		{
@@ -76,8 +76,8 @@ void UDWCharacterPart::OnEnterVoxel(UVoxel* InVoxel, const FVoxelHitResult& InHi
 {
 	InVoxel->OnTargetEnter(GetOwnerCharacter(), InHitResult);
 
-	UVoxelData* VoxelData = InVoxel->GetData();
-	switch (VoxelData->VoxelType)
+	UVoxelData& VoxelData = InVoxel->GetData();
+	switch (VoxelData.VoxelType)
 	{
 		case EVoxelType::Water:
 		{
@@ -110,8 +110,8 @@ void UDWCharacterPart::OnExitVoxel(UVoxel* InVoxel, const FVoxelHitResult& InHit
 {
 	InVoxel->OnTargetExit(GetOwnerCharacter(), InHitResult);
 
-	UVoxelData* VoxelData = InVoxel->GetData();
-	switch (VoxelData->VoxelType)
+	UVoxelData& VoxelData = InVoxel->GetData();
+	switch (VoxelData.VoxelType)
 	{
 		case EVoxelType::Water:
 		{
@@ -119,7 +119,7 @@ void UDWCharacterPart::OnExitVoxel(UVoxel* InVoxel, const FVoxelHitResult& InHit
 			{
 				case EDWCharacterPartType::Chest:
 				{
-					if(InHitResult.VoxelItem.GetData<UVoxelData>()->VoxelType != EVoxelType::Water)
+					if(InHitResult.VoxelItem.GetData<UVoxelData>().VoxelType != EVoxelType::Water)
 					{
 						GetOwnerCharacter()->UnSwim();
 					}
@@ -127,7 +127,7 @@ void UDWCharacterPart::OnExitVoxel(UVoxel* InVoxel, const FVoxelHitResult& InHit
 				}
 				case EDWCharacterPartType::Neck:
 				{
-					if(InHitResult.VoxelItem.GetData<UVoxelData>()->VoxelType != EVoxelType::Water)
+					if(InHitResult.VoxelItem.GetData<UVoxelData>().VoxelType != EVoxelType::Water)
 					{
 						GetOwnerCharacter()->Float(InVoxel->GetOwner()->IndexToLocation(InVoxel->GetIndex()).Z + AVoxelModule::GetWorldData()->BlockSize);
 					}

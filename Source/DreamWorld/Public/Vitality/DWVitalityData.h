@@ -1,12 +1,11 @@
 #pragma once
 
-#include "Ability/Item/ItemDataBase.h"
+#include "Ability/Vitality/VitalityDataBase.h"
 
 #include "DWVitalityData.generated.h"
 
-class AAbilityVitalityBase;
 UCLASS(BlueprintType)
-class DREAMWORLD_API UDWVitalityData : public UItemDataBase
+class DREAMWORLD_API UDWVitalityData : public UVitalityDataBase
 {
 	GENERATED_BODY()
 

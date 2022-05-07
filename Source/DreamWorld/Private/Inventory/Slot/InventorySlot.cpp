@@ -29,7 +29,7 @@ void UInventorySlot::InitSlot(UInventory* InOwner, FAbilityItem InItem, EAbility
 
 bool UInventorySlot::CheckSlot(FAbilityItem& InItem) const
 {
-	return LimitType == EAbilityItemType::None || InItem.GetData()->EqualType(LimitType);
+	return LimitType == EAbilityItemType::None || InItem.GetData().EqualType(LimitType);
 }
 
 bool UInventorySlot::CanPutIn(FAbilityItem& InItem) const
@@ -61,9 +61,9 @@ void UInventorySlot::EndSet()
 	if(Item.IsValid())
 	{
 		IAbilityVitalityInterface* vitality = Cast<IAbilityVitalityInterface>(Owner->GetOwnerActor());
-		if (vitality && Item.GetData()->AbilityClass)
+		if (vitality && Item.GetData().AbilityClass)
 		{
-			AbilityHandle = vitality->AcquireAbility(Item.GetData()->AbilityClass, Item.Level);
+			AbilityHandle = vitality->AcquireAbility(Item.GetData().AbilityClass, Item.Level);
 		}
 	}
 	else
@@ -205,7 +205,7 @@ void UInventorySlot::UseItem(int InCount /*= -1*/)
 
 	if (InCount == -1) InCount = Item.Count;
 	
-	if(Item.GetData()->EqualType(EAbilityItemType::Voxel))
+	if(Item.GetData().EqualType(EAbilityItemType::Voxel))
 	{
 		if(ADWCharacter* OwnerCharacter = Cast<ADWCharacter>(GetOwner()->GetOwnerActor()))
 		{
@@ -221,7 +221,7 @@ void UInventorySlot::UseItem(int InCount /*= -1*/)
 			}
 		}
 	}
-	else if(Item.GetData()->EqualType(EAbilityItemType::Prop))
+	else if(Item.GetData().EqualType(EAbilityItemType::Prop))
 	{
 		if(ADWCharacter* OwnerCharacter = Cast<ADWCharacter>(GetOwner()->GetOwnerActor()))
 		{
@@ -237,7 +237,7 @@ void UInventorySlot::UseItem(int InCount /*= -1*/)
 			}
 		}
 	}
-	else if(Item.GetData()->EqualType(EAbilityItemType::Equip))
+	else if(Item.GetData().EqualType(EAbilityItemType::Equip))
 	{
 		if(GetSplitType() != ESplitSlotType::Equip)
 		{
@@ -245,7 +245,7 @@ void UInventorySlot::UseItem(int InCount /*= -1*/)
 			Refresh();
 		}
 	}
-	else if(Item.GetData()->EqualType(EAbilityItemType::Skill))
+	else if(Item.GetData().EqualType(EAbilityItemType::Skill))
 	{
 		if(GetSplitType() != ESplitSlotType::Skill)
 		{
@@ -265,7 +265,7 @@ void UInventorySlot::DiscardItem(int InCount /*= -1*/)
 
 	if (InCount == -1) InCount = Item.Count;
 	FAbilityItem tmpItem = FAbilityItem(Item, InCount);
-	auto chunk = AVoxelModule::Get()->FindChunk(Owner->GetOwnerActor()->GetActorLocation());
+	auto chunk = AMainModule::GetModuleByClass<AVoxelModule>()->FindChunk(Owner->GetOwnerActor()->GetActorLocation());
 	if (chunk != nullptr)
 	{
 		chunk->SpawnPickUp(tmpItem, Owner->GetOwnerActor()->GetActorLocation() + FMath::RandPointInBox(FBox(FVector(-20, -20, -10), FVector(20, 20, 10))));
@@ -347,7 +347,7 @@ int UInventorySlot::GetRemainVolume() const
 
 int UInventorySlot::GetMaxVolume() const
 {
-	return Item.IsValid() ? Item.GetData()->MaxCount : 0;
+	return Item.IsValid() ? Item.GetData().MaxCount : 0;
 }
 
 FAbilityInfo UInventorySlot::GetAbilityInfo() const
@@ -355,7 +355,7 @@ FAbilityInfo UInventorySlot::GetAbilityInfo() const
 	FAbilityInfo AbilityInfo;
 	if(ADWCharacter* Character = Cast<ADWCharacter>(Owner->GetOwnerActor()))
 	{
-		Character->GetAbilityInfo(Item.GetData()->AbilityClass, AbilityInfo);
+		Character->GetAbilityInfo(Item.GetData().AbilityClass, AbilityInfo);
 	}
 	return AbilityInfo;
 }

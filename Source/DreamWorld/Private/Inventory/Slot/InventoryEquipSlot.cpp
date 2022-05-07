@@ -20,7 +20,7 @@ void UInventoryEquipSlot::InitSlot(UInventory* InOwner, FAbilityItem InItem, EAb
 
 bool UInventoryEquipSlot::CheckSlot(FAbilityItem& InItem) const
 {
-	return Super::CheckSlot(InItem) && InItem.GetData<UDWEquipData>()->PartType == PartType;
+	return Super::CheckSlot(InItem) && InItem.GetData<UDWEquipData>().PartType == PartType;
 }
 
 void UInventoryEquipSlot::Refresh()

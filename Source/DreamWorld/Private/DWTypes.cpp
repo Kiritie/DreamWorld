@@ -8,17 +8,37 @@
 #include "SaveGame/SaveGameModuleBPLibrary.h"
 #include "Ability/Vitality/AbilityVitalityBase.h"
 #include "Ability/Character/CharacterAbilityBase.h"
+#include "Vitality/DWVitalityData.h"
+#include "Character/DWCharacterData.h"
 
 FDWTeamData FDWTeamData::Empty = FDWTeamData();
 
-UVitalityDataBase* FDWVitalitySaveData::GetVitalityData() const
+void FDWVitalityBasicSaveData::Initialize()
 {
-	return UAssetModuleBPLibrary::LoadPrimaryAsset<UVitalityDataBase>(ID);
 }
 
-UCharacterDataBase* FDWCharacterSaveData::GetCharacterData() const
+void FDWVitalitySaveData::Initialize()
 {
-	return UAssetModuleBPLibrary::LoadPrimaryAsset<UCharacterDataBase>(ID);
+	Super::Initialize();
+
+	InventoryData = GetVitalityData().InventoryData;
+}
+
+UDWVitalityData& FDWVitalitySaveData::GetVitalityData() const
+{
+	return UAssetModuleBPLibrary::LoadPrimaryAssetRef<UDWVitalityData>(ID);
+}
+
+void FDWCharacterSaveData::Initialize()
+{
+	Super::Initialize();
+
+	InventoryData = GetCharacterData().InventoryData;
+}
+
+UDWCharacterData& FDWCharacterSaveData::GetCharacterData() const
+{
+	return UAssetModuleBPLibrary::LoadPrimaryAssetRef<UDWCharacterData>(ID);
 }
 
 FDWArchiveBasicSaveData FDWPlayerSaveData::GetArchiveData() const
@@ -31,6 +51,11 @@ FDWArchiveBasicSaveData FDWPlayerSaveData::GetArchiveData() const
 		}
 	}
 	return FDWArchiveBasicSaveData();
+}
+
+void FDWVoxelWorldSaveData::Initialize()
+{
+	Super::Initialize();
 }
 
 FDWArchiveBasicSaveData FDWVoxelWorldSaveData::GetArchiveData() const

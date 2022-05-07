@@ -42,7 +42,7 @@ public:
 
 	void LoadData(FDWPlayerSaveData InPlayerData);
 
-	void UnloadData(bool bPreview = false);
+	void UnloadData();
 
 	void ResetData();
 

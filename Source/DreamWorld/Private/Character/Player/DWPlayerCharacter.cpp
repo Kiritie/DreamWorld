@@ -406,7 +406,7 @@ void ADWPlayerCharacter::UpdateVoxelMesh()
 	const FAbilityItem tmpItem = UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryBar>()->GetSelectedItem();
 	if(!VoxelItem.IsValid() || !VoxelItem.EqualType(tmpItem))
 	{
-		if(tmpItem.IsValid() && tmpItem.GetData()->EqualType(EAbilityItemType::Voxel))
+		if(tmpItem.IsValid() && tmpItem.GetData().EqualType(EAbilityItemType::Voxel))
 		{
 			VoxelItem = FVoxelItem(tmpItem.ID);
 			VoxelMesh->BuildVoxel(VoxelItem);
@@ -570,14 +570,14 @@ void ADWPlayerCharacter::OnDodgeReleased()
 
 bool ADWPlayerCharacter::UseItem(FAbilityItem& InItem)
 {
-	if((InItem.GetData()->EqualType(EAbilityItemType::Voxel)))
+	if((InItem.GetData().EqualType(EAbilityItemType::Voxel)))
 	{
 		if(ControlMode == EDWControlMode::Creating)
 		{
 			return Super::UseItem(InItem);
 		}
 	}
-	else if((InItem.GetData()->EqualType(EAbilityItemType::Prop)))
+	else if((InItem.GetData().EqualType(EAbilityItemType::Prop)))
 	{
 		return Super::UseItem(InItem);
 	}

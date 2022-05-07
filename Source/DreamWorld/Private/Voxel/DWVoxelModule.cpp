@@ -9,6 +9,10 @@
 #include "Voxel/VoxelModuleBPLibrary.h"
 #include "Voxel/Chunks/VoxelChunk.h"
 #include "Voxel/Datas/VoxelData.h"
+#include "Widget/WidgetGameHUD.h"
+#include "Widget/WidgetModuleBPLibrary.h"
+#include "Widget/Inventory/WidgetInventoryBar.h"
+#include "Widget/Inventory/WidgetInventoryPanel.h"
 
 // Sets default values
 ADWVoxelModule::ADWVoxelModule()
@@ -46,6 +50,7 @@ void ADWVoxelModule::OnRefresh_Implementation(float DeltaSeconds)
 	switch (UGlobalBPLibrary::GetGameState<ADWGameState>(this)->GetCurrentState())
 	{
 		case EDWGameState::MainMenu:
+		case EDWGameState::Preparing:
 		case EDWGameState::Loading:
 		{
 			GenerateTerrain();
@@ -75,73 +80,59 @@ void ADWVoxelModule::OnTermination_Implementation()
 	Super::OnTermination_Implementation();
 }
 
-bool ADWVoxelModule::ChangeWorldState(EVoxelWorldState InWorldState)
+void ADWVoxelModule::OnWorldStateChanged()
 {
-	if(Super::ChangeWorldState(InWorldState))
+	Super::OnWorldStateChanged();
+	
+	switch(WorldState)
 	{
-		switch(WorldState)
+		case EVoxelWorldState::BasicGenerated:
 		{
-			case EVoxelWorldState::BasicGenerated:
+			if(ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>(this))
 			{
-				if(ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>(this))
+				FHitResult hitResult;
+				const FVector rayStart = FVector(PlayerCharacter->GetActorLocation().X, PlayerCharacter->GetActorLocation().Y, GetWorldData()->ChunkHeightRange * GetWorldData()->GetChunkLength() + 500);
+				const FVector rayEnd = FVector(PlayerCharacter->GetActorLocation().X, PlayerCharacter->GetActorLocation().Y, 0);
+				if (ChunkTraceSingle(rayStart, rayEnd, PlayerCharacter->GetRadius(), PlayerCharacter->GetHalfHeight(), hitResult))
 				{
-					FHitResult hitResult;
-					const FVector rayStart = FVector(PlayerCharacter->GetActorLocation().X, PlayerCharacter->GetActorLocation().Y, GetWorldData()->ChunkHeightRange * GetWorldData()->GetChunkLength() + 500);
-					const FVector rayEnd = FVector(PlayerCharacter->GetActorLocation().X, PlayerCharacter->GetActorLocation().Y, 0);
-					if (ChunkTraceSingle(rayStart, rayEnd, PlayerCharacter->GetRadius(), PlayerCharacter->GetHalfHeight(), hitResult))
+					if(PlayerCharacter->GetActorLocation().Size2D() < 1.f)
 					{
-						if(PlayerCharacter->GetActorLocation().Size2D() < 1.f)
-						{
-							PlayerCharacter->SetActorLocation(hitResult.Location);
-						}
-						if(!GetWorldData<FDWVoxelWorldSaveData>()->GetArchiveData().bPreview)
-						{
-							if(ADWGameState* GameState = UGlobalBPLibrary::GetGameState<ADWGameState>(this))
-							{
-								GameState->SetCurrentState(EDWGameState::Playing);
-							}
-							PlayerCharacter->Active();
-						}
+						PlayerCharacter->SetActorLocation(hitResult.Location);
 					}
 				}
-				break;
 			}
-			case EVoxelWorldState::FullGenerated:
-			{
-				break;
-			}
-			default: break;
+			break;
 		}
-		return true;
+		case EVoxelWorldState::FullGenerated:
+		{
+			if(ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>(this))
+			{
+				switch(WorldMode)
+				{
+					case EVoxelWorldMode::Game:
+					{
+						if(ADWGameState* GameState = UGlobalBPLibrary::GetGameState<ADWGameState>(this))
+						{
+							GameState->SetCurrentState(EDWGameState::Playing);
+							UWidgetModuleBPLibrary::InitializeUserWidget<UWidgetGameHUD>(PlayerCharacter);
+							UWidgetModuleBPLibrary::InitializeUserWidget<UWidgetInventoryBar>(PlayerCharacter);
+							UWidgetModuleBPLibrary::InitializeUserWidget<UWidgetInventoryPanel>(PlayerCharacter);
+						}
+						PlayerCharacter->Active();
+						break;
+					}
+					default: break;
+				}
+			}
+			break;
+		}
+		default: break;
 	}
-	return false;
 }
 
 void ADWVoxelModule::LoadData(FSaveData* InWorldData)
 {
 	Super::LoadData(InWorldData);
-
-	if(!GetWorldData<FDWVoxelWorldSaveData>()->GetArchiveData().bPreview)
-	{
-		if(ADWGameState* GameState = UGlobalBPLibrary::GetGameState<ADWGameState>(this))
-		{
-			GameState->SetCurrentState(EDWGameState::Loading);
-		}
-		if(GetWorldData<FDWVoxelWorldSaveData>()->IsSameArchive(*static_cast<FDWVoxelWorldSaveData*>(InWorldData)))
-		{
-			for(auto Iter : ChunkMap)
-			{
-				if(Iter.Value && Iter.Value->IsGenerated())
-				{
-					Iter.Value->SpawnActors();
-				}
-			}
-		}
-		else
-		{
-			UnloadData();
-		}
-	}
 }
 
 FSaveData* ADWVoxelModule::ToData(bool bSaved)
@@ -156,14 +147,9 @@ FSaveData* ADWVoxelModule::ToData(bool bSaved)
 	return WorldData;
 }
 
-void ADWVoxelModule::UnloadData(bool bPreview)
+void ADWVoxelModule::UnloadData()
 {
-	Super::UnloadData(bPreview);
-	
-	if(!bPreview)
-	{
-		// TeamMap.Empty();
-	}
+	Super::UnloadData();
 }
 
 void ADWVoxelModule::GeneratePreviews()
@@ -212,9 +198,7 @@ void ADWVoxelModule::GenerateChunkMap(AVoxelChunk* InChunk)
 
 void ADWVoxelModule::GenerateChunk(AVoxelChunk* InChunk)
 {
-	if (!InChunk || !ChunkMap.Contains(InChunk->GetIndex())) return;
-	
-	InChunk->Generate(GetWorldData<FDWVoxelWorldSaveData>()->GetArchiveData().bPreview);
+	Super::GenerateChunk(InChunk);
 }
 
 void ADWVoxelModule::DestroyChunk(AVoxelChunk* InChunk)
@@ -245,6 +229,6 @@ bool ADWVoxelModule::ChunkTraceSingle(FVector RayStart, FVector RayEnd, float In
 
 bool ADWVoxelModule::VoxelTraceSingle(const FVoxelItem& InVoxelItem, FVector InPoint, FHitResult& OutHitResult)
 {
-	FVector size = InVoxelItem.GetData<UVoxelData>()->GetCeilRange(InVoxelItem.Rotation, InVoxelItem.Scale) * GetWorldData()->BlockSize * 0.5f;
+	FVector size = InVoxelItem.GetData<UVoxelData>().GetCeilRange(InVoxelItem.Rotation, InVoxelItem.Scale) * GetWorldData()->BlockSize * 0.5f;
 	return UKismetSystemLibrary::BoxTraceSingle(this, InPoint + size, InPoint + size, size * 0.95f, FRotator::ZeroRotator, UDWHelper::GetGameTrace(EDWGameTraceType::Voxel), false, TArray<AActor*>(), EDrawDebugTrace::None, OutHitResult, true);
 }

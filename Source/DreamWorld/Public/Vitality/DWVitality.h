@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "AbilitySystemInterface.h"
 #include "Ability/Vitality/AbilityVitalityBase.h"
+#include "Inventory/InventoryAgentInterface.h"
 #include "Voxel/Agent/VoxelAgentInterface.h"
 
 #include "DWVitality.generated.h"
@@ -23,7 +24,7 @@ class UAttributeSetBase;
  * ������������
  */
 UCLASS()
-class DREAMWORLD_API ADWVitality : public AAbilityVitalityBase, public IVoxelAgentInterface
+class DREAMWORLD_API ADWVitality : public AAbilityVitalityBase, public IVoxelAgentInterface, public IInventoryAgentInterface
 {
 	GENERATED_BODY()
 
@@ -90,7 +91,7 @@ public:
 	virtual FVoxelItem& GetSelectedVoxelItem() override;
 
 	UFUNCTION(BlueprintPure)
-	virtual UInventory* GetInventory() const { return Inventory; }
+	virtual UInventory* GetInventory() const override { return Inventory; }
 		
 	UFUNCTION(BlueprintPure)
 	UWidgetVitalityHP* GetWidgetVitalityHPWidget() const;

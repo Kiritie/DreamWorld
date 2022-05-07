@@ -21,25 +21,32 @@ UDWArchiveSaveGame::UDWArchiveSaveGame()
 	SaveData = FDWArchiveSaveData();
 }
 
-void UDWArchiveSaveGame::OnCreate_Implementation()
+void UDWArchiveSaveGame::OnCreate_Implementation(int32 InSaveIndex)
 {
-	Super::OnCreate_Implementation();
+	Super::OnCreate_Implementation(InSaveIndex);
 
+	if(ADWSaveGameModule* SaveGameModule = AMainModule::GetModuleByClass<ADWSaveGameModule>())
+	{
+		SaveData.WorldData = SaveGameModule->GetDefaultWorldData();
+		SaveData.PlayerData = SaveGameModule->GetDefaultPlayerData();
+		SaveData.Initialize();
+	}
+}
+
+void UDWArchiveSaveGame::OnSave_Implementation()
+{
 	if(UDWGeneralSaveGame* GeneralSaveGame = USaveGameModuleBPLibrary::GetSaveGame<UDWGeneralSaveGame>())
 	{
-		if(SaveData.ID == -1)
+		if(SaveIndex == -1)
 		{
 			SaveData.ID = GeneralSaveGame->SaveData.ArchiveBasicDatas.Num();
-			if(ADWSaveGameModule* SaveGameModule = AMainModule::GetModuleByClass<ADWSaveGameModule>())
-			{
-				SaveData.WorldData = SaveGameModule->GetDefaultWorldData();
-				SaveData.PlayerData = SaveGameModule->GetDefaultPlayerData();
-			}
-			SaveData.bPreview = true;
+			GeneralSaveGame->SaveData.CurrentArchiveID = SaveData.ID;
 			SaveData.Initialize();
 		}
-		GeneralSaveGame->SaveData.ArchiveBasicDatas.Add(SaveData);
+		GeneralSaveGame->SaveData.ArchiveBasicDatas.EmplaceAt(SaveIndex, SaveData);
 	}
+
+	Super::OnSave_Implementation();
 }
 
 void UDWArchiveSaveGame::OnLoad_Implementation()
@@ -52,7 +59,7 @@ void UDWArchiveSaveGame::OnLoad_Implementation()
 
 		WHDebug(FString::Printf(TEXT("Loading archive : %d"), SaveData.ID));
 
-		if(AVoxelModule* VoxelModule = AVoxelModule::Get())
+		if(AVoxelModule* VoxelModule = AMainModule::GetModuleByClass<AVoxelModule>())
 		{
 			VoxelModule->LoadData(&SaveData.WorldData);
 		}
@@ -71,11 +78,11 @@ void UDWArchiveSaveGame::OnUnload_Implementation()
 
 	if(ADWPlayerController* PlayerController = UGlobalBPLibrary::GetPlayerController<ADWPlayerController>(GWorld))
 	{
-		PlayerController->UnloadData(true);
+		PlayerController->UnloadData();
 	}
-	if(AVoxelModule* VoxelModule = AVoxelModule::Get())
+	if(AVoxelModule* VoxelModule = AMainModule::GetModuleByClass<AVoxelModule>())
 	{
-		VoxelModule->UnloadData(true);
+		VoxelModule->UnloadData();
 	}
 }
 
@@ -87,7 +94,7 @@ void UDWArchiveSaveGame::OnRefresh_Implementation()
 	{
 		SaveData.PlayerData = *static_cast<FDWPlayerSaveData*>(PlayerCharacter->ToData());
 	}
-	if(AVoxelModule* VoxelModule = AVoxelModule::Get())
+	if(AVoxelModule* VoxelModule = AMainModule::GetModuleByClass<AVoxelModule>())
 	{
 		SaveData.WorldData = *static_cast<FDWVoxelWorldSaveData*>(VoxelModule->ToData());
 	}

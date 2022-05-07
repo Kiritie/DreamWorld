@@ -62,15 +62,6 @@ void ADWSaveGameModule::OnUnPause_Implementation()
 	Super::OnUnPause_Implementation();
 }
 
-int32 ADWSaveGameModule::GetNewValidArchiveID() const
-{
-	if(UDWGeneralSaveGame* GeneralSaveGame = USaveGameModuleBPLibrary::GetSaveGame<UDWGeneralSaveGame>())
-	{
-		return GeneralSaveGame->SaveData.ArchiveBasicDatas.Num() - 1;
-	}
-	return -1;
-}
-
 FDWPlayerSaveData ADWSaveGameModule::GetDefaultPlayerData() const
 {
 	return FDWPlayerSaveData(ArchiveBasicData.PlayerBasicData);

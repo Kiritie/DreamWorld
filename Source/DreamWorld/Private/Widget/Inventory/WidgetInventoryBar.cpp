@@ -146,6 +146,11 @@ void UWidgetInventoryBar::OnClose_Implementation(bool bInstant)
 	FinishClose(bInstant);
 }
 
+void UWidgetInventoryBar::OnRefresh_Implementation()
+{
+	Super::OnRefresh_Implementation();
+}
+
 void UWidgetInventoryBar::PrevInventorySlot()
 {
 	if(SelectedSlotIndex > 0)
@@ -167,7 +172,7 @@ void UWidgetInventoryBar::SelectInventorySlot(int32 InSlotIndex)
 	SelectedSlotIndex = InSlotIndex;
 	UpdateSelectBox();
 	GetInventory()->SetSelectedSlot(GetSelectedSlot());
-	TArray<FParameter> Params { FParameter::MakeString(GetSelectedItem().GetData()->Name.ToString()) };
+	TArray<FParameter> Params { FParameter::MakeString(GetSelectedItem().GetData().Name.ToString()) };
 	UWidgetModuleBPLibrary::OpenUserWidget<UWidgetItemInfoBox>(&Params);
 	UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>()->RefreshActions();
 }

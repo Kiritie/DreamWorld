@@ -19,11 +19,13 @@ public:
 	UDWArchiveSaveGame();
 	
 public:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	FDWArchiveSaveData SaveData;
 
 public:
-	virtual void OnCreate_Implementation() override;
+	virtual void OnCreate_Implementation(int32 InSaveIndex) override;
+
+	virtual void OnSave_Implementation() override;
 
 	virtual void OnLoad_Implementation() override;
 
