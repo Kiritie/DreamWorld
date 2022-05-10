@@ -232,7 +232,7 @@ void UDBTweenActor::UpdateFunc(float deltaTime)
 {
 	if (Paused)return;//
 	Super::UpdateFunc(deltaTime);
-	if (!Actor || Actor->IsPendingKill()) {
+	if (IsValid(Actor)) {
 		SetReadyToDestroy();
 		return;
 	}

@@ -18,6 +18,11 @@ class DREAMWORLD_API ADWPlayerController : public AWHPlayerController
 public:
 	ADWPlayerController();
 
+public:
+	virtual void OnInitialize_Implementation() override;
+
+	virtual void OnPreparatory_Implementation() override;
+
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class ADWPlayerCharacter* PlayerCharacter;
@@ -29,8 +34,6 @@ protected:
 	float DoubleJumpTime;
 
 protected:
-	virtual void BeginPlay() override;
-
 	virtual void SetupInputComponent() override;
 
 	virtual void OnPossess(APawn* InPawn) override;

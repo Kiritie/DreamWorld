@@ -35,3 +35,17 @@ void UDWGeneralSaveGame::OnRefresh_Implementation()
 		SaveData.CameraDistance = PlayerController->GetCurrentCameraDistance();
 	}
 }
+
+int32 UDWGeneralSaveGame::GetValidArchiveID()
+{
+	int32 ArchiveID = 0;
+	for(auto Iter : GetArchiveBasicDatas())
+	{
+		if(Iter.Key != ArchiveID)
+		{
+			return ArchiveID;
+		}
+		ArchiveID++;
+	}
+	return ArchiveID;
+}

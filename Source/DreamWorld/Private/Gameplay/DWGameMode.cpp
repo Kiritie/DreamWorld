@@ -9,6 +9,12 @@
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Main/MainModule.h"
+#include "Procedure/ProcedureModuleBPLibrary.h"
+#include "Procedure/Procedure_Initializing.h"
+#include "Procedure/Procedure_Loading.h"
+#include "Procedure/Procedure_Pausing.h"
+#include "Procedure/Procedure_Playing.h"
+#include "Procedure/Procedure_Starting.h"
 #include "SaveGame/DWArchiveSaveGame.h"
 #include "SaveGame/DWGeneralSaveGame.h"
 #include "SaveGame/SaveGameModuleBPLibrary.h"
@@ -19,82 +25,16 @@ ADWGameMode::ADWGameMode()
 	DefaultPawnClass = APawn::StaticClass();
 }
 
-void ADWGameMode::BeginPlay()
+void ADWGameMode::OnInitialize_Implementation()
 {
-	Super::BeginPlay();
+	Super::OnInitialize_Implementation();
 
-	InitializeGame();
+	UProcedureModuleBPLibrary::SwitchProcedureByClass<UProcedure_Initializing>();
 }
 
-void ADWGameMode::InitializeGame()
+void ADWGameMode::OnPreparatory_Implementation()
 {
-	if(ADWGameState* DWGameState = UGlobalBPLibrary::GetGameState<ADWGameState>(this))
-	{
-		DWGameState->SetCurrentState(EDWGameState::MainMenu);
-	}
-}
+	Super::OnPreparatory_Implementation();
 
-void ADWGameMode::StartGame(int32 InArchiveID)
-{
-	if(UDWGeneralSaveGame* GeneralSaveGame = USaveGameModuleBPLibrary::LoadSaveGame<UDWGeneralSaveGame>())
-	{
-		GeneralSaveGame->SaveData.CurrentArchiveID = InArchiveID;
-	}
-	if(ADWGameState* DWGameState = UGlobalBPLibrary::GetGameState<ADWGameState>(this))
-	{
-		DWGameState->SetCurrentState(EDWGameState::Loading);
-	}
-}
-
-void ADWGameMode::ContinueGame()
-{
-	if(ADWGameState* DWGameState = UGlobalBPLibrary::GetGameState<ADWGameState>(this))
-	{
-		DWGameState->SetCurrentState(EDWGameState::Loading);
-	}
-}
-
-void ADWGameMode::PauseGame()
-{
-	UGameplayStatics::SetGamePaused(this, true);
-	if(AMainModule* MainModule = AMainModule::Get())
-	{
-		MainModule->PauseModules();
-	}
-	if(ADWGameState* DWGameState = UGlobalBPLibrary::GetGameState<ADWGameState>(this))
-	{
-		DWGameState->SetCurrentState(EDWGameState::Pausing);
-	}
-}
-
-void ADWGameMode::UnPauseGame()
-{
-	UGameplayStatics::SetGamePaused(this, false);
-	if(AMainModule* MainModule = AMainModule::Get())
-	{
-		MainModule->UnPauseModules();
-	}
-	if(ADWGameState* DWGameState = UGlobalBPLibrary::GetGameState<ADWGameState>(this))
-	{
-		DWGameState->SetCurrentState(EDWGameState::Playing);
-	}
-}
-
-void ADWGameMode::BackMainMenu()
-{
-	USaveGameModuleBPLibrary::SaveSaveGame<UDWArchiveSaveGame>();
-	if(ADWGameState* DWGameState = UGlobalBPLibrary::GetGameState<ADWGameState>(this))
-	{
-		if(DWGameState->GetCurrentState() == EDWGameState::Pausing)
-		{
-			UnPauseGame();
-		}
-		DWGameState->SetCurrentState(EDWGameState::MainMenu);
-	}
-}
-
-void ADWGameMode::QuitGame()
-{
-	USaveGameModuleBPLibrary::SaveSaveGame<UDWArchiveSaveGame>();
-	UKismetSystemLibrary::QuitGame(this, nullptr, EQuitPreference::Quit, true);
+	UProcedureModuleBPLibrary::SwitchProcedureByClass<UProcedure_Starting>();
 }

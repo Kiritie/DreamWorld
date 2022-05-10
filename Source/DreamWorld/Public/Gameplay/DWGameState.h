@@ -17,13 +17,15 @@ class DREAMWORLD_API ADWGameState : public AWHGameState
 public:
 	ADWGameState();
 
+public:
+	virtual void OnInitialize_Implementation() override;
+
+	virtual void OnPreparatory_Implementation() override;
+
 protected:
 	// ��ǰ״̬
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	EDWGameState CurrentState;
-
-protected:
-	virtual void BeginPlay() override;
 
 public:
 	/** ���õ�ǰ״̬ */

@@ -38,7 +38,7 @@ void ADWSaveGameModule::OnInitialize_Implementation()
 	}
 	else
 	{
-		USaveGameModuleBPLibrary::CreateSaveGame<UDWGeneralSaveGame>();
+		USaveGameModuleBPLibrary::CreateSaveGame<UDWGeneralSaveGame>(0, true);
 	}
 }
 

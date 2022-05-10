@@ -50,8 +50,6 @@ class UDWCharacterSkillAbility;
 class UTargetType;
 class UInventorySlot;
 
-#define Vector_Empty FVector(MAX_flt)
-
 /**
  * 游戏状态
  */
@@ -63,7 +61,7 @@ enum class EDWGameState : uint8
 	// ?????
 	Initializing,
 	// ?????
-	MainMenu,
+	Starting,
 	// ?????
 	Preparing,
 	// ??????
@@ -812,8 +810,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 CurrentArchiveID;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	TArray<FDWArchiveBasicSaveData> ArchiveBasicDatas;
+	UPROPERTY()
+	TMap<int32, FDWArchiveBasicSaveData> ArchiveBasicDatas;
+	
 };
 
 /**

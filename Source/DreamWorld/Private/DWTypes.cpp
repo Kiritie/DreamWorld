@@ -45,9 +45,9 @@ FDWArchiveBasicSaveData FDWPlayerSaveData::GetArchiveData() const
 {
 	if(UDWGeneralSaveGame* GeneralSaveGame = USaveGameModuleBPLibrary::GetSaveGame<UDWGeneralSaveGame>())
 	{
-		if(GeneralSaveGame->SaveData.ArchiveBasicDatas.IsValidIndex(ArchiveID))
+		if(GeneralSaveGame->GetArchiveBasicDatas().Contains(ArchiveID))
 		{
-			return GeneralSaveGame->SaveData.ArchiveBasicDatas[ArchiveID];
+			return GeneralSaveGame->GetArchiveBasicDatas()[ArchiveID];
 		}
 	}
 	return FDWArchiveBasicSaveData();
@@ -62,9 +62,9 @@ FDWArchiveBasicSaveData FDWVoxelWorldSaveData::GetArchiveData() const
 {
 	if(UDWGeneralSaveGame* GeneralSaveGame = USaveGameModuleBPLibrary::GetSaveGame<UDWGeneralSaveGame>())
 	{
-		if(GeneralSaveGame->SaveData.ArchiveBasicDatas.IsValidIndex(ArchiveID))
+		if(GeneralSaveGame->GetArchiveBasicDatas().Contains(ArchiveID))
 		{
-			return GeneralSaveGame->SaveData.ArchiveBasicDatas[ArchiveID];
+			return GeneralSaveGame->GetArchiveBasicDatas()[ArchiveID];
 		}
 	}
 	return FDWArchiveBasicSaveData();

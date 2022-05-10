@@ -6,6 +6,7 @@
 #include "Character/Player/DWPlayerCharacter.h"
 #include "Gameplay/DWGameState.h"
 #include "ReferencePool/ReferencePoolModuleBPLibrary.h"
+#include "Voxel/DWVoxelChunk.h"
 #include "Voxel/VoxelModuleBPLibrary.h"
 #include "Voxel/Chunks/VoxelChunk.h"
 #include "Voxel/Datas/VoxelData.h"
@@ -17,6 +18,8 @@
 // Sets default values
 ADWVoxelModule::ADWVoxelModule()
 {
+	ChunkSpawnClass = ADWVoxelChunk::StaticClass();
+
 	BoundsMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BoundsMesh"));
 	BoundsMesh->SetRelativeScale3D(FVector::ZeroVector);
 	BoundsMesh->SetRelativeRotation(FRotator(0, 0, 0));
@@ -49,7 +52,7 @@ void ADWVoxelModule::OnRefresh_Implementation(float DeltaSeconds)
 {
 	switch (UGlobalBPLibrary::GetGameState<ADWGameState>(this)->GetCurrentState())
 	{
-		case EDWGameState::MainMenu:
+		case EDWGameState::Starting:
 		case EDWGameState::Preparing:
 		case EDWGameState::Loading:
 		{
@@ -100,29 +103,7 @@ void ADWVoxelModule::OnWorldStateChanged()
 						PlayerCharacter->SetActorLocation(hitResult.Location);
 					}
 				}
-			}
-			break;
-		}
-		case EVoxelWorldState::FullGenerated:
-		{
-			if(ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>(this))
-			{
-				switch(WorldMode)
-				{
-					case EVoxelWorldMode::Game:
-					{
-						if(ADWGameState* GameState = UGlobalBPLibrary::GetGameState<ADWGameState>(this))
-						{
-							GameState->SetCurrentState(EDWGameState::Playing);
-							UWidgetModuleBPLibrary::InitializeUserWidget<UWidgetGameHUD>(PlayerCharacter);
-							UWidgetModuleBPLibrary::InitializeUserWidget<UWidgetInventoryBar>(PlayerCharacter);
-							UWidgetModuleBPLibrary::InitializeUserWidget<UWidgetInventoryPanel>(PlayerCharacter);
-						}
-						PlayerCharacter->Active();
-						break;
-					}
-					default: break;
-				}
+				PlayerCharacter->Active();
 			}
 			break;
 		}

@@ -17,10 +17,6 @@ class DREAMWORLD_API UDWArchiveSaveGame : public USaveGameBase
 
 public:
 	UDWArchiveSaveGame();
-	
-public:
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	FDWArchiveSaveData SaveData;
 
 public:
 	virtual void OnCreate_Implementation(int32 InSaveIndex) override;
@@ -32,4 +28,17 @@ public:
 	virtual void OnUnload_Implementation() override;
 	
 	virtual void OnRefresh_Implementation() override;
+
+	virtual void OnDestroy_Implementation() override;
+	
+protected:
+	UPROPERTY()
+	FDWArchiveSaveData SaveData;
+	
+public:
+	UFUNCTION(BlueprintPure)
+	FDWArchiveSaveData& GetSaveData() { return SaveData; }
+
+	UFUNCTION(BlueprintCallable)
+	void SetSaveData(const FDWArchiveSaveData& InSaveData) { this->SaveData = InSaveData; }
 };

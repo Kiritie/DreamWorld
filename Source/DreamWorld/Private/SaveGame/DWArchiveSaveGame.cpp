@@ -14,8 +14,6 @@
 
 UDWArchiveSaveGame::UDWArchiveSaveGame()
 {
-	// set default pawn class to our Blueprinted character
-
 	SaveName = FName("Archive");
 	
 	SaveData = FDWArchiveSaveData();
@@ -39,11 +37,11 @@ void UDWArchiveSaveGame::OnSave_Implementation()
 	{
 		if(SaveIndex == -1)
 		{
-			SaveData.ID = GeneralSaveGame->SaveData.ArchiveBasicDatas.Num();
-			GeneralSaveGame->SaveData.CurrentArchiveID = SaveData.ID;
+			SaveIndex = GeneralSaveGame->GetValidArchiveID();
+			GeneralSaveGame->SetCurrentArchiveID(SaveData.ID = SaveIndex);
 			SaveData.Initialize();
 		}
-		GeneralSaveGame->SaveData.ArchiveBasicDatas.EmplaceAt(SaveIndex, SaveData);
+		GeneralSaveGame->GetArchiveBasicDatas().Emplace(SaveIndex, SaveData);
 	}
 
 	Super::OnSave_Implementation();
@@ -55,7 +53,7 @@ void UDWArchiveSaveGame::OnLoad_Implementation()
 
 	if(UDWGeneralSaveGame* GeneralSaveGame = USaveGameModuleBPLibrary::GetSaveGame<UDWGeneralSaveGame>())
 	{
-		GeneralSaveGame->SaveData.CurrentArchiveID = SaveData.ID;
+		GeneralSaveGame->SetCurrentArchiveID(SaveData.ID);
 
 		WHDebug(FString::Printf(TEXT("Loading archive : %d"), SaveData.ID));
 
@@ -76,13 +74,17 @@ void UDWArchiveSaveGame::OnUnload_Implementation()
 
 	WHDebug(FString::Printf(TEXT("UnLoading archive : %d"), SaveData.ID));
 
-	if(ADWPlayerController* PlayerController = UGlobalBPLibrary::GetPlayerController<ADWPlayerController>(GWorld))
+	if(UDWGeneralSaveGame* GeneralSaveGame = USaveGameModuleBPLibrary::GetSaveGame<UDWGeneralSaveGame>())
 	{
-		PlayerController->UnloadData();
-	}
-	if(AVoxelModule* VoxelModule = AMainModule::GetModuleByClass<AVoxelModule>())
-	{
-		VoxelModule->UnloadData();
+		GeneralSaveGame->SetCurrentArchiveID(-1);
+		if(AVoxelModule* VoxelModule = AMainModule::GetModuleByClass<AVoxelModule>())
+		{
+			VoxelModule->UnloadData();
+		}
+		if(ADWPlayerController* PlayerController = UGlobalBPLibrary::GetPlayerController<ADWPlayerController>(GWorld))
+		{
+			PlayerController->UnloadData();
+		}
 	}
 }
 
@@ -97,5 +99,18 @@ void UDWArchiveSaveGame::OnRefresh_Implementation()
 	if(AVoxelModule* VoxelModule = AMainModule::GetModuleByClass<AVoxelModule>())
 	{
 		SaveData.WorldData = *static_cast<FDWVoxelWorldSaveData*>(VoxelModule->ToData());
+	}
+}
+
+void UDWArchiveSaveGame::OnDestroy_Implementation()
+{
+	Super::OnDestroy_Implementation();
+	
+	if(UDWGeneralSaveGame* GeneralSaveGame = USaveGameModuleBPLibrary::GetSaveGame<UDWGeneralSaveGame>())
+	{
+		if(GeneralSaveGame->GetArchiveBasicDatas().Contains(SaveIndex))
+		{
+			GeneralSaveGame->GetArchiveBasicDatas().Remove(SaveIndex);
+		}
 	}
 }

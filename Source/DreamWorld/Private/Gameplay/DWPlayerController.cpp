@@ -16,6 +16,9 @@
 #include "Inventory/Inventory.h"
 #include "Gameplay/DWGameMode.h"
 #include "Inventory/Slot/InventorySlot.h"
+#include "Procedure/ProcedureModuleBPLibrary.h"
+#include "Procedure/Procedure_Pausing.h"
+#include "Procedure/Procedure_Playing.h"
 #include "SaveGame/DWGeneralSaveGame.h"
 #include "SaveGame/SaveGameModuleBPLibrary.h"
 #include "Voxel/VoxelModule.h"
@@ -46,9 +49,14 @@ ADWPlayerController::ADWPlayerController()
 	DoubleJumpTime = 0.f;
 }
 
-void ADWPlayerController::BeginPlay()
+void ADWPlayerController::OnInitialize_Implementation()
 {
-	Super::BeginPlay();
+	Super::OnInitialize_Implementation();
+}
+
+void ADWPlayerController::OnPreparatory_Implementation()
+{
+	Super::OnPreparatory_Implementation();
 }
 
 void ADWPlayerController::SetupInputComponent()
@@ -157,7 +165,7 @@ void ADWPlayerController::LoadData(FDWPlayerSaveData InPlayerData)
 		SetControlRotation(InPlayerData.CameraRotation);
 		if(UDWGeneralSaveGame* GeneralSaveGame = USaveGameModuleBPLibrary::GetSaveGame<UDWGeneralSaveGame>())
 		{
-			SetCameraDistance(GeneralSaveGame->SaveData.CameraDistance, true);
+			SetCameraDistance(GeneralSaveGame->GetCameraDistance(), true);
 		}
 
 		NewPlayerCharacter->Disable(true, true);
@@ -465,16 +473,13 @@ void ADWPlayerController::PauseOrContinueGame()
 {
 	if(ADWGameState* GameState = UGlobalBPLibrary::GetGameState<ADWGameState>(this))
 	{
-		if(ADWGameMode* GameMode = UGlobalBPLibrary::GetGameMode<ADWGameMode>(this))
+		if(GameState->GetCurrentState() == EDWGameState::Playing)
 		{
-			if(GameState->GetCurrentState() == EDWGameState::Playing)
-			{
-				GameMode->PauseGame();
-			}
-			else if(GameState->GetCurrentState() == EDWGameState::Pausing)
-			{
-				GameMode->UnPauseGame();
-			}
+			UProcedureModuleBPLibrary::SwitchProcedureByClass<UProcedure_Pausing>();
+		}
+		else if(GameState->GetCurrentState() == EDWGameState::Pausing)
+		{
+			UProcedureModuleBPLibrary::SwitchProcedureByClass<UProcedure_Playing>();
 		}
 	}
 }

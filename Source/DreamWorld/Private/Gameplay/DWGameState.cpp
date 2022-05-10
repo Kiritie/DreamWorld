@@ -25,92 +25,17 @@ ADWGameState::ADWGameState()
 	CurrentState = EDWGameState::None;
 }
 
-void ADWGameState::BeginPlay()
+void ADWGameState::OnInitialize_Implementation()
 {
-	Super::BeginPlay();
+	Super::OnInitialize_Implementation();
+}
 
+void ADWGameState::OnPreparatory_Implementation()
+{
+	Super::OnPreparatory_Implementation();
 }
 
 void ADWGameState::SetCurrentState(EDWGameState InGameState)
 {
-	if (CurrentState != InGameState)
-	{
-		CurrentState = InGameState;
-		switch (InGameState)
-		{
-			case EDWGameState::MainMenu:
-			{
-				UWidgetModuleBPLibrary::OpenUserWidget<UWidgetMainMenu>();
-				
-				UWidgetModuleBPLibrary::CloseUserWidget<UWidgetGameHUD>();
-				UWidgetModuleBPLibrary::CloseUserWidget<UWidgetInventoryBar>();
-				
-				UWidgetModuleBPLibrary::CreateUserWidget<UWidgetArchiveChoosingPanel>();
-
-				if(ADWVoxelModule* VoxelModule = AMainModule::GetModuleByClass<ADWVoxelModule>())
-				{
-					VoxelModule->SetWorldMode(EVoxelWorldMode::Preview);
-				}
-
-				if(UDWGeneralSaveGame* GeneralSaveGame = USaveGameModuleBPLibrary::GetSaveGame<UDWGeneralSaveGame>())
-				{
-					if(GeneralSaveGame->SaveData.CurrentArchiveID == -1)
-					{
-						if(UDWArchiveSaveGame* ArchiveSaveGame = USaveGameModuleBPLibrary::HasSaveGame<UDWArchiveSaveGame>() ? USaveGameModuleBPLibrary::GetSaveGame<UDWArchiveSaveGame>() : USaveGameModuleBPLibrary::CreateSaveGame<UDWArchiveSaveGame>(-1))
-						{
-							ArchiveSaveGame->Load();
-						}
-					}
-					else
-					{
-						USaveGameModuleBPLibrary::LoadSaveGame<UDWArchiveSaveGame>(GeneralSaveGame->SaveData.CurrentArchiveID);
-					}
-				}
-				break;
-			}
-			case EDWGameState::Preparing:
-			{
-				UWidgetModuleBPLibrary::OpenUserWidget<UWidgetArchiveChoosingPanel>();
-
-				UWidgetModuleBPLibrary::CreateUserWidget<UWidgetArchiveCreatingPanel>();
-				break;
-			}
-			case EDWGameState::Loading:
-			{
-				UWidgetModuleBPLibrary::OpenUserWidget<UWidgetLoadingPanel>();
-				
-				UWidgetModuleBPLibrary::CreateUserWidget<UWidgetGameHUD>();
-				UWidgetModuleBPLibrary::CreateUserWidget<UWidgetInventoryBar>();
-				UWidgetModuleBPLibrary::CreateUserWidget<UWidgetInventoryPanel>();
-
-				if(ADWVoxelModule* VoxelModule = AMainModule::GetModuleByClass<ADWVoxelModule>())
-				{
-					VoxelModule->SetWorldMode(EVoxelWorldMode::Game);
-				}
-
-				if(UDWGeneralSaveGame* GeneralSaveGame = USaveGameModuleBPLibrary::LoadSaveGame<UDWGeneralSaveGame>())
-				{
-					USaveGameModuleBPLibrary::LoadSaveGame<UDWArchiveSaveGame>(GeneralSaveGame->SaveData.CurrentArchiveID);
-				}
-				break;
-			}
-			case EDWGameState::Playing:
-			{
-				if(UWidgetModuleBPLibrary::GetTemporaryUserWidget<UUserWidgetBase>())
-				{
-					UWidgetModuleBPLibrary::GetTemporaryUserWidget<UUserWidgetBase>()->Close();
-				}
-				
-				UWidgetModuleBPLibrary::OpenUserWidget<UWidgetGameHUD>();
-				UWidgetModuleBPLibrary::OpenUserWidget<UWidgetInventoryBar>();
-				break;
-			}
-			case EDWGameState::Pausing:
-			{
-				UWidgetModuleBPLibrary::OpenUserWidget<UWidgetPausingMenu>();
-				break;
-			}
-			default: break;
-		}
-	}
+	CurrentState = InGameState;
 }

@@ -16,28 +16,8 @@ class DREAMWORLD_API ADWGameMode : public AWHGameMode
 public:
 	ADWGameMode();
 
-protected:
-	virtual void BeginPlay() override;
-
 public:
-	UFUNCTION(BlueprintCallable)
-	void InitializeGame();
+	virtual void OnInitialize_Implementation() override;
 
-	UFUNCTION(BlueprintCallable)
-	void StartGame(int32 InArchiveID);
-
-	UFUNCTION(BlueprintCallable)
-	void ContinueGame();
-
-	UFUNCTION(BlueprintCallable)
-	void PauseGame();
-	
-	UFUNCTION(BlueprintCallable)
-	void UnPauseGame();
-	
-	UFUNCTION(BlueprintCallable)
-	void BackMainMenu();
-		
-	UFUNCTION(BlueprintCallable)
-	void QuitGame();
+	virtual void OnPreparatory_Implementation() override;
 };
