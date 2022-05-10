@@ -66,8 +66,11 @@ void ADWVoxelChunk::OnSpawn_Implementation(const TArray<FParameter>& InParams)
 void ADWVoxelChunk::OnDespawn_Implementation()
 {
 	Super::OnDespawn_Implementation();
-	
-	AVoxelModule::GetWorldData<FDWVoxelWorldSaveData>()->SetChunkData(Index, *static_cast<FDWVoxelChunkSaveData*>(ToData()));
+
+	if(AVoxelModule::GetWorldData<FDWVoxelWorldSaveData>())
+	{
+		AVoxelModule::GetWorldData<FDWVoxelWorldSaveData>()->SetChunkData(Index, *static_cast<FDWVoxelChunkSaveData*>(ToData()));
+	}
 	
 	Characters.Empty();
 	Vitalitys.Empty();
