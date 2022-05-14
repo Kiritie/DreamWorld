@@ -2,7 +2,10 @@
 
 
 #include "Procedure/Procedure_Starting.h"
+
+#include "Character/Player/DWPlayerCharacter.h"
 #include "Gameplay/DWGameState.h"
+#include "Procedure/Procedure_Initializing.h"
 #include "SaveGame/DWArchiveSaveGame.h"
 #include "SaveGame/DWGeneralSaveGame.h"
 #include "SaveGame/SaveGameModuleBPLibrary.h"
@@ -52,18 +55,32 @@ void UProcedure_Starting::OnEnter(UProcedureBase* InLastProcedure)
 		VoxelModule->SetWorldMode(EVoxelWorldMode::Preview);
 	}
 
-	if(UDWGeneralSaveGame* GeneralSaveGame = USaveGameModuleBPLibrary::GetSaveGame<UDWGeneralSaveGame>())
+	if(InLastProcedure->IsA(UProcedure_Initializing::StaticClass()))
 	{
-		if(GeneralSaveGame->GetCurrentArchiveID() == -1)
+		if(UDWGeneralSaveGame* GeneralSaveGame = USaveGameModuleBPLibrary::GetSaveGame<UDWGeneralSaveGame>())
 		{
-			if(UDWArchiveSaveGame* ArchiveSaveGame = USaveGameModuleBPLibrary::HasSaveGame<UDWArchiveSaveGame>() ? USaveGameModuleBPLibrary::GetSaveGame<UDWArchiveSaveGame>() : USaveGameModuleBPLibrary::CreateSaveGame<UDWArchiveSaveGame>(-1))
+			if(GeneralSaveGame->GetCurrentArchiveID() == -1)
 			{
-				ArchiveSaveGame->Load();
+				if(UDWArchiveSaveGame* ArchiveSaveGame = USaveGameModuleBPLibrary::HasSaveGame<UDWArchiveSaveGame>() ? USaveGameModuleBPLibrary::GetSaveGame<UDWArchiveSaveGame>() : USaveGameModuleBPLibrary::CreateSaveGame<UDWArchiveSaveGame>(-1))
+				{
+					ArchiveSaveGame->Load();
+				}
+			}
+			else
+			{
+				USaveGameModuleBPLibrary::LoadSaveGame<UDWArchiveSaveGame>(GeneralSaveGame->GetCurrentArchiveID());
 			}
 		}
-		else
+	}
+	else
+	{
+		if(AVoxelModule* VoxelModule = AMainModule::GetModuleByClass<AVoxelModule>())
 		{
-			USaveGameModuleBPLibrary::LoadSaveGame<UDWArchiveSaveGame>(GeneralSaveGame->GetCurrentArchiveID());
+			VoxelModule->UnloadData();
+		}
+		if(ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>(GWorld))
+		{
+			PlayerCharacter->Disable(true);
 		}
 	}
 }

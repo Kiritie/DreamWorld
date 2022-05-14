@@ -33,7 +33,6 @@ ADWVoxelChunk::ADWVoxelChunk()
 void ADWVoxelChunk::BeginPlay()
 {
 	Super::BeginPlay();
-
 }
 
 void ADWVoxelChunk::OnCollision(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
@@ -55,7 +54,6 @@ void ADWVoxelChunk::OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 void ADWVoxelChunk::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
 void ADWVoxelChunk::OnSpawn_Implementation(const TArray<FParameter>& InParams)
@@ -66,14 +64,6 @@ void ADWVoxelChunk::OnSpawn_Implementation(const TArray<FParameter>& InParams)
 void ADWVoxelChunk::OnDespawn_Implementation()
 {
 	Super::OnDespawn_Implementation();
-
-	if(AVoxelModule::GetWorldData<FDWVoxelWorldSaveData>())
-	{
-		AVoxelModule::GetWorldData<FDWVoxelWorldSaveData>()->SetChunkData(Index, *static_cast<FDWVoxelChunkSaveData*>(ToData()));
-	}
-	
-	Characters.Empty();
-	Vitalitys.Empty();
 }
 
 void ADWVoxelChunk::Initialize(FIndex InIndex, int32 InBatch)
@@ -84,13 +74,13 @@ void ADWVoxelChunk::Initialize(FIndex InIndex, int32 InBatch)
 void ADWVoxelChunk::LoadData(FSaveData* InSaveData)
 {
 	FDWVoxelChunkSaveData ChunkData = *static_cast<FDWVoxelChunkSaveData*>(InSaveData);
-	for (int32 i = 0; i < ChunkData.VoxelItems.Num(); i++)
+	for(int32 i = 0; i < ChunkData.VoxelItems.Num(); i++)
 	{
 		const FVoxelItem& voxelItem = ChunkData.VoxelItems[i];
 		SetVoxelComplex(voxelItem.Index, voxelItem);
 	}
 }
-
+ 
 FSaveData* ADWVoxelChunk::ToData(bool bSaved)
 {
 	static FDWVoxelChunkSaveData ChunkData;
@@ -98,25 +88,25 @@ FSaveData* ADWVoxelChunk::ToData(bool bSaved)
 	ChunkData.Index = Index;
 	ChunkData.bSaved = bSaved;
 
-	for (auto& iter : VoxelMap)
+	for(auto& iter : VoxelMap)
 	{
 		ChunkData.VoxelItems.Add(iter.Value);
 	}
 
-	for (int32 i = 0; i < PickUps.Num(); i++)
+	for(int32 i = 0; i < PickUps.Num(); i++)
 	{
 		ChunkData.PickUpDatas.Add(*static_cast<FPickUpSaveData*>(PickUps[i]->ToData()));
 	}
-	
-	for (int32 i = 0; i < Characters.Num(); i++)
+
+	for(int32 i = 0; i < Characters.Num(); i++)
 	{
 		if(Characters[i]->GetNature() != EDWCharacterNature::Player)
 		{
 			ChunkData.CharacterDatas.Add(*static_cast<FDWCharacterSaveData*>(Characters[i]->ToData()));
 		}
 	}
-	
-	for (int32 i = 0; i < Vitalitys.Num(); i++)
+
+	for(int32 i = 0; i < Vitalitys.Num(); i++)
 	{
 		ChunkData.VitalityDatas.Add(*static_cast<FDWVitalitySaveData*>(Vitalitys[i]->ToData()));
 	}
@@ -142,38 +132,38 @@ void ADWVoxelChunk::GenerateMap()
 void ADWVoxelChunk::SpawnActors()
 {
 	Super::SpawnActors();
-	
-	if (AVoxelModule::GetWorldData<FDWVoxelWorldSaveData>()->IsExistChunkData(Index))
+
+	if(AVoxelModule::GetWorldData<FDWVoxelWorldSaveData>()->IsExistChunkData(Index))
 	{
 		FDWVoxelChunkSaveData ChunkData = AVoxelModule::GetWorldData<FDWVoxelWorldSaveData>()->GetChunkData(Index);
-		for (int32 i = 0; i < ChunkData.PickUpDatas.Num(); i++)
+		for(int32 i = 0; i < ChunkData.PickUpDatas.Num(); i++)
 		{
 			SpawnPickUp(ChunkData.PickUpDatas[i]);
 		}
-		for (int32 i = 0; i < ChunkData.CharacterDatas.Num(); i++)
+		for(int32 i = 0; i < ChunkData.CharacterDatas.Num(); i++)
 		{
 			SpawnCharacter(ChunkData.CharacterDatas[i]);
 		}
-		for (int32 i = 0; i < ChunkData.VitalityDatas.Num(); i++)
+		for(int32 i = 0; i < ChunkData.VitalityDatas.Num(); i++)
 		{
 			SpawnVitality(ChunkData.VitalityDatas[i]);
 		}
 	}
 	else if(SolidMesh || SemiMesh)
 	{
-		if (FIndex::Distance(Index, AVoxelModule::GetWorldData<FDWVoxelWorldSaveData>()->LastVitalityRaceIndex) > 250.f / AVoxelModule::GetWorldData()->VitalityRaceDensity)
+		if(FIndex::Distance(Index, AVoxelModule::GetWorldData<FDWVoxelWorldSaveData>()->LastVitalityRaceIndex) > 250.f / AVoxelModule::GetWorldData()->VitalityRaceDensity)
 		{
 			auto raceData = UDWHelper::RandomVitalityRaceData();
-			for (int32 i = 0; i < raceData.Items.Num(); i++)
+			for(int32 i = 0; i < raceData.Items.Num(); i++)
 			{
 				const FAbilityItem& vitalityItem = raceData.Items[i];
 				const UVitalityDataBase& vitalityData = vitalityItem.GetData<UVitalityDataBase>();
-				for (int32 j = 0; j < vitalityItem.Count; j++)
+				for(int32 j = 0; j < vitalityItem.Count; j++)
 				{
-					for (int32 k = 0; k < 10; k++)
+					for(int32 k = 0; k < 10; k++)
 					{
 						FHitResult hitResult;
-						if (AMainModule::GetModuleByClass<AVoxelModule>()->ChunkTraceSingle(this, FMath::Max(vitalityData.Range.X, vitalityData.Range.Y) * 0.5f * AVoxelModule::GetWorldData()->BlockSize, vitalityData.Range.Z * 0.5f * AVoxelModule::GetWorldData()->BlockSize, hitResult))
+						if(AMainModule::GetModuleByClass<AVoxelModule>()->ChunkTraceSingle(this, FMath::Max(vitalityData.Range.X, vitalityData.Range.Y) * 0.5f * AVoxelModule::GetWorldData()->BlockSize, vitalityData.Range.Z * 0.5f * AVoxelModule::GetWorldData()->BlockSize, hitResult))
 						{
 							auto saveData = FDWVitalitySaveData();
 							saveData.ID = vitalityData.GetPrimaryAssetId();
@@ -191,20 +181,20 @@ void ADWVoxelChunk::SpawnActors()
 				}
 			}
 		}
-		if (FIndex::Distance(Index, AVoxelModule::GetWorldData<FDWVoxelWorldSaveData>()->LastCharacterRaceIndex) > 300.f / AVoxelModule::GetWorldData()->CharacterRaceDensity)
+		if(FIndex::Distance(Index, AVoxelModule::GetWorldData<FDWVoxelWorldSaveData>()->LastCharacterRaceIndex) > 300.f / AVoxelModule::GetWorldData()->CharacterRaceDensity)
 		{
 			ADWCharacter* captain = nullptr;
 			auto raceData = UDWHelper::RandomCharacterRaceData();
-			for (int32 i = 0; i < raceData.Items.Num(); i++)
+			for(int32 i = 0; i < raceData.Items.Num(); i++)
 			{
 				const FAbilityItem& characterItem = raceData.Items[i];
 				const UCharacterDataBase& characterData = characterItem.GetData<UCharacterDataBase>();
-				for (int32 j = 0; j < characterItem.Count; j++)
+				for(int32 j = 0; j < characterItem.Count; j++)
 				{
-					for (int32 k = 0; k < 10; k++)
+					for(int32 k = 0; k < 10; k++)
 					{
 						FHitResult hitResult;
-						if (AMainModule::GetModuleByClass<AVoxelModule>()->ChunkTraceSingle(this, FMath::Max(characterData.Range.X, characterData.Range.Y) * 0.5f * AVoxelModule::GetWorldData()->BlockSize, characterData.Range.Z * 0.5f * AVoxelModule::GetWorldData()->BlockSize, hitResult))
+						if(AMainModule::GetModuleByClass<AVoxelModule>()->ChunkTraceSingle(this, FMath::Max(characterData.Range.X, characterData.Range.Y) * 0.5f * AVoxelModule::GetWorldData()->BlockSize, characterData.Range.Z * 0.5f * AVoxelModule::GetWorldData()->BlockSize, hitResult))
 						{
 							auto saveData = FDWCharacterSaveData();
 							saveData.ID = characterData.GetPrimaryAssetId();
@@ -216,7 +206,7 @@ void ADWVoxelChunk::SpawnActors()
 							saveData.Initialize();
 							if(auto character = SpawnCharacter(saveData))
 							{
-								if (captain == nullptr)
+								if(captain == nullptr)
 								{
 									captain = character;
 									if(ADWTeamModule* TeamModule = AMainModule::GetModuleByClass<ADWTeamModule>())
@@ -242,19 +232,24 @@ void ADWVoxelChunk::SpawnActors()
 void ADWVoxelChunk::DestroyActors()
 {
 	Super::DestroyActors();
-	
-	for (int32 i = 0; i < PickUps.Num(); i++)
+
+	for(int32 i = 0; i < PickUps.Num(); i++)
 	{
 		PickUps[i]->Destroy();
 	}
-	for (int32 i = 0; i < Characters.Num(); i++)
+	PickUps.Empty();
+
+	for(int32 i = 0; i < Characters.Num(); i++)
 	{
 		Characters[i]->Destroy();
 	}
-	for (int32 i = 0; i < Vitalitys.Num(); i++)
+	Characters.Empty();
+
+	for(int32 i = 0; i < Vitalitys.Num(); i++)
 	{
 		Vitalitys[i]->Destroy();
 	}
+	Vitalitys.Empty();
 }
 
 void ADWVoxelChunk::OnGenerated()
@@ -308,7 +303,7 @@ ADWCharacter* ADWVoxelChunk::SpawnCharacter(FDWCharacterSaveData InSaveData)
 {
 	FActorSpawnParameters spawnParams = FActorSpawnParameters();
 	spawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	if (ADWCharacter* character = GetWorld()->SpawnActor<ADWCharacter>(InSaveData.GetCharacterData().Class, spawnParams))
+	if(ADWCharacter* character = GetWorld()->SpawnActor<ADWCharacter>(InSaveData.GetCharacterData().Class, spawnParams))
 	{
 		character->LoadData(&InSaveData);
 		character->SpawnDefaultController();
@@ -338,9 +333,9 @@ void ADWVoxelChunk::DetachCharacter(ADWCharacter* InCharacter)
 
 void ADWVoxelChunk::DestroyCharacter(ADWCharacter* InCharacter)
 {
-	if (!InCharacter || !InCharacter->IsValidLowLevel()) return;
+	if(!InCharacter || !InCharacter->IsValidLowLevel()) return;
 
-	if (Characters.Contains(InCharacter))
+	if(Characters.Contains(InCharacter))
 	{
 		Characters.Remove(InCharacter);
 		InCharacter->Destroy();
@@ -351,7 +346,7 @@ ADWVitality* ADWVoxelChunk::SpawnVitality(FDWVitalitySaveData InSaveData)
 {
 	FActorSpawnParameters spawnParams = FActorSpawnParameters();
 	spawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	if (ADWVitality* Vitality = GetWorld()->SpawnActor<ADWVitality>(InSaveData.GetVitalityData().Class, spawnParams))
+	if(ADWVitality* Vitality = GetWorld()->SpawnActor<ADWVitality>(InSaveData.GetVitalityData().Class, spawnParams))
 	{
 		Vitality->LoadData(&InSaveData);
 		AttachVitality(Vitality);
@@ -380,9 +375,9 @@ void ADWVoxelChunk::DetachVitality(ADWVitality* InVitality)
 
 void ADWVoxelChunk::DestroyVitality(ADWVitality* InVitality)
 {
-	if (!InVitality || !InVitality->IsValidLowLevel()) return;
+	if(!InVitality || !InVitality->IsValidLowLevel()) return;
 
-	if (Vitalitys.Contains(InVitality))
+	if(Vitalitys.Contains(InVitality))
 	{
 		Vitalitys.Remove(InVitality);
 		InVitality->Destroy();

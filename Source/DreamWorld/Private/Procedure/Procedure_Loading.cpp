@@ -49,7 +49,7 @@ void UProcedure_Loading::OnEnter(UProcedureBase* InLastProcedure)
 	}
 
 	UWidgetModuleBPLibrary::OpenUserWidget<UWidgetLoadingPanel>();
-				
+	
 	UWidgetModuleBPLibrary::CreateUserWidget<UWidgetGameHUD>();
 	UWidgetModuleBPLibrary::CreateUserWidget<UWidgetInventoryBar>();
 	UWidgetModuleBPLibrary::CreateUserWidget<UWidgetInventoryPanel>();

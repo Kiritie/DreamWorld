@@ -122,7 +122,10 @@ FSaveData* ADWVoxelModule::ToData(bool bSaved)
 	{
 		if(Iter.Value)
 		{
-			GetWorldData<FDWVoxelWorldSaveData>()->SetChunkData(Iter.Key, *static_cast<FDWVoxelChunkSaveData*>(Iter.Value->ToData(bSaved)));
+			if(const FDWVoxelChunkSaveData* VoxelChunkSaveData = static_cast<FDWVoxelChunkSaveData*>(Iter.Value->ToData(bSaved)))
+			{
+				GetWorldData<FDWVoxelWorldSaveData>()->SetChunkData(Iter.Key, *VoxelChunkSaveData);
+			}
 		}
 	}
 	return WorldData;
@@ -184,6 +187,10 @@ void ADWVoxelModule::GenerateChunk(AVoxelChunk* InChunk)
 
 void ADWVoxelModule::DestroyChunk(AVoxelChunk* InChunk)
 {
+	if(!InChunk || !ChunkMap.Contains(InChunk->GetIndex())) return;
+
+	GetWorldData<FDWVoxelWorldSaveData>()->SetChunkData(InChunk->GetIndex(), *static_cast<FDWVoxelChunkSaveData*>(InChunk->ToData()));
+	
 	Super::DestroyChunk(InChunk);
 }
 
