@@ -55,7 +55,7 @@ void UProcedure_Starting::OnEnter(UProcedureBase* InLastProcedure)
 		VoxelModule->SetWorldMode(EVoxelWorldMode::Preview);
 	}
 
-	if(InLastProcedure->IsA(UProcedure_Initializing::StaticClass()))
+	if(!InLastProcedure || InLastProcedure->IsA(UProcedure_Initializing::StaticClass()))
 	{
 		if(UDWGeneralSaveGame* GeneralSaveGame = USaveGameModuleBPLibrary::GetSaveGame<UDWGeneralSaveGame>())
 		{

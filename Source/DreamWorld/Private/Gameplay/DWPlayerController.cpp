@@ -115,17 +115,17 @@ void ADWPlayerController::OnPossess(APawn* InPawn)
 
 void ADWPlayerController::OnUnPossess()
 {
-	if(ADWPlayerCharacter* OwnerCharacter = Cast<ADWPlayerCharacter>(GetPawn()))
-	{
-		if(OwnerCharacter == PlayerCharacter && !PlayerCharacter->IsRiding())
-		{
-			PlayerCharacter->SetOwnerController(nullptr);
-			PlayerCharacter = nullptr;
-			UWidgetModuleBPLibrary::InitializeUserWidget<UWidgetGameHUD>(nullptr);
-			UWidgetModuleBPLibrary::InitializeUserWidget<UWidgetInventoryBar>(nullptr);
-			UWidgetModuleBPLibrary::InitializeUserWidget<UWidgetInventoryPanel>(nullptr);
-		}
-	}
+	// if(ADWPlayerCharacter* OwnerCharacter = Cast<ADWPlayerCharacter>(GetPawn()))
+	// {
+	// 	if(OwnerCharacter == PlayerCharacter && !PlayerCharacter->IsRiding())
+	// 	{
+	// 		PlayerCharacter->SetOwnerController(nullptr);
+	// 		PlayerCharacter = nullptr;
+	// 		UWidgetModuleBPLibrary::InitializeUserWidget<UWidgetGameHUD>(nullptr);
+	// 		UWidgetModuleBPLibrary::InitializeUserWidget<UWidgetInventoryBar>(nullptr);
+	// 		UWidgetModuleBPLibrary::InitializeUserWidget<UWidgetInventoryPanel>(nullptr);
+	// 	}
+	// }
 	Super::OnUnPossess();
 }
 

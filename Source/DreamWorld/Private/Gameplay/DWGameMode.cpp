@@ -29,7 +29,7 @@ void ADWGameMode::OnInitialize_Implementation()
 {
 	Super::OnInitialize_Implementation();
 
-	UProcedureModuleBPLibrary::SwitchProcedureByClass<UProcedure_Initializing>();
+	//UProcedureModuleBPLibrary::SwitchProcedureByClass<UProcedure_Initializing>();
 }
 
 void ADWGameMode::OnPreparatory_Implementation()

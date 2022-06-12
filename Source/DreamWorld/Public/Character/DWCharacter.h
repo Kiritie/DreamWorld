@@ -346,7 +346,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual void EndAction(EDWCharacterActionType InActionType);
 
-	UFUNCTION(BlueprintCallable)
+	//UFUNCTION(BlueprintCallable)
 	virtual bool StopAction(EDWCharacterActionType InActionType = EDWCharacterActionType::None, bool bCancelAbility = true, bool bEndAction = false);
 					
 	UFUNCTION(BlueprintCallable)
