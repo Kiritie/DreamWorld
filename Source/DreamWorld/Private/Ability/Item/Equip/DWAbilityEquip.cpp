@@ -7,7 +7,7 @@
 
 #include "Ability/Character/AbilityCharacterBase.h"
 #include "Ability/Item/Equip/DWEquipData.h"
-#include "Ability/Item/Equip/EquipDataBase.h"
+#include "Ability/Item/Equip/AbilityEquipDataBase.h"
 #include "Character/DWCharacter.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/SkeletalMeshComponent.h"

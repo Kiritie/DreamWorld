@@ -5,6 +5,7 @@
 
 #include "Character/Player/DWPlayerCharacter.h"
 #include "Gameplay/DWGameState.h"
+#include "Global/GlobalBPLibrary.h"
 #include "Procedure/Procedure_Initializing.h"
 #include "SaveGame/DWArchiveSaveGame.h"
 #include "SaveGame/DWGeneralSaveGame.h"
@@ -41,7 +42,7 @@ void UProcedure_Starting::OnEnter(UProcedureBase* InLastProcedure)
 {
 	Super::OnEnter(InLastProcedure);
 	
-	if(ADWGameState* GameState = UGlobalBPLibrary::GetGameState<ADWGameState>(this))
+	if(ADWGameState* GameState = UGlobalBPLibrary::GetGameState<ADWGameState>())
 	{
 		GameState->SetCurrentState(EDWGameState::Starting);
 	}
@@ -78,7 +79,7 @@ void UProcedure_Starting::OnEnter(UProcedureBase* InLastProcedure)
 		{
 			VoxelModule->UnloadData();
 		}
-		if(ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>(GWorld))
+		if(ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>())
 		{
 			PlayerCharacter->Disable(true);
 		}

@@ -6,6 +6,7 @@
 #include "Character/Player/DWPlayerCharacter.h"
 #include "Gameplay/DWGameState.h"
 #include "Gameplay/DWPlayerController.h"
+#include "Global/GlobalBPLibrary.h"
 #include "ReferencePool/ReferencePoolModuleBPLibrary.h"
 #include "Voxel/DWVoxelChunk.h"
 #include "Voxel/VoxelModuleBPLibrary.h"
@@ -51,7 +52,7 @@ void ADWVoxelModule::OnPreparatory_Implementation()
 
 void ADWVoxelModule::OnRefresh_Implementation(float DeltaSeconds)
 {
-	switch (UGlobalBPLibrary::GetGameState<ADWGameState>(this)->GetCurrentState())
+	switch (UGlobalBPLibrary::GetGameState<ADWGameState>()->GetCurrentState())
 	{
 		case EDWGameState::Starting:
 		case EDWGameState::Preparing:
@@ -92,7 +93,7 @@ void ADWVoxelModule::OnWorldStateChanged()
 	{
 		case EVoxelWorldState::BasicGenerated:
 		{
-			if(ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerController<ADWPlayerController>(this)->GetPlayerCharacter())
+			if(ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>())
 			{
 				FHitResult hitResult;
 				const FVector rayStart = FVector(PlayerCharacter->GetActorLocation().X, PlayerCharacter->GetActorLocation().Y, GetWorldData()->ChunkHeightRange * GetWorldData()->GetChunkLength() + 500);

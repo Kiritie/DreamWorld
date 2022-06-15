@@ -4,6 +4,7 @@
 #include "Procedure/Procedure_Pausing.h"
 
 #include "Gameplay/DWGameState.h"
+#include "Global/GlobalBPLibrary.h"
 #include "Procedure/Procedure_Starting.h"
 #include "Widget/WidgetGameHUD.h"
 #include "Widget/WidgetModuleBPLibrary.h"
@@ -37,7 +38,7 @@ void UProcedure_Pausing::OnEnter(UProcedureBase* InLastProcedure)
 {
 	Super::OnEnter(InLastProcedure);
 
-	if(ADWGameState* GameState = UGlobalBPLibrary::GetGameState<ADWGameState>(this))
+	if(ADWGameState* GameState = UGlobalBPLibrary::GetGameState<ADWGameState>())
 	{
 		GameState->SetCurrentState(EDWGameState::Pausing);
 	}

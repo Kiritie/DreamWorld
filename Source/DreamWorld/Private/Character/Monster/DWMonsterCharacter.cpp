@@ -5,7 +5,7 @@
 
 #include "Ability/Components/CharacterInteractionComponent.h"
 #include "Ability/Item/Prop/DWPropData.h"
-#include "Ability/Item/Prop/PropDataBase.h"
+#include "Ability/Item/Prop/AbilityPropDataBase.h"
 #include "Components/BoxComponent.h"
 #include "BehaviorTree/BehaviorTree.h"
 #include "Components/SkeletalMeshComponent.h"
@@ -29,8 +29,8 @@ ADWMonsterCharacter::ADWMonsterCharacter()
 	AttackPoint->SetGenerateOverlapEvents(false);
 	AttackPoint->OnComponentBeginOverlap.AddDynamic(this, &ADWMonsterCharacter::OnAttackPointOverlap);
 
-	Interaction->AddInteractionAction(EInteractAction::Ride);
-	Interaction->AddInteractionAction(EInteractAction::Feed);
+	Interaction->AddInteractionAction((EInteractAction)EDWInteractAction::Ride);
+	Interaction->AddInteractionAction((EInteractAction)EDWInteractAction::Feed);
 }
 
 // Called when the game starts or when spawned
@@ -65,7 +65,7 @@ bool ADWMonsterCharacter::CanInteract(IInteractionAgentInterface* InInteractionA
 	
 	switch (InInteractAction)
 	{
-		case EInteractAction::Feed:
+		case EDWInteractAction::Feed:
 		{
 			if(ADWCharacter* InInteractionCharacter = Cast<ADWCharacter>(InInteractionAgent))
 			{
@@ -76,7 +76,7 @@ bool ADWMonsterCharacter::CanInteract(IInteractionAgentInterface* InInteractionA
 			}
 			break;
 		}
-		case EInteractAction::Ride:
+		case EDWInteractAction::Ride:
 		{
 			if(ADWCharacter* InInteractionCharacter = Cast<ADWCharacter>(InInteractionAgent))
 			{
@@ -87,7 +87,7 @@ bool ADWMonsterCharacter::CanInteract(IInteractionAgentInterface* InInteractionA
 			}
 			break;
 		}
-		case EInteractAction::UnRide:
+		case EDWInteractAction::UnRide:
 		{
 			if(ADWCharacter* InInteractionCharacter = Cast<ADWCharacter>(InInteractionAgent))
 			{
@@ -109,7 +109,7 @@ void ADWMonsterCharacter::OnInteract(IInteractionAgentInterface* InInteractionAg
 
 	switch (InInteractAction)
 	{
-		case EInteractAction::Feed:
+		case EDWInteractAction::Feed:
 		{
 			if(ADWCharacter* TriggerCharacter = Cast<ADWCharacter>(InInteractionAgent))
 			{
@@ -119,7 +119,7 @@ void ADWMonsterCharacter::OnInteract(IInteractionAgentInterface* InInteractionAg
 			}
 			break;
 		}
-		case EInteractAction::Ride:
+		case EDWInteractAction::Ride:
 		{
 			if(ADWCharacter* TriggerCharacter = Cast<ADWCharacter>(InInteractionAgent))
 			{
@@ -127,7 +127,7 @@ void ADWMonsterCharacter::OnInteract(IInteractionAgentInterface* InInteractionAg
 			}
 			break;
 		}
-		case EInteractAction::UnRide:
+		case EDWInteractAction::UnRide:
 		{
 			if(ADWCharacter* TriggerCharacter = Cast<ADWCharacter>(InInteractionAgent))
 			{

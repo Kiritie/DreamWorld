@@ -10,6 +10,7 @@
 #include "Components/GridPanel.h"
 #include "Components/GridSlot.h"
 #include "GameFramework/InputSettings.h"
+#include "Global/GlobalBPLibrary.h"
 #include "Inventory/Inventory.h"
 #include "Widget/Inventory/WidgetInventoryPanel.h"
 #include "Inventory/Slot/InventorySlot.h"

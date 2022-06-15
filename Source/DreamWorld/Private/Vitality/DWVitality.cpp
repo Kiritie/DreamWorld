@@ -5,7 +5,7 @@
 
 #include "Ability/Components/DWAbilitySystemComponent.h"
 #include "Ability/Vitality/DWVitalityAttributeSet.h"
-#include "Ability/Vitality/VitalityDataBase.h"
+#include "Ability/Vitality/AbilityVitalityDataBase.h"
 #include "Components/BoxComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Character/DWCharacter.h"

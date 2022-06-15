@@ -6,7 +6,12 @@
 #include "Character/Player/DWPlayerCharacter.h"
 #include "Engine/World.h"
 #include "Engine.h"
-#include "Ability/Character/CharacterDataBase.h"
+#include "Ability/AbilityModuleBPLibrary.h"
+#include "Ability/Character/AbilityCharacterDataBase.h"
+#include "Ability/Item/Equip/AbilityEquipDataBase.h"
+#include "Ability/Item/Prop/AbilityPropDataBase.h"
+#include "Ability/Item/Skill/AbilitySkillDataBase.h"
+#include "Camera/CameraModuleBPLibrary.h"
 #include "Character/DWCharacterData.h"
 #include "Widget/WidgetGameHUD.h"
 #include "Gameplay/DWGameInstance.h"
@@ -15,6 +20,8 @@
 #include "Widget/Inventory/WidgetInventoryPanel.h"
 #include "Inventory/Inventory.h"
 #include "Gameplay/DWGameMode.h"
+#include "Global/GlobalBPLibrary.h"
+#include "Input/InputModuleBPLibrary.h"
 #include "Inventory/Slot/InventorySlot.h"
 #include "Procedure/ProcedureModuleBPLibrary.h"
 #include "Procedure/Procedure_Pausing.h"
@@ -22,28 +29,11 @@
 #include "SaveGame/DWGeneralSaveGame.h"
 #include "SaveGame/SaveGameModuleBPLibrary.h"
 #include "Voxel/VoxelModule.h"
+#include "Voxel/Datas/VoxelData.h"
 #include "Widget/WidgetModuleBPLibrary.h"
 
 ADWPlayerController::ADWPlayerController()
 {
-	bCameraControlAble = true;
-
-	bCameraMoveAble = false;
-
-	CameraRotateKey = FKey();
-
-	CameraZoomKey = FKey("LeftCtrl");
-
-	// camera
-	CameraTurnRate = 45.f;
-	CameraLookUpRate = 45.f;
-	CameraRotateSmooth = 30.f;
-	InitCameraPinch = -20.f;
-
-	MinCameraDistance = 100.f;
-	MaxCameraDistance = 300.f;
-	InitCameraDistance = 150.f;
-
 	// inputs
 	bPressedSprint = false;
 	DoubleJumpTime = 0.f;
@@ -68,7 +58,11 @@ void ADWPlayerController::SetupInputComponent()
 
 	InputComponent->SetTickableWhenPaused(true);
 
-	InputComponent->BindAction("Jump", IE_Pressed, this, &ADWPlayerController::OnJumpPressed);
+	FInputActionHandlerDynamicSignature InputActionHandlerSignature;
+	InputActionHandlerSignature.BindDynamic(this, &ADWPlayerController::OnJumpPressed);
+	UInputModuleBPLibrary::BindInputAction("Jump", IE_Released, InputActionHandlerSignature);
+
+	//InputComponent->BindAction("Jump", IE_Pressed, this, &ADWPlayerController::OnJumpPressed);
 	InputComponent->BindAction("Jump", IE_Released, this, &ADWPlayerController::OnJumpReleased);
 	InputComponent->BindAction("Sprint", IE_Pressed, this, &ADWPlayerController::OnSprintPressed);
 	InputComponent->BindAction("Sprint", IE_Released, this, &ADWPlayerController::OnSprintReleased);
@@ -101,31 +95,14 @@ void ADWPlayerController::OnPossess(APawn* InPawn)
 
 	if(ADWPlayerCharacter* InCharacter = Cast<ADWPlayerCharacter>(InPawn))
 	{
-		if(InCharacter != PlayerCharacter)
-		{
-			PlayerCharacter = InCharacter;
-			PlayerCharacter->SetOwnerController(this);
-			UWidgetModuleBPLibrary::InitializeUserWidget<UWidgetGameHUD>(PlayerCharacter);
-			UWidgetModuleBPLibrary::InitializeUserWidget<UWidgetInventoryBar>(PlayerCharacter);
-			UWidgetModuleBPLibrary::InitializeUserWidget<UWidgetInventoryPanel>(PlayerCharacter);
-			PlayerCharacter->RefreshData();
-		}
+		UWidgetModuleBPLibrary::InitializeUserWidget<UWidgetGameHUD>(InCharacter);
+		UWidgetModuleBPLibrary::InitializeUserWidget<UWidgetInventoryBar>(InCharacter);
+		UWidgetModuleBPLibrary::InitializeUserWidget<UWidgetInventoryPanel>(InCharacter);
 	}
 }
 
 void ADWPlayerController::OnUnPossess()
 {
-	// if(ADWPlayerCharacter* OwnerCharacter = Cast<ADWPlayerCharacter>(GetPawn()))
-	// {
-	// 	if(OwnerCharacter == PlayerCharacter && !PlayerCharacter->IsRiding())
-	// 	{
-	// 		PlayerCharacter->SetOwnerController(nullptr);
-	// 		PlayerCharacter = nullptr;
-	// 		UWidgetModuleBPLibrary::InitializeUserWidget<UWidgetGameHUD>(nullptr);
-	// 		UWidgetModuleBPLibrary::InitializeUserWidget<UWidgetInventoryBar>(nullptr);
-	// 		UWidgetModuleBPLibrary::InitializeUserWidget<UWidgetInventoryPanel>(nullptr);
-	// 	}
-	// }
 	Super::OnUnPossess();
 }
 
@@ -133,17 +110,17 @@ void ADWPlayerController::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if(!GetProcessedCharacter() || GetProcessedCharacter()->IsDead()) return;
+	if(!GetPawn<ADWCharacter>() || GetPawn<ADWCharacter>()->IsDead()) return;
 
-	if(GetProcessedCharacter()->IsActive())
+	if(GetPawn<ADWCharacter>()->IsActive())
 	{
-		if(bPressedSprint && GetProcessedCharacter()->GetMoveVelocity().Size() > 0.2f)
+		if(bPressedSprint && GetPawn<ADWCharacter>()->GetMoveVelocity().Size() > 0.2f)
 		{
-			GetProcessedCharacter()->Sprint();
+			GetPawn<ADWCharacter>()->Sprint();
 		}
 		else
 		{
-			GetProcessedCharacter()->UnSprint();
+			GetPawn<ADWCharacter>()->UnSprint();
 		}
 
 		if(DoubleJumpTime > 0.f)
@@ -155,7 +132,7 @@ void ADWPlayerController::Tick(float DeltaTime)
 
 void ADWPlayerController::LoadData(FDWPlayerSaveData InPlayerData)
 {
-	if(GetProcessedCharacter()) return;
+	if(GetPlayerPawn<ADWPlayerCharacter>()) return;
 
 	FActorSpawnParameters SpawnParams = FActorSpawnParameters();
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
@@ -165,7 +142,7 @@ void ADWPlayerController::LoadData(FDWPlayerSaveData InPlayerData)
 		SetControlRotation(InPlayerData.CameraRotation);
 		if(UDWGeneralSaveGame* GeneralSaveGame = USaveGameModuleBPLibrary::GetSaveGame<UDWGeneralSaveGame>())
 		{
-			SetCameraDistance(GeneralSaveGame->GetCameraDistance(), true);
+			UCameraModuleBPLibrary::SetCameraDistance(GeneralSaveGame->GetCameraDistance(), true);
 		}
 
 		NewPlayerCharacter->Disable(true, true);
@@ -175,43 +152,43 @@ void ADWPlayerController::LoadData(FDWPlayerSaveData InPlayerData)
 
 		if(!InPlayerData.bSaved)
 		{
-			// auto VoxelDatas = UDWHelper::LoadVoxelDatas();
-			// for (int32 i = 0; i < VoxelDatas.Num(); i++)
-			// {
-			// 	FAbilityItem tmpItem = FAbilityItem(VoxelDatas[i].ID, VoxelDatas[i].MaxCount);
-			// 	NewPlayerCharacter->GetInventory()->AdditionItemByRange(tmpItem);
-			// }
-			//
-			// auto EquipDatas = UDWHelper::LoadEquipDatas();
-			// for (int32 i = 0; i < EquipDatas.Num(); i++)
-			// {
-			// 	FAbilityItem tmpItem = FAbilityItem(EquipDatas[i].ID, EquipDatas[i].MaxCount);
-			// 	NewPlayerCharacter->GetInventory()->AdditionItemByRange(tmpItem);
-			// }
-			//
-			// auto PropDatas = UDWHelper::LoadPropDatas();
-			// for (int32 i = 0; i < PropDatas.Num(); i++)
-			// {
-			// 	FAbilityItem tmpItem = FAbilityItem(PropDatas[i].ID, PropDatas[i].MaxCount);
-			// 	NewPlayerCharacter->GetInventory()->AdditionItemByRange(tmpItem);
-			// }
-			//
-			// auto SkillDatas = UDWHelper::LoadSkillDatas();
-			// for (int32 i = 0; i < SkillDatas.Num(); i++)
-			// {
-			// 	FAbilityItem tmpItem = FAbilityItem(SkillDatas[i].ID, SkillDatas[i].MaxCount);
-			// 	NewPlayerCharacter->GetInventory()->AdditionItemByRange(tmpItem);
-			// }
+			auto VoxelDatas = UAssetModuleBPLibrary::LoadPrimaryAssetRefs<UVoxelData>(UAbilityModuleBPLibrary::GetAssetTypeByItemType(EAbilityItemType::Voxel));
+			for (int32 i = 0; i < VoxelDatas.Num(); i++)
+			{
+				FAbilityItem tmpItem = FAbilityItem(VoxelDatas[i].GetPrimaryAssetId(), VoxelDatas[i].MaxCount);
+				NewPlayerCharacter->GetInventory()->AdditionItemByRange(tmpItem);
+			}
+			
+			auto EquipDatas = UAssetModuleBPLibrary::LoadPrimaryAssetRefs<UAbilityEquipDataBase>(UAbilityModuleBPLibrary::GetAssetTypeByItemType(EAbilityItemType::Equip));
+			for (int32 i = 0; i < EquipDatas.Num(); i++)
+			{
+				FAbilityItem tmpItem = FAbilityItem(EquipDatas[i].GetPrimaryAssetId(), EquipDatas[i].MaxCount);
+				NewPlayerCharacter->GetInventory()->AdditionItemByRange(tmpItem);
+			}
+			
+			auto PropDatas = UAssetModuleBPLibrary::LoadPrimaryAssetRefs<UAbilityPropDataBase>(UAbilityModuleBPLibrary::GetAssetTypeByItemType(EAbilityItemType::Prop));
+			for (int32 i = 0; i < PropDatas.Num(); i++)
+			{
+				FAbilityItem tmpItem = FAbilityItem(PropDatas[i].GetPrimaryAssetId(), PropDatas[i].MaxCount);
+				NewPlayerCharacter->GetInventory()->AdditionItemByRange(tmpItem);
+			}
+			
+			auto SkillDatas = UAssetModuleBPLibrary::LoadPrimaryAssetRefs<UAbilitySkillDataBase>(UAbilityModuleBPLibrary::GetAssetTypeByItemType(EAbilityItemType::Skill));
+			for (int32 i = 0; i < SkillDatas.Num(); i++)
+			{
+				FAbilityItem tmpItem = FAbilityItem(SkillDatas[i].GetPrimaryAssetId(), SkillDatas[i].MaxCount);
+				NewPlayerCharacter->GetInventory()->AdditionItemByRange(tmpItem);
+			}
 		}
 	}
 }
 
 void ADWPlayerController::UnloadData()
 {
-	if(!GetProcessedCharacter()) return;
+	if(!GetPlayerPawn<ADWPlayerCharacter>()) return;
 
 	UnPossess();
-	GetProcessedCharacter()->Destroy();
+	GetPlayerPawn<ADWPlayerCharacter>()->Destroy();
 }
 
 void ADWPlayerController::ResetData()
@@ -229,29 +206,29 @@ bool ADWPlayerController::RaycastFromAimPoint(FHitResult& OutHitResult, EDWGameT
 	{
 		const FVector rayStart = PlayerCameraManager->GetCameraLocation();
 		const FVector rayEnd = rayStart + rayDirection * InRayDistance;
-		return UKismetSystemLibrary::LineTraceSingle(PlayerCharacter, rayStart, rayEnd, UDWHelper::GetGameTrace(InGameTraceType), false, TArray<AActor*>(), EDrawDebugTrace::None, OutHitResult, true);
+		return UKismetSystemLibrary::LineTraceSingle(this, rayStart, rayEnd, UDWHelper::GetGameTrace(InGameTraceType), false, TArray<AActor*>(), EDrawDebugTrace::None, OutHitResult, true);
 	}
 	return false;
 }
 
-void ADWPlayerController::OnJumpPressed()
+void ADWPlayerController::OnJumpPressed(FKey Key)
 {
-	if(!GetProcessedCharacter() || GetProcessedCharacter()->IsBreakAllInput()) return;
+	if(!GetPawn<ADWCharacter>() || GetPawn<ADWCharacter>()->IsBreakAllInput()) return;
 
-	GetProcessedCharacter()->Jump();
+	GetPawn<ADWCharacter>()->Jump();
 	if(DoubleJumpTime <= 0.f)
 	{
 		DoubleJumpTime = 0.2f;
 	}
 	else
 	{
-		if(!GetProcessedCharacter()->IsFlying())
+		if(!GetPawn<ADWCharacter>()->IsFlying())
 		{
-			GetProcessedCharacter()->Fly();
+			GetPawn<ADWCharacter>()->Fly();
 		}
 		else
 		{
-			GetProcessedCharacter()->UnFly();
+			GetPawn<ADWCharacter>()->UnFly();
 		}
 		DoubleJumpTime = 0.f;
 	}
@@ -259,12 +236,12 @@ void ADWPlayerController::OnJumpPressed()
 
 void ADWPlayerController::OnJumpReleased()
 {
-	GetProcessedCharacter()->UnJump();
+	GetPawn<ADWCharacter>()->UnJump();
 }
 
 void ADWPlayerController::OnSprintPressed()
 {
-	if(!GetProcessedCharacter() || GetProcessedCharacter()->IsBreakAllInput()) return;
+	if(!GetPawn<ADWCharacter>() || GetPawn<ADWCharacter>()->IsBreakAllInput()) return;
 
 	bPressedSprint = true;
 }
@@ -276,7 +253,7 @@ void ADWPlayerController::OnSprintReleased()
 
 void ADWPlayerController::ToggleInventoryPanel()
 {
-	if(ADWGameState* GameState = UGlobalBPLibrary::GetGameState<ADWGameState>(this))
+	if(ADWGameState* GameState = UGlobalBPLibrary::GetGameState<ADWGameState>())
 	{
 		if(GameState->GetCurrentState() == EDWGameState::Playing)
 		{
@@ -287,9 +264,9 @@ void ADWPlayerController::ToggleInventoryPanel()
 
 void ADWPlayerController::UseInventoryItem()
 {
-	if(!GetProcessedCharacter() || GetProcessedCharacter()->IsBreakAllInput()) return;
+	if(!GetPawn<ADWCharacter>() || GetPawn<ADWCharacter>()->IsBreakAllInput()) return;
 
-	if(ADWGameState* GameState = UGlobalBPLibrary::GetGameState<ADWGameState>(this))
+	if(ADWGameState* GameState = UGlobalBPLibrary::GetGameState<ADWGameState>())
 	{
 		if(GameState->GetCurrentState() == EDWGameState::Playing)
 		{
@@ -300,9 +277,9 @@ void ADWPlayerController::UseInventoryItem()
 
 void ADWPlayerController::UseAllInventoryItem()
 {
-	if(!GetProcessedCharacter() || GetProcessedCharacter()->IsBreakAllInput()) return;
+	if(!GetPawn<ADWCharacter>() || GetPawn<ADWCharacter>()->IsBreakAllInput()) return;
 
-	if(ADWGameState* GameState = UGlobalBPLibrary::GetGameState<ADWGameState>(this))
+	if(ADWGameState* GameState = UGlobalBPLibrary::GetGameState<ADWGameState>())
 	{
 		if(GameState->GetCurrentState() == EDWGameState::Playing)
 		{
@@ -313,9 +290,9 @@ void ADWPlayerController::UseAllInventoryItem()
 
 void ADWPlayerController::DiscardInventoryItem()
 {
-	if(!GetProcessedCharacter() || GetProcessedCharacter()->IsBreakAllInput()) return;
+	if(!GetPawn<ADWCharacter>() || GetPawn<ADWCharacter>()->IsBreakAllInput()) return;
 
-	if(ADWGameState* GameState = UGlobalBPLibrary::GetGameState<ADWGameState>(this))
+	if(ADWGameState* GameState = UGlobalBPLibrary::GetGameState<ADWGameState>())
 	{
 		if(GameState->GetCurrentState() == EDWGameState::Playing)
 		{
@@ -326,9 +303,9 @@ void ADWPlayerController::DiscardInventoryItem()
 
 void ADWPlayerController::DiscardAllInventoryItem()
 {
-	if(!GetProcessedCharacter() || GetProcessedCharacter()->IsBreakAllInput()) return;
+	if(!GetPawn<ADWCharacter>() || GetPawn<ADWCharacter>()->IsBreakAllInput()) return;
 
-	if(ADWGameState* GameState = UGlobalBPLibrary::GetGameState<ADWGameState>(this))
+	if(ADWGameState* GameState = UGlobalBPLibrary::GetGameState<ADWGameState>())
 	{
 		if(GameState->GetCurrentState() == EDWGameState::Playing)
 		{
@@ -339,7 +316,7 @@ void ADWPlayerController::DiscardAllInventoryItem()
 
 void ADWPlayerController::PrevInventorySlot()
 {
-	if(ADWGameState* GameState = UGlobalBPLibrary::GetGameState<ADWGameState>(this))
+	if(ADWGameState* GameState = UGlobalBPLibrary::GetGameState<ADWGameState>())
 	{
 		if(GameState->GetCurrentState() == EDWGameState::Playing)
 		{
@@ -350,7 +327,7 @@ void ADWPlayerController::PrevInventorySlot()
 
 void ADWPlayerController::NextInventorySlot()
 {
-	if(ADWGameState* GameState = UGlobalBPLibrary::GetGameState<ADWGameState>(this))
+	if(ADWGameState* GameState = UGlobalBPLibrary::GetGameState<ADWGameState>())
 	{
 		if(GameState->GetCurrentState() == EDWGameState::Playing)
 		{
@@ -361,7 +338,7 @@ void ADWPlayerController::NextInventorySlot()
 
 void ADWPlayerController::SelectInventorySlot1()
 {
-	if(ADWGameState* GameState = UGlobalBPLibrary::GetGameState<ADWGameState>(this))
+	if(ADWGameState* GameState = UGlobalBPLibrary::GetGameState<ADWGameState>())
 	{
 		if(GameState->GetCurrentState() == EDWGameState::Playing)
 		{
@@ -372,7 +349,7 @@ void ADWPlayerController::SelectInventorySlot1()
 
 void ADWPlayerController::SelectInventorySlot2()
 {
-	if(ADWGameState* GameState = UGlobalBPLibrary::GetGameState<ADWGameState>(this))
+	if(ADWGameState* GameState = UGlobalBPLibrary::GetGameState<ADWGameState>())
 	{
 		if(GameState->GetCurrentState() == EDWGameState::Playing)
 		{
@@ -383,7 +360,7 @@ void ADWPlayerController::SelectInventorySlot2()
 
 void ADWPlayerController::SelectInventorySlot3()
 {
-	if(ADWGameState* GameState = UGlobalBPLibrary::GetGameState<ADWGameState>(this))
+	if(ADWGameState* GameState = UGlobalBPLibrary::GetGameState<ADWGameState>())
 	{
 		if(GameState->GetCurrentState() == EDWGameState::Playing)
 		{
@@ -394,7 +371,7 @@ void ADWPlayerController::SelectInventorySlot3()
 
 void ADWPlayerController::SelectInventorySlot4()
 {
-	if(ADWGameState* GameState = UGlobalBPLibrary::GetGameState<ADWGameState>(this))
+	if(ADWGameState* GameState = UGlobalBPLibrary::GetGameState<ADWGameState>())
 	{
 		if(GameState->GetCurrentState() == EDWGameState::Playing)
 		{
@@ -405,7 +382,7 @@ void ADWPlayerController::SelectInventorySlot4()
 
 void ADWPlayerController::SelectInventorySlot5()
 {
-	if(ADWGameState* GameState = UGlobalBPLibrary::GetGameState<ADWGameState>(this))
+	if(ADWGameState* GameState = UGlobalBPLibrary::GetGameState<ADWGameState>())
 	{
 		if(GameState->GetCurrentState() == EDWGameState::Playing)
 		{
@@ -416,7 +393,7 @@ void ADWPlayerController::SelectInventorySlot5()
 
 void ADWPlayerController::SelectInventorySlot6()
 {
-	if(ADWGameState* GameState = UGlobalBPLibrary::GetGameState<ADWGameState>(this))
+	if(ADWGameState* GameState = UGlobalBPLibrary::GetGameState<ADWGameState>())
 	{
 		if(GameState->GetCurrentState() == EDWGameState::Playing)
 		{
@@ -427,7 +404,7 @@ void ADWPlayerController::SelectInventorySlot6()
 
 void ADWPlayerController::SelectInventorySlot7()
 {
-	if(ADWGameState* GameState = UGlobalBPLibrary::GetGameState<ADWGameState>(this))
+	if(ADWGameState* GameState = UGlobalBPLibrary::GetGameState<ADWGameState>())
 	{
 		if(GameState->GetCurrentState() == EDWGameState::Playing)
 		{
@@ -438,7 +415,7 @@ void ADWPlayerController::SelectInventorySlot7()
 
 void ADWPlayerController::SelectInventorySlot8()
 {
-	if(ADWGameState* GameState = UGlobalBPLibrary::GetGameState<ADWGameState>(this))
+	if(ADWGameState* GameState = UGlobalBPLibrary::GetGameState<ADWGameState>())
 	{
 		if(GameState->GetCurrentState() == EDWGameState::Playing)
 		{
@@ -449,7 +426,7 @@ void ADWPlayerController::SelectInventorySlot8()
 
 void ADWPlayerController::SelectInventorySlot9()
 {
-	if(ADWGameState* GameState = UGlobalBPLibrary::GetGameState<ADWGameState>(this))
+	if(ADWGameState* GameState = UGlobalBPLibrary::GetGameState<ADWGameState>())
 	{
 		if(GameState->GetCurrentState() == EDWGameState::Playing)
 		{
@@ -460,7 +437,7 @@ void ADWPlayerController::SelectInventorySlot9()
 
 void ADWPlayerController::SelectInventorySlot10()
 {
-	if(ADWGameState* GameState = UGlobalBPLibrary::GetGameState<ADWGameState>(this))
+	if(ADWGameState* GameState = UGlobalBPLibrary::GetGameState<ADWGameState>())
 	{
 		if(GameState->GetCurrentState() == EDWGameState::Playing)
 		{
@@ -471,7 +448,7 @@ void ADWPlayerController::SelectInventorySlot10()
 
 void ADWPlayerController::PauseOrContinueGame()
 {
-	if(ADWGameState* GameState = UGlobalBPLibrary::GetGameState<ADWGameState>(this))
+	if(ADWGameState* GameState = UGlobalBPLibrary::GetGameState<ADWGameState>())
 	{
 		if(GameState->GetCurrentState() == EDWGameState::Playing)
 		{
@@ -482,9 +459,4 @@ void ADWPlayerController::PauseOrContinueGame()
 			UProcedureModuleBPLibrary::SwitchProcedureByClass<UProcedure_Playing>();
 		}
 	}
-}
-
-ADWCharacter* ADWPlayerController::GetProcessedCharacter() const
-{
-	return Cast<ADWCharacter>(GetPawn());
 }

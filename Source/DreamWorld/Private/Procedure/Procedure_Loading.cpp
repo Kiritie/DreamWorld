@@ -4,6 +4,7 @@
 #include "Procedure/Procedure_Loading.h"
 
 #include "Gameplay/DWGameState.h"
+#include "Global/GlobalBPLibrary.h"
 #include "Procedure/ProcedureModuleBPLibrary.h"
 #include "Procedure/Procedure_Playing.h"
 #include "SaveGame/DWGeneralSaveGame.h"
@@ -43,7 +44,7 @@ void UProcedure_Loading::OnEnter(UProcedureBase* InLastProcedure)
 {
 	Super::OnEnter(InLastProcedure);
 
-	if(ADWGameState* GameState = UGlobalBPLibrary::GetGameState<ADWGameState>(this))
+	if(ADWGameState* GameState = UGlobalBPLibrary::GetGameState<ADWGameState>())
 	{
 		GameState->SetCurrentState(EDWGameState::Loading);
 	}

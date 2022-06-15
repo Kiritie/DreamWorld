@@ -5,6 +5,7 @@
 
 #include "TimerManager.h"
 #include "Gameplay/DWGameState.h"
+#include "Global/GlobalBPLibrary.h"
 #include "Widget/WidgetMainMenu.h"
 #include "Widget/WidgetModuleBPLibrary.h"
 
@@ -35,7 +36,7 @@ void UProcedure_Initializing::OnEnter(UProcedureBase* InLastProcedure)
 {
 	Super::OnEnter(InLastProcedure);
 
-	if(ADWGameState* GameState = UGlobalBPLibrary::GetGameState<ADWGameState>(this))
+	if(ADWGameState* GameState = UGlobalBPLibrary::GetGameState<ADWGameState>())
 	{
 		GameState->SetCurrentState(EDWGameState::Initializing);
 	}

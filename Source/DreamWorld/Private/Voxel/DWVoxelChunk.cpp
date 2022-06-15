@@ -3,8 +3,9 @@
 
 #include "Voxel/DWVoxelChunk.h"
 
-#include "Ability/Character/CharacterDataBase.h"
-#include "Ability/Vitality/VitalityDataBase.h"
+#include "Ability/AbilityModuleBPLibrary.h"
+#include "Ability/Character/AbilityCharacterDataBase.h"
+#include "Ability/Vitality/AbilityVitalityDataBase.h"
 #include "Character/DWCharacter.h"
 #include "Character/DWCharacterData.h"
 #include "Character/Base/CharacterBase.h"
@@ -140,24 +141,24 @@ void ADWVoxelChunk::SpawnActors()
 		{
 			SpawnPickUp(ChunkData.PickUpDatas[i]);
 		}
-		for(int32 i = 0; i < ChunkData.CharacterDatas.Num(); i++)
-		{
-			SpawnCharacter(ChunkData.CharacterDatas[i]);
-		}
 		for(int32 i = 0; i < ChunkData.VitalityDatas.Num(); i++)
 		{
 			SpawnVitality(ChunkData.VitalityDatas[i]);
 		}
+		for(int32 i = 0; i < ChunkData.CharacterDatas.Num(); i++)
+		{
+			SpawnCharacter(ChunkData.CharacterDatas[i]);
+		}
 	}
 	else if(SolidMesh || SemiMesh)
 	{
-		if(FIndex::Distance(Index, AVoxelModule::GetWorldData<FDWVoxelWorldSaveData>()->LastVitalityRaceIndex) > 250.f / AVoxelModule::GetWorldData()->VitalityRaceDensity)
+		if(FIndex::Distance(Index, AVoxelModule::GetWorldData<FDWVoxelWorldSaveData>()->LastVitalityRaceIndex) > AVoxelModule::GetWorldData()->VitalityRaceDensity / AVoxelModule::GetWorldData()->GetChunkLength())
 		{
-			auto raceData = UDWHelper::RandomVitalityRaceData();
+			auto raceData = UAbilityModuleBPLibrary::RandomVitalityRaceData();
 			for(int32 i = 0; i < raceData.Items.Num(); i++)
 			{
 				const FAbilityItem& vitalityItem = raceData.Items[i];
-				const UVitalityDataBase& vitalityData = vitalityItem.GetData<UVitalityDataBase>();
+				const UAbilityVitalityDataBase& vitalityData = vitalityItem.GetData<UAbilityVitalityDataBase>();
 				for(int32 j = 0; j < vitalityItem.Count; j++)
 				{
 					for(int32 k = 0; k < 10; k++)
@@ -181,14 +182,14 @@ void ADWVoxelChunk::SpawnActors()
 				}
 			}
 		}
-		if(FIndex::Distance(Index, AVoxelModule::GetWorldData<FDWVoxelWorldSaveData>()->LastCharacterRaceIndex) > 300.f / AVoxelModule::GetWorldData()->CharacterRaceDensity)
+		if(FIndex::Distance(Index, AVoxelModule::GetWorldData<FDWVoxelWorldSaveData>()->LastCharacterRaceIndex) > AVoxelModule::GetWorldData()->CharacterRaceDensity / AVoxelModule::GetWorldData()->GetChunkLength())
 		{
 			ADWCharacter* captain = nullptr;
-			auto raceData = UDWHelper::RandomCharacterRaceData();
+			auto raceData = UAbilityModuleBPLibrary::RandomCharacterRaceData();
 			for(int32 i = 0; i < raceData.Items.Num(); i++)
 			{
 				const FAbilityItem& characterItem = raceData.Items[i];
-				const UCharacterDataBase& characterData = characterItem.GetData<UCharacterDataBase>();
+				const UAbilityCharacterDataBase& characterData = characterItem.GetData<UAbilityCharacterDataBase>();
 				for(int32 j = 0; j < characterItem.Count; j++)
 				{
 					for(int32 k = 0; k < 10; k++)
@@ -232,12 +233,6 @@ void ADWVoxelChunk::SpawnActors()
 void ADWVoxelChunk::DestroyActors()
 {
 	Super::DestroyActors();
-
-	for(int32 i = 0; i < PickUps.Num(); i++)
-	{
-		PickUps[i]->Destroy();
-	}
-	PickUps.Empty();
 
 	for(int32 i = 0; i < Characters.Num(); i++)
 	{

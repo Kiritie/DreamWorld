@@ -284,71 +284,6 @@ enum class EDWWeaponHandType : uint8
 	Both
 };
 
-/**
- * ???????
- */
-USTRUCT(BlueprintType)
-struct DREAMWORLD_API FDWRaceData : public FTableRowBase
-{
-	GENERATED_BODY()
-
-public:
-	UPROPERTY(BlueprintReadWrite)
-	FName ID;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	FName Name;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FString Detail;
-				
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float Proportion;
-
-	FORCEINLINE FDWRaceData()
-	{
-		ID = NAME_None;
-		Name = NAME_None;
-		Detail = TEXT("");
-		Proportion = 1;
-	}
-
-	FORCEINLINE bool IsValid() const
-	{
-		return !ID.IsNone();
-	}
-};
-
-USTRUCT(BlueprintType)
-struct DREAMWORLD_API FDWVitalityRaceData : public FDWRaceData
-{
-	GENERATED_BODY()
-
-public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TArray<FAbilityItem> Items;
-
-	FORCEINLINE FDWVitalityRaceData()
-	{
-		Items = TArray<FAbilityItem>();
-	}
-};
-
-USTRUCT(BlueprintType)
-struct DREAMWORLD_API FDWCharacterRaceData : public FDWRaceData
-{
-	GENERATED_BODY()
-
-public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TArray<FAbilityItem> Items;
-
-	FORCEINLINE FDWCharacterRaceData()
-	{
-		Items = TArray<FAbilityItem>();
-	}
-};
-
 USTRUCT(BlueprintType)
 struct DREAMWORLD_API FDWCharacterActionAbilityData : public FAbilityData
 {
@@ -884,4 +819,20 @@ enum class EDWCharacterPartType : uint8
 	Chest,
 	// 脚部
 	Foot
+};
+
+/**
+ * 交互选项
+ */
+UENUM(BlueprintType)
+enum class EDWInteractAction : uint8
+{
+	// 无
+	None = EInteractAction::None UMETA(DisplayName="无"),
+	// 喂食
+	Feed = EInteractAction::Custom3 UMETA(DisplayName="喂食"),
+	// 骑乘
+	Ride = EInteractAction::Custom4 UMETA(DisplayName="骑乘"),
+	// 取消骑乘
+	UnRide = EInteractAction::Custom5 UMETA(DisplayName="取消骑乘")
 };

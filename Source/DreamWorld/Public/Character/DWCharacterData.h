@@ -1,11 +1,11 @@
 #pragma once
 
-#include "Ability/Character/CharacterDataBase.h"
+#include "Ability/Character/AbilityCharacterDataBase.h"
 
 #include "DWCharacterData.generated.h"
 
 UCLASS(BlueprintType)
-class DREAMWORLD_API UDWCharacterData : public UCharacterDataBase
+class DREAMWORLD_API UDWCharacterData : public UAbilityCharacterDataBase
 {
 	GENERATED_BODY()
 

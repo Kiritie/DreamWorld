@@ -24,9 +24,6 @@ public:
 	virtual void OnPreparatory_Implementation() override;
 
 protected:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	class ADWPlayerCharacter* PlayerCharacter;
-
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Inputs")
 	bool bPressedSprint;
 
@@ -52,7 +49,7 @@ public:
 	bool RaycastFromAimPoint(FHitResult& OutHitResult, EDWGameTraceType InGameTraceType, float InRayDistance = 1000) const;
 
 protected:
-	virtual void OnJumpPressed();
+	virtual void OnJumpPressed(FKey Key);
 
 	virtual void OnJumpReleased();
 
@@ -95,11 +92,4 @@ protected:
 	virtual void SelectInventorySlot10();
 
 	virtual void PauseOrContinueGame();
-	
-public:
-	UFUNCTION(BlueprintPure)
-	class ADWPlayerCharacter* GetPlayerCharacter() const {return PlayerCharacter; }
-
-	UFUNCTION(BlueprintPure)
-	class ADWCharacter* GetProcessedCharacter() const;
 };

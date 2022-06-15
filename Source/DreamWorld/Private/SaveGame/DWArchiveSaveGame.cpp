@@ -5,6 +5,7 @@
 #include "Character/Player/DWPlayerCharacter.h"
 #include "Debug/DebugModuleTypes.h"
 #include "Gameplay/DWPlayerController.h"
+#include "Global/GlobalBPLibrary.h"
 #include "Kismet/GameplayStatics.h"
 #include "Main/MainModule.h"
 #include "SaveGame/DWGeneralSaveGame.h"
@@ -61,7 +62,7 @@ void UDWArchiveSaveGame::OnLoad_Implementation()
 		{
 			VoxelModule->LoadData(&SaveData.WorldData);
 		}
-		if(ADWPlayerController* PlayerController = UGlobalBPLibrary::GetPlayerController<ADWPlayerController>(GWorld))
+		if(ADWPlayerController* PlayerController = UGlobalBPLibrary::GetPlayerController<ADWPlayerController>())
 		{
 			PlayerController->LoadData(SaveData.PlayerData);
 		}
@@ -81,7 +82,7 @@ void UDWArchiveSaveGame::OnUnload_Implementation()
 		{
 			VoxelModule->UnloadData();
 		}
-		if(ADWPlayerController* PlayerController = UGlobalBPLibrary::GetPlayerController<ADWPlayerController>(GWorld))
+		if(ADWPlayerController* PlayerController = UGlobalBPLibrary::GetPlayerController<ADWPlayerController>())
 		{
 			PlayerController->UnloadData();
 		}
@@ -92,7 +93,7 @@ void UDWArchiveSaveGame::OnRefresh_Implementation()
 {
 	Super::OnRefresh_Implementation();
 	
-	if(ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>(GWorld))
+	if(ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>())
 	{
 		SaveData.PlayerData = *static_cast<FDWPlayerSaveData*>(PlayerCharacter->ToData());
 	}

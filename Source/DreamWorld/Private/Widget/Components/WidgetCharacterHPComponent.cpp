@@ -40,7 +40,7 @@ void UWidgetCharacterHPComponent::RefreshVisibility() const
 {
 	if(GetUserWidgetObject())
 	{
-		ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>(this);
+		ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>();
 		if(!OwnerCharacter->IsDead() && PlayerCharacter && FVector::Distance(OwnerCharacter->GetActorLocation(), PlayerCharacter->GetActorLocation()) < 1000)
 		{
 			GetUserWidgetObject()->SetVisibility(ESlateVisibility::SelfHitTestInvisible);

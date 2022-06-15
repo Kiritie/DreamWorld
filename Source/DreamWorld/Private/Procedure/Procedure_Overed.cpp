@@ -4,6 +4,7 @@
 #include "Procedure/Procedure_Overed.h"
 
 #include "Gameplay/DWGameState.h"
+#include "Global/GlobalBPLibrary.h"
 
 UProcedure_Overed::UProcedure_Overed()
 {
@@ -32,7 +33,7 @@ void UProcedure_Overed::OnEnter(UProcedureBase* InLastProcedure)
 {
 	Super::OnEnter(InLastProcedure);
 
-	if(ADWGameState* GameState = UGlobalBPLibrary::GetGameState<ADWGameState>(this))
+	if(ADWGameState* GameState = UGlobalBPLibrary::GetGameState<ADWGameState>())
 	{
 		GameState->SetCurrentState(EDWGameState::Overed);
 	}

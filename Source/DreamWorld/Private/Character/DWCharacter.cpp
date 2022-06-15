@@ -37,10 +37,10 @@
 #include "Ability/Item/Equip/Weapon/DWEquipWeapon.h"
 #include "Ability/Item/Equip/Weapon/DWEquipWeaponData.h"
 #include "Ability/Item/Prop/DWPropData.h"
-#include "Ability/Item/Prop/PropDataBase.h"
+#include "Ability/Item/Prop/AbilityPropDataBase.h"
 #include "Ability/Item/Skill/AbilitySkillBase.h"
 #include "Ability/Item/Skill/DWSkillData.h"
-#include "Ability/Item/Skill/SkillDataBase.h"
+#include "Ability/Item/Skill/AbilitySkillDataBase.h"
 #include "Asset/AssetModuleBPLibrary.h"
 #include "BehaviorTree/BehaviorTree.h"
 #include "BehaviorTree/BlackboardData.h"
@@ -379,7 +379,7 @@ void ADWCharacter::LoadData(FSaveData* InSaveData)
 
 		FallingAttackAbility.AbilityHandle = AcquireAbility(FallingAttackAbility.AbilityClass, FallingAttackAbility.AbilityLevel);
 
-		DefaultAbility.AbilityHandle = AcquireAbility(GetCharacterData().AbilityClass, DefaultAbility.AbilityLevel);
+		DefaultAbility.AbilityHandle = AcquireAbility(GetCharacterData<UDWCharacterData>().AbilityClass, DefaultAbility.AbilityLevel);
 		ActiveAbility(DefaultAbility.AbilityHandle);
 
 		UGlobalBPLibrary::LoadObjectFromMemory(this, SaveData.Datas);
@@ -1038,7 +1038,7 @@ bool ADWCharacter::SkillAttack(const FPrimaryAssetId& InSkillID)
 		if (HasSkillAbility(InSkillID))
 		{
 			const auto AbilityData = GetSkillAbility(InSkillID);
-			switch(AbilityData.GetItemData<USkillDataBase>().SkillMode)
+			switch(AbilityData.GetItemData<UAbilitySkillDataBase>().SkillMode)
 			{
 				case ESkillMode::Initiative:
 				{
@@ -1110,11 +1110,11 @@ void ADWCharacter::AttackStart()
 			}
 			case EDWAttackType::SkillAttack:
 			{
-				if (GetSkillAbility(SkillAbilityID).GetItemData<USkillDataBase>().SkillClass != nullptr)
+				if (GetSkillAbility(SkillAbilityID).GetItemData<UAbilitySkillDataBase>().SkillClass != nullptr)
 				{
 					FActorSpawnParameters spawnParams = FActorSpawnParameters();
 					spawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-					AAbilitySkillBase* tmpSkill = GetWorld()->SpawnActor<AAbilitySkillBase>(GetSkillAbility(SkillAbilityID).GetItemData<USkillDataBase>().SkillClass, spawnParams);
+					AAbilitySkillBase* tmpSkill = GetWorld()->SpawnActor<AAbilitySkillBase>(GetSkillAbility(SkillAbilityID).GetItemData<UAbilitySkillDataBase>().SkillClass, spawnParams);
 					if(tmpSkill) tmpSkill->Initialize(this, SkillAbilityID);
 				}
 				break;
@@ -1291,7 +1291,7 @@ bool ADWCharacter::GenerateVoxel(const FVoxelHitResult& InVoxelHitResult, FAbili
 		{
 			const FVoxelItem _voxelItem = FVoxelItem(InItem.ID);
 
-			//FRotator rotation = (Owner->VoxelIndexToLocation(index) + tmpVoxel->GetData<UVoxelData>().GetCeilRange() * 0.5f * AVoxelModule::GetWorldInfo().BlockSize - UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>(this)->GetActorLocation()).ToOrientationRotator();
+			//FRotator rotation = (Owner->VoxelIndexToLocation(index) + tmpVoxel->GetData<UVoxelData>().GetCeilRange() * 0.5f * AVoxelModule::GetWorldInfo().BlockSize - UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>()->GetActorLocation()).ToOrientationRotator();
 			//rotation = FRotator(FRotator::ClampAxis(FMath::RoundToInt(rotation.Pitch / 90) * 90.f), FRotator::ClampAxis(FMath::RoundToInt(rotation.Yaw / 90) * 90.f), FRotator::ClampAxis(FMath::RoundToInt(rotation.Roll / 90) * 90.f));
 			//tmpVoxel->Rotation = rotation;
 
@@ -1334,7 +1334,7 @@ void ADWCharacter::RefreshEquip(EDWEquipPartType InPartType, UInventoryEquipSlot
 	{
 		FActorSpawnParameters spawnParams = FActorSpawnParameters();
 		spawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-		Equips[InPartType] = GetWorld()->SpawnActor<AAbilityEquipBase>(EquipSlot->GetItem().GetData<UEquipDataBase>().EquipClass, spawnParams);
+		Equips[InPartType] = GetWorld()->SpawnActor<AAbilityEquipBase>(EquipSlot->GetItem().GetData<UAbilityEquipDataBase>().EquipClass, spawnParams);
 		if (Equips[InPartType])
 		{
 			Equips[InPartType]->Initialize(this);
@@ -1956,7 +1956,7 @@ FDWCharacterSkillAbilityData ADWCharacter::GetSkillAbility(ESkillType InSkillTyp
 		TArray<FDWCharacterSkillAbilityData> Abilities = TArray<FDWCharacterSkillAbilityData>();
 		for (auto Iter : SkillAbilities)
 		{
-			if(Iter.Value.GetItemData<USkillDataBase>().SkillType == InSkillType)
+			if(Iter.Value.GetItemData<UAbilitySkillDataBase>().SkillType == InSkillType)
 			{
 				Abilities.Add(Iter.Value);
 			}

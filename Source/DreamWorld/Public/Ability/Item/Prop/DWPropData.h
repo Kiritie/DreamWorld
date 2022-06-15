@@ -1,11 +1,11 @@
 #pragma once
 
-#include "Ability/Item/Prop/PropDataBase.h"
+#include "Ability/Item/Prop/AbilityPropDataBase.h"
 
 #include "DWPropData.generated.h"
 
 UCLASS(BlueprintType)
-class DREAMWORLD_API UDWPropData : public UPropDataBase
+class DREAMWORLD_API UDWPropData : public UAbilityPropDataBase
 {
 	GENERATED_BODY()
 

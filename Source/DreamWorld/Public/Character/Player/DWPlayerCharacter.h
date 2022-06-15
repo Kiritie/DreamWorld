@@ -128,11 +128,11 @@ public:
 	virtual void OnLeaveInteract(IInteractionAgentInterface* InInteractionAgent) override;
 
 protected:
-	virtual void MoveForward(float InValue, bool b2DMode) override;
+	virtual void MoveForward_Implementation(float InValue) override;
 
-	virtual void MoveRight(float InValue, bool b2DMode) override;
+	virtual void MoveRight_Implementation(float InValue) override;
 
-	virtual void MoveUp(float InValue, bool b2DMode) override;
+	virtual void MoveUp_Implementation(float InValue) override;
 	
 	virtual void ToggleControlMode();
 

@@ -18,13 +18,6 @@ UCLASS()
 class DREAMWORLD_API UDWHelper : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
-	
-	//////////////////////////////////////////////////////////////////////////
-	// Race
-public:
-	static FDWVitalityRaceData RandomVitalityRaceData();
-	
-	static FDWCharacterRaceData RandomCharacterRaceData();
 
 	//////////////////////////////////////////////////////////////////////////
 	// Trace

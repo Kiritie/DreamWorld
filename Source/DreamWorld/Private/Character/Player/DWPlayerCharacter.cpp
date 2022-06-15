@@ -456,7 +456,7 @@ void ADWPlayerCharacter::OnLeaveInteract(IInteractionAgentInterface* InInteracti
 	UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>()->RefreshActions();
 }
 
-void ADWPlayerCharacter::MoveForward(float InValue, bool b2DMode)
+void ADWPlayerCharacter::MoveForward_Implementation(float InValue)
 {
 	if(bBreakAllInput) return;
 
@@ -474,7 +474,7 @@ void ADWPlayerCharacter::MoveForward(float InValue, bool b2DMode)
 	AddMovementInput(Direction, InValue);
 }
 
-void ADWPlayerCharacter::MoveRight(float InValue, bool b2DMode)
+void ADWPlayerCharacter::MoveRight_Implementation(float InValue)
 {
 	if(bBreakAllInput) return;
 	
@@ -484,7 +484,7 @@ void ADWPlayerCharacter::MoveRight(float InValue, bool b2DMode)
 	AddMovementInput(Direction, InValue);
 }
 
-void ADWPlayerCharacter::MoveUp(float InValue, bool b2DMode)
+void ADWPlayerCharacter::MoveUp_Implementation(float InValue)
 {
 	if(bBreakAllInput) return;
 	
