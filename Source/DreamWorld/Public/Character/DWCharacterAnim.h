@@ -22,9 +22,6 @@ public:
 	
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CharacterStates")
-	bool bFalling;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CharacterStates")
 	bool bSprinting;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CharacterStates")
@@ -34,29 +31,11 @@ public:
 	bool bDefending;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CharacterStates")
-	bool bFlying;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CharacterStates")
 	bool bRiding;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CharacterStates")
 	bool bClimbing;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CharacterStates")
-	bool bCrouching;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CharacterStates")
-	bool bSwimming;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CharacterStats")
-	float MoveDirection;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CharacterStats")
-	float HorizontalSpeed;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CharacterStats")
-	float VerticalSpeed;
-	
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Default")
 	ADWCharacter* OwnerCharacter;
