@@ -148,35 +148,40 @@ void ADWPlayerController::LoadData(FDWPlayerSaveData InPlayerData)
 		NewPlayerCharacter->Disable(true, true);
 		NewPlayerCharacter->LoadData(&InPlayerData);
 
-		Possess(NewPlayerCharacter);
+		SetPlayerPawn(NewPlayerCharacter);
+
+		//Possess(NewPlayerCharacter);
 
 		if(!InPlayerData.bSaved)
 		{
-			auto VoxelDatas = UAssetModuleBPLibrary::LoadPrimaryAssetRefs<UVoxelData>(UAbilityModuleBPLibrary::GetAssetTypeByItemType(EAbilityItemType::Voxel));
+			auto VoxelDatas = UAssetModuleBPLibrary::LoadPrimaryAssets<UVoxelData>(UAbilityModuleBPLibrary::GetAssetTypeByItemType(EAbilityItemType::Voxel));
 			for (int32 i = 0; i < VoxelDatas.Num(); i++)
 			{
-				FAbilityItem tmpItem = FAbilityItem(VoxelDatas[i].GetPrimaryAssetId(), VoxelDatas[i].MaxCount);
-				NewPlayerCharacter->GetInventory()->AdditionItemByRange(tmpItem);
+				if(VoxelDatas[i]->VoxelType != EVoxelType::Empty && VoxelDatas[i]->VoxelType != EVoxelType::Unknown)
+				{
+					FAbilityItem tmpItem = FAbilityItem(VoxelDatas[i]->GetPrimaryAssetId(), VoxelDatas[i]->MaxCount);
+					NewPlayerCharacter->GetInventory()->AdditionItemByRange(tmpItem);
+				}
 			}
 			
-			auto EquipDatas = UAssetModuleBPLibrary::LoadPrimaryAssetRefs<UAbilityEquipDataBase>(UAbilityModuleBPLibrary::GetAssetTypeByItemType(EAbilityItemType::Equip));
+			auto EquipDatas = UAssetModuleBPLibrary::LoadPrimaryAssets<UAbilityEquipDataBase>(UAbilityModuleBPLibrary::GetAssetTypeByItemType(EAbilityItemType::Equip));
 			for (int32 i = 0; i < EquipDatas.Num(); i++)
 			{
-				FAbilityItem tmpItem = FAbilityItem(EquipDatas[i].GetPrimaryAssetId(), EquipDatas[i].MaxCount);
+				FAbilityItem tmpItem = FAbilityItem(EquipDatas[i]->GetPrimaryAssetId(), EquipDatas[i]->MaxCount);
 				NewPlayerCharacter->GetInventory()->AdditionItemByRange(tmpItem);
 			}
 			
-			auto PropDatas = UAssetModuleBPLibrary::LoadPrimaryAssetRefs<UAbilityPropDataBase>(UAbilityModuleBPLibrary::GetAssetTypeByItemType(EAbilityItemType::Prop));
+			auto PropDatas = UAssetModuleBPLibrary::LoadPrimaryAssets<UAbilityPropDataBase>(UAbilityModuleBPLibrary::GetAssetTypeByItemType(EAbilityItemType::Prop));
 			for (int32 i = 0; i < PropDatas.Num(); i++)
 			{
-				FAbilityItem tmpItem = FAbilityItem(PropDatas[i].GetPrimaryAssetId(), PropDatas[i].MaxCount);
+				FAbilityItem tmpItem = FAbilityItem(PropDatas[i]->GetPrimaryAssetId(), PropDatas[i]->MaxCount);
 				NewPlayerCharacter->GetInventory()->AdditionItemByRange(tmpItem);
 			}
-			
-			auto SkillDatas = UAssetModuleBPLibrary::LoadPrimaryAssetRefs<UAbilitySkillDataBase>(UAbilityModuleBPLibrary::GetAssetTypeByItemType(EAbilityItemType::Skill));
+
+			auto SkillDatas = UAssetModuleBPLibrary::LoadPrimaryAssets<UAbilitySkillDataBase>(UAbilityModuleBPLibrary::GetAssetTypeByItemType(EAbilityItemType::Skill));
 			for (int32 i = 0; i < SkillDatas.Num(); i++)
 			{
-				FAbilityItem tmpItem = FAbilityItem(SkillDatas[i].GetPrimaryAssetId(), SkillDatas[i].MaxCount);
+				FAbilityItem tmpItem = FAbilityItem(SkillDatas[i]->GetPrimaryAssetId(), SkillDatas[i]->MaxCount);
 				NewPlayerCharacter->GetInventory()->AdditionItemByRange(tmpItem);
 			}
 		}

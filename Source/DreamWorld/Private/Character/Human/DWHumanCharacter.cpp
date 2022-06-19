@@ -3,7 +3,6 @@
 
 #include "Character/Human/DWHumanCharacter.h"
 
-#include "Ability/Item/Equip/Weapon/DWEquipWeapon.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/StaticMeshComponent.h"
@@ -12,6 +11,7 @@
 #include "Character/Human/DWHumanCharacterAnim.h"
 #include "BehaviorTree/BehaviorTree.h"
 #include "AI/DWAIBlackboard.h"
+#include "Item/Equip/Weapon/DWEquipWeapon.h"
 
 ADWHumanCharacter::ADWHumanCharacter()
 {

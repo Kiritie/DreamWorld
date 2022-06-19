@@ -41,4 +41,7 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void SetSaveData(const FDWArchiveSaveData& InSaveData) { this->SaveData = InSaveData; }
+
+	UFUNCTION(BlueprintPure)
+	bool IsPreview() const { return SaveIndex == -1; }
 };

@@ -4,7 +4,6 @@
 #include "Character/Monster/DWMonsterCharacter.h"
 
 #include "Ability/Components/CharacterInteractionComponent.h"
-#include "Ability/Item/Prop/DWPropData.h"
 #include "Ability/Item/Prop/AbilityPropDataBase.h"
 #include "Components/BoxComponent.h"
 #include "BehaviorTree/BehaviorTree.h"
@@ -13,6 +12,7 @@
 #include "Character/Human/DWHumanCharacter.h"
 #include "Inventory/Inventory.h"
 #include "Inventory/Slot/InventorySlot.h"
+#include "Item/Prop/DWPropData.h"
 #include "Voxel/Datas/VoxelData.h"
 
 ADWMonsterCharacter::ADWMonsterCharacter()
@@ -25,7 +25,7 @@ ADWMonsterCharacter::ADWMonsterCharacter()
 	AttackPoint->SetRelativeLocationAndRotation(FVector(0, 0, 0), FRotator(0, 0, 0));
 	AttackPoint->SetRelativeScale3D(FVector(1, 1, 1));
 	AttackPoint->SetBoxExtent(FVector(20, 20, 20));
-	AttackPoint->SetCollisionProfileName(TEXT("DW_Weapon"));
+	AttackPoint->SetCollisionProfileName(TEXT("Weapon"));
 	AttackPoint->SetGenerateOverlapEvents(false);
 	AttackPoint->OnComponentBeginOverlap.AddDynamic(this, &ADWMonsterCharacter::OnAttackPointOverlap);
 

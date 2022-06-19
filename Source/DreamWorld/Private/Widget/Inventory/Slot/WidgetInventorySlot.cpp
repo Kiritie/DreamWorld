@@ -3,7 +3,7 @@
 
 #include "Widget/Inventory/Slot/WidgetInventorySlot.h"
 
-#include "Ability/Item/ItemDataBase.h"
+#include "Ability/Item/AbilityItemDataBase.h"
 #include "Blueprint/DragDropOperation.h"
 #include "Components/Border.h"
 #include "Components/Image.h"

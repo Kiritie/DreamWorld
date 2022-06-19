@@ -3,7 +3,7 @@
 
 #include "Widget/Inventory/WidgetInventoryBar.h"
 
-#include "Ability/Item/ItemDataBase.h"
+#include "Ability/Item/AbilityItemDataBase.h"
 #include "Blueprint/WidgetBlueprintLibrary.h"
 #include "Widget/Inventory/Slot/WidgetInventorySlot.h"
 #include "Character/Player/DWPlayerCharacter.h"

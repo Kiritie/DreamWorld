@@ -3,7 +3,7 @@
 
 #include "Inventory/Slot/InventoryEquipSlot.h"
 
-#include "Ability/Item/Equip/DWEquipData.h"
+#include "Item/Equip/DWEquipData.h"
 #include "Inventory/Inventory.h"
 #include "Character/DWCharacter.h"
 

@@ -55,7 +55,8 @@ void ADWVoxelModule::OnRefresh_Implementation(float DeltaSeconds)
 	switch (UGlobalBPLibrary::GetGameState<ADWGameState>()->GetCurrentState())
 	{
 		case EDWGameState::Starting:
-		case EDWGameState::Preparing:
+		case EDWGameState::ArchiveChoosing:
+		case EDWGameState::ArchiveCreating:
 		case EDWGameState::Loading:
 		{
 			GenerateTerrain();
@@ -87,8 +88,6 @@ void ADWVoxelModule::OnTermination_Implementation()
 
 void ADWVoxelModule::OnWorldStateChanged()
 {
-	Super::OnWorldStateChanged();
-	
 	switch(WorldState)
 	{
 		case EVoxelWorldState::BasicGenerated:
@@ -111,6 +110,8 @@ void ADWVoxelModule::OnWorldStateChanged()
 		}
 		default: break;
 	}
+
+	Super::OnWorldStateChanged();
 }
 
 void ADWVoxelModule::LoadData(FSaveData* InWorldData)

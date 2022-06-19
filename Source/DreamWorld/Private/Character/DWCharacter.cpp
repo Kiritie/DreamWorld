@@ -31,15 +31,15 @@
 #include "Ability/Character/DWCharacterAttributeSet.h"
 #include "Ability/Character/DWCharacterSkillAbility.h"
 #include "Ability/Item/ItemAbilityBase.h"
-#include "Ability/Item/Equip/Armor/DWEquipArmor.h"
-#include "Ability/Item/Equip/Shield/DWEquipShield.h"
-#include "Ability/Item/Equip/Shield/DWEquipShieldData.h"
-#include "Ability/Item/Equip/Weapon/DWEquipWeapon.h"
-#include "Ability/Item/Equip/Weapon/DWEquipWeaponData.h"
-#include "Ability/Item/Prop/DWPropData.h"
+#include "Ability/Item/Equip/AbilityEquipDataBase.h"
+#include "Item/Equip/Armor/DWEquipArmor.h"
+#include "Item/Equip/Shield/DWEquipShield.h"
+#include "Item/Equip/Shield/DWEquipShieldData.h"
+#include "Item/Equip/Weapon/DWEquipWeapon.h"
+#include "Item/Equip/Weapon/DWEquipWeaponData.h"
+#include "Item/Prop/DWPropData.h"
 #include "Ability/Item/Prop/AbilityPropDataBase.h"
 #include "Ability/Item/Skill/AbilitySkillBase.h"
-#include "Ability/Item/Skill/DWSkillData.h"
 #include "Ability/Item/Skill/AbilitySkillDataBase.h"
 #include "Asset/AssetModuleBPLibrary.h"
 #include "BehaviorTree/BehaviorTree.h"
@@ -47,6 +47,7 @@
 #include "Character/DWCharacterData.h"
 #include "Inventory/Slot/InventoryEquipSlot.h"
 #include "Inventory/Slot/InventorySkillSlot.h"
+#include "Item/Prop/DWPropData.h"
 #include "Main/MainModuleBPLibrary.h"
 #include "Scene/Actor/PickUp/PickUp.h"
 #include "Team/DWTeamModule.h"
@@ -78,7 +79,7 @@ ADWCharacter::ADWCharacter()
 
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96);
-	GetCapsuleComponent()->SetCollisionProfileName(TEXT("DW_Character"));
+	GetCapsuleComponent()->SetCollisionProfileName(TEXT("Character"));
 	GetCapsuleComponent()->CanCharacterStepUpOn = ECanBeCharacterBase::ECB_No;
 
 	GetMesh()->SetRelativeLocationAndRotation(FVector(0, 0, -90), FRotator(0, -90, 0));
@@ -1115,7 +1116,7 @@ void ADWCharacter::AttackStart()
 					FActorSpawnParameters spawnParams = FActorSpawnParameters();
 					spawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 					AAbilitySkillBase* tmpSkill = GetWorld()->SpawnActor<AAbilitySkillBase>(GetSkillAbility(SkillAbilityID).GetItemData<UAbilitySkillDataBase>().SkillClass, spawnParams);
-					if(tmpSkill) tmpSkill->Initialize(this, SkillAbilityID);
+					if(tmpSkill) tmpSkill->Initialize(this, FAbilityItem(SkillAbilityID));
 				}
 				break;
 			}
@@ -2050,7 +2051,7 @@ bool ADWCharacter::HasSkillAbility(ESkillType InSkillType, int32 InAbilityIndex)
 	TArray<FDWCharacterSkillAbilityData> Abilities = TArray<FDWCharacterSkillAbilityData>();
 	for (auto Iter : SkillAbilities)
 	{
-		if(Iter.Value.GetItemData<UDWSkillData>().SkillType == InSkillType)
+		if(Iter.Value.GetItemData<UAbilitySkillDataBase>().SkillType == InSkillType)
 		{
 			Abilities.Add(Iter.Value);
 		}

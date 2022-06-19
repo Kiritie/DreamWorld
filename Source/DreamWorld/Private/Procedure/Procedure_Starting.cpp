@@ -3,6 +3,8 @@
 
 #include "Procedure/Procedure_Starting.h"
 
+#include "Camera/CameraModuleBPLibrary.h"
+#include "Camera/Roam/RoamCameraPawn.h"
 #include "Character/Player/DWPlayerCharacter.h"
 #include "Gameplay/DWGameState.h"
 #include "Global/GlobalBPLibrary.h"
@@ -40,8 +42,6 @@ void UProcedure_Starting::OnInitialize()
 
 void UProcedure_Starting::OnEnter(UProcedureBase* InLastProcedure)
 {
-	Super::OnEnter(InLastProcedure);
-	
 	if(ADWGameState* GameState = UGlobalBPLibrary::GetGameState<ADWGameState>())
 	{
 		GameState->SetCurrentState(EDWGameState::Starting);
@@ -84,6 +84,10 @@ void UProcedure_Starting::OnEnter(UProcedureBase* InLastProcedure)
 			PlayerCharacter->Disable(true);
 		}
 	}
+
+	UCameraModuleBPLibrary::SwitchCameraByClass<ARoamCameraPawn>();
+
+	Super::OnEnter(InLastProcedure);
 }
 
 void UProcedure_Starting::OnRefresh()

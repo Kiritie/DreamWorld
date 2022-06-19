@@ -13,7 +13,7 @@ UDWCharacterPart::UDWCharacterPart(const FObjectInitializer& ObjectInitializer) 
 {
 	PrimaryComponentTick.bCanEverTick = true;
 	
-	UPrimitiveComponent::SetCollisionProfileName(TEXT("DW_CharacterPart"));
+	UPrimitiveComponent::SetCollisionProfileName(TEXT("CharacterPart"));
 	InitBoxExtent(FVector(15, 15, 15));
 
 	CharacterPartType = EDWCharacterPartType::None;

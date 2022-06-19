@@ -6,14 +6,6 @@
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "DWHelper.generated.h"
 
-UENUM(BlueprintType)
-enum class EDebugType : uint8
-{
-	Screen,
-	Console,
-	Both
-};
-
 UCLASS()
 class DREAMWORLD_API UDWHelper : public UBlueprintFunctionLibrary
 {

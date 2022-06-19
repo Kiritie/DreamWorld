@@ -3,10 +3,10 @@
 #include "Character/Player/DWPlayerCharacter.h"
 
 #include "Ability/Components/InteractionComponent.h"
-#include "Ability/Item/Equip/Shield/DWEquipShield.h"
-#include "Ability/Item/Equip/Weapon/DWEquipWeapon.h"
+#include "Item/Equip/Shield/DWEquipShield.h"
+#include "Item/Equip/Weapon/DWEquipWeapon.h"
 #include "Asset/AssetModuleBPLibrary.h"
-#include "Ability/Item/ItemDataBase.h"
+#include "Ability/Item/AbilityItemDataBase.h"
 #include "Character/Player/DWPlayerCharacterAnim.h"
 #include "Gameplay/DWPlayerController.h"
 #include "Camera/CameraComponent.h"
@@ -48,7 +48,7 @@ ADWPlayerCharacter::ADWPlayerCharacter()
 
 	GetCapsuleComponent()->SetCapsuleHalfHeight(69);
 	GetCapsuleComponent()->SetCapsuleRadius(24);
-	GetCapsuleComponent()->SetCollisionProfileName(FName("DW_Character"));
+	GetCapsuleComponent()->SetCollisionProfileName(FName("Character"));
 
 	// Configure character movement
 	GetCharacterMovement()->bOrientRotationToMovement = true; // Character moves in the direction of input...	
