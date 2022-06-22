@@ -34,7 +34,7 @@ public:
 protected:
 	UPROPERTY()
 	FDWArchiveSaveData SaveData;
-	
+
 public:
 	UFUNCTION(BlueprintPure)
 	FDWArchiveSaveData& GetSaveData() { return SaveData; }

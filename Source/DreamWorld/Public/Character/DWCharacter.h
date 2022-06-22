@@ -37,6 +37,8 @@ class UDWAIBlackboard;
 class UInventorySlot;
 class AAbilitySkillBase;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnCharacterActive);
+
 /**
  * 角色
  */
@@ -155,6 +157,10 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	UCharacterInventory* Inventory;
+	
+public:
+	UPROPERTY(BlueprintAssignable)
+	FOnCharacterActive OnCharacterActive;
 
 protected:
 	float DefaultGravityScale;

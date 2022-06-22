@@ -36,10 +36,7 @@ void UProcedure_Initializing::OnEnter(UProcedureBase* InLastProcedure)
 {
 	Super::OnEnter(InLastProcedure);
 
-	if(ADWGameState* GameState = UGlobalBPLibrary::GetGameState<ADWGameState>())
-	{
-		GameState->SetCurrentState(EDWGameState::Initializing);
-	}
+	UGlobalBPLibrary::GetGameState<ADWGameState>()->SetCurrentState(EDWGameState::Initializing);
 
 	UWidgetModuleBPLibrary::CreateUserWidget<UWidgetMainMenu>();
 }

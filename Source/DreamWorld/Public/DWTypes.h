@@ -749,7 +749,6 @@ public:
 
 	UPROPERTY()
 	TMap<int32, FDWArchiveBasicSaveData> ArchiveBasicDatas;
-	
 };
 
 /**

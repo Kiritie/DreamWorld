@@ -4,9 +4,9 @@
 #include "Procedure/Procedure_ArchiveCreating.h"
 
 #include "Camera/CameraModuleBPLibrary.h"
+#include "Character/CharacterModuleBPLibrary.h"
 #include "Character/Player/DWPlayerCharacter.h"
 #include "Event/EventModuleBPLibrary.h"
-#include "Event/Handle/Voxel/EventHandle_ChangeVoxelWorldState.h"
 #include "Gameplay/DWGameState.h"
 #include "Gameplay/DWPlayerController.h"
 #include "Global/GlobalBPLibrary.h"
@@ -41,23 +41,22 @@ void UProcedure_ArchiveCreating::OnUnGenerate()
 void UProcedure_ArchiveCreating::OnInitialize()
 {
 	Super::OnInitialize();
-
-	UEventModuleBPLibrary::SubscribeEvent<UEventHandle_ChangeVoxelWorldState>(this, FName("OnChangeVoxelWorldState"));
 }
 
 void UProcedure_ArchiveCreating::OnEnter(UProcedureBase* InLastProcedure)
 {
-	OperationTarget = UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>();
+	if(ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>())
+	{
+		OperationTarget = PlayerCharacter;
+		PlayerCharacter->SetActorHiddenInGame(false);
+		PlayerCharacter->OnCharacterActive.AddDynamic(this, &UProcedure_ArchiveCreating::ResetCameraView);
+	}
 	
 	Super::OnEnter(InLastProcedure);
 	
-	if(ADWGameState* GameState = UGlobalBPLibrary::GetGameState<ADWGameState>())
-	{
-		GameState->SetCurrentState(EDWGameState::ArchiveCreating);
-	}
+	UGlobalBPLibrary::GetGameState<ADWGameState>()->SetCurrentState(EDWGameState::ArchiveCreating);
 
 	UWidgetModuleBPLibrary::OpenUserWidget<UWidgetArchiveCreatingPanel>();
-
 	UWidgetModuleBPLibrary::CreateUserWidget<UWidgetLoadingPanel>();
 }
 
@@ -74,28 +73,16 @@ void UProcedure_ArchiveCreating::OnGuide()
 void UProcedure_ArchiveCreating::OnLeave(UProcedureBase* InNextProcedure)
 {
 	Super::OnLeave(InNextProcedure);
+
+	if(ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>())
+	{
+		PlayerCharacter->OnCharacterActive.RemoveDynamic(this, &UProcedure_ArchiveCreating::ResetCameraView);
+	}
 }
 
 void UProcedure_ArchiveCreating::CreateArchive(FDWArchiveSaveData InArchiveSaveData)
 {
 	USaveGameModuleBPLibrary::GetSaveGame<UDWArchiveSaveGame>()->SetSaveData(InArchiveSaveData);
 
-	UCameraModuleBPLibrary::SwitchCameraByClass(nullptr);
-
-	UGlobalBPLibrary::GetPlayerController<ADWPlayerController>()->Possess(UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>());
-	
 	UProcedureModuleBPLibrary::SwitchProcedureByClass<UProcedure_Loading>();
-}
-
-void UProcedure_ArchiveCreating::OnChangeVoxelWorldState(UObject* InSender, UEventHandle_ChangeVoxelWorldState* InEventHandle)
-{
-	switch(InEventHandle->WorldState)
-	{
-		case EVoxelWorldState::BasicGenerated:
-		{
-			ResetCameraView();
-			break;
-		}
-		default: break;
-	}
 }

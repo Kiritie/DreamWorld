@@ -33,6 +33,7 @@
 #include "Input/InputModuleBPLibrary.h"
 #include "Widget/WidgetGameHUD.h"
 #include "Inventory/Slot/InventoryEquipSlot.h"
+#include "Voxel/DWVoxelModule.h"
 #include "Voxel/VoxelModule.h"
 #include "Voxel/Chunks/VoxelChunk.h"
 #include "Voxel/Voxels/Voxel.h"
@@ -224,6 +225,20 @@ void ADWPlayerCharacter::Tick(float DeltaTime)
 			}
 		}
 	}
+	else
+	{
+		FHitResult hitResult;
+		const FVector rayStart = FVector(GetActorLocation().X, GetActorLocation().Y, ADWVoxelModule::GetWorldData()->ChunkHeightRange * ADWVoxelModule::GetWorldData()->GetChunkLength() + 500);
+		const FVector rayEnd = FVector(GetActorLocation().X, GetActorLocation().Y, 0);
+		if (AMainModule::GetModuleByClass<AVoxelModule>()->ChunkTraceSingle(rayStart, rayEnd, GetRadius(), GetHalfHeight(), hitResult))
+		{
+			if(GetActorLocation().Size2D() < 1.f)
+			{
+				SetActorLocation(hitResult.Location);
+			}
+		}
+		Active();
+	}
 }
 
 void ADWPlayerCharacter::LoadData(FSaveData* InSaveData)
@@ -231,7 +246,6 @@ void ADWPlayerCharacter::LoadData(FSaveData* InSaveData)
 	Super::LoadData(InSaveData);
 
 	auto SaveData = *static_cast<FDWPlayerSaveData*>(InSaveData);
-	
 }
 
 FSaveData* ADWPlayerCharacter::ToData(bool bSaved)
@@ -287,9 +301,9 @@ void ADWPlayerCharacter::ResetData(bool bRefresh)
 	bPressedAttack = false;
 	bPressedDefend = false;
 	LockedTarget = nullptr;
-	if(GetPlayerController())
+	if(GetController<ADWPlayerController>())
 	{
-		GetPlayerController()->ResetData();
+		GetController<ADWPlayerController>()->ResetData();
 	}
 }
 
@@ -322,7 +336,7 @@ void ADWPlayerCharacter::LookAtTarget(ADWCharacter* InTargetCharacter)
 	Super::LookAtTarget(InTargetCharacter);
 	const FVector tmpDirection = InTargetCharacter->GetActorLocation() + FVector::DownVector * InTargetCharacter->GetHalfHeight() - GetActorLocation();
 	const FRotator tmpRotator = tmpDirection.ToOrientationRotator();
-	GetPlayerController()->SetControlRotation(tmpRotator);
+	GetController<ADWPlayerController>()->SetControlRotation(tmpRotator);
 }
 
 FString ADWPlayerCharacter::GetHeadInfo() const
@@ -422,10 +436,10 @@ void ADWPlayerCharacter::UpdateVoxelMesh()
 
 bool ADWPlayerCharacter::RaycastVoxel(FVoxelHitResult& OutHitResult)
 {
-	if(GetPlayerController() != nullptr)
+	if(GetController<ADWPlayerController>())
 	{
 		FHitResult hitResult;
-		if(GetPlayerController()->RaycastFromAimPoint(hitResult, EDWGameTraceType::Voxel, InteractDistance) && hitResult.GetActor()->IsA(AVoxelChunk::StaticClass()))
+		if(GetController<ADWPlayerController>()->RaycastFromAimPoint(hitResult, EDWGameTraceType::Voxel, InteractDistance) && hitResult.GetActor()->IsA(AVoxelChunk::StaticClass()))
 		{
 			AVoxelChunk* chunk = Cast<AVoxelChunk>(hitResult.GetActor());
 			if(chunk != nullptr)
@@ -1143,9 +1157,4 @@ void ADWPlayerCharacter::HandleRegenSpeedAttribute(float NewValue, float DeltaVa
 void ADWPlayerCharacter::HandleExpendSpeedAttribute(float NewValue, float DeltaValue /*= 0.f*/)
 {
 	Super::HandleExpendSpeedAttribute(NewValue, DeltaValue);
-}
-
-ADWPlayerController* ADWPlayerCharacter::GetPlayerController() const
-{
-	return GetController<ADWPlayerController>();
 }

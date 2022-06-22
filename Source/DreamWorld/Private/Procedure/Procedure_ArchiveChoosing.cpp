@@ -2,6 +2,9 @@
 
 
 #include "Procedure/Procedure_ArchiveChoosing.h"
+
+#include "Character/CharacterModuleBPLibrary.h"
+#include "Character/Player/DWPlayerCharacter.h"
 #include "Gameplay/DWGameState.h"
 #include "Global/GlobalBPLibrary.h"
 #include "Procedure/ProcedureModuleBPLibrary.h"
@@ -41,10 +44,7 @@ void UProcedure_ArchiveChoosing::OnEnter(UProcedureBase* InLastProcedure)
 {
 	Super::OnEnter(InLastProcedure);
 	
-	if(ADWGameState* GameState = UGlobalBPLibrary::GetGameState<ADWGameState>())
-	{
-		GameState->SetCurrentState(EDWGameState::ArchiveChoosing);
-	}
+	UGlobalBPLibrary::GetGameState<ADWGameState>()->SetCurrentState(EDWGameState::ArchiveChoosing);
 
 	UWidgetModuleBPLibrary::OpenUserWidget<UWidgetArchiveChoosingPanel>();
 

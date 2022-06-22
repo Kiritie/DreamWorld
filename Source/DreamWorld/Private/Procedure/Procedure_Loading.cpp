@@ -3,6 +3,8 @@
 
 #include "Procedure/Procedure_Loading.h"
 
+#include "Character/CharacterModuleBPLibrary.h"
+#include "Character/Player/DWPlayerCharacter.h"
 #include "Gameplay/DWGameState.h"
 #include "Global/GlobalBPLibrary.h"
 #include "Procedure/ProcedureModuleBPLibrary.h"
@@ -44,10 +46,7 @@ void UProcedure_Loading::OnEnter(UProcedureBase* InLastProcedure)
 {
 	Super::OnEnter(InLastProcedure);
 
-	if(ADWGameState* GameState = UGlobalBPLibrary::GetGameState<ADWGameState>())
-	{
-		GameState->SetCurrentState(EDWGameState::Loading);
-	}
+	UGlobalBPLibrary::GetGameState<ADWGameState>()->SetCurrentState(EDWGameState::Loading);
 
 	UWidgetModuleBPLibrary::OpenUserWidget<UWidgetLoadingPanel>();
 	
@@ -55,14 +54,14 @@ void UProcedure_Loading::OnEnter(UProcedureBase* InLastProcedure)
 	UWidgetModuleBPLibrary::CreateUserWidget<UWidgetInventoryBar>();
 	UWidgetModuleBPLibrary::CreateUserWidget<UWidgetInventoryPanel>();
 
-	if(ADWVoxelModule* VoxelModule = AMainModule::GetModuleByClass<ADWVoxelModule>())
-	{
-		VoxelModule->SetWorldMode(EVoxelWorldMode::Normal);
-	}
+	AMainModule::GetModuleByClass<ADWVoxelModule>()->SetWorldMode(EVoxelWorldMode::Normal);
 
-	if(UDWGeneralSaveGame* GeneralSaveGame = USaveGameModuleBPLibrary::LoadSaveGame<UDWGeneralSaveGame>())
+	USaveGameModuleBPLibrary::LoadSaveGame<UDWArchiveSaveGame>(USaveGameModuleBPLibrary::LoadSaveGame<UDWGeneralSaveGame>()->GetCurrentArchiveID());
+
+	if(ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>())
 	{
-		USaveGameModuleBPLibrary::LoadSaveGame<UDWArchiveSaveGame>(GeneralSaveGame->GetCurrentArchiveID());
+		PlayerCharacter->SetActorHiddenInGame(false);
+		UCharacterModuleBPLibrary::SwitchCharacter(PlayerCharacter);
 	}
 }
 

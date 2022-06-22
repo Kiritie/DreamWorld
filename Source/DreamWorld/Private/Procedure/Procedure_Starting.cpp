@@ -42,35 +42,29 @@ void UProcedure_Starting::OnInitialize()
 
 void UProcedure_Starting::OnEnter(UProcedureBase* InLastProcedure)
 {
-	if(ADWGameState* GameState = UGlobalBPLibrary::GetGameState<ADWGameState>())
-	{
-		GameState->SetCurrentState(EDWGameState::Starting);
-	}
+	UGlobalBPLibrary::GetGameState<ADWGameState>()->SetCurrentState(EDWGameState::Starting);
 
 	UWidgetModuleBPLibrary::OpenUserWidget<UWidgetMainMenu>();
-				
 	UWidgetModuleBPLibrary::CreateUserWidget<UWidgetArchiveChoosingPanel>();
 
-	if(ADWVoxelModule* VoxelModule = AMainModule::GetModuleByClass<ADWVoxelModule>())
-	{
-		VoxelModule->SetWorldMode(EVoxelWorldMode::Preview);
-	}
+	AMainModule::GetModuleByClass<ADWVoxelModule>()->SetWorldMode(EVoxelWorldMode::Preview);
 
 	if(!InLastProcedure || InLastProcedure->IsA(UProcedure_Initializing::StaticClass()))
 	{
-		if(UDWGeneralSaveGame* GeneralSaveGame = USaveGameModuleBPLibrary::GetSaveGame<UDWGeneralSaveGame>())
+		if(USaveGameModuleBPLibrary::GetSaveGame<UDWGeneralSaveGame>()->GetCurrentArchiveID() == -1)
 		{
-			if(GeneralSaveGame->GetCurrentArchiveID() == -1)
+			if(UDWArchiveSaveGame* ArchiveSaveGame = USaveGameModuleBPLibrary::HasSaveGame<UDWArchiveSaveGame>() ? USaveGameModuleBPLibrary::GetSaveGame<UDWArchiveSaveGame>() : USaveGameModuleBPLibrary::CreateSaveGame<UDWArchiveSaveGame>(-1))
 			{
-				if(UDWArchiveSaveGame* ArchiveSaveGame = USaveGameModuleBPLibrary::HasSaveGame<UDWArchiveSaveGame>() ? USaveGameModuleBPLibrary::GetSaveGame<UDWArchiveSaveGame>() : USaveGameModuleBPLibrary::CreateSaveGame<UDWArchiveSaveGame>(-1))
-				{
-					ArchiveSaveGame->Load();
-				}
+				ArchiveSaveGame->Load();
 			}
-			else
-			{
-				USaveGameModuleBPLibrary::LoadSaveGame<UDWArchiveSaveGame>(GeneralSaveGame->GetCurrentArchiveID());
-			}
+		}
+		else
+		{
+			USaveGameModuleBPLibrary::LoadSaveGame<UDWArchiveSaveGame>(USaveGameModuleBPLibrary::GetSaveGame<UDWGeneralSaveGame>()->GetCurrentArchiveID());
+		}
+		if(ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>())
+		{
+			PlayerCharacter->SetActorHiddenInGame(true);
 		}
 	}
 	else
@@ -81,11 +75,9 @@ void UProcedure_Starting::OnEnter(UProcedureBase* InLastProcedure)
 		}
 		if(ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>())
 		{
-			PlayerCharacter->Disable(true);
+			PlayerCharacter->SetActorHiddenInGame(true);
 		}
 	}
-
-	UCameraModuleBPLibrary::SwitchCameraByClass<ARoamCameraPawn>();
 
 	Super::OnEnter(InLastProcedure);
 }

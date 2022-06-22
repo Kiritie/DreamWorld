@@ -5,6 +5,7 @@
 
 #include "Gameplay/DWGameState.h"
 #include "Global/GlobalBPLibrary.h"
+#include "Main/MainModuleBPLibrary.h"
 #include "Procedure/Procedure_Starting.h"
 #include "Widget/WidgetGameHUD.h"
 #include "Widget/WidgetModuleBPLibrary.h"
@@ -38,16 +39,10 @@ void UProcedure_Pausing::OnEnter(UProcedureBase* InLastProcedure)
 {
 	Super::OnEnter(InLastProcedure);
 
-	if(ADWGameState* GameState = UGlobalBPLibrary::GetGameState<ADWGameState>())
-	{
-		GameState->SetCurrentState(EDWGameState::Pausing);
-	}
+	UGlobalBPLibrary::GetGameState<ADWGameState>()->SetCurrentState(EDWGameState::Pausing);
 
 	UGameplayStatics::SetGamePaused(this, true);
-	if(AMainModule* MainModule = AMainModule::Get())
-	{
-		MainModule->PauseModules();
-	}
+	UMainModuleBPLibrary::PauseAllModule();
 
 	UWidgetModuleBPLibrary::OpenUserWidget<UWidgetPausingMenu>();
 }
@@ -67,10 +62,7 @@ void UProcedure_Pausing::OnLeave(UProcedureBase* InNextProcedure)
 	Super::OnLeave(InNextProcedure);
 
 	UGameplayStatics::SetGamePaused(this, false);
-	if(AMainModule* MainModule = AMainModule::Get())
-	{
-		MainModule->UnPauseModules();
-	}
+	UMainModuleBPLibrary::UnPauseAllModule();
 
 	if(InNextProcedure->IsA(UProcedure_Starting::StaticClass()))
 	{

@@ -41,8 +41,4 @@ public:
 public:
 	UFUNCTION(BlueprintCallable)
 	void CreateArchive(FDWArchiveSaveData InArchiveSaveData);
-
-protected:
-	UFUNCTION()
-	void OnChangeVoxelWorldState(UObject* InSender, UEventHandle_ChangeVoxelWorldState* InEventHandle);
 };

@@ -571,6 +571,7 @@ void ADWCharacter::Active(bool bResetData /*= false*/)
 		UnInterrupt();
 		GetCharacterMovement()->SetActive(true);
 		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		OnCharacterActive.Broadcast();
 	}
 	if (bResetData) ResetData();
 }

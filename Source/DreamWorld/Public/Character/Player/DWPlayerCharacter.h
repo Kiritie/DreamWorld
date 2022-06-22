@@ -255,7 +255,4 @@ public:
 
 	UFUNCTION(BlueprintPure)
 	UCameraComponent* GetFollowCamera() const { return FollowCamera; }
-		
-	UFUNCTION(BlueprintPure)
-	ADWPlayerController* GetPlayerController() const;
 };

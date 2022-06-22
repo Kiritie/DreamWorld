@@ -7,7 +7,7 @@
 #include "DWGameState.generated.h"
 
 /**
- * ��Ϸ״̬����
+ * 
  */
 UCLASS()
 class DREAMWORLD_API ADWGameState : public AWHGameState
@@ -23,16 +23,13 @@ public:
 	virtual void OnPreparatory_Implementation() override;
 
 protected:
-	// ��ǰ״̬
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	EDWGameState CurrentState;
 
 public:
-	/** ���õ�ǰ״̬ */
 	UFUNCTION(BlueprintCallable)
 	void SetCurrentState(EDWGameState InGameState);
 
-	/** ��ȡ��ǰ״̬ */
 	UFUNCTION(BlueprintPure)
 	EDWGameState GetCurrentState() const { return CurrentState; }
 };

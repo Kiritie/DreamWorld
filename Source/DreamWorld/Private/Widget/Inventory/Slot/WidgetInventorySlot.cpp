@@ -113,12 +113,17 @@ FReply UWidgetInventorySlot::NativeOnMouseButtonDown(const FGeometry& InGeometry
 
 void UWidgetInventorySlot::InitSlot(UInventorySlot* InOwnerSlot)
 {
-	OwnerSlot = InOwnerSlot;
+	if(InOwnerSlot == OwnerSlot) return;
+	
 	if(OwnerSlot)
 	{
-		OwnerSlot->OnInventorySlotRefresh.AddDynamic(this, &UWidgetInventorySlot::Refresh);
-		OwnerSlot->OnInventorySlotCooldownRefresh.AddDynamic(this, &UWidgetInventorySlot::RefreshCooldown);
+		OwnerSlot->OnInventorySlotRefresh.RemoveDynamic(this, &UWidgetInventorySlot::Refresh);
+		OwnerSlot->OnInventorySlotCooldownRefresh.RemoveDynamic(this, &UWidgetInventorySlot::RefreshCooldown);
 	}
+	OwnerSlot = InOwnerSlot;
+	OwnerSlot->OnInventorySlotRefresh.AddDynamic(this, &UWidgetInventorySlot::Refresh);
+	OwnerSlot->OnInventorySlotCooldownRefresh.AddDynamic(this, &UWidgetInventorySlot::RefreshCooldown);
+	
 	Refresh();
 	RefreshCooldown();
 }

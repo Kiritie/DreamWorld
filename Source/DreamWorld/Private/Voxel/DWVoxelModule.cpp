@@ -88,29 +88,6 @@ void ADWVoxelModule::OnTermination_Implementation()
 
 void ADWVoxelModule::OnWorldStateChanged()
 {
-	switch(WorldState)
-	{
-		case EVoxelWorldState::BasicGenerated:
-		{
-			if(ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>())
-			{
-				FHitResult hitResult;
-				const FVector rayStart = FVector(PlayerCharacter->GetActorLocation().X, PlayerCharacter->GetActorLocation().Y, GetWorldData()->ChunkHeightRange * GetWorldData()->GetChunkLength() + 500);
-				const FVector rayEnd = FVector(PlayerCharacter->GetActorLocation().X, PlayerCharacter->GetActorLocation().Y, 0);
-				if (ChunkTraceSingle(rayStart, rayEnd, PlayerCharacter->GetRadius(), PlayerCharacter->GetHalfHeight(), hitResult))
-				{
-					if(PlayerCharacter->GetActorLocation().Size2D() < 1.f)
-					{
-						PlayerCharacter->SetActorLocation(hitResult.Location);
-					}
-				}
-				PlayerCharacter->Active();
-			}
-			break;
-		}
-		default: break;
-	}
-
 	Super::OnWorldStateChanged();
 }
 

@@ -43,12 +43,9 @@ UDWCharacterData& FDWCharacterSaveData::GetCharacterData() const
 
 FDWArchiveBasicSaveData FDWPlayerSaveData::GetArchiveData() const
 {
-	if(UDWGeneralSaveGame* GeneralSaveGame = USaveGameModuleBPLibrary::GetSaveGame<UDWGeneralSaveGame>())
+	if(USaveGameModuleBPLibrary::GetSaveGame<UDWGeneralSaveGame>()->GetArchiveBasicDatas().Contains(ArchiveID))
 	{
-		if(GeneralSaveGame->GetArchiveBasicDatas().Contains(ArchiveID))
-		{
-			return GeneralSaveGame->GetArchiveBasicDatas()[ArchiveID];
-		}
+		return USaveGameModuleBPLibrary::GetSaveGame<UDWGeneralSaveGame>()->GetArchiveBasicDatas()[ArchiveID];
 	}
 	return FDWArchiveBasicSaveData();
 }
@@ -60,12 +57,9 @@ void FDWVoxelWorldSaveData::Initialize()
 
 FDWArchiveBasicSaveData FDWVoxelWorldSaveData::GetArchiveData() const
 {
-	if(UDWGeneralSaveGame* GeneralSaveGame = USaveGameModuleBPLibrary::GetSaveGame<UDWGeneralSaveGame>())
+	if(USaveGameModuleBPLibrary::GetSaveGame<UDWGeneralSaveGame>()->GetArchiveBasicDatas().Contains(ArchiveID))
 	{
-		if(GeneralSaveGame->GetArchiveBasicDatas().Contains(ArchiveID))
-		{
-			return GeneralSaveGame->GetArchiveBasicDatas()[ArchiveID];
-		}
+		return USaveGameModuleBPLibrary::GetSaveGame<UDWGeneralSaveGame>()->GetArchiveBasicDatas()[ArchiveID];
 	}
 	return FDWArchiveBasicSaveData();
 }
