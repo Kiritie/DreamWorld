@@ -144,8 +144,8 @@ public:
 		return SplitSlots;
 	}
 		
-	UFUNCTION(BlueprintPure, meta = (DisplayName = "GetSplitSlots"))
-	TArray<UInventorySlot*> K2_GetSplitSlots(ESplitSlotType InSplitSlotType);
+	UFUNCTION(BlueprintPure)
+	TArray<UInventorySlot*> GetSplitSlots(ESplitSlotType InSplitSlotType);
 
 	UFUNCTION(BlueprintPure)
 	TMap<ESplitSlotType, FSplitSlotData> GetSplitSlotDatas();

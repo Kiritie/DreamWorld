@@ -6,6 +6,7 @@
 #include "Character/Player/DWPlayerCharacter.h"
 #include "Gameplay/DWGameState.h"
 #include "Global/GlobalBPLibrary.h"
+#include "Procedure/Procedure_Loading.h"
 #include "Widget/WidgetGameHUD.h"
 #include "Widget/WidgetModuleBPLibrary.h"
 #include "Widget/Inventory/WidgetInventoryBar.h"
@@ -39,9 +40,16 @@ void UProcedure_Playing::OnEnter(UProcedureBase* InLastProcedure)
 	Super::OnEnter(InLastProcedure);
 		
 	UGlobalBPLibrary::GetGameState<ADWGameState>()->SetCurrentState(EDWGameState::Playing);
+
+	if(InLastProcedure->IsA(UProcedure_Loading::StaticClass()))
+	{
+		UWidgetModuleBPLibrary::OpenUserWidget<UWidgetGameHUD>();
+		UWidgetModuleBPLibrary::OpenUserWidget<UWidgetInventoryBar>();
 		
-	UWidgetModuleBPLibrary::OpenUserWidget<UWidgetGameHUD>();
-	UWidgetModuleBPLibrary::OpenUserWidget<UWidgetInventoryBar>();
+		UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>()->Initialize(UGlobalBPLibrary::GetPlayerCharacter());
+		UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryBar>()->Initialize(UGlobalBPLibrary::GetPlayerCharacter());
+		UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>()->Initialize(UGlobalBPLibrary::GetPlayerCharacter());
+	}
 }
 
 void UProcedure_Playing::OnRefresh()

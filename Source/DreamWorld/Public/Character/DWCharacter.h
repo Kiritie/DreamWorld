@@ -51,62 +51,6 @@ public:
 	ADWCharacter();
 	
 protected:
-	// states
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CharacterStates")
-	bool bDying;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CharacterStates")
-	bool bActive;
-	
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CharacterStates")
-	bool bFalling;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CharacterStates")
-	bool bDodging;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CharacterStates")
-	bool bSprinting;
-	
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CharacterStates")
-	bool bCrouching;
-		
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CharacterStates")
-	bool bSwimming;
-				
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CharacterStates")
-	bool bFloating;
-	
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CharacterStates")
-	bool bClimbing;
-					
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CharacterStates")
-	bool bRiding;
-	
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CharacterStates")
-	bool bFlying;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CharacterStates")
-	bool bAttacking;
-	
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CharacterStates")
-	bool bDefending;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CharacterStates")
-	bool bDamaging;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CharacterStates")
-	bool bInterrupting;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CharacterStates")
-	bool bLockRotation;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CharacterStates")
-	bool bFreeToAnimate;
-	
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CharacterStates")
-	bool bBreakAllInput;
-
-protected:
 	// stats
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CharacterStats")
 	EDWCharacterNature Nature;
@@ -144,6 +88,39 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CharacterStats")
 	ADWCharacter* LockedTarget;
+
+protected:
+	FGameplayTag ActiveTag;
+
+	FGameplayTag FallingTag;
+
+	FGameplayTag DodgingTag;
+
+	FGameplayTag SprintingTag;
+	
+	FGameplayTag CrouchingTag;
+		
+	FGameplayTag SwimmingTag;
+				
+	FGameplayTag FloatingTag;
+	
+	FGameplayTag ClimbingTag;
+					
+	FGameplayTag RidingTag;
+	
+	FGameplayTag FlyingTag;
+
+	FGameplayTag AttackingTag;
+	
+	FGameplayTag DefendingTag;
+
+	FGameplayTag InterruptingTag;
+	
+	FGameplayTag FreeToAnimTag;
+	
+	FGameplayTag LockRotationTag;
+
+	FGameplayTag BreakAllInputTag;
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
@@ -210,9 +187,7 @@ public:
 
 	virtual FSaveData* ToData(bool bSaved = true) override;
 
-	virtual void ResetData(bool bRefresh = false) override;
-
-	virtual void RefreshData() override;
+	virtual void ResetData() override;
 
 public:
 	UFUNCTION(BlueprintCallable)
@@ -379,7 +354,7 @@ public:
 
 	virtual void AddMovementInput(FVector WorldDirection, float ScaleValue = 1.0f, bool bForce = false) override;
 
-	virtual void SetDamaging(bool bInDamaging);
+	virtual void SetDamageAble(bool bInDamaging);
 
 	virtual bool RaycastStep(FHitResult& OutHitResult);
 
@@ -457,64 +432,64 @@ public:
 
 public:
 	UFUNCTION(BlueprintPure)
-	bool IsActive(bool bNeedFreeToAnim = false) const;
+	bool IsActive(bool bNeedNotDead = false, bool bNeedFreeToAnim = false) const;
 																	
 	UFUNCTION(BlueprintPure)
 	bool IsFreeToAnim(bool bCheckStates = true) const;
-	
-	virtual bool IsDead() const override;
 
 	UFUNCTION(BlueprintPure)
-	bool IsDying() const { return bDying; }
-
-	UFUNCTION(BlueprintPure)
-	bool IsFalling() const { return bFalling; }
+	bool IsFalling() const;
 	
 	UFUNCTION(BlueprintPure)
-	bool IsDodging() const { return bDodging; }
+	bool IsDodging() const;
 
 	UFUNCTION(BlueprintPure)
-	bool IsSprinting() const { return bSprinting; }
+	bool IsSprinting() const;
 
 	UFUNCTION(BlueprintPure)
-	bool IsCrouching() const { return bCrouching; }
+	bool IsCrouching() const;
 
 	UFUNCTION(BlueprintPure)
-	bool IsSwimming() const { return bSwimming; }
+	bool IsSwimming() const;
 
 	UFUNCTION(BlueprintPure)
-	bool IsFloating() const { return bFloating; }
+	bool IsFloating() const;
 
 	UFUNCTION(BlueprintPure)
-	bool IsAttacking() const { return bAttacking; }
+	bool IsAttacking() const;
 
 	UFUNCTION(BlueprintPure)
-	bool IsDefending() const { return bDefending; }
+	bool IsDefending() const;
 
 	UFUNCTION(BlueprintPure)
-	bool IsDamaging() const { return bDamaging; }
+	bool IsClimbing() const;
 
 	UFUNCTION(BlueprintPure)
-	bool IsClimbing() const { return bClimbing; }
+	bool IsRiding() const;
 
 	UFUNCTION(BlueprintPure)
-	bool IsRiding() const { return bRiding; }
+	bool IsFlying() const;
 
 	UFUNCTION(BlueprintPure)
-	bool IsFlying() const { return bFlying; }
+	bool IsInterrupting() const;
 
 	UFUNCTION(BlueprintPure)
-	bool IsInterrupting() const { return bInterrupting; }
+	bool IsLockRotation() const;
 
 	UFUNCTION(BlueprintPure)
-	bool IsLockRotation() const { return bLockRotation; }
-
-	UFUNCTION(BlueprintPure)
-	bool IsBreakAllInput() const { return bBreakAllInput; }
+	bool IsBreakAllInput() const;
 	
 	virtual bool IsTargetable_Implementation() const override;
 
 public:
+	virtual void SetNameV(FName InName) override;
+
+	virtual void SetRaceID(FName InRaceID) override;
+
+	virtual void SetLevelV(int32 InLevel) override;
+
+	virtual void SetEXP(int32 InEXP) override;
+	
 	UFUNCTION(BlueprintPure)
 	EDWCharacterNature GetNature() const { return Nature; }
 
@@ -525,7 +500,7 @@ public:
 	FName GetTeamID() const { return TeamID; }
 
 	UFUNCTION(BlueprintCallable)
-	void SetTeamID(FName InTeamID);
+	virtual void SetTeamID(FName InTeamID);
 			
 	UFUNCTION(BlueprintPure)
 	float GetMana() const;
@@ -737,67 +712,9 @@ public:
 	UDWCharacterPart* GetCharacterPart(EDWCharacterPartType InCharacterPartType) const;
 
 public:
+	virtual void OnAttributeChange(const FOnAttributeChangeData& InAttributeChangeData) override;
+	
 	virtual void HandleDamage(EDamageType DamageType, const float LocalDamageDone, bool bHasCrited, FHitResult HitResult, const FGameplayTagContainer& SourceTags, AActor* SourceActor) override;
 	
 	virtual void HandleInterrupt(float InterruptDuration);
-	
-	virtual void HandleNameChanged(FName NewValue) override;
-
-	virtual void HandleTeamIDChanged(FName NewValue);
-
-	virtual void HandleRaceIDChanged(FName NewValue) override;
-
-	virtual void HandleLevelChanged(int32 NewValue, int32 DeltaValue = 0) override;
-
-	virtual void HandleEXPChanged(int32 NewValue, int32 DeltaValue = 0) override;
-
-	virtual void HandleHealthChanged(float NewValue, float DeltaValue = 0.f) override;
-	
-	virtual void HandleMaxHealthChanged(float NewValue, float DeltaValue = 0.f) override;
-
-	virtual void HandleManaChanged(float NewValue, float DeltaValue = 0.f);
-
-	virtual void HandleMaxManaChanged(float NewValue, float DeltaValue = 0.f);
-
-	virtual void HandleStaminaChanged(float NewValue, float DeltaValue = 0.f);
-	
-	virtual void HandleMaxStaminaChanged(float NewValue, float DeltaValue = 0.f);
-
-	virtual void HandleMoveSpeedChanged(float NewValue, float DeltaValue = 0.f) override;
-
-	virtual void HandleSwimSpeedChanged(float NewValue, float DeltaValue = 0.f);
-
-	virtual void HandleRideSpeedChanged(float NewValue, float DeltaValue = 0.f);
-
-	virtual void HandleFlySpeedChanged(float NewValue, float DeltaValue = 0.f);
-
-	virtual void HandleRotationSpeedChanged(float NewValue, float DeltaValue = 0.f) override;
-
-	virtual void HandleJumpForceChanged(float NewValue, float DeltaValue = 0.f) override;
-
-	virtual void HandleDodgeForceChanged(float NewValue, float DeltaValue = 0.f);
-
-	virtual void HandleAttackForceChanged(float NewValue, float DeltaValue = 0.f);
-
-	virtual void HandleRepulseForceChanged(float NewValue, float DeltaValue = 0.f);
-
-	virtual void HandleAttackSpeedChanged(float NewValue, float DeltaValue = 0.f);
-
-	virtual void HandleAttackCritRateChanged(float NewValue, float DeltaValue = 0.f);
-
-	virtual void HandleAttackStealRateChanged(float NewValue, float DeltaValue = 0.f);
-
-	virtual void HandleDefendRateChanged(float NewValue, float DeltaValue = 0.f);
-
-	virtual void HandleDefendScopeChanged(float NewValue, float DeltaValue = 0.f);
-
-	virtual void HandlePhysicsDefRateChanged(float NewValue, float DeltaValue = 0.f);
-
-	virtual void HandleMagicDefRateChanged(float NewValue, float DeltaValue = 0.f);
-
-	virtual void HandleToughnessRateChanged(float NewValue, float DeltaValue = 0.f);
-
-	virtual void HandleRegenSpeedAttribute(float NewValue, float DeltaValue = 0.f);
-
-	virtual void HandleExpendSpeedAttribute(float NewValue, float DeltaValue = 0.f);
 };

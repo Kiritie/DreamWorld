@@ -4,6 +4,7 @@
 
 #include "TimerManager.h"
 #include "Ability/AbilityModuleBPLibrary.h"
+#include "Ability/Abilities/ItemAbilityBase.h"
 #include "Ability/Components/DWAbilitySystemComponent.h"
 #include "Character/DWCharacterAnim.h"
 #include "Components/CapsuleComponent.h"
@@ -30,7 +31,6 @@
 #include "Ability/Character/DWCharacterAttackAbility.h"
 #include "Ability/Character/DWCharacterAttributeSet.h"
 #include "Ability/Character/DWCharacterSkillAbility.h"
-#include "Ability/Item/ItemAbilityBase.h"
 #include "Ability/Item/Equip/AbilityEquipDataBase.h"
 #include "Item/Equip/Armor/DWEquipArmor.h"
 #include "Item/Equip/Shield/DWEquipShield.h"
@@ -44,6 +44,7 @@
 #include "Asset/AssetModuleBPLibrary.h"
 #include "BehaviorTree/BehaviorTree.h"
 #include "BehaviorTree/BlackboardData.h"
+#include "Character/CharacterModuleBPLibrary.h"
 #include "Character/DWCharacterData.h"
 #include "Inventory/Slot/InventoryEquipSlot.h"
 #include "Inventory/Slot/InventorySkillSlot.h"
@@ -91,27 +92,6 @@ ADWCharacter::ADWCharacter()
 	GetCharacterMovement()->JumpZVelocity = 420;
 	GetCharacterMovement()->AirControl = 0.2f;
 	GetCharacterMovement()->bComponentShouldUpdatePhysicsVolume = false;
-
-	// states
-	bDying = false;
-	bActive = false;
-
-	bFalling = false;
-	bDodging = false;
-	bSprinting = false;
-	bCrouching = false;
-	bSwimming = false;
-	bFloating = false;
-	bClimbing = false;
-	bRiding = false;
-	bFlying = false;
-	bAttacking = false;
-	bDefending = false;
-	bDamaging = false;
-	bInterrupting = false;
-	bLockRotation = false;
-	bFreeToAnimate = true;
-	bBreakAllInput = false;
 
 	// stats
 	Nature = EDWCharacterNature::AIHostile;
@@ -176,9 +156,9 @@ void ADWCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (bDead) return;
+	if (IsDead()) return;
 
-	if (bActive)
+	if (IsActive())
 	{
 		Inventory->Refresh(DeltaTime);
 		
@@ -237,7 +217,7 @@ void ADWCharacter::Tick(float DeltaTime)
 			}
 		}
 
-		if (bSprinting && GetMoveDirection().Size() > 0.2f)
+		if (IsSprinting() && GetMoveDirection().Size() > 0.2f)
 		{
 			ModifyStamina(-GetStaminaExpendSpeed() * DeltaTime);
 		}
@@ -245,50 +225,50 @@ void ADWCharacter::Tick(float DeltaTime)
 		{
 			ModifyStamina(GetStaminaRegenSpeed() * DeltaTime);
 		}
-	}
 
-	switch (GetCharacterMovement()->MovementMode)
-	{
-		case EMovementMode::MOVE_Walking:
-		case EMovementMode::MOVE_Swimming:
+		switch (GetCharacterMovement()->MovementMode)
 		{
-			if (bFalling)
+			case EMovementMode::MOVE_Walking:
+			case EMovementMode::MOVE_Swimming:
 			{
-				FallEnd();
-			}
-			break;
-		}
-		case EMovementMode::MOVE_Falling:
-		{
-			if (!bFalling)
-			{
-				FallStart();
-			}
-			break;
-		}
-		case EMovementMode::MOVE_Flying:
-		{
-			bFalling = false;
-			if(GetVelocity().Z < 0.f)
-			{
-				FFindFloorResult FindFloorResult;
-				GetCharacterMovement()->FindFloor(GetCharacterMovement()->UpdatedComponent->GetComponentLocation(), FindFloorResult, GetVelocity().IsZero(), nullptr);
-				if(FindFloorResult.IsWalkableFloor())
+				if (IsFalling())
 				{
-					UnFly();
+					FallEnd();
 				}
+				break;
 			}
-			break;
+			case EMovementMode::MOVE_Falling:
+			{
+				if (!IsFalling())
+				{
+					FallStart();
+				}
+				break;
+			}
+			case EMovementMode::MOVE_Flying:
+			{
+				if(GetVelocity().Z < 0.f)
+				{
+					FFindFloorResult FindFloorResult;
+					GetCharacterMovement()->FindFloor(GetCharacterMovement()->UpdatedComponent->GetComponentLocation(), FindFloorResult, GetVelocity().IsZero(), nullptr);
+					if(FindFloorResult.IsWalkableFloor())
+					{
+						UnFly();
+					}
+				}
+				break;
+			}
+			default: break;
 		}
-		default: break;
-	}
-	if (GetActorLocation().Z < 0)
-	{
-		Death();
-	}
-	if (bDying && !bFalling && ActionType != EDWCharacterActionType::Death)
-	{
-		DeathStart();
+
+		if (GetActorLocation().Z < 0)
+		{
+			Death();
+		}
+		if (IsDying() && !IsFalling() && ActionType != EDWCharacterActionType::Death)
+		{
+			DeathStart();
+		}
 	}
 }
 
@@ -508,20 +488,8 @@ FSaveData* ADWCharacter::ToData(bool bSaved)
 	return &SaveData;
 }
 
-void ADWCharacter::ResetData(bool bRefresh)
+void ADWCharacter::ResetData()
 {
-	// states
-	bDead = false;
-	bDying = false;
-	bDodging = false;
-	bSprinting = false;
-	bCrouching = false;
-	bSwimming = false;
-	bFloating = false;
-	bAttacking = false;
-	bDefending = false;
-	bDamaging = false;
-
 	// stats
 	SetMotionRate(1, 1);
 	SetLockedTarget(nullptr);
@@ -535,62 +503,6 @@ void ADWCharacter::ResetData(bool bRefresh)
 	InterruptRemainTime = 0;
 	NormalAttackRemainTime = 0;
 	ActionType = EDWCharacterActionType::None;
-
-	if(bRefresh) RefreshData();
-}
-
-void ADWCharacter::RefreshData()
-{
-	HandleEXPChanged(GetEXP());
-	HandleLevelChanged(GetLevelV());
-	HandleHealthChanged(GetHealth());
-	HandleManaChanged(GetMana());
-	HandleStaminaChanged(GetStamina());
-	HandleMoveSpeedChanged(GetMoveSpeed());
-	HandleSwimSpeedChanged(GetSwimSpeed());
-	HandleRideSpeedChanged(GetRideSpeed());
-	HandleFlySpeedChanged(GetFlySpeed());
-	HandleJumpForceChanged(GetJumpForce());
-	HandleDodgeForceChanged(GetDodgeForce());
-	HandleAttackForceChanged(GetAttackForce());
-	HandleRepulseForceChanged(GetRepulseForce());
-	HandleAttackSpeedChanged(GetAttackSpeed());
-	HandleAttackCritRateChanged(GetAttackCritRate());
-	HandleAttackStealRateChanged(GetAttackStealRate());
-	HandleDefendRateChanged(GetDefendRate());
-	HandlePhysicsDefRateChanged(GetPhysicsDefRate());
-	HandleMagicDefRateChanged(GetMagicDefRate());
-	HandleToughnessRateChanged(GetToughnessRate());
-}
-
-void ADWCharacter::Active(bool bResetData /*= false*/)
-{
-	if (!bActive)
-	{
-		bActive = true;
-		UnInterrupt();
-		GetCharacterMovement()->SetActive(true);
-		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-		OnCharacterActive.Broadcast();
-	}
-	if (bResetData) ResetData();
-}
-
-void ADWCharacter::Disable(bool bDisableMovement, bool bDisableCollision)
-{
-	if (bActive)
-	{
-		bActive = false;
-		Interrupt();
-		if (bDisableMovement)
-		{
-			GetCharacterMovement()->SetActive(false);
-		}
-		if (bDisableCollision)
-		{
-			GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-		}
-	}
 }
 
 void ADWCharacter::Spawn()
@@ -603,40 +515,65 @@ void ADWCharacter::Spawn()
 	DoAction(EDWCharacterActionType::Revive);
 }
 
+void ADWCharacter::Active(bool bResetData /*= false*/)
+{
+	if (!IsActive())
+	{
+		AbilitySystem->AddLooseGameplayTag(ActiveTag);
+		UnInterrupt();
+		GetCharacterMovement()->SetActive(true);
+		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		OnCharacterActive.Broadcast();
+	}
+	if (bResetData) ResetData();
+}
+
+void ADWCharacter::Disable(bool bDisableMovement, bool bDisableCollision)
+{
+	if (IsActive())
+	{
+		AbilitySystem->RemoveLooseGameplayTag(ActiveTag);
+		Interrupt();
+		if (bDisableMovement)
+		{
+			GetCharacterMovement()->SetActive(false);
+		}
+		if (bDisableCollision)
+		{
+			GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		}
+	}
+}
+
 void ADWCharacter::Revive()
 {
-	if (bDead && !bDying)
+	if(DoAction(EDWCharacterActionType::Revive))
 	{
 		Active(true);
 		SetVisible(true);
 		SetHealth(GetMaxHealth());
 		SetMana(GetMaxMana());
 		SetStamina(GetMaxStamina());
-		DoAction(EDWCharacterActionType::Revive);
 	}
 }
 
 void ADWCharacter::Death(AActor* InKiller /*= nullptr*/)
 {
-	if (!IsDead())
+	Disable(true);
+	if(IAbilityVitalityInterface* InVitality = Cast<IAbilityVitalityInterface>(InKiller))
 	{
-		bDying = true;
-		Disable(true);
-		if(IAbilityVitalityInterface* InVitality = Cast<IAbilityVitalityInterface>(InKiller))
-		{
-			InVitality->ModifyEXP(GetTotalEXP());
-		}
-		SetEXP(0);
-		SetHealth(0.f);
-		SetMana(0.f);
-		SetStamina(0.f);
-		SetLockedTarget(nullptr);
-		OnCharacterDead.Broadcast();
-		if (!IsPlayer())
-		{
-			GetTeamData()->RemoveMember(this);
-			GetController<ADWAIController>()->UnPossess();
-		}
+		InVitality->ModifyEXP(GetTotalEXP());
+	}
+	SetEXP(0);
+	SetHealth(0.f);
+	SetMana(0.f);
+	SetStamina(0.f);
+	SetLockedTarget(nullptr);
+	OnCharacterDead.Broadcast();
+	if (!IsPlayer())
+	{
+		GetTeamData()->RemoveMember(this);
+		GetController<ADWAIController>()->UnPossess();
 	}
 }
 
@@ -647,8 +584,6 @@ void ADWCharacter::DeathStart()
 
 void ADWCharacter::DeathEnd()
 {
-	bDead = true;
-	bDying = false;
 	SetVisible(false);
 	GetCharacterMovement()->SetActive(false);
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
@@ -687,7 +622,7 @@ bool ADWCharacter::CanInteract(IInteractionAgentInterface* InInteractionAgent, E
 	{
 		case EInteractAction::Revive:
 		{
-			if(bDead)
+			if(!IsDead() && !IsDying())
 			{
 				return true;
 			}
@@ -712,25 +647,25 @@ void ADWCharacter::OnInteract(IInteractionAgentInterface* InInteractionAgent, EI
 
 void ADWCharacter::FreeToAnim(bool bUnLockRotation /*= true*/)
 {
-	if (!bInterrupting)
+	if (!IsInterrupting())
 	{
-		bFreeToAnimate = true;
+		AbilitySystem->AddLooseGameplayTag(FreeToAnimTag);
 	}
 	if (bUnLockRotation)
 	{
-		bLockRotation = false;
+		AbilitySystem->RemoveLooseGameplayTag(LockRotationTag);
 	}
 }
 
 void ADWCharacter::LimitToAnim(bool bInLockRotation /*= false*/, bool bUnSprint /*= false*/)
 {
-	if (!bFlying && !bFalling && !bRiding && !bClimbing && !bDefending)
+	if (!IsFlying() && !IsFalling() && !IsRiding() && !IsClimbing() && !IsDefending())
 	{
-		bFreeToAnimate = false;
+		AbilitySystem->RemoveLooseGameplayTag(FreeToAnimTag);
 	}
 	if (bInLockRotation)
 	{
-		bLockRotation = true;
+		AbilitySystem->AddLooseGameplayTag(LockRotationTag);
 	}
 	if (bUnSprint)
 	{
@@ -740,7 +675,7 @@ void ADWCharacter::LimitToAnim(bool bInLockRotation /*= false*/, bool bUnSprint 
 
 void ADWCharacter::Interrupt(float InDuration /*= -1*/, bool bDoAction /*= false*/)
 {
-	if (!bInterrupting)
+	if (!IsInterrupting())
 	{
 		UnFly();
 		UnRide();
@@ -751,8 +686,8 @@ void ADWCharacter::Interrupt(float InDuration /*= -1*/, bool bDoAction /*= false
 		UnDefend();
 		UnSprint();
 		LimitToAnim();
-		bInterrupting = true;
-		bBreakAllInput = true;
+		AbilitySystem->AddLooseGameplayTag(InterruptingTag);
+		AbilitySystem->AddLooseGameplayTag(BreakAllInputTag);
 	}
 	if (InDuration != -1) InDuration = InDuration * (1 - GetToughnessRate());
 	InterruptRemainTime = InDuration;
@@ -761,10 +696,10 @@ void ADWCharacter::Interrupt(float InDuration /*= -1*/, bool bDoAction /*= false
 
 void ADWCharacter::UnInterrupt()
 {
-	if (bInterrupting)
+	if (IsInterrupting())
 	{
-		bInterrupting = false;
-		bBreakAllInput = false;
+		AbilitySystem->RemoveLooseGameplayTag(InterruptingTag);
+		AbilitySystem->RemoveLooseGameplayTag(BreakAllInputTag);
 		FreeToAnim();
 		StopAction(EDWCharacterActionType::Interrupt);
 	}
@@ -772,72 +707,59 @@ void ADWCharacter::UnInterrupt()
 
 void ADWCharacter::Jump()
 {
-	if (IsFreeToAnim() && !bSwimming)
+	if(DoAction(EDWCharacterActionType::Jump))
 	{
-		if(DoAction(EDWCharacterActionType::Jump))
-		{
-			Super::Jump();
-		}
+		Super::Jump();
 	}
 }
 
 void ADWCharacter::UnJump()
 {
-	if(bFalling)
+	if(StopAction(EDWCharacterActionType::Jump))
 	{
-		StopAction(EDWCharacterActionType::Jump);
 		Super::StopJumping();
 	}
 }
 
 void ADWCharacter::Dodge()
 {
-	if (!bDodging && IsFreeToAnim() && GetMoveDirection().Size() > 0)
+	if(DoAction(EDWCharacterActionType::Dodge)/* && GetMoveDirection().Size() > 0*/)
 	{
-		if (DoAction(EDWCharacterActionType::Dodge))
-		{
-			bDodging = true;
-			LimitToAnim();
-			GetCapsuleComponent()->SetGenerateOverlapEvents(false);
-			SetActorRotation(FRotator(0.f, GetMoveDirection().ToOrientationRotator().Yaw, 0.f));
-		}
+		LimitToAnim();
+		GetCapsuleComponent()->SetGenerateOverlapEvents(false);
+		SetActorRotation(FRotator(0.f, GetMoveDirection().ToOrientationRotator().Yaw, 0.f));
 	}
 }
 
 void ADWCharacter::UnDodge()
 {
-	if (bDodging)
+	if(StopAction(EDWCharacterActionType::Dodge))
 	{
-		bDodging = false;
 		FreeToAnim();
 		GetCapsuleComponent()->SetGenerateOverlapEvents(true);
-		StopAction(EDWCharacterActionType::Dodge);
 	}
 }
 
 void ADWCharacter::Sprint()
 {
-	if (!bSprinting && IsFreeToAnim())
+	if (!IsSprinting() && IsFreeToAnim())
 	{
-		bSprinting = true;
-		HandleMoveSpeedChanged(GetMoveSpeed());
+		AbilitySystem->AddLooseGameplayTag(SprintingTag);
 	}
 }
 
 void ADWCharacter::UnSprint()
 {
-	if (bSprinting)
+	if (IsSprinting())
 	{
-		bSprinting = false;
-		HandleMoveSpeedChanged(GetMoveSpeed());
+		AbilitySystem->RemoveLooseGameplayTag(SprintingTag);
 	}
 }
 
 void ADWCharacter::Crouch(bool bClientSimulation /*= false*/)
 {
-	if (!bCrouching && DoAction(EDWCharacterActionType::Crouch))
+	if (DoAction(EDWCharacterActionType::Crouch))
 	{
-		bCrouching = true;
 		LimitToAnim();
 		Super::Crouch(bClientSimulation);
 	}
@@ -845,20 +767,17 @@ void ADWCharacter::Crouch(bool bClientSimulation /*= false*/)
 
 void ADWCharacter::UnCrouch(bool bClientSimulation /*= false*/)
 {
-	if (bCrouching)
+	if (StopAction(EDWCharacterActionType::Crouch))
 	{
-		bCrouching = false;
 		FreeToAnim();
-		StopAction(EDWCharacterActionType::Crouch);
 		Super::UnCrouch(bClientSimulation);
 	}
 }
 
 void ADWCharacter::Swim()
 {
-	if(!bSwimming && DoAction(EDWCharacterActionType::Swim))
+	if(DoAction(EDWCharacterActionType::Swim))
 	{
-		bSwimming = true;
 		GetCharacterMovement()->SetMovementMode(MOVE_Swimming);
  		if(USceneModuleBPLibrary::HasPhysicsVolumeByName(FName("Water")))
 		{
@@ -874,11 +793,9 @@ void ADWCharacter::Swim()
 
 void ADWCharacter::UnSwim()
 {
-	if (bSwimming)
+	if(StopAction(EDWCharacterActionType::Swim))
 	{
-		bSwimming = false;
 		UnFloat();
-		StopAction(EDWCharacterActionType::Swim);
 		GetCharacterMovement()->SetMovementMode(MOVE_Walking);
 		if(GetCharacterMovement()->UpdatedComponent)
 		{
@@ -891,9 +808,8 @@ void ADWCharacter::UnSwim()
 
 void ADWCharacter::Float(float InWaterPosZ)
 {
-	if(!bFloating && bSwimming)
+	if(DoAction(EDWCharacterActionType::Float))
 	{
-		bFloating = true;
 		GetCharacterMovement()->Velocity = FVector(GetCharacterMovement()->Velocity.X, GetCharacterMovement()->Velocity.Y, 0);
 		const float NeckPosZ = GetCharacterPart(EDWCharacterPartType::Neck)->GetComponentLocation().Z;
 		const float ChestPosZ = GetCharacterPart(EDWCharacterPartType::Chest)->GetComponentLocation().Z;
@@ -904,42 +820,34 @@ void ADWCharacter::Float(float InWaterPosZ)
 
 void ADWCharacter::UnFloat()
 {
-	if(bFloating)
+	if(StopAction(EDWCharacterActionType::Float))
 	{
-		bFloating = false;
 		GetCharacterMovement()->Velocity = FVector(GetCharacterMovement()->Velocity.X, GetCharacterMovement()->Velocity.Y, GetCharacterMovement()->Velocity.Z * 0.5f);
 	}
 }
 
 void ADWCharacter::Climb()
 {
-	if (!bClimbing && DoAction(EDWCharacterActionType::Climb))
+	if (DoAction(EDWCharacterActionType::Climb))
 	{
-		bClimbing = true;
 		LimitToAnim();
 	}
 }
 
 void ADWCharacter::UnClimb()
 {
-	if (bClimbing)
+	if (StopAction(EDWCharacterActionType::Climb))
 	{
-		bClimbing = false;
 		FreeToAnim();
-		StopAction(EDWCharacterActionType::Climb);
 	}
 }
 
 void ADWCharacter::Ride(ADWCharacter* InTarget)
 {
-	if (!bRiding && InTarget && DoAction(EDWCharacterActionType::Ride))
+	if (InTarget && DoAction(EDWCharacterActionType::Ride))
 	{
-		bRiding = true;
 		RidingTarget = InTarget;
-		if(GetOwnerController())
-		{
-			GetOwnerController()->Possess(RidingTarget);
-		}
+		UCharacterModuleBPLibrary::SwitchCharacter(RidingTarget);
 		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		AttachToComponent(RidingTarget->GetMesh(), FAttachmentTransformRules::KeepWorldTransform, FName("RiderPoint"));
 		SetActorRelativeLocation(FVector::ZeroVector);
@@ -950,18 +858,14 @@ void ADWCharacter::Ride(ADWCharacter* InTarget)
 
 void ADWCharacter::UnRide()
 {
-	if (bRiding)
+	if (StopAction(EDWCharacterActionType::Ride))
 	{
-		bRiding = false;
 		FreeToAnim();
 		if(IsActive()) GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 		DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 		if(RidingTarget)
 		{
-			if(RidingTarget->GetOwnerController())
-			{
-				RidingTarget->GetOwnerController()->Possess(RidingTarget);
-			}
+			UCharacterModuleBPLibrary::SwitchCharacter(this);
 			FHitResult hitResult;
 			const FVector offset = GetActorRightVector() * (GetRadius() + RidingTarget->GetRadius());
 			const FVector rayStart = FVector(GetActorLocation().X, GetActorLocation().Y, AVoxelModule::GetWorldData()->ChunkHeightRange * AVoxelModule::GetWorldData()->GetChunkLength() + 500) + offset;
@@ -972,16 +876,13 @@ void ADWCharacter::UnRide()
 			}
 		}
 		RidingTarget = nullptr;
-		GetOwnerController()->Possess(this);
-		StopAction(EDWCharacterActionType::Ride);
 	}
 }
 
 void ADWCharacter::Fly()
 {
-	if (!bFlying && DoAction(EDWCharacterActionType::Fly))
+	if (DoAction(EDWCharacterActionType::Fly))
 	{
-		bFlying = true;
 		LimitToAnim();
 		GetCharacterMovement()->SetMovementMode(MOVE_Flying);
 		GetCharacterMovement()->Velocity = FVector(GetCharacterMovement()->Velocity.X, GetCharacterMovement()->Velocity.Y, 100.f);
@@ -992,9 +893,8 @@ void ADWCharacter::Fly()
 
 void ADWCharacter::UnFly()
 {
-	if (bFlying)
+	if (StopAction(EDWCharacterActionType::Fly))
 	{
-		bFlying = false;
 		FreeToAnim();
 		StopAction(EDWCharacterActionType::Fly);
 		GetCharacterMovement()->SetMovementMode(MOVE_Walking);
@@ -1012,7 +912,6 @@ bool ADWCharacter::Attack(int32 InAbilityIndex /*= -1*/)
 		{
 			if (ActiveAbility(GetAttackAbility(InAbilityIndex).AbilityHandle))
 			{
-				bAttacking = true;
 				LimitToAnim(true, true);
 				SetMotionRate(0, 0);
 				AttackAbilityIndex = InAbilityIndex;
@@ -1026,7 +925,7 @@ bool ADWCharacter::Attack(int32 InAbilityIndex /*= -1*/)
 			}
 		}
 	}
-	else if(!bAttacking && bFalling)
+	else if(!IsAttacking() && IsFalling())
 	{
 		return FallingAttack();
 	}
@@ -1048,7 +947,6 @@ bool ADWCharacter::SkillAttack(const FPrimaryAssetId& InSkillID)
 					{
 						if(ActiveAbility(AbilityData.AbilityHandle))
 						{
-							bAttacking = true;
 							LimitToAnim(true, true);
 							SetMotionRate(0, 0);
 							SkillAbilityID = InSkillID;
@@ -1088,7 +986,6 @@ bool ADWCharacter::FallingAttack()
 	{
 		if (ActiveAbility(FallingAttackAbility.AbilityHandle))
 		{
-			bAttacking = true;
 			LimitToAnim(true, true);
 			SetMotionRate(0, 0);
 			AttackType = EDWAttackType::FallingAttack;
@@ -1100,14 +997,14 @@ bool ADWCharacter::FallingAttack()
 
 void ADWCharacter::AttackStart()
 {
-	if (bAttacking)
+	if (IsAttacking())
 	{
 		switch (AttackType)
 		{
 			case EDWAttackType::NormalAttack:
 			case EDWAttackType::FallingAttack:
 			{
-				SetDamaging(true);
+				SetDamageAble(true);
 				break;
 			}
 			case EDWAttackType::SkillAttack:
@@ -1128,24 +1025,24 @@ void ADWCharacter::AttackStart()
 
 void ADWCharacter::AttackHurt()
 {
-	if (bAttacking)
+	if (IsAttacking())
 	{
-		SetDamaging(false);
+		SetDamageAble(false);
 		FTimerDelegate TimerDelegate;
-		TimerDelegate.BindLambda([this](){ SetDamaging(true); });
+		TimerDelegate.BindLambda([this](){ SetDamageAble(true); });
 		GetWorld()->GetTimerManager().SetTimerForNextTick(TimerDelegate);
 	}
 }
 
 void ADWCharacter::AttackEnd()
 {
-	if (bAttacking)
+	if (IsAttacking())
 	{
 		switch (AttackType)
 		{
 			case EDWAttackType::NormalAttack:
 			{
-				SetDamaging(false);
+				SetDamageAble(false);
 				if (++AttackAbilityIndex >= AttackAbilities.Num())
 				{
 					AttackAbilityIndex = 0;
@@ -1170,12 +1067,11 @@ void ADWCharacter::AttackEnd()
 
 void ADWCharacter::UnAttack()
 {
-	if (bAttacking)
+	if (IsAttacking())
 	{
-		bAttacking = false;
 		FreeToAnim();
 		SetMotionRate(1, 1);
-		SetDamaging(false);
+		SetDamageAble(false);
 		AttackAbilityIndex = 0;
 		SkillAbilityID = FPrimaryAssetId();
 		AttackType = EDWAttackType::None;
@@ -1184,9 +1080,8 @@ void ADWCharacter::UnAttack()
 
 void ADWCharacter::Defend()
 {
-	if (IsFreeToAnim() && DoAction(EDWCharacterActionType::Defend))
+	if (DoAction(EDWCharacterActionType::Defend))
 	{
-		bDefending = true;
 		SetMotionRate(0.5f, 0.1f);
 		LimitToAnim(true, true);
 	}
@@ -1194,9 +1089,8 @@ void ADWCharacter::Defend()
 
 void ADWCharacter::UnDefend()
 {
-	if (bDefending)
+	if (IsDefending())
 	{
-		bDefending = false;
 		FreeToAnim();
 		SetMotionRate(1, 1);
 		StopAction(EDWCharacterActionType::Defend);
@@ -1205,8 +1099,8 @@ void ADWCharacter::UnDefend()
 
 void ADWCharacter::FallStart()
 {
-	bFalling = true;
-	if(bDefending)
+	AbilitySystem->AddLooseGameplayTag(FallingTag);
+	if(IsDefending())
 	{
 		UnDefend();
 	}
@@ -1214,9 +1108,9 @@ void ADWCharacter::FallStart()
 
 void ADWCharacter::FallEnd()
 {
-	bFalling = false;
+	AbilitySystem->RemoveLooseGameplayTag(FallingTag);
 	UnJump();
-	if(bAttacking && AttackType == EDWAttackType::FallingAttack)
+	if(IsAttacking() && AttackType == EDWAttackType::FallingAttack)
 	{
 		AttackEnd();
 	}
@@ -1507,7 +1401,7 @@ void ADWCharacter::SetLockedTarget(ADWCharacter* InTargetCharacter)
 
 void ADWCharacter::LookAtTarget(ADWCharacter* InTargetCharacter)
 {
-	if(InTargetCharacter && !bDodging)
+	if(InTargetCharacter && !IsDodging())
 	{
 		const FVector tmpDirection = InTargetCharacter->GetActorLocation() - GetActorLocation();
 		SetActorRotation(FRotator(0, tmpDirection.ToOrientationRotator().Yaw, 0));
@@ -1551,13 +1445,13 @@ void ADWCharacter::StopAIMove(bool bMulticast /*= false*/)
 
 void ADWCharacter::AddMovementInput(FVector WorldDirection, float ScaleValue, bool bForce)
 {
-	if (bBreakAllInput) return;
+	if (IsBreakAllInput()) return;
 
 	switch(GetCharacterMovement()->MovementMode)
 	{
 		case EMovementMode::MOVE_Swimming:
 		{
-			if(bFloating && WorldDirection.Z > -0.5f)
+			if(IsFloating() && WorldDirection.Z > -0.5f)
 			{
 				WorldDirection.Z = 0;
 			}
@@ -1578,9 +1472,9 @@ void ADWCharacter::AddMovementInput(FVector WorldDirection, float ScaleValue, bo
 	}
 }
 
-void ADWCharacter::SetDamaging(bool bInDamaging)
+void ADWCharacter::SetDamageAble(bool bInDamaging)
 {
-	bDamaging = bInDamaging;
+	
 }
 
 UInventory* ADWCharacter::GetInventory() const
@@ -1617,19 +1511,84 @@ UWidgetCharacterHP* ADWCharacter::GetWidgetCharacterHPWidget() const
 	return nullptr;
 }
 
-bool ADWCharacter::IsActive(bool bNeedFreeToAnim /*= false*/) const
+bool ADWCharacter::IsActive(bool bNeedNotDead, bool bNeedFreeToAnim /*= false*/) const
 {
-	return bActive && !IsDead() && (!bNeedFreeToAnim || IsFreeToAnim(false));
+	return AbilitySystem->HasMatchingGameplayTag(ActiveTag) && (!bNeedNotDead || !IsDead()) && (!bNeedFreeToAnim || IsFreeToAnim(false));
 }
 
 bool ADWCharacter::IsFreeToAnim(bool bCheckStates) const
 {
-	return bFreeToAnimate && (!bCheckStates || !bFlying && !bFalling && !bRiding && !bClimbing && !bDefending);
+	return AbilitySystem->HasMatchingGameplayTag(FreeToAnimTag) && (!bCheckStates || !IsFlying() && !IsFalling() && !IsRiding() && !IsClimbing() && !IsDefending());
 }
 
-bool ADWCharacter::IsDead() const
+bool ADWCharacter::IsFalling() const
 {
-	return bDead || bDying;
+	return AbilitySystem->HasMatchingGameplayTag(FallingTag);
+}
+
+bool ADWCharacter::IsDodging() const
+{
+	return AbilitySystem->HasMatchingGameplayTag(DodgingTag);
+}
+
+bool ADWCharacter::IsSprinting() const
+{
+	return AbilitySystem->HasMatchingGameplayTag(SprintingTag);
+}
+
+bool ADWCharacter::IsCrouching() const
+{
+	return AbilitySystem->HasMatchingGameplayTag(CrouchingTag);
+}
+
+bool ADWCharacter::IsSwimming() const
+{
+	return AbilitySystem->HasMatchingGameplayTag(SwimmingTag);
+}
+
+bool ADWCharacter::IsFloating() const
+{
+	return AbilitySystem->HasMatchingGameplayTag(FloatingTag);
+}
+
+bool ADWCharacter::IsAttacking() const
+{
+	return AbilitySystem->HasMatchingGameplayTag(AttackingTag);
+}
+
+bool ADWCharacter::IsDefending() const
+{
+	return AbilitySystem->HasMatchingGameplayTag(DefendingTag);
+}
+
+bool ADWCharacter::IsClimbing() const
+{
+	return AbilitySystem->HasMatchingGameplayTag(ClimbingTag);
+}
+
+bool ADWCharacter::IsRiding() const
+{
+	return AbilitySystem->HasMatchingGameplayTag(RidingTag);
+}
+
+bool ADWCharacter::IsFlying() const
+{
+	return AbilitySystem->HasMatchingGameplayTag(FlyingTag);
+}
+
+bool ADWCharacter::IsInterrupting() const
+{
+	return AbilitySystem->HasMatchingGameplayTag(InterruptingTag);
+}
+
+bool ADWCharacter::IsLockRotation() const
+{
+	return AbilitySystem->HasMatchingGameplayTag(LockRotationTag);
+}
+
+bool ADWCharacter::IsBreakAllInput() const
+{
+	return AbilitySystem->HasMatchingGameplayTag(BreakAllInputTag);
 }
 
 FDWTeamData* ADWCharacter::GetTeamData() const
@@ -1646,10 +1605,56 @@ bool ADWCharacter::IsTargetable_Implementation() const
 	return !IsDead();
 }
 
+void ADWCharacter::SetNameV(FName InName)
+{
+	Super::SetNameV(InName);
+
+	if (GetWidgetCharacterHPWidget())
+	{
+		GetWidgetCharacterHPWidget()->SetHeadInfo(GetHeadInfo());
+	}
+}
+
+void ADWCharacter::SetRaceID(FName InRaceID)
+{
+	Super::SetRaceID(InRaceID);
+	
+	if (GetWidgetCharacterHPWidget())
+	{
+		GetWidgetCharacterHPWidget()->SetHeadInfo(GetHeadInfo());
+	}
+}
+
+void ADWCharacter::SetLevelV(int32 InLevel)
+{
+	Super::SetLevelV(InLevel);
+
+	FallingAttackAbility.AbilityLevel = InLevel;
+
+	if (GetWidgetCharacterHPWidget())
+	{
+		GetWidgetCharacterHPWidget()->SetHeadInfo(GetHeadInfo());
+	}
+}
+
+void ADWCharacter::SetEXP(int32 InEXP)
+{
+	Super::SetEXP(InEXP);
+
+	if (GetWidgetCharacterHPWidget())
+	{
+		GetWidgetCharacterHPWidget()->SetHeadInfo(GetHeadInfo());
+	}
+}
+
 void ADWCharacter::SetTeamID(FName InTeamID)
 {
 	TeamID = InTeamID;
-	HandleTeamIDChanged(InTeamID);
+
+	if (GetWidgetCharacterHPWidget())
+	{
+		GetWidgetCharacterHPWidget()->SetHeadInfo(GetHeadInfo());
+	}
 }
 
 float ADWCharacter::GetMana() const
@@ -2191,11 +2196,6 @@ void ADWCharacter::SetMotionRate_Implementation(float InMovementRate, float InRo
 {
 	MovementRate = InMovementRate;
 	RotationRate = InRotationRate;
-	HandleMoveSpeedChanged(GetMoveSpeed());
-	HandleRotationSpeedChanged(GetRotationSpeed());
-	HandleSwimSpeedChanged(GetSwimSpeed());
-	HandleRideSpeedChanged(GetRideSpeed());
-	HandleFlySpeedChanged(GetFlySpeed());
 }
 
 UDWCharacterPart* ADWCharacter::GetCharacterPart(EDWCharacterPartType InCharacterPartType) const
@@ -2210,6 +2210,78 @@ UDWCharacterPart* ADWCharacter::GetCharacterPart(EDWCharacterPartType InCharacte
 		}
 	}
 	return nullptr;
+}
+
+void ADWCharacter::OnAttributeChange(const FOnAttributeChangeData& InAttributeChangeData)
+{
+	Super::OnAttributeChange(InAttributeChangeData);
+	
+	const float DeltaValue = InAttributeChangeData.NewValue - InAttributeChangeData.OldValue;
+	if(InAttributeChangeData.Attribute == Cast<UDWCharacterAttributeSet>(AttributeSet)->GetHealthAttribute())
+	{
+		if (GetWidgetCharacterHPWidget())
+		{
+			GetWidgetCharacterHPWidget()->SetHealthPercent(InAttributeChangeData.NewValue, GetMaxHealth());
+		}
+	}
+	else if(InAttributeChangeData.Attribute == Cast<UDWCharacterAttributeSet>(AttributeSet)->GetMaxHealthAttribute())
+	{
+		if (GetWidgetCharacterHPWidget())
+		{
+			GetWidgetCharacterHPWidget()->SetHealthPercent(GetHealth(), InAttributeChangeData.NewValue);
+		}
+	}
+	else if(InAttributeChangeData.Attribute == Cast<UDWCharacterAttributeSet>(AttributeSet)->GetManaAttribute())
+	{
+		if (GetWidgetCharacterHPWidget())
+		{
+			GetWidgetCharacterHPWidget()->SetManaPercent(InAttributeChangeData.NewValue, GetMaxMana());
+		}
+	}
+	else if(InAttributeChangeData.Attribute == Cast<UDWCharacterAttributeSet>(AttributeSet)->GetMaxManaAttribute())
+	{
+		if (GetWidgetCharacterHPWidget())
+		{
+			GetWidgetCharacterHPWidget()->SetManaPercent(GetMana(), InAttributeChangeData.NewValue);
+		}
+	}
+	else if(InAttributeChangeData.Attribute == Cast<UDWCharacterAttributeSet>(AttributeSet)->GetMaxStaminaAttribute())
+	{
+		if (GetWidgetCharacterHPWidget())
+		{
+			GetWidgetCharacterHPWidget()->SetStaminaPercent(InAttributeChangeData.NewValue, GetMaxStamina());
+		}
+	}
+	else if(InAttributeChangeData.Attribute == Cast<UDWCharacterAttributeSet>(AttributeSet)->GetMaxStaminaAttribute())
+	{
+		if (GetWidgetCharacterHPWidget())
+		{
+			GetWidgetCharacterHPWidget()->SetStaminaPercent(GetStamina(), InAttributeChangeData.NewValue);
+		}
+	}
+	else if(InAttributeChangeData.Attribute == Cast<UDWCharacterAttributeSet>(AttributeSet)->GetMoveSpeedAttribute())
+	{
+		GetCharacterMovement()->MaxWalkSpeed = InAttributeChangeData.NewValue * (IsSprinting() ? 1.5f : 1) * MovementRate;
+	}
+	else if(InAttributeChangeData.Attribute == Cast<UDWCharacterAttributeSet>(AttributeSet)->GetSwimSpeedAttribute())
+	{
+		GetCharacterMovement()->MaxSwimSpeed = InAttributeChangeData.NewValue * (IsSprinting() ? 1.5f : 1) * MovementRate;
+	}
+	else if(InAttributeChangeData.Attribute == Cast<UDWCharacterAttributeSet>(AttributeSet)->GetRideSpeedAttribute())
+	{
+		if(RidingTarget)
+		{
+			RidingTarget->GetCharacterMovement()->MaxWalkSpeed = InAttributeChangeData.NewValue * (IsSprinting() ? 1.5f : 1) * MovementRate;
+		}
+	}
+	else if(InAttributeChangeData.Attribute == Cast<UDWCharacterAttributeSet>(AttributeSet)->GetFlySpeedAttribute())
+	{
+		GetCharacterMovement()->MaxFlySpeed = InAttributeChangeData.NewValue * (IsSprinting() ? 1.5f : 1) * MovementRate;
+	}
+	else if(InAttributeChangeData.Attribute == Cast<UDWCharacterAttributeSet>(AttributeSet)->GetRotationSpeedAttribute())
+	{
+		GetCharacterMovement()->RotationRate = FRotator(0, InAttributeChangeData.NewValue * (IsSprinting() ? 1.5f : 1), 0) * RotationRate;
+	}
 }
 
 void ADWCharacter::HandleDamage(EDamageType DamageType, const float LocalDamageDone, bool bHasCrited, FHitResult HitResult, const FGameplayTagContainer& SourceTags, AActor* SourceActor)
@@ -2241,200 +2313,4 @@ void ADWCharacter::HandleInterrupt(float InterruptDuration)
 	{
 		Interrupt(InterruptDuration * (1 - GetToughnessRate()), true);
 	}
-}
-
-void ADWCharacter::HandleNameChanged(FName NewValue)
-{
-	Super::HandleNameChanged(NewValue);
-	
-	if (GetWidgetCharacterHPWidget())
-	{
-		GetWidgetCharacterHPWidget()->SetHeadInfo(GetHeadInfo());
-	}
-}
-
-void ADWCharacter::HandleTeamIDChanged(FName NewValue)
-{
-	if (GetWidgetCharacterHPWidget())
-	{
-		GetWidgetCharacterHPWidget()->SetHeadInfo(GetHeadInfo());
-	}
-}
-
-void ADWCharacter::HandleRaceIDChanged(FName NewValue)
-{
-	Super::HandleRaceIDChanged(NewValue);
-	
-	if (GetWidgetCharacterHPWidget())
-	{
-		GetWidgetCharacterHPWidget()->SetHeadInfo(GetHeadInfo());
-	}
-}
-
-void ADWCharacter::HandleLevelChanged(int32 NewValue, int32 DeltaValue /*= 0*/)
-{
-	Super::HandleLevelChanged(NewValue, DeltaValue);
-	
-	FallingAttackAbility.AbilityLevel = NewValue;
-	if (GetWidgetCharacterHPWidget())
-	{
-		GetWidgetCharacterHPWidget()->SetHeadInfo(GetHeadInfo());
-	}
-}
-
-void ADWCharacter::HandleEXPChanged(int32 NewValue, int32 DeltaValue /*= 0*/)
-{
-	Super::HandleEXPChanged(NewValue, DeltaValue);
-	
-	if (GetWidgetCharacterHPWidget())
-	{
-		GetWidgetCharacterHPWidget()->SetHeadInfo(GetHeadInfo());
-	}
-}
-
-void ADWCharacter::HandleHealthChanged(float NewValue, float DeltaValue /*= 0.f*/)
-{
-	Super::HandleHealthChanged(NewValue, DeltaValue);
-	
-	if (GetWidgetCharacterHPWidget())
-	{
-		GetWidgetCharacterHPWidget()->SetHealthPercent(NewValue, GetMaxHealth());
-	}
-}
-
-void ADWCharacter::HandleMaxHealthChanged(float NewValue, float DeltaValue /*= 0.f*/)
-{
-	Super::HandleMaxHealthChanged(NewValue, DeltaValue);
-	
-	if (GetWidgetCharacterHPWidget())
-	{
-		GetWidgetCharacterHPWidget()->SetHealthPercent(NewValue, GetMaxHealth());
-	}
-}
-
-void ADWCharacter::HandleManaChanged(float NewValue, float DeltaValue /*= 0.f*/)
-{
-	if (GetWidgetCharacterHPWidget())
-	{
-		GetWidgetCharacterHPWidget()->SetManaPercent(NewValue, GetMaxMana());
-	}
-}
-
-void ADWCharacter::HandleMaxManaChanged(float NewValue, float DeltaValue /*= 0.f*/)
-{
-	if (GetWidgetCharacterHPWidget())
-	{
-		GetWidgetCharacterHPWidget()->SetManaPercent(NewValue, GetMaxMana());
-	}
-}
-
-void ADWCharacter::HandleStaminaChanged(float NewValue, float DeltaValue /*= 0.f*/)
-{
-	if (GetWidgetCharacterHPWidget())
-	{
-		GetWidgetCharacterHPWidget()->SetStaminaPercent(NewValue, GetMaxStamina());
-	}
-}
-
-void ADWCharacter::HandleMaxStaminaChanged(float NewValue, float DeltaValue /*= 0.f*/)
-{
-	if (GetWidgetCharacterHPWidget())
-	{
-		GetWidgetCharacterHPWidget()->SetStaminaPercent(NewValue, GetMaxStamina());
-	}
-}
-
-void ADWCharacter::HandleMoveSpeedChanged(float NewValue, float DeltaValue /*= 0.f*/)
-{
-	GetCharacterMovement()->MaxWalkSpeed = NewValue * (bSprinting ? 1.5f : 1) * MovementRate;
-}
-
-void ADWCharacter::HandleSwimSpeedChanged(float NewValue, float DeltaValue /*= 0.f*/)
-{
-	GetCharacterMovement()->MaxSwimSpeed = NewValue * (bSprinting ? 1.5f : 1) * MovementRate;
-}
-
-void ADWCharacter::HandleRideSpeedChanged(float NewValue, float DeltaValue /*= 0.f*/)
-{
-	GetCharacterMovement()->MaxWalkSpeed = NewValue * (bSprinting ? 1.5f : 1) * MovementRate;
-}
-
-void ADWCharacter::HandleFlySpeedChanged(float NewValue, float DeltaValue /*= 0.f*/)
-{
-	GetCharacterMovement()->MaxFlySpeed = NewValue * (bSprinting ? 1.5f : 1) * MovementRate;
-}
-
-void ADWCharacter::HandleRotationSpeedChanged(float NewValue, float DeltaValue /*= 0.f*/)
-{
-	GetCharacterMovement()->RotationRate = FRotator(0, NewValue * (bSprinting ? 1.5f : 1), 0) * RotationRate;
-}
-
-void ADWCharacter::HandleJumpForceChanged(float NewValue, float DeltaValue)
-{
-	Super::HandleJumpForceChanged(NewValue, DeltaValue);
-}
-
-void ADWCharacter::HandleDodgeForceChanged(float NewValue, float DeltaValue /*= 0.f*/)
-{
-	
-}
-
-void ADWCharacter::HandleAttackForceChanged(float NewValue, float DeltaValue /*= 0.f*/)
-{
-	
-}
-
-void ADWCharacter::HandleRepulseForceChanged(float NewValue, float DeltaValue /*= 0.f*/)
-{
-	
-}
-
-void ADWCharacter::HandleAttackSpeedChanged(float NewValue, float DeltaValue /*= 0.f*/)
-{
-	
-}
-
-void ADWCharacter::HandleAttackCritRateChanged(float NewValue, float DeltaValue /*= 0.f*/)
-{
-	
-}
-
-void ADWCharacter::HandleAttackStealRateChanged(float NewValue, float DeltaValue /*= 0.f*/)
-{
-	
-}
-
-void ADWCharacter::HandleDefendRateChanged(float NewValue, float DeltaValue /*= 0.f*/)
-{
-	
-}
-
-void ADWCharacter::HandleDefendScopeChanged(float NewValue, float DeltaValue /*= 0.f*/)
-{
-	
-}
-
-void ADWCharacter::HandlePhysicsDefRateChanged(float NewValue, float DeltaValue /*= 0.f*/)
-{
-	
-}
-
-void ADWCharacter::HandleMagicDefRateChanged(float NewValue, float DeltaValue /*= 0.f*/)
-{
-	
-}
-
-void ADWCharacter::HandleToughnessRateChanged(float NewValue, float DeltaValue /*= 0.f*/)
-{
-	
-}
-
-void ADWCharacter::HandleRegenSpeedAttribute(float NewValue, float DeltaValue /*= 0.f*/)
-{
-
-}
-
-void ADWCharacter::HandleExpendSpeedAttribute(float NewValue, float DeltaValue /*= 0.f*/)
-{
-
 }

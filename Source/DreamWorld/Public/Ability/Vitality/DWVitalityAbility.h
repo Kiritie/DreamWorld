@@ -1,7 +1,7 @@
 #pragma once
 
 #include "DreamWorld/DreamWorld.h"
-#include "Ability/Vitality/VitalityAbilityBase.h"
+#include "Ability/Abilities/VitalityAbilityBase.h"
 #include "DWVitalityAbility.generated.h"
 
 /**

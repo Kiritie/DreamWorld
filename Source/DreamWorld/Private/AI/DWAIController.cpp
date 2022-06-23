@@ -46,8 +46,6 @@ void ADWAIController::OnPossess(APawn* InPawn)
 
 	if (GetPossessedCharacter())
 	{
-		GetPossessedCharacter()->SetOwnerController(this);
-		GetPossessedCharacter()->RefreshData();
 		if (GetPossessedCharacter()->HasBehaviorTree())
 		{
 			RunBehaviorTree(GetPossessedCharacter()->GetBehaviorTree());
@@ -65,11 +63,6 @@ void ADWAIController::OnPossess(APawn* InPawn)
 
 void ADWAIController::OnUnPossess()
 {
-	if(GetPossessedCharacter())
-	{
-		GetPossessedCharacter()->SetOwnerController(nullptr);
-	}
-
 	Super::OnUnPossess();
 
 	if (GetBrainComponent() && GetBrainComponent()->IsA(UBehaviorTreeComponent::StaticClass()))

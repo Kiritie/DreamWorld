@@ -2,7 +2,7 @@
 
 #include "Inventory/Slot/InventorySlot.h"
 
-#include "Ability/Item/ItemAbilityBase.h"
+#include "Ability/Abilities/ItemAbilityBase.h"
 #include "Ability/Item/AbilityItemDataBase.h"
 #include "Inventory/Inventory.h"
 #include "Character/Player/DWPlayerCharacter.h"

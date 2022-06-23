@@ -185,6 +185,8 @@ enum class EDWCharacterActionType : uint8
 	// ???
 	Swim,
 	// ???
+	Float,
+	// ???
 	Ride,
 	// ????
 	Fly,

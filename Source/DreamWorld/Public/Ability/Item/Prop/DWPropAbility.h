@@ -1,7 +1,7 @@
 #pragma once
 
+#include "Ability/Abilities/PropAbilityBase.h"
 #include "DreamWorld/DreamWorld.h"
-#include "Ability/Item/Prop/PropAbilityBase.h"
 #include "DWPropAbility.generated.h"
 
 /**

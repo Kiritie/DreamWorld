@@ -344,7 +344,7 @@ FSplitSlotInfo UInventory::GetSplitSlotInfo(ESplitSlotType InSplitSlotType) cons
 	return FSplitSlotInfo();
 }
 
-TArray<UInventorySlot*> UInventory::K2_GetSplitSlots(ESplitSlotType InSplitSlotType)
+TArray<UInventorySlot*> UInventory::GetSplitSlots(ESplitSlotType InSplitSlotType)
 {
 	TArray<UInventorySlot*> SplitSlots = TArray<UInventorySlot*>();
 

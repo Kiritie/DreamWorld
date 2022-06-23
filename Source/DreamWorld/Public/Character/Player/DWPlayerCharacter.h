@@ -100,7 +100,7 @@ public:
 
 	virtual void DeathEnd() override;
 
-	virtual void ResetData(bool bRefresh) override;
+	virtual void ResetData() override;
 
 	virtual void Interrupt(float InDuration  = -1, bool bInPlayAnim  = false) override;
 
@@ -175,67 +175,19 @@ protected:
 	virtual void DoInteractAction5();
 
 public:
-	virtual void HandleNameChanged(FName NewValue) override;
-
-	virtual void HandleTeamIDChanged(FName NewValue) override;
-
-	virtual void HandleRaceIDChanged(FName NewValue) override;
-
-	virtual void HandleLevelChanged(int32 NewValue, int32 DeltaValue = 0) override;
-
-	virtual void HandleEXPChanged(int32 NewValue, int32 DeltaValue = 0) override;
-
-	virtual void HandleHealthChanged(float NewValue, float DeltaValue = 0.f) override;
-
-	virtual void HandleMaxHealthChanged(float NewValue, float DeltaValue = 0.f) override;
-
-	virtual void HandleManaChanged(float NewValue, float DeltaValue = 0.f) override;
-	
-	virtual void HandleMaxManaChanged(float NewValue, float DeltaValue = 0.f) override;
-
-	virtual void HandleStaminaChanged(float NewValue, float DeltaValue = 0.f) override;
-	
-	virtual void HandleMaxStaminaChanged(float NewValue, float DeltaValue = 0.f) override;
-
-	virtual void HandleMoveSpeedChanged(float NewValue, float DeltaValue = 0.f) override;
-
-	virtual void HandleSwimSpeedChanged(float NewValue, float DeltaValue = 0.f) override;
-
-	virtual void HandleRideSpeedChanged(float NewValue, float DeltaValue = 0.f) override;
-
-	virtual void HandleFlySpeedChanged(float NewValue, float DeltaValue = 0.f) override;
-
-	virtual void HandleRotationSpeedChanged(float NewValue, float DeltaValue = 0.f) override;
-
-	virtual void HandleJumpForceChanged(float NewValue, float DeltaValue = 0.f) override;
-
-	virtual void HandleDodgeForceChanged(float NewValue, float DeltaValue = 0.f) override;
-
-	virtual void HandleAttackForceChanged(float NewValue, float DeltaValue = 0.f) override;
-
-	virtual void HandleRepulseForceChanged(float NewValue, float DeltaValue = 0.f) override;
-
-	virtual void HandleAttackSpeedChanged(float NewValue, float DeltaValue = 0.f) override;
-
-	virtual void HandleAttackCritRateChanged(float NewValue, float DeltaValue = 0.f) override;
-
-	virtual void HandleAttackStealRateChanged(float NewValue, float DeltaValue = 0.f) override;
-
-	virtual void HandleDefendRateChanged(float NewValue, float DeltaValue = 0.f) override;
-
-	virtual void HandleDefendScopeChanged(float NewValue, float DeltaValue = 0.f) override;
-
-	virtual void HandlePhysicsDefRateChanged(float NewValue, float DeltaValue = 0.f) override;
-
-	virtual void HandleMagicDefRateChanged(float NewValue, float DeltaValue = 0.f) override;
-
-	virtual void HandleToughnessRateChanged(float NewValue, float DeltaValue = 0.f) override;
-
-	virtual void HandleRegenSpeedAttribute(float NewValue, float DeltaValue = 0.f) override;
-
-	virtual void HandleExpendSpeedAttribute(float NewValue, float DeltaValue = 0.f) override;
+	virtual void OnAttributeChange(const FOnAttributeChangeData& InAttributeChangeData) override;
 
 public:
+	virtual void SetNameV(FName InName) override;
+
+	virtual void SetRaceID(FName InRaceID) override;
+
+	virtual void SetLevelV(int32 InLevel) override;
+
+	virtual void SetEXP(int32 InEXP) override;
+
+	virtual void SetTeamID(FName InTeamID) override;
+	
 	virtual FString GetHeadInfo() const override;
 
 	UFUNCTION(BlueprintPure)
@@ -250,9 +202,7 @@ public:
 	UFUNCTION(BlueprintPure)
 	UTargetSystemComponent* GetTargetSystem() const { return TargetSystem; }
 
-	UFUNCTION(BlueprintPure)
-	USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
+	UCameraComponent* GetCameraComp_Implementation() override { return FollowCamera; }
 
-	UFUNCTION(BlueprintPure)
-	UCameraComponent* GetFollowCamera() const { return FollowCamera; }
+	USpringArmComponent* GetCameraBoom_Implementation() override { return CameraBoom; }
 };

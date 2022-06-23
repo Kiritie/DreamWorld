@@ -47,9 +47,9 @@ void UProcedure_ArchiveCreating::OnEnter(UProcedureBase* InLastProcedure)
 {
 	if(ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>())
 	{
-		OperationTarget = PlayerCharacter;
 		PlayerCharacter->SetActorHiddenInGame(false);
 		PlayerCharacter->OnCharacterActive.AddDynamic(this, &UProcedure_ArchiveCreating::ResetCameraView);
+		OperationTarget = PlayerCharacter;
 	}
 	
 	Super::OnEnter(InLastProcedure);

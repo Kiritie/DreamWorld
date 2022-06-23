@@ -37,161 +37,82 @@ void UDWCharacterAttributeSet::PreAttributeChange(const FGameplayAttribute& Attr
 	if (Attribute == GetManaAttribute())
 	{
 		NewValue = FMath::Clamp(NewValue, 0.f, GetMaxMana());
-		if (TargetCharacter)
-		{
-			TargetCharacter->HandleManaChanged(NewValue, NewValue - CurrentValue);
-		}
 	}
 	else if (Attribute == GetMaxManaAttribute())
 	{
-		if (TargetCharacter)
-		{
-			TargetCharacter->HandleMaxManaChanged(NewValue, NewValue - CurrentValue);
-		}
-		AdjustAttributeForMaxChange(Stamina, MaxStamina, NewValue, GetMaxStaminaAttribute());
+		AdjustAttributeForMaxChange(Mana, MaxMana, NewValue, GetMaxManaAttribute());
 	}
 	else if (Attribute == GetStaminaAttribute())
 	{
 		NewValue = FMath::Clamp(NewValue, 0.f, GetMaxStamina());
-		if (TargetCharacter)
-		{
-			TargetCharacter->HandleStaminaChanged(NewValue, NewValue - CurrentValue);
-		}
 	}
 	else if (Attribute == GetMaxStaminaAttribute())
 	{
-		if (TargetCharacter)
-		{
-			TargetCharacter->HandleMaxStaminaChanged(NewValue, NewValue - CurrentValue);
-		}
+		AdjustAttributeForMaxChange(Stamina, MaxStamina, NewValue, GetMaxStaminaAttribute());
 	}
 	else if (Attribute == GetSwimSpeedAttribute())
 	{
 		NewValue = FMath::Clamp(NewValue, 0.f, NewValue);
-		if (TargetCharacter)
-		{
-			TargetCharacter->HandleSwimSpeedChanged(NewValue, NewValue - CurrentValue);
-		}
 	}
 	else if (Attribute == GetRideSpeedAttribute())
 	{
 		NewValue = FMath::Clamp(NewValue, 0.f, NewValue);
-		if (TargetCharacter)
-		{
-			TargetCharacter->HandleRideSpeedChanged(NewValue, NewValue - CurrentValue);
-		}
 	}
 	else if (Attribute == GetFlySpeedAttribute())
 	{
 		NewValue = FMath::Clamp(NewValue, 0.f, NewValue);
-		if (TargetCharacter)
-		{
-			TargetCharacter->HandleFlySpeedChanged(NewValue, NewValue - CurrentValue);
-		}
 	}
 	else if (Attribute == GetDodgeForceAttribute())
 	{
 		NewValue = FMath::Clamp(NewValue, 0.f, NewValue);
-		if (TargetCharacter)
-		{
-			TargetCharacter->HandleDodgeForceChanged(NewValue, NewValue - CurrentValue);
-		}
 	}
 	else if (Attribute == GetAttackForceAttribute())
 	{
 		NewValue = FMath::Clamp(NewValue, 0.f, NewValue);
-		if (TargetCharacter)
-		{
-			TargetCharacter->HandleAttackForceChanged(NewValue, NewValue - CurrentValue);
-		}
 	}
 	else if (Attribute == GetRepulseForceAttribute())
 	{
 		NewValue = FMath::Clamp(NewValue, 0.f, NewValue);
-		if (TargetCharacter)
-		{
-			TargetCharacter->HandleRepulseForceChanged(NewValue, NewValue - CurrentValue);
-		}
 	}
 	else if (Attribute == GetAttackSpeedAttribute())
 	{
 		NewValue = FMath::Clamp(NewValue, 0.f, NewValue);
-		if (TargetCharacter)
-		{
-			TargetCharacter->HandleAttackSpeedChanged(NewValue, NewValue - CurrentValue);
-		}
 	}
 	else if (Attribute == GetAttackCritRateAttribute())
 	{
 		NewValue = FMath::Clamp(NewValue, 0.f, 1.f);
-		if (TargetCharacter)
-		{
-			TargetCharacter->HandleAttackCritRateChanged(NewValue, NewValue - CurrentValue);
-		}
 	}
 	else if (Attribute == GetAttackStealRateAttribute())
 	{
 		NewValue = FMath::Clamp(NewValue, 0.f, 1.f);
-		if (TargetCharacter)
-		{
-			TargetCharacter->HandleAttackStealRateChanged(NewValue, NewValue - CurrentValue);
-		}
 	}
 	else if (Attribute == GetDefendRateAttribute())
 	{
 		NewValue = FMath::Clamp(NewValue, 0.f, 1.f);
-		if (TargetCharacter)
-		{
-			TargetCharacter->HandleDefendRateChanged(NewValue, NewValue - CurrentValue);
-		}
 	}
 	else if (Attribute == GetDefendScopeAttribute())
 	{
 		NewValue = FMath::Clamp(NewValue, 0.f, 1.f);
-		if (TargetCharacter)
-		{
-			TargetCharacter->HandleDefendScopeChanged(NewValue, NewValue - CurrentValue);
-		}
 	}
 	else if (Attribute == GetPhysicsDefRateAttribute())
 	{
 		NewValue = FMath::Clamp(NewValue, 0.f, 1.f);
-		if (TargetCharacter)
-		{
-			TargetCharacter->HandlePhysicsDefRateChanged(NewValue, NewValue - CurrentValue);
-		}
 	}
 	else if (Attribute == GetMagicDefRateAttribute())
 	{
 		NewValue = FMath::Clamp(NewValue, 0.f, 1.f);
-		if (TargetCharacter)
-		{
-			TargetCharacter->HandleMagicDefRateChanged(NewValue, NewValue - CurrentValue);
-		}
 	}
 	else if (Attribute == GetToughnessRateAttribute())
 	{
 		NewValue = FMath::Clamp(NewValue, 0.f, 1.f);
-		if (TargetCharacter)
-		{
-			TargetCharacter->HandleToughnessRateChanged(NewValue, NewValue - CurrentValue);
-		}
 	}
 	else if (Attribute == GetStaminaRegenSpeedAttribute())
 	{
 		NewValue = FMath::Clamp(NewValue, 0.f, NewValue);
-		if (TargetCharacter)
-		{
-			TargetCharacter->HandleRegenSpeedAttribute(NewValue, NewValue - CurrentValue);
-		}
 	}
 	else if (Attribute == GetStaminaExpendSpeedAttribute())
 	{
 		NewValue = FMath::Clamp(NewValue, 0.f, NewValue);
-		if (TargetCharacter)
-		{
-			TargetCharacter->HandleExpendSpeedAttribute(NewValue, NewValue - CurrentValue);
-		}
 	}
 	else
 	{

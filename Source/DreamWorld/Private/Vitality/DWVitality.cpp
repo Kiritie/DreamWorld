@@ -8,6 +8,8 @@
 #include "Ability/Vitality/AbilityVitalityDataBase.h"
 #include "Components/BoxComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Vitality/DWVitality.h"
+
 #include "Character/DWCharacter.h"
 #include "Inventory/VitalityInventory.h"
 #include "Vitality/DWVitalityData.h"
@@ -50,7 +52,7 @@ void ADWVitality::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if(bDead) return;
+	if(IsDead()) return;
 
 	Inventory->Refresh(DeltaTime);
 }
@@ -122,19 +124,14 @@ FSaveData* ADWVitality::ToData(bool bSaved)
 	return &SaveData;
 }
 
-void ADWVitality::ResetData(bool bRefresh)
+void ADWVitality::ResetData()
 {
-	Super::ResetData(bRefresh);
-}
-
-void ADWVitality::RefreshData()
-{
-	Super::RefreshData();
+	Super::ResetData();
 }
 
 void ADWVitality::Death(AActor* InKiller /*= nullptr*/)
 {
-	if (!bDead)
+	if (!IsDead())
 	{
 		Inventory->DiscardAllItem();
 		OwnerChunk->DestroySceneActor(this);
@@ -168,7 +165,7 @@ bool ADWVitality::CanInteract(IInteractionAgentInterface* InInteractionAgent, EI
 	{
 		case EInteractAction::Revive:
 		{
-			if(bDead)
+			if(!IsDead(true))
 			{
 				return true;
 			}
@@ -190,6 +187,46 @@ void ADWVitality::OnInteract(IInteractionAgentInterface* InInteractionAgent, EIn
 			break;
 		}
 		default: break;
+	}
+}
+
+void ADWVitality::SetNameV(FName InName)
+{
+	Super::SetNameV(InName);
+
+	if (GetWidgetVitalityHPWidget())
+	{
+		GetWidgetVitalityHPWidget()->SetHeadInfo(GetHeadInfo());
+	}
+}
+
+void ADWVitality::SetRaceID(FName InRaceID)
+{
+	Super::SetRaceID(InRaceID);
+	
+	if (GetWidgetVitalityHPWidget())
+	{
+		GetWidgetVitalityHPWidget()->SetHeadInfo(GetHeadInfo());
+	}
+}
+
+void ADWVitality::SetLevelV(int32 InLevel)
+{
+	Super::SetLevelV(InLevel);
+
+	if (GetWidgetVitalityHPWidget())
+	{
+		GetWidgetVitalityHPWidget()->SetHeadInfo(GetHeadInfo());
+	}
+}
+
+void ADWVitality::SetEXP(int32 InEXP)
+{
+	Super::SetEXP(InEXP);
+
+	if (GetWidgetVitalityHPWidget())
+	{
+		GetWidgetVitalityHPWidget()->SetHeadInfo(GetHeadInfo());
 	}
 }
 
@@ -217,78 +254,39 @@ UWidgetVitalityHP* ADWVitality::GetWidgetVitalityHPWidget() const
 	return nullptr;
 }
 
+void ADWVitality::OnAttributeChange(const FOnAttributeChangeData& InAttributeChangeData)
+{
+	Super::OnAttributeChange(InAttributeChangeData);
+	
+	const float DeltaValue = InAttributeChangeData.NewValue - InAttributeChangeData.OldValue;
+	if(InAttributeChangeData.Attribute == Cast<UDWVitalityAttributeSet>(AttributeSet)->GetHealthAttribute())
+	{
+		if (GetWidgetVitalityHPWidget())
+		{
+			GetWidgetVitalityHPWidget()->SetHealthPercent(InAttributeChangeData.NewValue, GetMaxHealth());
+		}
+	}
+	else if(InAttributeChangeData.Attribute == Cast<UDWVitalityAttributeSet>(AttributeSet)->GetMaxHealthAttribute())
+	{
+		if (GetWidgetVitalityHPWidget())
+		{
+			GetWidgetVitalityHPWidget()->SetHealthPercent(GetHealth(), InAttributeChangeData.NewValue);
+		}
+	}
+}
+
 void ADWVitality::HandleDamage(EDamageType DamageType, const float LocalDamageDone, bool bHasCrited, FHitResult HitResult, const FGameplayTagContainer& SourceTags, AActor* SourceActor)
 {
 	Super::HandleDamage(DamageType, LocalDamageDone, bHasCrited, HitResult, SourceTags, SourceActor);
 	
 	if(SourceActor && SourceActor != this)
 	{
-		if(ADWCharacter* SourceCharacter = Cast<ADWCharacter>(SourceActor))
+		if(ADWCharacter* SourceVitality = Cast<ADWCharacter>(SourceActor))
 		{
 			if(DamageType == EDamageType::Physics)
 			{
-				SourceCharacter->ModifyHealth(LocalDamageDone * SourceCharacter->GetAttackStealRate());
+				SourceVitality->ModifyHealth(LocalDamageDone * SourceVitality->GetAttackStealRate());
 			}
 		}
-	}
-}
-
-void ADWVitality::HandleNameChanged(FName NewValue)
-{
-	Super::HandleNameChanged(NewValue);
-	
-	if (GetWidgetVitalityHPWidget())
-	{
-		GetWidgetVitalityHPWidget()->SetHeadInfo(GetHeadInfo());
-	}
-}
-
-void ADWVitality::HandleRaceIDChanged(FName NewValue)
-{
-	Super::HandleRaceIDChanged(NewValue);
-	
-	if (GetWidgetVitalityHPWidget())
-	{
-		GetWidgetVitalityHPWidget()->SetHeadInfo(GetHeadInfo());
-	}
-}
-
-void ADWVitality::HandleLevelChanged(int32 NewValue, int32 DeltaValue /*= 0*/)
-{
-	Super::HandleLevelChanged(NewValue, DeltaValue);
-	
-	if (GetWidgetVitalityHPWidget())
-	{
-		GetWidgetVitalityHPWidget()->SetHeadInfo(GetHeadInfo());
-	}
-}
-
-void ADWVitality::HandleEXPChanged(int32 NewValue, int32 DeltaValue /*= 0*/)
-{
-	Super::HandleEXPChanged(NewValue, DeltaValue);
-	
-	if (GetWidgetVitalityHPWidget())
-	{
-		GetWidgetVitalityHPWidget()->SetHeadInfo(GetHeadInfo());
-	}
-}
-
-void ADWVitality::HandleHealthChanged(float NewValue, float DeltaValue /*= 0.f*/)
-{
-	Super::HandleHealthChanged(NewValue, DeltaValue);
-	
-	if (GetWidgetVitalityHPWidget())
-	{
-		GetWidgetVitalityHPWidget()->SetHealthPercent(NewValue, GetMaxHealth());
-	}
-}
-
-void ADWVitality::HandleMaxHealthChanged(float NewValue, float DeltaValue /*= 0.f*/)
-{
-	Super::HandleMaxHealthChanged(NewValue, DeltaValue);
-	
-	if (GetWidgetVitalityHPWidget())
-	{
-		GetWidgetVitalityHPWidget()->SetHealthPercent(NewValue, GetMaxHealth());
 	}
 }

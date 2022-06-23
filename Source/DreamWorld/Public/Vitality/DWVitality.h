@@ -61,9 +61,7 @@ public:
 
 	virtual FSaveData* ToData(bool bSaved = true) override;
 	
-	virtual void ResetData(bool bRefresh = false) override;
-	
-	virtual void RefreshData() override;
+	virtual void ResetData() override;
 
 	virtual void Death(AActor* InKiller = nullptr) override;
 
@@ -80,6 +78,14 @@ public:
 	virtual void OnInteract(IInteractionAgentInterface* InInteractionAgent, EInteractAction InInteractAction) override;
 
 public:
+	virtual void SetNameV(FName InName) override;
+
+	virtual void SetRaceID(FName InRaceID) override;
+
+	virtual void SetLevelV(int32 InLevel) override;
+
+	virtual void SetEXP(int32 InEXP) override;
+
 	UFUNCTION(BlueprintPure)
 	virtual AVoxelChunk* GetOwnerChunk() const override { return OwnerChunk; }
 	
@@ -97,17 +103,7 @@ public:
 	UWidgetVitalityHP* GetWidgetVitalityHPWidget() const;
 
 public:
-	virtual void HandleDamage(EDamageType DamageType, const float LocalDamageDone, bool bHasCrited, FHitResult HitResult, const FGameplayTagContainer& SourceTags, AActor* SourceActor) override;
-		
-	virtual void HandleNameChanged(FName NewValue) override;
-
-	virtual void HandleRaceIDChanged(FName NewValue) override;
-
-	virtual void HandleLevelChanged(int32 NewValue, int32 DeltaValue = 0) override;
-
-	virtual void HandleEXPChanged(int32 NewValue, int32 DeltaValue = 0) override;
-
-	virtual void HandleHealthChanged(float NewValue, float DeltaValue = 0.f) override;
+	virtual void OnAttributeChange(const FOnAttributeChangeData& InAttributeChangeData) override;
 	
-	virtual void HandleMaxHealthChanged(float NewValue, float DeltaValue = 0.f) override;
+	virtual void HandleDamage(EDamageType DamageType, const float LocalDamageDone, bool bHasCrited, FHitResult HitResult, const FGameplayTagContainer& SourceTags, AActor* SourceActor) override;
 };

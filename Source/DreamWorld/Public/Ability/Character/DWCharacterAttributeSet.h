@@ -1,7 +1,7 @@
 #pragma once
 
 #include "DreamWorld/DreamWorld.h"
-#include "Ability/Character/CharacterAttributeSetBase.h"
+#include "Ability/Attributes/CharacterAttributeSetBase.h"
 #include "DWCharacterAttributeSet.generated.h"
 
 /**

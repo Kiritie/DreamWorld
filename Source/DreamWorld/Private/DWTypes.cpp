@@ -7,7 +7,7 @@
 #include "SaveGame/DWGeneralSaveGame.h"
 #include "SaveGame/SaveGameModuleBPLibrary.h"
 #include "Ability/Vitality/AbilityVitalityBase.h"
-#include "Ability/Character/CharacterAbilityBase.h"
+#include "Ability/Abilities/CharacterAbilityBase.h"
 #include "Vitality/DWVitalityData.h"
 #include "Character/DWCharacterData.h"
 
