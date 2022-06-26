@@ -85,14 +85,12 @@ public:
 
 	virtual void LoadData(FSaveData* InSaveData) override;
 
-	virtual FSaveData* ToData(bool bSaved = true) override;
+	virtual FSaveData* ToData() override;
 
 public:
 	virtual void Active(bool bResetData = false) override;
 
 	virtual void Disable(bool bDisableMovement = false, bool bDisableCollision = false) override;
-
-	virtual void Spawn() override;
 
 	virtual void Revive() override;
 

@@ -25,7 +25,7 @@ public:
 	
 	virtual void LoadData(FInventorySaveData InInventoryData, AActor* InOwner) override;
 
-	virtual FInventorySaveData ToData(bool bSaved = true) override;
+	virtual FInventorySaveData ToData() override;
 
 public:
 	virtual FQueryItemInfo GetItemInfoByRange(EQueryItemType InActionType, FAbilityItem InItem, int32 InStartIndex = 0, int32 InEndIndex = -1) override;

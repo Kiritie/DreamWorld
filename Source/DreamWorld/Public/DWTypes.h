@@ -546,6 +546,7 @@ public:
 	FORCEINLINE FDWPlayerSaveData()
 	{
 		ArchiveID = 0;
+		ControlMode = EDWControlMode::Fighting;
 	}
 	
 	FORCEINLINE FDWPlayerSaveData(FDWPlayerBasicSaveData InBasicSaveData)
@@ -553,12 +554,16 @@ public:
 		ID = InBasicSaveData.ID;
 	
 		ArchiveID = 0;
+		ControlMode = EDWControlMode::Fighting;
 	}
 	
 	struct FDWArchiveBasicSaveData GetArchiveData() const;
 
 	UPROPERTY(BlueprintReadOnly)
 	int32 ArchiveID;
+
+	UPROPERTY(BlueprintReadOnly)
+	EDWControlMode ControlMode;
 };
 
 USTRUCT(BlueprintType)

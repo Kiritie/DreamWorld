@@ -39,6 +39,12 @@
 #include "Voxel/Chunks/VoxelChunk.h"
 #include "Voxel/Voxels/Voxel.h"
 #include "Widget/WidgetModuleBPLibrary.h"
+#include "Voxel/Datas/VoxelData.h"
+#include "Ability/Item/Equip/AbilityEquipDataBase.h"
+#include "Ability/Item/Prop/AbilityPropDataBase.h"
+#include "Ability/Item/Skill/AbilitySkillDataBase.h"
+#include "Ability/AbilityModuleBPLibrary.h"
+#include "Ability/AbilityModuleTypes.h"
 
 //////////////////////////////////////////////////////////////////////////
 // ADWPlayerCharacter
@@ -244,11 +250,52 @@ void ADWPlayerCharacter::LoadData(FSaveData* InSaveData)
 	Super::LoadData(InSaveData);
 
 	auto SaveData = *static_cast<FDWPlayerSaveData*>(InSaveData);
+	if (SaveData.bSaved)
+	{
+		SetControlMode(SaveData.ControlMode);
+	}
+	else
+	{
+		SetControlMode(EDWControlMode::Fighting);
+
+		auto VoxelDatas = UAssetModuleBPLibrary::LoadPrimaryAssets<UVoxelData>(UAbilityModuleBPLibrary::GetAssetTypeByItemType(EAbilityItemType::Voxel));
+		for (int32 i = 0; i < VoxelDatas.Num(); i++)
+		{
+			if(VoxelDatas[i]->VoxelType != EVoxelType::Empty && VoxelDatas[i]->VoxelType != EVoxelType::Unknown)
+			{
+				FAbilityItem tmpItem = FAbilityItem(VoxelDatas[i]->GetPrimaryAssetId(), VoxelDatas[i]->MaxCount);
+				Inventory->AdditionItemByRange(tmpItem);
+			}
+		}
+		
+		auto EquipDatas = UAssetModuleBPLibrary::LoadPrimaryAssets<UAbilityEquipDataBase>(UAbilityModuleBPLibrary::GetAssetTypeByItemType(EAbilityItemType::Equip));
+		for (int32 i = 0; i < EquipDatas.Num(); i++)
+		{
+			FAbilityItem tmpItem = FAbilityItem(EquipDatas[i]->GetPrimaryAssetId(), EquipDatas[i]->MaxCount);
+			Inventory->AdditionItemByRange(tmpItem);
+		}
+			
+		auto PropDatas = UAssetModuleBPLibrary::LoadPrimaryAssets<UAbilityPropDataBase>(UAbilityModuleBPLibrary::GetAssetTypeByItemType(EAbilityItemType::Prop));
+		for (int32 i = 0; i < PropDatas.Num(); i++)
+		{
+			FAbilityItem tmpItem = FAbilityItem(PropDatas[i]->GetPrimaryAssetId(), PropDatas[i]->MaxCount);
+			Inventory->AdditionItemByRange(tmpItem);
+		}
+
+		auto SkillDatas = UAssetModuleBPLibrary::LoadPrimaryAssets<UAbilitySkillDataBase>(UAbilityModuleBPLibrary::GetAssetTypeByItemType(EAbilityItemType::Skill));
+		for (int32 i = 0; i < SkillDatas.Num(); i++)
+		{
+			FAbilityItem tmpItem = FAbilityItem(SkillDatas[i]->GetPrimaryAssetId(), SkillDatas[i]->MaxCount);
+			Inventory->AdditionItemByRange(tmpItem);
+		}
+	}
 }
 
-FSaveData* ADWPlayerCharacter::ToData(bool bSaved)
+FSaveData* ADWPlayerCharacter::ToData()
 {
-	return Super::ToData(bSaved);
+	static auto SaveData = FDWPlayerSaveData();
+	SaveData.ControlMode = ControlMode;
+	return &SaveData;
 }
 
 void ADWPlayerCharacter::Active(bool bResetData)
@@ -259,12 +306,6 @@ void ADWPlayerCharacter::Active(bool bResetData)
 void ADWPlayerCharacter::Disable(bool bDisableMovement, bool bDisableCollision)
 {
 	Super::Disable(bDisableMovement, bDisableCollision);
-}
-
-void ADWPlayerCharacter::Spawn()
-{
-	Super::Spawn();
-	SetControlMode(ControlMode);
 }
 
 void ADWPlayerCharacter::Revive()
@@ -514,9 +555,13 @@ void ADWPlayerCharacter::ToggleControlMode()
 	if(IsBreakAllInput() || !IsFreeToAnim()) return;
 
 	if(ControlMode == EDWControlMode::Fighting)
+	{
 		SetControlMode(EDWControlMode::Creating);
+	}
 	else
+	{
 		SetControlMode(EDWControlMode::Fighting);
+	}
 }
 
 void ADWPlayerCharacter::ToggleCrouch()

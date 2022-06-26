@@ -4,6 +4,7 @@
 
 #include "DreamWorld/DreamWorld.h"
 #include "Gameplay/WHPlayerController.h"
+#include "SaveGame/Base/SaveDataInterface.h"
 
 #include "DWPlayerController.generated.h"
 
@@ -11,7 +12,7 @@
  * 玩家角色控制器
  */
 UCLASS()
-class DREAMWORLD_API ADWPlayerController : public AWHPlayerController
+class DREAMWORLD_API ADWPlayerController : public AWHPlayerController, public ISaveDataInterface
 {
 	GENERATED_BODY()
 
@@ -38,13 +39,15 @@ protected:
 	virtual void OnUnPossess() override;
 
 public:
+	virtual void LoadData(FSaveData* InSaveData) override;
+
+	virtual FSaveData* ToData() override;
+
+	virtual void UnloadData() override;
+
+	virtual void ResetData();
+
 	virtual void Tick(float DeltaTime) override;
-
-	void LoadData(FDWPlayerSaveData InPlayerData);
-
-	void UnloadData();
-
-	void ResetData();
 
 	bool RaycastFromAimPoint(FHitResult& OutHitResult, EDWGameTraceType InGameTraceType, float InRayDistance = 1000) const;
 

@@ -23,7 +23,7 @@ public:
 	
 	virtual void LoadData(FInventorySaveData InInventoryData, AActor* InOwner) override;
 
-	virtual FInventorySaveData ToData(bool bSaved = true) override;
+	virtual FInventorySaveData ToData() override;
 
 	virtual void DiscardAllItem() override;
 

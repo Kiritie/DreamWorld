@@ -26,12 +26,16 @@ ADWVitality::ADWVitality()
 	WidgetVitalityHP->SetRelativeLocation(FVector(0, 0, 50));
 
 	AbilitySystem = CreateDefaultSubobject<UDWAbilitySystemComponent>(FName("AbilitySystem"));
-	
+
 	AttributeSet = CreateDefaultSubobject<UDWVitalityAttributeSet>(FName("AttributeSet"));
 	
 	Inventory = CreateDefaultSubobject<UVitalityInventory>(FName("Inventory"));
 
 	OwnerChunk = nullptr;
+
+	// tags
+	DeadTag = FGameplayTag::RequestGameplayTag("State.Vitality.Dead");
+	DyingTag = FGameplayTag::RequestGameplayTag("State.Vitality.Dying");
 }
 
 // Called when the game starts or when spawned
@@ -43,11 +47,18 @@ void ADWVitality::BeginPlay()
 	{
 		GetWidgetVitalityHPWidget()->SetOwnerObject(this);
 	}
-
-	Spawn();
 }
 
-// Called every frame
+void ADWVitality::OnSpawn_Implementation(const TArray<FParameter>& InParams)
+{
+	Super::OnSpawn_Implementation(InParams);
+}
+
+void ADWVitality::OnDespawn_Implementation()
+{
+	Super::OnDespawn_Implementation();
+}
+
 void ADWVitality::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
@@ -104,11 +115,9 @@ void ADWVitality::LoadData(FSaveData* InSaveData)
 	}
 }
 
-FSaveData* ADWVitality::ToData(bool bSaved)
+FSaveData* ADWVitality::ToData()
 {
 	static FDWVitalitySaveData SaveData;
-
-	SaveData.bSaved = bSaved;
 
 	SaveData.ID = AssetID;
 	SaveData.Name = Name;
@@ -137,11 +146,6 @@ void ADWVitality::Death(AActor* InKiller /*= nullptr*/)
 		OwnerChunk->DestroySceneActor(this);
 	}
 	Super::Death(InKiller);
-}
-
-void ADWVitality::Spawn()
-{
-	Super::Spawn();
 }
 
 void ADWVitality::Revive()

@@ -19,6 +19,8 @@
 #include "Voxel/Components/VoxelMeshComponent.h"
 #include "Voxel/Voxels/Voxel.h"
 #include "Voxel/Voxels/Auxiliary/VoxelAuxiliary.h"
+#include "ObjectPool/ObjectPoolModuleBPLibrary.h"
+#include "SaveGame/SaveGameModuleBPLibrary.h"
 
 // Sets default values
 ADWVoxelChunk::ADWVoxelChunk()
@@ -82,12 +84,11 @@ void ADWVoxelChunk::LoadData(FSaveData* InSaveData)
 	}
 }
  
-FSaveData* ADWVoxelChunk::ToData(bool bSaved)
+FSaveData* ADWVoxelChunk::ToData()
 {
 	static FDWVoxelChunkSaveData ChunkData;
 
 	ChunkData.Index = Index;
-	ChunkData.bSaved = bSaved;
 
 	for(auto& iter : VoxelMap)
 	{
@@ -96,20 +97,20 @@ FSaveData* ADWVoxelChunk::ToData(bool bSaved)
 
 	for(int32 i = 0; i < PickUps.Num(); i++)
 	{
-		ChunkData.PickUpDatas.Add(*static_cast<FPickUpSaveData*>(PickUps[i]->ToData()));
+		ChunkData.PickUpDatas.Add(*USaveGameModuleBPLibrary::ObjectToData<FPickUpSaveData>(PickUps[i]));
 	}
 
 	for(int32 i = 0; i < Characters.Num(); i++)
 	{
 		if(Characters[i]->GetNature() != EDWCharacterNature::Player)
 		{
-			ChunkData.CharacterDatas.Add(*static_cast<FDWCharacterSaveData*>(Characters[i]->ToData()));
+			ChunkData.CharacterDatas.Add(*USaveGameModuleBPLibrary::ObjectToData<FDWCharacterSaveData>(Characters[i]));
 		}
 	}
 
 	for(int32 i = 0; i < Vitalitys.Num(); i++)
 	{
-		ChunkData.VitalityDatas.Add(*static_cast<FDWVitalitySaveData*>(Vitalitys[i]->ToData()));
+		ChunkData.VitalityDatas.Add(*USaveGameModuleBPLibrary::ObjectToData<FDWVitalitySaveData>(Vitalitys[i]));
 	}
 
 	return &ChunkData;
@@ -296,9 +297,7 @@ void ADWVoxelChunk::DestroySceneActor(AActor* InActor)
 
 ADWCharacter* ADWVoxelChunk::SpawnCharacter(FDWCharacterSaveData InSaveData)
 {
-	FActorSpawnParameters spawnParams = FActorSpawnParameters();
-	spawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	if(ADWCharacter* character = GetWorld()->SpawnActor<ADWCharacter>(InSaveData.GetCharacterData().Class, spawnParams))
+	if(ADWCharacter* character = UObjectPoolModuleBPLibrary::SpawnObject<ADWCharacter>(nullptr, InSaveData.GetCharacterData().Class))
 	{
 		character->LoadData(&InSaveData);
 		character->SpawnDefaultController();
@@ -339,9 +338,7 @@ void ADWVoxelChunk::DestroyCharacter(ADWCharacter* InCharacter)
 
 ADWVitality* ADWVoxelChunk::SpawnVitality(FDWVitalitySaveData InSaveData)
 {
-	FActorSpawnParameters spawnParams = FActorSpawnParameters();
-	spawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	if(ADWVitality* Vitality = GetWorld()->SpawnActor<ADWVitality>(InSaveData.GetVitalityData().Class, spawnParams))
+	if(ADWVitality* Vitality = UObjectPoolModuleBPLibrary::SpawnObject<ADWVitality>(nullptr, InSaveData.GetVitalityData().Class))
 	{
 		Vitality->LoadData(&InSaveData);
 		AttachVitality(Vitality);

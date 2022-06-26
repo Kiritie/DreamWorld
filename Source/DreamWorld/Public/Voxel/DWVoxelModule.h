@@ -52,9 +52,9 @@ protected:
 	virtual void OnWorldStateChanged() override;
 	
 public:
-	virtual void LoadData(FSaveData* InWorldData) override;
+	virtual void LoadData(FSaveData* InSaveData) override;
 
-	virtual FSaveData* ToData(bool bSaved = true) override;
+	virtual FSaveData* ToData() override;
 
 	virtual void UnloadData() override;
 

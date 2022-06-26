@@ -1,4 +1,4 @@
-// Copyright 1998-2019 Epic Games, Inc. All Rights Reserved.
+﻿// Copyright 1998-2019 Epic Games, Inc. All Rights Reserved.
 
 #include "Character/DWCharacter.h"
 
@@ -93,6 +93,26 @@ ADWCharacter::ADWCharacter()
 	GetCharacterMovement()->AirControl = 0.2f;
 	GetCharacterMovement()->bComponentShouldUpdatePhysicsVolume = false;
 
+	// tags
+	DeadTag = FGameplayTag::RequestGameplayTag("State.Vitality.Dead");
+	DyingTag = FGameplayTag::RequestGameplayTag("State.Vitality.Dying");
+	ActiveTag = FGameplayTag::RequestGameplayTag("State.Character.Active");
+	FallingTag = FGameplayTag::RequestGameplayTag("State.Character.Falling");
+	DodgingTag = FGameplayTag::RequestGameplayTag("State.Character.Dodging");
+	SprintingTag = FGameplayTag::RequestGameplayTag("State.Character.Sprinting");
+	CrouchingTag = FGameplayTag::RequestGameplayTag("State.Character.Crouching");
+	SwimmingTag = FGameplayTag::RequestGameplayTag("State.Character.Swimming");
+	FloatingTag = FGameplayTag::RequestGameplayTag("State.Character.Floating");
+	ClimbingTag = FGameplayTag::RequestGameplayTag("State.Character.Climbing");
+	RidingTag = FGameplayTag::RequestGameplayTag("State.Character.Riding");
+	FlyingTag = FGameplayTag::RequestGameplayTag("State.Character.Flying");
+	AttackingTag = FGameplayTag::RequestGameplayTag("State.Character.Attacking");
+	DefendingTag = FGameplayTag::RequestGameplayTag("State.Character.Defending");
+	InterruptingTag = FGameplayTag::RequestGameplayTag("State.Character.Interrupting");
+	FreeToAnimTag = FGameplayTag::RequestGameplayTag("State.Character.FreeToAnim");
+	LockRotationTag = FGameplayTag::RequestGameplayTag("State.Character.LockRotation");
+	BreakAllInputTag = FGameplayTag::RequestGameplayTag("State.Character.BreakAllInput");
+
 	// stats
 	Nature = EDWCharacterNature::AIHostile;
 	TeamID = NAME_None;
@@ -147,8 +167,16 @@ void ADWCharacter::BeginPlay()
 	{
 		GetWidgetCharacterHPWidget()->SetOwnerCharacter(this);
 	}
+}
 
-	Spawn();
+void ADWCharacter::OnSpawn_Implementation(const TArray<FParameter>& InParams)
+{
+	Super::OnSpawn_Implementation(InParams);
+}
+
+void ADWCharacter::OnDespawn_Implementation()
+{
+	Super::OnDespawn_Implementation();
 }
 
 // Called every frame
@@ -362,8 +390,6 @@ void ADWCharacter::LoadData(FSaveData* InSaveData)
 
 		DefaultAbility.AbilityHandle = AcquireAbility(GetCharacterData<UDWCharacterData>().AbilityClass, DefaultAbility.AbilityLevel);
 		ActiveAbility(DefaultAbility.AbilityHandle);
-
-		UGlobalBPLibrary::LoadObjectFromMemory(this, SaveData.Datas);
 	}
 	else
 	{
@@ -440,24 +466,13 @@ void ADWCharacter::LoadData(FSaveData* InSaveData)
 			SaveData.InventoryData = CharacterData.InventoryData;
 		}
 
-		// if(!IsPlayer())
-		// {
-		// 	const auto ItemDatas = UDWHelper::LoadItemDatas();
-		// 	if(ItemDatas.Num() > 0 && FMath::FRand() < 0.5f)
-		// 	{
-		// 		SaveData.InventoryData.Items.Add(FAbilityItem(ItemDatas[FMath::RandRange(0, ItemDatas.Num() - 1)].ID, 1));
-		// 	}
-		// }
-
 		Inventory->LoadData(SaveData.InventoryData, this);
 	}
 }
 
-FSaveData* ADWCharacter::ToData(bool bSaved)
+FSaveData* ADWCharacter::ToData()
 {
 	static auto SaveData = FDWCharacterSaveData();
-
-	SaveData.bSaved = bSaved;
 
 	SaveData.ID = AssetID;
 	SaveData.Nature = Nature;
@@ -483,8 +498,6 @@ FSaveData* ADWCharacter::ToData(bool bSaved)
 	SaveData.SpawnLocation = GetActorLocation();
 	SaveData.SpawnRotation = GetActorRotation();
 
-	UGlobalBPLibrary::SaveObjectToMemory(this, SaveData.Datas);
-
 	return &SaveData;
 }
 
@@ -503,16 +516,6 @@ void ADWCharacter::ResetData()
 	InterruptRemainTime = 0;
 	NormalAttackRemainTime = 0;
 	ActionType = EDWCharacterActionType::None;
-}
-
-void ADWCharacter::Spawn()
-{
-	Active(true);
-	SetVisible(true);
-	SetHealth(GetMaxHealth());
-	SetMana(GetMaxMana());
-	SetStamina(GetMaxStamina());
-	DoAction(EDWCharacterActionType::Revive);
 }
 
 void ADWCharacter::Active(bool bResetData /*= false*/)
@@ -542,18 +545,6 @@ void ADWCharacter::Disable(bool bDisableMovement, bool bDisableCollision)
 		{
 			GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		}
-	}
-}
-
-void ADWCharacter::Revive()
-{
-	if(DoAction(EDWCharacterActionType::Revive))
-	{
-		Active(true);
-		SetVisible(true);
-		SetHealth(GetMaxHealth());
-		SetMana(GetMaxMana());
-		SetStamina(GetMaxStamina());
 	}
 }
 
@@ -613,6 +604,18 @@ void ADWCharacter::DeathEnd()
 				Iter.Value->Destroy();
 			}
 		}
+	}
+}
+
+void ADWCharacter::Revive()
+{
+	if (DoAction(EDWCharacterActionType::Revive))
+	{
+		Active(true);
+		SetVisible(true);
+		SetHealth(GetMaxHealth());
+		SetMana(GetMaxMana());
+		SetStamina(GetMaxStamina());
 	}
 }
 

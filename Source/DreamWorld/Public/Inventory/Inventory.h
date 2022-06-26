@@ -43,7 +43,7 @@ public:
 
 	virtual void LoadData(FInventorySaveData InInventoryData, AActor* InOwner);
 
-	virtual FInventorySaveData ToData(bool bSaved = true);
+	virtual FInventorySaveData ToData();
 
 	//////////////////////////////////////////////////////////////////////////
 	/// Actions

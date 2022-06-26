@@ -16,6 +16,7 @@
 #include "Widget/WidgetModuleBPLibrary.h"
 #include "Widget/Inventory/WidgetInventoryBar.h"
 #include "Widget/Inventory/WidgetInventoryPanel.h"
+#include "SaveGame/SaveGameModuleBPLibrary.h"
 
 // Sets default values
 ADWVoxelModule::ADWVoxelModule()
@@ -91,21 +92,18 @@ void ADWVoxelModule::OnWorldStateChanged()
 	Super::OnWorldStateChanged();
 }
 
-void ADWVoxelModule::LoadData(FSaveData* InWorldData)
+void ADWVoxelModule::LoadData(FSaveData* InSaveData)
 {
-	Super::LoadData(InWorldData);
+	Super::LoadData(InSaveData);
 }
 
-FSaveData* ADWVoxelModule::ToData(bool bSaved)
+FSaveData* ADWVoxelModule::ToData()
 {
 	for(auto Iter : ChunkMap)
 	{
 		if(Iter.Value)
 		{
-			if(const FDWVoxelChunkSaveData* VoxelChunkSaveData = static_cast<FDWVoxelChunkSaveData*>(Iter.Value->ToData(bSaved)))
-			{
-				GetWorldData<FDWVoxelWorldSaveData>()->SetChunkData(Iter.Key, *VoxelChunkSaveData);
-			}
+			GetWorldData<FDWVoxelWorldSaveData>()->SetChunkData(Iter.Key, *USaveGameModuleBPLibrary::ObjectToData<FDWVoxelChunkSaveData>(Iter.Value));
 		}
 	}
 	return WorldData;

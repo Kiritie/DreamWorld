@@ -71,7 +71,7 @@ void UProcedure_Starting::OnEnter(UProcedureBase* InLastProcedure)
 	{
 		if(AVoxelModule* VoxelModule = AMainModule::GetModuleByClass<AVoxelModule>())
 		{
-			VoxelModule->UnloadData();
+			USaveGameModuleBPLibrary::ObjectUnloadData(VoxelModule);
 		}
 		if(ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>())
 		{

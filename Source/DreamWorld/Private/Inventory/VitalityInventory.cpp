@@ -24,7 +24,7 @@ void UVitalityInventory::LoadData(FInventorySaveData InInventoryData, AActor* In
 	Super::LoadData(InInventoryData, InOwner);
 }
 
-FInventorySaveData UVitalityInventory::ToData(bool bSaved)
+FInventorySaveData UVitalityInventory::ToData()
 {
 	return Super::ToData();
 }

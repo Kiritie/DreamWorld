@@ -98,11 +98,10 @@ void UInventory::LoadData(FInventorySaveData InInventoryData, AActor* InOwner)
 	}
 }
 
-FInventorySaveData UInventory::ToData(bool bSaved)
+FInventorySaveData UInventory::ToData()
 {
 	auto data = FInventorySaveData();
 
-	data.bSaved = bSaved;
 	data.SplitInfos = SplitInfos;
 
 	for (int32 i = 0; i < Slots.Num(); i++)

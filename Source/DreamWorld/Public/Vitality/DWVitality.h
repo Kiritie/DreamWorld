@@ -52,20 +52,21 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
-	// Called every frame
+	virtual void OnSpawn_Implementation(const TArray<FParameter>& InParams) override;
+
+	virtual void OnDespawn_Implementation() override;
+
 	virtual void Tick(float DeltaTime) override;
 
 	virtual void Serialize(FArchive& Ar) override;
 
 	virtual void LoadData(FSaveData* InSaveData) override;
 
-	virtual FSaveData* ToData(bool bSaved = true) override;
+	virtual FSaveData* ToData() override;
 	
 	virtual void ResetData() override;
 
 	virtual void Death(AActor* InKiller = nullptr) override;
-
-	virtual void Spawn() override;
 
 	virtual void Revive() override;
 
