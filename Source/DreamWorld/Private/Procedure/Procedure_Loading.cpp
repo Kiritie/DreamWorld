@@ -57,12 +57,6 @@ void UProcedure_Loading::OnEnter(UProcedureBase* InLastProcedure)
 	AMainModule::GetModuleByClass<ADWVoxelModule>()->SetWorldMode(EVoxelWorldMode::Normal);
 
 	USaveGameModuleBPLibrary::LoadSaveGame<UDWArchiveSaveGame>(USaveGameModuleBPLibrary::LoadSaveGame<UDWGeneralSaveGame>()->GetCurrentArchiveID());
-
-	if(ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>())
-	{
-		PlayerCharacter->SetActorHiddenInGame(false);
-		UCharacterModuleBPLibrary::SwitchCharacter(PlayerCharacter);
-	}
 }
 
 void UProcedure_Loading::OnRefresh()

@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include "Components/WidgetComponent.h"
 #include "DreamWorld/DreamWorld.h"
+#include "Widget/World/WorldWidgetComponent.h"
 #include "WidgetCharacterHPComponent.generated.h"
 
 class ADWCharacter;
@@ -12,7 +12,7 @@ class ADWCharacter;
  * 角色血条组件
  */
 UCLASS(Blueprintable, meta = (BlueprintSpawnableComponent))
-class DREAMWORLD_API UWidgetCharacterHPComponent : public UWidgetComponent
+class DREAMWORLD_API UWidgetCharacterHPComponent : public UWorldWidgetComponent
 {
 	GENERATED_BODY()
 	

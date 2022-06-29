@@ -134,14 +134,14 @@ void ADWPlayerController::LoadData(FSaveData* InSaveData)
 {
 	if(GetPlayerPawn<ADWPlayerCharacter>()) return;
 
-	FDWPlayerSaveData InPlayerData = *static_cast<FDWPlayerSaveData*>(InSaveData);
+	FDWPlayerSaveData InPlayerData = InSaveData->ToRef<FDWPlayerSaveData>();
 
 	if(ADWPlayerCharacter* PlayerCharacter = UObjectPoolModuleBPLibrary::SpawnObject<ADWPlayerCharacter>(nullptr, InPlayerData.GetCharacterData().Class))
 	{
 		SetPlayerPawn(PlayerCharacter);
 
 		PlayerCharacter->Disable(true, true);
-		PlayerCharacter->LoadData(&InPlayerData);
+		USaveGameModuleBPLibrary::LoadObjectData(PlayerCharacter, &InPlayerData, true);
 	}
 }
 

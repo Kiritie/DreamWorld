@@ -75,7 +75,7 @@ void ADWVitality::Serialize(FArchive& Ar)
 
 void ADWVitality::LoadData(FSaveData* InSaveData)
 {
-	auto SaveData = *static_cast<FDWVitalitySaveData*>(InSaveData);
+	auto SaveData = InSaveData->ToRef<FDWVitalitySaveData>();
 	if (SaveData.bSaved)
 	{
 		AssetID = SaveData.ID;

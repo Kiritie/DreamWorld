@@ -11,14 +11,16 @@
 
 UWidgetVitalityHPComponent::UWidgetVitalityHPComponent()
 {
+	SetAutoCreate(true);
+	SetWidgetSpace(EWidgetSpace::Screen);
+	SetDrawSize(FVector2D(220, 60));
+	SetPivot(FVector2D(0.5f, 1));
+
 	static ConstructorHelpers::FClassFinder<UWidgetVitalityHP> VitalityHPClassFinder(TEXT("WidgetBlueprint'/Game/Blueprints/Widget/World/WB_VitalityHP.WB_VitalityHP_C'"));
 	if(VitalityHPClassFinder.Succeeded())
 	{
 		SetWidgetClass(VitalityHPClassFinder.Class);
 	}
-	SetWidgetSpace(EWidgetSpace::Screen);
-	SetDrawSize(FVector2D(220, 60));
-	SetPivot(FVector2D(0.5f, 1));
 }
 
 void UWidgetVitalityHPComponent::BeginPlay()

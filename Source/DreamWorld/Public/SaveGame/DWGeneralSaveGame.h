@@ -29,15 +29,21 @@ public:
 
 	virtual void OnRefresh_Implementation() override;
 
-public:
-	UFUNCTION(BlueprintPure)
-	int32 GetValidArchiveID();
-
 protected:
 	UPROPERTY()
 	FDWGeneralSaveData SaveData;
 
 public:
+	virtual FSaveData* GetSaveData() override { return &SaveData; }
+
+	virtual void SetSaveData(FSaveData* InSaveData) override { SaveData = InSaveData->ToRef<FDWGeneralSaveData>(); }
+
+	UFUNCTION(BlueprintPure, meta = (DisplayName = "GetSaveData"))
+	FDWGeneralSaveData& K2_GetSaveData() { return SaveData; }
+
+	UFUNCTION(BlueprintCallable, meta = (DisplayName = "SetSaveData"))
+	void K2_SetSaveData(const FDWGeneralSaveData& InSaveData) { this->SaveData = InSaveData; }
+
 	UFUNCTION(BlueprintPure)
 	bool IsAutoJump() const { return SaveData.bAutoJump; }
 	

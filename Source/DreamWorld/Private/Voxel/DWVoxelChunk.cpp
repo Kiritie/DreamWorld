@@ -76,7 +76,7 @@ void ADWVoxelChunk::Initialize(FIndex InIndex, int32 InBatch)
 
 void ADWVoxelChunk::LoadData(FSaveData* InSaveData)
 {
-	FDWVoxelChunkSaveData ChunkData = *static_cast<FDWVoxelChunkSaveData*>(InSaveData);
+	FDWVoxelChunkSaveData ChunkData = InSaveData->ToRef<FDWVoxelChunkSaveData>();
 	for(int32 i = 0; i < ChunkData.VoxelItems.Num(); i++)
 	{
 		const FVoxelItem& voxelItem = ChunkData.VoxelItems[i];
@@ -97,20 +97,20 @@ FSaveData* ADWVoxelChunk::ToData()
 
 	for(int32 i = 0; i < PickUps.Num(); i++)
 	{
-		ChunkData.PickUpDatas.Add(*USaveGameModuleBPLibrary::ObjectToData<FPickUpSaveData>(PickUps[i]));
+		ChunkData.PickUpDatas.Add(USaveGameModuleBPLibrary::ObjectToDataRef<FPickUpSaveData>(PickUps[i], true, true));
 	}
 
 	for(int32 i = 0; i < Characters.Num(); i++)
 	{
 		if(Characters[i]->GetNature() != EDWCharacterNature::Player)
 		{
-			ChunkData.CharacterDatas.Add(*USaveGameModuleBPLibrary::ObjectToData<FDWCharacterSaveData>(Characters[i]));
+			ChunkData.CharacterDatas.Add(USaveGameModuleBPLibrary::ObjectToDataRef<FDWCharacterSaveData>(Characters[i], true, true));
 		}
 	}
 
 	for(int32 i = 0; i < Vitalitys.Num(); i++)
 	{
-		ChunkData.VitalityDatas.Add(*USaveGameModuleBPLibrary::ObjectToData<FDWVitalitySaveData>(Vitalitys[i]));
+		ChunkData.VitalityDatas.Add(USaveGameModuleBPLibrary::ObjectToDataRef<FDWVitalitySaveData>(Vitalitys[i], true, true));
 	}
 
 	return &ChunkData;
@@ -299,7 +299,7 @@ ADWCharacter* ADWVoxelChunk::SpawnCharacter(FDWCharacterSaveData InSaveData)
 {
 	if(ADWCharacter* character = UObjectPoolModuleBPLibrary::SpawnObject<ADWCharacter>(nullptr, InSaveData.GetCharacterData().Class))
 	{
-		character->LoadData(&InSaveData);
+		USaveGameModuleBPLibrary::LoadObjectData(character, &InSaveData, true);
 		character->SpawnDefaultController();
 		AttachCharacter(character);
 		return character;
@@ -340,7 +340,7 @@ ADWVitality* ADWVoxelChunk::SpawnVitality(FDWVitalitySaveData InSaveData)
 {
 	if(ADWVitality* Vitality = UObjectPoolModuleBPLibrary::SpawnObject<ADWVitality>(nullptr, InSaveData.GetVitalityData().Class))
 	{
-		Vitality->LoadData(&InSaveData);
+		USaveGameModuleBPLibrary::LoadObjectData(Vitality, &InSaveData, true);
 		AttachVitality(Vitality);
 		return Vitality;
 	}

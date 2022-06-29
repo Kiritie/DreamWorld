@@ -10,14 +10,17 @@
 
 UWidgetCharacterHPComponent::UWidgetCharacterHPComponent()
 {
-	static ConstructorHelpers::FClassFinder<UWidgetCharacterHP> CharacterHPClassFinder(TEXT("WidgetBlueprint'/Game/Blueprints/Widget/World/WB_CharacterHP.WB_CharacterHP_C'"));
-	if(CharacterHPClassFinder.Succeeded())
-	{
-		SetWidgetClass(CharacterHPClassFinder.Class);
-	}
+	SetAutoCreate(true);
+	
 	SetWidgetSpace(EWidgetSpace::Screen);
 	SetDrawSize(FVector2D(220, 60));
 	SetPivot(FVector2D(0.5f, 1));
+
+	static ConstructorHelpers::FClassFinder<UWidgetCharacterHP> CharacterHPClassFinder(TEXT("WidgetBlueprint'/Game/Blueprints/Widget/World/WB_CharacterHP.WB_CharacterHP_C'"));
+	if(CharacterHPClassFinder.Succeeded())
+	{
+		SetWorldWidgetClass(CharacterHPClassFinder.Class);
+	}
 }
 
 void UWidgetCharacterHPComponent::BeginPlay()

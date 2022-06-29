@@ -36,4 +36,8 @@ public:
 	virtual void OnGuide() override;
 	
 	virtual void OnLeave(UProcedureBase* InNextProcedure) override;
+
+protected:
+	UPROPERTY(EditAnywhere, Category = "BGM")
+	USoundBase* BGMSound;
 };

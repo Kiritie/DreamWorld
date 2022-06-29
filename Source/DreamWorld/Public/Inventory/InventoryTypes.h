@@ -8,32 +8,6 @@
 class UWidgetInventorySlot;
 class UInventorySlot;
 
-USTRUCT(BlueprintType)
-struct DREAMWORLD_API FQueryItemInfo
-{
-	GENERATED_BODY()
-
-public:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	FAbilityItem Item;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TArray<UInventorySlot*> Slots;
-
-public:
-	FORCEINLINE FQueryItemInfo()
-	{
-		Item = FAbilityItem();
-		Slots = TArray<UInventorySlot*>();
-	}
-
-	FORCEINLINE FQueryItemInfo(FAbilityItem InItem, TArray<UInventorySlot*> InSlots)
-	{
-		Item = InItem;
-		Slots = InSlots;
-	}
-};
-
 UENUM(BlueprintType)
 enum class ESplitSlotType : uint8
 {
@@ -47,17 +21,36 @@ enum class ESplitSlotType : uint8
 };
 
 USTRUCT(BlueprintType)
+struct DREAMWORLD_API FQueryItemInfo
+{
+	GENERATED_BODY()
+
+public:
+	FORCEINLINE FQueryItemInfo()
+	{
+		Item = FAbilityItem();
+		Slots = TArray<UInventorySlot*>();
+	}
+
+	FORCEINLINE FQueryItemInfo(FAbilityItem InItem, TArray<UInventorySlot*> InSlots)
+	{
+		Item = InItem;
+		Slots = InSlots;
+	}
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	FAbilityItem Item;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<UInventorySlot*> Slots;
+};
+
+USTRUCT(BlueprintType)
 struct DREAMWORLD_API FSplitSlotInfo
 {
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
-	int32 StartIndex;
-
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
-	int32 TotalCount;
-
 	FORCEINLINE FSplitSlotInfo()
 	{
 		StartIndex = 0;
@@ -69,6 +62,12 @@ public:
 		StartIndex = InStartIndex;
 		TotalCount = InTotalCount;
 	}
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	int32 StartIndex;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	int32 TotalCount;
 };
 
 USTRUCT(BlueprintType)
@@ -77,13 +76,13 @@ struct DREAMWORLD_API FSplitSlotData
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
-	TArray<UInventorySlot*> Slots;
-
 	FORCEINLINE FSplitSlotData()
 	{
 		Slots = TArray<UInventorySlot*>();
 	}
+	
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
+	TArray<UInventorySlot*> Slots;
 };
 
 USTRUCT(BlueprintType)
@@ -92,13 +91,13 @@ struct DREAMWORLD_API FWidgetSplitSlotData
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
-	TArray<UWidgetInventorySlot*> Slots;
-
 	FORCEINLINE FWidgetSplitSlotData()
 	{
 		Slots = TArray<UWidgetInventorySlot*>();
 	}
+
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
+	TArray<UWidgetInventorySlot*> Slots;
 };
 
 USTRUCT(BlueprintType)
@@ -107,17 +106,17 @@ struct DREAMWORLD_API FInventorySaveData : public FSaveData
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TMap<ESplitSlotType, FSplitSlotInfo> SplitInfos;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TArray<FAbilityItem> Items;
-		
 	FORCEINLINE FInventorySaveData()
 	{
 		SplitInfos = TMap<ESplitSlotType, FSplitSlotInfo>();
 		Items = TArray<FAbilityItem>();
 	}
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TMap<ESplitSlotType, FSplitSlotInfo> SplitInfos;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<FAbilityItem> Items;
 };
 
 /**

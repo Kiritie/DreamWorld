@@ -3,6 +3,7 @@
 
 #include "Procedure/Procedure_Starting.h"
 
+#include "Audio/AudioModuleBPLibrary.h"
 #include "Camera/CameraModuleBPLibrary.h"
 #include "Camera/Roam/RoamCameraPawn.h"
 #include "Character/Player/DWPlayerCharacter.h"
@@ -21,6 +22,8 @@ UProcedure_Starting::UProcedure_Starting()
 {
 	ProcedureName = FName("Starting");
 	ProcedureDisplayName = FText::FromString(TEXT("Starting"));
+	
+	BGMSound = nullptr;
 }
 
 #if WITH_EDITOR
@@ -44,6 +47,8 @@ void UProcedure_Starting::OnEnter(UProcedureBase* InLastProcedure)
 {
 	UGlobalBPLibrary::GetGameState<ADWGameState>()->SetCurrentState(EDWGameState::Starting);
 
+	UAudioModuleBPLibrary::PlaySingleSound2D(BGMSound, FName("BGM"));
+
 	UWidgetModuleBPLibrary::OpenUserWidget<UWidgetMainMenu>();
 	UWidgetModuleBPLibrary::CreateUserWidget<UWidgetArchiveChoosingPanel>();
 
@@ -53,7 +58,7 @@ void UProcedure_Starting::OnEnter(UProcedureBase* InLastProcedure)
 	{
 		if(USaveGameModuleBPLibrary::GetSaveGame<UDWGeneralSaveGame>()->GetCurrentArchiveID() == -1)
 		{
-			if(UDWArchiveSaveGame* ArchiveSaveGame = USaveGameModuleBPLibrary::HasSaveGame<UDWArchiveSaveGame>() ? USaveGameModuleBPLibrary::GetSaveGame<UDWArchiveSaveGame>() : USaveGameModuleBPLibrary::CreateSaveGame<UDWArchiveSaveGame>(-1))
+			if(UDWArchiveSaveGame* ArchiveSaveGame = USaveGameModuleBPLibrary::GetOrCreateSaveGame<UDWArchiveSaveGame>(-1))
 			{
 				ArchiveSaveGame->Load();
 			}
@@ -71,7 +76,7 @@ void UProcedure_Starting::OnEnter(UProcedureBase* InLastProcedure)
 	{
 		if(AVoxelModule* VoxelModule = AMainModule::GetModuleByClass<AVoxelModule>())
 		{
-			USaveGameModuleBPLibrary::ObjectUnloadData(VoxelModule);
+			USaveGameModuleBPLibrary::UnloadDataObject(VoxelModule);
 		}
 		if(ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>())
 		{

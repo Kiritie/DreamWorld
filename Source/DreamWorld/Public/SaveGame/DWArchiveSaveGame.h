@@ -8,7 +8,7 @@
 #include "DWArchiveSaveGame.generated.h"
 
 /**
- * 世界数据存取类
+ * 存档数据存取类
  */
 UCLASS()
 class DREAMWORLD_API UDWArchiveSaveGame : public USaveGameBase
@@ -36,12 +36,13 @@ protected:
 	FDWArchiveSaveData SaveData;
 
 public:
-	UFUNCTION(BlueprintPure)
-	FDWArchiveSaveData& GetSaveData() { return SaveData; }
+	virtual FSaveData* GetSaveData() override { return &SaveData; }
 
-	UFUNCTION(BlueprintCallable)
-	void SetSaveData(const FDWArchiveSaveData& InSaveData) { this->SaveData = InSaveData; }
+	virtual void SetSaveData(FSaveData* InSaveData) override { SaveData = InSaveData->ToRef<FDWArchiveSaveData>(); }
 
-	UFUNCTION(BlueprintPure)
-	bool IsPreview() const { return SaveIndex == -1; }
+	UFUNCTION(BlueprintPure, meta = (DisplayName = "GetSaveData"))
+	FDWArchiveSaveData& K2_GetSaveData() { return SaveData; }
+
+	UFUNCTION(BlueprintCallable, meta = (DisplayName = "SetSaveData"))
+	void K2_SetSaveData(const FDWArchiveSaveData& InSaveData) { this->SaveData = InSaveData; }
 };

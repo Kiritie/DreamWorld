@@ -3,6 +3,8 @@
 
 #include "Procedure/Procedure_Playing.h"
 
+#include "Audio/AudioModuleBPLibrary.h"
+#include "Character/CharacterModuleBPLibrary.h"
 #include "Character/Player/DWPlayerCharacter.h"
 #include "Gameplay/DWGameState.h"
 #include "Global/GlobalBPLibrary.h"
@@ -16,6 +18,8 @@ UProcedure_Playing::UProcedure_Playing()
 {
 	ProcedureName = FName("Playing");
 	ProcedureDisplayName = FText::FromString(TEXT("Playing"));
+	
+	BGMSound = nullptr;
 }
 
 #if WITH_EDITOR
@@ -43,6 +47,14 @@ void UProcedure_Playing::OnEnter(UProcedureBase* InLastProcedure)
 
 	if(InLastProcedure->IsA(UProcedure_Loading::StaticClass()))
 	{
+		UAudioModuleBPLibrary::PlaySingleSound2D(BGMSound, FName("BGM"));
+
+		if(ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>())
+		{
+			PlayerCharacter->SetActorHiddenInGame(false);
+			UCharacterModuleBPLibrary::SwitchCharacter(PlayerCharacter);
+		}
+
 		UWidgetModuleBPLibrary::OpenUserWidget<UWidgetGameHUD>();
 		UWidgetModuleBPLibrary::OpenUserWidget<UWidgetInventoryBar>();
 		

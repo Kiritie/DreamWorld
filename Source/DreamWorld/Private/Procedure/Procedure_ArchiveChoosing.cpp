@@ -68,7 +68,7 @@ void UProcedure_ArchiveChoosing::OnLeave(UProcedureBase* InNextProcedure)
 
 void UProcedure_ArchiveChoosing::CreateArchive()
 {
-	if(!USaveGameModuleBPLibrary::GetSaveGame<UDWArchiveSaveGame>()->IsPreview())
+	if(USaveGameModuleBPLibrary::GetSaveGame<UDWArchiveSaveGame>()->IsSaved())
 	{
 		USaveGameModuleBPLibrary::UnloadSaveGame<UDWArchiveSaveGame>();
 		USaveGameModuleBPLibrary::CreateSaveGame<UDWArchiveSaveGame>(-1, true);

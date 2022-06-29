@@ -12,7 +12,7 @@
 #include "SaveGame/DWSaveGameModule.h"
 #include "SaveGame/SaveGameModuleBPLibrary.h"
 #include "Voxel/VoxelModule.h"
-#include "../../Public/Voxel/DWVoxelModule.h"
+#include "Voxel/DWVoxelModule.h"
 
 UDWArchiveSaveGame::UDWArchiveSaveGame()
 {
@@ -27,6 +27,8 @@ void UDWArchiveSaveGame::OnCreate_Implementation(int32 InSaveIndex)
 
 	if(ADWSaveGameModule* SaveGameModule = AMainModule::GetModuleByClass<ADWSaveGameModule>())
 	{
+		if(InSaveIndex == -1) SaveIndex = SaveGameModule->GetValidArchiveID();
+		SaveData.ID = SaveIndex;
 		SaveData.WorldData = SaveGameModule->GetDefaultWorldData();
 		SaveData.PlayerData = SaveGameModule->GetDefaultPlayerData();
 		SaveData.Initialize();
@@ -35,12 +37,7 @@ void UDWArchiveSaveGame::OnCreate_Implementation(int32 InSaveIndex)
 
 void UDWArchiveSaveGame::OnSave_Implementation()
 {
-	if(IsPreview())
-	{
-		SaveIndex = USaveGameModuleBPLibrary::GetSaveGame<UDWGeneralSaveGame>()->GetValidArchiveID();
-		USaveGameModuleBPLibrary::GetSaveGame<UDWGeneralSaveGame>()->SetCurrentArchiveID(SaveData.ID = SaveIndex);
-		SaveData.Initialize();
-	}
+	USaveGameModuleBPLibrary::GetSaveGame<UDWGeneralSaveGame>()->SetCurrentArchiveID(SaveData.ID);
 	USaveGameModuleBPLibrary::GetSaveGame<UDWGeneralSaveGame>()->GetArchiveBasicDatas().Emplace(SaveIndex, SaveData);
 
 	Super::OnSave_Implementation();
@@ -54,14 +51,8 @@ void UDWArchiveSaveGame::OnLoad_Implementation()
 
 	WHDebug(FString::Printf(TEXT("Loading archive : %d"), SaveData.ID));
 
-	if(AVoxelModule* VoxelModule = AMainModule::GetModuleByClass<AVoxelModule>())
-	{
-		USaveGameModuleBPLibrary::ObjectLoadData(VoxelModule, &SaveData.WorldData);
-	}
-	if(ADWPlayerController* PlayerController = UGlobalBPLibrary::GetPlayerController<ADWPlayerController>())
-	{
-		USaveGameModuleBPLibrary::ObjectLoadData(PlayerController, &SaveData.WorldData);
-	}
+	USaveGameModuleBPLibrary::LoadObjectData(AMainModule::GetModuleByClass<AVoxelModule>(), &SaveData.WorldData);
+	USaveGameModuleBPLibrary::LoadObjectData(UGlobalBPLibrary::GetPlayerController<ADWPlayerController>(), &SaveData.PlayerData);
 }
 
 void UDWArchiveSaveGame::OnUnload_Implementation()
@@ -72,16 +63,16 @@ void UDWArchiveSaveGame::OnUnload_Implementation()
 
 	USaveGameModuleBPLibrary::GetSaveGame<UDWGeneralSaveGame>()->SetCurrentArchiveID(-1);
 
-	USaveGameModuleBPLibrary::ObjectUnloadData(AMainModule::GetModuleByClass<ADWVoxelModule>());
-	USaveGameModuleBPLibrary::ObjectUnloadData(UGlobalBPLibrary::GetPlayerController<ADWPlayerController>());
+	USaveGameModuleBPLibrary::UnloadDataObject(AMainModule::GetModuleByClass<ADWVoxelModule>());
+	USaveGameModuleBPLibrary::UnloadDataObject(UGlobalBPLibrary::GetPlayerController<ADWPlayerController>());
 }
 
 void UDWArchiveSaveGame::OnRefresh_Implementation()
 {
 	Super::OnRefresh_Implementation();
 	
-	SaveData.PlayerData = *USaveGameModuleBPLibrary::ObjectToData<FDWPlayerSaveData>(UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>());
-	SaveData.WorldData = *USaveGameModuleBPLibrary::ObjectToData<FDWVoxelWorldSaveData>(AMainModule::GetModuleByClass<ADWVoxelModule>());
+	SaveData.PlayerData = USaveGameModuleBPLibrary::ObjectToDataRef<FDWPlayerSaveData>(UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>(), true, true);
+	SaveData.WorldData = USaveGameModuleBPLibrary::ObjectToDataRef<FDWVoxelWorldSaveData>(AMainModule::GetModuleByClass<ADWVoxelModule>());
 }
 
 void UDWArchiveSaveGame::OnDestroy_Implementation()

@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include "Components/WidgetComponent.h"
 #include "DreamWorld/DreamWorld.h"
+#include "Widget/World/WorldWidgetComponent.h"
 #include "WidgetVitalityHPComponent.generated.h"
 
 class AAbilityVitalityBase;
@@ -12,7 +12,7 @@ class AAbilityVitalityBase;
  * 生命体血条组件
  */
 UCLASS(Blueprintable, meta = (BlueprintSpawnableComponent))
-class DREAMWORLD_API UWidgetVitalityHPComponent : public UWidgetComponent
+class DREAMWORLD_API UWidgetVitalityHPComponent : public UWorldWidgetComponent
 {
 	GENERATED_BODY()
 

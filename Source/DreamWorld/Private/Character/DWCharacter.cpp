@@ -343,7 +343,7 @@ void ADWCharacter::Serialize(FArchive& Ar)
 
 void ADWCharacter::LoadData(FSaveData* InSaveData)
 {
-	auto SaveData = *static_cast<FDWCharacterSaveData*>(InSaveData);
+	auto SaveData = InSaveData->ToRef<FDWCharacterSaveData>();
 	
 	if (SaveData.bSaved)
 	{
@@ -524,10 +524,10 @@ void ADWCharacter::Active(bool bResetData /*= false*/)
 	{
 		AbilitySystem->AddLooseGameplayTag(ActiveTag);
 		UnInterrupt();
-		GetCharacterMovement()->SetActive(true);
-		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 		OnCharacterActive.Broadcast();
 	}
+	GetCharacterMovement()->SetActive(true);
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	if (bResetData) ResetData();
 }
 
@@ -537,14 +537,14 @@ void ADWCharacter::Disable(bool bDisableMovement, bool bDisableCollision)
 	{
 		AbilitySystem->RemoveLooseGameplayTag(ActiveTag);
 		Interrupt();
-		if (bDisableMovement)
-		{
-			GetCharacterMovement()->SetActive(false);
-		}
-		if (bDisableCollision)
-		{
-			GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-		}
+	}
+	if (bDisableMovement)
+	{
+		GetCharacterMovement()->SetActive(false);
+	}
+	if (bDisableCollision)
+	{
+		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
 }
 

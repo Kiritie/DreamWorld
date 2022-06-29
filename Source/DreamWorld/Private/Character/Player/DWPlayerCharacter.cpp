@@ -62,6 +62,8 @@ ADWPlayerCharacter::ADWPlayerCharacter()
 	GetCharacterMovement()->bOrientRotationToMovement = true; // Character moves in the direction of input...	
 	GetCharacterMovement()->AirControl = 0.3f;
 
+	WidgetCharacterHP->SetAutoCreate(false);
+
 	TargetSystem = CreateDefaultSubobject<UTargetSystemComponent>(FName("TargetSystem"));
 	TargetSystem->bShouldControlRotation = true;
 	TargetSystem->TargetableActors = ADWCharacter::StaticClass();
@@ -172,11 +174,7 @@ void ADWPlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	WidgetCharacterHP->SetWidget(nullptr);
-
 	PreviewCapture->ShowOnlyActors.Add(this);
-
-	//AVoxelModule::GetCurrent()->CreateTeam();
 }
 
 // Called every frame
@@ -249,7 +247,7 @@ void ADWPlayerCharacter::LoadData(FSaveData* InSaveData)
 {
 	Super::LoadData(InSaveData);
 
-	auto SaveData = *static_cast<FDWPlayerSaveData*>(InSaveData);
+	auto SaveData = InSaveData->ToRef<FDWPlayerSaveData>();
 	if (SaveData.bSaved)
 	{
 		SetControlMode(SaveData.ControlMode);
@@ -293,7 +291,7 @@ void ADWPlayerCharacter::LoadData(FSaveData* InSaveData)
 
 FSaveData* ADWPlayerCharacter::ToData()
 {
-	static auto SaveData = FDWPlayerSaveData();
+	static auto SaveData = *static_cast<FDWPlayerSaveData*>(Super::ToData());
 	SaveData.ControlMode = ControlMode;
 	return &SaveData;
 }
