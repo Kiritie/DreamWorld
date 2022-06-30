@@ -42,8 +42,6 @@ void UProcedure_Playing::OnInitialize()
 void UProcedure_Playing::OnEnter(UProcedureBase* InLastProcedure)
 {
 	Super::OnEnter(InLastProcedure);
-		
-	UGlobalBPLibrary::GetGameState<ADWGameState>()->SetCurrentState(EDWGameState::Playing);
 
 	if(InLastProcedure->IsA(UProcedure_Loading::StaticClass()))
 	{

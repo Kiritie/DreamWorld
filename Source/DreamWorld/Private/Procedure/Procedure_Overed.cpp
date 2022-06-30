@@ -32,8 +32,6 @@ void UProcedure_Overed::OnInitialize()
 void UProcedure_Overed::OnEnter(UProcedureBase* InLastProcedure)
 {
 	Super::OnEnter(InLastProcedure);
-
-	UGlobalBPLibrary::GetGameState<ADWGameState>()->SetCurrentState(EDWGameState::Overed);
 }
 
 void UProcedure_Overed::OnRefresh()

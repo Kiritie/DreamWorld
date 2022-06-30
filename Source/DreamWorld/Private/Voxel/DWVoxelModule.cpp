@@ -7,6 +7,12 @@
 #include "Gameplay/DWGameState.h"
 #include "Gameplay/DWPlayerController.h"
 #include "Global/GlobalBPLibrary.h"
+#include "Procedure/ProcedureModuleBPLibrary.h"
+#include "Procedure/Procedure_ArchiveChoosing.h"
+#include "Procedure/Procedure_ArchiveCreating.h"
+#include "Procedure/Procedure_Loading.h"
+#include "Procedure/Procedure_Playing.h"
+#include "Procedure/Procedure_Starting.h"
 #include "ReferencePool/ReferencePoolModuleBPLibrary.h"
 #include "Voxel/DWVoxelChunk.h"
 #include "Voxel/VoxelModuleBPLibrary.h"
@@ -53,22 +59,13 @@ void ADWVoxelModule::OnPreparatory_Implementation()
 
 void ADWVoxelModule::OnRefresh_Implementation(float DeltaSeconds)
 {
-	switch (UGlobalBPLibrary::GetGameState<ADWGameState>()->GetCurrentState())
+	if(UProcedureModuleBPLibrary::IsCurrentProcedureClass<UProcedure_Starting>()
+		|| UProcedureModuleBPLibrary::IsCurrentProcedureClass<UProcedure_ArchiveChoosing>()
+		|| UProcedureModuleBPLibrary::IsCurrentProcedureClass<UProcedure_ArchiveCreating>()
+		|| UProcedureModuleBPLibrary::IsCurrentProcedureClass<UProcedure_Loading>()
+		|| UProcedureModuleBPLibrary::IsCurrentProcedureClass<UProcedure_Playing>())
 	{
-		case EDWGameState::Starting:
-		case EDWGameState::ArchiveChoosing:
-		case EDWGameState::ArchiveCreating:
-		case EDWGameState::Loading:
-		{
-			GenerateTerrain();
-			break;
-		}
-		case EDWGameState::Playing:
-		{
-			GenerateTerrain();
-			break;
-		}
-		default: break;
+		Super::OnRefresh_Implementation(DeltaSeconds);
 	}
 }
 

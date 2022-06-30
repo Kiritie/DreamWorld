@@ -21,15 +21,4 @@ public:
 	virtual void OnInitialize_Implementation() override;
 
 	virtual void OnPreparatory_Implementation() override;
-
-protected:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	EDWGameState CurrentState;
-
-public:
-	UFUNCTION(BlueprintCallable)
-	void SetCurrentState(EDWGameState InGameState);
-
-	UFUNCTION(BlueprintPure)
-	EDWGameState GetCurrentState() const { return CurrentState; }
 };

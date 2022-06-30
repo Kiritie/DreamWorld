@@ -46,8 +46,6 @@ void UProcedure_Loading::OnEnter(UProcedureBase* InLastProcedure)
 {
 	Super::OnEnter(InLastProcedure);
 
-	UGlobalBPLibrary::GetGameState<ADWGameState>()->SetCurrentState(EDWGameState::Loading);
-
 	UWidgetModuleBPLibrary::OpenUserWidget<UWidgetLoadingPanel>();
 	
 	UWidgetModuleBPLibrary::CreateUserWidget<UWidgetGameHUD>();

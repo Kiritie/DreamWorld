@@ -39,8 +39,6 @@ void UProcedure_Pausing::OnEnter(UProcedureBase* InLastProcedure)
 {
 	Super::OnEnter(InLastProcedure);
 
-	UGlobalBPLibrary::GetGameState<ADWGameState>()->SetCurrentState(EDWGameState::Pausing);
-
 	UGameplayStatics::SetGamePaused(this, true);
 	UMainModuleBPLibrary::PauseAllModule();
 

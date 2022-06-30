@@ -53,8 +53,6 @@ void UProcedure_ArchiveCreating::OnEnter(UProcedureBase* InLastProcedure)
 	}
 	
 	Super::OnEnter(InLastProcedure);
-	
-	UGlobalBPLibrary::GetGameState<ADWGameState>()->SetCurrentState(EDWGameState::ArchiveCreating);
 
 	UWidgetModuleBPLibrary::OpenUserWidget<UWidgetArchiveCreatingPanel>();
 	UWidgetModuleBPLibrary::CreateUserWidget<UWidgetLoadingPanel>();

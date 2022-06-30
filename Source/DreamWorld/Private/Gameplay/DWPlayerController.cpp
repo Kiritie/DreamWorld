@@ -221,7 +221,7 @@ void ADWPlayerController::OnSprintReleased()
 
 void ADWPlayerController::ToggleInventoryPanel()
 {
-	if(UGlobalBPLibrary::GetGameState<ADWGameState>()->GetCurrentState() == EDWGameState::Playing)
+	if(UProcedureModuleBPLibrary::IsCurrentProcedureClass<UProcedure_Playing>())
 	{
 		UWidgetModuleBPLibrary::ToggleUserWidget<UWidgetInventoryPanel>(false);
 	}
@@ -231,7 +231,7 @@ void ADWPlayerController::UseInventoryItem()
 {
 	if(!GetPawn<ADWCharacter>() || GetPawn<ADWCharacter>()->IsBreakAllInput()) return;
 
-	if(UGlobalBPLibrary::GetGameState<ADWGameState>()->GetCurrentState() == EDWGameState::Playing)
+	if(UProcedureModuleBPLibrary::IsCurrentProcedureClass<UProcedure_Playing>())
 	{
 		UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryBar>()->GetSelectedSlot()->UseItem(1);
 	}
@@ -241,7 +241,7 @@ void ADWPlayerController::UseAllInventoryItem()
 {
 	if(!GetPawn<ADWCharacter>() || GetPawn<ADWCharacter>()->IsBreakAllInput()) return;
 
-	if(UGlobalBPLibrary::GetGameState<ADWGameState>()->GetCurrentState() == EDWGameState::Playing)
+	if(UProcedureModuleBPLibrary::IsCurrentProcedureClass<UProcedure_Playing>())
 	{
 		UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryBar>()->GetSelectedSlot()->UseItem(-1);
 	}
@@ -251,7 +251,7 @@ void ADWPlayerController::DiscardInventoryItem()
 {
 	if(!GetPawn<ADWCharacter>() || GetPawn<ADWCharacter>()->IsBreakAllInput()) return;
 
-	if(UGlobalBPLibrary::GetGameState<ADWGameState>()->GetCurrentState() == EDWGameState::Playing)
+	if(UProcedureModuleBPLibrary::IsCurrentProcedureClass<UProcedure_Playing>())
 	{
 		UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryBar>()->GetSelectedSlot()->DiscardItem(1);
 	}
@@ -261,7 +261,7 @@ void ADWPlayerController::DiscardAllInventoryItem()
 {
 	if(!GetPawn<ADWCharacter>() || GetPawn<ADWCharacter>()->IsBreakAllInput()) return;
 
-	if(UGlobalBPLibrary::GetGameState<ADWGameState>()->GetCurrentState() == EDWGameState::Playing)
+	if(UProcedureModuleBPLibrary::IsCurrentProcedureClass<UProcedure_Playing>())
 	{
 		UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryBar>()->GetSelectedSlot()->DiscardItem(-1);
 	}
@@ -269,7 +269,7 @@ void ADWPlayerController::DiscardAllInventoryItem()
 
 void ADWPlayerController::PrevInventorySlot()
 {
-	if(UGlobalBPLibrary::GetGameState<ADWGameState>()->GetCurrentState() == EDWGameState::Playing)
+	if(UProcedureModuleBPLibrary::IsCurrentProcedureClass<UProcedure_Playing>())
 	{
 		UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryBar>()->PrevInventorySlot();
 	}
@@ -277,7 +277,7 @@ void ADWPlayerController::PrevInventorySlot()
 
 void ADWPlayerController::NextInventorySlot()
 {
-	if(UGlobalBPLibrary::GetGameState<ADWGameState>()->GetCurrentState() == EDWGameState::Playing)
+	if(UProcedureModuleBPLibrary::IsCurrentProcedureClass<UProcedure_Playing>())
 	{
 		UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryBar>()->NextInventorySlot();
 	}
@@ -285,7 +285,7 @@ void ADWPlayerController::NextInventorySlot()
 
 void ADWPlayerController::SelectInventorySlot1()
 {
-	if(UGlobalBPLibrary::GetGameState<ADWGameState>()->GetCurrentState() == EDWGameState::Playing)
+	if(UProcedureModuleBPLibrary::IsCurrentProcedureClass<UProcedure_Playing>())
 	{
 		UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryBar>()->SelectInventorySlot(0);
 	}
@@ -293,7 +293,7 @@ void ADWPlayerController::SelectInventorySlot1()
 
 void ADWPlayerController::SelectInventorySlot2()
 {
-	if(UGlobalBPLibrary::GetGameState<ADWGameState>()->GetCurrentState() == EDWGameState::Playing)
+	if(UProcedureModuleBPLibrary::IsCurrentProcedureClass<UProcedure_Playing>())
 	{
 		UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryBar>()->SelectInventorySlot(1);
 	}
@@ -301,7 +301,7 @@ void ADWPlayerController::SelectInventorySlot2()
 
 void ADWPlayerController::SelectInventorySlot3()
 {
-	if(UGlobalBPLibrary::GetGameState<ADWGameState>()->GetCurrentState() == EDWGameState::Playing)
+	if(UProcedureModuleBPLibrary::IsCurrentProcedureClass<UProcedure_Playing>())
 	{
 		UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryBar>()->SelectInventorySlot(2);
 	}
@@ -309,7 +309,7 @@ void ADWPlayerController::SelectInventorySlot3()
 
 void ADWPlayerController::SelectInventorySlot4()
 {
-	if(UGlobalBPLibrary::GetGameState<ADWGameState>()->GetCurrentState() == EDWGameState::Playing)
+	if(UProcedureModuleBPLibrary::IsCurrentProcedureClass<UProcedure_Playing>())
 	{
 		UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryBar>()->SelectInventorySlot(3);
 	}
@@ -317,7 +317,7 @@ void ADWPlayerController::SelectInventorySlot4()
 
 void ADWPlayerController::SelectInventorySlot5()
 {
-	if(UGlobalBPLibrary::GetGameState<ADWGameState>()->GetCurrentState() == EDWGameState::Playing)
+	if(UProcedureModuleBPLibrary::IsCurrentProcedureClass<UProcedure_Playing>())
 	{
 		UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryBar>()->SelectInventorySlot(4);
 	}
@@ -325,7 +325,7 @@ void ADWPlayerController::SelectInventorySlot5()
 
 void ADWPlayerController::SelectInventorySlot6()
 {
-	if(UGlobalBPLibrary::GetGameState<ADWGameState>()->GetCurrentState() == EDWGameState::Playing)
+	if(UProcedureModuleBPLibrary::IsCurrentProcedureClass<UProcedure_Playing>())
 	{
 		UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryBar>()->SelectInventorySlot(5);
 	}
@@ -333,7 +333,7 @@ void ADWPlayerController::SelectInventorySlot6()
 
 void ADWPlayerController::SelectInventorySlot7()
 {
-	if(UGlobalBPLibrary::GetGameState<ADWGameState>()->GetCurrentState() == EDWGameState::Playing)
+	if(UProcedureModuleBPLibrary::IsCurrentProcedureClass<UProcedure_Playing>())
 	{
 		UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryBar>()->SelectInventorySlot(6);
 	}
@@ -341,7 +341,7 @@ void ADWPlayerController::SelectInventorySlot7()
 
 void ADWPlayerController::SelectInventorySlot8()
 {
-	if(UGlobalBPLibrary::GetGameState<ADWGameState>()->GetCurrentState() == EDWGameState::Playing)
+	if(UProcedureModuleBPLibrary::IsCurrentProcedureClass<UProcedure_Playing>())
 	{
 		UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryBar>()->SelectInventorySlot(7);
 	}
@@ -349,7 +349,7 @@ void ADWPlayerController::SelectInventorySlot8()
 
 void ADWPlayerController::SelectInventorySlot9()
 {
-	if(UGlobalBPLibrary::GetGameState<ADWGameState>()->GetCurrentState() == EDWGameState::Playing)
+	if(UProcedureModuleBPLibrary::IsCurrentProcedureClass<UProcedure_Playing>())
 	{
 		UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryBar>()->SelectInventorySlot(8);
 	}
@@ -357,7 +357,7 @@ void ADWPlayerController::SelectInventorySlot9()
 
 void ADWPlayerController::SelectInventorySlot10()
 {
-	if(UGlobalBPLibrary::GetGameState<ADWGameState>()->GetCurrentState() == EDWGameState::Playing)
+	if(UProcedureModuleBPLibrary::IsCurrentProcedureClass<UProcedure_Playing>())
 	{
 		UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryBar>()->SelectInventorySlot(9);
 	}
@@ -365,11 +365,11 @@ void ADWPlayerController::SelectInventorySlot10()
 
 void ADWPlayerController::PauseOrContinueGame()
 {
-	if(UGlobalBPLibrary::GetGameState<ADWGameState>()->GetCurrentState() == EDWGameState::Playing)
+	if(UProcedureModuleBPLibrary::IsCurrentProcedureClass<UProcedure_Playing>())
 	{
 		UProcedureModuleBPLibrary::SwitchProcedureByClass<UProcedure_Pausing>();
 	}
-	else if(UGlobalBPLibrary::GetGameState<ADWGameState>()->GetCurrentState() == EDWGameState::Pausing)
+	else if(UProcedureModuleBPLibrary::IsCurrentProcedureClass<UProcedure_Pausing>())
 	{
 		UProcedureModuleBPLibrary::SwitchProcedureByClass<UProcedure_Playing>();
 	}

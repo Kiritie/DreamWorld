@@ -22,7 +22,6 @@ ADWGameState::ADWGameState()
 {
 	// set default pawn class to our Blueprinted character
 	
-	CurrentState = EDWGameState::None;
 }
 
 void ADWGameState::OnInitialize_Implementation()
@@ -33,9 +32,4 @@ void ADWGameState::OnInitialize_Implementation()
 void ADWGameState::OnPreparatory_Implementation()
 {
 	Super::OnPreparatory_Implementation();
-}
-
-void ADWGameState::SetCurrentState(EDWGameState InGameState)
-{
-	CurrentState = InGameState;
 }

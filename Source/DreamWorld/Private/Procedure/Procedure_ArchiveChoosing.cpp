@@ -43,8 +43,6 @@ void UProcedure_ArchiveChoosing::OnInitialize()
 void UProcedure_ArchiveChoosing::OnEnter(UProcedureBase* InLastProcedure)
 {
 	Super::OnEnter(InLastProcedure);
-	
-	UGlobalBPLibrary::GetGameState<ADWGameState>()->SetCurrentState(EDWGameState::ArchiveChoosing);
 
 	UWidgetModuleBPLibrary::OpenUserWidget<UWidgetArchiveChoosingPanel>();
 

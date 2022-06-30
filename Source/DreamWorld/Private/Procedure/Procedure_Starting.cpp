@@ -9,6 +9,7 @@
 #include "Character/Player/DWPlayerCharacter.h"
 #include "Gameplay/DWGameState.h"
 #include "Global/GlobalBPLibrary.h"
+#include "Procedure/ProcedureModuleBPLibrary.h"
 #include "Procedure/Procedure_Initializing.h"
 #include "SaveGame/DWArchiveSaveGame.h"
 #include "SaveGame/DWGeneralSaveGame.h"
@@ -45,8 +46,6 @@ void UProcedure_Starting::OnInitialize()
 
 void UProcedure_Starting::OnEnter(UProcedureBase* InLastProcedure)
 {
-	UGlobalBPLibrary::GetGameState<ADWGameState>()->SetCurrentState(EDWGameState::Starting);
-
 	UAudioModuleBPLibrary::PlaySingleSound2D(BGMSound, FName("BGM"));
 
 	UWidgetModuleBPLibrary::OpenUserWidget<UWidgetMainMenu>();
