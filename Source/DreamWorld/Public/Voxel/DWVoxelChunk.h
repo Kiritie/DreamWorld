@@ -11,7 +11,7 @@
 
 class ADWVitality;
 class UVoxel;
-class APickUp;
+class AAbilityPickUpBase;
 class UVoxelMeshComponent;
 
 /**

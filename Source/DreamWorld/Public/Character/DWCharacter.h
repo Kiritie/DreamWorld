@@ -9,7 +9,6 @@
 #include "TargetSystemTargetableInterface.h"
 #include "Ability/Character/AbilityCharacterBase.h"
 #include "Inventory/InventoryAgentInterface.h"
-#include "Scene/Actor/PickUp/PickerInterface.h"
 #include "Voxel/Agent/VoxelAgentInterface.h"
 
 #include "DWCharacter.generated.h"
@@ -43,7 +42,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnCharacterActive);
  * 角色
  */
 UCLASS()
-class DREAMWORLD_API ADWCharacter : public AAbilityCharacterBase, public IVoxelAgentInterface, public ITargetSystemTargetableInterface, public IPickerInterface, public IInventoryAgentInterface
+class DREAMWORLD_API ADWCharacter : public AAbilityCharacterBase, public IVoxelAgentInterface, public ITargetSystemTargetableInterface, public IInventoryAgentInterface
 {
 	GENERATED_BODY()
 
@@ -309,7 +308,7 @@ public:
 	
 	virtual bool UseItem(FAbilityItem& InItem);
 
-	virtual void PickUp(APickUp* InPickUp) override;
+	virtual void PickUp(AAbilityPickUpBase* InPickUp) override;
 
 	UFUNCTION(BlueprintCallable)
 	virtual bool GenerateVoxel(const FVoxelHitResult& InVoxelHitResult, FAbilityItem& InItem) override;

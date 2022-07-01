@@ -41,6 +41,7 @@
 #include "Ability/Item/Prop/AbilityPropDataBase.h"
 #include "Ability/Item/Skill/AbilitySkillBase.h"
 #include "Ability/Item/Skill/AbilitySkillDataBase.h"
+#include "Ability/PickUp/AbilityPickUpBase.h"
 #include "Asset/AssetModuleBPLibrary.h"
 #include "BehaviorTree/BehaviorTree.h"
 #include "BehaviorTree/BlackboardData.h"
@@ -50,7 +51,6 @@
 #include "Inventory/Slot/InventorySkillSlot.h"
 #include "Item/Prop/DWPropData.h"
 #include "Main/MainModuleBPLibrary.h"
-#include "Scene/Actor/PickUp/PickUp.h"
 #include "Team/DWTeamModule.h"
 #include "Voxel/Datas/VoxelData.h"
 #include "Voxel/DWVoxelChunk.h"
@@ -1160,7 +1160,7 @@ bool ADWCharacter::UseItem(FAbilityItem& InItem)
 	return false;
 }
 
-void ADWCharacter::PickUp(APickUp* InPickUp)
+void ADWCharacter::PickUp(AAbilityPickUpBase* InPickUp)
 {
 	if(InPickUp)
 	{

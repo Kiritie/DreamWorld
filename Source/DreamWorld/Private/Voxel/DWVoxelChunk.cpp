@@ -5,13 +5,13 @@
 
 #include "Ability/AbilityModuleBPLibrary.h"
 #include "Ability/Character/AbilityCharacterDataBase.h"
+#include "Ability/PickUp/AbilityPickUpBase.h"
 #include "Ability/Vitality/AbilityVitalityDataBase.h"
 #include "Character/DWCharacter.h"
 #include "Character/DWCharacterData.h"
 #include "Character/Base/CharacterBase.h"
 #include "Components/BoxComponent.h"
 #include "Main/MainModule.h"
-#include "Scene/Actor/PickUp/PickUp.h"
 #include "Team/DWTeamModule.h"
 #include "Vitality/DWVitality.h"
 #include "Vitality/DWVitalityData.h"
@@ -97,7 +97,7 @@ FSaveData* ADWVoxelChunk::ToData()
 
 	for(int32 i = 0; i < PickUps.Num(); i++)
 	{
-		ChunkData.PickUpDatas.Add(USaveGameModuleBPLibrary::ObjectToDataRef<FPickUpSaveData>(PickUps[i], true, true));
+		ChunkData.PickUpDatas.Add(USaveGameModuleBPLibrary::ObjectToDataRef<FPickUpSaveData>(PickUps[i], true, false));
 	}
 
 	for(int32 i = 0; i < Characters.Num(); i++)
