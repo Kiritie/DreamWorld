@@ -42,7 +42,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnCharacterActive);
  * 角色
  */
 UCLASS()
-class DREAMWORLD_API ADWCharacter : public AAbilityCharacterBase, public IVoxelAgentInterface, public ITargetSystemTargetableInterface, public IInventoryAgentInterface
+class DREAMWORLD_API ADWCharacter : public AAbilityCharacterBase, public ITargetSystemTargetableInterface, public IInventoryAgentInterface
 {
 	GENERATED_BODY()
 
@@ -77,9 +77,6 @@ protected:
 	FVector BirthLocation;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CharacterStats")
-	AVoxelChunk* OwnerChunk;
-	
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CharacterStats")
 	ADWCharacter* OwnerRider;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CharacterStats")
@@ -87,39 +84,6 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CharacterStats")
 	ADWCharacter* LockedTarget;
-
-protected:
-	FGameplayTag ActiveTag;
-
-	FGameplayTag FallingTag;
-
-	FGameplayTag DodgingTag;
-
-	FGameplayTag SprintingTag;
-	
-	FGameplayTag CrouchingTag;
-		
-	FGameplayTag SwimmingTag;
-				
-	FGameplayTag FloatingTag;
-	
-	FGameplayTag ClimbingTag;
-					
-	FGameplayTag RidingTag;
-	
-	FGameplayTag FlyingTag;
-
-	FGameplayTag AttackingTag;
-	
-	FGameplayTag DefendingTag;
-
-	FGameplayTag InterruptingTag;
-	
-	FGameplayTag FreeToAnimTag;
-	
-	FGameplayTag LockRotationTag;
-
-	FGameplayTag BreakAllInputTag;
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
@@ -160,8 +124,6 @@ protected:
 	EDWCharacterActionType ActionType;
 
 	FTimerHandle AttackHurtTimer;
-
-	FVoxelItem SelectedVoxelItem;
 
 	UPROPERTY()
 	TMap<EDWEquipPartType, AAbilityEquipBase*> Equips;
@@ -310,10 +272,12 @@ public:
 
 	virtual void PickUp(AAbilityPickUpBase* InPickUp) override;
 
-	UFUNCTION(BlueprintCallable)
-	virtual bool GenerateVoxel(const FVoxelHitResult& InVoxelHitResult, FAbilityItem& InItem) override;
+	virtual bool GenerateVoxel(FVoxelItem& InVoxelItem) override;
 
-	UFUNCTION(BlueprintCallable)
+	virtual bool GenerateVoxel(FVoxelItem& InVoxelItem, const FVoxelHitResult& InVoxelHitResult) override;
+
+	virtual bool DestroyVoxel(FVoxelItem& InVoxelItem) override;
+
 	virtual bool DestroyVoxel(const FVoxelHitResult& InVoxelHitResult) override;
 
 	UFUNCTION(BlueprintCallable)
@@ -624,18 +588,6 @@ public:
 	void SetStaminaExpendSpeed(float InValue);
 
 	UFUNCTION(BlueprintPure)
-	virtual AVoxelChunk* GetOwnerChunk() const override { return OwnerChunk; }
-
-	UFUNCTION(BlueprintCallable)
-	virtual void SetOwnerChunk(AVoxelChunk* InOwnerChunk) override { OwnerChunk = InOwnerChunk; }
-
-	UFUNCTION(BlueprintPure)
-	virtual FAbilityItem& GetGeneratingVoxelItem() override;
-
-	UFUNCTION(BlueprintPure)
-	virtual FVoxelItem& GetSelectedVoxelItem() override;
-
-	UFUNCTION(BlueprintPure)
 	ADWCharacter* GetOwnerRider() const { return OwnerRider; }
 
 	UFUNCTION(BlueprintCallable)
@@ -713,6 +665,8 @@ public:
 	UDWCharacterPart* GetCharacterPart(EDWCharacterPartType InCharacterPartType) const;
 
 public:
+	virtual void OnInventorySlotSelected(UInventorySlot* InInventorySlot);
+	
 	virtual void OnAttributeChange(const FOnAttributeChangeData& InAttributeChangeData) override;
 	
 	virtual void HandleDamage(EDamageType DamageType, const float LocalDamageDone, bool bHasCrited, FHitResult HitResult, const FGameplayTagContainer& SourceTags, AActor* SourceActor) override;

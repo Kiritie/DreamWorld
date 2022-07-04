@@ -11,10 +11,16 @@
 #include "Vitality/DWVitality.h"
 
 #include "Character/DWCharacter.h"
+#include "FSM/Components/FSMComponent.h"
 #include "Inventory/VitalityInventory.h"
+#include "Inventory/Slot/InventorySlot.h"
 #include "Vitality/DWVitalityData.h"
+#include "Vitality/States/DWVitalityState_Death.h"
+#include "Vitality/States/DWVitalityState_Default.h"
 #include "Voxel/DWVoxelChunk.h"
+#include "Voxel/VoxelModule.h"
 #include "Voxel/Chunks/VoxelChunk.h"
+#include "Voxel/Datas/VoxelData.h"
 #include "Widget/Components/WidgetVitalityHPComponent.h"
 #include "Widget/World/WidgetVitalityHP.h"
 
@@ -30,12 +36,12 @@ ADWVitality::ADWVitality()
 	AttributeSet = CreateDefaultSubobject<UDWVitalityAttributeSet>(FName("AttributeSet"));
 	
 	Inventory = CreateDefaultSubobject<UVitalityInventory>(FName("Inventory"));
+	Inventory->GetOnSlotSelected().AddDynamic(this, &ADWVitality::OnInventorySlotSelected);
 
-	OwnerChunk = nullptr;
-
-	// tags
-	DeadTag = FGameplayTag::RequestGameplayTag("State.Vitality.Dead");
-	DyingTag = FGameplayTag::RequestGameplayTag("State.Vitality.Dying");
+	FSM->States.Empty();
+	FSM->States.Add(UDWVitalityState_Default::StaticClass());
+	FSM->States.Add(UDWVitalityState_Death::StaticClass());
+	FSM->DefaultState = UDWVitalityState_Default::StaticClass();
 }
 
 // Called when the game starts or when spawned
@@ -153,16 +159,6 @@ void ADWVitality::Revive()
 	Super::Revive();
 }
 
-bool ADWVitality::GenerateVoxel(const FVoxelHitResult& InVoxelHitResult, FAbilityItem& InItem)
-{
-	return false;
-}
-
-bool ADWVitality::DestroyVoxel(const FVoxelHitResult& InVoxelHitResult)
-{
-	return false;
-}
-
 bool ADWVitality::CanInteract(IInteractionAgentInterface* InInteractionAgent, EInteractAction InInteractAction)
 {
 	switch (InInteractAction)
@@ -192,6 +188,40 @@ void ADWVitality::OnInteract(IInteractionAgentInterface* InInteractionAgent, EIn
 		}
 		default: break;
 	}
+}
+
+bool ADWVitality::GenerateVoxel(FVoxelItem& InVoxelItem)
+{
+	bool bSuccess = false;
+	FQueryItemInfo QueryItemInfo = Inventory->GetItemInfoByRange(EQueryItemType::Remove, static_cast<FAbilityItem>(InVoxelItem));
+	if(QueryItemInfo.Item.IsValid())
+	{
+		bSuccess = Super::GenerateVoxel(InVoxelItem);
+	}
+	if(bSuccess) Inventory->RemoveItemBySlots(QueryItemInfo.Item, QueryItemInfo.Slots);
+	return bSuccess;
+}
+
+bool ADWVitality::GenerateVoxel(FVoxelItem& InVoxelItem, const FVoxelHitResult& InVoxelHitResult)
+{
+	bool bSuccess = false;
+	FQueryItemInfo QueryItemInfo = Inventory->GetItemInfoByRange(EQueryItemType::Remove, static_cast<FAbilityItem>(InVoxelItem));
+	if(QueryItemInfo.Item.IsValid())
+	{
+		bSuccess = Super::GenerateVoxel(InVoxelItem, InVoxelHitResult);
+	}
+	if(bSuccess) Inventory->RemoveItemBySlots(QueryItemInfo.Item, QueryItemInfo.Slots);
+	return bSuccess;
+}
+
+bool ADWVitality::DestroyVoxel(FVoxelItem& InVoxelItem)
+{
+	return Super::DestroyVoxel(InVoxelItem);
+}
+
+bool ADWVitality::DestroyVoxel(const FVoxelHitResult& InVoxelHitResult)
+{
+	return Super::DestroyVoxel(InVoxelHitResult);
 }
 
 void ADWVitality::SetNameV(FName InName)
@@ -234,21 +264,6 @@ void ADWVitality::SetEXP(int32 InEXP)
 	}
 }
 
-FAbilityItem& ADWVitality::GetGeneratingVoxelItem()
-{
-	FAbilityItem tmpItem = Inventory->GetSelectedItem();
-	if(tmpItem.IsValid() && tmpItem.GetData().EqualType(EAbilityItemType::Voxel))
-	{
-		return tmpItem;
-	}
-	return FAbilityItem::Empty;
-}
-
-FVoxelItem& ADWVitality::GetSelectedVoxelItem()
-{
-	return SelectedVoxelItem;
-}
-
 UWidgetVitalityHP* ADWVitality::GetWidgetVitalityHPWidget() const
 {
 	if (WidgetVitalityHP->GetUserWidgetObject())
@@ -256,6 +271,15 @@ UWidgetVitalityHP* ADWVitality::GetWidgetVitalityHPWidget() const
 		return Cast<UWidgetVitalityHP>(WidgetVitalityHP->GetUserWidgetObject());
 	}
 	return nullptr;
+}
+
+void ADWVitality::OnInventorySlotSelected(UInventorySlot* InInventorySlot)
+{
+	const FAbilityItem tmpItem = InInventorySlot->GetItem();
+	if(tmpItem.IsValid() && tmpItem.GetData().EqualType(EAbilityItemType::Voxel))
+	{
+		GeneratingVoxelItem = tmpItem.ID;
+	}
 }
 
 void ADWVitality::OnAttributeChange(const FOnAttributeChangeData& InAttributeChangeData)

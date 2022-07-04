@@ -7,7 +7,6 @@
 #include "AbilitySystemInterface.h"
 #include "Ability/Vitality/AbilityVitalityBase.h"
 #include "Inventory/InventoryAgentInterface.h"
-#include "Voxel/Agent/VoxelAgentInterface.h"
 
 #include "DWVitality.generated.h"
 
@@ -24,7 +23,7 @@ class UAttributeSetBase;
  * ������������
  */
 UCLASS()
-class DREAMWORLD_API ADWVitality : public AAbilityVitalityBase, public IVoxelAgentInterface, public IInventoryAgentInterface
+class DREAMWORLD_API ADWVitality : public AAbilityVitalityBase, public IInventoryAgentInterface
 {
 	GENERATED_BODY()
 
@@ -33,19 +32,11 @@ public:
 	ADWVitality();
 
 protected:
-	// stats
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "VitalityStats")
-	AVoxelChunk* OwnerChunk;
-
-protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	UWidgetVitalityHPComponent* WidgetVitalityHP;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	UInventory* Inventory;
-
-protected:
-	FVoxelItem SelectedVoxelItem;
 
 protected:
 	// Called when the game starts or when spawned
@@ -70,13 +61,17 @@ public:
 
 	virtual void Revive() override;
 
-	virtual bool GenerateVoxel(const FVoxelHitResult& InVoxelHitResult, FAbilityItem& InItem) override;
-
-	virtual bool DestroyVoxel(const FVoxelHitResult& InVoxelHitResult) override;
-
 	virtual bool CanInteract(IInteractionAgentInterface* InInteractionAgent, EInteractAction InInteractAction) override;
 
 	virtual void OnInteract(IInteractionAgentInterface* InInteractionAgent, EInteractAction InInteractAction) override;
+
+	virtual bool GenerateVoxel(FVoxelItem& InVoxelItem) override;
+
+	virtual bool GenerateVoxel(FVoxelItem& InVoxelItem, const FVoxelHitResult& InVoxelHitResult) override;
+
+	virtual bool DestroyVoxel(FVoxelItem& InVoxelItem) override;
+
+	virtual bool DestroyVoxel(const FVoxelHitResult& InVoxelHitResult) override;
 
 public:
 	virtual void SetNameV(FName InName) override;
@@ -88,22 +83,14 @@ public:
 	virtual void SetEXP(int32 InEXP) override;
 
 	UFUNCTION(BlueprintPure)
-	virtual AVoxelChunk* GetOwnerChunk() const override { return OwnerChunk; }
-	
-	UFUNCTION(BlueprintCallable)
-	virtual void SetOwnerChunk(AVoxelChunk* InOwnerChunk) override { OwnerChunk = InOwnerChunk; }
-
-	virtual FAbilityItem& GetGeneratingVoxelItem() override;
-
-	virtual FVoxelItem& GetSelectedVoxelItem() override;
-
-	UFUNCTION(BlueprintPure)
 	virtual UInventory* GetInventory() const override { return Inventory; }
 		
 	UFUNCTION(BlueprintPure)
 	UWidgetVitalityHP* GetWidgetVitalityHPWidget() const;
 
 public:
+	virtual void OnInventorySlotSelected(UInventorySlot* InInventorySlot);
+	
 	virtual void OnAttributeChange(const FOnAttributeChangeData& InAttributeChangeData) override;
 	
 	virtual void HandleDamage(EDamageType DamageType, const float LocalDamageDone, bool bHasCrited, FHitResult HitResult, const FGameplayTagContainer& SourceTags, AActor* SourceActor) override;

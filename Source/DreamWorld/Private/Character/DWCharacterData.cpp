@@ -16,4 +16,24 @@ UDWCharacterData::UDWCharacterData()
 	BehaviorTreeAsset = nullptr;
 	FallingAttackAbility = FDWCharacterAttackAbilityData();
 	InventoryData = FInventorySaveData();
+
+	// tags
+	DeadTag = FGameplayTag::RequestGameplayTag("State.Vitality.Dead");
+	DyingTag = FGameplayTag::RequestGameplayTag("State.Vitality.Dying");
+	ActiveTag = FGameplayTag::RequestGameplayTag("State.Character.Active");
+	FallingTag = FGameplayTag::RequestGameplayTag("State.Character.Falling");
+	DodgingTag = FGameplayTag::RequestGameplayTag("State.Character.Dodging");
+	SprintingTag = FGameplayTag::RequestGameplayTag("State.Character.Sprinting");
+	CrouchingTag = FGameplayTag::RequestGameplayTag("State.Character.Crouching");
+	SwimmingTag = FGameplayTag::RequestGameplayTag("State.Character.Swimming");
+	FloatingTag = FGameplayTag::RequestGameplayTag("State.Character.Floating");
+	ClimbingTag = FGameplayTag::RequestGameplayTag("State.Character.Climbing");
+	RidingTag = FGameplayTag::RequestGameplayTag("State.Character.Riding");
+	FlyingTag = FGameplayTag::RequestGameplayTag("State.Character.Flying");
+	AttackingTag = FGameplayTag::RequestGameplayTag("State.Character.Attacking");
+	DefendingTag = FGameplayTag::RequestGameplayTag("State.Character.Defending");
+	InterruptingTag = FGameplayTag::RequestGameplayTag("State.Character.Interrupting");
+	FreeToAnimTag = FGameplayTag::RequestGameplayTag("State.Character.FreeToAnim");
+	LockRotationTag = FGameplayTag::RequestGameplayTag("State.Character.LockRotation");
+	BreakAllInputTag = FGameplayTag::RequestGameplayTag("State.Character.BreakAllInput");
 }

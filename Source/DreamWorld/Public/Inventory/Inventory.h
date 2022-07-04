@@ -19,21 +19,24 @@ public:
 	//////////////////////////////////////////////////////////////////////////
 	/// Properties
 protected:
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Default")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Default")
 	TMap<ESplitSlotType, FSplitSlotInfo> SplitInfos;
 	
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Default")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Default")
 	TArray<UInventorySlot*> Slots;
 				
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Default")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Default")
 	AActor* OwnerActor;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Default")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Default")
 	UInventory* ConnectInventory;
 				
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Default")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Default")
 	UInventorySlot* SelectedSlot;
 
+	UPROPERTY(BlueprintAssignable)
+	FOnInventorySlotSelected OnSlotSelected;
+	
 	//////////////////////////////////////////////////////////////////////////
 	/// Initialize
 public:
@@ -112,7 +115,13 @@ public:
 	UInventorySlot* GetSelectedSlot() const { return SelectedSlot; }
 
 	UFUNCTION(BlueprintCallable)
-	void SetSelectedSlot(UInventorySlot* InSelectedSlot) { this->SelectedSlot = InSelectedSlot; }
+	void SetSelectedSlot(UInventorySlot* InSelectedSlot)
+	{
+		this->SelectedSlot = InSelectedSlot;
+		OnSlotSelected.Broadcast(InSelectedSlot);
+	}
+
+	FOnInventorySlotSelected& GetOnSlotSelected() { return OnSlotSelected; }
 	
 	UFUNCTION(BlueprintPure)
 	FAbilityItem& GetSelectedItem() const;

@@ -8,6 +8,8 @@
 class UWidgetInventorySlot;
 class UInventorySlot;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInventorySlotSelected, UInventorySlot*, InInventorySlot);
+
 UENUM(BlueprintType)
 enum class ESplitSlotType : uint8
 {

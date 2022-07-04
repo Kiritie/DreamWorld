@@ -1,8 +1,8 @@
-root = true  # ËùÔÚÄ¿Â¼ÊÇÏîÄ¿¸ùÄ¿Â¼£¬´ËÄ¿Â¼¼°×ÓÄ¿Â¼ÏÂ±£´æµÄÎÄ¼ş¶¼»áÉúĞ§    
- 
-[*]  # ¶ÔÓÚËùÓĞÎÄ¼ş
-indent_style = tab  # Ëõ½ø·ç¸ñ
-tab_width = 4  # Ëõ½ø¿í¶È
-charset = utf-8-bom  # ÎÄ¼ş±àÂë¸ñÊ½£¬Visual StudioÊ¹ÓÃutf-8-bom£¬ÒÔ·À¾¯¸æ
-end_of_line = crlf  # ĞĞÎ²¸ñÊ½£¬WindowsÒ»°ãÎªCRLF£¬LinuxÒ»°ãÎªLF£¬¸ù¾İĞèÒª¸ü¸Ä
-insert_final_newline = true   #ÎÄ¼ş½áÎ²Ìí¼Ó»»ĞĞ·û£¬ÒÔ·À¾¯¸æ
+root = true  #æ‰€åœ¨ç›®å½•æ˜¯é¡¹ç›®æ ¹ç›®å½•ï¼Œæ­¤ç›®å½•åŠå­ç›®å½•ä¸‹ä¿å­˜çš„æ–‡ä»¶éƒ½ä¼šç”Ÿæ•ˆ    
+
+[*]  #å¯¹äºæ‰€æœ‰æ–‡ä»¶
+indent_style = tab  #ç¼©è¿›é£æ ¼
+tab_width = 4  #ç¼©è¿›å®½åº¦
+charset = utf-8  #æ–‡ä»¶ç¼–ç æ ¼å¼ï¼ŒVisual Studioä½¿ç”¨utf-8-bomï¼Œä»¥é˜²è­¦å‘Š
+end_of_line = crlf  #è¡Œå°¾æ ¼å¼ï¼ŒWindowsä¸€èˆ¬ä¸ºCRLFï¼ŒLinuxä¸€èˆ¬ä¸ºLFï¼Œæ ¹æ®éœ€è¦æ›´æ”¹
+insert_final_newline = true  #æ–‡ä»¶ç»“å°¾æ·»åŠ æ¢è¡Œç¬¦ï¼Œä»¥é˜²è­¦å‘Š

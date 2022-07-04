@@ -75,6 +75,7 @@ ADWCharacter::ADWCharacter()
 	AttributeSet = CreateDefaultSubobject<UDWCharacterAttributeSet>(FName("AttributeSet"));
 
 	Inventory = CreateDefaultSubobject<UCharacterInventory>(FName("Inventory"));
+	Inventory->GetOnSlotSelected().AddDynamic(this, &ADWCharacter::OnInventorySlotSelected);
 
 	BehaviorTree = nullptr;
 
@@ -93,26 +94,6 @@ ADWCharacter::ADWCharacter()
 	GetCharacterMovement()->AirControl = 0.2f;
 	GetCharacterMovement()->bComponentShouldUpdatePhysicsVolume = false;
 
-	// tags
-	DeadTag = FGameplayTag::RequestGameplayTag("State.Vitality.Dead");
-	DyingTag = FGameplayTag::RequestGameplayTag("State.Vitality.Dying");
-	ActiveTag = FGameplayTag::RequestGameplayTag("State.Character.Active");
-	FallingTag = FGameplayTag::RequestGameplayTag("State.Character.Falling");
-	DodgingTag = FGameplayTag::RequestGameplayTag("State.Character.Dodging");
-	SprintingTag = FGameplayTag::RequestGameplayTag("State.Character.Sprinting");
-	CrouchingTag = FGameplayTag::RequestGameplayTag("State.Character.Crouching");
-	SwimmingTag = FGameplayTag::RequestGameplayTag("State.Character.Swimming");
-	FloatingTag = FGameplayTag::RequestGameplayTag("State.Character.Floating");
-	ClimbingTag = FGameplayTag::RequestGameplayTag("State.Character.Climbing");
-	RidingTag = FGameplayTag::RequestGameplayTag("State.Character.Riding");
-	FlyingTag = FGameplayTag::RequestGameplayTag("State.Character.Flying");
-	AttackingTag = FGameplayTag::RequestGameplayTag("State.Character.Attacking");
-	DefendingTag = FGameplayTag::RequestGameplayTag("State.Character.Defending");
-	InterruptingTag = FGameplayTag::RequestGameplayTag("State.Character.Interrupting");
-	FreeToAnimTag = FGameplayTag::RequestGameplayTag("State.Character.FreeToAnim");
-	LockRotationTag = FGameplayTag::RequestGameplayTag("State.Character.LockRotation");
-	BreakAllInputTag = FGameplayTag::RequestGameplayTag("State.Character.BreakAllInput");
-
 	// stats
 	Nature = EDWCharacterNature::AIHostile;
 	TeamID = NAME_None;
@@ -128,7 +109,6 @@ ADWCharacter::ADWCharacter()
 		Equips.Add((EDWEquipPartType)i, nullptr);
 	}
 
-	OwnerChunk = nullptr;
 	RidingTarget = nullptr;
 	LockedTarget = nullptr;
 
@@ -522,7 +502,7 @@ void ADWCharacter::Active(bool bResetData /*= false*/)
 {
 	if (!IsActive())
 	{
-		AbilitySystem->AddLooseGameplayTag(ActiveTag);
+		AbilitySystem->AddLooseGameplayTag(GetCharacterData<UDWCharacterData>().ActiveTag);
 		UnInterrupt();
 		OnCharacterActive.Broadcast();
 	}
@@ -535,7 +515,7 @@ void ADWCharacter::Disable(bool bDisableMovement, bool bDisableCollision)
 {
 	if (IsActive())
 	{
-		AbilitySystem->RemoveLooseGameplayTag(ActiveTag);
+		AbilitySystem->RemoveLooseGameplayTag(GetCharacterData<UDWCharacterData>().ActiveTag);
 		Interrupt();
 	}
 	if (bDisableMovement)
@@ -652,11 +632,11 @@ void ADWCharacter::FreeToAnim(bool bUnLockRotation /*= true*/)
 {
 	if (!IsInterrupting())
 	{
-		AbilitySystem->AddLooseGameplayTag(FreeToAnimTag);
+		AbilitySystem->AddLooseGameplayTag(GetCharacterData<UDWCharacterData>().FreeToAnimTag);
 	}
 	if (bUnLockRotation)
 	{
-		AbilitySystem->RemoveLooseGameplayTag(LockRotationTag);
+		AbilitySystem->RemoveLooseGameplayTag(GetCharacterData<UDWCharacterData>().LockRotationTag);
 	}
 }
 
@@ -664,11 +644,11 @@ void ADWCharacter::LimitToAnim(bool bInLockRotation /*= false*/, bool bUnSprint 
 {
 	if (!IsFlying() && !IsFalling() && !IsRiding() && !IsClimbing() && !IsDefending())
 	{
-		AbilitySystem->RemoveLooseGameplayTag(FreeToAnimTag);
+		AbilitySystem->RemoveLooseGameplayTag(GetCharacterData<UDWCharacterData>().FreeToAnimTag);
 	}
 	if (bInLockRotation)
 	{
-		AbilitySystem->AddLooseGameplayTag(LockRotationTag);
+		AbilitySystem->AddLooseGameplayTag(GetCharacterData<UDWCharacterData>().LockRotationTag);
 	}
 	if (bUnSprint)
 	{
@@ -689,8 +669,8 @@ void ADWCharacter::Interrupt(float InDuration /*= -1*/, bool bDoAction /*= false
 		UnDefend();
 		UnSprint();
 		LimitToAnim();
-		AbilitySystem->AddLooseGameplayTag(InterruptingTag);
-		AbilitySystem->AddLooseGameplayTag(BreakAllInputTag);
+		AbilitySystem->AddLooseGameplayTag(GetCharacterData<UDWCharacterData>().InterruptingTag);
+		AbilitySystem->AddLooseGameplayTag(GetCharacterData<UDWCharacterData>().BreakAllInputTag);
 	}
 	if (InDuration != -1) InDuration = InDuration * (1 - GetToughnessRate());
 	InterruptRemainTime = InDuration;
@@ -701,8 +681,8 @@ void ADWCharacter::UnInterrupt()
 {
 	if (IsInterrupting())
 	{
-		AbilitySystem->RemoveLooseGameplayTag(InterruptingTag);
-		AbilitySystem->RemoveLooseGameplayTag(BreakAllInputTag);
+		AbilitySystem->RemoveLooseGameplayTag(GetCharacterData<UDWCharacterData>().InterruptingTag);
+		AbilitySystem->RemoveLooseGameplayTag(GetCharacterData<UDWCharacterData>().BreakAllInputTag);
 		FreeToAnim();
 		StopAction(EDWCharacterActionType::Interrupt);
 	}
@@ -747,7 +727,7 @@ void ADWCharacter::Sprint()
 {
 	if (!IsSprinting() && IsFreeToAnim())
 	{
-		AbilitySystem->AddLooseGameplayTag(SprintingTag);
+		AbilitySystem->AddLooseGameplayTag(GetCharacterData<UDWCharacterData>().SprintingTag);
 	}
 }
 
@@ -755,7 +735,7 @@ void ADWCharacter::UnSprint()
 {
 	if (IsSprinting())
 	{
-		AbilitySystem->RemoveLooseGameplayTag(SprintingTag);
+		AbilitySystem->RemoveLooseGameplayTag(GetCharacterData<UDWCharacterData>().SprintingTag);
 	}
 }
 
@@ -1102,7 +1082,7 @@ void ADWCharacter::UnDefend()
 
 void ADWCharacter::FallStart()
 {
-	AbilitySystem->AddLooseGameplayTag(FallingTag);
+	AbilitySystem->AddLooseGameplayTag(GetCharacterData<UDWCharacterData>().FallingTag);
 	if(IsDefending())
 	{
 		UnDefend();
@@ -1111,7 +1091,7 @@ void ADWCharacter::FallStart()
 
 void ADWCharacter::FallEnd()
 {
-	AbilitySystem->RemoveLooseGameplayTag(FallingTag);
+	AbilitySystem->RemoveLooseGameplayTag(GetCharacterData<UDWCharacterData>().FallingTag);
 	UnJump();
 	if(IsAttacking() && AttackType == EDWAttackType::FallingAttack)
 	{
@@ -1126,7 +1106,7 @@ bool ADWCharacter::UseItem(FAbilityItem& InItem)
 		FVoxelHitResult voxelHitResult;
 		if (RaycastVoxel(voxelHitResult))
 		{
-			return GenerateVoxel(voxelHitResult, InItem);
+			return GenerateVoxel(static_cast<FVoxelItem&>(InItem), voxelHitResult);
 		}
 	}
 	else if(InItem.GetData().EqualType(EAbilityItemType::Prop))
@@ -1168,15 +1148,57 @@ void ADWCharacter::PickUp(AAbilityPickUpBase* InPickUp)
 	}
 }
 
-bool ADWCharacter::GenerateVoxel(const FVoxelHitResult& InVoxelHitResult, FAbilityItem& InItem)
+bool ADWCharacter::GenerateVoxel(FVoxelItem& InVoxelItem)
 {
 	bool bSuccess = false;
 	FQueryItemInfo QueryItemInfo;
 	if(!IsPlayer())
 	{
-		QueryItemInfo = Inventory->GetItemInfoByRange(EQueryItemType::Remove, InItem);
+		QueryItemInfo = Inventory->GetItemInfoByRange(EQueryItemType::Remove, static_cast<FAbilityItem>(InVoxelItem));
 	}
-	else if(Inventory->GetSelectedItem().EqualType(InItem))
+	else if(Inventory->GetSelectedItem().EqualType(static_cast<FAbilityItem>(InVoxelItem)))
+	{
+		QueryItemInfo = FQueryItemInfo(Inventory->GetSelectedItem(), TArray<UInventorySlot*>{ Inventory->GetSelectedSlot() });
+	}
+	if(QueryItemInfo.Item.IsValid() && DoAction(EDWCharacterActionType::Generate))
+	{
+		AVoxelChunk* chunk = InVoxelItem.Owner;
+		const FIndex index = InVoxelItem.Index;
+		const FVoxelItem& voxelItem = chunk->GetVoxelItem(index);
+
+		if(!voxelItem.IsValid() || voxelItem.GetData<UVoxelData>().Transparency == EVoxelTransparency::Transparent && voxelItem != InVoxelItem)
+		{
+			//FRotator rotation = (Owner->VoxelIndexToLocation(index) + tmpVoxel->GetData<UVoxelData>().GetCeilRange() * 0.5f * AVoxelModule::GetWorldInfo().BlockSize - UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>()->GetActorLocation()).ToOrientationRotator();
+			//rotation = FRotator(FRotator::ClampAxis(FMath::RoundToInt(rotation.Pitch / 90) * 90.f), FRotator::ClampAxis(FMath::RoundToInt(rotation.Yaw / 90) * 90.f), FRotator::ClampAxis(FMath::RoundToInt(rotation.Roll / 90) * 90.f));
+			//tmpVoxel->Rotation = rotation;
+
+			FHitResult HitResult;
+			if (!AMainModule::GetModuleByClass<AVoxelModule>()->VoxelTraceSingle(InVoxelItem, chunk->IndexToLocation(index), HitResult))
+			{
+				if(voxelItem.IsValid())
+				{
+					bSuccess = chunk->ReplaceVoxel(voxelItem, InVoxelItem);
+				}
+				else
+				{
+					bSuccess = chunk->GenerateVoxel(index, InVoxelItem);
+				}
+			}
+		}
+	}
+	if(bSuccess) Inventory->RemoveItemBySlots(QueryItemInfo.Item, QueryItemInfo.Slots);
+	return bSuccess;
+}
+
+bool ADWCharacter::GenerateVoxel(FVoxelItem& InVoxelItem, const FVoxelHitResult& InVoxelHitResult)
+{
+	bool bSuccess = false;
+	FQueryItemInfo QueryItemInfo;
+	if(!IsPlayer())
+	{
+		QueryItemInfo = Inventory->GetItemInfoByRange(EQueryItemType::Remove, static_cast<FAbilityItem>(InVoxelItem));
+	}
+	else if(Inventory->GetSelectedItem().EqualType(static_cast<FAbilityItem>(InVoxelItem)))
 	{
 		QueryItemInfo = FQueryItemInfo(Inventory->GetSelectedItem(), TArray<UInventorySlot*>{ Inventory->GetSelectedSlot() });
 	}
@@ -1188,22 +1210,20 @@ bool ADWCharacter::GenerateVoxel(const FVoxelHitResult& InVoxelHitResult, FAbili
 
 		if(!voxelItem.IsValid() || voxelItem.GetData<UVoxelData>().Transparency == EVoxelTransparency::Transparent && voxelItem != InVoxelHitResult.VoxelItem)
 		{
-			const FVoxelItem _voxelItem = FVoxelItem(InItem.ID);
-
 			//FRotator rotation = (Owner->VoxelIndexToLocation(index) + tmpVoxel->GetData<UVoxelData>().GetCeilRange() * 0.5f * AVoxelModule::GetWorldInfo().BlockSize - UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>()->GetActorLocation()).ToOrientationRotator();
 			//rotation = FRotator(FRotator::ClampAxis(FMath::RoundToInt(rotation.Pitch / 90) * 90.f), FRotator::ClampAxis(FMath::RoundToInt(rotation.Yaw / 90) * 90.f), FRotator::ClampAxis(FMath::RoundToInt(rotation.Roll / 90) * 90.f));
 			//tmpVoxel->Rotation = rotation;
 
 			FHitResult HitResult;
-			if (!AMainModule::GetModuleByClass<AVoxelModule>()->VoxelTraceSingle(_voxelItem, chunk->IndexToLocation(index), HitResult))
+			if (!AMainModule::GetModuleByClass<AVoxelModule>()->VoxelTraceSingle(InVoxelItem, chunk->IndexToLocation(index), HitResult))
 			{
 				if(voxelItem.IsValid())
 				{
-					bSuccess = chunk->ReplaceVoxel(voxelItem, _voxelItem);
+					bSuccess = chunk->ReplaceVoxel(voxelItem, InVoxelItem);
 				}
 				else
 				{
-					bSuccess = chunk->GenerateVoxel(index, _voxelItem);
+					bSuccess = chunk->GenerateVoxel(index, InVoxelItem);
 				}
 			}
 		}
@@ -1212,17 +1232,20 @@ bool ADWCharacter::GenerateVoxel(const FVoxelHitResult& InVoxelHitResult, FAbili
 	return bSuccess;
 }
 
+bool ADWCharacter::DestroyVoxel(FVoxelItem& InVoxelItem)
+{
+	if(DoAction(EDWCharacterActionType::Destroy))
+	{
+		Super::DestroyVoxel(InVoxelItem);
+	}
+	return false;
+}
+
 bool ADWCharacter::DestroyVoxel(const FVoxelHitResult& InVoxelHitResult)
 {
 	if(DoAction(EDWCharacterActionType::Destroy))
 	{
-		AVoxelChunk* chunk = InVoxelHitResult.GetOwner();
-		const FVoxelItem& voxelItem = InVoxelHitResult.VoxelItem;
-
-		if (voxelItem.GetData<UVoxelData>().VoxelType != EVoxelType::Bedrock)
-		{
-			return chunk->DestroyVoxel(voxelItem);
-		}
+		Super::DestroyVoxel(InVoxelHitResult);
 	}
 	return false;
 }
@@ -1516,82 +1539,82 @@ UWidgetCharacterHP* ADWCharacter::GetWidgetCharacterHPWidget() const
 
 bool ADWCharacter::IsActive(bool bNeedNotDead, bool bNeedFreeToAnim /*= false*/) const
 {
-	return AbilitySystem->HasMatchingGameplayTag(ActiveTag) && (!bNeedNotDead || !IsDead()) && (!bNeedFreeToAnim || IsFreeToAnim(false));
+	return AbilitySystem->HasMatchingGameplayTag(GetCharacterData<UDWCharacterData>().ActiveTag) && (!bNeedNotDead || !IsDead()) && (!bNeedFreeToAnim || IsFreeToAnim(false));
 }
 
 bool ADWCharacter::IsFreeToAnim(bool bCheckStates) const
 {
-	return AbilitySystem->HasMatchingGameplayTag(FreeToAnimTag) && (!bCheckStates || !IsFlying() && !IsFalling() && !IsRiding() && !IsClimbing() && !IsDefending());
+	return AbilitySystem->HasMatchingGameplayTag(GetCharacterData<UDWCharacterData>().FreeToAnimTag) && (!bCheckStates || !IsFlying() && !IsFalling() && !IsRiding() && !IsClimbing() && !IsDefending());
 }
 
 bool ADWCharacter::IsFalling() const
 {
-	return AbilitySystem->HasMatchingGameplayTag(FallingTag);
+	return AbilitySystem->HasMatchingGameplayTag(GetCharacterData<UDWCharacterData>().FallingTag);
 }
 
 bool ADWCharacter::IsDodging() const
 {
-	return AbilitySystem->HasMatchingGameplayTag(DodgingTag);
+	return AbilitySystem->HasMatchingGameplayTag(GetCharacterData<UDWCharacterData>().DodgingTag);
 }
 
 bool ADWCharacter::IsSprinting() const
 {
-	return AbilitySystem->HasMatchingGameplayTag(SprintingTag);
+	return AbilitySystem->HasMatchingGameplayTag(GetCharacterData<UDWCharacterData>().SprintingTag);
 }
 
 bool ADWCharacter::IsCrouching() const
 {
-	return AbilitySystem->HasMatchingGameplayTag(CrouchingTag);
+	return AbilitySystem->HasMatchingGameplayTag(GetCharacterData<UDWCharacterData>().CrouchingTag);
 }
 
 bool ADWCharacter::IsSwimming() const
 {
-	return AbilitySystem->HasMatchingGameplayTag(SwimmingTag);
+	return AbilitySystem->HasMatchingGameplayTag(GetCharacterData<UDWCharacterData>().SwimmingTag);
 }
 
 bool ADWCharacter::IsFloating() const
 {
-	return AbilitySystem->HasMatchingGameplayTag(FloatingTag);
+	return AbilitySystem->HasMatchingGameplayTag(GetCharacterData<UDWCharacterData>().FloatingTag);
 }
 
 bool ADWCharacter::IsAttacking() const
 {
-	return AbilitySystem->HasMatchingGameplayTag(AttackingTag);
+	return AbilitySystem->HasMatchingGameplayTag(GetCharacterData<UDWCharacterData>().AttackingTag);
 }
 
 bool ADWCharacter::IsDefending() const
 {
-	return AbilitySystem->HasMatchingGameplayTag(DefendingTag);
+	return AbilitySystem->HasMatchingGameplayTag(GetCharacterData<UDWCharacterData>().DefendingTag);
 }
 
 bool ADWCharacter::IsClimbing() const
 {
-	return AbilitySystem->HasMatchingGameplayTag(ClimbingTag);
+	return AbilitySystem->HasMatchingGameplayTag(GetCharacterData<UDWCharacterData>().ClimbingTag);
 }
 
 bool ADWCharacter::IsRiding() const
 {
-	return AbilitySystem->HasMatchingGameplayTag(RidingTag);
+	return AbilitySystem->HasMatchingGameplayTag(GetCharacterData<UDWCharacterData>().RidingTag);
 }
 
 bool ADWCharacter::IsFlying() const
 {
-	return AbilitySystem->HasMatchingGameplayTag(FlyingTag);
+	return AbilitySystem->HasMatchingGameplayTag(GetCharacterData<UDWCharacterData>().FlyingTag);
 }
 
 bool ADWCharacter::IsInterrupting() const
 {
-	return AbilitySystem->HasMatchingGameplayTag(InterruptingTag);
+	return AbilitySystem->HasMatchingGameplayTag(GetCharacterData<UDWCharacterData>().InterruptingTag);
 }
 
 bool ADWCharacter::IsLockRotation() const
 {
-	return AbilitySystem->HasMatchingGameplayTag(LockRotationTag);
+	return AbilitySystem->HasMatchingGameplayTag(GetCharacterData<UDWCharacterData>().LockRotationTag);
 }
 
 bool ADWCharacter::IsBreakAllInput() const
 {
-	return AbilitySystem->HasMatchingGameplayTag(BreakAllInputTag);
+	return AbilitySystem->HasMatchingGameplayTag(GetCharacterData<UDWCharacterData>().BreakAllInputTag);
 }
 
 FDWTeamData* ADWCharacter::GetTeamData() const
@@ -1858,21 +1881,6 @@ float ADWCharacter::GetStaminaExpendSpeed() const
 void ADWCharacter::SetStaminaExpendSpeed(float InValue)
 {
 	AbilitySystem->ApplyModToAttributeUnsafe(GetAttributeSet<UDWCharacterAttributeSet>()->GetStaminaExpendSpeedAttribute(), EGameplayModOp::Override, InValue);
-}
-
-FAbilityItem& ADWCharacter::GetGeneratingVoxelItem()
-{
-	FAbilityItem tmpItem = Inventory->GetSelectedItem();
-	if(tmpItem.IsValid() && tmpItem.GetData().EqualType(EAbilityItemType::Voxel))
-	{
-		return tmpItem;
-	}
-	return FAbilityItem::Empty;
-}
-
-FVoxelItem& ADWCharacter::GetSelectedVoxelItem()
-{
-	return SelectedVoxelItem;
 }
 
 bool ADWCharacter::HasWeapon(EDWWeaponType InWeaponType)
@@ -2213,6 +2221,15 @@ UDWCharacterPart* ADWCharacter::GetCharacterPart(EDWCharacterPartType InCharacte
 		}
 	}
 	return nullptr;
+}
+
+void ADWCharacter::OnInventorySlotSelected(UInventorySlot* InInventorySlot)
+{
+	const FAbilityItem tmpItem = InInventorySlot->GetItem();
+	if(tmpItem.IsValid() && tmpItem.GetData().EqualType(EAbilityItemType::Voxel))
+	{
+		GeneratingVoxelItem = tmpItem.ID;
+	}
 }
 
 void ADWCharacter::OnAttributeChange(const FOnAttributeChangeData& InAttributeChangeData)
