@@ -47,6 +47,17 @@
 #include "BehaviorTree/BlackboardData.h"
 #include "Character/CharacterModuleBPLibrary.h"
 #include "Character/DWCharacterData.h"
+#include "Character/States/DWCharacterState_Attack.h"
+#include "Character/States/DWCharacterState_Climb.h"
+#include "Character/States/DWCharacterState_Crouch.h"
+#include "Character/States/DWCharacterState_Defend.h"
+#include "Character/States/DWCharacterState_Dodge.h"
+#include "Character/States/DWCharacterState_Float.h"
+#include "Character/States/DWCharacterState_Fly.h"
+#include "Character/States/DWCharacterState_Interrupt.h"
+#include "Character/States/DWCharacterState_Ride.h"
+#include "Character/States/DWCharacterState_Swim.h"
+#include "FSM/Components/FSMComponent.h"
 #include "Inventory/Slot/InventoryEquipSlot.h"
 #include "Inventory/Slot/InventorySkillSlot.h"
 #include "Item/Prop/DWPropData.h"
@@ -170,15 +181,6 @@ void ADWCharacter::Tick(float DeltaTime)
 	{
 		Inventory->Refresh(DeltaTime);
 		
-		if (InterruptRemainTime != -1)
-		{
-			InterruptRemainTime -= DeltaTime;
-			if (InterruptRemainTime <= 0)
-			{
-				UnInterrupt();
-			}
-		}
-
 		if(NormalAttackRemainTime > 0)
 		{
 			NormalAttackRemainTime -= DeltaTime;
@@ -234,48 +236,9 @@ void ADWCharacter::Tick(float DeltaTime)
 			ModifyStamina(GetStaminaRegenSpeed() * DeltaTime);
 		}
 
-		switch (GetCharacterMovement()->MovementMode)
-		{
-			case EMovementMode::MOVE_Walking:
-			case EMovementMode::MOVE_Swimming:
-			{
-				if (IsFalling())
-				{
-					FallEnd();
-				}
-				break;
-			}
-			case EMovementMode::MOVE_Falling:
-			{
-				if (!IsFalling())
-				{
-					FallStart();
-				}
-				break;
-			}
-			case EMovementMode::MOVE_Flying:
-			{
-				if(GetVelocity().Z < 0.f)
-				{
-					FFindFloorResult FindFloorResult;
-					GetCharacterMovement()->FindFloor(GetCharacterMovement()->UpdatedComponent->GetComponentLocation(), FindFloorResult, GetVelocity().IsZero(), nullptr);
-					if(FindFloorResult.IsWalkableFloor())
-					{
-						UnFly();
-					}
-				}
-				break;
-			}
-			default: break;
-		}
-
 		if (GetActorLocation().Z < 0)
 		{
 			Death();
-		}
-		if (IsDying() && !IsFalling() && ActionType != EDWCharacterActionType::Death)
-		{
-			DeathStart();
 		}
 	}
 }
@@ -487,8 +450,7 @@ void ADWCharacter::ResetData()
 	SetMotionRate(1, 1);
 	SetLockedTarget(nullptr);
 	OwnerRider = nullptr;
-	RidingTarget = nullptr;
-			
+	
 	// local
 	AttackAbilityIndex = 0;
 	AIMoveLocation = Vector_Empty;
@@ -498,105 +460,14 @@ void ADWCharacter::ResetData()
 	ActionType = EDWCharacterActionType::None;
 }
 
-void ADWCharacter::Active(bool bResetData /*= false*/)
-{
-	if (!IsActive())
-	{
-		AbilitySystem->AddLooseGameplayTag(GetCharacterData<UDWCharacterData>().ActiveTag);
-		UnInterrupt();
-		OnCharacterActive.Broadcast();
-	}
-	GetCharacterMovement()->SetActive(true);
-	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-	if (bResetData) ResetData();
-}
-
-void ADWCharacter::Disable(bool bDisableMovement, bool bDisableCollision)
-{
-	if (IsActive())
-	{
-		AbilitySystem->RemoveLooseGameplayTag(GetCharacterData<UDWCharacterData>().ActiveTag);
-		Interrupt();
-	}
-	if (bDisableMovement)
-	{
-		GetCharacterMovement()->SetActive(false);
-	}
-	if (bDisableCollision)
-	{
-		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	}
-}
-
 void ADWCharacter::Death(AActor* InKiller /*= nullptr*/)
 {
-	Disable(true);
-	if(IAbilityVitalityInterface* InVitality = Cast<IAbilityVitalityInterface>(InKiller))
-	{
-		InVitality->ModifyEXP(GetTotalEXP());
-	}
-	SetEXP(0);
-	SetHealth(0.f);
-	SetMana(0.f);
-	SetStamina(0.f);
-	SetLockedTarget(nullptr);
-	OnCharacterDead.Broadcast();
-	if (!IsPlayer())
-	{
-		GetTeamData()->RemoveMember(this);
-		GetController<ADWAIController>()->UnPossess();
-	}
-}
-
-void ADWCharacter::DeathStart()
-{
-	DoAction(EDWCharacterActionType::Death);
-}
-
-void ADWCharacter::DeathEnd()
-{
-	SetVisible(false);
-	GetCharacterMovement()->SetActive(false);
-	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	if(Inventory) Inventory->DiscardAllItem();
-	if(!IsPlayer())
-	{
-		if(GetController())
-		{
-			GetController()->UnPossess();
-		}
-		if (OwnerChunk && OwnerChunk->IsValidLowLevel())
-		{
-			OwnerChunk->DestroySceneActor(this);
-		}
-		else
-		{
-			Destroy();
-		}
-		if (HasTeam())
-		{
-			GetTeamData()->RemoveMember(this);
-		}
-		for(auto Iter : Equips)
-		{
-			if(Iter.Value)
-			{
-				Iter.Value->Destroy();
-			}
-		}
-	}
+	Super::Death(InKiller);
 }
 
 void ADWCharacter::Revive()
 {
-	if (DoAction(EDWCharacterActionType::Revive))
-	{
-		Active(true);
-		SetVisible(true);
-		SetHealth(GetMaxHealth());
-		SetMana(GetMaxMana());
-		SetStamina(GetMaxStamina());
-	}
+	Super::Revive();
 }
 
 bool ADWCharacter::CanInteract(IInteractionAgentInterface* InInteractionAgent, EInteractAction InInteractAction)
@@ -656,71 +527,20 @@ void ADWCharacter::LimitToAnim(bool bInLockRotation /*= false*/, bool bUnSprint 
 	}
 }
 
-void ADWCharacter::Interrupt(float InDuration /*= -1*/, bool bDoAction /*= false*/)
+void ADWCharacter::Interrupt(float InDuration /*= -1*/)
 {
-	if (!IsInterrupting())
-	{
-		UnFly();
-		UnRide();
-		UnClimb();
-		UnJump();
-		UnDodge();
-		UnAttack();
-		UnDefend();
-		UnSprint();
-		LimitToAnim();
-		AbilitySystem->AddLooseGameplayTag(GetCharacterData<UDWCharacterData>().InterruptingTag);
-		AbilitySystem->AddLooseGameplayTag(GetCharacterData<UDWCharacterData>().BreakAllInputTag);
-	}
-	if (InDuration != -1) InDuration = InDuration * (1 - GetToughnessRate());
-	InterruptRemainTime = InDuration;
-	if (bDoAction) DoAction(EDWCharacterActionType::Interrupt);
+	FSM->GetStateByClass<UDWCharacterState_Interrupt>()->Duration = InDuration;
+	FSM->SwitchStateByClass<UDWCharacterState_Interrupt>();
 }
 
-void ADWCharacter::UnInterrupt()
+void ADWCharacter::StartJump()
 {
-	if (IsInterrupting())
-	{
-		AbilitySystem->RemoveLooseGameplayTag(GetCharacterData<UDWCharacterData>().InterruptingTag);
-		AbilitySystem->RemoveLooseGameplayTag(GetCharacterData<UDWCharacterData>().BreakAllInputTag);
-		FreeToAnim();
-		StopAction(EDWCharacterActionType::Interrupt);
-	}
-}
-
-void ADWCharacter::Jump()
-{
-	if(DoAction(EDWCharacterActionType::Jump))
-	{
-		Super::Jump();
-	}
-}
-
-void ADWCharacter::UnJump()
-{
-	if(StopAction(EDWCharacterActionType::Jump))
-	{
-		Super::StopJumping();
-	}
+	Super::StartJump();
 }
 
 void ADWCharacter::Dodge()
 {
-	if(DoAction(EDWCharacterActionType::Dodge)/* && GetMoveDirection().Size() > 0*/)
-	{
-		LimitToAnim();
-		GetCapsuleComponent()->SetGenerateOverlapEvents(false);
-		SetActorRotation(FRotator(0.f, GetMoveDirection().ToOrientationRotator().Yaw, 0.f));
-	}
-}
-
-void ADWCharacter::UnDodge()
-{
-	if(StopAction(EDWCharacterActionType::Dodge))
-	{
-		FreeToAnim();
-		GetCapsuleComponent()->SetGenerateOverlapEvents(true);
-	}
+	FSM->SwitchStateByClass<UDWCharacterState_Dodge>();
 }
 
 void ADWCharacter::Sprint()
@@ -739,151 +559,36 @@ void ADWCharacter::UnSprint()
 	}
 }
 
-void ADWCharacter::Crouch(bool bClientSimulation /*= false*/)
+void ADWCharacter::Crouch()
 {
-	if (DoAction(EDWCharacterActionType::Crouch))
-	{
-		LimitToAnim();
-		Super::Crouch(bClientSimulation);
-	}
-}
-
-void ADWCharacter::UnCrouch(bool bClientSimulation /*= false*/)
-{
-	if (StopAction(EDWCharacterActionType::Crouch))
-	{
-		FreeToAnim();
-		Super::UnCrouch(bClientSimulation);
-	}
+	FSM->SwitchStateByClass<UDWCharacterState_Crouch>();
 }
 
 void ADWCharacter::Swim()
 {
-	if(DoAction(EDWCharacterActionType::Swim))
-	{
-		GetCharacterMovement()->SetMovementMode(MOVE_Swimming);
- 		if(USceneModuleBPLibrary::HasPhysicsVolumeByName(FName("Water")))
-		{
-			if(GetCharacterMovement()->UpdatedComponent)
-			{
-				GetCharacterMovement()->UpdatedComponent->SetPhysicsVolume(USceneModuleBPLibrary::GetPhysicsVolumeByName(FName("Water")), true);
-			}
-		}
-		//FVector Velocity = GetMovementComponent()->Velocity;
-		//GetMovementComponent()->Velocity = FVector(Velocity.X, Velocity.Y, 0);
-	}
-}
-
-void ADWCharacter::UnSwim()
-{
-	if(StopAction(EDWCharacterActionType::Swim))
-	{
-		UnFloat();
-		GetCharacterMovement()->SetMovementMode(MOVE_Walking);
-		if(GetCharacterMovement()->UpdatedComponent)
-		{
-			GetCharacterMovement()->UpdatedComponent->SetPhysicsVolume(GetWorld()->GetDefaultPhysicsVolume(), true);
-		}
-		//FVector Velocity = GetMovementComponent()->Velocity;
-		//GetMovementComponent()->Velocity = FVector(Velocity.X, Velocity.Y, 0);
-	}
+	FSM->SwitchStateByClass<UDWCharacterState_Swim>();
 }
 
 void ADWCharacter::Float(float InWaterPosZ)
 {
-	if(DoAction(EDWCharacterActionType::Float))
-	{
-		GetCharacterMovement()->Velocity = FVector(GetCharacterMovement()->Velocity.X, GetCharacterMovement()->Velocity.Y, 0);
-		const float NeckPosZ = GetCharacterPart(EDWCharacterPartType::Neck)->GetComponentLocation().Z;
-		const float ChestPosZ = GetCharacterPart(EDWCharacterPartType::Chest)->GetComponentLocation().Z;
-		const float OffsetZ = ChestPosZ + (NeckPosZ - ChestPosZ) * 0.35f - GetActorLocation().Z;
-		SetActorLocation(FVector(GetActorLocation().X, GetActorLocation().Y, InWaterPosZ - OffsetZ));
-	}
-}
-
-void ADWCharacter::UnFloat()
-{
-	if(StopAction(EDWCharacterActionType::Float))
-	{
-		GetCharacterMovement()->Velocity = FVector(GetCharacterMovement()->Velocity.X, GetCharacterMovement()->Velocity.Y, GetCharacterMovement()->Velocity.Z * 0.5f);
-	}
+	FSM->GetStateByClass<UDWCharacterState_Float>()->WaterPosZ = InWaterPosZ;
+	FSM->SwitchStateByClass<UDWCharacterState_Float>();
 }
 
 void ADWCharacter::Climb()
 {
-	if (DoAction(EDWCharacterActionType::Climb))
-	{
-		LimitToAnim();
-	}
-}
-
-void ADWCharacter::UnClimb()
-{
-	if (StopAction(EDWCharacterActionType::Climb))
-	{
-		FreeToAnim();
-	}
+	FSM->SwitchStateByClass<UDWCharacterState_Climb>();
 }
 
 void ADWCharacter::Ride(ADWCharacter* InTarget)
 {
-	if (InTarget && DoAction(EDWCharacterActionType::Ride))
-	{
-		RidingTarget = InTarget;
-		UCharacterModuleBPLibrary::SwitchCharacter(RidingTarget);
-		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-		AttachToComponent(RidingTarget->GetMesh(), FAttachmentTransformRules::KeepWorldTransform, FName("RiderPoint"));
-		SetActorRelativeLocation(FVector::ZeroVector);
-		SetActorRotation(RidingTarget->GetActorRotation());
-		LimitToAnim();
-	}
-}
-
-void ADWCharacter::UnRide()
-{
-	if (StopAction(EDWCharacterActionType::Ride))
-	{
-		FreeToAnim();
-		if(IsActive()) GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-		DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
-		if(RidingTarget)
-		{
-			UCharacterModuleBPLibrary::SwitchCharacter(this);
-			FHitResult hitResult;
-			const FVector offset = GetActorRightVector() * (GetRadius() + RidingTarget->GetRadius());
-			const FVector rayStart = FVector(GetActorLocation().X, GetActorLocation().Y, AVoxelModule::GetWorldData()->ChunkHeightRange * AVoxelModule::GetWorldData()->GetChunkLength() + 500) + offset;
-			const FVector rayEnd = FVector(GetActorLocation().X, GetActorLocation().Y, 0) + offset;
-			if (AMainModule::GetModuleByClass<AVoxelModule>()->ChunkTraceSingle(rayStart, rayEnd, GetRadius(), GetHalfHeight(), hitResult))
-			{
-				SetActorLocation(hitResult.Location);
-			}
-		}
-		RidingTarget = nullptr;
-	}
+	RidingTarget = InTarget;
+	FSM->SwitchStateByClass<UDWCharacterState_Ride>();
 }
 
 void ADWCharacter::Fly()
 {
-	if (DoAction(EDWCharacterActionType::Fly))
-	{
-		LimitToAnim();
-		GetCharacterMovement()->SetMovementMode(MOVE_Flying);
-		GetCharacterMovement()->Velocity = FVector(GetCharacterMovement()->Velocity.X, GetCharacterMovement()->Velocity.Y, 100.f);
-		// GetCharacterMovement()->GravityScale = 0.f;
-		// GetCharacterMovement()->AirControl = 1.f;
-	}
-}
-
-void ADWCharacter::UnFly()
-{
-	if (StopAction(EDWCharacterActionType::Fly))
-	{
-		FreeToAnim();
-		StopAction(EDWCharacterActionType::Fly);
-		GetCharacterMovement()->SetMovementMode(MOVE_Walking);
-		// GetCharacterMovement()->GravityScale = DefaultGravityScale;
-		// GetCharacterMovement()->AirControl = DefaultAirControl;
-	}
+	FSM->SwitchStateByClass<UDWCharacterState_Fly>();
 }
 
 bool ADWCharacter::Attack(int32 InAbilityIndex /*= -1*/)
@@ -895,8 +600,7 @@ bool ADWCharacter::Attack(int32 InAbilityIndex /*= -1*/)
 		{
 			if (ActiveAbility(GetAttackAbility(InAbilityIndex).AbilityHandle))
 			{
-				LimitToAnim(true, true);
-				SetMotionRate(0, 0);
+				FSM->SwitchStateByClass<UDWCharacterState_Attack>();
 				AttackAbilityIndex = InAbilityIndex;
 				AttackType = EDWAttackType::NormalAttack;
 				NormalAttackRemainTime = 1.f / GetAttackSpeed();
@@ -930,8 +634,7 @@ bool ADWCharacter::SkillAttack(const FPrimaryAssetId& InSkillID)
 					{
 						if(ActiveAbility(AbilityData.AbilityHandle))
 						{
-							LimitToAnim(true, true);
-							SetMotionRate(0, 0);
+							FSM->SwitchStateByClass<UDWCharacterState_Attack>();
 							SkillAbilityID = InSkillID;
 							AttackType = EDWAttackType::SkillAttack;
 							return true;
@@ -969,8 +672,7 @@ bool ADWCharacter::FallingAttack()
 	{
 		if (ActiveAbility(FallingAttackAbility.AbilityHandle))
 		{
-			LimitToAnim(true, true);
-			SetMotionRate(0, 0);
+			FSM->SwitchStateByClass<UDWCharacterState_Attack>();
 			AttackType = EDWAttackType::FallingAttack;
 			return true;
 		}
@@ -1063,40 +765,7 @@ void ADWCharacter::UnAttack()
 
 void ADWCharacter::Defend()
 {
-	if (DoAction(EDWCharacterActionType::Defend))
-	{
-		SetMotionRate(0.5f, 0.1f);
-		LimitToAnim(true, true);
-	}
-}
-
-void ADWCharacter::UnDefend()
-{
-	if (IsDefending())
-	{
-		FreeToAnim();
-		SetMotionRate(1, 1);
-		StopAction(EDWCharacterActionType::Defend);
-	}
-}
-
-void ADWCharacter::FallStart()
-{
-	AbilitySystem->AddLooseGameplayTag(GetCharacterData<UDWCharacterData>().FallingTag);
-	if(IsDefending())
-	{
-		UnDefend();
-	}
-}
-
-void ADWCharacter::FallEnd()
-{
-	AbilitySystem->RemoveLooseGameplayTag(GetCharacterData<UDWCharacterData>().FallingTag);
-	UnJump();
-	if(IsAttacking() && AttackType == EDWAttackType::FallingAttack)
-	{
-		AttackEnd();
-	}
+	FSM->SwitchStateByClass<UDWCharacterState_Defend>();
 }
 
 bool ADWCharacter::UseItem(FAbilityItem& InItem)
@@ -1310,7 +979,7 @@ bool ADWCharacter::DoAction(EDWCharacterActionType InActionType)
 	const FDWCharacterActionAbilityData AbilityData = GetActionAbility(InActionType);
 	if(!AbilityData.bNeedActive || IsActive(AbilityData.bNeedFreeToAnim))
 	{
-		if (StopAction(ActionType, true, true) && ActiveAbility(AbilityData.AbilityHandle))
+		if (StopAction(ActionType, true) && ActiveAbility(AbilityData.AbilityHandle))
 		{
 			ActionType = InActionType;
 			return true;
@@ -1319,60 +988,7 @@ bool ADWCharacter::DoAction(EDWCharacterActionType InActionType)
 	return false;
 }
 
-void ADWCharacter::EndAction(EDWCharacterActionType InActionType)
-{
-	switch(InActionType)
-	{
-		case EDWCharacterActionType::Death:
-		{
-			DeathEnd();
-			break;
-		}
-		case EDWCharacterActionType::Jump:
-		{
-			UnJump();
-			break;
-		}
-		case EDWCharacterActionType::Dodge:
-		{
-			UnDodge();
-			break;
-		}
-		case EDWCharacterActionType::Crouch:
-		{
-			UnCrouch();
-			break;
-		}
-		case EDWCharacterActionType::Defend:
-		{
-			UnDefend();
-			break;
-		}
-		case EDWCharacterActionType::Fly:
-		{
-			UnFly();
-			break;
-		}
-		case EDWCharacterActionType::Ride:
-		{
-			UnRide();
-			break;
-		}
-		case EDWCharacterActionType::Climb:
-		{
-			UnClimb();
-			break;
-		}
-		case EDWCharacterActionType::Swim:
-		{
-			UnSwim();
-			break;
-		}
-		default: break;
-	}
-}
-
-bool ADWCharacter::StopAction(EDWCharacterActionType InActionType, bool bCancelAbility, bool bEndAction)
+bool ADWCharacter::StopAction(EDWCharacterActionType InActionType, bool bCancelAbility)
 {
 	if (InActionType == EDWCharacterActionType::None) InActionType = ActionType;
 
@@ -1387,11 +1003,6 @@ bool ADWCharacter::StopAction(EDWCharacterActionType InActionType, bool bCancelA
 	}
 
 	ActionType = EDWCharacterActionType::None;
-
-	if (bEndAction)
-	{
-		EndAction(InActionType);
-	}
 	return true;
 }
 
@@ -1539,7 +1150,7 @@ UWidgetCharacterHP* ADWCharacter::GetWidgetCharacterHPWidget() const
 
 bool ADWCharacter::IsActive(bool bNeedNotDead, bool bNeedFreeToAnim /*= false*/) const
 {
-	return AbilitySystem->HasMatchingGameplayTag(GetCharacterData<UDWCharacterData>().ActiveTag) && (!bNeedNotDead || !IsDead()) && (!bNeedFreeToAnim || IsFreeToAnim(false));
+	return AbilitySystem->HasMatchingGameplayTag(GetCharacterData<UDWCharacterData>().StaticTag) && (!bNeedNotDead || !IsDead()) && (!bNeedFreeToAnim || IsFreeToAnim(false));
 }
 
 bool ADWCharacter::IsFreeToAnim(bool bCheckStates) const
@@ -2331,6 +1942,6 @@ void ADWCharacter::HandleInterrupt(float InterruptDuration)
 {
 	if (!FMath::IsNearlyZero(InterruptDuration))
 	{
-		Interrupt(InterruptDuration * (1 - GetToughnessRate()), true);
+		Interrupt(InterruptDuration * (1 - GetToughnessRate()));
 	}
 }

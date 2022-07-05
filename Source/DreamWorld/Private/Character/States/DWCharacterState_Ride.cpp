@@ -2,9 +2,15 @@
 
 #include "Character/States/DWCharacterState_Ride.h"
 
+#include "Character/CharacterModuleBPLibrary.h"
+#include "Character/DWCharacter.h"
+#include "Components/CapsuleComponent.h"
+#include "Voxel/VoxelModule.h"
+
 UDWCharacterState_Ride::UDWCharacterState_Ride()
 {
 	StateName = FName("Ride");
+
 }
 
 void UDWCharacterState_Ride::OnInitialize(UFSMComponent* InFSMComponent, int32 InStateIndex)
@@ -12,9 +18,28 @@ void UDWCharacterState_Ride::OnInitialize(UFSMComponent* InFSMComponent, int32 I
 	Super::OnInitialize(InFSMComponent, InStateIndex);
 }
 
+bool UDWCharacterState_Ride::OnValidate()
+{
+	if(!Super::OnValidate()) return false;
+
+	ADWCharacter* Character = GetAgent<ADWCharacter>();
+
+	return Character->DoAction(EDWCharacterActionType::Ride);
+}
+
 void UDWCharacterState_Ride::OnEnter(UFiniteStateBase* InLastFiniteState)
 {
 	Super::OnEnter(InLastFiniteState);
+
+	ADWCharacter* Character = GetAgent<ADWCharacter>();
+	ADWCharacter* RidingTarget = Character->GetRidingTarget();
+
+	UCharacterModuleBPLibrary::SwitchCharacter(RidingTarget);
+	Character->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	Character->AttachToComponent(RidingTarget->GetMesh(), FAttachmentTransformRules::KeepWorldTransform, FName("RiderPoint"));
+	Character->SetActorRelativeLocation(FVector::ZeroVector);
+	Character->SetActorRotation(RidingTarget->GetActorRotation());
+	Character->LimitToAnim();
 }
 
 void UDWCharacterState_Ride::OnRefresh()
@@ -25,6 +50,28 @@ void UDWCharacterState_Ride::OnRefresh()
 void UDWCharacterState_Ride::OnLeave(UFiniteStateBase* InNextFiniteState)
 {
 	Super::OnLeave(InNextFiniteState);
+
+	ADWCharacter* Character = GetAgent<ADWCharacter>();
+	ADWCharacter* RidingTarget = Character->GetRidingTarget();
+
+	Character->StopAction(EDWCharacterActionType::Ride);
+
+	Character->FreeToAnim();
+	if(Character->IsActive()) Character->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	Character->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+	if(RidingTarget)
+	{
+		UCharacterModuleBPLibrary::SwitchCharacter(Character);
+		FHitResult hitResult;
+		const FVector offset = Character->GetActorRightVector() * (Character->GetRadius() + RidingTarget->GetRadius());
+		const FVector rayStart = FVector(Character->GetActorLocation().X, Character->GetActorLocation().Y, AVoxelModule::GetWorldData()->ChunkHeightRange * AVoxelModule::GetWorldData()->GetChunkLength() + 500) + offset;
+		const FVector rayEnd = FVector(Character->GetActorLocation().X, Character->GetActorLocation().Y, 0) + offset;
+		if (AMainModule::GetModuleByClass<AVoxelModule>()->ChunkTraceSingle(rayStart, rayEnd, Character->GetRadius(), Character->GetHalfHeight(), hitResult))
+		{
+			Character->SetActorLocation(hitResult.Location);
+		}
+	}
+	Character->SetRidingTarget(nullptr);
 }
 
 void UDWCharacterState_Ride::OnTermination()

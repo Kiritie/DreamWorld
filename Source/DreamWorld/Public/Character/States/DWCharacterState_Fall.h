@@ -3,23 +3,25 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Ability/Character/States/AbilityCharacterState_Fall.h"
 #include "UObject/Object.h"
-#include "Ability/Character/States/AbilityCharacterStateBase.h"
-#include "DWCharacterState_Revive.generated.h"
+#include "DWCharacterState_Fall.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class WHFRAMEWORK_API UDWCharacterState_Revive : public UAbilityCharacterStateBase
+class WHFRAMEWORK_API UDWCharacterState_Fall : public UAbilityCharacterState_Fall
 {
 	GENERATED_BODY()
 
 public:
-	UDWCharacterState_Revive();
+	UDWCharacterState_Fall();
 
 public:
 	virtual void OnInitialize(UFSMComponent* InFSMComponent, int32 InStateIndex) override;
+
+	virtual bool OnValidate() override;
 
 	virtual void OnEnter(UFiniteStateBase* InLastFiniteState) override;
 	

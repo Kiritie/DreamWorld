@@ -2,6 +2,8 @@
 
 #include "Character/States/DWCharacterState_Crouch.h"
 
+#include "Character/DWCharacter.h"
+
 UDWCharacterState_Crouch::UDWCharacterState_Crouch()
 {
 	StateName = FName("Crouch");
@@ -12,9 +14,22 @@ void UDWCharacterState_Crouch::OnInitialize(UFSMComponent* InFSMComponent, int32
 	Super::OnInitialize(InFSMComponent, InStateIndex);
 }
 
+bool UDWCharacterState_Crouch::OnValidate()
+{
+	if(!Super::OnValidate()) return false;
+
+	ADWCharacter* Character = GetAgent<ADWCharacter>();
+
+	return Character->DoAction(EDWCharacterActionType::Crouch);
+}
+
 void UDWCharacterState_Crouch::OnEnter(UFiniteStateBase* InLastFiniteState)
 {
 	Super::OnEnter(InLastFiniteState);
+
+	ADWCharacter* Character = GetAgent<ADWCharacter>();
+
+	Character->LimitToAnim();
 }
 
 void UDWCharacterState_Crouch::OnRefresh()
@@ -25,6 +40,12 @@ void UDWCharacterState_Crouch::OnRefresh()
 void UDWCharacterState_Crouch::OnLeave(UFiniteStateBase* InNextFiniteState)
 {
 	Super::OnLeave(InNextFiniteState);
+
+	ADWCharacter* Character = GetAgent<ADWCharacter>();
+
+	Character->StopAction(EDWCharacterActionType::Crouch);
+
+	Character->FreeToAnim();
 }
 
 void UDWCharacterState_Crouch::OnTermination()

@@ -88,23 +88,15 @@ public:
 	virtual FSaveData* ToData() override;
 
 public:
-	virtual void Active(bool bResetData = false) override;
-
-	virtual void Disable(bool bDisableMovement = false, bool bDisableCollision = false) override;
-
 	virtual void Revive() override;
 
 	virtual void Death(AActor* InKiller) override;
 
-	virtual void DeathEnd() override;
-
 	virtual void ResetData() override;
 
-	virtual void Interrupt(float InDuration  = -1, bool bInPlayAnim  = false) override;
+	virtual void Interrupt(float InDuration  = -1) override;
 
 	virtual void Dodge() override;
-
-	virtual void UnDodge() override;
 
 	virtual void LookAtTarget(ADWCharacter* InTargetCharacter) override;
 

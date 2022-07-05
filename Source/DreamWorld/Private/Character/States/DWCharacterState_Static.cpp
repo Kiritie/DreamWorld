@@ -2,6 +2,12 @@
 
 #include "Character/States/DWCharacterState_Static.h"
 
+#include "AbilitySystemComponent.h"
+#include "Character/DWCharacter.h"
+#include "Character/DWCharacterData.h"
+#include "Components/CapsuleComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
+
 UDWCharacterState_Static::UDWCharacterState_Static()
 {
 	StateName = FName("Static");
@@ -10,6 +16,11 @@ UDWCharacterState_Static::UDWCharacterState_Static()
 void UDWCharacterState_Static::OnInitialize(UFSMComponent* InFSMComponent, int32 InStateIndex)
 {
 	Super::OnInitialize(InFSMComponent, InStateIndex);
+}
+
+bool UDWCharacterState_Static::OnValidate()
+{
+	return Super::OnValidate();
 }
 
 void UDWCharacterState_Static::OnEnter(UFiniteStateBase* InLastFiniteState)

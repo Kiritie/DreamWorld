@@ -20,7 +20,7 @@ UDWCharacterData::UDWCharacterData()
 	// tags
 	DeadTag = FGameplayTag::RequestGameplayTag("State.Vitality.Dead");
 	DyingTag = FGameplayTag::RequestGameplayTag("State.Vitality.Dying");
-	ActiveTag = FGameplayTag::RequestGameplayTag("State.Character.Active");
+	StaticTag = FGameplayTag::RequestGameplayTag("State.Character.Static");
 	FallingTag = FGameplayTag::RequestGameplayTag("State.Character.Falling");
 	DodgingTag = FGameplayTag::RequestGameplayTag("State.Character.Dodging");
 	SprintingTag = FGameplayTag::RequestGameplayTag("State.Character.Sprinting");

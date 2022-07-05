@@ -5,13 +5,14 @@
 #include "CoreMinimal.h"
 #include "UObject/Object.h"
 #include "Ability/Character/States/AbilityCharacterStateBase.h"
+#include "Ability/Character/States/AbilityCharacterState_Static.h"
 #include "DWCharacterState_Static.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class WHFRAMEWORK_API UDWCharacterState_Static : public UAbilityCharacterStateBase
+class WHFRAMEWORK_API UDWCharacterState_Static : public UAbilityCharacterState_Static
 {
 	GENERATED_BODY()
 
@@ -20,6 +21,8 @@ public:
 
 public:
 	virtual void OnInitialize(UFSMComponent* InFSMComponent, int32 InStateIndex) override;
+
+	virtual bool OnValidate() override;
 
 	virtual void OnEnter(UFiniteStateBase* InLastFiniteState) override;
 	

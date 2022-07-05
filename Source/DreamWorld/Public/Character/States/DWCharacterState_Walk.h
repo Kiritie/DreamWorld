@@ -3,20 +3,20 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Ability/Character/States/AbilityCharacterState_Walk.h"
 #include "UObject/Object.h"
-#include "Ability/Character/States/AbilityCharacterStateBase.h"
-#include "DWCharacterState_Climb.generated.h"
+#include "DWCharacterState_Walk.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class WHFRAMEWORK_API UDWCharacterState_Climb : public UAbilityCharacterStateBase
+class WHFRAMEWORK_API UDWCharacterState_Walk : public UAbilityCharacterState_Walk
 {
 	GENERATED_BODY()
 
 public:
-	UDWCharacterState_Climb();
+	UDWCharacterState_Walk();
 
 public:
 	virtual void OnInitialize(UFSMComponent* InFSMComponent, int32 InStateIndex) override;

@@ -2,6 +2,8 @@
 
 #include "Character/States/DWCharacterState_Jump.h"
 
+#include "Character/DWCharacter.h"
+
 UDWCharacterState_Jump::UDWCharacterState_Jump()
 {
 	StateName = FName("Jump");
@@ -10,6 +12,15 @@ UDWCharacterState_Jump::UDWCharacterState_Jump()
 void UDWCharacterState_Jump::OnInitialize(UFSMComponent* InFSMComponent, int32 InStateIndex)
 {
 	Super::OnInitialize(InFSMComponent, InStateIndex);
+}
+
+bool UDWCharacterState_Jump::OnValidate()
+{
+	if(!Super::OnValidate()) return false;
+
+	ADWCharacter* Character = GetAgent<ADWCharacter>();
+
+	return Character->DoAction(EDWCharacterActionType::Jump);
 }
 
 void UDWCharacterState_Jump::OnEnter(UFiniteStateBase* InLastFiniteState)
@@ -25,6 +36,10 @@ void UDWCharacterState_Jump::OnRefresh()
 void UDWCharacterState_Jump::OnLeave(UFiniteStateBase* InNextFiniteState)
 {
 	Super::OnLeave(InNextFiniteState);
+
+	ADWCharacter* Character = GetAgent<ADWCharacter>();
+
+	Character->StopAction(EDWCharacterActionType::Jump);
 }
 
 void UDWCharacterState_Jump::OnTermination()

@@ -36,8 +36,6 @@ class UDWAIBlackboard;
 class UInventorySlot;
 class AAbilitySkillBase;
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnCharacterActive);
-
 /**
  * 角色
  */
@@ -78,7 +76,7 @@ protected:
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CharacterStats")
 	ADWCharacter* OwnerRider;
-
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CharacterStats")
 	ADWCharacter* RidingTarget;
 
@@ -97,10 +95,6 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	UCharacterInventory* Inventory;
-	
-public:
-	UPROPERTY(BlueprintAssignable)
-	FOnCharacterActive OnCharacterActive;
 
 protected:
 	float DefaultGravityScale;
@@ -155,19 +149,8 @@ public:
 	virtual void ResetData() override;
 
 public:
-	UFUNCTION(BlueprintCallable)
-	virtual void Active(bool bResetData = false);
-	
-	UFUNCTION(BlueprintCallable)
-	virtual void Disable(bool bDisableMovement = false, bool bDisableCollision = false);
-						
 	virtual void Death(AActor* InKiller = nullptr) override;
 			
-	virtual void DeathStart();
-
-	UFUNCTION(BlueprintCallable)
-	virtual void DeathEnd();
-
 	virtual void Revive() override;
 
 	virtual bool CanInteract(IInteractionAgentInterface* InInteractionAgent, EInteractAction InInteractAction) override;
@@ -181,20 +164,12 @@ public:
 	virtual void LimitToAnim(bool bInLockRotation = false, bool bUnSprint = false);
 
 	UFUNCTION(BlueprintCallable)
-	virtual void Interrupt(float InDuration = -1, bool bDoAction = false);
-			
-	UFUNCTION(BlueprintCallable)
-	virtual void UnInterrupt();
-	
-	virtual void Jump() override;
+	virtual void Interrupt(float InDuration = -1);
 
-	virtual void UnJump() override;
+	virtual void StartJump() override;
 
 	UFUNCTION(BlueprintCallable)
 	virtual void Dodge();
-
-	UFUNCTION(BlueprintCallable)
-	virtual void UnDodge();
 
 	UFUNCTION(BlueprintCallable)
 	virtual void Sprint();
@@ -202,39 +177,22 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual void UnSprint();
 
-	virtual void Crouch(bool bClientSimulation = false) override;
-
-	virtual void UnCrouch(bool bClientSimulation = false) override;
+	virtual void Crouch();
 		
 	UFUNCTION(BlueprintCallable)
 	virtual void Swim();
-
-	UFUNCTION(BlueprintCallable)
-	virtual void UnSwim();
 								
 	UFUNCTION(BlueprintCallable)
 	virtual void Float(float InWaterPosZ);
-	
-	UFUNCTION(BlueprintCallable)
-	virtual void UnFloat();
 
 	UFUNCTION(BlueprintCallable)
 	virtual void Climb();
-
-	UFUNCTION(BlueprintCallable)
-	virtual void UnClimb();
 			
 	UFUNCTION(BlueprintCallable)
 	virtual void Ride(ADWCharacter* InTarget);
 
 	UFUNCTION(BlueprintCallable)
-	virtual void UnRide();
-
-	UFUNCTION(BlueprintCallable)
 	virtual void Fly();
-
-	UFUNCTION(BlueprintCallable)
-	virtual void UnFly();
 
 	UFUNCTION(BlueprintCallable)
 	virtual bool Attack(int32 InAbilityIndex = -1);
@@ -261,12 +219,6 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	virtual void Defend();
-
-	virtual void UnDefend();
-
-	virtual void FallStart();
-
-	virtual void FallEnd();
 	
 	virtual bool UseItem(FAbilityItem& InItem);
 
@@ -289,11 +241,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual bool DoAction(EDWCharacterActionType InActionType);
 
-	UFUNCTION(BlueprintCallable)
-	virtual void EndAction(EDWCharacterActionType InActionType);
-
 	//UFUNCTION(BlueprintCallable)
-	virtual bool StopAction(EDWCharacterActionType InActionType = EDWCharacterActionType::None, bool bCancelAbility = true, bool bEndAction = false);
+	virtual bool StopAction(EDWCharacterActionType InActionType = EDWCharacterActionType::None, bool bCancelAbility = true);
 					
 	UFUNCTION(BlueprintCallable)
 	virtual void ModifyMana(float InDeltaValue);
@@ -595,6 +544,9 @@ public:
 
 	UFUNCTION(BlueprintPure)
 	ADWCharacter* GetRidingTarget() const { return RidingTarget; }
+
+	UFUNCTION(BlueprintCallable)
+	void SetRidingTarget(ADWCharacter* InRidingTarget) { this->RidingTarget = InRidingTarget; }
 
 	UFUNCTION(BlueprintPure)
 	ADWCharacter* GetLockedTarget() const { return LockedTarget; }

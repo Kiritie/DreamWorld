@@ -2,6 +2,8 @@
 
 #include "Character/States/DWCharacterState_Defend.h"
 
+#include "Character/DWCharacter.h"
+
 UDWCharacterState_Defend::UDWCharacterState_Defend()
 {
 	StateName = FName("Defend");
@@ -12,9 +14,23 @@ void UDWCharacterState_Defend::OnInitialize(UFSMComponent* InFSMComponent, int32
 	Super::OnInitialize(InFSMComponent, InStateIndex);
 }
 
+bool UDWCharacterState_Defend::OnValidate()
+{
+	if(!Super::OnValidate()) return false;
+
+	ADWCharacter* Character = GetAgent<ADWCharacter>();
+
+	return Character->DoAction(EDWCharacterActionType::Defend);
+}
+
 void UDWCharacterState_Defend::OnEnter(UFiniteStateBase* InLastFiniteState)
 {
 	Super::OnEnter(InLastFiniteState);
+
+	ADWCharacter* Character = GetAgent<ADWCharacter>();
+
+	Character->SetMotionRate(0.5f, 0.1f);
+	Character->LimitToAnim(true, true);
 }
 
 void UDWCharacterState_Defend::OnRefresh()
@@ -25,6 +41,14 @@ void UDWCharacterState_Defend::OnRefresh()
 void UDWCharacterState_Defend::OnLeave(UFiniteStateBase* InNextFiniteState)
 {
 	Super::OnLeave(InNextFiniteState);
+
+	ADWCharacter* Character = GetAgent<ADWCharacter>();
+
+	Character->StopAction(EDWCharacterActionType::Defend);
+
+	Character->FreeToAnim();
+	Character->SetMotionRate(1, 1);
+	Character->StopAction(EDWCharacterActionType::Defend);
 }
 
 void UDWCharacterState_Defend::OnTermination()

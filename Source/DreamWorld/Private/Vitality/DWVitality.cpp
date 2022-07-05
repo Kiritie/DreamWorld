@@ -1,4 +1,4 @@
-	// Fill out your copyright notice in the Description page of Project Settings.
+// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "Vitality/DWVitality.h"
@@ -24,7 +24,7 @@
 #include "Widget/Components/WidgetVitalityHPComponent.h"
 #include "Widget/World/WidgetVitalityHP.h"
 
-	// Sets default values
+// Sets default values
 ADWVitality::ADWVitality()
 {
 	WidgetVitalityHP = CreateDefaultSubobject<UWidgetVitalityHPComponent>(FName("WidgetVitalityHP"));

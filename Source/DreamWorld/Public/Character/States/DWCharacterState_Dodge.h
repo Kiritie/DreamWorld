@@ -5,21 +5,23 @@
 #include "CoreMinimal.h"
 #include "UObject/Object.h"
 #include "Ability/Character/States/AbilityCharacterStateBase.h"
-#include "DWCharacterState_Float.generated.h"
+#include "DWCharacterState_Dodge.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class WHFRAMEWORK_API UDWCharacterState_Float : public UAbilityCharacterStateBase
+class WHFRAMEWORK_API UDWCharacterState_Dodge : public UAbilityCharacterStateBase
 {
 	GENERATED_BODY()
 
 public:
-	UDWCharacterState_Float();
+	UDWCharacterState_Dodge();
 
 public:
 	virtual void OnInitialize(UFSMComponent* InFSMComponent, int32 InStateIndex) override;
+
+	virtual bool OnValidate() override;
 
 	virtual void OnEnter(UFiniteStateBase* InLastFiniteState) override;
 	

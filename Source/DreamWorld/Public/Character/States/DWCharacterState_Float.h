@@ -21,6 +21,8 @@ public:
 public:
 	virtual void OnInitialize(UFSMComponent* InFSMComponent, int32 InStateIndex) override;
 
+	virtual bool OnValidate() override;
+
 	virtual void OnEnter(UFiniteStateBase* InLastFiniteState) override;
 	
 	virtual void OnRefresh() override;
@@ -28,4 +30,8 @@ public:
 	virtual void OnLeave(UFiniteStateBase* InNextFiniteState) override;
 
 	virtual void OnTermination() override;
+
+public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	float WaterPosZ;
 };

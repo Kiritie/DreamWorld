@@ -131,7 +131,7 @@ void ADWMonsterCharacter::OnInteract(IInteractionAgentInterface* InInteractionAg
 		{
 			if(ADWCharacter* TriggerCharacter = Cast<ADWCharacter>(InInteractionAgent))
 			{
-				TriggerCharacter->UnRide();
+				// TriggerCharacter->UnRide();
 			}
 			break;
 		}

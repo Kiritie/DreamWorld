@@ -2,6 +2,8 @@
 
 #include "Character/States/DWCharacterState_Climb.h"
 
+#include "Character/DWCharacter.h"
+
 UDWCharacterState_Climb::UDWCharacterState_Climb()
 {
 	StateName = FName("Climb");
@@ -12,9 +14,22 @@ void UDWCharacterState_Climb::OnInitialize(UFSMComponent* InFSMComponent, int32 
 	Super::OnInitialize(InFSMComponent, InStateIndex);
 }
 
+bool UDWCharacterState_Climb::OnValidate()
+{
+	if(!Super::OnValidate()) return false;
+
+	ADWCharacter* Character = GetAgent<ADWCharacter>();
+
+	return Character->DoAction(EDWCharacterActionType::Climb);
+}
+
 void UDWCharacterState_Climb::OnEnter(UFiniteStateBase* InLastFiniteState)
 {
 	Super::OnEnter(InLastFiniteState);
+
+	ADWCharacter* Character = GetAgent<ADWCharacter>();
+	
+	Character->LimitToAnim();
 }
 
 void UDWCharacterState_Climb::OnRefresh()
@@ -25,6 +40,12 @@ void UDWCharacterState_Climb::OnRefresh()
 void UDWCharacterState_Climb::OnLeave(UFiniteStateBase* InNextFiniteState)
 {
 	Super::OnLeave(InNextFiniteState);
+
+	ADWCharacter* Character = GetAgent<ADWCharacter>();
+
+	Character->StopAction(EDWCharacterActionType::Climb);
+	
+	Character->FreeToAnim();
 }
 
 void UDWCharacterState_Climb::OnTermination()
