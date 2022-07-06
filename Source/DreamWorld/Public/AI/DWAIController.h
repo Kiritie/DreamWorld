@@ -7,6 +7,7 @@
 #include "Perception/AIPerceptionTypes.h"
 #include "DWAIController.generated.h"
 
+class UFiniteStateBase;
 class ADWCharacter;
 class UBehaviorTreeComponent;
 
@@ -41,7 +42,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	UFUNCTION()
-	virtual void OnTargetCharacterDead();
+	virtual void OnTargetCharacterStateChanged(UFiniteStateBase* InFiniteState);
 
 	UFUNCTION()
 	virtual void OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus);

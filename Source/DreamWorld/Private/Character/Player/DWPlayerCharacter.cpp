@@ -45,6 +45,8 @@
 #include "Ability/Item/Skill/AbilitySkillDataBase.h"
 #include "Ability/AbilityModuleBPLibrary.h"
 #include "Ability/AbilityModuleTypes.h"
+#include "Character/States/DWCharacterState_Walk.h"
+#include "FSM/Components/FSMComponent.h"
 
 //////////////////////////////////////////////////////////////////////////
 // ADWPlayerCharacter
@@ -142,8 +144,6 @@ void ADWPlayerCharacter::SetupPlayerInputComponent(class UInputComponent* Player
 	// Set up gameplay key bindings
 	check(PlayerInputComponent);
 
-	PlayerInputComponent->SetTickableWhenPaused(true);
-
 	PlayerInputComponent->BindAction("Interact1", IE_Pressed, this, &ADWPlayerCharacter::DoInteractAction1);
 	PlayerInputComponent->BindAction("Interact2", IE_Pressed, this, &ADWPlayerCharacter::DoInteractAction1);
 	PlayerInputComponent->BindAction("Interact3", IE_Pressed, this, &ADWPlayerCharacter::DoInteractAction1);
@@ -204,7 +204,7 @@ void ADWPlayerCharacter::Tick(float DeltaTime)
 				{
 					Attack();
 				}
-				else if(IsFreeToAnim() && AttackType == EDWAttackType::NormalAttack)
+				else if(IsFreeToAnim() && AttackType == EDWCharacterAttackType::NormalAttack)
 				{
 					UnAttack();
 				}
@@ -238,7 +238,7 @@ void ADWPlayerCharacter::Tick(float DeltaTime)
 		if(AMainModule::GetModuleByClass<AVoxelModule>()->ChunkTraceSingle(rayStart, rayEnd, GetRadius(), GetHalfHeight(), hitResult))
 		{
 			SetActorLocationAndRotation(hitResult.Location, FRotator::ZeroRotator);
-			Active();
+			FSM->SwitchStateByClass<UDWCharacterState_Walk>();
 		}
 	}
 }
@@ -296,78 +296,6 @@ FSaveData* ADWPlayerCharacter::ToData()
 	return &SaveData;
 }
 
-void ADWPlayerCharacter::Active(bool bResetData)
-{
-	Super::Active(bResetData);
-}
-
-void ADWPlayerCharacter::Disable(bool bDisableMovement, bool bDisableCollision)
-{
-	Super::Disable(bDisableMovement, bDisableCollision);
-}
-
-void ADWPlayerCharacter::Revive()
-{
-	Super::Revive();
-	SetControlMode(ControlMode);
-}
-
-void ADWPlayerCharacter::Death(AActor* InKiller)
-{
-	Super::Death(InKiller);
-	if(TargetSystem->IsLocked())
-	{
-		TargetSystem->TargetLockOff();
-	}
-}
-
-void ADWPlayerCharacter::DeathEnd()
-{
-	Super::DeathEnd();
-	if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>())
-	{
-		UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>()->SetCrosshairVisible(false);
-	}
-}
-
-void ADWPlayerCharacter::ResetData()
-{
-	Super::ResetData();
-
-	ControlMode = EDWControlMode::Fighting;
-	bPressedAttack = false;
-	bPressedDefend = false;
-	LockedTarget = nullptr;
-	if(GetController<ADWPlayerController>())
-	{
-		GetController<ADWPlayerController>()->ResetData();
-	}
-}
-
-void ADWPlayerCharacter::Interrupt(float InDuration /* = -1 */, bool bInPlayAnim /* = false */)
-{
-	Super::Interrupt(InDuration, bInPlayAnim);
-	AttackAbilityQueue = 0;
-}
-
-void ADWPlayerCharacter::Dodge()
-{
-	if(!IsDodging())
-	{
-		TargetSystem->SetShouldControlRotation(false);
-	}
-	Super::Dodge();
-}
-
-void ADWPlayerCharacter::UnDodge()
-{
-	if(IsDodging())
-	{
-		TargetSystem->SetShouldControlRotation(true);
-	}
-	Super::UnDodge();
-}
-
 void ADWPlayerCharacter::LookAtTarget(ADWCharacter* InTargetCharacter)
 {
 	Super::LookAtTarget(InTargetCharacter);
@@ -400,34 +328,6 @@ void ADWPlayerCharacter::SetControlMode(EDWControlMode InControlMode)
 			if(GetWeapon()) GetWeapon()->SetVisible(false);
 			if(GetShield()) GetShield()->SetVisible(false);
 			break;
-		}
-	}
-}
-
-void ADWPlayerCharacter::UnAttack()
-{
-	Super::UnAttack();
-	AttackAbilityQueue = 0;
-}
-
-void ADWPlayerCharacter::AttackStart()
-{
-	Super::AttackStart();
-
-	if(IsAttacking())
-	{
-		switch (AttackType)
-		{
-			case EDWAttackType::NormalAttack:
-			case EDWAttackType::FallingAttack:
-			{
-				if(AttackAbilityQueue > 0)
-				{
-					AttackAbilityQueue--;
-				}
-				break;
-			}
-			default: break;
 		}
 	}
 }
@@ -568,7 +468,7 @@ void ADWPlayerCharacter::ToggleCrouch()
 
 	if(!IsCrouching())
 	{
-		Crouch();
+		Crouch(true);
 	}
 	else
 	{
@@ -581,34 +481,6 @@ void ADWPlayerCharacter::ToggleLockTarget()
 	if(IsBreakAllInput()) return;
 
 	TargetSystem->TargetActor();
-
-	// if(!LockedTarget)
-	// {
-	// 	TArray<FHitResult> hitResults;
-	// 	if(UKismetSystemLibrary::SphereTraceMulti(this, GetActorLocation(), GetActorLocation(), 1000, UDWHelper::GetGameTrace(EGameTraceType::Sight), true, TArray<AActor*>(), EDrawDebugTrace::None, hitResults, true))
-	// 	{
-	// 		ADWCharacter* nearCharacter = nullptr;
-	// 		for (int i = 0; i < hitResults.Num(); i++)
-	// 		{
-	// 			if(hitResults[i].GetActor()->IsA(ADWCharacter::StaticClass()))
-	// 			{
-	// 				ADWCharacter* character = Cast<ADWCharacter>(hitResults[i].GetActor());
-	// 				if(!character->IsDead() && (!nearCharacter || Distance(character, false, false) < Distance(nearCharacter, false, false)))
-	// 				{
-	// 					nearCharacter = character;
-	// 				}
-	// 			}
-	// 		}
-	// 		if(nearCharacter)
-	// 		{
-	// 			SetLockedTarget(nearCharacter);
-	// 		}
-	// 	}
-	// }
-	// else
-	// {
-	// 	SetLockedTarget(nullptr);
-	// }
 }
 
 void ADWPlayerCharacter::OnDodgePressed()
@@ -620,7 +492,7 @@ void ADWPlayerCharacter::OnDodgePressed()
 
 void ADWPlayerCharacter::OnDodgeReleased()
 {
-	//UnDodge();
+	UnDodge();
 }
 
 bool ADWPlayerCharacter::UseItem(FAbilityItem& InItem)

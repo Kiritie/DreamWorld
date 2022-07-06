@@ -11,9 +11,11 @@
  * 
  */
 UCLASS()
-class WHFRAMEWORK_API UDWCharacterState_Attack : public UAbilityCharacterStateBase
+class DREAMWORLD_API UDWCharacterState_Attack : public UAbilityCharacterStateBase
 {
 	GENERATED_BODY()
+
+	friend class ADWCharacter;
 
 public:
 	UDWCharacterState_Attack();
@@ -30,4 +32,14 @@ public:
 	virtual void OnLeave(UFiniteStateBase* InNextFiniteState) override;
 
 	virtual void OnTermination() override;
+
+public:
+	UFUNCTION(BlueprintCallable)
+	virtual void AttackStart();
+
+	UFUNCTION(BlueprintCallable)
+	virtual void AttackHurt();
+
+	UFUNCTION(BlueprintCallable)
+	virtual void AttackEnd();
 };

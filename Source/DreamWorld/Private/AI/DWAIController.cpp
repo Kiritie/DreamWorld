@@ -11,6 +11,8 @@
 #include "BehaviorTree/BehaviorTree.h"
 #include "AI/DWAIBlackboard.h"
 #include "AIModule/Classes/BehaviorTree/BlackboardComponent.h"
+#include "Character/States/DWCharacterState_Death.h"
+#include "FSM/Components/FSMComponent.h"
 
 ADWAIController::ADWAIController()
 {
@@ -76,10 +78,13 @@ void ADWAIController::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
-void ADWAIController::OnTargetCharacterDead()
+void ADWAIController::OnTargetCharacterStateChanged(UFiniteStateBase* InFiniteState)
 {
-	SetTargetCharacter(nullptr);
-	SetLostTarget(false);
+	if(InFiniteState->IsA<UDWCharacterState_Death>())
+	{
+		SetTargetCharacter(nullptr);
+		SetLostTarget(false);
+	}
 }
 
 void ADWAIController::OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus)
@@ -203,15 +208,15 @@ ADWCharacter* ADWAIController::GetTargetCharacter() const
 
 void ADWAIController::SetTargetCharacter(ADWCharacter* InTargetCharacter)
 {
-	if(!GetBlackboardComponent()) return;
+	if(!GetBlackboardComponent() || InTargetCharacter == GetTargetCharacter()) return;
 
 	if(GetTargetCharacter())
 	{
-		GetTargetCharacter()->OnCharacterDead.RemoveDynamic(this, &ADWAIController::OnTargetCharacterDead);
+		GetTargetCharacter()->GetFSMComponent()->OnStateChanged.RemoveDynamic(this, &ADWAIController::OnTargetCharacterStateChanged);
 	}
-	if(InTargetCharacter && !InTargetCharacter->OnCharacterDead.Contains(this, FName("OnTargetCharacterDead")))
+	if(InTargetCharacter)
 	{
-		InTargetCharacter->OnCharacterDead.AddDynamic(this, &ADWAIController::OnTargetCharacterDead);
+		InTargetCharacter->GetFSMComponent()->OnStateChanged.AddDynamic(this, &ADWAIController::OnTargetCharacterStateChanged);
 	}
 
 	GetBlackboardComponent()->SetValueAsObject(FName("TargetCharacter"), InTargetCharacter);

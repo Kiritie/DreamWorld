@@ -12,9 +12,11 @@
  * 
  */
 UCLASS()
-class WHFRAMEWORK_API UDWCharacterState_Jump : public UAbilityCharacterState_Jump
+class DREAMWORLD_API UDWCharacterState_Jump : public UAbilityCharacterState_Jump
 {
 	GENERATED_BODY()
+
+	friend class ADWCharacter;
 
 public:
 	UDWCharacterState_Jump();

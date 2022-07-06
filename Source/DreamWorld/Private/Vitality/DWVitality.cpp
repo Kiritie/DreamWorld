@@ -139,24 +139,14 @@ FSaveData* ADWVitality::ToData()
 	return &SaveData;
 }
 
-void ADWVitality::ResetData()
+void ADWVitality::Death(IAbilityVitalityInterface* InKiller)
 {
-	Super::ResetData();
-}
-
-void ADWVitality::Death(AActor* InKiller /*= nullptr*/)
-{
-	if (!IsDead())
-	{
-		Inventory->DiscardAllItem();
-		OwnerChunk->DestroySceneActor(this);
-	}
 	Super::Death(InKiller);
 }
 
-void ADWVitality::Revive()
+void ADWVitality::Revive(IAbilityVitalityInterface* InRescuer)
 {
-	Super::Revive();
+	Super::Revive(InRescuer);
 }
 
 bool ADWVitality::CanInteract(IInteractionAgentInterface* InInteractionAgent, EInteractAction InInteractAction)
@@ -303,7 +293,7 @@ void ADWVitality::OnAttributeChange(const FOnAttributeChangeData& InAttributeCha
 	}
 }
 
-void ADWVitality::HandleDamage(EDamageType DamageType, const float LocalDamageDone, bool bHasCrited, FHitResult HitResult, const FGameplayTagContainer& SourceTags, AActor* SourceActor)
+void ADWVitality::HandleDamage(EDamageType DamageType, const float LocalDamageDone, bool bHasCrited, FHitResult HitResult, const FGameplayTagContainer& SourceTags, IAbilityVitalityInterface* SourceVitality)
 {
 	Super::HandleDamage(DamageType, LocalDamageDone, bHasCrited, HitResult, SourceTags, SourceActor);
 	

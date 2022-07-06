@@ -774,7 +774,7 @@ enum class EDWCharacterAIState : uint8
  * ????????
  */
 UENUM(BlueprintType)
-enum class EDWAttackType : uint8
+enum class EDWCharacterAttackType : uint8
 {
 	// ??
 	None,

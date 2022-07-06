@@ -48,7 +48,6 @@ void UDWCharacterState_Defend::OnLeave(UFiniteStateBase* InNextFiniteState)
 
 	Character->FreeToAnim();
 	Character->SetMotionRate(1, 1);
-	Character->StopAction(EDWCharacterActionType::Defend);
 }
 
 void UDWCharacterState_Defend::OnTermination()

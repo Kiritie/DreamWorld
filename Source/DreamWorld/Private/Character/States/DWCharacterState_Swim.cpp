@@ -57,7 +57,6 @@ void UDWCharacterState_Swim::OnLeave(UFiniteStateBase* InNextFiniteState)
 
 	Character->StopAction(EDWCharacterActionType::Swim);
 
-	Character->UnFloat();
 	Character->GetCharacterMovement()->SetMovementMode(MOVE_Walking);
 	if(Character->GetCharacterMovement()->UpdatedComponent)
 	{

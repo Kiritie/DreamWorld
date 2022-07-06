@@ -11,9 +11,11 @@
  * 
  */
 UCLASS()
-class WHFRAMEWORK_API UDWCharacterState_Walk : public UAbilityCharacterState_Walk
+class DREAMWORLD_API UDWCharacterState_Walk : public UAbilityCharacterState_Walk
 {
 	GENERATED_BODY()
+
+	friend class ADWCharacter;
 
 public:
 	UDWCharacterState_Walk();

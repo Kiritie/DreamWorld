@@ -27,6 +27,12 @@ class ADWPlayerCharacter : public ADWHumanCharacter, public IWHPlayerInterface
 {
 	GENERATED_BODY()
 
+	friend class UDWPlayerCharacterState_Attack;
+	friend class UDWPlayerCharacterState_Death;
+	friend class UDWPlayerCharacterState_Default;
+	friend class UDWPlayerCharacterState_Dodge;
+	friend class UDWPlayerCharacterState_Interrupt;
+
 public:
 	ADWPlayerCharacter();
 
@@ -71,7 +77,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	USceneCaptureComponent2D* MiniMapCapture;
 
-private:
+protected:
 	int32 AttackAbilityQueue;
 	
 protected:
@@ -88,21 +94,7 @@ public:
 	virtual FSaveData* ToData() override;
 
 public:
-	virtual void Revive() override;
-
-	virtual void Death(AActor* InKiller) override;
-
-	virtual void ResetData() override;
-
-	virtual void Interrupt(float InDuration  = -1) override;
-
-	virtual void Dodge() override;
-
 	virtual void LookAtTarget(ADWCharacter* InTargetCharacter) override;
-
-	virtual void UnAttack() override;
-
-	virtual void AttackStart() override;
 
 	virtual bool UseItem(FAbilityItem& InItem) override;
 
@@ -187,12 +179,9 @@ public:
 	virtual void SetControlMode(EDWControlMode InControlMode);
 	
 	UFUNCTION(BlueprintPure)
-	float GetInteractDistance() const { return InteractDistance; }
-	
-	UFUNCTION(BlueprintPure)
 	UTargetSystemComponent* GetTargetSystem() const { return TargetSystem; }
 
-	UCameraComponent* GetCameraComp_Implementation() override { return FollowCamera; }
+	virtual UCameraComponent* GetCameraComp_Implementation() override { return FollowCamera; }
 
-	USpringArmComponent* GetCameraBoom_Implementation() override { return CameraBoom; }
+	virtual USpringArmComponent* GetCameraBoom_Implementation() override { return CameraBoom; }
 };

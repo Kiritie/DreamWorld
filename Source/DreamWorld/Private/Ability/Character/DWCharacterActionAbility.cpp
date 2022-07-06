@@ -14,7 +14,7 @@ void UDWCharacterActionAbility::EndAbility(const FGameplayAbilitySpecHandle Hand
 	{
 		if(ADWCharacter* OwnerCharacter = GetOwnerCharacter<ADWCharacter>())
 		{
-			OwnerCharacter->StopAction(ActionType, false, true);
+			OwnerCharacter->StopAction(ActionType, false);
 		}
 	}
 }

@@ -27,6 +27,9 @@ class DREAMWORLD_API ADWVitality : public AAbilityVitalityBase, public IInventor
 {
 	GENERATED_BODY()
 
+	friend class UDWVitalityState_Death;
+	friend class UDWVitalityState_Default;
+
 public:
 	// Sets default values for this actor's properties
 	ADWVitality();
@@ -54,12 +57,10 @@ public:
 	virtual void LoadData(FSaveData* InSaveData) override;
 
 	virtual FSaveData* ToData() override;
-	
-	virtual void ResetData() override;
 
-	virtual void Death(AActor* InKiller = nullptr) override;
+	virtual void Death(IAbilityVitalityInterface* InKiller = nullptr) override;
 
-	virtual void Revive() override;
+	virtual void Revive(IAbilityVitalityInterface* InRescuer = nullptr) override;
 
 	virtual bool CanInteract(IInteractionAgentInterface* InInteractionAgent, EInteractAction InInteractAction) override;
 
@@ -93,5 +94,5 @@ public:
 	
 	virtual void OnAttributeChange(const FOnAttributeChangeData& InAttributeChangeData) override;
 	
-	virtual void HandleDamage(EDamageType DamageType, const float LocalDamageDone, bool bHasCrited, FHitResult HitResult, const FGameplayTagContainer& SourceTags, AActor* SourceActor) override;
+	virtual void HandleDamage(EDamageType DamageType, const float LocalDamageDone, bool bHasCrited, FHitResult HitResult, const FGameplayTagContainer& SourceTags, IAbilityVitalityInterface* SourceVitality) override;
 };

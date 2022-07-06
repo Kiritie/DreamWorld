@@ -4,21 +4,21 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Object.h"
-#include "Ability/Character/States/AbilityCharacterStateBase.h"
-#include "DWCharacterState_Dodge.generated.h"
+#include "Character/States/DWCharacterState_Default.h"
+#include "DWPlayerCharacterState_Default.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class DREAMWORLD_API UDWCharacterState_Dodge : public UAbilityCharacterStateBase
+class DREAMWORLD_API UDWPlayerCharacterState_Default : public UDWCharacterState_Default
 {
 	GENERATED_BODY()
 
-	friend class ADWCharacter;
+	friend class ADWPlayerCharacter;
 
 public:
-	UDWCharacterState_Dodge();
+	UDWPlayerCharacterState_Default();
 
 public:
 	virtual void OnInitialize(UFSMComponent* InFSMComponent, int32 InStateIndex) override;

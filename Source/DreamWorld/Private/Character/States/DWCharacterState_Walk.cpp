@@ -25,11 +25,6 @@ void UDWCharacterState_Walk::OnEnter(UFiniteStateBase* InLastFiniteState)
 	Super::OnEnter(InLastFiniteState);
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
-
-	if(InLastFiniteState && InLastFiniteState->IsA(UDWCharacterState_Attack::StaticClass()))
-	{
-		Character->AttackEnd();
-	}
 }
 
 void UDWCharacterState_Walk::OnRefresh()

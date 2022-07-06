@@ -50,6 +50,7 @@
 #include "Character/States/DWCharacterState_Attack.h"
 #include "Character/States/DWCharacterState_Climb.h"
 #include "Character/States/DWCharacterState_Crouch.h"
+#include "Character/States/DWCharacterState_Default.h"
 #include "Character/States/DWCharacterState_Defend.h"
 #include "Character/States/DWCharacterState_Dodge.h"
 #include "Character/States/DWCharacterState_Float.h"
@@ -126,12 +127,11 @@ ADWCharacter::ADWCharacter()
 	// local
 	AttackAbilityIndex = 0;
 	SkillAbilityID = FPrimaryAssetId();
-	AttackType = EDWAttackType::None;
+	AttackType = EDWCharacterAttackType::None;
 	ActionType = EDWCharacterActionType::None;
 	BirthLocation = FVector(0, 0, 0);
 	AIMoveLocation = Vector_Empty;
 	AIMoveStopDistance = 0;
-	InterruptRemainTime = 0;
 	NormalAttackRemainTime = 0;
 
 	DefaultAbility = FAbilityData();
@@ -157,6 +157,29 @@ void ADWCharacter::BeginPlay()
 	if (GetWidgetCharacterHPWidget() && !GetWidgetCharacterHPWidget()->GetOwnerCharacter())
 	{
 		GetWidgetCharacterHPWidget()->SetOwnerCharacter(this);
+	}
+}
+
+void ADWCharacter::OnMovementModeChanged(EMovementMode PrevMovementMode, uint8 PreviousCustomMode)
+{
+	Super::OnMovementModeChanged(PrevMovementMode, PreviousCustomMode);
+
+	if(!FSM->GetCurrentState() || FSM->IsCurrentStateClass<UDWCharacterState_Default>())
+	{
+		switch (GetCharacterMovement()->MovementMode)
+		{
+			case EMovementMode::MOVE_Flying:
+			{
+				FSM->SwitchStateByClass<UDWCharacterState_Fly>();
+				break;
+			}
+			case EMovementMode::MOVE_Swimming:
+			{
+				FSM->SwitchStateByClass<UDWCharacterState_Swim>();
+				break;
+			}
+			default: break;
+		}
 	}
 }
 
@@ -444,30 +467,14 @@ FSaveData* ADWCharacter::ToData()
 	return &SaveData;
 }
 
-void ADWCharacter::ResetData()
-{
-	// stats
-	SetMotionRate(1, 1);
-	SetLockedTarget(nullptr);
-	OwnerRider = nullptr;
-	
-	// local
-	AttackAbilityIndex = 0;
-	AIMoveLocation = Vector_Empty;
-	AIMoveStopDistance = 0;
-	InterruptRemainTime = 0;
-	NormalAttackRemainTime = 0;
-	ActionType = EDWCharacterActionType::None;
-}
-
-void ADWCharacter::Death(AActor* InKiller /*= nullptr*/)
+void ADWCharacter::Death(IAbilityVitalityInterface* InKiller)
 {
 	Super::Death(InKiller);
 }
 
-void ADWCharacter::Revive()
+void ADWCharacter::Revive(IAbilityVitalityInterface* InRescuer)
 {
-	Super::Revive();
+	Super::Revive(InRescuer);
 }
 
 bool ADWCharacter::CanInteract(IInteractionAgentInterface* InInteractionAgent, EInteractAction InInteractAction)
@@ -533,14 +540,27 @@ void ADWCharacter::Interrupt(float InDuration /*= -1*/)
 	FSM->SwitchStateByClass<UDWCharacterState_Interrupt>();
 }
 
-void ADWCharacter::StartJump()
+void ADWCharacter::Jump()
 {
-	Super::StartJump();
+	Super::Jump();
+}
+
+void ADWCharacter::UnJump()
+{
+	Super::UnJump();
 }
 
 void ADWCharacter::Dodge()
 {
 	FSM->SwitchStateByClass<UDWCharacterState_Dodge>();
+}
+
+void ADWCharacter::UnDodge()
+{
+	if(FSM->IsCurrentStateClass<UDWCharacterState_Dodge>())
+	{
+		FSM->SwitchState(nullptr);
+	}
 }
 
 void ADWCharacter::Sprint()
@@ -559,14 +579,30 @@ void ADWCharacter::UnSprint()
 	}
 }
 
-void ADWCharacter::Crouch()
+void ADWCharacter::Crouch(bool bClientSimulation)
 {
 	FSM->SwitchStateByClass<UDWCharacterState_Crouch>();
+}
+
+void ADWCharacter::UnCrouch()
+{
+	if(FSM->IsCurrentStateClass<UDWCharacterState_Crouch>())
+	{
+		FSM->SwitchState(nullptr);
+	}
 }
 
 void ADWCharacter::Swim()
 {
 	FSM->SwitchStateByClass<UDWCharacterState_Swim>();
+}
+
+void ADWCharacter::UnSwim()
+{
+	if(FSM->IsCurrentStateClass<UDWCharacterState_Swim>())
+	{
+		FSM->SwitchState(nullptr);
+	}
 }
 
 void ADWCharacter::Float(float InWaterPosZ)
@@ -575,9 +611,25 @@ void ADWCharacter::Float(float InWaterPosZ)
 	FSM->SwitchStateByClass<UDWCharacterState_Float>();
 }
 
+void ADWCharacter::UnFloat()
+{
+	if(FSM->IsCurrentStateClass<UDWCharacterState_Float>())
+	{
+		FSM->SwitchState(nullptr);
+	}
+}
+
 void ADWCharacter::Climb()
 {
 	FSM->SwitchStateByClass<UDWCharacterState_Climb>();
+}
+
+void ADWCharacter::UnClimb()
+{
+	if(FSM->IsCurrentStateClass<UDWCharacterState_Climb>())
+	{
+		FSM->SwitchState(nullptr);
+	}
 }
 
 void ADWCharacter::Ride(ADWCharacter* InTarget)
@@ -586,9 +638,25 @@ void ADWCharacter::Ride(ADWCharacter* InTarget)
 	FSM->SwitchStateByClass<UDWCharacterState_Ride>();
 }
 
+void ADWCharacter::UnRide()
+{
+	if(FSM->IsCurrentStateClass<UDWCharacterState_Ride>())
+	{
+		FSM->SwitchState(nullptr);
+	}
+}
+
 void ADWCharacter::Fly()
 {
 	FSM->SwitchStateByClass<UDWCharacterState_Fly>();
+}
+
+void ADWCharacter::UnFly()
+{
+	if(FSM->IsCurrentStateClass<UDWCharacterState_Fly>())
+	{
+		FSM->SwitchState(nullptr);
+	}
 }
 
 bool ADWCharacter::Attack(int32 InAbilityIndex /*= -1*/)
@@ -602,7 +670,7 @@ bool ADWCharacter::Attack(int32 InAbilityIndex /*= -1*/)
 			{
 				FSM->SwitchStateByClass<UDWCharacterState_Attack>();
 				AttackAbilityIndex = InAbilityIndex;
-				AttackType = EDWAttackType::NormalAttack;
+				AttackType = EDWCharacterAttackType::NormalAttack;
 				NormalAttackRemainTime = 1.f / GetAttackSpeed();
 				return true;
 			}
@@ -636,7 +704,7 @@ bool ADWCharacter::SkillAttack(const FPrimaryAssetId& InSkillID)
 						{
 							FSM->SwitchStateByClass<UDWCharacterState_Attack>();
 							SkillAbilityID = InSkillID;
-							AttackType = EDWAttackType::SkillAttack;
+							AttackType = EDWCharacterAttackType::SkillAttack;
 							return true;
 						}
 					}
@@ -673,99 +741,32 @@ bool ADWCharacter::FallingAttack()
 		if (ActiveAbility(FallingAttackAbility.AbilityHandle))
 		{
 			FSM->SwitchStateByClass<UDWCharacterState_Attack>();
-			AttackType = EDWAttackType::FallingAttack;
+			AttackType = EDWCharacterAttackType::FallingAttack;
 			return true;
 		}
 	}
 	return false;
 }
 
-void ADWCharacter::AttackStart()
-{
-	if (IsAttacking())
-	{
-		switch (AttackType)
-		{
-			case EDWAttackType::NormalAttack:
-			case EDWAttackType::FallingAttack:
-			{
-				SetDamageAble(true);
-				break;
-			}
-			case EDWAttackType::SkillAttack:
-			{
-				if (GetSkillAbility(SkillAbilityID).GetItemData<UAbilitySkillDataBase>().SkillClass != nullptr)
-				{
-					FActorSpawnParameters spawnParams = FActorSpawnParameters();
-					spawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-					AAbilitySkillBase* tmpSkill = GetWorld()->SpawnActor<AAbilitySkillBase>(GetSkillAbility(SkillAbilityID).GetItemData<UAbilitySkillDataBase>().SkillClass, spawnParams);
-					if(tmpSkill) tmpSkill->Initialize(this, FAbilityItem(SkillAbilityID));
-				}
-				break;
-			}
-			default: break;
-		}
-	}
-}
-
-void ADWCharacter::AttackHurt()
-{
-	if (IsAttacking())
-	{
-		SetDamageAble(false);
-		FTimerDelegate TimerDelegate;
-		TimerDelegate.BindLambda([this](){ SetDamageAble(true); });
-		GetWorld()->GetTimerManager().SetTimerForNextTick(TimerDelegate);
-	}
-}
-
-void ADWCharacter::AttackEnd()
-{
-	if (IsAttacking())
-	{
-		switch (AttackType)
-		{
-			case EDWAttackType::NormalAttack:
-			{
-				SetDamageAble(false);
-				if (++AttackAbilityIndex >= AttackAbilities.Num())
-				{
-					AttackAbilityIndex = 0;
-				}
-				break;
-			}
-			case EDWAttackType::SkillAttack:
-			{
-				UnAttack();
-				break;
-			}
-			case EDWAttackType::FallingAttack:
-			{
-				UnAttack();
-				StopAnimMontage();
-				break;
-			}
-			default: break;
-		}
-	}
-}
-
 void ADWCharacter::UnAttack()
 {
-	if (IsAttacking())
+	if(FSM->IsCurrentStateClass<UDWCharacterState_Attack>())
 	{
-		FreeToAnim();
-		SetMotionRate(1, 1);
-		SetDamageAble(false);
-		AttackAbilityIndex = 0;
-		SkillAbilityID = FPrimaryAssetId();
-		AttackType = EDWAttackType::None;
+		FSM->SwitchState(nullptr);
 	}
 }
 
 void ADWCharacter::Defend()
 {
 	FSM->SwitchStateByClass<UDWCharacterState_Defend>();
+}
+
+void ADWCharacter::UnDefend()
+{
+	if(FSM->IsCurrentStateClass<UDWCharacterState_Defend>())
+	{
+		FSM->SwitchState(nullptr);
+	}
 }
 
 bool ADWCharacter::UseItem(FAbilityItem& InItem)
@@ -1915,7 +1916,7 @@ void ADWCharacter::OnAttributeChange(const FOnAttributeChangeData& InAttributeCh
 	}
 }
 
-void ADWCharacter::HandleDamage(EDamageType DamageType, const float LocalDamageDone, bool bHasCrited, FHitResult HitResult, const FGameplayTagContainer& SourceTags, AActor* SourceActor)
+void ADWCharacter::HandleDamage(EDamageType DamageType, const float LocalDamageDone, bool bHasCrited, FHitResult HitResult, const FGameplayTagContainer& SourceTags, IAbilityVitalityInterface* SourceVitality)
 {
 	Super::HandleDamage(DamageType, LocalDamageDone, bHasCrited, HitResult, SourceTags, SourceActor);
 	

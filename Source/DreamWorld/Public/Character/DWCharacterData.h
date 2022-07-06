@@ -50,9 +50,6 @@ public:
 	FInventorySaveData InventoryData;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tags")
-	FGameplayTag StaticTag;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tags")
 	FGameplayTag FallingTag;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tags")

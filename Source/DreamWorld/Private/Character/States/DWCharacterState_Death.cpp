@@ -7,6 +7,7 @@
 #include "Character/DWCharacter.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Inventory/CharacterInventory.h"
 #include "Inventory/Inventory.h"
 #include "Voxel/Chunks/VoxelChunk.h"
 
@@ -77,9 +78,9 @@ void UDWCharacterState_Death::DeathEnd()
 
 	Character->StopAction(EDWCharacterActionType::Death);
 
-	if(Character->GetInventory())
+	if(Character->Inventory)
 	{
-		Character->GetInventory()->DiscardAllItem();
+		Character->Inventory->DiscardAllItem();
 	}
 	if(!Character->IsPlayer())
 	{
@@ -87,9 +88,9 @@ void UDWCharacterState_Death::DeathEnd()
 		{
 			Character->GetController()->UnPossess();
 		}
-		if (Character->GetOwnerChunk())
+		if (Character->OwnerChunk)
 		{
-			Character->GetOwnerChunk()->DestroySceneActor(Character);
+			Character->OwnerChunk->DestroySceneActor(Character);
 		}
 		else
 		{
@@ -99,7 +100,7 @@ void UDWCharacterState_Death::DeathEnd()
 		{
 			Character->GetTeamData()->RemoveMember(Character);
 		}
-		for(auto Iter : Character->GetEquips())
+		for(auto Iter : Character->Equips)
 		{
 			if(Iter.Value)
 			{

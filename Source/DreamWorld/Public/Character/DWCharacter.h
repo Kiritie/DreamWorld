@@ -44,6 +44,23 @@ class DREAMWORLD_API ADWCharacter : public AAbilityCharacterBase, public ITarget
 {
 	GENERATED_BODY()
 
+	friend class UDWCharacterState_Attack;
+	friend class UDWCharacterState_Climb;
+	friend class UDWCharacterState_Crouch;
+	friend class UDWCharacterState_Death;
+	friend class UDWCharacterState_Default;
+	friend class UDWCharacterState_Defend;
+	friend class UDWCharacterState_Dodge;
+	friend class UDWCharacterState_Fall;
+	friend class UDWCharacterState_Float;
+	friend class UDWCharacterState_Fly;
+	friend class UDWCharacterState_Interrupt;
+	friend class UDWCharacterState_Jump;
+	friend class UDWCharacterState_Ride;
+	friend class UDWCharacterState_Static;
+	friend class UDWCharacterState_Swim;
+	friend class UDWCharacterState_Walk;
+
 public:
 	ADWCharacter();
 	
@@ -103,8 +120,6 @@ protected:
 	
 	float AIMoveStopDistance;
 
-	float InterruptRemainTime;
-
 	float NormalAttackRemainTime;
 
 	FVector AIMoveLocation;
@@ -113,11 +128,11 @@ protected:
 
 	FPrimaryAssetId SkillAbilityID;
 
-	EDWAttackType AttackType;
+	FTimerHandle AttackHurtTimer;
+
+	EDWCharacterAttackType AttackType;
 
 	EDWCharacterActionType ActionType;
-
-	FTimerHandle AttackHurtTimer;
 
 	UPROPERTY()
 	TMap<EDWEquipPartType, AAbilityEquipBase*> Equips;
@@ -133,6 +148,8 @@ protected:
 protected:
 	virtual void BeginPlay() override;
 
+	virtual void OnMovementModeChanged(EMovementMode PrevMovementMode, uint8 PreviousCustomMode) override;
+	
 public:
 	virtual void OnSpawn_Implementation(const TArray<FParameter>& InParams) override;
 
@@ -146,12 +163,10 @@ public:
 
 	virtual FSaveData* ToData() override;
 
-	virtual void ResetData() override;
-
 public:
-	virtual void Death(AActor* InKiller = nullptr) override;
+	virtual void Death(IAbilityVitalityInterface* InKiller = nullptr) override;
 			
-	virtual void Revive() override;
+	virtual void Revive(IAbilityVitalityInterface* InRescuer = nullptr) override;
 
 	virtual bool CanInteract(IInteractionAgentInterface* InInteractionAgent, EInteractAction InInteractAction) override;
 
@@ -166,10 +181,15 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual void Interrupt(float InDuration = -1);
 
-	virtual void StartJump() override;
+	virtual void Jump() override;
+
+	virtual void UnJump() override;
 
 	UFUNCTION(BlueprintCallable)
 	virtual void Dodge();
+
+	UFUNCTION(BlueprintCallable)
+	virtual void UnDodge();
 
 	UFUNCTION(BlueprintCallable)
 	virtual void Sprint();
@@ -177,22 +197,40 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual void UnSprint();
 
-	virtual void Crouch();
+	virtual void Crouch(bool bClientSimulation) override;
 		
 	UFUNCTION(BlueprintCallable)
+	virtual void UnCrouch();
+
+	UFUNCTION(BlueprintCallable)
 	virtual void Swim();
-								
+		
+	UFUNCTION(BlueprintCallable)
+	virtual void UnSwim();
+						
 	UFUNCTION(BlueprintCallable)
 	virtual void Float(float InWaterPosZ);
+						
+	UFUNCTION(BlueprintCallable)
+	virtual void UnFloat();
 
 	UFUNCTION(BlueprintCallable)
 	virtual void Climb();
 			
 	UFUNCTION(BlueprintCallable)
+	virtual void UnClimb();
+
+	UFUNCTION(BlueprintCallable)
 	virtual void Ride(ADWCharacter* InTarget);
 
 	UFUNCTION(BlueprintCallable)
+	virtual void UnRide();
+
+	UFUNCTION(BlueprintCallable)
 	virtual void Fly();
+
+	UFUNCTION(BlueprintCallable)
+	virtual void UnFly();
 
 	UFUNCTION(BlueprintCallable)
 	virtual bool Attack(int32 InAbilityIndex = -1);
@@ -206,20 +244,14 @@ public:
 	virtual bool FallingAttack();
 
 	UFUNCTION(BlueprintCallable)
-	virtual void AttackStart();
-
-	UFUNCTION(BlueprintCallable)
-	virtual void AttackHurt();
-
-	UFUNCTION(BlueprintCallable)
-	virtual void AttackEnd();
-
-	UFUNCTION(BlueprintCallable)
 	virtual void UnAttack();
 
 	UFUNCTION(BlueprintCallable)
 	virtual void Defend();
 	
+	UFUNCTION(BlueprintCallable)
+	virtual void UnDefend();
+
 	virtual bool UseItem(FAbilityItem& InItem);
 
 	virtual void PickUp(AAbilityPickUpBase* InPickUp) override;
@@ -257,7 +289,7 @@ public:
 	virtual void LookAtTarget(ADWCharacter* InTargetCharacter);
 
 	UFUNCTION(BlueprintCallable)
-	virtual void AIMoveTo(FVector InTargetLocation, float InMoveStopDistance = 10.f, bool bMulticast = false);
+	virtual void AIMoveTo(FVector InTargetLocation, float InMoveStopDistance = 10.f, bool bMulticast = false) override;
 
 	UFUNCTION(BlueprintCallable)
 	virtual bool DoAIMove(FVector InTargetLocation, float InMoveStopDistance = 10.f);
@@ -539,14 +571,8 @@ public:
 	UFUNCTION(BlueprintPure)
 	ADWCharacter* GetOwnerRider() const { return OwnerRider; }
 
-	UFUNCTION(BlueprintCallable)
-	void SetOwnerRider(ADWCharacter* InOwnerRider) { this->OwnerRider = InOwnerRider; }
-
 	UFUNCTION(BlueprintPure)
 	ADWCharacter* GetRidingTarget() const { return RidingTarget; }
-
-	UFUNCTION(BlueprintCallable)
-	void SetRidingTarget(ADWCharacter* InRidingTarget) { this->RidingTarget = InRidingTarget; }
 
 	UFUNCTION(BlueprintPure)
 	ADWCharacter* GetLockedTarget() const { return LockedTarget; }
@@ -556,6 +582,9 @@ public:
 
 	UFUNCTION(BlueprintPure)
 	float GetAttackDistance() const { return AttackDistance; }
+	
+	UFUNCTION(BlueprintPure)
+	float GetInteractDistance() const { return InteractDistance; }
 
 	UFUNCTION(BlueprintPure)
 	float GetFollowDistance() const { return FollowDistance; }
@@ -565,7 +594,28 @@ public:
 
 	UFUNCTION(BlueprintPure)
 	float GetPatrolDuration() const { return PatrolDuration; }
-	
+
+	UFUNCTION(BlueprintPure)
+	float GetDefaultGravityScale() const { return DefaultGravityScale; }
+
+	UFUNCTION(BlueprintPure)
+	float GetDefaultAirControl() const { return DefaultAirControl; }
+
+	UFUNCTION(BlueprintPure)
+	FVector GetAIMoveLocation() const { return AIMoveLocation; }
+
+	UFUNCTION(BlueprintPure)
+	int32 GetAttackAbilityIndex() const { return AttackAbilityIndex; }
+
+	UFUNCTION(BlueprintPure)
+	FPrimaryAssetId GetSkillAbilityID() const { return SkillAbilityID; }
+
+	UFUNCTION(BlueprintPure)
+	EDWCharacterAttackType GetAttackType() const { return AttackType; }
+
+	UFUNCTION(BlueprintPure)
+	EDWCharacterActionType GetActionType() const { return ActionType; }
+
 	UFUNCTION(BlueprintPure)
 	bool HasWeapon(EDWWeaponType InWeaponType);
 		
@@ -621,7 +671,7 @@ public:
 	
 	virtual void OnAttributeChange(const FOnAttributeChangeData& InAttributeChangeData) override;
 	
-	virtual void HandleDamage(EDamageType DamageType, const float LocalDamageDone, bool bHasCrited, FHitResult HitResult, const FGameplayTagContainer& SourceTags, AActor* SourceActor) override;
+	virtual void HandleDamage(EDamageType DamageType, const float LocalDamageDone, bool bHasCrited, FHitResult HitResult, const FGameplayTagContainer& SourceTags, IAbilityVitalityInterface* SourceVitality) override;
 	
 	virtual void HandleInterrupt(float InterruptDuration);
 };

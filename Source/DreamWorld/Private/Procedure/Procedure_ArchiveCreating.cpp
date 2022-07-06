@@ -6,7 +6,9 @@
 #include "Camera/CameraModuleBPLibrary.h"
 #include "Character/CharacterModuleBPLibrary.h"
 #include "Character/Player/DWPlayerCharacter.h"
+#include "Character/States/DWCharacterState_Walk.h"
 #include "Event/EventModuleBPLibrary.h"
+#include "FSM/Components/FSMComponent.h"
 #include "Gameplay/DWGameState.h"
 #include "Gameplay/DWPlayerController.h"
 #include "Global/GlobalBPLibrary.h"
@@ -48,7 +50,7 @@ void UProcedure_ArchiveCreating::OnEnter(UProcedureBase* InLastProcedure)
 	if(ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>())
 	{
 		PlayerCharacter->SetActorHiddenInGame(false);
-		PlayerCharacter->OnCharacterActive.AddDynamic(this, &UProcedure_ArchiveCreating::ResetCameraView);
+		PlayerCharacter->GetFSMComponent()->OnStateChanged.AddDynamic(this, &UProcedure_ArchiveCreating::OnTargetCharacterStateChanged);
 		OperationTarget = PlayerCharacter;
 	}
 	
@@ -74,7 +76,15 @@ void UProcedure_ArchiveCreating::OnLeave(UProcedureBase* InNextProcedure)
 
 	if(ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>())
 	{
-		PlayerCharacter->OnCharacterActive.RemoveDynamic(this, &UProcedure_ArchiveCreating::ResetCameraView);
+		PlayerCharacter->GetFSMComponent()->OnStateChanged.RemoveDynamic(this, &UProcedure_ArchiveCreating::OnTargetCharacterStateChanged);
+	}
+}
+
+void UProcedure_ArchiveCreating::OnTargetCharacterStateChanged(UFiniteStateBase* InFiniteState)
+{
+	if(InFiniteState->IsA<UDWCharacterState_Walk>())
+	{
+		ResetCameraView();
 	}
 }
 

@@ -48,7 +48,7 @@ void UDWCharacterState_Fly::OnRefresh()
 	if(Character->GetVelocity().Z < 0.f)
 	{
 		FFindFloorResult FindFloorResult;
-		Character->GetCharacterMovement()->FindFloor(Character->GetCharacterMovement()->UpdatedComponent->GetComponentLocation(), FindFloorResult, GetVelocity().IsZero(), nullptr);
+		Character->GetCharacterMovement()->FindFloor(Character->GetCharacterMovement()->UpdatedComponent->GetComponentLocation(), FindFloorResult, Character->GetVelocity().IsZero(), nullptr);
 		if(FindFloorResult.IsWalkableFloor())
 		{
 			FSM->SwitchStateByClass<UAbilityCharacterState_Walk>();

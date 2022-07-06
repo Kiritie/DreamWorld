@@ -32,7 +32,7 @@ void UDWCharacterState_Dodge::OnEnter(UFiniteStateBase* InLastFiniteState)
 
 	Character->LimitToAnim();
 	Character->GetCapsuleComponent()->SetGenerateOverlapEvents(false);
-	Character->SetActorRotation(FRotator(0.f, Character->GetMoveDirection().ToOrientationRotator().Yaw, 0.f));
+	Character->SetActorRotation(FRotator(0.f, Character->MoveDirection.ToOrientationRotator().Yaw, 0.f));
 }
 
 void UDWCharacterState_Dodge::OnRefresh()

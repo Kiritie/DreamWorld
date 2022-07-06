@@ -13,6 +13,8 @@
 #include "Ability/Item/Skill/AbilitySkillDataBase.h"
 #include "Camera/CameraModuleBPLibrary.h"
 #include "Character/DWCharacterData.h"
+#include "Character/States/DWCharacterState_Static.h"
+#include "FSM/Components/FSMComponent.h"
 #include "Widget/WidgetGameHUD.h"
 #include "Gameplay/DWGameInstance.h"
 #include "Gameplay/DWGameState.h"
@@ -140,7 +142,7 @@ void ADWPlayerController::LoadData(FSaveData* InSaveData)
 	{
 		SetPlayerPawn(PlayerCharacter);
 
-		PlayerCharacter->Disable(true, true);
+		PlayerCharacter->GetFSMComponent()->SwitchStateByClass<UDWCharacterState_Static>();
 		USaveGameModuleBPLibrary::LoadObjectData(PlayerCharacter, &InPlayerData, true);
 	}
 }

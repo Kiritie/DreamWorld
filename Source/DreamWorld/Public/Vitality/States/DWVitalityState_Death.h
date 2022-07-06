@@ -11,9 +11,11 @@
  * 
  */
 UCLASS()
-class WHFRAMEWORK_API UDWVitalityState_Death : public UAbilityVitalityState_Death
+class DREAMWORLD_API UDWVitalityState_Death : public UAbilityVitalityState_Death
 {
 	GENERATED_BODY()
+
+	friend class ADWVitality;
 
 public:
 	UDWVitalityState_Death();

@@ -4,6 +4,7 @@
 
 #include "AbilitySystemComponent.h"
 #include "Ability/Vitality/AbilityVitalityBase.h"
+#include "Vitality/DWVitality.h"
 
 UDWVitalityState_Death::UDWVitalityState_Death()
 {
@@ -43,4 +44,9 @@ void UDWVitalityState_Death::DeathStart()
 void UDWVitalityState_Death::DeathEnd()
 {
 	Super::DeathEnd();
+
+	ADWVitality* Vitality = GetAgent<ADWVitality>();
+	
+	Vitality->Inventory->DiscardAllItem();
+	Vitality->OwnerChunk->DestroySceneActor(Vitality);
 }

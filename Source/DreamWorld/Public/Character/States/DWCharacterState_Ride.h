@@ -11,9 +11,11 @@
  * 
  */
 UCLASS()
-class WHFRAMEWORK_API UDWCharacterState_Ride : public UAbilityCharacterStateBase
+class DREAMWORLD_API UDWCharacterState_Ride : public UAbilityCharacterStateBase
 {
 	GENERATED_BODY()
+
+	friend class ADWCharacter;
 
 public:
 	UDWCharacterState_Ride();

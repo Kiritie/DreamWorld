@@ -71,7 +71,7 @@ void UDWCharacterState_Ride::OnLeave(UFiniteStateBase* InNextFiniteState)
 			Character->SetActorLocation(hitResult.Location);
 		}
 	}
-	Character->SetRidingTarget(nullptr);
+	Character->RidingTarget = nullptr;
 }
 
 void UDWCharacterState_Ride::OnTermination()

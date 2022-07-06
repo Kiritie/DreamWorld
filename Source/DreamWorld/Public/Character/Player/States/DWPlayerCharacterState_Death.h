@@ -3,22 +3,22 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Character/States/DWCharacterState_Death.h"
 #include "UObject/Object.h"
-#include "Ability/Character/States/AbilityCharacterStateBase.h"
-#include "DWCharacterState_Dodge.generated.h"
+#include "DWPlayerCharacterState_Death.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class DREAMWORLD_API UDWCharacterState_Dodge : public UAbilityCharacterStateBase
+class DREAMWORLD_API UDWPlayerCharacterState_Death : public UDWCharacterState_Death
 {
 	GENERATED_BODY()
 
-	friend class ADWCharacter;
+	friend class ADWPlayerCharacter;
 
 public:
-	UDWCharacterState_Dodge();
+	UDWPlayerCharacterState_Death();
 
 public:
 	virtual void OnInitialize(UFSMComponent* InFSMComponent, int32 InStateIndex) override;
@@ -32,4 +32,9 @@ public:
 	virtual void OnLeave(UFiniteStateBase* InNextFiniteState) override;
 
 	virtual void OnTermination() override;
+
+public:
+	virtual void DeathStart() override;
+
+	virtual void DeathEnd() override;
 };

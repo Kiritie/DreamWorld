@@ -29,6 +29,18 @@ void UDWCharacterState_Default::OnEnter(UFiniteStateBase* InLastFiniteState)
 
 	Character->SetMana(-1.f);
 	Character->SetStamina(-1.f);
+	
+	// stats
+	Character->SetLockedTarget(nullptr);
+	Character->RidingTarget = nullptr;
+	Character->OwnerRider = nullptr;
+	
+	// local
+	Character->AttackAbilityIndex = 0;
+	Character->AIMoveLocation = Vector_Empty;
+	Character->AIMoveStopDistance = 0;
+	Character->NormalAttackRemainTime = 0;
+	Character->ActionType = EDWCharacterActionType::None;
 }
 
 void UDWCharacterState_Default::OnRefresh()
