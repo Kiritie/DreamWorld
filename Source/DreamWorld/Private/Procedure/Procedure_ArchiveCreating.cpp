@@ -82,7 +82,7 @@ void UProcedure_ArchiveCreating::OnLeave(UProcedureBase* InNextProcedure)
 
 void UProcedure_ArchiveCreating::OnTargetCharacterStateChanged(UFiniteStateBase* InFiniteState)
 {
-	if(InFiniteState->IsA<UDWCharacterState_Walk>())
+	if(InFiniteState && InFiniteState->IsA<UDWCharacterState_Walk>())
 	{
 		ResetCameraView();
 	}

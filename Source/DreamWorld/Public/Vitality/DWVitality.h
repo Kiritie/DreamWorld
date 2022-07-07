@@ -90,9 +90,10 @@ public:
 	UWidgetVitalityHP* GetWidgetVitalityHPWidget() const;
 
 public:
+	UFUNCTION()
 	virtual void OnInventorySlotSelected(UInventorySlot* InInventorySlot);
 	
 	virtual void OnAttributeChange(const FOnAttributeChangeData& InAttributeChangeData) override;
 	
-	virtual void HandleDamage(EDamageType DamageType, const float LocalDamageDone, bool bHasCrited, FHitResult HitResult, const FGameplayTagContainer& SourceTags, IAbilityVitalityInterface* SourceVitality) override;
+	virtual void HandleDamage(EDamageType DamageType, const float LocalDamageDone, bool bHasCrited, FHitResult HitResult, const FGameplayTagContainer& SourceTags, AActor* SourceActor) override;
 };

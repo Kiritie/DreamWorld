@@ -45,6 +45,19 @@
 #include "Ability/Item/Skill/AbilitySkillDataBase.h"
 #include "Ability/AbilityModuleBPLibrary.h"
 #include "Ability/AbilityModuleTypes.h"
+#include "Character/Player/States/DWPlayerCharacterState_Attack.h"
+#include "Character/Player/States/DWPlayerCharacterState_Death.h"
+#include "Character/Player/States/DWPlayerCharacterState_Default.h"
+#include "Character/Player/States/DWPlayerCharacterState_Dodge.h"
+#include "Character/Player/States/DWPlayerCharacterState_Interrupt.h"
+#include "Character/States/DWCharacterState_Climb.h"
+#include "Character/States/DWCharacterState_Crouch.h"
+#include "Character/States/DWCharacterState_Defend.h"
+#include "Character/States/DWCharacterState_Fall.h"
+#include "Character/States/DWCharacterState_Float.h"
+#include "Character/States/DWCharacterState_Fly.h"
+#include "Character/States/DWCharacterState_Jump.h"
+#include "Character/States/DWCharacterState_Ride.h"
 #include "Character/States/DWCharacterState_Walk.h"
 #include "FSM/Components/FSMComponent.h"
 
@@ -115,6 +128,22 @@ ADWPlayerCharacter::ADWPlayerCharacter()
 	//MiniMapCapture->PrimitiveRenderMode = ESceneCapturePrimitiveRenderMode::PRM_UseShowOnlyList;
 	MiniMapCapture->SetupAttachment(RootComponent);
 	MiniMapCapture->SetRelativeLocationAndRotation(FVector(0, 0, 500), FRotator(0, 90, 0));
+
+	FSM->States.Empty();
+	FSM->States.Add(UDWPlayerCharacterState_Attack::StaticClass());
+	FSM->States.Add(UDWCharacterState_Climb::StaticClass());
+	FSM->States.Add(UDWCharacterState_Crouch::StaticClass());
+	FSM->States.Add(UDWPlayerCharacterState_Death::StaticClass());
+	FSM->States.Add(UDWPlayerCharacterState_Default::StaticClass());
+	FSM->States.Add(UDWCharacterState_Defend::StaticClass());
+	FSM->States.Add(UDWPlayerCharacterState_Dodge::StaticClass());
+	FSM->States.Add(UDWCharacterState_Fall::StaticClass());
+	FSM->States.Add(UDWCharacterState_Float::StaticClass());
+	FSM->States.Add(UDWCharacterState_Fly::StaticClass());
+	FSM->States.Add(UDWPlayerCharacterState_Interrupt::StaticClass());
+	FSM->States.Add(UDWCharacterState_Jump::StaticClass());
+	FSM->States.Add(UDWCharacterState_Ride::StaticClass());
+	FSM->DefaultState = UDWCharacterState_Default::StaticClass();
 
 	// states
 	ControlMode = EDWControlMode::Fighting;
@@ -472,7 +501,7 @@ void ADWPlayerCharacter::ToggleCrouch()
 	}
 	else
 	{
-		UnCrouch();
+		UnCrouch(true);
 	}
 }
 

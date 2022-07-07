@@ -3,13 +3,12 @@
 using UnrealBuildTool;
 
 /// <summary>
-/// ��ģ�����C#��
+/// 
 /// </summary>
 public class DreamWorld : ModuleRules
 {
 	public DreamWorld(ReadOnlyTargetRules Target) : base(Target)
 	{
-		// ����Ԥ����ͷ�ļ�
 		PrivatePCHHeaderFile = "DreamWorld.h";
 
 		bLegacyPublicIncludePaths = false;
@@ -18,7 +17,6 @@ public class DreamWorld : ModuleRules
 
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
-		// ��ӹ�������ģ��
 		PublicDependencyModuleNames.AddRange(
 			new string[] {
 				"Core",
@@ -28,7 +26,6 @@ public class DreamWorld : ModuleRules
 			}
 		);
 
-		// ���˽������ģ��
 		PrivateDependencyModuleNames.AddRange(
 			new string[] {
 				"InputCore",
@@ -39,7 +36,6 @@ public class DreamWorld : ModuleRules
 				"GameplayTags",
 				"GameplayTasks",
 				"ProceduralMeshComponent",
-				"WHFramework",
 				"AchievementSystem",
 				"TargetSystem"
 			}

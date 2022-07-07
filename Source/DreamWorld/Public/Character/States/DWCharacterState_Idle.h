@@ -3,22 +3,22 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Ability/Character/States/AbilityCharacterState_Idle.h"
 #include "UObject/Object.h"
-#include "Character/States/DWCharacterState_Attack.h"
-#include "DWPlayerCharacterState_Attack.generated.h"
+#include "DWCharacterState_Idle.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class DREAMWORLD_API UDWPlayerCharacterState_Attack : public UDWCharacterState_Attack
+class DREAMWORLD_API UDWCharacterState_Idle : public UAbilityCharacterState_Idle
 {
 	GENERATED_BODY()
 
-	friend class ADWPlayerCharacter;
+	friend class ADWCharacter;
 
 public:
-	UDWPlayerCharacterState_Attack();
+	UDWCharacterState_Idle();
 
 public:
 	virtual void OnInitialize(UFSMComponent* InFSMComponent, int32 InStateIndex) override;
@@ -32,11 +32,4 @@ public:
 	virtual void OnLeave(UFiniteStateBase* InNextFiniteState) override;
 
 	virtual void OnTermination() override;
-
-public:
-	virtual void AttackStart() override;
-
-	virtual void AttackHurt() override;
-
-	virtual void AttackEnd() override;
 };

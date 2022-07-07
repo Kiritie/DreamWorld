@@ -50,12 +50,16 @@
 #include "Character/States/DWCharacterState_Attack.h"
 #include "Character/States/DWCharacterState_Climb.h"
 #include "Character/States/DWCharacterState_Crouch.h"
+#include "Character/States/DWCharacterState_Death.h"
 #include "Character/States/DWCharacterState_Default.h"
 #include "Character/States/DWCharacterState_Defend.h"
 #include "Character/States/DWCharacterState_Dodge.h"
+#include "Character/States/DWCharacterState_Fall.h"
 #include "Character/States/DWCharacterState_Float.h"
 #include "Character/States/DWCharacterState_Fly.h"
+#include "Character/States/DWCharacterState_Idle.h"
 #include "Character/States/DWCharacterState_Interrupt.h"
+#include "Character/States/DWCharacterState_Jump.h"
 #include "Character/States/DWCharacterState_Ride.h"
 #include "Character/States/DWCharacterState_Swim.h"
 #include "FSM/Components/FSMComponent.h"
@@ -89,6 +93,23 @@ ADWCharacter::ADWCharacter()
 	Inventory = CreateDefaultSubobject<UCharacterInventory>(FName("Inventory"));
 	Inventory->GetOnSlotSelected().AddDynamic(this, &ADWCharacter::OnInventorySlotSelected);
 
+	FSM->States.Empty();
+	FSM->States.Add(UDWCharacterState_Attack::StaticClass());
+	FSM->States.Add(UDWCharacterState_Climb::StaticClass());
+	FSM->States.Add(UDWCharacterState_Crouch::StaticClass());
+	FSM->States.Add(UDWCharacterState_Death::StaticClass());
+	FSM->States.Add(UDWCharacterState_Default::StaticClass());
+	FSM->States.Add(UDWCharacterState_Defend::StaticClass());
+	FSM->States.Add(UDWCharacterState_Dodge::StaticClass());
+	FSM->States.Add(UDWCharacterState_Fall::StaticClass());
+	FSM->States.Add(UDWCharacterState_Float::StaticClass());
+	FSM->States.Add(UDWCharacterState_Fly::StaticClass());
+	FSM->States.Add(UDWCharacterState_Idle::StaticClass());
+	FSM->States.Add(UDWCharacterState_Interrupt::StaticClass());
+	FSM->States.Add(UDWCharacterState_Jump::StaticClass());
+	FSM->States.Add(UDWCharacterState_Ride::StaticClass());
+	FSM->DefaultState = UDWCharacterState_Default::StaticClass();
+	
 	BehaviorTree = nullptr;
 
 	// Set size for collision capsule
@@ -160,11 +181,11 @@ void ADWCharacter::BeginPlay()
 	}
 }
 
-void ADWCharacter::OnMovementModeChanged(EMovementMode PrevMovementMode, uint8 PreviousCustomMode)
+void ADWCharacter::RefreshFiniteState()
 {
-	Super::OnMovementModeChanged(PrevMovementMode, PreviousCustomMode);
+	Super::RefreshFiniteState();
 
-	if(!FSM->GetCurrentState() || FSM->IsCurrentStateClass<UDWCharacterState_Default>())
+	if(!FSM->GetCurrentState())
 	{
 		switch (GetCharacterMovement()->MovementMode)
 		{
@@ -581,14 +602,25 @@ void ADWCharacter::UnSprint()
 
 void ADWCharacter::Crouch(bool bClientSimulation)
 {
-	FSM->SwitchStateByClass<UDWCharacterState_Crouch>();
+	if(!FSM->IsCurrentStateClass<UDWCharacterState_Crouch>())
+	{
+		FSM->SwitchStateByClass<UDWCharacterState_Crouch>();
+	}
+	else
+	{
+		Super::Crouch(bClientSimulation);
+	}
 }
 
-void ADWCharacter::UnCrouch()
+void ADWCharacter::UnCrouch(bool bClientSimulation)
 {
 	if(FSM->IsCurrentStateClass<UDWCharacterState_Crouch>())
 	{
 		FSM->SwitchState(nullptr);
+	}
+	else
+	{
+		Super::UnCrouch(bClientSimulation);
 	}
 }
 
@@ -1005,6 +1037,64 @@ bool ADWCharacter::StopAction(EDWCharacterActionType InActionType, bool bCancelA
 
 	ActionType = EDWCharacterActionType::None;
 	return true;
+}
+
+void ADWCharacter::EndAction(EDWCharacterActionType InActionType)
+{
+	switch(InActionType)
+	{
+		case EDWCharacterActionType::Death:
+		{
+			FSM->GetCurrentState<UDWCharacterState_Death>()->DeathEnd();
+			break;
+		}
+		case EDWCharacterActionType::Jump:
+		{
+			UnJump();
+			break;
+		}
+		case EDWCharacterActionType::Dodge:
+		{
+			UnDodge();
+			break;
+		}
+		case EDWCharacterActionType::Crouch:
+		{
+			UnCrouch(true);
+			break;
+		}
+		case EDWCharacterActionType::Defend:
+		{
+			UnDefend();
+			break;
+		}
+		case EDWCharacterActionType::Fly:
+		{
+			UnFly();
+			break;
+		}
+		case EDWCharacterActionType::Ride:
+		{
+			UnRide();
+			break;
+		}
+		case EDWCharacterActionType::Climb:
+		{
+			UnClimb();
+			break;
+		}
+		case EDWCharacterActionType::Swim:
+		{
+			UnSwim();
+			break;
+		}
+		case EDWCharacterActionType::Float:
+		{
+			UnFloat();
+			break;
+		}
+		default: break;
+	}
 }
 
 void ADWCharacter::ModifyMana(float InDeltaValue)
@@ -1916,7 +2006,7 @@ void ADWCharacter::OnAttributeChange(const FOnAttributeChangeData& InAttributeCh
 	}
 }
 
-void ADWCharacter::HandleDamage(EDamageType DamageType, const float LocalDamageDone, bool bHasCrited, FHitResult HitResult, const FGameplayTagContainer& SourceTags, IAbilityVitalityInterface* SourceVitality)
+void ADWCharacter::HandleDamage(EDamageType DamageType, const float LocalDamageDone, bool bHasCrited, FHitResult HitResult, const FGameplayTagContainer& SourceTags, AActor* SourceActor)
 {
 	Super::HandleDamage(DamageType, LocalDamageDone, bHasCrited, HitResult, SourceTags, SourceActor);
 	

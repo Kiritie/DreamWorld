@@ -80,7 +80,7 @@ void ADWAIController::Tick(float DeltaTime)
 
 void ADWAIController::OnTargetCharacterStateChanged(UFiniteStateBase* InFiniteState)
 {
-	if(InFiniteState->IsA<UDWCharacterState_Death>())
+	if(InFiniteState && InFiniteState->IsA<UDWCharacterState_Death>())
 	{
 		SetTargetCharacter(nullptr);
 		SetLostTarget(false);

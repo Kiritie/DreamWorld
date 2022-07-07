@@ -54,6 +54,7 @@ class DREAMWORLD_API ADWCharacter : public AAbilityCharacterBase, public ITarget
 	friend class UDWCharacterState_Fall;
 	friend class UDWCharacterState_Float;
 	friend class UDWCharacterState_Fly;
+	friend class UDWCharacterState_Idle;
 	friend class UDWCharacterState_Interrupt;
 	friend class UDWCharacterState_Jump;
 	friend class UDWCharacterState_Ride;
@@ -148,7 +149,7 @@ protected:
 protected:
 	virtual void BeginPlay() override;
 
-	virtual void OnMovementModeChanged(EMovementMode PrevMovementMode, uint8 PreviousCustomMode) override;
+	virtual void RefreshFiniteState() override;
 	
 public:
 	virtual void OnSpawn_Implementation(const TArray<FParameter>& InParams) override;
@@ -198,9 +199,8 @@ public:
 	virtual void UnSprint();
 
 	virtual void Crouch(bool bClientSimulation) override;
-		
-	UFUNCTION(BlueprintCallable)
-	virtual void UnCrouch();
+
+	virtual void UnCrouch(bool bClientSimulation) override;
 
 	UFUNCTION(BlueprintCallable)
 	virtual void Swim();
@@ -275,6 +275,9 @@ public:
 
 	//UFUNCTION(BlueprintCallable)
 	virtual bool StopAction(EDWCharacterActionType InActionType = EDWCharacterActionType::None, bool bCancelAbility = true);
+
+	UFUNCTION(BlueprintCallable)
+	virtual void EndAction(EDWCharacterActionType InActionType);
 					
 	UFUNCTION(BlueprintCallable)
 	virtual void ModifyMana(float InDeltaValue);
@@ -667,11 +670,12 @@ public:
 	UDWCharacterPart* GetCharacterPart(EDWCharacterPartType InCharacterPartType) const;
 
 public:
+	UFUNCTION()
 	virtual void OnInventorySlotSelected(UInventorySlot* InInventorySlot);
 	
 	virtual void OnAttributeChange(const FOnAttributeChangeData& InAttributeChangeData) override;
 	
-	virtual void HandleDamage(EDamageType DamageType, const float LocalDamageDone, bool bHasCrited, FHitResult HitResult, const FGameplayTagContainer& SourceTags, IAbilityVitalityInterface* SourceVitality) override;
+	virtual void HandleDamage(EDamageType DamageType, const float LocalDamageDone, bool bHasCrited, FHitResult HitResult, const FGameplayTagContainer& SourceTags, AActor* SourceActor) override;
 	
 	virtual void HandleInterrupt(float InterruptDuration);
 };

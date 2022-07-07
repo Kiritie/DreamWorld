@@ -3,7 +3,10 @@
 
 #include "Character/DWCharacterAnim.h"
 #include "Character/DWCharacter.h"
+#include "Character/States/DWCharacterState_Attack.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "FSM/Components/FSMComponent.h"
+#include "Global/GlobalBPLibrary.h"
 
 UDWCharacterAnim::UDWCharacterAnim()
 {
@@ -35,15 +38,15 @@ bool UDWCharacterAnim::HandleNotify(const FAnimNotifyEvent& AnimNotifyEvent)
 	}
 	else if (notifyName.IsEqual(FName("AnimNotify_Attack start")))
 	{
-		OwnerCharacter->AttackStart();
+		OwnerCharacter->GetFSMComponent()->GetCurrentState<UDWCharacterState_Attack>()->AttackStart();
 	}
 	else if (notifyName.IsEqual(FName("AnimNotify_Attack hurt")))
 	{
-		OwnerCharacter->AttackHurt();
+		OwnerCharacter->GetFSMComponent()->GetCurrentState<UDWCharacterState_Attack>()->AttackHurt();
 	}
 	else if (notifyName.IsEqual(FName("AnimNotify_Attack end")))
 	{
-		OwnerCharacter->AttackEnd();
+		OwnerCharacter->GetFSMComponent()->GetCurrentState<UDWCharacterState_Attack>()->AttackEnd();
 	}
 	return false;
 }
@@ -59,7 +62,7 @@ void UDWCharacterAnim::NativeUpdateAnimation(float DeltaSeconds)
 
 void UDWCharacterAnim::UpdateAnimParams(float DeltaSeconds)
 {
-	if (!OwnerCharacter) return;
+	if (!OwnerCharacter || !UGlobalBPLibrary::IsPlaying()) return;
 
 	bFalling = OwnerCharacter->IsFalling();
 

@@ -26,7 +26,7 @@ void UDWPlayerCharacterState_Interrupt::OnEnter(UFiniteStateBase* InLastFiniteSt
 	
 	ADWPlayerCharacter* PlayerCharacter = GetAgent<ADWPlayerCharacter>();
 
-	PlayerCharacter->SetAttackAbilityQueue(0);
+	PlayerCharacter->AttackAbilityQueue = 0;
 }
 
 void UDWPlayerCharacterState_Interrupt::OnRefresh()
