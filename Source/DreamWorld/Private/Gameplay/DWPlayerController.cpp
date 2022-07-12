@@ -100,7 +100,10 @@ void ADWPlayerController::OnPossess(APawn* InPawn)
 	}
 	Super::OnPossess(InPawn);
 
-	UCameraModuleBPLibrary::SetCameraDistance(USaveGameModuleBPLibrary::GetSaveGame<UDWGeneralSaveGame>()->GetCameraDistance(), true);
+	if(USaveGameModuleBPLibrary::GetSaveGame<UDWGeneralSaveGame>())
+	{
+		UCameraModuleBPLibrary::SetCameraDistance(USaveGameModuleBPLibrary::GetSaveGame<UDWGeneralSaveGame>()->GetCameraDistance(), true);
+	}
 }
 
 void ADWPlayerController::OnUnPossess()
@@ -141,8 +144,6 @@ void ADWPlayerController::LoadData(FSaveData* InSaveData)
 	if(ADWPlayerCharacter* PlayerCharacter = UObjectPoolModuleBPLibrary::SpawnObject<ADWPlayerCharacter>(nullptr, InPlayerData.GetCharacterData().Class))
 	{
 		SetPlayerPawn(PlayerCharacter);
-
-		PlayerCharacter->GetFSMComponent()->SwitchStateByClass<UDWCharacterState_Static>();
 		USaveGameModuleBPLibrary::LoadObjectData(PlayerCharacter, &InPlayerData, true);
 	}
 }

@@ -54,7 +54,7 @@ void UProcedure_Loading::OnEnter(UProcedureBase* InLastProcedure)
 
 	AMainModule::GetModuleByClass<ADWVoxelModule>()->SetWorldMode(EVoxelWorldMode::Normal);
 
-	USaveGameModuleBPLibrary::LoadSaveGame<UDWArchiveSaveGame>(USaveGameModuleBPLibrary::LoadSaveGame<UDWGeneralSaveGame>()->GetCurrentArchiveID());
+	USaveGameModuleBPLibrary::LoadSaveGame<UDWArchiveSaveGame>();
 }
 
 void UProcedure_Loading::OnRefresh()

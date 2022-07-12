@@ -30,6 +30,4 @@ void UDWGeneralSaveGame::OnUnload_Implementation()
 void UDWGeneralSaveGame::OnRefresh_Implementation()
 {
 	Super::OnRefresh_Implementation();
-	
-	SaveData.CameraDistance = UCameraModuleBPLibrary::GetCurrentCameraDistance();
 }

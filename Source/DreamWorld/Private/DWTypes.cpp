@@ -41,27 +41,9 @@ UDWCharacterData& FDWCharacterSaveData::GetCharacterData() const
 	return UAssetModuleBPLibrary::LoadPrimaryAssetRef<UDWCharacterData>(ID);
 }
 
-FDWArchiveBasicSaveData FDWPlayerSaveData::GetArchiveData() const
-{
-	if(USaveGameModuleBPLibrary::GetSaveGame<UDWGeneralSaveGame>()->GetArchiveBasicDatas().Contains(ArchiveID))
-	{
-		return USaveGameModuleBPLibrary::GetSaveGame<UDWGeneralSaveGame>()->GetArchiveBasicDatas()[ArchiveID];
-	}
-	return FDWArchiveBasicSaveData();
-}
-
 void FDWVoxelWorldSaveData::Initialize()
 {
 	Super::Initialize();
-}
-
-FDWArchiveBasicSaveData FDWVoxelWorldSaveData::GetArchiveData() const
-{
-	if(USaveGameModuleBPLibrary::GetSaveGame<UDWGeneralSaveGame>()->GetArchiveBasicDatas().Contains(ArchiveID))
-	{
-		return USaveGameModuleBPLibrary::GetSaveGame<UDWGeneralSaveGame>()->GetArchiveBasicDatas()[ArchiveID];
-	}
-	return FDWArchiveBasicSaveData();
 }
 
 void FDWTeamData::AddMember(ADWCharacter* InMember)

@@ -530,8 +530,6 @@ public:
 		ArchiveID = 0;
 		ControlMode = EDWControlMode::Fighting;
 	}
-	
-	struct FDWArchiveBasicSaveData GetArchiveData() const;
 
 	UPROPERTY(BlueprintReadOnly)
 	int32 ArchiveID;
@@ -620,8 +618,6 @@ public:
 public:
 	virtual void Initialize() override;
 	
-	FDWArchiveBasicSaveData GetArchiveData() const;
-
 	FORCEINLINE bool IsSameArchive(FDWVoxelWorldSaveData InSaveData) const
 	{
 		return InSaveData.ArchiveID == ArchiveID;
@@ -706,7 +702,7 @@ public:
 };
 
 USTRUCT(BlueprintType)
-struct DREAMWORLD_API FDWGeneralSaveData : public FSaveData
+struct DREAMWORLD_API FDWGeneralSaveData : public FGeneralSaveData
 {
 	GENERATED_BODY()
 
@@ -715,7 +711,6 @@ public:
 	{
 		bAutoJump = true;
 		CameraDistance = 150.f;
-		CurrentArchiveID = -1;
 	}
 
 public:
@@ -724,12 +719,6 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float CameraDistance;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 CurrentArchiveID;
-
-	UPROPERTY()
-	TMap<int32, FDWArchiveBasicSaveData> ArchiveBasicDatas;
 };
 
 /**

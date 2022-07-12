@@ -61,7 +61,9 @@
 #include "Character/States/DWCharacterState_Interrupt.h"
 #include "Character/States/DWCharacterState_Jump.h"
 #include "Character/States/DWCharacterState_Ride.h"
+#include "Character/States/DWCharacterState_Static.h"
 #include "Character/States/DWCharacterState_Swim.h"
+#include "Character/States/DWCharacterState_Walk.h"
 #include "FSM/Components/FSMComponent.h"
 #include "Inventory/Slot/InventoryEquipSlot.h"
 #include "Inventory/Slot/InventorySkillSlot.h"
@@ -108,6 +110,9 @@ ADWCharacter::ADWCharacter()
 	FSM->States.Add(UDWCharacterState_Interrupt::StaticClass());
 	FSM->States.Add(UDWCharacterState_Jump::StaticClass());
 	FSM->States.Add(UDWCharacterState_Ride::StaticClass());
+	FSM->States.Add(UDWCharacterState_Static::StaticClass());
+	FSM->States.Add(UDWCharacterState_Swim::StaticClass());
+	FSM->States.Add(UDWCharacterState_Walk::StaticClass());
 	FSM->DefaultState = UDWCharacterState_Default::StaticClass();
 	
 	BehaviorTree = nullptr;
@@ -956,9 +961,7 @@ void ADWCharacter::RefreshEquip(EDWEquipPartType InPartType, UInventoryEquipSlot
 {
 	if (!EquipSlot->IsEmpty())
 	{
-		FActorSpawnParameters spawnParams = FActorSpawnParameters();
-		spawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-		Equips[InPartType] = GetWorld()->SpawnActor<AAbilityEquipBase>(EquipSlot->GetItem().GetData<UAbilityEquipDataBase>().EquipClass, spawnParams);
+		Equips[InPartType] = UObjectPoolModuleBPLibrary::SpawnObject<AAbilityEquipBase>(nullptr, EquipSlot->GetItem().GetData<UAbilityEquipDataBase>().EquipClass);
 		if (Equips[InPartType])
 		{
 			Equips[InPartType]->Initialize(this);
@@ -968,7 +971,7 @@ void ADWCharacter::RefreshEquip(EDWEquipPartType InPartType, UInventoryEquipSlot
 	else if(Equips[InPartType])
 	{
 		Equips[InPartType]->OnDischarge();
-		Equips[InPartType]->Destroy();
+		UObjectPoolModuleBPLibrary::DespawnObject(Equips[InPartType]);
 		Equips[InPartType] = nullptr;
 	}
 }

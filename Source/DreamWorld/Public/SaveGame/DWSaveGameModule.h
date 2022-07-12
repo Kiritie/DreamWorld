@@ -35,6 +35,11 @@ public:
 
 	virtual void OnUnPause_Implementation() override;
 
+public:
+	virtual void LoadData(FSaveData* InSaveData) override;
+
+	virtual FSaveData* ToData() override;
+
 	//////////////////////////////////////////////////////////////////////////
 	// ArchiveData
 protected:
@@ -42,9 +47,6 @@ protected:
 	FDWArchiveBasicSaveData ArchiveBasicData;
 
 public:
-	UFUNCTION(BlueprintPure)
-	int32 GetValidArchiveID() const;
-
 	UFUNCTION(BlueprintPure)
 	FDWPlayerSaveData GetDefaultPlayerData() const;
 

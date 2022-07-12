@@ -9,6 +9,7 @@
 #include "Character/CharacterModule.h"
 #include "Debug/DebugModule.h"
 #include "Event/EventModule.h"
+#include "FSM/FSMModule.h"
 #include "Input/InputModule.h"
 #include "LatentAction/LatentActionModule.h"
 #include "Media/MediaModule.h"
@@ -38,6 +39,7 @@ ADWMainModule::ADWMainModule()
 	ModuleClasses.Add(ACharacterModule::StaticClass());
 	ModuleClasses.Add(ADebugModule::StaticClass());
 	ModuleClasses.Add(AEventModule::StaticClass());
+	ModuleClasses.Add(AFSMModule::StaticClass());
 	ModuleClasses.Add(AInputModule::StaticClass());
 	ModuleClasses.Add(ALatentActionModule::StaticClass());
 	ModuleClasses.Add(AMediaModule::StaticClass());

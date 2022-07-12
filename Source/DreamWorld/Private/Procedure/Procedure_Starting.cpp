@@ -55,17 +55,7 @@ void UProcedure_Starting::OnEnter(UProcedureBase* InLastProcedure)
 
 	if(!InLastProcedure || InLastProcedure->IsA(UProcedure_Initializing::StaticClass()))
 	{
-		if(USaveGameModuleBPLibrary::GetSaveGame<UDWGeneralSaveGame>()->GetCurrentArchiveID() == -1)
-		{
-			if(UDWArchiveSaveGame* ArchiveSaveGame = USaveGameModuleBPLibrary::GetOrCreateSaveGame<UDWArchiveSaveGame>(-1))
-			{
-				ArchiveSaveGame->Load();
-			}
-		}
-		else
-		{
-			USaveGameModuleBPLibrary::LoadSaveGame<UDWArchiveSaveGame>(USaveGameModuleBPLibrary::GetSaveGame<UDWGeneralSaveGame>()->GetCurrentArchiveID());
-		}
+		USaveGameModuleBPLibrary::LoadOrCreateSaveGame<UDWArchiveSaveGame>(USaveGameModuleBPLibrary::GetActiveSaveIndex<UDWArchiveSaveGame>());
 		if(ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>())
 		{
 			PlayerCharacter->SetActorHiddenInGame(true);

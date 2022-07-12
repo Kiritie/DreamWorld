@@ -58,6 +58,8 @@
 #include "Character/States/DWCharacterState_Fly.h"
 #include "Character/States/DWCharacterState_Jump.h"
 #include "Character/States/DWCharacterState_Ride.h"
+#include "Character/States/DWCharacterState_Static.h"
+#include "Character/States/DWCharacterState_Swim.h"
 #include "Character/States/DWCharacterState_Walk.h"
 #include "FSM/Components/FSMComponent.h"
 
@@ -143,6 +145,9 @@ ADWPlayerCharacter::ADWPlayerCharacter()
 	FSM->States.Add(UDWPlayerCharacterState_Interrupt::StaticClass());
 	FSM->States.Add(UDWCharacterState_Jump::StaticClass());
 	FSM->States.Add(UDWCharacterState_Ride::StaticClass());
+	FSM->States.Add(UDWCharacterState_Static::StaticClass());
+	FSM->States.Add(UDWCharacterState_Swim::StaticClass());
+	FSM->States.Add(UDWCharacterState_Walk::StaticClass());
 	FSM->DefaultState = UDWCharacterState_Default::StaticClass();
 
 	// states
@@ -202,6 +207,8 @@ void ADWPlayerCharacter::SetupPlayerInputComponent(class UInputComponent* Player
 void ADWPlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
+	FSM->SwitchStateByClass<UDWCharacterState_Static>();
 
 	PreviewCapture->ShowOnlyActors.Add(this);
 }

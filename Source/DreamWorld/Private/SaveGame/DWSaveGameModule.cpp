@@ -3,6 +3,7 @@
 
 #include "SaveGame/DWSaveGameModule.h"
 
+#include "Camera/CameraModuleBPLibrary.h"
 #include "Debug/DebugModuleTypes.h"
 #include "Gameplay/DWPlayerController.h"
 #include "Kismet/GameplayStatics.h"
@@ -13,6 +14,8 @@
 // ParamSets default values
 ADWSaveGameModule::ADWSaveGameModule()
 {
+	GeneralSaveGame = UDWGeneralSaveGame::StaticClass();
+
 	ArchiveBasicData = FDWArchiveBasicSaveData();
 }
 
@@ -31,15 +34,6 @@ void ADWSaveGameModule::OnDestroy_Implementation()
 void ADWSaveGameModule::OnInitialize_Implementation()
 {
 	Super::OnInitialize_Implementation();
-
-	if(USaveGameModuleBPLibrary::HasSaveGame<UDWGeneralSaveGame>(UserIndex))
-	{
-		USaveGameModuleBPLibrary::LoadSaveGame<UDWGeneralSaveGame>(UserIndex);
-	}
-	else
-	{
-		USaveGameModuleBPLibrary::CreateSaveGame<UDWGeneralSaveGame>(0, true);
-	}
 }
 
 void ADWSaveGameModule::OnPreparatory_Implementation()
@@ -62,18 +56,17 @@ void ADWSaveGameModule::OnUnPause_Implementation()
 	Super::OnUnPause_Implementation();
 }
 
-int32 ADWSaveGameModule::GetValidArchiveID() const
+void ADWSaveGameModule::LoadData(FSaveData* InSaveData)
 {
-	int32 ArchiveID = 0;
-	for(auto Iter : GetSaveGame<UDWGeneralSaveGame>()->GetArchiveBasicDatas())
-	{
-		if(Iter.Key != ArchiveID)
-		{
-			return ArchiveID;
-		}
-		ArchiveID++;
-	}
-	return ArchiveID;
+	Super::LoadData(InSaveData);
+}
+
+FSaveData* ADWSaveGameModule::ToData()
+{
+	static FDWGeneralSaveData SaveData;
+	SaveData.AllSaveGameInfo = Super::ToData()->ToRef<FGeneralSaveData>().AllSaveGameInfo;
+	SaveData.CameraDistance = UCameraModuleBPLibrary::GetCurrentCameraDistance();
+	return &SaveData;
 }
 
 FDWPlayerSaveData ADWSaveGameModule::GetDefaultPlayerData() const

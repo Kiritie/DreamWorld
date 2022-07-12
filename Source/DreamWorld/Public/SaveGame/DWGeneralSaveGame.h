@@ -3,7 +3,7 @@
 #pragma once
 
 #include "DreamWorld/DreamWorld.h"
-#include "SaveGame/Base/SaveGameBase.h"
+#include "SaveGame/General/GeneralSaveGame.h"
 
 #include "DWGeneralSaveGame.generated.h"
 
@@ -13,7 +13,7 @@ class UDWArchiveSaveGame;
  * 常规游戏数据存取类
  */
 UCLASS()
-class DREAMWORLD_API UDWGeneralSaveGame : public USaveGameBase
+class DREAMWORLD_API UDWGeneralSaveGame : public UGeneralSaveGame
 {
 	GENERATED_BODY()
 
@@ -31,40 +31,28 @@ public:
 
 protected:
 	UPROPERTY()
-	FDWGeneralSaveData SaveData;
+	FDWGeneralSaveData DWGeneralSaveData;
 
 public:
-	virtual FSaveData* GetSaveData() override { return &SaveData; }
+	virtual FSaveData* GetSaveData() override { return &DWGeneralSaveData; }
 
-	virtual void SetSaveData(FSaveData* InSaveData) override { SaveData = InSaveData->ToRef<FDWGeneralSaveData>(); }
+	virtual void SetSaveData(FSaveData* InSaveData) override { DWGeneralSaveData = InSaveData->ToRef<FDWGeneralSaveData>(); }
 
 	UFUNCTION(BlueprintPure, meta = (DisplayName = "GetSaveData"))
-	FDWGeneralSaveData& K2_GetSaveData() { return SaveData; }
+	FDWGeneralSaveData& K2_GetSaveData() { return DWGeneralSaveData; }
 
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "SetSaveData"))
-	void K2_SetSaveData(const FDWGeneralSaveData& InSaveData) { this->SaveData = InSaveData; }
+	void K2_SetSaveData(const FDWGeneralSaveData& InSaveData) { this->DWGeneralSaveData = InSaveData; }
 
 	UFUNCTION(BlueprintPure)
-	bool IsAutoJump() const { return SaveData.bAutoJump; }
+	bool IsAutoJump() const { return DWGeneralSaveData.bAutoJump; }
 	
 	UFUNCTION(BlueprintCallable)
-	void SetAutoJump(bool bInAutoJump) { SaveData.bAutoJump = bInAutoJump; }
+	void SetAutoJump(bool bInAutoJump) { DWGeneralSaveData.bAutoJump = bInAutoJump; }
 
 	UFUNCTION(BlueprintPure)
-	float GetCameraDistance() const { return SaveData.CameraDistance; }
+	float GetCameraDistance() const { return DWGeneralSaveData.CameraDistance; }
 	
 	UFUNCTION(BlueprintCallable)
-	void SetCameraDistance(float InCameraDistance) { SaveData.CameraDistance = InCameraDistance; }
-
-	UFUNCTION(BlueprintPure)
-	int32 GetCurrentArchiveID() const { return SaveData.CurrentArchiveID; }
-	
-	UFUNCTION(BlueprintCallable)
-	void SetCurrentArchiveID(int32 InArchiveID) { SaveData.CurrentArchiveID = InArchiveID; }
-
-	UFUNCTION(BlueprintPure)
-	TMap<int32, FDWArchiveBasicSaveData>& GetArchiveBasicDatas() { return SaveData.ArchiveBasicDatas; }
-
-	UFUNCTION(BlueprintCallable)
-	void SetArchiveBasicDatas(const TMap<int32, FDWArchiveBasicSaveData>& ArchiveBasicDatas) { SaveData.ArchiveBasicDatas = ArchiveBasicDatas; }
+	void SetCameraDistance(float InCameraDistance) { DWGeneralSaveData.CameraDistance = InCameraDistance; }
 };

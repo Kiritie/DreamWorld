@@ -77,9 +77,8 @@ void UProcedure_ArchiveChoosing::CreateArchive()
 void UProcedure_ArchiveChoosing::RemoveArchive(int32 InArchiveID)
 {
 	USaveGameModuleBPLibrary::DestroySaveGame<UDWArchiveSaveGame>(InArchiveID);
-	if(USaveGameModuleBPLibrary::GetSaveGame<UDWGeneralSaveGame>()->GetCurrentArchiveID() != InArchiveID)
+	if(USaveGameModuleBPLibrary::GetActiveSaveIndex<UDWArchiveSaveGame>() != InArchiveID)
 	{
-		USaveGameModuleBPLibrary::GetSaveGame<UDWGeneralSaveGame>()->GetArchiveBasicDatas().Remove(InArchiveID);
 		USaveGameModuleBPLibrary::CreateSaveGame<UDWArchiveSaveGame>(-1, true);
 	}
 	UWidgetModuleBPLibrary::GetUserWidget<UWidgetArchiveChoosingPanel>()->Refresh();
@@ -87,10 +86,10 @@ void UProcedure_ArchiveChoosing::RemoveArchive(int32 InArchiveID)
 
 void UProcedure_ArchiveChoosing::ChooseArchive(int32 InArchiveID)
 {
-	if(USaveGameModuleBPLibrary::GetSaveGame<UDWGeneralSaveGame>()->GetCurrentArchiveID() != InArchiveID)
+	if(USaveGameModuleBPLibrary::GetActiveSaveIndex<UDWArchiveSaveGame>() != InArchiveID)
 	{
 		USaveGameModuleBPLibrary::UnloadSaveGame<UDWArchiveSaveGame>();
-		USaveGameModuleBPLibrary::GetSaveGame<UDWGeneralSaveGame>()->SetCurrentArchiveID(InArchiveID);
+		USaveGameModuleBPLibrary::SetActiveSaveIndex<UDWArchiveSaveGame>(InArchiveID);
 	}
 	UProcedureModuleBPLibrary::SwitchProcedureByClass<UProcedure_Loading>();
 }

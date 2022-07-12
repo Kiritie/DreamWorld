@@ -22,6 +22,9 @@ UWidgetInventoryPanel::UWidgetInventoryPanel(const FObjectInitializer& ObjectIni
 	WidgetCategory = EWidgetCategory::Permanent;
 	InputMode = EInputMode::GameAndUI;
 
+	WidgetOpenFinishType = EWidgetOpenFinishType::Procedure;
+	WidgetCloseFinishType = EWidgetCloseFinishType::Procedure;
+
 	DefaultSlotClass = LoadClass<UWidgetInventorySlot>(nullptr, TEXT("WidgetBlueprint'/Game/Blueprints/Widget/Inventory/Slot/WB_InventorySlot.WB_InventorySlot_C'"));
 	EquipSlotClass = LoadClass<UWidgetInventoryEquipSlot>(nullptr, TEXT("WidgetBlueprint'/Game/Blueprints/Widget/Inventory/Slot/WB_InventoryEquipSlot.WB_InventoryEquipSlot_C'"));
 
