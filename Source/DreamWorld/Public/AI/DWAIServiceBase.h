@@ -3,30 +3,18 @@
 #pragma once
 
 #include "DreamWorld/DreamWorld.h"
-#include "BehaviorTree/BTService.h"
+#include "AI/Base/AIServiceBase.h"
 #include "DWAIServiceBase.generated.h"
-
-class ADWCharacter;
-class ADWAIController;
 
 /**
  * AI�������
  */
 UCLASS()
-class DREAMWORLD_API UDWAIServiceBase : public UBTService
+class DREAMWORLD_API UDWAIServiceBase : public UAIServiceBase
 {
 	GENERATED_UCLASS_BODY()
 
 protected:
-	UPROPERTY(Transient)
-	ADWAIController* OwnerController;
-
-	UPROPERTY(Transient)
-	ADWCharacter* OwnerCharacter;
-
-protected:
-	virtual bool InitService(UBehaviorTreeComponent& OwnerComp);
-
 	virtual void OnBecomeRelevant(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
 
 	virtual void OnCeaseRelevant(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;

@@ -3,30 +3,18 @@
 #pragma once
 
 #include "DreamWorld/DreamWorld.h"
-#include "BehaviorTree/BTTaskNode.h"
+#include "AI/Base/AITaskBase.h"
 #include "DWAITaskBase.generated.h"
-
-class ADWAIController;
-class ADWCharacter;
 
 /**
  * AI任务基类
  */
 UCLASS()
-class DREAMWORLD_API UDWAITaskBase : public UBTTaskNode
+class DREAMWORLD_API UDWAITaskBase : public UAITaskBase
 {
 	GENERATED_UCLASS_BODY()
-
-protected:
-	UPROPERTY()
-	ADWAIController* OwnerController;
-
-	UPROPERTY()
-	ADWCharacter* OwnerCharacter;
 	
 protected:
-	virtual bool InitTask(UBehaviorTreeComponent& OwnerComp);
-
 	virtual void TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds) override;
 
 	virtual EBTNodeResult::Type AbortTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;

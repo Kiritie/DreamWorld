@@ -3,17 +3,31 @@
 #pragma once
 
 #include "DreamWorld/DreamWorld.h"
-#include "BehaviorTree/BlackboardData.h"
+#include "AI/Base/AIBlackboardBase.h"
 #include "DWAIBlackboard.generated.h"
 
 /**
  * AI黑板基类
  */
 UCLASS()
-class DREAMWORLD_API UDWAIBlackboard : public UBlackboardData
+class DREAMWORLD_API UDWAIBlackboard : public UAIBlackboardBase
 {
 	GENERATED_BODY()
 	
 public:
 	virtual void PostLoad() override;
+
+	virtual void Initialize(UBlackboardComponent* InComponent, ACharacterBase* InCharacter) override;
+
+	virtual void Refresh() override;
+
+public:
+	BLACKBOARD_VALUE_ACCESSORS_ENUM(CharacterNature);
+	BLACKBOARD_VALUE_ACCESSORS_FLOAT(AttackDistance);
+	BLACKBOARD_VALUE_ACCESSORS_FLOAT(FollowDistance);
+	BLACKBOARD_VALUE_ACCESSORS_FLOAT(PatrolDistance);
+	BLACKBOARD_VALUE_ACCESSORS_FLOAT(PatrolDuration);
+	BLACKBOARD_VALUE_ACCESSORS_OBJECT(TargetCharacter);
+	BLACKBOARD_VALUE_ACCESSORS_BOOL(IsLostTarget);
+	BLACKBOARD_VALUE_ACCESSORS_VECTOR(LostTargetLocation);
 };

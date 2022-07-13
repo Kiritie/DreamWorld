@@ -13,47 +13,27 @@
 #include "Inventory/Inventory.h"
 #include "Inventory/Slot/InventoryEquipSlot.h"
 
-// Sets default values
 ADWEquip::ADWEquip()
 {
-
-}
-
-// Called when the game starts or when spawned
-void ADWEquip::BeginPlay()
-{
-	Super::BeginPlay();
-
-}
-
-// Called every frame
-void ADWEquip::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
 
 }
 
 void ADWEquip::Initialize(AAbilityCharacterBase* InOwnerCharacter)
 {
 	Super::Initialize(InOwnerCharacter);
-	if (GetOwnerCharacter<ADWCharacter>())
+	if (const ADWCharacter* Character = Cast<ADWCharacter>(InOwnerCharacter))
 	{
-		GetOwnerCharacter<ADWCharacter>()->GetInventory()->GetSplitSlots<UInventoryEquipSlot>(ESplitSlotType::Equip)[(int32)GetItemData<UDWEquipData>().PartType];
-		AttachToComponent(OwnerCharacter->GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, *UGlobalBPLibrary::GetEnumValueAuthoredName(TEXT("EEquipPartType"), (int32)GetItemData<UDWEquipData>().PartType));
+		Character->GetInventory()->GetSplitSlots<UInventoryEquipSlot>(ESplitSlotType::Equip)[(int32)GetItemData<UDWEquipData>().PartType]->SetPartType(GetItemData<UDWEquipData>().PartType);
+		AttachToComponent(Character->GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, *UGlobalBPLibrary::GetEnumValueAuthoredName(TEXT("EDWEquipPartType"), (int32)GetItemData<UDWEquipData>().PartType));
 	}
-}
-
-void ADWEquip::SetVisible_Implementation(bool bVisible)
-{
-	GetRootComponent()->SetVisibility(bVisible, true);
 }
 
 void ADWEquip::OnAssemble_Implementation()
 {
-	
+	Super::OnAssemble_Implementation();
 }
 
 void ADWEquip::OnDischarge_Implementation()
 {
-	
+	Super::OnDischarge_Implementation();
 }

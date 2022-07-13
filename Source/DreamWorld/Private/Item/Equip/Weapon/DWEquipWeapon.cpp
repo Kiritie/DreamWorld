@@ -7,12 +7,8 @@
 #include "Character/DWCharacter.h"
 #include "Components/StaticMeshComponent.h"
 
-// Sets default values
 ADWEquipWeapon::ADWEquipWeapon()
 {
-	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = false;
-
 	BoxComponent = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxComponent"));
 	BoxComponent->SetupAttachment(RootComponent);
 	BoxComponent->SetRelativeLocationAndRotation(FVector(40, 0, 0), FRotator(0, 0, 0));
@@ -23,23 +19,13 @@ ADWEquipWeapon::ADWEquipWeapon()
 	BoxComponent->OnComponentBeginOverlap.AddDynamic(this, &ADWEquipWeapon::OnBeginOverlap);
 }
 
-// Called when the game starts or when spawned
-void ADWEquipWeapon::BeginPlay()
-{
-	Super::BeginPlay();
-
-}
-
 void ADWEquipWeapon::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	OnHitTarget(OverlappedComponent, OtherActor, OtherComp, OtherBodyIndex, bFromSweep, SweepResult);
 }
 
-// Called every frame
-void ADWEquipWeapon::Tick(float DeltaTime)
+void ADWEquipWeapon::OnHitTarget_Implementation(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	Super::Tick(DeltaTime);
-
 }
 
 void ADWEquipWeapon::SetCollisionEnable(bool InValue)

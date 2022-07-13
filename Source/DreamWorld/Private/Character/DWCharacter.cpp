@@ -42,6 +42,7 @@
 #include "Ability/Item/Skill/AbilitySkillBase.h"
 #include "Ability/Item/Skill/AbilitySkillDataBase.h"
 #include "Ability/PickUp/AbilityPickUpBase.h"
+#include "AI/DWAIBlackboard.h"
 #include "Asset/AssetModuleBPLibrary.h"
 #include "BehaviorTree/BehaviorTree.h"
 #include "BehaviorTree/BlackboardData.h"
@@ -114,8 +115,6 @@ ADWCharacter::ADWCharacter()
 	FSM->States.Add(UDWCharacterState_Swim::StaticClass());
 	FSM->States.Add(UDWCharacterState_Walk::StaticClass());
 	FSM->DefaultState = UDWCharacterState_Default::StaticClass();
-	
-	BehaviorTree = nullptr;
 
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96);
@@ -964,7 +963,7 @@ void ADWCharacter::RefreshEquip(EDWEquipPartType InPartType, UInventoryEquipSlot
 		Equips[InPartType] = UObjectPoolModuleBPLibrary::SpawnObject<AAbilityEquipBase>(nullptr, EquipSlot->GetItem().GetData<UAbilityEquipDataBase>().EquipClass);
 		if (Equips[InPartType])
 		{
-			Equips[InPartType]->Initialize(this);
+			Equips[InPartType]->Initialize(this, EquipSlot->GetItem());
 			Equips[InPartType]->OnAssemble();
 		}
 	}
@@ -1211,26 +1210,6 @@ void ADWCharacter::SetDamageAble(bool bInDamaging)
 UInventory* ADWCharacter::GetInventory() const
 {
 	return Inventory;
-}
-
-bool ADWCharacter::HasBehaviorTree() const
-{
-	return GetCharacterData<UDWCharacterData>().BehaviorTreeAsset != nullptr;
-}
-
-UBehaviorTree* ADWCharacter::GetBehaviorTree()
-{
-	const UDWCharacterData& CharacterData = GetCharacterData<UDWCharacterData>();
-	if (!BehaviorTree)
-	{
-		BehaviorTree = DuplicateObject<UBehaviorTree>(CharacterData.BehaviorTreeAsset, this);
-		if(BehaviorTree)
-		{
-			UBlackboardData* Blackboard = DuplicateObject<UBlackboardData>(CharacterData.BehaviorTreeAsset->BlackboardAsset, nullptr);
-			BehaviorTree->BlackboardAsset = Blackboard;
-		}
-	}
-	return BehaviorTree;
 }
 
 UWidgetCharacterHP* ADWCharacter::GetWidgetCharacterHPWidget() const
@@ -1926,6 +1905,11 @@ UDWCharacterPart* ADWCharacter::GetCharacterPart(EDWCharacterPartType InCharacte
 		}
 	}
 	return nullptr;
+}
+
+UBehaviorTree* ADWCharacter::GetBehaviorTreeAsset() const
+{
+	return GetCharacterData<UDWCharacterData>().BehaviorTreeAsset;
 }
 
 void ADWCharacter::OnInventorySlotSelected(UInventorySlot* InInventorySlot)

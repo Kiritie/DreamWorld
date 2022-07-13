@@ -32,14 +32,14 @@ void UDWAITask_AIFollow::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* Node
 {
 	if (!InitTask(OwnerComp)) return;
 
-	OwnerCharacter->DoAIMove(TargetCharacter, TargetDistance, true);
+	GetOwnerCharacter<ADWCharacter>()->DoAIMove(TargetCharacter, TargetDistance, true);
 }
 
 EBTNodeResult::Type UDWAITask_AIFollow::AbortTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
 	if (!InitTask(OwnerComp)) return EBTNodeResult::Failed;
 
-	OwnerCharacter->SetLockedTarget(nullptr);
+	GetOwnerCharacter<ADWCharacter>()->SetLockedTarget(nullptr);
 
 	return EBTNodeResult::Aborted;
 }
@@ -48,7 +48,7 @@ EBTNodeResult::Type UDWAITask_AIFollow::ExecuteTask(UBehaviorTreeComponent& Owne
 {
 	if (!InitTask(OwnerComp)) return EBTNodeResult::Failed;
 
-	OwnerCharacter->SetMotionRate(1, 1);
+	GetOwnerCharacter<ADWCharacter>()->SetMotionRate(1, 1);
 
 	return EBTNodeResult::InProgress;
 }

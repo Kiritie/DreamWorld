@@ -2,65 +2,39 @@
 
 
 #include "AI/DWAIBlackboard.h"
+
 #include "Character/DWCharacter.h"
-#include "BehaviorTree/Blackboard/BlackboardKeyType_Object.h"
-#include "BehaviorTree/Blackboard/BlackboardKeyType_Enum.h"
-#include "BehaviorTree/Blackboard/BlackboardKeyType_Vector.h"
-#include "BehaviorTree/Blackboard/BlackboardKeyType_Bool.h"
-#include "BehaviorTree/Blackboard/BlackboardKeyType_Float.h"
 
 void UDWAIBlackboard::PostLoad()
 {
 	Super::PostLoad();
 
-	// FBlackboardEntry CharacterNature;
-	// CharacterNature.EntryName = FName("CharacterNature");
-	// UBlackboardKeyType_Enum* CharacterNatureKeyType = NewObject<UBlackboardKeyType_Enum>();
-	// CharacterNatureKeyType->EnumType = FindObject<UEnum>(ANY_PACKAGE, *FString("ECharacterNature"), true);
-	// CharacterNatureKeyType->EnumName = TEXT("ECharacterNature");
-	// CharacterNature.KeyType = CharacterNatureKeyType;
-	// Keys.Add(CharacterNature);
-	//
-	// FBlackboardEntry AttackDistance;
-	// AttackDistance.EntryName = FName("AttackDistance");
-	// UBlackboardKeyType_Float* AttackDistanceKeyType = NewObject<UBlackboardKeyType_Float>();
-	// AttackDistance.KeyType = AttackDistanceKeyType;
-	// Keys.Add(AttackDistance);
-	//
-	// FBlackboardEntry FollowDistance;
-	// FollowDistance.EntryName = FName("FollowDistance");
-	// UBlackboardKeyType_Float* FollowDistanceKeyType = NewObject<UBlackboardKeyType_Float>();
-	// FollowDistance.KeyType = FollowDistanceKeyType;
-	// Keys.Add(FollowDistance);
-	// 	
-	// FBlackboardEntry PatrolDistance;
-	// PatrolDistance.EntryName = FName("PatrolDistance");
-	// UBlackboardKeyType_Float* PatrolDistanceKeyType = NewObject<UBlackboardKeyType_Float>();
-	// PatrolDistance.KeyType = PatrolDistanceKeyType;
-	// Keys.Add(PatrolDistance);
-	// 		
-	// FBlackboardEntry PatrolDuration;
-	// PatrolDuration.EntryName = FName("PatrolDuration");
-	// UBlackboardKeyType_Float* PatrolDurationKeyType = NewObject<UBlackboardKeyType_Float>();
-	// PatrolDuration.KeyType = PatrolDurationKeyType;
-	// Keys.Add(PatrolDuration);
-	//
-	// FBlackboardEntry TargetCharacter;
-	// TargetCharacter.EntryName = FName("TargetCharacter");
-	// UBlackboardKeyType_Object* TargetCharacterKeyType = NewObject<UBlackboardKeyType_Object>();
-	// TargetCharacterKeyType->BaseClass = ADWCharacter::StaticClass();
-	// TargetCharacter.KeyType = TargetCharacterKeyType;
-	// Keys.Add(TargetCharacter);
-	//
-	// FBlackboardEntry IsLostTarget;
-	// IsLostTarget.EntryName = FName("IsLostTarget");
-	// UBlackboardKeyType_Bool* IsLostTargetKeyType = NewObject<UBlackboardKeyType_Bool>();
-	// IsLostTarget.KeyType = IsLostTargetKeyType;
-	// Keys.Add(IsLostTarget);
-	//
-	// FBlackboardEntry LostTargetLocation;
-	// LostTargetLocation.EntryName = FName("LostTargetLocation");
-	// UBlackboardKeyType_Vector* LostTargetLocationKeyType = NewObject<UBlackboardKeyType_Vector>();
-	// LostTargetLocation.KeyType = LostTargetLocationKeyType;
-	// Keys.Add(LostTargetLocation);
+	// BLACKBOARD_VALUE_GENERATE_ENUM(CharacterNature, EDWCharacterNature);
+	// BLACKBOARD_VALUE_GENERATE_FLOAT(AttackDistance);
+	// BLACKBOARD_VALUE_GENERATE_FLOAT(FollowDistance);
+	// BLACKBOARD_VALUE_GENERATE_FLOAT(PatrolDistance);
+	// BLACKBOARD_VALUE_GENERATE_FLOAT(PatrolDuration);
+	// BLACKBOARD_VALUE_GENERATE_OBJECT(TargetCharacter, ADWCharacter);
+	// BLACKBOARD_VALUE_GENERATE_BOOL(IsLostTarget);
+	// BLACKBOARD_VALUE_GENERATE_VECTOR(LostTargetLocation);
+}
+
+void UDWAIBlackboard::Initialize(UBlackboardComponent* InComponent, ACharacterBase* InCharacter)
+{
+	Super::Initialize(InComponent, InCharacter);
+
+	SetTargetCharacter(nullptr);
+	SetIsLostTarget(false);
+	SetLostTargetLocation(FVector::ZeroVector);
+}
+
+void UDWAIBlackboard::Refresh()
+{
+	Super::Refresh();
+
+	SetCharacterNature((uint8)GetCharacter<ADWCharacter>()->GetNature());
+	SetAttackDistance(GetCharacter<ADWCharacter>()->GetAttackDistance());
+	SetFollowDistance(GetCharacter<ADWCharacter>()->GetFollowDistance());
+	SetPatrolDistance(GetCharacter<ADWCharacter>()->GetPatrolDistance());
+	SetPatrolDuration(GetCharacter<ADWCharacter>()->GetPatrolDuration());
 }

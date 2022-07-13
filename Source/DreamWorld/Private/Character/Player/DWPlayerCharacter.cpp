@@ -45,6 +45,7 @@
 #include "Ability/Item/Skill/AbilitySkillDataBase.h"
 #include "Ability/AbilityModuleBPLibrary.h"
 #include "Ability/AbilityModuleTypes.h"
+#include "Ability/Components/CharacterInteractionComponent.h"
 #include "Character/Player/States/DWPlayerCharacterState_Attack.h"
 #include "Character/Player/States/DWPlayerCharacterState_Death.h"
 #include "Character/Player/States/DWPlayerCharacterState_Default.h"
@@ -761,7 +762,9 @@ void ADWPlayerCharacter::ReleaseSkillAbility4()
 
 void ADWPlayerCharacter::DoInteractAction1()
 {
-	if(UInteractionComponent* InteractionAgent = GetInteractionComponent()->GetInteractionAgent()->GetInteractionComponent())
+	if(!Interaction->GetInteractionAgent()) return;
+	
+	if(UInteractionComponent* InteractionAgent = Interaction->GetInteractionAgent()->GetInteractionComponent())
 	{
 		if(InteractionAgent->GetValidInteractActions(this).IsValidIndex(0))
 		{
@@ -772,7 +775,9 @@ void ADWPlayerCharacter::DoInteractAction1()
 
 void ADWPlayerCharacter::DoInteractAction2()
 {
-	if(UInteractionComponent* InteractionAgent = GetInteractionComponent()->GetInteractionAgent()->GetInteractionComponent())
+	if(!Interaction->GetInteractionAgent()) return;
+	
+	if(UInteractionComponent* InteractionAgent = Interaction->GetInteractionAgent()->GetInteractionComponent())
 	{
 		if(InteractionAgent->GetValidInteractActions(this).IsValidIndex(1))
 		{
@@ -783,7 +788,9 @@ void ADWPlayerCharacter::DoInteractAction2()
 
 void ADWPlayerCharacter::DoInteractAction3()
 {
-	if(UInteractionComponent* InteractionAgent = GetInteractionComponent()->GetInteractionAgent()->GetInteractionComponent())
+	if(!Interaction->GetInteractionAgent()) return;
+	
+	if(UInteractionComponent* InteractionAgent = Interaction->GetInteractionAgent()->GetInteractionComponent())
 	{
 		if(InteractionAgent->GetValidInteractActions(this).IsValidIndex(2))
 		{
@@ -794,7 +801,9 @@ void ADWPlayerCharacter::DoInteractAction3()
 
 void ADWPlayerCharacter::DoInteractAction4()
 {
-	if(UInteractionComponent* InteractionAgent = GetInteractionComponent()->GetInteractionAgent()->GetInteractionComponent())
+	if(!Interaction->GetInteractionAgent()) return;
+	
+	if(UInteractionComponent* InteractionAgent = Interaction->GetInteractionAgent()->GetInteractionComponent())
 	{
 		if(InteractionAgent->GetValidInteractActions(this).IsValidIndex(3))
 		{
@@ -805,7 +814,9 @@ void ADWPlayerCharacter::DoInteractAction4()
 
 void ADWPlayerCharacter::DoInteractAction5()
 {
-	if(UInteractionComponent* InteractionAgent = GetInteractionComponent()->GetInteractionAgent()->GetInteractionComponent())
+	if(!Interaction->GetInteractionAgent()) return;
+	
+	if(UInteractionComponent* InteractionAgent = Interaction->GetInteractionAgent()->GetInteractionComponent())
 	{
 		if(InteractionAgent->GetValidInteractActions(this).IsValidIndex(4))
 		{

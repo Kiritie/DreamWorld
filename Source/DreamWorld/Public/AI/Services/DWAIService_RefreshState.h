@@ -4,7 +4,6 @@
 
 #include "DreamWorld/DreamWorld.h"
 #include "AI/DWAIServiceBase.h"
-#include "../../DWTypes.h"
 #include "DWAIService_RefreshState.generated.h"
 
 class ADWCharacter;

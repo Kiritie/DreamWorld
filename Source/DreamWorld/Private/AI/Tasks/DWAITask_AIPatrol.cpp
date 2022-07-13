@@ -33,7 +33,7 @@ void UDWAITask_AIPatrol::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* Node
 	{
 		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
 	}
-	else if (OwnerCharacter->DoAIMove(PatrolLocation))
+	else if (GetOwnerCharacter<ADWCharacter>()->DoAIMove(PatrolLocation))
 	{
 		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
 	}
@@ -50,13 +50,13 @@ EBTNodeResult::Type UDWAITask_AIPatrol::ExecuteTask(UBehaviorTreeComponent& Owne
 {
 	if (!InitTask(OwnerComp)) return EBTNodeResult::Failed;
 
-	OwnerCharacter->SetMotionRate(0.3f, 0.5f);
+	GetOwnerCharacter<ADWCharacter>()->SetMotionRate(0.3f, 0.5f);
 
 	PatrolDistance = OwnerComp.GetBlackboardComponent()->GetValueAsFloat(PatrolDistanceKey.SelectedKeyName);
 	PatrolDuration= OwnerComp.GetBlackboardComponent()->GetValueAsFloat(PatrolDurationKey.SelectedKeyName);
 
 	PatrolDuration = FMath::RandRange(PatrolDuration - 2, PatrolDuration + 2);
-	PatrolLocation = OwnerCharacter->GetBirthLocation() + FRotator(0, FMath::RandRange(0, 360), 0).Vector() * FMath::FRandRange(0, PatrolDistance);
+	PatrolLocation = GetOwnerCharacter<ADWCharacter>()->GetBirthLocation() + FRotator(0, FMath::RandRange(0, 360), 0).Vector() * FMath::FRandRange(0, PatrolDistance);
 
 	return EBTNodeResult::InProgress;
 }

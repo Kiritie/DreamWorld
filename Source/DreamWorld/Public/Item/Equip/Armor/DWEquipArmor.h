@@ -2,27 +2,18 @@
 
 #pragma once
 
-#include "Ability/Item/Equip/AbilityEquipBase.h"
 #include "DreamWorld/DreamWorld.h"
+#include "Item/Equip/DWEquip.h"
 #include "DWEquipArmor.generated.h"
 
 /**
  * ����
  */
 UCLASS()
-class DREAMWORLD_API ADWEquipArmor : public AAbilityEquipBase
+class DREAMWORLD_API ADWEquipArmor : public ADWEquip
 {
 	GENERATED_BODY()
 	
 public:	
-	// Sets default values for this actor's properties
 	ADWEquipArmor();
-
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-
-public:
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
 };

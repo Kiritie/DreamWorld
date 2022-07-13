@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include "Ability/Item/Equip/AbilityEquipBase.h"
 #include "DreamWorld/DreamWorld.h"
+#include "Item/Equip/DWEquip.h"
 #include "DWEquipWeapon.generated.h"
 
 class UBoxComponent;
@@ -12,12 +12,11 @@ class UBoxComponent;
  * ����
  */
 UCLASS()
-class DREAMWORLD_API ADWEquipWeapon : public AAbilityEquipBase
+class DREAMWORLD_API ADWEquipWeapon : public ADWEquip
 {
 	GENERATED_BODY()
 
 public:
-	// Sets default values for this actor's properties
 	ADWEquipWeapon();
 
 protected:
@@ -25,19 +24,13 @@ protected:
 	UBoxComponent* BoxComponent;
 
 protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-		
 	UFUNCTION()
-	virtual void OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
-			
-	UFUNCTION(BlueprintImplementableEvent)
+	void OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
+	
+	UFUNCTION(BlueprintNativeEvent)
 	void OnHitTarget(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
 
 public:
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
 	UFUNCTION(BlueprintCallable)
 	void SetCollisionEnable(bool InValue);
 	

@@ -3,6 +3,7 @@
 #include "Main/DWMainModule.h"
 
 #include "Ability/AbilityModule.h"
+#include "AI/AIModule.h"
 #include "Asset/AssetModule.h"
 #include "Audio/AudioModule.h"
 #include "Camera/CameraModule.h"
@@ -33,6 +34,7 @@ ADWMainModule::ADWMainModule()
 
 	ModuleClasses = TArray<TSubclassOf<AModuleBase>>();
 	ModuleClasses.Add(AAbilityModule::StaticClass());
+	ModuleClasses.Add(AAIModule::StaticClass());
 	ModuleClasses.Add(AAssetModule::StaticClass());
 	ModuleClasses.Add(AAudioModule::StaticClass());
 	ModuleClasses.Add(ACameraModule::StaticClass());

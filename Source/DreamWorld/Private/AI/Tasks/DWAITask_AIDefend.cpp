@@ -32,9 +32,9 @@ void UDWAITask_AIDefend::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* Node
 	AIMoveRemainTime -= DeltaSeconds;
 	if (AIMoveRemainTime <= 0)
 	{
-		//AIMoveLocation = OwnerCharacter->GetPatrolLocation(AIMoveRemainTime);
+		//AIMoveLocation = GetOwnerCharacter<ADWCharacter>()->GetPatrolLocation(AIMoveRemainTime);
 	}
-	if (OwnerCharacter->DoAIMove(AIMoveLocation))
+	if (GetOwnerCharacter<ADWCharacter>()->DoAIMove(AIMoveLocation))
 	{
 		AIMoveRemainTime = FMath::FRandRange(1.f, 2.f);
 	}
@@ -44,8 +44,8 @@ EBTNodeResult::Type UDWAITask_AIDefend::AbortTask(UBehaviorTreeComponent& OwnerC
 {
 	if (!InitTask(OwnerComp)) return EBTNodeResult::Failed;
 
-	OwnerCharacter->UnDefend();
-	OwnerCharacter->SetLockedTarget(nullptr);
+	GetOwnerCharacter<ADWCharacter>()->UnDefend();
+	GetOwnerCharacter<ADWCharacter>()->SetLockedTarget(nullptr);
 
 	return EBTNodeResult::Aborted;
 }
@@ -54,10 +54,10 @@ EBTNodeResult::Type UDWAITask_AIDefend::ExecuteTask(UBehaviorTreeComponent& Owne
 {
 	if (!InitTask(OwnerComp)) return EBTNodeResult::Failed;
 
-	OwnerCharacter->Defend();
-	OwnerCharacter->SetLockedTarget(DefendTarget);
+	GetOwnerCharacter<ADWCharacter>()->Defend();
+	GetOwnerCharacter<ADWCharacter>()->SetLockedTarget(DefendTarget);
 
-	//OwnerCharacter->SetMotionRate(1, 1);
+	//GetOwnerCharacter<ADWCharacter>()->SetMotionRate(1, 1);
 
 	return EBTNodeResult::InProgress;
 }

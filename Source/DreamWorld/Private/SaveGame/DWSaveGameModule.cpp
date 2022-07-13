@@ -7,8 +7,8 @@
 #include "Debug/DebugModuleTypes.h"
 #include "Gameplay/DWPlayerController.h"
 #include "Kismet/GameplayStatics.h"
-#include "SaveGame/DWArchiveSaveGame.h"
-#include "SaveGame/DWGeneralSaveGame.h"
+#include "SaveGame/Archive/DWArchiveSaveGame.h"
+#include "SaveGame/General/DWGeneralSaveGame.h"
 #include "SaveGame/SaveGameModuleBPLibrary.h"
 
 // ParamSets default values

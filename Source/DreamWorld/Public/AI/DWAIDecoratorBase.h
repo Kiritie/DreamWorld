@@ -3,17 +3,14 @@
 #pragma once
 
 #include "DreamWorld/DreamWorld.h"
-#include "BehaviorTree/BTDecorator.h"
+#include "AI/Base/AIDecoratorBase.h"
 #include "DWAIDecoratorBase.generated.h"
-
-class ADWAIController;
-class ADWCharacter;
 
 /**
  * AIװ��������
  */
 UCLASS()
-class DREAMWORLD_API UDWAIDecoratorBase : public UBTDecorator
+class DREAMWORLD_API UDWAIDecoratorBase : public UAIDecoratorBase
 {
 	GENERATED_UCLASS_BODY()
 	

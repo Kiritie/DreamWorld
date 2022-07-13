@@ -109,9 +109,6 @@ protected:
 	UWidgetCharacterHPComponent* WidgetCharacterHP;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-	UBehaviorTree* BehaviorTree;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	UCharacterInventory* Inventory;
 
 protected:
@@ -370,12 +367,6 @@ public:
 	UFUNCTION(BlueprintPure)
 	virtual UInventory* GetInventory() const override;
 
-	UFUNCTION(BlueprintPure)
-	bool HasBehaviorTree() const;
-
-	UFUNCTION(BlueprintPure)
-	UBehaviorTree* GetBehaviorTree();
-	
 	UFUNCTION(BlueprintPure)
 	UWidgetCharacterHP* GetWidgetCharacterHPWidget() const;
 
@@ -668,6 +659,8 @@ public:
 
 	UFUNCTION(BlueprintPure)
 	UDWCharacterPart* GetCharacterPart(EDWCharacterPartType InCharacterPartType) const;
+
+	virtual UBehaviorTree* GetBehaviorTreeAsset() const override;
 
 public:
 	UFUNCTION()

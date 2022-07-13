@@ -16,60 +16,45 @@
 
 ADWAIController::ADWAIController()
 {
-	bAttachToPawn = true;
-
-	AIPerception = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("AIPerception"));
-	AIPerception->OnTargetPerceptionUpdated.AddDynamic(this, &ADWAIController::OnTargetPerceptionUpdated);
-
-	FAISenseAffiliationFilter affiliationFilter;
-	affiliationFilter.bDetectEnemies = true;
-	affiliationFilter.bDetectFriendlies = true;
-	affiliationFilter.bDetectNeutrals = true;
-
-	auto sightSenseConfig = CreateDefaultSubobject<UAISenseConfig_Sight>(TEXT("SightSenseConfig"));
-	sightSenseConfig->SightRadius = 1000;
-	sightSenseConfig->LoseSightRadius = 1200;
-	sightSenseConfig->PeripheralVisionAngleDegrees = 90;
-	sightSenseConfig->DetectionByAffiliation = affiliationFilter;
-	sightSenseConfig->SetMaxAge(5);
-	AIPerception->ConfigureSense(*sightSenseConfig);
-	AIPerception->SetDominantSense(*sightSenseConfig->GetSenseImplementation());
-
-	const auto damageSenseConfig = CreateDefaultSubobject<UAISenseConfig_Damage>(TEXT("DamageSenseConfig"));
-	AIPerception->ConfigureSense(*damageSenseConfig);
-
-	bLostPerceptionTarget = false;
-	RedirectRemainTime = 0;
+	
 }
 
 void ADWAIController::OnPossess(APawn* InPawn)
 {
 	Super::OnPossess(InPawn);
-
-	if (GetPossessedCharacter())
-	{
-		if (GetPossessedCharacter()->HasBehaviorTree())
-		{
-			RunBehaviorTree(GetPossessedCharacter()->GetBehaviorTree());
-
-			SetCharacterNature(GetPossessedCharacter()->GetNature());
-			SetAttackDistance(GetPossessedCharacter()->GetAttackDistance());
-			SetFollowDistance(GetPossessedCharacter()->GetFollowDistance());
-			SetPatrolDistance(GetPossessedCharacter()->GetPatrolDistance());
-			SetPatrolDuration(GetPossessedCharacter()->GetPatrolDuration());
-			SetTargetCharacter(nullptr);
-			SetLostTarget(false);
-		}
-	}
 }
 
 void ADWAIController::OnUnPossess()
 {
 	Super::OnUnPossess();
+}
 
-	if (GetBrainComponent() && GetBrainComponent()->IsA(UBehaviorTreeComponent::StaticClass()))
+void ADWAIController::OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus)
+{
+	Super::OnTargetPerceptionUpdated(Actor, Stimulus);
+
+	ADWCharacter* OwnerCharacter = GetPawn<ADWCharacter>();
+	
+	ADWCharacter* TargetCharacter = Cast<ADWCharacter>(Actor);
+	
+	if (TargetCharacter && TargetCharacter != OwnerCharacter && !TargetCharacter->IsDead())
 	{
-		Cast<UBehaviorTreeComponent>(GetBrainComponent())->StopTree();
+		if (Stimulus.WasSuccessfullySensed())
+		{
+			if (!GetTargetCharacter())
+			{
+				SetTargetCharacter(TargetCharacter);
+				SetLostTarget(false);
+			}
+			else if(TargetCharacter == GetTargetCharacter())
+			{
+				SetLostTarget(false);
+			}
+		}
+		else if(TargetCharacter == GetTargetCharacter())
+		{
+			SetLostTarget(true, TargetCharacter->GetActorLocation());
+		}
 	}
 }
 
@@ -87,123 +72,70 @@ void ADWAIController::OnTargetCharacterStateChanged(UFiniteStateBase* InFiniteSt
 	}
 }
 
-void ADWAIController::OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus)
-{
-	if (!GetPossessedCharacter()) return;
-	
-	ADWCharacter* character = Cast<ADWCharacter>(Actor);
-	
-	if (character && character != GetPossessedCharacter() && !character->IsDead())
-	{
-		if (Stimulus.WasSuccessfullySensed())
-		{
-			if (!GetTargetCharacter())
-			{
-				SetTargetCharacter(character);
-				SetLostTarget(false);
-			}
-			else if(character == GetTargetCharacter())
-			{
-				SetLostTarget(false);
-			}
-		}
-		else if(character == GetTargetCharacter())
-		{
-			SetLostTarget(true, character->GetActorLocation());
-		}
-	}
-}
-
 EDWCharacterNature ADWAIController::GetCharacterNature() const
 {
-	if(!GetBlackboardComponent()) return EDWCharacterNature::AIFriendly;
-
-	return (EDWCharacterNature)GetBlackboardComponent()->GetValueAsEnum(FName("CharacterNature"));
+	return (EDWCharacterNature)GetBlackboard<UDWAIBlackboard>()->GetCharacterNature();
 }
 
 void ADWAIController::SetCharacterNature(EDWCharacterNature InCharacterNature)
 {
-	if(!GetBlackboardComponent()) return;
-
-	GetBlackboardComponent()->SetValueAsEnum(FName("CharacterNature"), (uint8)InCharacterNature);
+	GetBlackboard<UDWAIBlackboard>()->SetCharacterNature((uint8)InCharacterNature);
 }
 
 float ADWAIController::GetAttackDistance() const
 {
-	if(!GetBlackboardComponent()) return 0.f;
-
-	return GetBlackboardComponent()->GetValueAsFloat(FName("AttackDistance"));
+	return GetBlackboard<UDWAIBlackboard>()->GetAttackDistance();
 }
 
 void ADWAIController::SetAttackDistance(float InAttackDistance)
 {
-	if(!GetBlackboardComponent()) return;
-
-	GetBlackboardComponent()->SetValueAsFloat(FName("AttackDistance"), InAttackDistance);
+	GetBlackboard<UDWAIBlackboard>()->SetAttackDistance(InAttackDistance);
 }
 
 float ADWAIController::GetFollowDistance() const
 {
-	if(!GetBlackboardComponent()) return 0.f;
-
-	return GetBlackboardComponent()->GetValueAsFloat(FName("FollowDistance"));
+	return GetBlackboard<UDWAIBlackboard>()->GetFollowDistance();
 }
 
 void ADWAIController::SetFollowDistance(float InFollowDistance)
 {
-	if(!GetBlackboardComponent()) return;
-
-	GetBlackboardComponent()->SetValueAsFloat(FName("FollowDistance"), InFollowDistance);
+	GetBlackboard<UDWAIBlackboard>()->SetFollowDistance(InFollowDistance);
 }
 
 float ADWAIController::GetPatrolDistance() const
 {
-	if(!GetBlackboardComponent()) return 0.f;
-
-	return GetBlackboardComponent()->GetValueAsFloat(FName("PatrolDistance"));
+	return GetBlackboard<UDWAIBlackboard>()->GetPatrolDistance();
 }
 
 void ADWAIController::SetPatrolDistance(float InPatrolDistance)
 {
-	if(!GetBlackboardComponent()) return;
-
-	GetBlackboardComponent()->SetValueAsFloat(FName("PatrolDistance"), InPatrolDistance);
+	GetBlackboard<UDWAIBlackboard>()->SetPatrolDistance(InPatrolDistance);
 }
 
 float ADWAIController::GetPatrolDuration() const
 {
-	if(!GetBlackboardComponent()) return 0.f;
-
-	return GetBlackboardComponent()->GetValueAsFloat(FName("PatrolDuration"));
+	return GetBlackboard<UDWAIBlackboard>()->GetPatrolDuration();
 }
 
 void ADWAIController::SetPatrolDuration(float InPatrolDuration)
 {
-	if(!GetBlackboardComponent()) return;
-
-	GetBlackboardComponent()->SetValueAsFloat(FName("PatrolDuration"), InPatrolDuration);
+	GetBlackboard<UDWAIBlackboard>()->SetPatrolDuration(InPatrolDuration);
 }
 
 bool ADWAIController::IsLostTarget() const
 {
-	if(!GetBlackboardComponent()) return false;
-
-	return GetBlackboardComponent()->GetValueAsBool(FName("IsLostTarget"));
+	return GetBlackboard<UDWAIBlackboard>()->GetIsLostTarget();
 }
 
 void ADWAIController::SetLostTarget(bool bLostTarget, FVector InLostTargetLocation /*= FVector::ZeroVector*/)
 {
-	if(!GetBlackboardComponent()) return;
-
-	GetBlackboardComponent()->SetValueAsBool(FName("IsLostTarget"), bLostTarget);
-	GetBlackboardComponent()->SetValueAsVector(FName("LostTargetLocation"), InLostTargetLocation);
+	GetBlackboard<UDWAIBlackboard>()->SetIsLostTarget(bLostTarget);
+	GetBlackboard<UDWAIBlackboard>()->SetLostTargetLocation(InLostTargetLocation);
 }
 
 ADWCharacter* ADWAIController::GetTargetCharacter() const
 {
-	if(!GetBlackboardComponent()) return nullptr;
-	
-	return Cast<ADWCharacter>(GetBlackboardComponent()->GetValueAsObject(FName("TargetCharacter")));
+	return Cast<ADWCharacter>(GetBlackboard<UDWAIBlackboard>()->GetTargetCharacter());
 }
 
 void ADWAIController::SetTargetCharacter(ADWCharacter* InTargetCharacter)
@@ -219,10 +151,5 @@ void ADWAIController::SetTargetCharacter(ADWCharacter* InTargetCharacter)
 		InTargetCharacter->GetFSMComponent()->OnStateChanged.AddDynamic(this, &ADWAIController::OnTargetCharacterStateChanged);
 	}
 
-	GetBlackboardComponent()->SetValueAsObject(FName("TargetCharacter"), InTargetCharacter);
-}
-
-ADWCharacter* ADWAIController::GetPossessedCharacter() const
-{
-	return Cast<ADWCharacter>(GetPawn());
+	GetBlackboard<UDWAIBlackboard>()->SetTargetCharacter(InTargetCharacter);
 }

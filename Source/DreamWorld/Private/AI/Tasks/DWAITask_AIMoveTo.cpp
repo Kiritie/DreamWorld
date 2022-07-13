@@ -48,14 +48,14 @@ void UDWAITask_AIMoveTo::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* Node
 
 	if (TargetKey.SelectedKeyType == UBlackboardKeyType_Vector::StaticClass())
 	{
-		if(OwnerCharacter->DoAIMove(TargetLocation, TargetDistance))
+		if(GetOwnerCharacter<ADWCharacter>()->DoAIMove(TargetLocation, TargetDistance))
 		{
 			FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
 		}
 	}
 	else
 	{
-		if(OwnerCharacter->DoAIMove(TargetCharacter, TargetDistance))
+		if(GetOwnerCharacter<ADWCharacter>()->DoAIMove(TargetCharacter, TargetDistance))
 		{
 			FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
 		}
@@ -81,8 +81,8 @@ EBTNodeResult::Type UDWAITask_AIMoveTo::ExecuteTask(UBehaviorTreeComponent& Owne
 	if (!InitTask(OwnerComp)) return EBTNodeResult::Failed;
 
 	LocalRemainTime = DurationTime;
-	OwnerCharacter->SetMotionRate(0.7f, 0.7f);
-	OwnerCharacter->SetLockedTarget(nullptr);
+	GetOwnerCharacter<ADWCharacter>()->SetMotionRate(0.7f, 0.7f);
+	GetOwnerCharacter<ADWCharacter>()->SetLockedTarget(nullptr);
 	
 	return EBTNodeResult::InProgress;
 }

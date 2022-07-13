@@ -1,14 +1,12 @@
 // Copyright 1998-2019 Epic Games, Inc. All Rights Reserved.
 
-#include "SaveGame/DWArchiveSaveGame.h"
-
+#include "SaveGame/Archive/DWArchiveSaveGame.h"
 #include "Character/Player/DWPlayerCharacter.h"
 #include "Debug/DebugModuleTypes.h"
 #include "Gameplay/DWPlayerController.h"
 #include "Global/GlobalBPLibrary.h"
 #include "Kismet/GameplayStatics.h"
 #include "Main/MainModule.h"
-#include "SaveGame/DWGeneralSaveGame.h"
 #include "SaveGame/DWSaveGameModule.h"
 #include "SaveGame/SaveGameModuleBPLibrary.h"
 #include "Voxel/VoxelModule.h"

@@ -3,13 +3,9 @@
 #pragma once
 
 #include "DreamWorld/DreamWorld.h"
-#include "AIController.h"
+#include "AI/Base/AIControllerBase.h"
 #include "Perception/AIPerceptionTypes.h"
 #include "DWAIController.generated.h"
-
-class UFiniteStateBase;
-class ADWCharacter;
-class UBehaviorTreeComponent;
 
 DECLARE_DELEGATE_TwoParams(FDWAIPerceptionUpdated, ADWCharacter*, bool)
 
@@ -17,7 +13,7 @@ DECLARE_DELEGATE_TwoParams(FDWAIPerceptionUpdated, ADWCharacter*, bool)
  * AI����������
  */
 UCLASS()
-class DREAMWORLD_API ADWAIController : public AAIController
+class DREAMWORLD_API ADWAIController : public AAIControllerBase
 {
     GENERATED_BODY()
 
@@ -25,27 +21,17 @@ public:
     ADWAIController();
 
 protected:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-	UAIPerceptionComponent* AIPerception;
-
-private:
-	bool bLostPerceptionTarget;
-
-	float RedirectRemainTime;
-
-protected:
 	virtual void OnPossess(APawn* InPawn) override;
 
 	virtual void OnUnPossess() override;
+
+	virtual void OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus) override;
 
 public:
 	virtual void Tick(float DeltaTime) override;
 
 	UFUNCTION()
 	virtual void OnTargetCharacterStateChanged(UFiniteStateBase* InFiniteState);
-
-	UFUNCTION()
-	virtual void OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus);
 
 	UFUNCTION(BlueprintPure)
 	EDWCharacterNature GetCharacterNature() const;
@@ -88,7 +74,4 @@ public:
 	
 	UFUNCTION(BlueprintCallable)
 	void SetTargetCharacter(ADWCharacter* InTargetCharacter);
-
-	UFUNCTION(BlueprintPure)
-	ADWCharacter* GetPossessedCharacter() const;
 };

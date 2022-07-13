@@ -7,18 +7,6 @@
 
 UDWAITaskBase::UDWAITaskBase(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
-	OwnerController = nullptr;
-	OwnerCharacter = nullptr;
-}
-
-bool UDWAITaskBase::InitTask(UBehaviorTreeComponent& OwnerComp)
-{
-	OwnerController = Cast<ADWAIController>(OwnerComp.GetOwner());
-	if (OwnerController)
-	{
-		OwnerCharacter = Cast<ADWCharacter>(OwnerController->GetPawn());
-	}
-	return OwnerController && OwnerCharacter;
 }
 
 void UDWAITaskBase::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)

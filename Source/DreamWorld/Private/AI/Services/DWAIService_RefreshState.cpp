@@ -39,7 +39,7 @@ void UDWAIService_RefreshState::OnCeaseRelevant(UBehaviorTreeComponent& OwnerCom
 
 void UDWAIService_RefreshState::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
 {
-	if (!InitService(OwnerComp) || !OwnerCharacter->IsActive()) return;
+	if (!InitService(OwnerComp) || !GetOwnerCharacter<ADWCharacter>()->IsActive()) return;
 
 	Super::TickNode(OwnerComp, NodeMemory, DeltaSeconds);
 	
@@ -50,7 +50,7 @@ void UDWAIService_RefreshState::TickNode(UBehaviorTreeComponent& OwnerComp, uint
 	{
 		if (!IsLostTarget)
 		{
-			switch (OwnerCharacter->GetNature())
+			switch (GetOwnerCharacter<ADWCharacter>()->GetNature())
 			{
 				case EDWCharacterNature::AIFriendly:
 				{
@@ -59,9 +59,9 @@ void UDWAIService_RefreshState::TickNode(UBehaviorTreeComponent& OwnerComp, uint
 				}
 				case EDWCharacterNature::AIHostile:
 				{
-					if (OwnerCharacter->IsEnemy(TargetCharacter))
+					if (GetOwnerCharacter<ADWCharacter>()->IsEnemy(TargetCharacter))
 					{
-						//if (OwnerCharacter->Distance(TargetCharacter, false, false) >= OwnerCharacter->GetAIFollowDistance())
+						//if (GetOwnerCharacter<ADWCharacter>()->Distance(TargetCharacter, false, false) >= GetOwnerCharacter<ADWCharacter>()->GetAIFollowDistance())
 						//{
 						//	SetCharacterAIState(OwnerComp, ECharacterAIState::AIFollow);
 						//}
@@ -93,7 +93,7 @@ void UDWAIService_RefreshState::TickNode(UBehaviorTreeComponent& OwnerComp, uint
 	}
 	else
 	{
-		//SetCharacterAIState(OwnerComp, OwnerCharacter->IsAllowAIPatrol() ? ECharacterAIState::AIPatrol : ECharacterAIState::None);
+		//SetCharacterAIState(OwnerComp, GetOwnerCharacter<ADWCharacter>()->IsAllowAIPatrol() ? ECharacterAIState::AIPatrol : ECharacterAIState::None);
 	}
 }
 

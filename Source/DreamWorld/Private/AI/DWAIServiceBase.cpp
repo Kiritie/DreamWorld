@@ -7,24 +7,6 @@
 
 UDWAIServiceBase::UDWAIServiceBase(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
-	
-}
-
-bool UDWAIServiceBase::InitService(UBehaviorTreeComponent& OwnerComp)
-{
-	if(OwnerController == nullptr)
-	{
-		OwnerController = Cast<ADWAIController>(OwnerComp.GetOwner());
-		if (OwnerController != nullptr && OwnerCharacter == nullptr)
-		{
-			OwnerCharacter = Cast<ADWCharacter>(OwnerController->GetPawn());
-		}
-	}
-	if(OwnerController && OwnerCharacter)
-	{
-		return true;	
-	}
-	return false;
 }
 
 void UDWAIServiceBase::OnBecomeRelevant(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
