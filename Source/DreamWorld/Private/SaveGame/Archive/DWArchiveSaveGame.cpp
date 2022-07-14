@@ -28,7 +28,6 @@ void UDWArchiveSaveGame::OnCreate_Implementation(int32 InSaveIndex)
 		DWArchiveSaveData.ID = InSaveIndex;
 		DWArchiveSaveData.WorldData = SaveGameModule->GetDefaultWorldData();
 		DWArchiveSaveData.PlayerData = SaveGameModule->GetDefaultPlayerData();
-		DWArchiveSaveData.Initialize();
 	}
 }
 

@@ -72,7 +72,7 @@ bool ADWTeamModule::CreateTeam(ADWCharacter* InCaptain, FName InTeamName /*= NAM
 		tmpData.ID = *FString::Printf(TEXT("Team_%d"), TeamMap.Num());
 		if (!IsExistTeam(tmpData.ID))
 		{
-			tmpData.Name = !InTeamName.IsNone() ? InTeamName : *FString::Printf(TEXT("%s �� Team"), *InCaptain->GetNameC().ToString());
+			tmpData.Name = !InTeamName.IsNone() ? InTeamName : *FString::Printf(TEXT("%s Team"), *InCaptain->GetNameC().ToString());
 			tmpData.Detail = !InTeamDetail.IsEmpty() ? InTeamDetail : tmpData.Name.ToString();
 			tmpData.Captain = InCaptain;
 			tmpData.AddMember(InCaptain);

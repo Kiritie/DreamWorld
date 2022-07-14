@@ -186,7 +186,9 @@ bool ADWVoxelModule::ChunkTraceSingle(AVoxelChunk* InChunk, float InRadius, floa
 bool ADWVoxelModule::ChunkTraceSingle(FVector RayStart, FVector RayEnd, float InRadius, float InHalfHeight, FHitResult& OutHitResult)
 {
 	if (UKismetSystemLibrary::CapsuleTraceSingle(this, RayStart, RayEnd, InRadius, InHalfHeight, UDWHelper::GetGameTrace(EDWGameTraceType::Chunk), false, TArray<AActor*>(), EDrawDebugTrace::None, OutHitResult, true))
+	{
 		return OutHitResult.ImpactPoint.Z > 0;
+	}
 	return false;
 }
 

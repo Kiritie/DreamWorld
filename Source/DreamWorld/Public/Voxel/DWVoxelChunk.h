@@ -81,29 +81,5 @@ public:
 	virtual void AddSceneActor(AActor* InActor) override;
 
 	virtual void RemoveSceneActor(AActor* InActor) override;
-
-	virtual void DestroySceneActor(AActor* InActor) override;
-
-	//////////////////////////////////////////////////////////////////////////
-	// Character
-public:
-	ADWCharacter* SpawnCharacter(FDWCharacterSaveData InSaveData);
-
-	void AttachCharacter(ADWCharacter* InCharacter);
-
-	void DetachCharacter(ADWCharacter* InCharacter);
-
-	void DestroyCharacter(ADWCharacter* InCharacter);
-
-	//////////////////////////////////////////////////////////////////////////
-	// Vitality
-public:
-	ADWVitality* SpawnVitality(FDWVitalitySaveData InSaveData);
-
-	void AttachVitality(ADWVitality* InVitality);
-
-	void DetachVitality(ADWVitality* InVitality);
-
-	void DestroyVitality(ADWVitality* InVitality);
 };
 

@@ -2,6 +2,7 @@
 
 #include "Inventory/Slot/InventorySlot.h"
 
+#include "Ability/AbilityModuleBPLibrary.h"
 #include "Ability/Abilities/ItemAbilityBase.h"
 #include "Ability/Item/AbilityItemDataBase.h"
 #include "Inventory/Inventory.h"
@@ -265,10 +266,9 @@ void UInventorySlot::DiscardItem(int InCount /*= -1*/)
 
 	if (InCount == -1) InCount = Item.Count;
 	FAbilityItem tmpItem = FAbilityItem(Item, InCount);
-	auto chunk = AMainModule::GetModuleByClass<AVoxelModule>()->FindChunk(Owner->GetOwnerActor()->GetActorLocation());
-	if (chunk != nullptr)
+	if (auto chunk = AMainModule::GetModuleByClass<AVoxelModule>()->FindChunk(Owner->GetOwnerActor()->GetActorLocation()))
 	{
-		chunk->SpawnPickUp(tmpItem, Owner->GetOwnerActor()->GetActorLocation() + FMath::RandPointInBox(FBox(FVector(-20, -20, -10), FVector(20, 20, 10))));
+		UAbilityModuleBPLibrary::SpawnPickUp(tmpItem, Owner->GetOwnerActor()->GetActorLocation() + FMath::RandPointInBox(FBox(FVector(-20, -20, -10), FVector(20, 20, 10))), chunk);
 	}
 	if(ADWCharacter* OwnerCharacter = Cast<ADWCharacter>(GetOwner()->GetOwnerActor()))
 	{

@@ -260,18 +260,11 @@ void ADWCharacter::Tick(float DeltaTime)
 		{
 			if(AVoxelChunk* Chunk = VoxelModule->FindChunk(Location))
 			{
-				if(Chunk != OwnerChunk)
-				{
-					if(OwnerChunk)
-					{
-						OwnerChunk->RemoveSceneActor(this);
-					}
-					Chunk->RemoveSceneActor(this);
-				}
+				Chunk->AddSceneActor(this);
 			}
-			else if(OwnerChunk)
+			else if(Container)
 			{
-				OwnerChunk->RemoveSceneActor(this);
+				Cast<AVoxelChunk>(Container.GetObject())->RemoveSceneActor(this);
 			}
 		}
 

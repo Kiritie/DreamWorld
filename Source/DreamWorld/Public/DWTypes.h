@@ -80,62 +80,6 @@ enum class EDWCharacterNature : uint8
 	AIHostile
 };
 
-USTRUCT(BlueprintType)
-struct DREAMWORLD_API FDWTeamData
-{
-	GENERATED_BODY()
-
-public:
-	UPROPERTY(BlueprintReadOnly)
-	FName ID;
-
-	UPROPERTY(BlueprintReadOnly)
-	FName Name;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FString Detail;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	ADWCharacter* Captain;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TArray<ADWCharacter*> Members;
-	
-	static FDWTeamData Empty;
-
-	FORCEINLINE FDWTeamData()
-	{
-		ID = NAME_None;
-		Name = NAME_None;
-		Detail = TEXT("");
-		Captain = nullptr;
-		Members = TArray<ADWCharacter*>();
-	}
-
-	void AddMember(ADWCharacter* InMember);
-
-	void RemoveMember(ADWCharacter* InMember);
-
-	void DissolveTeam();
-
-	TArray<ADWCharacter*> GetMembers(ADWCharacter* InMember = nullptr);
-
-	FORCEINLINE int GetNumMember()
-	{
-		return Members.Num();
-	}
-
-	FORCEINLINE bool IsCaptain(ADWCharacter* InMember)
-	{
-		return Captain == nullptr || Captain == InMember;
-	}
-
-	FORCEINLINE bool IsValid()
-	{
-		return !ID.IsNone();
-	}
-};
-
 /**
  * ??????????
  */
@@ -361,55 +305,7 @@ public:
 };
 
 USTRUCT(BlueprintType)
-struct DREAMWORLD_API FDWVitalityBasicSaveData : public FSaveData
-{
-	GENERATED_BODY()
-
-public:
-	FORCEINLINE FDWVitalityBasicSaveData()
-	{
-		Name = NAME_None;
-		RaceID = NAME_None;
-		Level = 0;
-		EXP = 0;
-		SpawnLocation = FVector::ZeroVector;
-		SpawnRotation = FRotator::ZeroRotator;
-	}
-
-public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FPrimaryAssetId ID;
-
-	UPROPERTY(BlueprintReadWrite)
-	FName Name;
-		
-	UPROPERTY(BlueprintReadOnly)
-	FName RaceID;
-
-	UPROPERTY(BlueprintReadWrite)
-	int32 Level;
-
-	UPROPERTY(BlueprintReadOnly)
-	int32 EXP;
-	
-	UPROPERTY()
-	FVector SpawnLocation;
-	
-	UPROPERTY()
-	FRotator SpawnRotation;
-
-	UPROPERTY()
-	FAbilityData DefaultAbility;
-
-	UPROPERTY(BlueprintReadWrite)
-	FInventorySaveData InventoryData;
-
-public:
-	virtual void Initialize();
-};
-
-USTRUCT(BlueprintType)
-struct DREAMWORLD_API FDWVitalitySaveData : public FDWVitalityBasicSaveData
+struct DREAMWORLD_API FDWVitalitySaveData : public FVitalitySaveData
 {
 	GENERATED_BODY()
 
@@ -417,37 +313,21 @@ public:
 	FORCEINLINE FDWVitalitySaveData()
 	{
 	}
-
-public:
-	virtual void Initialize() override;
 	
-	class UDWVitalityData& GetVitalityData() const;
+public:
+	UPROPERTY(BlueprintReadWrite)
+	FInventorySaveData InventoryData;
 };
 
 USTRUCT(BlueprintType)
-struct DREAMWORLD_API FDWCharacterBasicSaveData : public FDWVitalityBasicSaveData
-{
-	GENERATED_BODY()
-
-public:
-	FORCEINLINE FDWCharacterBasicSaveData()
-	{
-		TeamID = NAME_None;
-	}
-
-public:
-	UPROPERTY(BlueprintReadOnly)
-	FName TeamID;
-};
-
-USTRUCT(BlueprintType)
-struct DREAMWORLD_API FDWCharacterSaveData : public FDWCharacterBasicSaveData
+struct DREAMWORLD_API FDWCharacterSaveData : public FCharacterSaveData
 {
 	GENERATED_BODY()
 
 public:
 	FORCEINLINE FDWCharacterSaveData()
 	{
+		TeamID = NAME_None;
 		Nature = EDWCharacterNature::AIHostile;
 		AttackDistance = 100.f;
 		InteractDistance = 500.f;
@@ -459,6 +339,9 @@ public:
 		SkillAbilities = TMap<FPrimaryAssetId, FDWCharacterSkillAbilityData>();
 		ActionAbilities = TMap<EDWCharacterActionType, FDWCharacterActionAbilityData>();
 	}
+	
+	UPROPERTY(BlueprintReadOnly)
+	FName TeamID;
 
 	UPROPERTY()
 	EDWCharacterNature Nature;
@@ -477,6 +360,9 @@ public:
 			
 	UPROPERTY()
 	float PatrolDuration;
+	
+	UPROPERTY(BlueprintReadWrite)
+	FInventorySaveData InventoryData;
 
 	UPROPERTY()
 	FDWCharacterAttackAbilityData FallingAttackAbility;
@@ -489,11 +375,6 @@ public:
 
 	UPROPERTY()
 	TMap<EDWCharacterActionType, FDWCharacterActionAbilityData> ActionAbilities;
-
-public:
-	virtual void Initialize() override;
-
-	class UDWCharacterData& GetCharacterData() const;
 };
 
 USTRUCT(BlueprintType)
@@ -565,7 +446,6 @@ struct DREAMWORLD_API FDWVoxelWorldSaveData : public FVoxelWorldSaveData
 public:
 	FORCEINLINE FDWVoxelWorldSaveData()
 	{
-		ArchiveID = 0;
 		WorldSeed = 0;
 		TimeSeconds = 0.f;
 
@@ -596,17 +476,12 @@ public:
 		VitalityRaceDensity = InBasicSaveData.VitalityRaceDensity;
 		CharacterRaceDensity = InBasicSaveData.CharacterRaceDensity;
 
-		ArchiveID = 0;
-
 		LastVitalityRaceIndex = FIndex::ZeroIndex;
 		LastCharacterRaceIndex = FIndex::ZeroIndex;
 	}
 
 public:
 	static const FDWVoxelWorldSaveData Empty;
-
-	UPROPERTY(BlueprintReadOnly)
-	int32 ArchiveID;
 	
 	UPROPERTY(BlueprintReadOnly)
 	TMap<FVector, FDWVoxelChunkSaveData> ChunkDatas;
@@ -616,13 +491,6 @@ public:
 	FIndex LastCharacterRaceIndex;
 
 public:
-	virtual void Initialize() override;
-	
-	FORCEINLINE bool IsSameArchive(FDWVoxelWorldSaveData InSaveData) const
-	{
-		return InSaveData.ArchiveID == ArchiveID;
-	}
-	
 	bool IsExistChunkData(FIndex InChunkIndex) const
 	{
 		return ChunkDatas.Contains(InChunkIndex.ToVector());
@@ -689,16 +557,6 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	FDWVoxelWorldSaveData WorldData;
-
-public:
-	void Initialize()
-	{
-		PlayerData.ArchiveID = ID;
-		PlayerData.Initialize();
-		
-		WorldData.ArchiveID = ID;
-		WorldData.Initialize();
-	}
 };
 
 USTRUCT(BlueprintType)

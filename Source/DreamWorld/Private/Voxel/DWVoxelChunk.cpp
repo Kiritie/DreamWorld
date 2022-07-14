@@ -140,15 +140,15 @@ void ADWVoxelChunk::SpawnActors()
 		FDWVoxelChunkSaveData ChunkData = AVoxelModule::GetWorldData<FDWVoxelWorldSaveData>()->GetChunkData(Index);
 		for(int32 i = 0; i < ChunkData.PickUpDatas.Num(); i++)
 		{
-			SpawnPickUp(ChunkData.PickUpDatas[i]);
+			UAbilityModuleBPLibrary::SpawnPickUp(&ChunkData.PickUpDatas[i], this);
 		}
 		for(int32 i = 0; i < ChunkData.VitalityDatas.Num(); i++)
 		{
-			SpawnVitality(ChunkData.VitalityDatas[i]);
+			UAbilityModuleBPLibrary::SpawnVitality(&ChunkData.VitalityDatas[i], this);
 		}
 		for(int32 i = 0; i < ChunkData.CharacterDatas.Num(); i++)
 		{
-			SpawnCharacter(ChunkData.CharacterDatas[i]);
+			UAbilityModuleBPLibrary::SpawnCharacter(&ChunkData.CharacterDatas[i], this);
 		}
 	}
 	else if(SolidMesh || SemiMesh)
@@ -174,8 +174,7 @@ void ADWVoxelChunk::SpawnActors()
 							saveData.Level = vitalityItem.Level;
 							saveData.SpawnLocation = hitResult.Location;
 							saveData.SpawnRotation = FRotator(0, FMath::RandRange(0, 360), 0);
-							saveData.Initialize();
-							SpawnVitality(saveData);
+							UAbilityModuleBPLibrary::SpawnVitality(&saveData, this);
 							AVoxelModule::GetWorldData<FDWVoxelWorldSaveData>()->LastVitalityRaceIndex = Index;
 							break;
 						}
@@ -205,8 +204,7 @@ void ADWVoxelChunk::SpawnActors()
 							saveData.Level = characterItem.Level;
 							saveData.SpawnLocation = hitResult.Location;
 							saveData.SpawnRotation = FRotator(0, FMath::RandRange(0, 360), 0);
-							saveData.Initialize();
-							if(auto character = SpawnCharacter(saveData))
+							if(ADWCharacter* character = Cast<ADWCharacter>(UAbilityModuleBPLibrary::SpawnCharacter(&saveData, this)))
 							{
 								if(captain == nullptr)
 								{
@@ -257,13 +255,24 @@ void ADWVoxelChunk::AddSceneActor(AActor* InActor)
 {
 	Super::AddSceneActor(InActor);
 
+	if(!InActor || !InActor->Implements<USceneActorInterface>() || ISceneActorInterface::Execute_GetContainer(InActor) == this) return;
+
+	if(ISceneActorInterface::Execute_GetContainer(InActor))
+	{
+		ISceneActorInterface::Execute_GetContainer(InActor)->RemoveSceneActor(InActor);
+	}
+
 	if(ADWCharacter* Character = Cast<ADWCharacter>(InActor))
 	{
-		AttachCharacter(Character);
+		// InCharacter->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
+		Character->Execute_SetContainer(Character, this);
+		Characters.Add(Character);
 	}
 	else if(ADWVitality* Vitality = Cast<ADWVitality>(InActor))
 	{
-		AttachVitality(Vitality);
+		Vitality->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
+		Vitality->Execute_SetContainer(Vitality, this);
+		Vitalitys.Add(Vitality);
 	}
 }
 
@@ -271,107 +280,18 @@ void ADWVoxelChunk::RemoveSceneActor(AActor* InActor)
 {
 	Super::RemoveSceneActor(InActor);
 
-	if(ADWCharacter* Character = Cast<ADWCharacter>(InActor))
-	{
-		DetachCharacter(Character);
-	}
-	else if(ADWVitality* Vitality = Cast<ADWVitality>(InActor))
-	{
-		DetachVitality(Vitality);
-	}
-}
-
-void ADWVoxelChunk::DestroySceneActor(AActor* InActor)
-{
-	Super::DestroySceneActor(InActor);
+	if(!InActor || !InActor->Implements<USceneActorInterface>() || ISceneActorInterface::Execute_GetContainer(InActor) != this) return;
 
 	if(ADWCharacter* Character = Cast<ADWCharacter>(InActor))
 	{
-		DestroyCharacter(Character);
+		// InCharacter->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+		Character->Execute_SetContainer(Character, nullptr);
+		Characters.Remove(Character);
 	}
 	else if(ADWVitality* Vitality = Cast<ADWVitality>(InActor))
 	{
-		DestroyVitality(Vitality);
-	}
-}
-
-ADWCharacter* ADWVoxelChunk::SpawnCharacter(FDWCharacterSaveData InSaveData)
-{
-	if(ADWCharacter* character = UObjectPoolModuleBPLibrary::SpawnObject<ADWCharacter>(nullptr, InSaveData.GetCharacterData().Class))
-	{
-		USaveGameModuleBPLibrary::LoadObjectData(character, &InSaveData, true);
-		character->SpawnDefaultController();
-		AttachCharacter(character);
-		return character;
-	}
-	return nullptr;
-}
-
-void ADWVoxelChunk::AttachCharacter(ADWCharacter* InCharacter)
-{
-	if(!InCharacter || !InCharacter->IsValidLowLevel() || Characters.Contains(InCharacter)) return;
-
-	// InCharacter->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
-	InCharacter->SetOwnerChunk(this);
-	Characters.Add(InCharacter);
-}
-
-void ADWVoxelChunk::DetachCharacter(ADWCharacter* InCharacter)
-{
-	if(!InCharacter || !InCharacter->IsValidLowLevel() || !Characters.Contains(InCharacter)) return;
-
-	// InCharacter->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
-	InCharacter->SetOwnerChunk(nullptr);
-	Characters.Remove(InCharacter);
-}
-
-void ADWVoxelChunk::DestroyCharacter(ADWCharacter* InCharacter)
-{
-	if(!InCharacter || !InCharacter->IsValidLowLevel()) return;
-
-	if(Characters.Contains(InCharacter))
-	{
-		Characters.Remove(InCharacter);
-		InCharacter->Destroy();
-	}
-}
-
-ADWVitality* ADWVoxelChunk::SpawnVitality(FDWVitalitySaveData InSaveData)
-{
-	if(ADWVitality* Vitality = UObjectPoolModuleBPLibrary::SpawnObject<ADWVitality>(nullptr, InSaveData.GetVitalityData().Class))
-	{
-		USaveGameModuleBPLibrary::LoadObjectData(Vitality, &InSaveData, true);
-		AttachVitality(Vitality);
-		return Vitality;
-	}
-	return nullptr;
-}
-
-void ADWVoxelChunk::AttachVitality(ADWVitality* InVitality)
-{
-	if(!InVitality || !InVitality->IsValidLowLevel() || Vitalitys.Contains(InVitality)) return;
-
-	InVitality->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
-	InVitality->SetOwnerChunk(this);
-	Vitalitys.Add(InVitality);
-}
-
-void ADWVoxelChunk::DetachVitality(ADWVitality* InVitality)
-{
-	if(!InVitality || !InVitality->IsValidLowLevel() || !Vitalitys.Contains(InVitality)) return;
-
-	InVitality->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
-	InVitality->SetOwnerChunk(nullptr);
-	Vitalitys.Remove(InVitality);
-}
-
-void ADWVoxelChunk::DestroyVitality(ADWVitality* InVitality)
-{
-	if(!InVitality || !InVitality->IsValidLowLevel()) return;
-
-	if(Vitalitys.Contains(InVitality))
-	{
-		Vitalitys.Remove(InVitality);
-		InVitality->Destroy();
+		Vitality->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+		Vitality->Execute_SetContainer(Vitality, nullptr);
+		Vitalitys.Remove(Vitality);
 	}
 }

@@ -9,6 +9,7 @@
 #include "TargetSystemTargetableInterface.h"
 #include "Ability/Character/AbilityCharacterBase.h"
 #include "Inventory/InventoryAgentInterface.h"
+#include "Team/DWTeamModuleTypes.h"
 #include "Voxel/Agent/VoxelAgentInterface.h"
 
 #include "DWCharacter.generated.h"
@@ -433,7 +434,6 @@ public:
 	UFUNCTION(BlueprintPure)
 	EDWCharacterNature GetNature() const { return Nature; }
 
-	//UFUNCTION(BlueprintPure)
 	FDWTeamData* GetTeamData() const;
 
 	UFUNCTION(BlueprintPure)

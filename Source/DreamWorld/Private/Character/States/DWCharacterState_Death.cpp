@@ -2,6 +2,7 @@
 
 #include "Character/States/DWCharacterState_Death.h"
 
+#include "Ability/AbilityModuleBPLibrary.h"
 #include "Ability/Item/Equip/AbilityEquipBase.h"
 #include "AI/DWAIController.h"
 #include "Character/DWCharacter.h"
@@ -78,23 +79,13 @@ void UDWCharacterState_Death::DeathEnd()
 
 	Character->StopAction(EDWCharacterActionType::Death);
 
-	if(Character->Inventory)
-	{
-		Character->Inventory->DiscardAllItem();
-	}
+	Character->Inventory->DiscardAllItem();
+
 	if(!Character->IsPlayer())
 	{
 		if(Character->GetController())
 		{
 			Character->GetController()->UnPossess();
-		}
-		if (Character->OwnerChunk)
-		{
-			Character->OwnerChunk->DestroySceneActor(Character);
-		}
-		else
-		{
-			Character->Destroy();
 		}
 		if (Character->HasTeam())
 		{
@@ -107,5 +98,6 @@ void UDWCharacterState_Death::DeathEnd()
 				Iter.Value->Destroy();
 			}
 		}
+		UAbilityModuleBPLibrary::DestroyCharacter(Character);
 	}
 }
