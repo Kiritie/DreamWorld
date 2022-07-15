@@ -6,6 +6,7 @@
 #include "Character/DWCharacter.h"
 #include "Components/CapsuleComponent.h"
 #include "Voxel/VoxelModule.h"
+#include "Voxel/VoxelModuleBPLibrary.h"
 
 UDWCharacterState_Ride::UDWCharacterState_Ride()
 {
@@ -64,7 +65,7 @@ void UDWCharacterState_Ride::OnLeave(UFiniteStateBase* InNextFiniteState)
 		UCharacterModuleBPLibrary::SwitchCharacter(Character);
 		FHitResult hitResult;
 		const FVector offset = Character->GetActorRightVector() * (Character->GetRadius() + RidingTarget->GetRadius());
-		const FVector rayStart = FVector(Character->GetActorLocation().X, Character->GetActorLocation().Y, AVoxelModule::GetWorldData()->ChunkHeightRange * AVoxelModule::GetWorldData()->GetChunkLength() + 500) + offset;
+		const FVector rayStart = FVector(Character->GetActorLocation().X, Character->GetActorLocation().Y, UVoxelModuleBPLibrary::GetWorldData().ChunkHeightRange * UVoxelModuleBPLibrary::GetWorldData().GetChunkLength() + 500) + offset;
 		const FVector rayEnd = FVector(Character->GetActorLocation().X, Character->GetActorLocation().Y, 0) + offset;
 		if (AMainModule::GetModuleByClass<AVoxelModule>()->ChunkTraceSingle(rayStart, rayEnd, Character->GetRadius(), Character->GetHalfHeight(), hitResult))
 		{

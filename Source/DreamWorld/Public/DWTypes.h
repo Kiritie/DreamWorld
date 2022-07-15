@@ -436,6 +436,20 @@ public:
 		CharacterDatas = TArray<FDWCharacterSaveData>();
 		VitalityDatas = TArray<FDWVitalitySaveData>();
 	}
+
+public:
+	virtual void MakeSaved() override
+	{
+		Super::MakeSaved();
+		for(auto Iter : CharacterDatas)
+		{
+			Iter.MakeSaved();
+		}
+		for(auto Iter : VitalityDatas)
+		{
+			Iter.MakeSaved();
+		}
+	}
 };
 
 USTRUCT(BlueprintType)
@@ -486,11 +500,22 @@ public:
 	UPROPERTY(BlueprintReadOnly)
 	TMap<FVector, FDWVoxelChunkSaveData> ChunkDatas;
 
+	UPROPERTY(Transient)
 	FIndex LastVitalityRaceIndex;
 
+	UPROPERTY(Transient)
 	FIndex LastCharacterRaceIndex;
 
 public:
+	virtual void MakeSaved() override
+	{
+		Super::MakeSaved();
+		for(auto Iter : ChunkDatas)
+		{
+			Iter.Value.MakeSaved();
+		}
+	}
+	
 	bool IsExistChunkData(FIndex InChunkIndex) const
 	{
 		return ChunkDatas.Contains(InChunkIndex.ToVector());
@@ -537,6 +562,15 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FVoxelWorldBasicSaveData WorldBasicData;
+
+public:
+	virtual void MakeSaved() override
+	{
+		Super::MakeSaved();
+		
+		PlayerBasicData.MakeSaved();
+		WorldBasicData.MakeSaved();
+	}
 };
 
 USTRUCT(BlueprintType)
@@ -557,6 +591,15 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	FDWVoxelWorldSaveData WorldData;
+
+public:
+	virtual void MakeSaved() override
+	{
+		Super::MakeSaved();
+		
+		PlayerData.MakeSaved();
+		WorldData.MakeSaved();
+	}
 };
 
 USTRUCT(BlueprintType)

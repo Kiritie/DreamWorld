@@ -84,11 +84,6 @@ void ADWVoxelModule::OnTermination_Implementation()
 	Super::OnTermination_Implementation();
 }
 
-void ADWVoxelModule::OnWorldStateChanged()
-{
-	Super::OnWorldStateChanged();
-}
-
 void ADWVoxelModule::LoadData(FSaveData* InSaveData)
 {
 	Super::LoadData(InSaveData);
@@ -100,15 +95,20 @@ FSaveData* ADWVoxelModule::ToData()
 	{
 		if(Iter.Value)
 		{
-			GetWorldData<FDWVoxelWorldSaveData>()->SetChunkData(Iter.Key, USaveGameModuleBPLibrary::ObjectToDataRef<FDWVoxelChunkSaveData>(Iter.Value));
+			GetWorldData<FDWVoxelWorldSaveData>().SetChunkData(Iter.Key, Iter.Value->ToSaveDataRef<FDWVoxelChunkSaveData>());
 		}
 	}
 	return WorldData;
 }
 
-void ADWVoxelModule::UnloadData()
+void ADWVoxelModule::UnloadData(bool bForceMode)
 {
-	Super::UnloadData();
+	Super::UnloadData(bForceMode);
+}
+
+void ADWVoxelModule::OnWorldStateChanged()
+{
+	Super::OnWorldStateChanged();
 }
 
 void ADWVoxelModule::GeneratePreviews()
@@ -130,7 +130,7 @@ void ADWVoxelModule::GenerateChunks(FIndex InIndex)
 	if(BoundsMesh != nullptr)
 	{
 		BoundsMesh->SetRelativeLocation(UVoxelModuleBPLibrary::ChunkIndexToLocation(InIndex));
-		BoundsMesh->SetRelativeScale3D(FVector(GetWorldLength() * GetWorldData()->BlockSize * 0.01f, GetWorldLength() * GetWorldData()->BlockSize * 0.01f, 15.f));
+		BoundsMesh->SetRelativeScale3D(FVector(GetWorldLength() * GetWorldData().BlockSize * 0.01f, GetWorldLength() * GetWorldData().BlockSize * 0.01f, 15.f));
 	}
 }
 
@@ -138,9 +138,9 @@ void ADWVoxelModule::BuildChunkMap(AVoxelChunk* InChunk)
 {
 	if (!InChunk || !ChunkMap.Contains(InChunk->GetIndex())) return;
 
-	if (GetWorldData<FDWVoxelWorldSaveData>()->IsExistChunkData(InChunk->GetIndex()))
+	if (GetWorldData<FDWVoxelWorldSaveData>().IsExistChunkData(InChunk->GetIndex()))
 	{
-		InChunk->LoadData(&GetWorldData<FDWVoxelWorldSaveData>()->GetChunkData(InChunk->GetIndex()));
+		InChunk->LoadSaveData(&GetWorldData<FDWVoxelWorldSaveData>().GetChunkData(InChunk->GetIndex()));
 	}
 	else
 	{
@@ -164,7 +164,7 @@ void ADWVoxelModule::DestroyChunk(AVoxelChunk* InChunk)
 {
 	if(!InChunk || !ChunkMap.Contains(InChunk->GetIndex())) return;
 
-	GetWorldData<FDWVoxelWorldSaveData>()->SetChunkData(InChunk->GetIndex(), USaveGameModuleBPLibrary::ObjectToDataRef<FDWVoxelChunkSaveData>(InChunk));
+	GetWorldData<FDWVoxelWorldSaveData>().SetChunkData(InChunk->GetIndex(), InChunk->ToSaveDataRef<FDWVoxelChunkSaveData>());
 	
 	Super::DestroyChunk(InChunk);
 }
@@ -176,10 +176,10 @@ AVoxelChunk* ADWVoxelModule::SpawnChunk(FIndex InIndex, bool bAddToQueue)
 
 bool ADWVoxelModule::ChunkTraceSingle(AVoxelChunk* InChunk, float InRadius, float InHalfHeight, FHitResult& OutHitResult)
 {
-	FVector rayStart = InChunk->GetActorLocation() + FVector(FMath::FRandRange(1.f, GetWorldData()->ChunkSize - 1), FMath::FRandRange(1.f, GetWorldData()->ChunkSize), GetWorldData()->ChunkSize) * GetWorldData()->BlockSize;
-	rayStart.X = ((int32)(rayStart.X / GetWorldData()->BlockSize) + 0.5f) * GetWorldData()->BlockSize;
-	rayStart.Y = ((int32)(rayStart.Y / GetWorldData()->BlockSize) + 0.5f) * GetWorldData()->BlockSize;
-	FVector rayEnd = rayStart + FVector::DownVector * GetWorldData()->GetChunkLength();
+	FVector rayStart = InChunk->GetActorLocation() + FVector(FMath::FRandRange(1.f, GetWorldData().ChunkSize - 1), FMath::FRandRange(1.f, GetWorldData().ChunkSize), GetWorldData().ChunkSize) * GetWorldData().BlockSize;
+	rayStart.X = ((int32)(rayStart.X / GetWorldData().BlockSize) + 0.5f) * GetWorldData().BlockSize;
+	rayStart.Y = ((int32)(rayStart.Y / GetWorldData().BlockSize) + 0.5f) * GetWorldData().BlockSize;
+	FVector rayEnd = rayStart + FVector::DownVector * GetWorldData().GetChunkLength();
 	return ChunkTraceSingle(rayStart, rayEnd, InRadius * 0.95f, InHalfHeight * 0.95f, OutHitResult);
 }
 
@@ -194,6 +194,6 @@ bool ADWVoxelModule::ChunkTraceSingle(FVector RayStart, FVector RayEnd, float In
 
 bool ADWVoxelModule::VoxelTraceSingle(const FVoxelItem& InVoxelItem, FVector InPoint, FHitResult& OutHitResult)
 {
-	FVector size = InVoxelItem.GetData<UVoxelData>().GetCeilRange(InVoxelItem.Rotation, InVoxelItem.Scale) * GetWorldData()->BlockSize * 0.5f;
+	FVector size = InVoxelItem.GetData<UVoxelData>().GetCeilRange(InVoxelItem.Rotation, InVoxelItem.Scale) * GetWorldData().BlockSize * 0.5f;
 	return UKismetSystemLibrary::BoxTraceSingle(this, InPoint + size, InPoint + size, size * 0.95f, FRotator::ZeroRotator, UDWHelper::GetGameTrace(EDWGameTraceType::Voxel), false, TArray<AActor*>(), EDrawDebugTrace::None, OutHitResult, true);
 }

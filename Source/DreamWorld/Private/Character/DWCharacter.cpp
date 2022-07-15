@@ -73,6 +73,7 @@
 #include "Team/DWTeamModule.h"
 #include "Voxel/Datas/VoxelData.h"
 #include "Voxel/DWVoxelChunk.h"
+#include "Voxel/VoxelModuleBPLibrary.h"
 #include "Widget/WidgetModuleBPLibrary.h"
 #include "Widget/Inventory/WidgetInventoryBar.h"
 
@@ -185,29 +186,6 @@ void ADWCharacter::BeginPlay()
 	}
 }
 
-void ADWCharacter::RefreshFiniteState()
-{
-	Super::RefreshFiniteState();
-
-	if(!FSM->GetCurrentState())
-	{
-		switch (GetCharacterMovement()->MovementMode)
-		{
-			case EMovementMode::MOVE_Flying:
-			{
-				FSM->SwitchStateByClass<UDWCharacterState_Fly>();
-				break;
-			}
-			case EMovementMode::MOVE_Swimming:
-			{
-				FSM->SwitchStateByClass<UDWCharacterState_Swim>();
-				break;
-			}
-			default: break;
-		}
-	}
-}
-
 void ADWCharacter::OnSpawn_Implementation(const TArray<FParameter>& InParams)
 {
 	Super::OnSpawn_Implementation(InParams);
@@ -218,118 +196,11 @@ void ADWCharacter::OnDespawn_Implementation()
 	Super::OnDespawn_Implementation();
 }
 
-// Called every frame
-void ADWCharacter::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-	if (IsDead()) return;
-
-	if (IsActive())
-	{
-		Inventory->Refresh(DeltaTime);
-		
-		if(NormalAttackRemainTime > 0)
-		{
-			NormalAttackRemainTime -= DeltaTime;
-		}
-
-		if (LockedTarget)
-		{
-			if (!LockedTarget->IsDead() && FVector::Distance(GetActorLocation(), LockedTarget->GetActorLocation()) <= 1000)
-			{
-				LookAtTarget(LockedTarget);
-			}
-			else
-			{
-				SetLockedTarget(nullptr);
-			}
-		}
-
-		if (AIMoveLocation != Vector_Empty)
-		{
-			if (DoAIMove(AIMoveLocation, AIMoveStopDistance))
-			{
-				StopAIMove();
-			}
-		}
-
-		const FVector Location = GetMesh()->GetSocketLocation(FName("Foot"));
-
-		if(AVoxelModule* VoxelModule = AMainModule::GetModuleByClass<AVoxelModule>())
-		{
-			if(AVoxelChunk* Chunk = VoxelModule->FindChunk(Location))
-			{
-				Chunk->AddSceneActor(this);
-			}
-			else if(Container)
-			{
-				Cast<AVoxelChunk>(Container.GetObject())->RemoveSceneActor(this);
-			}
-		}
-
-		if (IsSprinting() && GetMoveDirection().Size() > 0.2f)
-		{
-			ModifyStamina(-GetStaminaExpendSpeed() * DeltaTime);
-		}
-		else if(IsFreeToAnim())
-		{
-			ModifyStamina(GetStaminaRegenSpeed() * DeltaTime);
-		}
-
-		if (GetActorLocation().Z < 0)
-		{
-			Death();
-		}
-	}
-}
-
-void ADWCharacter::Serialize(FArchive& Ar)
-{
-	Super::Serialize(Ar);
-
-	if(Ar.IsSaveGame())
-	{
-		float CurrentValue;
-		if(Ar.IsLoading())
-		{
-			Ar << CurrentValue;
-			if(CurrentValue > 0)
-			{
-				SetHealth(CurrentValue);
-				
-				Ar << CurrentValue;
-				SetMana(CurrentValue);
-
-				Ar << CurrentValue;
-				SetStamina(CurrentValue);
-			}
-			else
-			{
-				Revive();
-				Ar << CurrentValue;
-				Ar << CurrentValue;
-			}
-		}
-		else if(Ar.IsSaveGame())
-		{
-			CurrentValue = GetHealth();
-			Ar << CurrentValue;
-
-			CurrentValue = GetMana();
-			Ar << CurrentValue;
-
-			CurrentValue = GetStamina();
-			Ar << CurrentValue;
-		}
-	}
-}
-
 void ADWCharacter::LoadData(FSaveData* InSaveData)
 {
-	auto SaveData = InSaveData->ToRef<FDWCharacterSaveData>();
+	auto SaveData = InSaveData->CastRef<FDWCharacterSaveData>();
 	
-	if (SaveData.bSaved)
+	if (SaveData.IsSaved())
 	{
 		AssetID = SaveData.ID;
 		Nature = SaveData.Nature;
@@ -483,6 +354,136 @@ FSaveData* ADWCharacter::ToData()
 	SaveData.SpawnRotation = GetActorRotation();
 
 	return &SaveData;
+}
+
+void ADWCharacter::RefreshFiniteState()
+{
+	Super::RefreshFiniteState();
+
+	if(!FSM->GetCurrentState())
+	{
+		switch (GetCharacterMovement()->MovementMode)
+		{
+			case EMovementMode::MOVE_Flying:
+			{
+				FSM->SwitchStateByClass<UDWCharacterState_Fly>();
+				break;
+			}
+			case EMovementMode::MOVE_Swimming:
+			{
+				FSM->SwitchStateByClass<UDWCharacterState_Swim>();
+				break;
+			}
+			default: break;
+		}
+	}
+}
+
+// Called every frame
+void ADWCharacter::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	if (IsDead()) return;
+
+	if (IsActive())
+	{
+		Inventory->Refresh(DeltaTime);
+		
+		if(NormalAttackRemainTime > 0)
+		{
+			NormalAttackRemainTime -= DeltaTime;
+		}
+
+		if (LockedTarget)
+		{
+			if (!LockedTarget->IsDead() && FVector::Distance(GetActorLocation(), LockedTarget->GetActorLocation()) <= 1000)
+			{
+				LookAtTarget(LockedTarget);
+			}
+			else
+			{
+				SetLockedTarget(nullptr);
+			}
+		}
+
+		if (AIMoveLocation != Vector_Empty)
+		{
+			if (DoAIMove(AIMoveLocation, AIMoveStopDistance))
+			{
+				StopAIMove();
+			}
+		}
+
+		const FVector Location = GetMesh()->GetSocketLocation(FName("Foot"));
+
+		if(AVoxelModule* VoxelModule = AMainModule::GetModuleByClass<AVoxelModule>())
+		{
+			if(AVoxelChunk* Chunk = VoxelModule->FindChunk(Location))
+			{
+				Chunk->AddSceneActor(this);
+			}
+			else if(Container)
+			{
+				Cast<AVoxelChunk>(Container.GetObject())->RemoveSceneActor(this);
+			}
+		}
+
+		if (IsSprinting() && GetMoveDirection().Size() > 0.2f)
+		{
+			ModifyStamina(-GetStaminaExpendSpeed() * DeltaTime);
+		}
+		else if(IsFreeToAnim())
+		{
+			ModifyStamina(GetStaminaRegenSpeed() * DeltaTime);
+		}
+
+		if (GetActorLocation().Z < 0)
+		{
+			Death();
+		}
+	}
+}
+
+void ADWCharacter::Serialize(FArchive& Ar)
+{
+	Super::Serialize(Ar);
+
+	if(Ar.IsSaveGame())
+	{
+		float CurrentValue;
+		if(Ar.IsLoading())
+		{
+			Ar << CurrentValue;
+			if(CurrentValue > 0)
+			{
+				SetHealth(CurrentValue);
+				
+				Ar << CurrentValue;
+				SetMana(CurrentValue);
+
+				Ar << CurrentValue;
+				SetStamina(CurrentValue);
+			}
+			else
+			{
+				Revive();
+				Ar << CurrentValue;
+				Ar << CurrentValue;
+			}
+		}
+		else if(Ar.IsSaveGame())
+		{
+			CurrentValue = GetHealth();
+			Ar << CurrentValue;
+
+			CurrentValue = GetMana();
+			Ar << CurrentValue;
+
+			CurrentValue = GetStamina();
+			Ar << CurrentValue;
+		}
+	}
 }
 
 void ADWCharacter::Death(IAbilityVitalityInterface* InKiller)
@@ -904,7 +905,7 @@ bool ADWCharacter::GenerateVoxel(FVoxelItem& InVoxelItem, const FVoxelHitResult&
 	if(QueryItemInfo.Item.IsValid() && DoAction(EDWCharacterActionType::Generate))
 	{
 		AVoxelChunk* chunk = InVoxelHitResult.GetOwner();
-		const FIndex index = chunk->LocationToIndex(InVoxelHitResult.Point - AVoxelModule::GetWorldData()->GetBlockSizedNormal(InVoxelHitResult.Normal)) + FIndex(InVoxelHitResult.Normal);
+		const FIndex index = chunk->LocationToIndex(InVoxelHitResult.Point - UVoxelModuleBPLibrary::GetWorldData().GetBlockSizedNormal(InVoxelHitResult.Normal)) + FIndex(InVoxelHitResult.Normal);
 		const FVoxelItem& voxelItem = chunk->GetVoxelItem(index);
 
 		if(!voxelItem.IsValid() || voxelItem.GetData<UVoxelData>().Transparency == EVoxelTransparency::Transparent && voxelItem != InVoxelHitResult.VoxelItem)
@@ -1600,7 +1601,7 @@ ADWEquipShield* ADWCharacter::GetShield()
 
 bool ADWCharacter::HasArmor(EDWEquipPartType InPartType)
 {
-	return HasEquip(InPartType) && GetEquip(InPartType)->IsA(ADWEquipArmor::StaticClass());
+	return HasEquip(InPartType) && GetEquip(InPartType)->IsA<ADWEquipArmor>();
 }
 
 ADWEquipArmor* ADWCharacter::GetArmor(EDWEquipPartType InPartType)
@@ -1674,7 +1675,7 @@ FDWCharacterActionAbilityData ADWCharacter::GetActionAbility(EDWCharacterActionT
 bool ADWCharacter::RaycastStep(FHitResult& OutHitResult)
 {
 	const FVector rayStart = GetActorLocation() + FVector::DownVector * (GetHalfHeight() - GetCharacterMovement()->MaxStepHeight);
-	const FVector rayEnd = rayStart + GetMoveDirection() * (GetRadius() + AVoxelModule::GetWorldData()->BlockSize * FMath::Clamp(GetMoveDirection().Size() * 0.005f, 0.5f, 1.3f));
+	const FVector rayEnd = rayStart + GetMoveDirection() * (GetRadius() + UVoxelModuleBPLibrary::GetWorldData().BlockSize * FMath::Clamp(GetMoveDirection().Size() * 0.005f, 0.5f, 1.3f));
 	return UKismetSystemLibrary::LineTraceSingle(this, rayStart, rayEnd, UDWHelper::GetGameTrace(EDWGameTraceType::Step), false, TArray<AActor*>(), EDrawDebugTrace::None, OutHitResult, true);
 }
 
@@ -1685,12 +1686,12 @@ bool ADWCharacter::RaycastVoxel(FVoxelHitResult& OutHitResult)
 	const FVector rayEnd = rayStart + GetActorForwardVector() * InteractDistance;
 	if (UKismetSystemLibrary::LineTraceSingle(this, rayStart, rayEnd, UDWHelper::GetGameTrace(EDWGameTraceType::Voxel), false, TArray<AActor*>(), EDrawDebugTrace::None, hitResult, true))
 	{
-		if (hitResult.GetActor()->IsA(AVoxelChunk::StaticClass()))
+		if (hitResult.GetActor()->IsA<AVoxelChunk>())
 		{
 			AVoxelChunk* chunk = Cast<AVoxelChunk>(hitResult.GetActor());
 			if (chunk != nullptr)
 			{
-				const FVoxelItem& voxelItem = chunk->GetVoxelItem(chunk->LocationToIndex(hitResult.ImpactPoint - AVoxelModule::GetWorldData()->GetBlockSizedNormal(hitResult.ImpactNormal, 0.01f)));
+				const FVoxelItem& voxelItem = chunk->GetVoxelItem(chunk->LocationToIndex(hitResult.ImpactPoint - UVoxelModuleBPLibrary::GetWorldData().GetBlockSizedNormal(hitResult.ImpactNormal, 0.01f)));
 				if (voxelItem.IsValid())
 				{
 					OutHitResult = FVoxelHitResult(voxelItem, hitResult.ImpactPoint, hitResult.ImpactNormal);

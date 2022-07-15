@@ -5,6 +5,7 @@
 
 #include "Character/DWCharacter.h"
 #include "Voxel/VoxelModule.h"
+#include "Voxel/VoxelModuleBPLibrary.h"
 #include "Voxel/Chunks/VoxelChunk.h"
 #include "Voxel/Voxels/Voxel.h"
 #include "Voxel/Datas/VoxelData.h"
@@ -129,7 +130,7 @@ void UDWCharacterPart::OnExitVoxel(UVoxel* InVoxel, const FVoxelHitResult& InHit
 				{
 					if(InHitResult.VoxelItem.GetData<UVoxelData>().VoxelType != EVoxelType::Water)
 					{
-						GetOwnerCharacter()->Float(InVoxel->GetOwner()->IndexToLocation(InVoxel->GetIndex()).Z + AVoxelModule::GetWorldData()->BlockSize);
+						GetOwnerCharacter()->Float(InVoxel->GetOwner()->IndexToLocation(InVoxel->GetIndex()).Z + UVoxelModuleBPLibrary::GetWorldData().BlockSize);
 					}
 					break;
 				}

@@ -52,6 +52,44 @@ void ADWPlayerController::OnPreparatory_Implementation()
 	Super::OnPreparatory_Implementation();
 }
 
+void ADWPlayerController::LoadData(FSaveData* InSaveData)
+{
+	ADWPlayerCharacter* PlayerCharacter = GetPlayerPawn<ADWPlayerCharacter>();
+	
+	auto SaveData = InSaveData->CastRef<FDWPlayerSaveData>();
+	if(!PlayerCharacter || !PlayerCharacter->IsA(SaveData.GetCharacterData().Class))
+	{
+		PlayerCharacter = UObjectPoolModuleBPLibrary::SpawnObject<ADWPlayerCharacter>(nullptr, SaveData.GetCharacterData().Class);
+		SetPlayerPawn(PlayerCharacter);
+	}
+	if(PlayerCharacter)
+	{
+		PlayerCharacter->LoadSaveData(&SaveData, true);
+	}
+}
+
+FSaveData* ADWPlayerController::ToData()
+{
+	return nullptr;
+}
+
+void ADWPlayerController::UnloadData(bool bForceMode)
+{
+	ADWPlayerCharacter* PlayerCharacter = GetPlayerPawn<ADWPlayerCharacter>();
+	if(!PlayerCharacter) return;
+	
+	UnPossess();
+	if(bForceMode)
+	{
+		PlayerCharacter->Destroy();
+		SetPlayerPawn(nullptr);
+	}
+	else
+	{
+		PlayerCharacter->SetActorHiddenInGame(true);
+	}
+}
+
 void ADWPlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
@@ -92,7 +130,7 @@ void ADWPlayerController::SetupInputComponent()
 
 void ADWPlayerController::OnPossess(APawn* InPawn)
 {
-	if(InPawn->IsA(ADWPlayerCharacter::StaticClass()) && (InPawn != GetPlayerPawn() || !GetPawn()))
+	if(InPawn->IsA<ADWPlayerCharacter>() && (InPawn != GetPlayerPawn() || !GetPawn()))
 	{
 		UWidgetModuleBPLibrary::InitializeUserWidget<UWidgetGameHUD>(InPawn);
 		UWidgetModuleBPLibrary::InitializeUserWidget<UWidgetInventoryBar>(InPawn);
@@ -133,39 +171,6 @@ void ADWPlayerController::Tick(float DeltaTime)
 			DoubleJumpTime -= DeltaTime;
 		}
 	}
-}
-
-void ADWPlayerController::LoadData(FSaveData* InSaveData)
-{
-	if(GetPlayerPawn<ADWPlayerCharacter>()) return;
-
-	FDWPlayerSaveData InPlayerData = InSaveData->ToRef<FDWPlayerSaveData>();
-
-	if(ADWPlayerCharacter* PlayerCharacter = UObjectPoolModuleBPLibrary::SpawnObject<ADWPlayerCharacter>(nullptr, InPlayerData.GetCharacterData().Class))
-	{
-		SetPlayerPawn(PlayerCharacter);
-		USaveGameModuleBPLibrary::LoadObjectData(PlayerCharacter, &InPlayerData, true);
-	}
-}
-
-FSaveData* ADWPlayerController::ToData()
-{
-	return nullptr;
-}
-
-void ADWPlayerController::UnloadData()
-{
-	if(!GetPlayerPawn<ADWPlayerCharacter>()) return;
-
-	UnPossess();
-	GetPlayerPawn<ADWPlayerCharacter>()->Destroy();
-	SetPlayerPawn(nullptr);
-}
-
-void ADWPlayerController::ResetData()
-{
-	bPressedSprint = false;
-	DoubleJumpTime = 0.f;
 }
 
 bool ADWPlayerController::RaycastFromAimPoint(FHitResult& OutHitResult, EDWGameTraceType InGameTraceType, float InRayDistance) const

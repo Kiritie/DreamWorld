@@ -39,6 +39,13 @@ public:
 	virtual void OnUnPause_Implementation() override;
 
 	virtual void OnTermination_Implementation() override;
+	
+protected:
+	virtual void LoadData(FSaveData* InSaveData) override;
+
+	virtual FSaveData* ToData() override;
+
+	virtual void UnloadData(bool bForceMode) override;
 
 	//////////////////////////////////////////////////////////////////////////
 	// Components
@@ -50,13 +57,6 @@ protected:
 	// World
 protected:
 	virtual void OnWorldStateChanged() override;
-	
-public:
-	virtual void LoadData(FSaveData* InSaveData) override;
-
-	virtual FSaveData* ToData() override;
-
-	virtual void UnloadData() override;
 
 protected:
 	virtual void GeneratePreviews() override;

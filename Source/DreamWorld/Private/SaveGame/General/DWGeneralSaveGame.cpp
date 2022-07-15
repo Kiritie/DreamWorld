@@ -22,9 +22,9 @@ void UDWGeneralSaveGame::OnLoad_Implementation()
 	Super::OnLoad_Implementation();
 }
 
-void UDWGeneralSaveGame::OnUnload_Implementation()
+void UDWGeneralSaveGame::OnUnload_Implementation(bool bForceMode)
 {
-	Super::OnLoad_Implementation();
+	Super::OnUnload_Implementation(bForceMode);
 }
 
 void UDWGeneralSaveGame::OnRefresh_Implementation()

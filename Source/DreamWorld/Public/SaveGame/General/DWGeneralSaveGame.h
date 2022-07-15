@@ -25,7 +25,7 @@ public:
 	
 	virtual void OnLoad_Implementation() override;
 	
-	virtual void OnUnload_Implementation() override;
+	virtual void OnUnload_Implementation(bool bForceMode) override;
 
 	virtual void OnRefresh_Implementation() override;
 
@@ -36,7 +36,7 @@ protected:
 public:
 	virtual FSaveData* GetSaveData() override { return &DWGeneralSaveData; }
 
-	virtual void SetSaveData(FSaveData* InSaveData) override { DWGeneralSaveData = InSaveData->ToRef<FDWGeneralSaveData>(); }
+	virtual void SetSaveData(FSaveData* InSaveData) override { DWGeneralSaveData = InSaveData->CastRef<FDWGeneralSaveData>(); }
 
 	UFUNCTION(BlueprintPure, meta = (DisplayName = "GetSaveData"))
 	FDWGeneralSaveData& K2_GetSaveData() { return DWGeneralSaveData; }

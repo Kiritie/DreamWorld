@@ -43,7 +43,7 @@ void UProcedure_Playing::OnEnter(UProcedureBase* InLastProcedure)
 {
 	Super::OnEnter(InLastProcedure);
 
-	if(InLastProcedure->IsA(UProcedure_Loading::StaticClass()))
+	if(InLastProcedure->IsA<UProcedure_Loading>())
 	{
 		UAudioModuleBPLibrary::PlaySingleSound2D(BGMSound, FName("BGM"));
 

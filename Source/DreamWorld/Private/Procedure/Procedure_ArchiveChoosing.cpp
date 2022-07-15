@@ -6,6 +6,7 @@
 #include "Character/CharacterModuleBPLibrary.h"
 #include "Character/Player/DWPlayerCharacter.h"
 #include "Gameplay/DWGameState.h"
+#include "Gameplay/DWPlayerController.h"
 #include "Global/GlobalBPLibrary.h"
 #include "Procedure/ProcedureModuleBPLibrary.h"
 #include "Procedure/Procedure_ArchiveCreating.h"
@@ -13,6 +14,7 @@
 #include "SaveGame/Archive/DWArchiveSaveGame.h"
 #include "SaveGame/General/DWGeneralSaveGame.h"
 #include "SaveGame/SaveGameModuleBPLibrary.h"
+#include "Voxel/VoxelModule.h"
 #include "Widget/WidgetModuleBPLibrary.h"
 #include "Widget/Archive/WidgetArchiveChoosingPanel.h"
 #include "Widget/Archive/WidgetArchiveCreatingPanel.h"
@@ -43,6 +45,11 @@ void UProcedure_ArchiveChoosing::OnInitialize()
 void UProcedure_ArchiveChoosing::OnEnter(UProcedureBase* InLastProcedure)
 {
 	Super::OnEnter(InLastProcedure);
+	
+	if(ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>())
+	{
+		PlayerCharacter->SetActorHiddenInGame(true);
+	}
 
 	UWidgetModuleBPLibrary::OpenUserWidget<UWidgetArchiveChoosingPanel>();
 
@@ -68,7 +75,8 @@ void UProcedure_ArchiveChoosing::CreateArchive()
 {
 	if(USaveGameModuleBPLibrary::GetSaveGame<UDWArchiveSaveGame>()->IsSaved())
 	{
-		USaveGameModuleBPLibrary::UnloadSaveGame<UDWArchiveSaveGame>();
+		AMainModule::GetModuleByClass<AVoxelModule>()->UnloadSaveData(false);
+		UGlobalBPLibrary::GetPlayerController<ADWPlayerController>()->UnloadSaveData(false);
 		USaveGameModuleBPLibrary::CreateSaveGame<UDWArchiveSaveGame>(-1, true);
 	}
 	UProcedureModuleBPLibrary::SwitchProcedureByClass<UProcedure_ArchiveCreating>();
@@ -76,11 +84,9 @@ void UProcedure_ArchiveChoosing::CreateArchive()
 
 void UProcedure_ArchiveChoosing::RemoveArchive(int32 InArchiveID)
 {
+	const bool bNeedCreateArchive = USaveGameModuleBPLibrary::GetActiveSaveIndex<UDWArchiveSaveGame>() == InArchiveID;
 	USaveGameModuleBPLibrary::DestroySaveGame<UDWArchiveSaveGame>(InArchiveID);
-	if(USaveGameModuleBPLibrary::GetActiveSaveIndex<UDWArchiveSaveGame>() != InArchiveID)
-	{
-		USaveGameModuleBPLibrary::CreateSaveGame<UDWArchiveSaveGame>(-1, true);
-	}
+	if(bNeedCreateArchive) USaveGameModuleBPLibrary::CreateSaveGame<UDWArchiveSaveGame>(-1, true);
 	UWidgetModuleBPLibrary::GetUserWidget<UWidgetArchiveChoosingPanel>()->Refresh();
 }
 
@@ -88,7 +94,8 @@ void UProcedure_ArchiveChoosing::ChooseArchive(int32 InArchiveID)
 {
 	if(USaveGameModuleBPLibrary::GetActiveSaveIndex<UDWArchiveSaveGame>() != InArchiveID)
 	{
-		USaveGameModuleBPLibrary::UnloadSaveGame<UDWArchiveSaveGame>();
+		AMainModule::GetModuleByClass<AVoxelModule>()->UnloadSaveData(false);
+		UGlobalBPLibrary::GetPlayerController<ADWPlayerController>()->UnloadSaveData(false);
 		USaveGameModuleBPLibrary::SetActiveSaveIndex<UDWArchiveSaveGame>(InArchiveID);
 	}
 	UProcedureModuleBPLibrary::SwitchProcedureByClass<UProcedure_Loading>();

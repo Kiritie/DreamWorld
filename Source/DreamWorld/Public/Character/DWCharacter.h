@@ -147,20 +147,20 @@ protected:
 protected:
 	virtual void BeginPlay() override;
 
-	virtual void RefreshFiniteState() override;
-	
-public:
 	virtual void OnSpawn_Implementation(const TArray<FParameter>& InParams) override;
 
 	virtual void OnDespawn_Implementation() override;
 	
-	virtual void Tick(float DeltaTime) override;
-
-	virtual void Serialize(FArchive& Ar) override;
-
 	virtual void LoadData(FSaveData* InSaveData) override;
 
 	virtual FSaveData* ToData() override;
+
+	virtual void RefreshFiniteState() override;
+	
+public:
+	virtual void Tick(float DeltaTime) override;
+
+	virtual void Serialize(FArchive& Ar) override;
 
 public:
 	virtual void Death(IAbilityVitalityInterface* InKiller = nullptr) override;

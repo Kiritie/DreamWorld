@@ -8,9 +8,11 @@
 #include "Camera/Roam/RoamCameraPawn.h"
 #include "Character/Player/DWPlayerCharacter.h"
 #include "Gameplay/DWGameState.h"
+#include "Gameplay/DWPlayerController.h"
 #include "Global/GlobalBPLibrary.h"
 #include "Procedure/ProcedureModuleBPLibrary.h"
 #include "Procedure/Procedure_Initializing.h"
+#include "Procedure/Procedure_Pausing.h"
 #include "SaveGame/Archive/DWArchiveSaveGame.h"
 #include "SaveGame/General/DWGeneralSaveGame.h"
 #include "SaveGame/SaveGameModuleBPLibrary.h"
@@ -53,24 +55,14 @@ void UProcedure_Starting::OnEnter(UProcedureBase* InLastProcedure)
 
 	AMainModule::GetModuleByClass<ADWVoxelModule>()->SetWorldMode(EVoxelWorldMode::Preview);
 
-	if(!InLastProcedure || InLastProcedure->IsA(UProcedure_Initializing::StaticClass()))
+	if(!InLastProcedure || InLastProcedure->IsA<UProcedure_Initializing>())
 	{
 		USaveGameModuleBPLibrary::LoadOrCreateSaveGame<UDWArchiveSaveGame>(USaveGameModuleBPLibrary::GetActiveSaveIndex<UDWArchiveSaveGame>());
-		if(ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>())
-		{
-			PlayerCharacter->SetActorHiddenInGame(true);
-		}
 	}
-	else
+	else if(InLastProcedure->IsA<UProcedure_Pausing>())
 	{
-		if(AVoxelModule* VoxelModule = AMainModule::GetModuleByClass<AVoxelModule>())
-		{
-			USaveGameModuleBPLibrary::UnloadDataObject(VoxelModule);
-		}
-		if(ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>())
-		{
-			PlayerCharacter->SetActorHiddenInGame(true);
-		}
+		AMainModule::GetModuleByClass<AVoxelModule>()->UnloadSaveData(false);
+		UGlobalBPLibrary::GetPlayerController<ADWPlayerController>()->UnloadSaveData(false);
 	}
 
 	Super::OnEnter(InLastProcedure);

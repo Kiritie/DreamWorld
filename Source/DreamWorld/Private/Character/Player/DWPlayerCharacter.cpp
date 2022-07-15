@@ -63,6 +63,7 @@
 #include "Character/States/DWCharacterState_Swim.h"
 #include "Character/States/DWCharacterState_Walk.h"
 #include "FSM/Components/FSMComponent.h"
+#include "Voxel/VoxelModuleBPLibrary.h"
 
 //////////////////////////////////////////////////////////////////////////
 // ADWPlayerCharacter
@@ -214,6 +215,59 @@ void ADWPlayerCharacter::BeginPlay()
 	PreviewCapture->ShowOnlyActors.Add(this);
 }
 
+void ADWPlayerCharacter::LoadData(FSaveData* InSaveData)
+{
+	Super::LoadData(InSaveData);
+
+	const auto SaveData = InSaveData->CastRef<FDWPlayerSaveData>();
+	if (SaveData.IsSaved())
+	{
+		SetControlMode(SaveData.ControlMode);
+	}
+	else
+	{
+		SetControlMode(EDWControlMode::Fighting);
+
+		auto VoxelDatas = UAssetModuleBPLibrary::LoadPrimaryAssets<UVoxelData>(UAbilityModuleBPLibrary::GetAssetTypeByItemType(EAbilityItemType::Voxel));
+		for (int32 i = 0; i < VoxelDatas.Num(); i++)
+		{
+			if(VoxelDatas[i]->VoxelType != EVoxelType::Empty && VoxelDatas[i]->VoxelType != EVoxelType::Unknown)
+			{
+				FAbilityItem tmpItem = FAbilityItem(VoxelDatas[i]->GetPrimaryAssetId(), VoxelDatas[i]->MaxCount);
+				Inventory->AdditionItemByRange(tmpItem);
+			}
+		}
+		
+		auto EquipDatas = UAssetModuleBPLibrary::LoadPrimaryAssets<UAbilityEquipDataBase>(UAbilityModuleBPLibrary::GetAssetTypeByItemType(EAbilityItemType::Equip));
+		for (int32 i = 0; i < EquipDatas.Num(); i++)
+		{
+			FAbilityItem tmpItem = FAbilityItem(EquipDatas[i]->GetPrimaryAssetId(), EquipDatas[i]->MaxCount);
+			Inventory->AdditionItemByRange(tmpItem);
+		}
+			
+		auto PropDatas = UAssetModuleBPLibrary::LoadPrimaryAssets<UAbilityPropDataBase>(UAbilityModuleBPLibrary::GetAssetTypeByItemType(EAbilityItemType::Prop));
+		for (int32 i = 0; i < PropDatas.Num(); i++)
+		{
+			FAbilityItem tmpItem = FAbilityItem(PropDatas[i]->GetPrimaryAssetId(), PropDatas[i]->MaxCount);
+			Inventory->AdditionItemByRange(tmpItem);
+		}
+
+		auto SkillDatas = UAssetModuleBPLibrary::LoadPrimaryAssets<UAbilitySkillDataBase>(UAbilityModuleBPLibrary::GetAssetTypeByItemType(EAbilityItemType::Skill));
+		for (int32 i = 0; i < SkillDatas.Num(); i++)
+		{
+			FAbilityItem tmpItem = FAbilityItem(SkillDatas[i]->GetPrimaryAssetId(), SkillDatas[i]->MaxCount);
+			Inventory->AdditionItemByRange(tmpItem);
+		}
+	}
+}
+
+FSaveData* ADWPlayerCharacter::ToData()
+{
+	static auto SaveData = *static_cast<FDWPlayerSaveData*>(Super::ToData());
+	SaveData.ControlMode = ControlMode;
+	return &SaveData;
+}
+
 // Called every frame
 void ADWPlayerCharacter::Tick(float DeltaTime)
 {
@@ -270,7 +324,7 @@ void ADWPlayerCharacter::Tick(float DeltaTime)
 	else if(GetActorLocation().IsNearlyZero())
 	{
 		FHitResult hitResult;
-		const FVector rayStart = FVector(GetActorLocation().X, GetActorLocation().Y, ADWVoxelModule::GetWorldData()->ChunkHeightRange * ADWVoxelModule::GetWorldData()->GetChunkLength() + 500);
+		const FVector rayStart = FVector(GetActorLocation().X, GetActorLocation().Y, UVoxelModuleBPLibrary::GetWorldData().ChunkHeightRange * UVoxelModuleBPLibrary::GetWorldData().GetChunkLength() + 500);
 		const FVector rayEnd = FVector(GetActorLocation().X, GetActorLocation().Y, 0);
 		if(AMainModule::GetModuleByClass<AVoxelModule>()->ChunkTraceSingle(rayStart, rayEnd, GetRadius(), GetHalfHeight(), hitResult))
 		{
@@ -278,59 +332,6 @@ void ADWPlayerCharacter::Tick(float DeltaTime)
 			FSM->SwitchStateByClass<UDWCharacterState_Walk>();
 		}
 	}
-}
-
-void ADWPlayerCharacter::LoadData(FSaveData* InSaveData)
-{
-	Super::LoadData(InSaveData);
-
-	auto SaveData = InSaveData->ToRef<FDWPlayerSaveData>();
-	if (SaveData.bSaved)
-	{
-		SetControlMode(SaveData.ControlMode);
-	}
-	else
-	{
-		SetControlMode(EDWControlMode::Fighting);
-
-		auto VoxelDatas = UAssetModuleBPLibrary::LoadPrimaryAssets<UVoxelData>(UAbilityModuleBPLibrary::GetAssetTypeByItemType(EAbilityItemType::Voxel));
-		for (int32 i = 0; i < VoxelDatas.Num(); i++)
-		{
-			if(VoxelDatas[i]->VoxelType != EVoxelType::Empty && VoxelDatas[i]->VoxelType != EVoxelType::Unknown)
-			{
-				FAbilityItem tmpItem = FAbilityItem(VoxelDatas[i]->GetPrimaryAssetId(), VoxelDatas[i]->MaxCount);
-				Inventory->AdditionItemByRange(tmpItem);
-			}
-		}
-		
-		auto EquipDatas = UAssetModuleBPLibrary::LoadPrimaryAssets<UAbilityEquipDataBase>(UAbilityModuleBPLibrary::GetAssetTypeByItemType(EAbilityItemType::Equip));
-		for (int32 i = 0; i < EquipDatas.Num(); i++)
-		{
-			FAbilityItem tmpItem = FAbilityItem(EquipDatas[i]->GetPrimaryAssetId(), EquipDatas[i]->MaxCount);
-			Inventory->AdditionItemByRange(tmpItem);
-		}
-			
-		auto PropDatas = UAssetModuleBPLibrary::LoadPrimaryAssets<UAbilityPropDataBase>(UAbilityModuleBPLibrary::GetAssetTypeByItemType(EAbilityItemType::Prop));
-		for (int32 i = 0; i < PropDatas.Num(); i++)
-		{
-			FAbilityItem tmpItem = FAbilityItem(PropDatas[i]->GetPrimaryAssetId(), PropDatas[i]->MaxCount);
-			Inventory->AdditionItemByRange(tmpItem);
-		}
-
-		auto SkillDatas = UAssetModuleBPLibrary::LoadPrimaryAssets<UAbilitySkillDataBase>(UAbilityModuleBPLibrary::GetAssetTypeByItemType(EAbilityItemType::Skill));
-		for (int32 i = 0; i < SkillDatas.Num(); i++)
-		{
-			FAbilityItem tmpItem = FAbilityItem(SkillDatas[i]->GetPrimaryAssetId(), SkillDatas[i]->MaxCount);
-			Inventory->AdditionItemByRange(tmpItem);
-		}
-	}
-}
-
-FSaveData* ADWPlayerCharacter::ToData()
-{
-	static auto SaveData = *static_cast<FDWPlayerSaveData*>(Super::ToData());
-	SaveData.ControlMode = ControlMode;
-	return &SaveData;
 }
 
 void ADWPlayerCharacter::LookAtTarget(ADWCharacter* InTargetCharacter)
@@ -413,12 +414,12 @@ bool ADWPlayerCharacter::RaycastVoxel(FVoxelHitResult& OutHitResult)
 	if(GetController<ADWPlayerController>())
 	{
 		FHitResult hitResult;
-		if(GetController<ADWPlayerController>()->RaycastFromAimPoint(hitResult, EDWGameTraceType::Voxel, InteractDistance) && hitResult.GetActor()->IsA(AVoxelChunk::StaticClass()))
+		if(GetController<ADWPlayerController>()->RaycastFromAimPoint(hitResult, EDWGameTraceType::Voxel, InteractDistance) && hitResult.GetActor()->IsA<AVoxelChunk>())
 		{
 			AVoxelChunk* chunk = Cast<AVoxelChunk>(hitResult.GetActor());
 			if(chunk != nullptr)
 			{
-				const FVoxelItem& voxelItem = chunk->GetVoxelItem(chunk->LocationToIndex(hitResult.ImpactPoint - AVoxelModule::GetWorldData()->GetBlockSizedNormal(hitResult.ImpactNormal, 0.01f)));
+				const FVoxelItem& voxelItem = chunk->GetVoxelItem(chunk->LocationToIndex(hitResult.ImpactPoint - UVoxelModuleBPLibrary::GetWorldData().GetBlockSizedNormal(hitResult.ImpactNormal, 0.01f)));
 				if(voxelItem.IsValid())
 				{
 					OutHitResult = FVoxelHitResult(voxelItem, hitResult.ImpactPoint, hitResult.ImpactNormal);

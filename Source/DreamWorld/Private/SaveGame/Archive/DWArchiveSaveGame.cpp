@@ -42,26 +42,26 @@ void UDWArchiveSaveGame::OnLoad_Implementation()
 
 	WHDebug(FString::Printf(TEXT("Loading archive : %d"), DWArchiveSaveData.ID));
 
-	USaveGameModuleBPLibrary::LoadObjectData(AMainModule::GetModuleByClass<AVoxelModule>(), &DWArchiveSaveData.WorldData);
-	USaveGameModuleBPLibrary::LoadObjectData(UGlobalBPLibrary::GetPlayerController<ADWPlayerController>(), &DWArchiveSaveData.PlayerData);
+	AMainModule::GetModuleByClass<AVoxelModule>()->LoadSaveData(&DWArchiveSaveData.WorldData);
+	UGlobalBPLibrary::GetPlayerController<ADWPlayerController>()->LoadSaveData(&DWArchiveSaveData.PlayerData);
 }
 
-void UDWArchiveSaveGame::OnUnload_Implementation()
+void UDWArchiveSaveGame::OnUnload_Implementation(bool bForceMode)
 {
-	Super::OnUnload_Implementation();
+	Super::OnUnload_Implementation(bForceMode);
 
 	WHDebug(FString::Printf(TEXT("UnLoading archive : %d"), DWArchiveSaveData.ID));
 
-	USaveGameModuleBPLibrary::UnloadDataObject(AMainModule::GetModuleByClass<ADWVoxelModule>());
-	USaveGameModuleBPLibrary::UnloadDataObject(UGlobalBPLibrary::GetPlayerController<ADWPlayerController>());
+	AMainModule::GetModuleByClass<ADWVoxelModule>()->UnloadSaveData(bForceMode);
+	UGlobalBPLibrary::GetPlayerController<ADWPlayerController>()->UnloadSaveData(bForceMode);
 }
 
 void UDWArchiveSaveGame::OnRefresh_Implementation()
 {
 	Super::OnRefresh_Implementation();
 
-	DWArchiveSaveData.PlayerData = USaveGameModuleBPLibrary::ObjectToDataRef<FDWPlayerSaveData>(UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>(), true, true);
-	DWArchiveSaveData.WorldData = USaveGameModuleBPLibrary::ObjectToDataRef<FDWVoxelWorldSaveData>(AMainModule::GetModuleByClass<ADWVoxelModule>());
+	DWArchiveSaveData.PlayerData = UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>()->ToSaveDataRef<FDWPlayerSaveData>(true);
+	DWArchiveSaveData.WorldData = AMainModule::GetModuleByClass<ADWVoxelModule>()->ToSaveDataRef<FDWVoxelWorldSaveData>();
 }
 
 void UDWArchiveSaveGame::OnDestroy_Implementation()

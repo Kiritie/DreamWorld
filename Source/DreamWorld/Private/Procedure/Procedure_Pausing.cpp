@@ -62,7 +62,7 @@ void UProcedure_Pausing::OnLeave(UProcedureBase* InNextProcedure)
 	UGameplayStatics::SetGamePaused(this, false);
 	UMainModuleBPLibrary::UnPauseAllModule();
 
-	if(InNextProcedure->IsA(UProcedure_Starting::StaticClass()))
+	if(InNextProcedure->IsA<UProcedure_Starting>())
 	{
 		UWidgetModuleBPLibrary::CloseUserWidget<UWidgetGameHUD>();
 		UWidgetModuleBPLibrary::CloseUserWidget<UWidgetInventoryBar>();

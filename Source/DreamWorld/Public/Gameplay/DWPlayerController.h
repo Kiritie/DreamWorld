@@ -25,6 +25,13 @@ public:
 	virtual void OnPreparatory_Implementation() override;
 
 protected:
+	virtual void LoadData(FSaveData* InSaveData) override;
+
+	virtual FSaveData* ToData() override;
+
+	virtual void UnloadData(bool bForceMode) override;
+
+protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Inputs")
 	bool bPressedSprint;
 
@@ -39,17 +46,9 @@ protected:
 	virtual void OnUnPossess() override;
 
 public:
-	virtual void LoadData(FSaveData* InSaveData) override;
-
-	virtual FSaveData* ToData() override;
-
-	virtual void UnloadData() override;
-
-	virtual void ResetData();
-
 	virtual void Tick(float DeltaTime) override;
 
-	bool RaycastFromAimPoint(FHitResult& OutHitResult, EDWGameTraceType InGameTraceType, float InRayDistance = 1000) const;
+	virtual bool RaycastFromAimPoint(FHitResult& OutHitResult, EDWGameTraceType InGameTraceType, float InRayDistance = 1000.f) const;
 
 protected:
 	virtual void OnJumpPressed(FKey Key);

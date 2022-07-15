@@ -30,6 +30,14 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	virtual void OnSpawn_Implementation(const TArray<FParameter>& InParams) override;
+		
+	virtual void OnDespawn_Implementation() override;
+
+	virtual void LoadData(FSaveData* InSaveData) override;
+
+	virtual FSaveData* ToData() override;
+
 	virtual void OnCollision(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit) override;
 	
 	virtual void OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) override;
@@ -39,10 +47,6 @@ protected:
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
-	virtual void OnSpawn_Implementation(const TArray<FParameter>& InParams) override;
-		
-	virtual void OnDespawn_Implementation() override;
 
 	//////////////////////////////////////////////////////////////////////////
 	// Stats
@@ -57,10 +61,6 @@ protected:
 	// Chunk
 public:
 	virtual void Initialize(FIndex InIndex, int32 InBatch) override;
-
-	virtual void LoadData(FSaveData* InSaveData) override;
-
-	virtual FSaveData* ToData() override;
 
 	virtual void Generate() override;
 

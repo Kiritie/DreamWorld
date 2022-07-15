@@ -64,7 +64,7 @@ void ADWSaveGameModule::LoadData(FSaveData* InSaveData)
 FSaveData* ADWSaveGameModule::ToData()
 {
 	static FDWGeneralSaveData SaveData;
-	SaveData.AllSaveGameInfo = Super::ToData()->ToRef<FGeneralSaveData>().AllSaveGameInfo;
+	SaveData.AllSaveGameInfo = Super::ToData()->CastRef<FGeneralSaveData>().AllSaveGameInfo;
 	SaveData.CameraDistance = UCameraModuleBPLibrary::GetCurrentCameraDistance();
 	return &SaveData;
 }

@@ -30,10 +30,6 @@ void UDWPlayerCharacterState_Default::OnEnter(UFiniteStateBase* InLastFiniteStat
 	PlayerCharacter->bPressedAttack = false;
 	PlayerCharacter->bPressedDefend = false;
 	PlayerCharacter->LockedTarget = nullptr;
-	if(PlayerCharacter->GetController<ADWPlayerController>())
-	{
-		PlayerCharacter->GetController<ADWPlayerController>()->ResetData();
-	}
 
 	PlayerCharacter->SetControlMode(PlayerCharacter->ControlMode);
 }

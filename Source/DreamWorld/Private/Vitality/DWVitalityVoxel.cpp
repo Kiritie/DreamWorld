@@ -6,6 +6,7 @@
 #include "Asset/AssetModuleBPLibrary.h"
 #include "Components/BoxComponent.h"
 #include "Voxel/VoxelModule.h"
+#include "Voxel/VoxelModuleBPLibrary.h"
 #include "Voxel/Components/VoxelMeshComponent.h"
 #include "Voxel/Datas/VoxelData.h"
 
@@ -26,7 +27,7 @@ void ADWVitalityVoxel::BeginPlay()
 	Super::BeginPlay();
 
 	FVector range = GetVoxelData().GetFinalRange();
-	BoxComponent->SetBoxExtent(range * AVoxelModule::GetWorldData()->BlockSize);
+	BoxComponent->SetBoxExtent(range * UVoxelModuleBPLibrary::GetWorldData().BlockSize);
 	//AddActorLocalOffset(FVector::UpVector * range.Z * VoxelMesh->BlockScale * 0.5f);
 
 	if (GetVoxelData().IsValid())
