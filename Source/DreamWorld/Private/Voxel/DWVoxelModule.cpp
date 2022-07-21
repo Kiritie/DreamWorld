@@ -84,21 +84,14 @@ void ADWVoxelModule::OnTermination_Implementation()
 	Super::OnTermination_Implementation();
 }
 
-void ADWVoxelModule::LoadData(FSaveData* InSaveData)
+void ADWVoxelModule::LoadData(FSaveData* InSaveData, bool bForceMode)
 {
-	Super::LoadData(InSaveData);
+	Super::LoadData(InSaveData, bForceMode);
 }
 
 FSaveData* ADWVoxelModule::ToData()
 {
-	for(auto Iter : ChunkMap)
-	{
-		if(Iter.Value)
-		{
-			GetWorldData<FDWVoxelWorldSaveData>().SetChunkData(Iter.Key, Iter.Value->ToSaveDataRef<FDWVoxelChunkSaveData>());
-		}
-	}
-	return WorldData;
+	return Super::ToData();
 }
 
 void ADWVoxelModule::UnloadData(bool bForceMode)
@@ -134,20 +127,9 @@ void ADWVoxelModule::GenerateChunks(FIndex InIndex)
 	}
 }
 
-void ADWVoxelModule::BuildChunkMap(AVoxelChunk* InChunk)
+void ADWVoxelModule::BuildChunkMap(AVoxelChunk* InChunk, int32 InStage)
 {
-	if (!InChunk || !ChunkMap.Contains(InChunk->GetIndex())) return;
-
-	if (GetWorldData<FDWVoxelWorldSaveData>().IsExistChunkData(InChunk->GetIndex()))
-	{
-		InChunk->LoadSaveData(&GetWorldData<FDWVoxelWorldSaveData>().GetChunkData(InChunk->GetIndex()));
-	}
-	else
-	{
-		InChunk->BuildMap();
-	}
-
-	AddToMapGenerateQueue(InChunk);
+	Super::BuildChunkMap(InChunk, InStage);
 }
 
 void ADWVoxelModule::GenerateChunkMap(AVoxelChunk* InChunk)
@@ -162,10 +144,6 @@ void ADWVoxelModule::GenerateChunk(AVoxelChunk* InChunk)
 
 void ADWVoxelModule::DestroyChunk(AVoxelChunk* InChunk)
 {
-	if(!InChunk || !ChunkMap.Contains(InChunk->GetIndex())) return;
-
-	GetWorldData<FDWVoxelWorldSaveData>().SetChunkData(InChunk->GetIndex(), InChunk->ToSaveDataRef<FDWVoxelChunkSaveData>());
-	
 	Super::DestroyChunk(InChunk);
 }
 

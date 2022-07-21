@@ -47,14 +47,12 @@ void UProcedure_ArchiveCreating::OnInitialize()
 
 void UProcedure_ArchiveCreating::OnEnter(UProcedureBase* InLastProcedure)
 {
+	Super::OnEnter(InLastProcedure);
+
 	if(ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>())
 	{
 		PlayerCharacter->SetActorHiddenInGame(false);
-		PlayerCharacter->GetFSMComponent()->OnStateChanged.AddDynamic(this, &UProcedure_ArchiveCreating::OnTargetCharacterStateChanged);
-		OperationTarget = PlayerCharacter;
 	}
-	
-	Super::OnEnter(InLastProcedure);
 
 	UWidgetModuleBPLibrary::OpenUserWidget<UWidgetArchiveCreatingPanel>();
 	UWidgetModuleBPLibrary::CreateUserWidget<UWidgetLoadingPanel>();
@@ -63,6 +61,11 @@ void UProcedure_ArchiveCreating::OnEnter(UProcedureBase* InLastProcedure)
 void UProcedure_ArchiveCreating::OnRefresh()
 {
 	Super::OnRefresh();
+
+	if(ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>())
+	{
+		UCameraModuleBPLibrary::SetCameraLocation(PlayerCharacter->GetActorLocation() + CameraViewOffset);
+	}
 }
 
 void UProcedure_ArchiveCreating::OnGuide()
@@ -73,19 +76,6 @@ void UProcedure_ArchiveCreating::OnGuide()
 void UProcedure_ArchiveCreating::OnLeave(UProcedureBase* InNextProcedure)
 {
 	Super::OnLeave(InNextProcedure);
-
-	if(ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>())
-	{
-		PlayerCharacter->GetFSMComponent()->OnStateChanged.RemoveDynamic(this, &UProcedure_ArchiveCreating::OnTargetCharacterStateChanged);
-	}
-}
-
-void UProcedure_ArchiveCreating::OnTargetCharacterStateChanged(UFiniteStateBase* InFiniteState)
-{
-	if(InFiniteState && InFiniteState->IsA<UDWCharacterState_Walk>())
-	{
-		ResetCameraView();
-	}
 }
 
 void UProcedure_ArchiveCreating::CreateArchive(FDWArchiveSaveData InArchiveSaveData)

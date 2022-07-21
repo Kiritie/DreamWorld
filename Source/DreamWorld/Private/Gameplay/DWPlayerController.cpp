@@ -52,19 +52,23 @@ void ADWPlayerController::OnPreparatory_Implementation()
 	Super::OnPreparatory_Implementation();
 }
 
-void ADWPlayerController::LoadData(FSaveData* InSaveData)
+void ADWPlayerController::LoadData(FSaveData* InSaveData, bool bForceMode)
 {
-	ADWPlayerCharacter* PlayerCharacter = GetPlayerPawn<ADWPlayerCharacter>();
+	ADWPlayerCharacter* PlayerCharacter = nullptr;
 	
 	auto SaveData = InSaveData->CastRef<FDWPlayerSaveData>();
-	if(!PlayerCharacter || !PlayerCharacter->IsA(SaveData.GetCharacterData().Class))
+	if(bForceMode)
 	{
 		PlayerCharacter = UObjectPoolModuleBPLibrary::SpawnObject<ADWPlayerCharacter>(nullptr, SaveData.GetCharacterData().Class);
 		SetPlayerPawn(PlayerCharacter);
 	}
+	else
+	{
+		PlayerCharacter = GetPlayerPawn<ADWPlayerCharacter>();
+	}
 	if(PlayerCharacter)
 	{
-		PlayerCharacter->LoadSaveData(&SaveData, true);
+		PlayerCharacter->LoadSaveData(&SaveData, bForceMode);
 	}
 }
 
@@ -76,17 +80,19 @@ FSaveData* ADWPlayerController::ToData()
 void ADWPlayerController::UnloadData(bool bForceMode)
 {
 	ADWPlayerCharacter* PlayerCharacter = GetPlayerPawn<ADWPlayerCharacter>();
-	if(!PlayerCharacter) return;
 	
-	UnPossess();
-	if(bForceMode)
+	if(PlayerCharacter)
 	{
-		PlayerCharacter->Destroy();
-		SetPlayerPawn(nullptr);
-	}
-	else
-	{
-		PlayerCharacter->SetActorHiddenInGame(true);
+		if(bForceMode)
+		{
+			UObjectPoolModuleBPLibrary::DespawnObject(PlayerCharacter);
+			SetPlayerPawn(nullptr);
+		}
+		else
+		{
+			UnPossess();
+			PlayerCharacter->SetActorHiddenInGame(true);
+		}
 	}
 }
 

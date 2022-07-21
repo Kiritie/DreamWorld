@@ -3,6 +3,7 @@
 #pragma once
 
 #include "DreamWorld/DreamWorld.h"
+#include "Global/Base/WHObject.h"
 #include "InventorySlot.generated.h"
 
 class UInventory;
@@ -14,7 +15,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnInventorySlotCooldownRefresh);
  * 物品槽
  */
 UCLASS(BlueprintType)
-class DREAMWORLD_API UInventorySlot : public UObject
+class DREAMWORLD_API UInventorySlot : public UWHObject
 {
 	GENERATED_BODY()
 
@@ -47,6 +48,10 @@ public:
 public:
 	UFUNCTION(BlueprintCallable)
 	virtual void InitSlot(UInventory* InOwner, FAbilityItem InItem, EAbilityItemType InLimitType/* = EAbilityItemType::None*/, ESplitSlotType InSplitType/* = ESplitSlotType::Default*/);
+	
+	virtual void OnSpawn_Implementation(const TArray<FParameter>& InParams) override;
+
+	virtual void OnDespawn_Implementation() override;
 
 	//////////////////////////////////////////////////////////////////////////
 	/// Checks

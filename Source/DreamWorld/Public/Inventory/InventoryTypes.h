@@ -119,6 +119,15 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<FAbilityItem> Items;
+
+public:
+	virtual void Reset() override
+	{
+		FSaveData::Reset();
+
+		SplitInfos.Empty();
+		Items.Empty();
+	}
 };
 
 /**

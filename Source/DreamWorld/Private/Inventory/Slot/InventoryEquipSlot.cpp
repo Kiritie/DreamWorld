@@ -18,6 +18,18 @@ void UInventoryEquipSlot::InitSlot(UInventory* InOwner, FAbilityItem InItem, EAb
 	Super::InitSlot(InOwner, InItem, InLimitType, InSplitType);
 }
 
+void UInventoryEquipSlot::OnSpawn_Implementation(const TArray<FParameter>& InParams)
+{
+	Super::OnSpawn_Implementation(InParams);
+}
+
+void UInventoryEquipSlot::OnDespawn_Implementation()
+{
+	Super::OnDespawn_Implementation();
+
+	PartType = EDWEquipPartType::Head;
+}
+
 bool UInventoryEquipSlot::CheckSlot(FAbilityItem& InItem) const
 {
 	return Super::CheckSlot(InItem) && InItem.GetData<UDWEquipData>().PartType == PartType;

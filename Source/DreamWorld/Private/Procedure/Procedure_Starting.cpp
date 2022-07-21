@@ -53,11 +53,9 @@ void UProcedure_Starting::OnEnter(UProcedureBase* InLastProcedure)
 	UWidgetModuleBPLibrary::OpenUserWidget<UWidgetMainMenu>();
 	UWidgetModuleBPLibrary::CreateUserWidget<UWidgetArchiveChoosingPanel>();
 
-	AMainModule::GetModuleByClass<ADWVoxelModule>()->SetWorldMode(EVoxelWorldMode::Preview);
-
 	if(!InLastProcedure || InLastProcedure->IsA<UProcedure_Initializing>())
 	{
-		USaveGameModuleBPLibrary::LoadOrCreateSaveGame<UDWArchiveSaveGame>(USaveGameModuleBPLibrary::GetActiveSaveIndex<UDWArchiveSaveGame>());
+		USaveGameModuleBPLibrary::LoadOrCreateSaveGame<UDWArchiveSaveGame>();
 	}
 	else if(InLastProcedure->IsA<UProcedure_Pausing>())
 	{

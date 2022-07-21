@@ -45,11 +45,9 @@ void UDWVitalityState_Death::DeathStart()
 
 void UDWVitalityState_Death::DeathEnd()
 {
-	Super::DeathEnd();
-
 	ADWVitality* Vitality = GetAgent<ADWVitality>();
 	
 	Vitality->Inventory->DiscardAllItem();
-	
-	UAbilityModuleBPLibrary::DestroyVitality(Vitality);
+
+	Super::DeathEnd();
 }

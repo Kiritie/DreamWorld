@@ -3,13 +3,15 @@
 #pragma once
 
 #include "DreamWorld/DreamWorld.h"
+#include "Global/Base/WHObject.h"
+#include "SaveGame/Base/SaveDataInterface.h"
 #include "Inventory.generated.h"
 
 /**
  * ��Ʒ��
  */
 UCLASS(DefaultToInstanced, Blueprintable)
-class DREAMWORLD_API UInventory : public UObject
+class DREAMWORLD_API UInventory : public UWHObject, public ISaveDataInterface
 {
 	GENERATED_BODY()
 
@@ -38,19 +40,20 @@ protected:
 	FOnInventorySlotSelected OnSlotSelected;
 	
 	//////////////////////////////////////////////////////////////////////////
-	/// Initialize
-public:
-	virtual void Initialize(AActor* InOwner, TMap<ESplitSlotType, FSplitSlotInfo> InSplitInfos);
-	
-	virtual void Refresh(float DeltaSeconds);
+	/// Data
+protected:
+	virtual void LoadData(FSaveData* InSaveData, bool bForceMode) override;
 
-	virtual void LoadData(FInventorySaveData InInventoryData, AActor* InOwner);
+	virtual FSaveData* ToData() override;
 
-	virtual FInventorySaveData ToData();
+	virtual void UnloadData(bool bForceMode) override;
 
 	//////////////////////////////////////////////////////////////////////////
 	/// Actions
 public:
+	UFUNCTION(BlueprintCallable)
+	virtual void Refresh(float DeltaSeconds);
+
 	UFUNCTION(BlueprintPure)
 	virtual FQueryItemInfo GetItemInfoByRange(EQueryItemType InQueryType, FAbilityItem InItem, int32 InStartIndex = 0, int32 InEndIndex = -1);
 

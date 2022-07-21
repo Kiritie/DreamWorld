@@ -52,9 +52,7 @@ void UProcedure_Loading::OnEnter(UProcedureBase* InLastProcedure)
 	UWidgetModuleBPLibrary::CreateUserWidget<UWidgetInventoryBar>();
 	UWidgetModuleBPLibrary::CreateUserWidget<UWidgetInventoryPanel>();
 
-	AMainModule::GetModuleByClass<ADWVoxelModule>()->SetWorldMode(EVoxelWorldMode::Normal);
-
-	USaveGameModuleBPLibrary::LoadSaveGame<UDWArchiveSaveGame>();
+	USaveGameModuleBPLibrary::LoadSaveGame<UDWArchiveSaveGame>(-1, false);
 }
 
 void UProcedure_Loading::OnRefresh()

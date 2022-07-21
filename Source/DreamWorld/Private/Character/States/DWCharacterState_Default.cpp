@@ -3,6 +3,12 @@
 #include "Character/States/DWCharacterState_Default.h"
 
 #include "Character/DWCharacter.h"
+#include "Character/States/DWCharacterState_Walk.h"
+#include "Components/CapsuleComponent.h"
+#include "FSM/Components/FSMComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
+#include "Voxel/VoxelModule.h"
+#include "Voxel/VoxelModuleBPLibrary.h"
 
 UDWCharacterState_Default::UDWCharacterState_Default()
 {
@@ -41,16 +47,42 @@ void UDWCharacterState_Default::OnEnter(UFiniteStateBase* InLastFiniteState)
 	Character->AIMoveStopDistance = 0;
 	Character->NormalAttackRemainTime = 0;
 	Character->ActionType = EDWCharacterActionType::None;
+
+	Character->GetCharacterMovement()->SetActive(false);
+	Character->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
 void UDWCharacterState_Default::OnRefresh()
 {
 	Super::OnRefresh();
+
+	ADWCharacter* Character = GetAgent<ADWCharacter>();
+
+	if(Character->GetActorLocation().IsNearlyZero())
+	{
+		FHitResult hitResult;
+		const FVector rayStart = FVector(Character->GetActorLocation().X, Character->GetActorLocation().Y, UVoxelModuleBPLibrary::GetWorldData().ChunkHeightRange * UVoxelModuleBPLibrary::GetWorldData().GetChunkLength() + 500);
+		const FVector rayEnd = FVector(Character->GetActorLocation().X, Character->GetActorLocation().Y, 0);
+		if(AMainModule::GetModuleByClass<AVoxelModule>()->ChunkTraceSingle(rayStart, rayEnd, Character->GetRadius(), Character->GetHalfHeight(), hitResult))
+		{
+			Character->SetActorLocationAndRotation(hitResult.Location, FRotator::ZeroRotator);
+			FSM->SwitchStateByClass<UDWCharacterState_Walk>();
+		}
+	}
+	else
+	{
+		FSM->SwitchStateByClass<UDWCharacterState_Walk>();
+	}
 }
 
 void UDWCharacterState_Default::OnLeave(UFiniteStateBase* InNextFiniteState)
 {
 	Super::OnLeave(InNextFiniteState);
+
+	ADWCharacter* Character = GetAgent<ADWCharacter>();
+
+	Character->GetCharacterMovement()->SetActive(true);
+	Character->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 }
 
 void UDWCharacterState_Default::OnTermination()

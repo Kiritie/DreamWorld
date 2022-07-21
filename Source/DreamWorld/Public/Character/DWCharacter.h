@@ -147,11 +147,13 @@ protected:
 protected:
 	virtual void BeginPlay() override;
 
+	virtual int32 GetLimit_Implementation() const override { return -1; }
+
 	virtual void OnSpawn_Implementation(const TArray<FParameter>& InParams) override;
 
 	virtual void OnDespawn_Implementation() override;
 	
-	virtual void LoadData(FSaveData* InSaveData) override;
+	virtual void LoadData(FSaveData* InSaveData, bool bForceMode) override;
 
 	virtual FSaveData* ToData() override;
 
@@ -353,8 +355,6 @@ public:
 	
 	UFUNCTION(BlueprintPure)
 	virtual bool IsEnemy(ADWCharacter* InTargetCharacter) const;
-
-	virtual void SetVisible_Implementation(bool bVisible) override;
 									
 	virtual void SetMotionRate_Implementation(float InMovementRate, float InRotationRate) override;
 

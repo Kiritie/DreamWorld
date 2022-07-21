@@ -3,18 +3,18 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "SaveGame/SaveGameModule.h"
+#include "Character/CharacterModule.h"
 
-#include "DWSaveGameModule.generated.h"
+#include "DWCharacterModule.generated.h"
 
 UCLASS()
-class DREAMWORLD_API ADWSaveGameModule : public ASaveGameModule
+class DREAMWORLD_API ADWCharacterModule : public ACharacterModule
 {
 	GENERATED_BODY()
 	
 public:	
 	// ParamSets default values for this actor's properties
-	ADWSaveGameModule();
+	ADWCharacterModule();
 	
 	//////////////////////////////////////////////////////////////////////////
 	/// Module
@@ -35,8 +35,11 @@ public:
 
 	virtual void OnUnPause_Implementation() override;
 
+	//////////////////////////////////////////////////////////////////////////
+	/// Player
 protected:
-	virtual void LoadData(FSaveData* InSaveData, bool bForceMode) override;
-
-	virtual FSaveData* ToData() override;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Player")
+	FDWPlayerBasicSaveData PlayerBasicData;
+public:
+	FDWPlayerBasicSaveData GetPlayerBasicData() const { return PlayerBasicData; }
 };

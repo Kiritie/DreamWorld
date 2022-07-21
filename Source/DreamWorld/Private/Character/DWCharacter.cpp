@@ -97,6 +97,7 @@ ADWCharacter::ADWCharacter()
 	Inventory = CreateDefaultSubobject<UCharacterInventory>(FName("Inventory"));
 	Inventory->GetOnSlotSelected().AddDynamic(this, &ADWCharacter::OnInventorySlotSelected);
 
+	FSM->DefaultState = UDWCharacterState_Default::StaticClass();
 	FSM->States.Empty();
 	FSM->States.Add(UDWCharacterState_Attack::StaticClass());
 	FSM->States.Add(UDWCharacterState_Climb::StaticClass());
@@ -115,7 +116,6 @@ ADWCharacter::ADWCharacter()
 	FSM->States.Add(UDWCharacterState_Static::StaticClass());
 	FSM->States.Add(UDWCharacterState_Swim::StaticClass());
 	FSM->States.Add(UDWCharacterState_Walk::StaticClass());
-	FSM->DefaultState = UDWCharacterState_Default::StaticClass();
 
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96);
@@ -173,13 +173,6 @@ void ADWCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	DefaultGravityScale = GetCharacterMovement()->GravityScale;
-	DefaultAirControl = GetCharacterMovement()->AirControl;
-
-	AbilitySystem->InitAbilityActorInfo(this, this);
-
-	BirthLocation = GetActorLocation();
-
 	if (GetWidgetCharacterHPWidget() && !GetWidgetCharacterHPWidget()->GetOwnerCharacter())
 	{
 		GetWidgetCharacterHPWidget()->SetOwnerCharacter(this);
@@ -194,164 +187,145 @@ void ADWCharacter::OnSpawn_Implementation(const TArray<FParameter>& InParams)
 void ADWCharacter::OnDespawn_Implementation()
 {
 	Super::OnDespawn_Implementation();
+
+	Inventory->UnloadSaveData(true);
+	
+	for(auto& Iter : Equips)
+	{
+		UObjectPoolModuleBPLibrary::DespawnObject(Iter.Value);
+		Iter.Value = nullptr;
+	}
 }
 
-void ADWCharacter::LoadData(FSaveData* InSaveData)
+void ADWCharacter::LoadData(FSaveData* InSaveData, bool bForceMode)
 {
+	Super::LoadData(InSaveData, bForceMode);
+	
 	auto SaveData = InSaveData->CastRef<FDWCharacterSaveData>();
 	
-	if (SaveData.IsSaved())
+	if(bForceMode)
 	{
-		AssetID = SaveData.ID;
 		Nature = SaveData.Nature;
-		SetNameV(SaveData.Name);
-		SetRaceID(SaveData.RaceID);
 		SetTeamID(SaveData.TeamID);
-		SetLevelV(SaveData.Level);
-		SetEXP(SaveData.EXP);
-		AttackDistance = SaveData.AttackDistance;
-		InteractDistance = SaveData.InteractDistance;
-		FollowDistance = SaveData.FollowDistance;
-		PatrolDistance = SaveData.PatrolDistance;
-		PatrolDuration = SaveData.PatrolDuration;
-
-		DefaultAbility = SaveData.DefaultAbility;
-		FallingAttackAbility = SaveData.FallingAttackAbility;
-		AttackAbilities = SaveData.AttackAbilities;
-		SkillAbilities = SaveData.SkillAbilities;
-		ActionAbilities = SaveData.ActionAbilities;
-
-		Inventory->LoadData(SaveData.InventoryData, this);
-
-		SetActorLocation(SaveData.SpawnLocation);
-		SetActorRotation(SaveData.SpawnRotation);
-
-		for(auto& iter : AttackAbilities)
-		{
-			iter.AbilityHandle = AcquireAbility(iter.AbilityClass, iter.AbilityLevel);
-		}
-		
-		for(auto& iter : SkillAbilities)
-		{
-			iter.Value.AbilityHandle = AcquireAbility(iter.Value.AbilityClass, iter.Value.AbilityLevel);
-		}
-
-		for(auto& iter : ActionAbilities)
-		{
-			iter.Value.AbilityHandle = AcquireAbility(iter.Value.AbilityClass, iter.Value.AbilityLevel);
-		}
-
-		FallingAttackAbility.AbilityHandle = AcquireAbility(FallingAttackAbility.AbilityClass, FallingAttackAbility.AbilityLevel);
-
-		DefaultAbility.AbilityHandle = AcquireAbility(GetCharacterData<UDWCharacterData>().AbilityClass, DefaultAbility.AbilityLevel);
-		ActiveAbility(DefaultAbility.AbilityHandle);
 	}
-	else
+
+	BirthLocation = GetActorLocation();
+	AttackDistance = SaveData.AttackDistance;
+	InteractDistance = SaveData.InteractDistance;
+	FollowDistance = SaveData.FollowDistance;
+	PatrolDistance = SaveData.PatrolDistance;
+	PatrolDuration = SaveData.PatrolDuration;
+
+	DefaultAbility = SaveData.DefaultAbility;
+	FallingAttackAbility = SaveData.FallingAttackAbility;
+	AttackAbilities = SaveData.AttackAbilities;
+	SkillAbilities = SaveData.SkillAbilities;
+	ActionAbilities = SaveData.ActionAbilities;
+
+	if(bForceMode)
 	{
-		AssetID = SaveData.ID;
-		SetNameV(SaveData.Name);
-		SetRaceID(SaveData.RaceID);
-		SetLevelV(SaveData.Level);
-
-		SetActorLocation(SaveData.SpawnLocation);
-		SetActorRotation(SaveData.SpawnRotation);
-
-		const UDWCharacterData& CharacterData = GetCharacterData<UDWCharacterData>();
-		if(CharacterData.IsValid())
+		if(SaveData.IsSaved())
 		{
-			FString contextString;
+			for(auto& iter : AttackAbilities)
+			{
+				iter.AbilityHandle = AcquireAbility(iter.GetItemData().AbilityClass, iter.AbilityLevel);
+			}
 			
-			if (CharacterData.AttackAbilityTable != nullptr)
+			for(auto& iter : SkillAbilities)
 			{
-				TArray<FDWCharacterAttackAbilityData*> attackAbilities;
-				CharacterData.AttackAbilityTable->GetAllRows(contextString, attackAbilities);
-				for (int i = 0; i < attackAbilities.Num(); i++)
-				{
-					auto abilityData = *attackAbilities[i];
-					abilityData.AbilityHandle = AcquireAbility(abilityData.AbilityClass, abilityData.AbilityLevel);
-					AttackAbilities.Add(abilityData);
-				}
+				iter.Value.AbilityHandle = AcquireAbility(iter.Value.GetItemData().AbilityClass, iter.Value.AbilityLevel);
 			}
 
-			if (CharacterData.SkillAbilityTable != nullptr)
+			for(auto& iter : ActionAbilities)
 			{
-				TArray<FDWCharacterSkillAbilityData*> skillAbilities;
-				CharacterData.SkillAbilityTable->GetAllRows(contextString, skillAbilities);
-				for (int i = 0; i < skillAbilities.Num(); i++)
-				{
-					auto abilityData = *skillAbilities[i];
-					abilityData.AbilityHandle = AcquireAbility(abilityData.AbilityClass, abilityData.AbilityLevel);
-					SkillAbilities.Add(abilityData.AbilityID, abilityData);
-				}
+				iter.Value.AbilityHandle = AcquireAbility(iter.Value.GetItemData().AbilityClass, iter.Value.AbilityLevel);
 			}
 
-			if (CharacterData.ActionAbilityTable != nullptr)
-			{
-				TArray<FDWCharacterActionAbilityData*> actionAbilities;
-				CharacterData.ActionAbilityTable->GetAllRows(contextString, actionAbilities);
-				for (int i = 0; i < actionAbilities.Num(); i++)
-				{
-					auto abilityData = *actionAbilities[i];
-					abilityData.AbilityHandle = AcquireAbility(abilityData.AbilityClass, abilityData.AbilityLevel);
-					ActionAbilities.Add(abilityData.ActionType, abilityData);
-				}
-			}
+			FallingAttackAbility.AbilityHandle = AcquireAbility(FallingAttackAbility.GetItemData().AbilityClass, FallingAttackAbility.AbilityLevel);
 
-			if (CharacterData.FallingAttackAbility.AbilityClass != nullptr)
-			{
-				FallingAttackAbility = CharacterData.FallingAttackAbility;
-				FallingAttackAbility.AbilityHandle = AcquireAbility(FallingAttackAbility.AbilityClass, FallingAttackAbility.AbilityLevel);
-			}
-
-			if(CharacterData.AbilityClass != nullptr)
-			{
-				DefaultAbility = FAbilityData();
-				DefaultAbility.AbilityLevel = SaveData.Level;
-				DefaultAbility.AbilityHandle = AcquireAbility(CharacterData.AbilityClass, DefaultAbility.AbilityLevel);
-				ActiveAbility(DefaultAbility.AbilityHandle);
-			}
-
-			Nature = CharacterData.Nature;
-			AttackDistance = CharacterData.AttackDistance;
-			InteractDistance = CharacterData.InteractDistance;
-			FollowDistance = CharacterData.FollowDistance;
-			PatrolDistance = CharacterData.PatrolDistance;
-			PatrolDuration = CharacterData.PatrolDuration;
-			
-			SaveData.InventoryData = CharacterData.InventoryData;
+			DefaultAbility.AbilityHandle = AcquireAbility(GetCharacterData<UDWCharacterData>().AbilityClass, DefaultAbility.AbilityLevel);
 		}
+		else
+		{
+			const UDWCharacterData& CharacterData = GetCharacterData<UDWCharacterData>();
+			if(CharacterData.IsValid())
+			{
+				TArray<FDWCharacterAttackAbilityData> _AttackAbilities;
+				UAssetModuleBPLibrary::ReadDataTable(CharacterData.AttackAbilityTable, _AttackAbilities);
+				for(auto Iter : _AttackAbilities)
+				{
+					Iter.AbilityHandle = AcquireAbility(Iter.GetItemData().AbilityClass, Iter.AbilityLevel);
+					AttackAbilities.Add(Iter);
+				}
 
-		Inventory->LoadData(SaveData.InventoryData, this);
+				TArray<FDWCharacterSkillAbilityData> _SkillAbilities;
+				UAssetModuleBPLibrary::ReadDataTable(CharacterData.SkillAbilityTable, _SkillAbilities);
+				for(auto Iter : _SkillAbilities)
+				{
+					Iter.AbilityHandle = AcquireAbility(Iter.GetItemData().AbilityClass, Iter.AbilityLevel);
+					SkillAbilities.Add(Iter.AbilityID, Iter);
+				}
+
+				TArray<FDWCharacterActionAbilityData> _ActionAbilities;
+				UAssetModuleBPLibrary::ReadDataTable(CharacterData.ActionAbilityTable, _ActionAbilities);
+				for(auto Iter : _ActionAbilities)
+				{
+					Iter.AbilityHandle = AcquireAbility(Iter.GetItemData().AbilityClass, Iter.AbilityLevel);
+					ActionAbilities.Add(Iter.ActionType, Iter);
+				}
+
+				if (CharacterData.FallingAttackAbility.GetItemData().AbilityClass != nullptr)
+				{
+					FallingAttackAbility = CharacterData.FallingAttackAbility;
+					FallingAttackAbility.AbilityHandle = AcquireAbility(FallingAttackAbility.GetItemData().AbilityClass, FallingAttackAbility.AbilityLevel);
+				}
+
+				if(CharacterData.AbilityClass != nullptr)
+				{
+					DefaultAbility = FAbilityData();
+					DefaultAbility.AbilityLevel = SaveData.Level;
+					DefaultAbility.AbilityHandle = AcquireAbility(CharacterData.AbilityClass, DefaultAbility.AbilityLevel);
+					ActiveAbility(DefaultAbility.AbilityHandle);
+				}
+
+				Nature = CharacterData.Nature;
+				AttackDistance = CharacterData.AttackDistance;
+				InteractDistance = CharacterData.InteractDistance;
+				FollowDistance = CharacterData.FollowDistance;
+				PatrolDistance = CharacterData.PatrolDistance;
+				PatrolDuration = CharacterData.PatrolDuration;
+				
+				SaveData.InventoryData = CharacterData.InventoryData;
+			}
+		}
+		ActiveAbility(DefaultAbility.AbilityHandle);
+
+		Inventory->SetOwnerActor(this);
 	}
+
+	Inventory->LoadSaveData(&SaveData.InventoryData, bForceMode);
 }
 
 FSaveData* ADWCharacter::ToData()
 {
-	static auto SaveData = FDWCharacterSaveData();
+	static FDWCharacterSaveData SaveData;
+	SaveData = Super::ToData()->CastRef<FCharacterSaveData>();
 
-	SaveData.ID = AssetID;
 	SaveData.Nature = Nature;
-	SaveData.Name = Name;
 	SaveData.TeamID = TeamID;
-	SaveData.RaceID = RaceID;
-	SaveData.Level = Level;
-	SaveData.EXP = EXP;
 	SaveData.AttackDistance = AttackDistance;
 	SaveData.InteractDistance = InteractDistance;
 	SaveData.FollowDistance = FollowDistance;
 	SaveData.PatrolDistance = PatrolDistance;
 	SaveData.PatrolDuration = PatrolDuration;
 
-	SaveData.InventoryData = Inventory->ToData();
+	SaveData.InventoryData = Inventory->ToSaveDataRef<FInventorySaveData>();
 
 	SaveData.DefaultAbility = DefaultAbility;
 	SaveData.FallingAttackAbility = FallingAttackAbility;
 	SaveData.AttackAbilities = AttackAbilities;
 	SaveData.SkillAbilities = SkillAbilities;
 	SaveData.ActionAbilities = ActionAbilities;
-
-	SaveData.SpawnLocation = GetActorLocation();
-	SaveData.SpawnRotation = GetActorRotation();
 
 	return &SaveData;
 }
@@ -766,7 +740,7 @@ bool ADWCharacter::SkillAttack(ESkillType InSkillType, int32 InAbilityIndex)
 
 bool ADWCharacter::FallingAttack()
 {
-	if (FallingAttackAbility.AbilityClass != nullptr && HasWeapon(FallingAttackAbility.WeaponType))
+	if (FallingAttackAbility.GetItemData().AbilityClass != nullptr && HasWeapon(FallingAttackAbility.WeaponType))
 	{
 		if (ActiveAbility(FallingAttackAbility.AbilityHandle))
 		{
@@ -868,9 +842,9 @@ bool ADWCharacter::GenerateVoxel(FVoxelItem& InVoxelItem)
 
 		if(!voxelItem.IsValid() || voxelItem.GetData<UVoxelData>().Transparency == EVoxelTransparency::Transparent && voxelItem != InVoxelItem)
 		{
-			//FRotator rotation = (Owner->VoxelIndexToLocation(index) + tmpVoxel->GetData<UVoxelData>().GetCeilRange() * 0.5f * AVoxelModule::GetWorldInfo().BlockSize - UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>()->GetActorLocation()).ToOrientationRotator();
+			//FRotator rotation = (Owner->VoxelIndexToLocation(index) + tmpVoxel.GetData<UVoxelData>().GetCeilRange() * 0.5f * AVoxelModule::GetWorldInfo().BlockSize - UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>()->GetActorLocation()).ToOrientationRotator();
 			//rotation = FRotator(FRotator::ClampAxis(FMath::RoundToInt(rotation.Pitch / 90) * 90.f), FRotator::ClampAxis(FMath::RoundToInt(rotation.Yaw / 90) * 90.f), FRotator::ClampAxis(FMath::RoundToInt(rotation.Roll / 90) * 90.f));
-			//tmpVoxel->Rotation = rotation;
+			//tmpVoxel.Rotation = rotation;
 
 			FHitResult HitResult;
 			if (!AMainModule::GetModuleByClass<AVoxelModule>()->VoxelTraceSingle(InVoxelItem, chunk->IndexToLocation(index), HitResult))
@@ -910,9 +884,9 @@ bool ADWCharacter::GenerateVoxel(FVoxelItem& InVoxelItem, const FVoxelHitResult&
 
 		if(!voxelItem.IsValid() || voxelItem.GetData<UVoxelData>().Transparency == EVoxelTransparency::Transparent && voxelItem != InVoxelHitResult.VoxelItem)
 		{
-			//FRotator rotation = (Owner->VoxelIndexToLocation(index) + tmpVoxel->GetData<UVoxelData>().GetCeilRange() * 0.5f * AVoxelModule::GetWorldInfo().BlockSize - UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>()->GetActorLocation()).ToOrientationRotator();
+			//FRotator rotation = (Owner->VoxelIndexToLocation(index) + tmpVoxel.GetData<UVoxelData>().GetCeilRange() * 0.5f * AVoxelModule::GetWorldInfo().BlockSize - UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>()->GetActorLocation()).ToOrientationRotator();
 			//rotation = FRotator(FRotator::ClampAxis(FMath::RoundToInt(rotation.Pitch / 90) * 90.f), FRotator::ClampAxis(FMath::RoundToInt(rotation.Yaw / 90) * 90.f), FRotator::ClampAxis(FMath::RoundToInt(rotation.Roll / 90) * 90.f));
-			//tmpVoxel->Rotation = rotation;
+			//tmpVoxel.Rotation = rotation;
 
 			FHitResult HitResult;
 			if (!AMainModule::GetModuleByClass<AVoxelModule>()->VoxelTraceSingle(InVoxelItem, chunk->IndexToLocation(index), HitResult))
@@ -1874,11 +1848,6 @@ bool ADWCharacter::IsEnemy(ADWCharacter* InTargetCharacter) const
 		}
 	}
 	return !IsTeamMate(InTargetCharacter) && !InTargetCharacter->GetRaceID().IsEqual(RaceID);
-}
-
-void ADWCharacter::SetVisible_Implementation(bool bVisible)
-{
-	Super::SetVisible_Implementation(bVisible);
 }
 
 void ADWCharacter::SetMotionRate_Implementation(float InMovementRate, float InRotationRate)

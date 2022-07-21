@@ -214,9 +214,6 @@ struct DREAMWORLD_API FDWCharacterActionAbilityData : public FAbilityData
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	EDWCharacterActionType ActionType;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TSubclassOf<UDWCharacterActionAbility> AbilityClass;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bCancelable;
@@ -230,7 +227,6 @@ public:
 	FORCEINLINE FDWCharacterActionAbilityData()
 	{
 		ActionType = EDWCharacterActionType::None;
-		AbilityClass = nullptr;
 		bCancelable = true;
 		bNeedActive = true;
 		bNeedFreeToAnim = false;
@@ -246,13 +242,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	EDWWeaponType WeaponType;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TSubclassOf<UDWCharacterAttackAbility> AbilityClass;
-
 	FORCEINLINE FDWCharacterAttackAbilityData()
 	{
 		WeaponType = EDWWeaponType::None;
-		AbilityClass = nullptr;
 	}
 };
 
@@ -264,9 +256,6 @@ struct DREAMWORLD_API FDWCharacterSkillAbilityData : public FAbilityData
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	EDWWeaponType WeaponType;
-		
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TSubclassOf<UDWCharacterSkillAbility> AbilityClass;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bCancelable;
@@ -274,7 +263,6 @@ public:
 	FORCEINLINE FDWCharacterSkillAbilityData()
 	{
 		WeaponType = EDWWeaponType::None;
-		AbilityClass = nullptr;
 		bCancelable = false;
 	}
 };
@@ -312,6 +300,12 @@ struct DREAMWORLD_API FDWVitalitySaveData : public FVitalitySaveData
 public:
 	FORCEINLINE FDWVitalitySaveData()
 	{
+		InventoryData = FInventorySaveData();
+	}
+	
+	FORCEINLINE FDWVitalitySaveData(const FVitalitySaveData& InVitalitySaveData) : FVitalitySaveData(InVitalitySaveData)
+	{
+		InventoryData = FInventorySaveData();
 	}
 	
 public:
@@ -326,6 +320,21 @@ struct DREAMWORLD_API FDWCharacterSaveData : public FCharacterSaveData
 
 public:
 	FORCEINLINE FDWCharacterSaveData()
+	{
+		TeamID = NAME_None;
+		Nature = EDWCharacterNature::AIHostile;
+		AttackDistance = 100.f;
+		InteractDistance = 500.f;
+		FollowDistance = 500.f;
+		PatrolDistance = 1000.f;
+		PatrolDuration = 10.f;
+		FallingAttackAbility = FDWCharacterAttackAbilityData();
+		AttackAbilities = TArray<FDWCharacterAttackAbilityData>();
+		SkillAbilities = TMap<FPrimaryAssetId, FDWCharacterSkillAbilityData>();
+		ActionAbilities = TMap<EDWCharacterActionType, FDWCharacterActionAbilityData>();
+	}
+	
+	FORCEINLINE FDWCharacterSaveData(const FCharacterSaveData& InCharacterSaveData) : FCharacterSaveData(InCharacterSaveData)
 	{
 		TeamID = NAME_None;
 		Nature = EDWCharacterNature::AIHostile;
@@ -388,6 +397,11 @@ public:
 		CameraRotation = FRotator::ZeroRotator;
 	}
 
+	FORCEINLINE FDWPlayerBasicSaveData(const FDWCharacterSaveData& InCharacterSaveData) : FDWCharacterSaveData(InCharacterSaveData)
+	{
+		CameraRotation = FRotator::ZeroRotator;
+	}
+
 	UPROPERTY(EditDefaultsOnly)
 	FRotator CameraRotation;
 };
@@ -403,11 +417,15 @@ public:
 		ArchiveID = 0;
 		ControlMode = EDWControlMode::Fighting;
 	}
-	
-	FORCEINLINE FDWPlayerSaveData(FDWPlayerBasicSaveData InBasicSaveData)
+		
+	FORCEINLINE FDWPlayerSaveData(const FDWCharacterSaveData& InCharacterSaveData) : FDWPlayerBasicSaveData(InCharacterSaveData)
 	{
-		ID = InBasicSaveData.ID;
-	
+		ArchiveID = 0;
+		ControlMode = EDWControlMode::Fighting;
+	}
+
+	FORCEINLINE FDWPlayerSaveData(const FDWPlayerBasicSaveData& InBasicSaveData) : FDWPlayerBasicSaveData(InBasicSaveData)
+	{
 		ArchiveID = 0;
 		ControlMode = EDWControlMode::Fighting;
 	}
@@ -437,19 +455,32 @@ public:
 		VitalityDatas = TArray<FDWVitalitySaveData>();
 	}
 
+	FORCEINLINE FDWVoxelChunkSaveData(const FVoxelChunkSaveData& InVoxelChunkSaveData) : FVoxelChunkSaveData(InVoxelChunkSaveData)
+	{
+		CharacterDatas = TArray<FDWCharacterSaveData>();
+		VitalityDatas = TArray<FDWVitalitySaveData>();
+	}
+
 public:
+	virtual void Reset() override
+	{
+		FSaveData::Reset();
+		CharacterDatas.Empty();
+		VitalityDatas.Empty();
+	}
+
 	virtual void MakeSaved() override
 	{
 		Super::MakeSaved();
-		for(auto Iter : CharacterDatas)
+		for(auto& Iter : CharacterDatas)
 		{
 			Iter.MakeSaved();
 		}
-		for(auto Iter : VitalityDatas)
+		for(auto& Iter : VitalityDatas)
 		{
 			Iter.MakeSaved();
 		}
-	}
+	}	
 };
 
 USTRUCT(BlueprintType)
@@ -460,53 +491,25 @@ struct DREAMWORLD_API FDWVoxelWorldSaveData : public FVoxelWorldSaveData
 public:
 	FORCEINLINE FDWVoxelWorldSaveData()
 	{
-		WorldSeed = 0;
-		TimeSeconds = 0.f;
-
-		LastVitalityRaceIndex = FIndex::ZeroIndex;
-		LastCharacterRaceIndex = FIndex::ZeroIndex;
+		ChunkDatas = TMap<FVector, FDWVoxelChunkSaveData>();
 	}
 	
-	FORCEINLINE FDWVoxelWorldSaveData(FVoxelWorldBasicSaveData InBasicSaveData)
+	FORCEINLINE FDWVoxelWorldSaveData(const FVoxelWorldBasicSaveData& InBasicSaveData) : FVoxelWorldSaveData(InBasicSaveData)
 	{
-		WorldSeed = 0;
-		TimeSeconds = 0;
-
-		BlockSize = InBasicSaveData.BlockSize;
-		ChunkSize = InBasicSaveData.ChunkSize;
-		
-		ChunkHeightRange = InBasicSaveData.ChunkHeightRange;
-
-		TerrainBaseHeight = InBasicSaveData.TerrainBaseHeight;
-		TerrainPlainScale = InBasicSaveData.TerrainPlainScale;
-		TerrainMountainScale = InBasicSaveData.TerrainMountainScale;
-		TerrainStoneVoxelScale = InBasicSaveData.TerrainStoneVoxelScale;
-		TerrainSandVoxelScale = InBasicSaveData.TerrainSandVoxelScale;
-		TerrainWaterVoxelHeight = InBasicSaveData.TerrainWaterVoxelHeight;
-		TerrainBedrockVoxelHeight = InBasicSaveData.TerrainBedrockVoxelHeight;
-
-		ChunkMaterials = InBasicSaveData.ChunkMaterials;
-
-		VitalityRaceDensity = InBasicSaveData.VitalityRaceDensity;
-		CharacterRaceDensity = InBasicSaveData.CharacterRaceDensity;
-
-		LastVitalityRaceIndex = FIndex::ZeroIndex;
-		LastCharacterRaceIndex = FIndex::ZeroIndex;
+		ChunkDatas = TMap<FVector, FDWVoxelChunkSaveData>();
 	}
 
 public:
-	static const FDWVoxelWorldSaveData Empty;
-	
 	UPROPERTY(BlueprintReadOnly)
 	TMap<FVector, FDWVoxelChunkSaveData> ChunkDatas;
 
-	UPROPERTY(Transient)
-	FIndex LastVitalityRaceIndex;
-
-	UPROPERTY(Transient)
-	FIndex LastCharacterRaceIndex;
-
 public:
+	virtual void Reset() override
+	{
+		FSaveData::Reset();
+		ChunkDatas.Empty();
+	}
+
 	virtual void MakeSaved() override
 	{
 		Super::MakeSaved();
@@ -516,27 +519,23 @@ public:
 		}
 	}
 	
-	bool IsExistChunkData(FIndex InChunkIndex) const
+	virtual bool IsExistChunkData(FIndex InChunkIndex) const override
 	{
 		return ChunkDatas.Contains(InChunkIndex.ToVector());
 	}
 
-	FDWVoxelChunkSaveData& GetChunkData(FIndex InChunkIndex) const
+	virtual FVoxelChunkSaveData* GetChunkData(FIndex InChunkIndex) override
 	{
-		static FDWVoxelChunkSaveData ChunkData;
 		if (ChunkDatas.Contains(InChunkIndex.ToVector()))
 		{
-			ChunkData = ChunkDatas[InChunkIndex.ToVector()];
+			return &ChunkDatas[InChunkIndex.ToVector()];
 		}
-		return ChunkData;
+		return nullptr;
 	}
 
-	void SetChunkData(FIndex InChunkIndex, FDWVoxelChunkSaveData InChunkData)
+	virtual void SetChunkData(FIndex InChunkIndex, FVoxelChunkSaveData* InChunkData) override
 	{
-		if (!ChunkDatas.Contains(InChunkIndex.ToVector()))
-			ChunkDatas.Add(InChunkIndex.ToVector(), InChunkData);
-		else
-			ChunkDatas[InChunkIndex.ToVector()] = InChunkData;
+		ChunkDatas.Emplace(InChunkIndex.ToVector(), InChunkData->CastRef<FDWVoxelChunkSaveData>());
 	}
 };
 
@@ -549,27 +548,16 @@ public:
 	FORCEINLINE FDWArchiveBasicSaveData()
 	{
 		ID = -1;
-		PlayerBasicData = FDWPlayerBasicSaveData();
-		WorldBasicData = FVoxelWorldBasicSaveData();
 	}
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	int32 ID;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	FDWPlayerBasicSaveData PlayerBasicData;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	FVoxelWorldBasicSaveData WorldBasicData;
-
 public:
 	virtual void MakeSaved() override
 	{
 		Super::MakeSaved();
-		
-		PlayerBasicData.MakeSaved();
-		WorldBasicData.MakeSaved();
 	}
 };
 

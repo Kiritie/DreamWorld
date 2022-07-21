@@ -11,6 +11,7 @@
 #include "Widget/WidgetItemInfoBox.h"
 #include "Ability/Character/DWCharacterSkillAbility.h"
 #include "Ability/Item/Skill/AbilitySkillDataBase.h"
+#include "Ability/Abilities/ItemAbilityBase.h"
 
 UInventorySkillSlot::UInventorySkillSlot()
 {
@@ -81,7 +82,7 @@ FAbilityInfo UInventorySkillSlot::GetAbilityInfo() const
 	FAbilityInfo AbilityInfo;
 	if(ADWCharacter* Character = Cast<ADWCharacter>(Owner->GetOwnerActor()))
 	{
-		Character->GetAbilityInfo(GetSkillData().AbilityClass, AbilityInfo);
+		Character->GetAbilityInfo(GetSkillData().GetItemData().AbilityClass, AbilityInfo);
 	}
 	return AbilityInfo;
 }

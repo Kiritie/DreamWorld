@@ -36,12 +36,13 @@ ADWVitality::ADWVitality()
 	AttributeSet = CreateDefaultSubobject<UDWVitalityAttributeSet>(FName("AttributeSet"));
 	
 	Inventory = CreateDefaultSubobject<UVitalityInventory>(FName("Inventory"));
+	Inventory->SetOwnerActor(this);
 	Inventory->GetOnSlotSelected().AddDynamic(this, &ADWVitality::OnInventorySlotSelected);
 
+	FSM->DefaultState = UDWVitalityState_Default::StaticClass();
 	FSM->States.Empty();
 	FSM->States.Add(UDWVitalityState_Default::StaticClass());
 	FSM->States.Add(UDWVitalityState_Death::StaticClass());
-	FSM->DefaultState = UDWVitalityState_Default::StaticClass();
 }
 
 // Called when the game starts or when spawned
@@ -63,6 +64,8 @@ void ADWVitality::OnSpawn_Implementation(const TArray<FParameter>& InParams)
 void ADWVitality::OnDespawn_Implementation()
 {
 	Super::OnDespawn_Implementation();
+
+	Inventory->UnloadSaveData(true);
 }
 
 void ADWVitality::Tick(float DeltaTime)
@@ -79,51 +82,37 @@ void ADWVitality::Serialize(FArchive& Ar)
 	Super::Serialize(Ar);
 }
 
-void ADWVitality::LoadData(FSaveData* InSaveData)
+void ADWVitality::LoadData(FSaveData* InSaveData, bool bForceMode)
 {
+	Super::LoadData(InSaveData, bForceMode);
+	
 	auto SaveData = InSaveData->CastRef<FDWVitalitySaveData>();
-	if (SaveData.IsSaved())
+
+	if(bForceMode)
 	{
-		AssetID = SaveData.ID;
-		SetNameV(SaveData.Name);
-		SetRaceID(SaveData.RaceID);
-		SetLevelV(SaveData.Level);
-		SetEXP(SaveData.EXP);
-
-		SetActorLocation(SaveData.SpawnLocation);
-		SetActorRotation(SaveData.SpawnRotation);
-
-		Inventory->LoadData(SaveData.InventoryData, this);
-	}
-	else
-	{
-		AssetID = SaveData.ID;
-		SetNameV(SaveData.Name);
-		SetRaceID(SaveData.RaceID);
-		SetLevelV(SaveData.Level);
-
-		SetActorLocation(SaveData.SpawnLocation);
-		SetActorRotation(SaveData.SpawnRotation);
-
-		const UDWVitalityData& vitalityData = GetVitalityData<UDWVitalityData>();
-		if(vitalityData.IsValid())
+		if(!SaveData.IsSaved())
 		{
-			SaveData.InventoryData = vitalityData.InventoryData;
+			const UDWVitalityData& vitalityData = GetVitalityData<UDWVitalityData>();
+			if(vitalityData.IsValid())
+			{
+				SaveData.InventoryData = vitalityData.InventoryData;
+			}
+			// const auto ItemDatas = UDWHelper::LoadItemDatas();
+			// if(ItemDatas.Num() > 0 && FMath::FRand() < 0.2f)
+			// {
+			// 	SaveData.InventoryData.Items.Add(FAbilityItem(ItemDatas[FMath::RandRange(0, ItemDatas.Num() - 1)].ID, 1));
+			// }
 		}
-
-		// const auto ItemDatas = UDWHelper::LoadItemDatas();
-		// if(ItemDatas.Num() > 0 && FMath::FRand() < 0.2f)
-		// {
-		// 	SaveData.InventoryData.Items.Add(FAbilityItem(ItemDatas[FMath::RandRange(0, ItemDatas.Num() - 1)].ID, 1));
-		// }
-		
-		Inventory->LoadData(SaveData.InventoryData, this);
+		Inventory->SetOwnerActor(this);
 	}
+
+	Inventory->LoadSaveData(&SaveData.InventoryData, bForceMode);
 }
 
 FSaveData* ADWVitality::ToData()
 {
 	static FDWVitalitySaveData SaveData;
+	SaveData = Super::ToData()->CastRef<FVitalitySaveData>();
 
 	SaveData.ID = AssetID;
 	SaveData.Name = Name;
@@ -131,7 +120,7 @@ FSaveData* ADWVitality::ToData()
 	SaveData.Level = Level;
 	SaveData.EXP = EXP;
 	
-	SaveData.InventoryData = Inventory->ToData();
+	SaveData.InventoryData = Inventory->ToSaveDataRef<FInventorySaveData>();
 
 	SaveData.SpawnLocation = GetActorLocation();
 	SaveData.SpawnRotation = GetActorRotation();
@@ -268,7 +257,7 @@ void ADWVitality::OnInventorySlotSelected(UInventorySlot* InInventorySlot)
 	const FAbilityItem tmpItem = InInventorySlot->GetItem();
 	if(tmpItem.IsValid() && tmpItem.GetData().EqualType(EAbilityItemType::Voxel))
 	{
-		GeneratingVoxelItem = tmpItem.ID;
+		GeneratingVoxelItem = tmpItem;
 	}
 }
 

@@ -41,7 +41,7 @@ public:
 	virtual void OnTermination_Implementation() override;
 	
 protected:
-	virtual void LoadData(FSaveData* InSaveData) override;
+	virtual void LoadData(FSaveData* InSaveData, bool bForceMode) override;
 
 	virtual FSaveData* ToData() override;
 
@@ -66,7 +66,7 @@ protected:
 	virtual void GenerateChunks(FIndex InIndex) override;
 
 public:
-	virtual void BuildChunkMap(AVoxelChunk* InChunk) override;
+	virtual void BuildChunkMap(AVoxelChunk* InChunk, int32 InStage) override;
 
 	virtual void GenerateChunkMap(AVoxelChunk* InChunk) override;
 

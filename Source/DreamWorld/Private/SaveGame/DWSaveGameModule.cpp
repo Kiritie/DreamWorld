@@ -15,8 +15,6 @@
 ADWSaveGameModule::ADWSaveGameModule()
 {
 	GeneralSaveGame = UDWGeneralSaveGame::StaticClass();
-
-	ArchiveBasicData = FDWArchiveBasicSaveData();
 }
 
 #if WITH_EDITOR
@@ -56,25 +54,15 @@ void ADWSaveGameModule::OnUnPause_Implementation()
 	Super::OnUnPause_Implementation();
 }
 
-void ADWSaveGameModule::LoadData(FSaveData* InSaveData)
+void ADWSaveGameModule::LoadData(FSaveData* InSaveData, bool bForceMode)
 {
-	Super::LoadData(InSaveData);
+	Super::LoadData(InSaveData, bForceMode);
 }
 
 FSaveData* ADWSaveGameModule::ToData()
 {
-	static FDWGeneralSaveData SaveData;
-	SaveData.AllSaveGameInfo = Super::ToData()->CastRef<FGeneralSaveData>().AllSaveGameInfo;
+	static auto SaveData = Super::ToData()->CastRef<FDWGeneralSaveData>();
+	SaveData.Reset();
 	SaveData.CameraDistance = UCameraModuleBPLibrary::GetCurrentCameraDistance();
 	return &SaveData;
-}
-
-FDWPlayerSaveData ADWSaveGameModule::GetDefaultPlayerData() const
-{
-	return FDWPlayerSaveData(ArchiveBasicData.PlayerBasicData);
-}
-
-FDWVoxelWorldSaveData ADWSaveGameModule::GetDefaultWorldData() const
-{
-	return FDWVoxelWorldSaveData(ArchiveBasicData.WorldBasicData);
 }

@@ -49,46 +49,30 @@ void ADWVoxelChunk::OnDespawn_Implementation()
 	Super::OnDespawn_Implementation();
 }
 
-void ADWVoxelChunk::LoadData(FSaveData* InSaveData)
+void ADWVoxelChunk::LoadData(FSaveData* InSaveData, bool bForceMode)
 {
-	FDWVoxelChunkSaveData ChunkData = InSaveData->CastRef<FDWVoxelChunkSaveData>();
-	for(int32 i = 0; i < ChunkData.VoxelItems.Num(); i++)
-	{
-		const FVoxelItem& voxelItem = ChunkData.VoxelItems[i];
-		SetVoxelComplex(voxelItem.Index, voxelItem);
-	}
+	Super::LoadData(InSaveData, bForceMode);
 }
  
 FSaveData* ADWVoxelChunk::ToData()
 {
-	static FDWVoxelChunkSaveData ChunkData;
+	static FDWVoxelChunkSaveData SaveData;
+	SaveData = Super::ToData()->CastRef<FVoxelChunkSaveData>();
 
-	ChunkData.Index = Index;
-
-	for(auto& iter : VoxelMap)
+	for(auto& Iter : Characters)
 	{
-		ChunkData.VoxelItems.Add(iter.Value);
-	}
-
-	for(int32 i = 0; i < PickUps.Num(); i++)
-	{
-		ChunkData.PickUpDatas.Add(PickUps[i]->ToSaveDataRef<FPickUpSaveData>());
-	}
-
-	for(int32 i = 0; i < Characters.Num(); i++)
-	{
-		if(Characters[i]->GetNature() != EDWCharacterNature::Player)
+		if(Iter->GetNature() != EDWCharacterNature::Player)
 		{
-			ChunkData.CharacterDatas.Add(Characters[i]->ToSaveDataRef<FDWCharacterSaveData>(true));
+			SaveData.CharacterDatas.Add(Iter->ToSaveDataRef<FDWCharacterSaveData>(true));
 		}
 	}
 
-	for(int32 i = 0; i < Vitalitys.Num(); i++)
+	for(auto& Iter : Vitalitys)
 	{
-		ChunkData.VitalityDatas.Add(Vitalitys[i]->ToSaveDataRef<FDWVitalitySaveData>(true));
+		SaveData.VitalityDatas.Add(Iter->ToSaveDataRef<FDWVitalitySaveData>(true));
 	}
 
-	return &ChunkData;
+	return &SaveData;
 }
 
 void ADWVoxelChunk::OnCollision(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
@@ -99,11 +83,72 @@ void ADWVoxelChunk::OnCollision(UPrimitiveComponent* HitComponent, AActor* Other
 void ADWVoxelChunk::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	Super::OnBeginOverlap(OverlappedComponent, OtherActor, OtherComp, OtherBodyIndex, bFromSweep, SweepResult);
+
+	// if(OtherComp && OtherComp->IsA<UAbilityCharacterPart>())
+	// {
+	// 	if(UAbilityCharacterPart* characterPart = Cast<UAbilityCharacterPart>(OtherComp))
+	// 	{
+	// 		if(ACharacterBase* character = characterPart->GetOwnerCharacter())
+	// 		{
+	// 			Debug(FString::Printf(TEXT("%s"), *SweepResult.ImpactPoint.ToString()));
+	// 			Debug(FString::Printf(TEXT("%s"), *SweepResult.ImpactNormal.ToString()));
+	// 			const FVector normal = FVector(FMath::Min((character->GetMoveDirection(false) * 2.5f).X, 1.f), FMath::Min((character->GetMoveDirection(false) * 2.5f).Y, 1.f), FMath::Min((character->GetMoveDirection(false) * 2.5f).Z, 1.f));
+	// 			const FVector point = characterPart->GetComponentLocation() + characterPart->GetScaledCapsuleRadius() * normal + UVoxelModuleBPLibrary::GetWorldData().GetBlockSizedNormal(normal);
+	// 			if(FVector::Distance(character->GetActorLocation(), point) > 100)
+	// 			{
+	// 				Debug(FString::Printf(TEXT("%f"), FVector::Distance(character->GetActorLocation(), point)));
+	// 			}
+	// 			UKismetSystemLibrary::DrawDebugBox(this, point, FVector(5), FColor::Green, FRotator::ZeroRotator, 100);
+	// 			const FVoxelItem& voxelItem = GetVoxelItem(LocationToIndex(point));
+	// 			const UVoxelAsset VoxelData = voxelItem.GetData<UVoxelAsset>();
+	// 			if(voxelItem.IsValid() && VoxelData.VoxelType != characterPart->GetLastOverlapVoxel())
+	// 			{
+	// 				if(UVoxel& voxel = voxelItem.GetVoxel())
+	// 				{
+	// 					characterPart->SetLastVoxelType(VoxelData.VoxelType);
+	// 					voxel.OnTargetEnter(characterPart, FVoxelHitResult(voxelItem, point, normal));
+	// 					UVoxelModuleBPLibrary::DespawnVoxel(voxel);
+	// 				}
+	// 			}
+	// 			character->OnBeginOverlapVoxel(characterPart, FVoxelHitResult(voxelItem, point, normal));
+	// 		}
+	// 	}
+	// }
 }
 
 void ADWVoxelChunk::OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
 	Super::OnEndOverlap(OverlappedComponent, OtherActor, OtherComp, OtherBodyIndex);
+
+	// if(OtherComp && OtherComp->IsA<UAbilityCharacterPart>())
+	// {
+	// 	if(UAbilityCharacterPart* characterPart = Cast<UAbilityCharacterPart>(OtherComp))
+	// 	{
+	// 		if(ACharacterBase* character = characterPart->GetOwnerCharacter())
+	// 		{
+	// 			const FVector normal = FVector(FMath::Min((character->GetMoveDirection(false) * 2.5f).X, 1.f), FMath::Min((character->GetMoveDirection(false) * 2.5f).Y, 1.f), FMath::Min((character->GetMoveDirection(false) * 2.5f).Z, 1.f));
+	// 			const FVector point = characterPart->GetComponentLocation() - characterPart->GetScaledCapsuleRadius() * normal - UVoxelModuleBPLibrary::GetWorldData().GetBlockSizedNormal(normal);
+	// 			UKismetSystemLibrary::DrawDebugBox(this, point, FVector(5), FColor::Red, FRotator::ZeroRotator, 100);
+	// 			const FVoxelItem& voxelItem = GetVoxelItem(LocationToIndex(point));
+	// 			const UVoxelAsset VoxelData = voxelItem.GetData<UVoxelAsset>();
+	// 			if(voxelItem.IsValid() && VoxelData.VoxelType == characterPart->GetLastOverlapVoxel())
+	// 			{
+	// 				const FVoxelItem& tmpVoxelItem = GetVoxelItem(LocationToIndex(characterPart->GetComponentLocation()));
+	// 				const UVoxelAsset tmpVoxelData = tmpVoxelItem.GetData<UVoxelAsset>();
+	// 				if(!tmpVoxelItem.IsValid() || tmpVoxelData.VoxelType != VoxelData.VoxelType)
+	// 				{
+	// 					if(UVoxel& voxel = voxelItem.GetVoxel())
+	// 					{
+	// 						characterPart->SetLastVoxelType(EVoxelType::Unknown);
+	// 						voxel.OnTargetExit(characterPart, FVoxelHitResult(voxelItem, point, normal));
+	// 						UVoxelModuleBPLibrary::DespawnVoxel(voxel);
+	// 					}
+	// 				}
+	// 			}
+	// 			character->OnEndOverlapVoxel(characterPart, FVoxelHitResult(voxelItem, point, normal));
+	// 		}
+	// 	}
+	// }
 }
 
 // Called every frame
@@ -112,19 +157,19 @@ void ADWVoxelChunk::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
-void ADWVoxelChunk::Initialize(FIndex InIndex, int32 InBatch)
+void ADWVoxelChunk::Initialize(AVoxelModule* InModule, FIndex InIndex, int32 InBatch)
 {
-	Super::Initialize(InIndex, InBatch);
+	Super::Initialize(InModule, InIndex, InBatch);
 }
 
-void ADWVoxelChunk::Generate()
+void ADWVoxelChunk::Generate(bool bForceMode)
 {
-	Super::Generate();
+	Super::Generate(bForceMode);
 }
 
-void ADWVoxelChunk::BuildMap()
+void ADWVoxelChunk::BuildMap(int32 InStage)
 {
-	Super::BuildMap();
+	Super::BuildMap(InStage);
 }
 
 void ADWVoxelChunk::GenerateMap()
@@ -136,25 +181,21 @@ void ADWVoxelChunk::SpawnActors()
 {
 	Super::SpawnActors();
 
-	if(UVoxelModuleBPLibrary::GetWorldData<FDWVoxelWorldSaveData>().IsExistChunkData(Index))
+	if(UVoxelModuleBPLibrary::GetWorldData().IsExistChunkData(Index))
 	{
-		FDWVoxelChunkSaveData ChunkData = UVoxelModuleBPLibrary::GetWorldData<FDWVoxelWorldSaveData>().GetChunkData(Index);
-		for(int32 i = 0; i < ChunkData.PickUpDatas.Num(); i++)
+		auto chunkData = *UVoxelModuleBPLibrary::GetWorldData().GetChunkData<FDWVoxelChunkSaveData>(Index);
+		for(int32 i = 0; i < chunkData.VitalityDatas.Num(); i++)
 		{
-			UAbilityModuleBPLibrary::SpawnPickUp(&ChunkData.PickUpDatas[i], this);
+			UAbilityModuleBPLibrary::SpawnVitality(&chunkData.VitalityDatas[i], this);
 		}
-		for(int32 i = 0; i < ChunkData.VitalityDatas.Num(); i++)
+		for(int32 i = 0; i < chunkData.CharacterDatas.Num(); i++)
 		{
-			UAbilityModuleBPLibrary::SpawnVitality(&ChunkData.VitalityDatas[i], this);
-		}
-		for(int32 i = 0; i < ChunkData.CharacterDatas.Num(); i++)
-		{
-			UAbilityModuleBPLibrary::SpawnCharacter(&ChunkData.CharacterDatas[i], this);
+			UAbilityModuleBPLibrary::SpawnCharacter(&chunkData.CharacterDatas[i], this);
 		}
 	}
-	else if(SolidMesh || SemiMesh)
+	else if(IsEntity())
 	{
-		if(FIndex::Distance(Index, UVoxelModuleBPLibrary::GetWorldData<FDWVoxelWorldSaveData>().LastVitalityRaceIndex) > UVoxelModuleBPLibrary::GetWorldData().VitalityRaceDensity / UVoxelModuleBPLibrary::GetWorldData().GetChunkLength())
+		if(FIndex::Distance(Index, UVoxelModuleBPLibrary::GetWorldData().LastVitalityRaceIndex) > UVoxelModuleBPLibrary::GetWorldData().VitalityRaceDensity / UVoxelModuleBPLibrary::GetWorldData().GetChunkLength())
 		{
 			auto raceData = UAbilityModuleBPLibrary::RandomVitalityRaceData();
 			for(int32 i = 0; i < raceData.Items.Num(); i++)
@@ -166,7 +207,7 @@ void ADWVoxelChunk::SpawnActors()
 					for(int32 k = 0; k < 10; k++)
 					{
 						FHitResult hitResult;
-						if(AMainModule::GetModuleByClass<AVoxelModule>()->ChunkTraceSingle(this, FMath::Max(vitalityData.Range.X, vitalityData.Range.Y) * 0.5f * UVoxelModuleBPLibrary::GetWorldData().BlockSize, vitalityData.Range.Z * 0.5f * UVoxelModuleBPLibrary::GetWorldData().BlockSize, hitResult))
+						if(Module->ChunkTraceSingle(this, FMath::Max(vitalityData.Range.X, vitalityData.Range.Y) * 0.5f * UVoxelModuleBPLibrary::GetWorldData().BlockSize, vitalityData.Range.Z * 0.5f * UVoxelModuleBPLibrary::GetWorldData().BlockSize, hitResult))
 						{
 							auto saveData = FDWVitalitySaveData();
 							saveData.ID = vitalityData.GetPrimaryAssetId();
@@ -176,14 +217,14 @@ void ADWVoxelChunk::SpawnActors()
 							saveData.SpawnLocation = hitResult.Location;
 							saveData.SpawnRotation = FRotator(0, FMath::RandRange(0, 360), 0);
 							UAbilityModuleBPLibrary::SpawnVitality(&saveData, this);
-							UVoxelModuleBPLibrary::GetWorldData<FDWVoxelWorldSaveData>().LastVitalityRaceIndex = Index;
+							UVoxelModuleBPLibrary::GetWorldData().LastVitalityRaceIndex = Index;
 							break;
 						}
 					}
 				}
 			}
 		}
-		if(FIndex::Distance(Index, UVoxelModuleBPLibrary::GetWorldData<FDWVoxelWorldSaveData>().LastCharacterRaceIndex) > UVoxelModuleBPLibrary::GetWorldData().CharacterRaceDensity / UVoxelModuleBPLibrary::GetWorldData().GetChunkLength())
+		if(FIndex::Distance(Index, UVoxelModuleBPLibrary::GetWorldData().LastCharacterRaceIndex) > UVoxelModuleBPLibrary::GetWorldData().CharacterRaceDensity / UVoxelModuleBPLibrary::GetWorldData().GetChunkLength())
 		{
 			ADWCharacter* captain = nullptr;
 			auto raceData = UAbilityModuleBPLibrary::RandomCharacterRaceData();
@@ -196,7 +237,7 @@ void ADWVoxelChunk::SpawnActors()
 					for(int32 k = 0; k < 10; k++)
 					{
 						FHitResult hitResult;
-						if(AMainModule::GetModuleByClass<AVoxelModule>()->ChunkTraceSingle(this, FMath::Max(characterData.Range.X, characterData.Range.Y) * 0.5f * UVoxelModuleBPLibrary::GetWorldData().BlockSize, characterData.Range.Z * 0.5f * UVoxelModuleBPLibrary::GetWorldData().BlockSize, hitResult))
+						if(Module->ChunkTraceSingle(this, FMath::Max(characterData.Range.X, characterData.Range.Y) * 0.5f * UVoxelModuleBPLibrary::GetWorldData().BlockSize, characterData.Range.Z * 0.5f * UVoxelModuleBPLibrary::GetWorldData().BlockSize, hitResult))
 						{
 							auto saveData = FDWCharacterSaveData();
 							saveData.ID = characterData.GetPrimaryAssetId();
@@ -220,7 +261,7 @@ void ADWVoxelChunk::SpawnActors()
 									captain->AddTeamMate(character);
 								}
 							}
-							UVoxelModuleBPLibrary::GetWorldData<FDWVoxelWorldSaveData>().LastCharacterRaceIndex = Index;
+							UVoxelModuleBPLibrary::GetWorldData().LastCharacterRaceIndex = Index;
 							break;
 						}
 					}
@@ -234,22 +275,17 @@ void ADWVoxelChunk::DestroyActors()
 {
 	Super::DestroyActors();
 
-	for(int32 i = 0; i < Characters.Num(); i++)
+	for(auto Iter : Characters)
 	{
-		Characters[i]->Destroy();
+		UObjectPoolModuleBPLibrary::DespawnObject(Iter);
 	}
 	Characters.Empty();
 
-	for(int32 i = 0; i < Vitalitys.Num(); i++)
+	for(auto Iter : Vitalitys)
 	{
-		Vitalitys[i]->Destroy();
+		UObjectPoolModuleBPLibrary::DespawnObject(Iter);
 	}
 	Vitalitys.Empty();
-}
-
-void ADWVoxelChunk::OnGenerated()
-{
-	Super::OnGenerated();
 }
 
 void ADWVoxelChunk::AddSceneActor(AActor* InActor)
@@ -265,7 +301,6 @@ void ADWVoxelChunk::AddSceneActor(AActor* InActor)
 
 	if(ADWCharacter* Character = Cast<ADWCharacter>(InActor))
 	{
-		// InCharacter->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
 		Character->Execute_SetContainer(Character, this);
 		Characters.Add(Character);
 	}
@@ -285,7 +320,6 @@ void ADWVoxelChunk::RemoveSceneActor(AActor* InActor)
 
 	if(ADWCharacter* Character = Cast<ADWCharacter>(InActor))
 	{
-		// InCharacter->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 		Character->Execute_SetContainer(Character, nullptr);
 		Characters.Remove(Character);
 	}

@@ -133,6 +133,7 @@ ADWPlayerCharacter::ADWPlayerCharacter()
 	MiniMapCapture->SetupAttachment(RootComponent);
 	MiniMapCapture->SetRelativeLocationAndRotation(FVector(0, 0, 500), FRotator(0, 90, 0));
 
+	FSM->DefaultState = UDWCharacterState_Default::StaticClass();
 	FSM->States.Empty();
 	FSM->States.Add(UDWPlayerCharacterState_Attack::StaticClass());
 	FSM->States.Add(UDWCharacterState_Climb::StaticClass());
@@ -150,7 +151,6 @@ ADWPlayerCharacter::ADWPlayerCharacter()
 	FSM->States.Add(UDWCharacterState_Static::StaticClass());
 	FSM->States.Add(UDWCharacterState_Swim::StaticClass());
 	FSM->States.Add(UDWCharacterState_Walk::StaticClass());
-	FSM->DefaultState = UDWCharacterState_Default::StaticClass();
 
 	// states
 	ControlMode = EDWControlMode::Fighting;
@@ -210,24 +210,29 @@ void ADWPlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	FSM->SwitchStateByClass<UDWCharacterState_Static>();
-
 	PreviewCapture->ShowOnlyActors.Add(this);
 }
 
-void ADWPlayerCharacter::LoadData(FSaveData* InSaveData)
+void ADWPlayerCharacter::OnSpawn_Implementation(const TArray<FParameter>& InParams)
 {
-	Super::LoadData(InSaveData);
+	Super::OnSpawn_Implementation(InParams);
+}
+
+void ADWPlayerCharacter::OnDespawn_Implementation()
+{
+	Super::OnDespawn_Implementation();
+}
+
+void ADWPlayerCharacter::LoadData(FSaveData* InSaveData, bool bForceMode)
+{
+	Super::LoadData(InSaveData, bForceMode);
 
 	const auto SaveData = InSaveData->CastRef<FDWPlayerSaveData>();
-	if (SaveData.IsSaved())
-	{
-		SetControlMode(SaveData.ControlMode);
-	}
-	else
-	{
-		SetControlMode(EDWControlMode::Fighting);
 
+	SetControlMode(SaveData.ControlMode);
+	
+	if(!bForceMode && !SaveData.IsSaved())
+	{
 		auto VoxelDatas = UAssetModuleBPLibrary::LoadPrimaryAssets<UVoxelData>(UAbilityModuleBPLibrary::GetAssetTypeByItemType(EAbilityItemType::Voxel));
 		for (int32 i = 0; i < VoxelDatas.Num(); i++)
 		{
@@ -263,7 +268,8 @@ void ADWPlayerCharacter::LoadData(FSaveData* InSaveData)
 
 FSaveData* ADWPlayerCharacter::ToData()
 {
-	static auto SaveData = *static_cast<FDWPlayerSaveData*>(Super::ToData());
+	static FDWPlayerSaveData SaveData;
+	SaveData = Super::ToData()->CastRef<FDWCharacterSaveData>();
 	SaveData.ControlMode = ControlMode;
 	return &SaveData;
 }
@@ -314,22 +320,11 @@ void ADWPlayerCharacter::Tick(float DeltaTime)
 				// FVoxelHitResult voxelHitResult;
 				// if(RaycastVoxel(voxelHitResult))
 				// {
-				// 	voxelHitResult.GetVoxel()->OnMouseHover(voxelHitResult);
-				// 	UVoxel::DespawnVoxel(voxelHitResult.GetVoxel());
+				// 	voxelHitResult.GetVoxel().OnMouseHover(voxelHitResult);
+				// 	UVoxelModuleBPLibrary::DespawnVoxel(voxelHitResult.GetVoxel());
 				// }
 				break;
 			}
-		}
-	}
-	else if(GetActorLocation().IsNearlyZero())
-	{
-		FHitResult hitResult;
-		const FVector rayStart = FVector(GetActorLocation().X, GetActorLocation().Y, UVoxelModuleBPLibrary::GetWorldData().ChunkHeightRange * UVoxelModuleBPLibrary::GetWorldData().GetChunkLength() + 500);
-		const FVector rayEnd = FVector(GetActorLocation().X, GetActorLocation().Y, 0);
-		if(AMainModule::GetModuleByClass<AVoxelModule>()->ChunkTraceSingle(rayStart, rayEnd, GetRadius(), GetHalfHeight(), hitResult))
-		{
-			SetActorLocationAndRotation(hitResult.Location, FRotator::ZeroRotator);
-			FSM->SwitchStateByClass<UDWCharacterState_Walk>();
 		}
 	}
 }
@@ -355,16 +350,16 @@ void ADWPlayerCharacter::SetControlMode(EDWControlMode InControlMode)
 		{
 			VoxelMesh->SetVisibility(false);
 			HammerMesh->SetVisibility(false);
-			if(GetWeapon()) GetWeapon()->SetVisible(true);
-			if(GetShield()) GetShield()->SetVisible(true);
+			if(GetWeapon()) GetWeapon()->Execute_SetActorVisible(GetWeapon(), true);
+			if(GetShield()) GetShield()->Execute_SetActorVisible(GetShield(), true);
 			break;
 		}
 		case EDWControlMode::Creating:
 		{
 			VoxelMesh->SetVisibility(true);
 			HammerMesh->SetVisibility(true);
-			if(GetWeapon()) GetWeapon()->SetVisible(false);
-			if(GetShield()) GetShield()->SetVisible(false);
+			if(GetWeapon()) GetWeapon()->Execute_SetActorVisible(GetWeapon(), false);
+			if(GetShield()) GetShield()->Execute_SetActorVisible(GetShield(), false);
 			break;
 		}
 	}
@@ -575,8 +570,8 @@ void ADWPlayerCharacter::OnAttackDestroyPressed()
 			FVoxelHitResult voxelHitResult;
 			if(RaycastVoxel(voxelHitResult))
 			{
-				voxelHitResult.GetVoxel()->OnMouseDown(EMouseButton::Left, voxelHitResult);
-				// UVoxel::DespawnVoxel(voxelHitResult.GetVoxel());
+				voxelHitResult.GetVoxel().OnMouseDown(EMouseButton::Left, voxelHitResult);
+				// UVoxelModuleBPLibrary::DespawnVoxel(voxelHitResult.GetVoxel());
 			}
 			break;
 		}
@@ -599,11 +594,7 @@ void ADWPlayerCharacter::OnAttackDestroyRepeat()
 			FVoxelHitResult voxelHitResult;
 			if(RaycastVoxel(voxelHitResult))
 			{
-				if(UVoxel* voxel = voxelHitResult.GetVoxel())
-				{
-					voxel->OnMouseHold(EMouseButton::Left, voxelHitResult);
-					UVoxel::DespawnVoxel(voxel);
-				}
+				voxelHitResult.GetVoxel().OnMouseHold(EMouseButton::Left, voxelHitResult);
 			}
 			break;
 		}
@@ -626,11 +617,7 @@ void ADWPlayerCharacter::OnAttackDestroyReleased()
 			FVoxelHitResult voxelHitResult;
 			if(RaycastVoxel(voxelHitResult))
 			{
-				if(UVoxel* voxel = voxelHitResult.GetVoxel())
-				{
-					voxel->OnMouseUp(EMouseButton::Left, voxelHitResult);
-					UVoxel::DespawnVoxel(voxel);
-				}
+				voxelHitResult.GetVoxel().OnMouseUp(EMouseButton::Left, voxelHitResult);
 			}
 			break;
 		}
@@ -656,11 +643,7 @@ void ADWPlayerCharacter::OnDefendGeneratePressed()
 			FVoxelHitResult voxelHitResult;
 			if(RaycastVoxel(voxelHitResult))
 			{
-				if(UVoxel* voxel = voxelHitResult.GetVoxel())
-				{
-					voxel->OnMouseDown(EMouseButton::Right, voxelHitResult);
-					UVoxel::DespawnVoxel(voxel);
-				}
+				voxelHitResult.GetVoxel().OnMouseDown(EMouseButton::Right, voxelHitResult);
 			}
 			break;
 		}
@@ -683,11 +666,7 @@ void ADWPlayerCharacter::OnDefendGenerateRepeat()
 			FVoxelHitResult voxelHitResult;
 			if(RaycastVoxel(voxelHitResult))
 			{
-				if(UVoxel* voxel = voxelHitResult.GetVoxel())
-				{
-					voxel->OnMouseHold(EMouseButton::Right, voxelHitResult);
-					UVoxel::DespawnVoxel(voxel);
-				}
+				voxelHitResult.GetVoxel().OnMouseHold(EMouseButton::Right, voxelHitResult);
 			}
 			break;
 		}
@@ -710,11 +689,7 @@ void ADWPlayerCharacter::OnDefendGenerateReleased()
 			FVoxelHitResult voxelHitResult;
 			if(RaycastVoxel(voxelHitResult))
 			{
-				if(UVoxel* voxel = voxelHitResult.GetVoxel())
-				{
-					voxel->OnMouseUp(EMouseButton::Right, voxelHitResult);
-					UVoxel::DespawnVoxel(voxel);
-				}
+				voxelHitResult.GetVoxel().OnMouseUp(EMouseButton::Right, voxelHitResult);
 			}
 			break;
 		}

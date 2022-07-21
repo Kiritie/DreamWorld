@@ -75,8 +75,6 @@ void UProcedure_ArchiveChoosing::CreateArchive()
 {
 	if(USaveGameModuleBPLibrary::GetSaveGame<UDWArchiveSaveGame>()->IsSaved())
 	{
-		AMainModule::GetModuleByClass<AVoxelModule>()->UnloadSaveData(false);
-		UGlobalBPLibrary::GetPlayerController<ADWPlayerController>()->UnloadSaveData(false);
 		USaveGameModuleBPLibrary::CreateSaveGame<UDWArchiveSaveGame>(-1, true);
 	}
 	UProcedureModuleBPLibrary::SwitchProcedureByClass<UProcedure_ArchiveCreating>();
@@ -94,8 +92,6 @@ void UProcedure_ArchiveChoosing::ChooseArchive(int32 InArchiveID)
 {
 	if(USaveGameModuleBPLibrary::GetActiveSaveIndex<UDWArchiveSaveGame>() != InArchiveID)
 	{
-		AMainModule::GetModuleByClass<AVoxelModule>()->UnloadSaveData(false);
-		UGlobalBPLibrary::GetPlayerController<ADWPlayerController>()->UnloadSaveData(false);
 		USaveGameModuleBPLibrary::SetActiveSaveIndex<UDWArchiveSaveGame>(InArchiveID);
 	}
 	UProcedureModuleBPLibrary::SwitchProcedureByClass<UProcedure_Loading>();

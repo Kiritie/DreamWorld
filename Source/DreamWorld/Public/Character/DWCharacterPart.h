@@ -26,20 +26,20 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 public:
-	virtual void OnHitVoxel(UVoxel* InVoxel, const FVoxelHitResult& InHitResult);
+	virtual void OnHitVoxel(UVoxel& InVoxel, const FVoxelHitResult& InHitResult);
 
-	virtual void OnEnterVoxel(UVoxel* InVoxel, const FVoxelHitResult& InHitResult);
+	virtual void OnEnterVoxel(UVoxel& InVoxel, const FVoxelHitResult& InHitResult);
 
-	virtual void OnStayVoxel(UVoxel* InVoxel, const FVoxelHitResult& InHitResult);
+	virtual void OnStayVoxel(UVoxel& InVoxel, const FVoxelHitResult& InHitResult);
 
-	virtual void OnExitVoxel(UVoxel* InVoxel, const FVoxelHitResult& InHitResult);
+	virtual void OnExitVoxel(UVoxel& InVoxel, const FVoxelHitResult& InHitResult);
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	EDWCharacterPartType CharacterPartType;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	UVoxel* LastOverlapVoxel;
+	FVoxelItem LastOverlapVoxel;
 
 public:
 	UFUNCTION(BlueprintPure)
@@ -49,7 +49,7 @@ public:
 	void SetCharacterPartType(EDWCharacterPartType InCharacterPartType) { this->CharacterPartType = InCharacterPartType; }
 
 	UFUNCTION(BlueprintPure)
-	UVoxel* GetLastOverlapVoxel() const { return LastOverlapVoxel; }
+	FVoxelItem& GetLastOverlapVoxel() { return LastOverlapVoxel; }
 
 	UFUNCTION(BlueprintPure)
 	ADWCharacter* GetOwnerCharacter() const;

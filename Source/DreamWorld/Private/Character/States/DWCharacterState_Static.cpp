@@ -6,7 +6,10 @@
 #include "Character/DWCharacter.h"
 #include "Character/DWCharacterData.h"
 #include "Components/CapsuleComponent.h"
+#include "FSM/Components/FSMComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Voxel/VoxelModule.h"
+#include "Voxel/VoxelModuleBPLibrary.h"
 
 UDWCharacterState_Static::UDWCharacterState_Static()
 {

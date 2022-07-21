@@ -73,8 +73,6 @@ void UDWCharacterState_Death::DeathStart()
 
 void UDWCharacterState_Death::DeathEnd()
 {
-	Super::DeathEnd();
-
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 
 	Character->StopAction(EDWCharacterActionType::Death);
@@ -98,6 +96,7 @@ void UDWCharacterState_Death::DeathEnd()
 				Iter.Value->Destroy();
 			}
 		}
-		UAbilityModuleBPLibrary::DestroyCharacter(Character);
 	}
+
+	Super::DeathEnd();
 }

@@ -8,6 +8,7 @@
 #include "Audio/AudioModule.h"
 #include "Camera/CameraModule.h"
 #include "Character/CharacterModule.h"
+#include "Character/DWCharacterModule.h"
 #include "Debug/DebugModule.h"
 #include "Event/EventModule.h"
 #include "FSM/FSMModule.h"
@@ -38,7 +39,7 @@ ADWMainModule::ADWMainModule()
 	ModuleClasses.Add(AAssetModule::StaticClass());
 	ModuleClasses.Add(AAudioModule::StaticClass());
 	ModuleClasses.Add(ACameraModule::StaticClass());
-	ModuleClasses.Add(ACharacterModule::StaticClass());
+	ModuleClasses.Add(ADWCharacterModule::StaticClass());
 	ModuleClasses.Add(ADebugModule::StaticClass());
 	ModuleClasses.Add(AEventModule::StaticClass());
 	ModuleClasses.Add(AFSMModule::StaticClass());

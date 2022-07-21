@@ -17,9 +17,9 @@ void UDWGeneralSaveGame::OnCreate_Implementation(int32 InSaveIndex)
 	Super::OnCreate_Implementation(InSaveIndex);
 }
 
-void UDWGeneralSaveGame::OnLoad_Implementation()
+void UDWGeneralSaveGame::OnLoad_Implementation(bool bForceMode)
 {
-	Super::OnLoad_Implementation();
+	Super::OnLoad_Implementation(bForceMode);
 }
 
 void UDWGeneralSaveGame::OnUnload_Implementation(bool bForceMode)

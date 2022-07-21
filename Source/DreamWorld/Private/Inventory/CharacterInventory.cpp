@@ -11,19 +11,19 @@ UCharacterInventory::UCharacterInventory()
 	
 }
 
-void UCharacterInventory::Initialize(AActor* InOwner, TMap<ESplitSlotType, FSplitSlotInfo> InSplitInfos)
+void UCharacterInventory::LoadData(FSaveData* InSaveData, bool bForceMode)
 {
-	Super::Initialize(InOwner, InSplitInfos);
+	Super::LoadData(InSaveData, bForceMode);
 }
 
-void UCharacterInventory::LoadData(FInventorySaveData InInventoryData, AActor* InOwner)
-{
-	Super::LoadData(InInventoryData, InOwner);
-}
-
-FInventorySaveData UCharacterInventory::ToData()
+FSaveData* UCharacterInventory::ToData()
 {
 	return Super::ToData();
+}
+
+void UCharacterInventory::UnloadData(bool bForceMode)
+{
+	Super::UnloadData(bForceMode);
 }
 
 FQueryItemInfo UCharacterInventory::GetItemInfoByRange(EQueryItemType InActionType, FAbilityItem InItem, int32 InStartIndex, int32 InEndIndex)

@@ -84,7 +84,11 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	virtual void LoadData(FSaveData* InSaveData) override;
+	virtual void OnSpawn_Implementation(const TArray<FParameter>& InParams) override;
+
+	virtual void OnDespawn_Implementation() override;
+
+	virtual void LoadData(FSaveData* InSaveData, bool bForceMode) override;
 
 	virtual FSaveData* ToData() override;
 

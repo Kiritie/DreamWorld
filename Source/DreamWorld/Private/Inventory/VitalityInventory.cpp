@@ -14,19 +14,19 @@ UVitalityInventory::UVitalityInventory()
 	
 }
 
-void UVitalityInventory::Initialize(AActor* InOwner, TMap<ESplitSlotType, FSplitSlotInfo> InSplitInfos)
+void UVitalityInventory::LoadData(FSaveData* InSaveData, bool bForceMode)
 {
-	Super::Initialize(InOwner, InSplitInfos);
+	Super::LoadData(InSaveData, bForceMode);
 }
 
-void UVitalityInventory::LoadData(FInventorySaveData InInventoryData, AActor* InOwner)
-{
-	Super::LoadData(InInventoryData, InOwner);
-}
-
-FInventorySaveData UVitalityInventory::ToData()
+FSaveData* UVitalityInventory::ToData()
 {
 	return Super::ToData();
+}
+
+void UVitalityInventory::UnloadData(bool bForceMode)
+{
+	Super::UnloadData(bForceMode);
 }
 
 void UVitalityInventory::DiscardAllItem()

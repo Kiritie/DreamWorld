@@ -34,7 +34,7 @@ protected:
 		
 	virtual void OnDespawn_Implementation() override;
 
-	virtual void LoadData(FSaveData* InSaveData) override;
+	virtual void LoadData(FSaveData* InSaveData, bool bForceMode) override;
 
 	virtual FSaveData* ToData() override;
 
@@ -60,20 +60,17 @@ protected:
 	//////////////////////////////////////////////////////////////////////////
 	// Chunk
 public:
-	virtual void Initialize(FIndex InIndex, int32 InBatch) override;
+	virtual void Initialize(AVoxelModule* InModule, FIndex InIndex, int32 InBatch) override;
+	
+	virtual void Generate(bool bForceMode) override;
 
-	virtual void Generate() override;
-
-	virtual void BuildMap() override;
+	virtual void BuildMap(int32 InStage) override;
 
 	virtual void GenerateMap() override;
 
 	virtual void SpawnActors() override;
 
 	virtual void DestroyActors() override;
-
-protected:
-	virtual void OnGenerated() override;
 
 	//////////////////////////////////////////////////////////////////////////
 	// SceneContainer

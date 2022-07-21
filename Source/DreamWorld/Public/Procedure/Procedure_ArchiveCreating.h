@@ -40,9 +40,6 @@ public:
 	virtual void OnLeave(UProcedureBase* InNextProcedure) override;
 
 public:
-	UFUNCTION()
-	void OnTargetCharacterStateChanged(UFiniteStateBase* InFiniteState);
-
 	UFUNCTION(BlueprintCallable)
 	void CreateArchive(FDWArchiveSaveData InArchiveSaveData);
 };

@@ -24,6 +24,10 @@ protected:
 public:
 	virtual void InitSlot(UInventory* InOwner, FAbilityItem InItem, EAbilityItemType InLimitType /* = EAbilityItemType::None */, ESplitSlotType InSplitType /*= ESplitSlotType::Default*/) override;
 
+	virtual void OnSpawn_Implementation(const TArray<FParameter>& InParams) override;
+
+	virtual void OnDespawn_Implementation() override;
+
 	virtual bool CheckSlot(FAbilityItem& InItem) const override;
 	
 	virtual void Refresh() override;

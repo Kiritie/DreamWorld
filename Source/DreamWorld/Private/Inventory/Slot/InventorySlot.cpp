@@ -28,6 +28,20 @@ void UInventorySlot::InitSlot(UInventory* InOwner, FAbilityItem InItem, EAbility
 	SplitType = InSplitType;
 }
 
+void UInventorySlot::OnSpawn_Implementation(const TArray<FParameter>& InParams)
+{
+	
+}
+
+void UInventorySlot::OnDespawn_Implementation()
+{
+	Item = FAbilityItem::Empty;
+	Owner = nullptr;
+	LimitType = EAbilityItemType::None;
+	SplitType = ESplitSlotType::Default;
+	AbilityHandle = FGameplayAbilitySpecHandle();
+}
+
 bool UInventorySlot::CheckSlot(FAbilityItem& InItem) const
 {
 	return LimitType == EAbilityItemType::None || InItem.GetData().EqualType(LimitType);

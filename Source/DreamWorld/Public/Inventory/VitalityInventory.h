@@ -18,13 +18,14 @@ class DREAMWORLD_API UVitalityInventory : public UInventory
 public:
 	UVitalityInventory();
 
+protected:
+	virtual void LoadData(FSaveData* InSaveData, bool bForceMode) override;
+
+	virtual FSaveData* ToData() override;
+
+	virtual void UnloadData(bool bForceMode) override;
+
 public:
-	virtual void Initialize(AActor* InOwner, TMap<ESplitSlotType, FSplitSlotInfo> InSplitInfos) override;
-	
-	virtual void LoadData(FInventorySaveData InInventoryData, AActor* InOwner) override;
-
-	virtual FInventorySaveData ToData() override;
-
 	virtual void DiscardAllItem() override;
 
 	virtual void ClearAllItem() override;

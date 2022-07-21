@@ -20,12 +20,12 @@ class DREAMWORLD_API UCharacterInventory : public UInventory
 public:
 	UCharacterInventory();
 
-public:
-	virtual void Initialize(AActor* InOwner, TMap<ESplitSlotType, FSplitSlotInfo> InSplitInfos) override;
-	
-	virtual void LoadData(FInventorySaveData InInventoryData, AActor* InOwner) override;
+protected:
+	virtual void LoadData(FSaveData* InSaveData, bool bForceMode) override;
 
-	virtual FInventorySaveData ToData() override;
+	virtual FSaveData* ToData() override;
+
+	virtual void UnloadData(bool bForceMode) override;
 
 public:
 	virtual FQueryItemInfo GetItemInfoByRange(EQueryItemType InActionType, FAbilityItem InItem, int32 InStartIndex = 0, int32 InEndIndex = -1) override;

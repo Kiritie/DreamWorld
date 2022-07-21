@@ -23,13 +23,15 @@ public:
 
 	virtual void OnSave_Implementation() override;
 
-	virtual void OnLoad_Implementation() override;
+	virtual void OnLoad_Implementation(bool bForceMode) override;
 
 	virtual void OnUnload_Implementation(bool bForceMode) override;
 	
 	virtual void OnRefresh_Implementation() override;
 
 	virtual void OnDestroy_Implementation() override;
+
+	virtual void OnActiveChange_Implementation(bool bActive) override;
 	
 protected:
 	UPROPERTY()
