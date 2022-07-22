@@ -128,6 +128,28 @@ public:
 		SplitInfos.Empty();
 		Items.Empty();
 	}
+
+	FSplitSlotInfo GetSplitSlotInfo(ESplitSlotType InSplitSlotType) const
+	{
+		if(SplitInfos.Contains(InSplitSlotType))
+		{
+			return SplitInfos[InSplitSlotType];
+		}
+		return FSplitSlotInfo();
+	}
+
+	void AddItem(const FAbilityItem& InItem, ESplitSlotType InSplitSlotType = ESplitSlotType::None)
+	{
+		FSplitSlotInfo SplitSlotInfo = GetSplitSlotInfo(InSplitSlotType);
+		for(int32 i = SplitSlotInfo.StartIndex; i < (SplitSlotInfo.TotalCount > 0 ? SplitSlotInfo.TotalCount : Items.Num()); i++)
+		{
+			if(Items.IsValidIndex(i) && !Items[i].IsValid())
+			{
+				Items[i] = InItem;
+				break;
+			}
+		}
+	}
 };
 
 /**

@@ -78,7 +78,7 @@ void UProcedure_ArchiveCreating::OnLeave(UProcedureBase* InNextProcedure)
 	Super::OnLeave(InNextProcedure);
 }
 
-void UProcedure_ArchiveCreating::CreateArchive(FDWArchiveSaveData InArchiveSaveData)
+void UProcedure_ArchiveCreating::CreateArchive(FDWArchiveSaveData& InArchiveSaveData)
 {
 	USaveGameModuleBPLibrary::GetSaveGame<UDWArchiveSaveGame>()->SetSaveData(&InArchiveSaveData);
 

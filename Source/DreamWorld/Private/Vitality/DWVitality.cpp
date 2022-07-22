@@ -4,12 +4,14 @@
 #include "Vitality/DWVitality.h"
 
 #include "Ability/Components/DWAbilitySystemComponent.h"
+#include "Ability/AbilityModuleBPLibrary.h"
 #include "Ability/Vitality/DWVitalityAttributeSet.h"
 #include "Ability/Vitality/AbilityVitalityDataBase.h"
 #include "Components/BoxComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Vitality/DWVitality.h"
 
+#include "Ability/Item/Prop/AbilityPropDataBase.h"
 #include "Character/DWCharacter.h"
 #include "FSM/Components/FSMComponent.h"
 #include "Inventory/VitalityInventory.h"
@@ -86,7 +88,7 @@ void ADWVitality::LoadData(FSaveData* InSaveData, bool bForceMode)
 {
 	Super::LoadData(InSaveData, bForceMode);
 	
-	auto SaveData = InSaveData->CastRef<FDWVitalitySaveData>();
+	auto& SaveData = InSaveData->CastRef<FDWVitalitySaveData>();
 
 	if(bForceMode)
 	{
@@ -97,11 +99,13 @@ void ADWVitality::LoadData(FSaveData* InSaveData, bool bForceMode)
 			{
 				SaveData.InventoryData = vitalityData.InventoryData;
 			}
-			// const auto ItemDatas = UDWHelper::LoadItemDatas();
-			// if(ItemDatas.Num() > 0 && FMath::FRand() < 0.2f)
-			// {
-			// 	SaveData.InventoryData.Items.Add(FAbilityItem(ItemDatas[FMath::RandRange(0, ItemDatas.Num() - 1)].ID, 1));
-			// }
+			auto PropDatas = UAssetModuleBPLibrary::LoadPrimaryAssets<UAbilityPropDataBase>(UAbilityModuleBPLibrary::GetAssetTypeByItemType(EAbilityItemType::Equip));
+			const int32 PropNum = FMath::Clamp(FMath::Rand() < 0.2f ? FMath::RandRange(1, 3) : 0, 0, PropDatas.Num());
+			for (int32 i = 0; i < PropNum; i++)
+			{
+				FAbilityItem tmpItem = FAbilityItem(PropDatas[FMath::RandRange(0, PropDatas.Num() - 1)]->GetPrimaryAssetId(), 1);
+				SaveData.InventoryData.AddItem(tmpItem);
+			}
 		}
 		Inventory->SetOwnerActor(this);
 	}
@@ -257,7 +261,7 @@ void ADWVitality::OnInventorySlotSelected(UInventorySlot* InInventorySlot)
 	const FAbilityItem tmpItem = InInventorySlot->GetItem();
 	if(tmpItem.IsValid() && tmpItem.GetData().EqualType(EAbilityItemType::Voxel))
 	{
-		GeneratingVoxelItem = tmpItem;
+		GenerateVoxelItem = tmpItem;
 	}
 }
 

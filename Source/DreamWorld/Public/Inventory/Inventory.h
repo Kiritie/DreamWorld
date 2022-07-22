@@ -61,6 +61,9 @@ public:
 	virtual FQueryItemInfo GetItemInfoBySplitType(EQueryItemType InQueryType, FAbilityItem InItem, ESplitSlotType InSplitSlotType);
 		
 	UFUNCTION(BlueprintCallable)
+	virtual void AdditionItem(FAbilityItem& InItem);
+
+	UFUNCTION(BlueprintCallable)
 	virtual void AdditionItemBySlots(FAbilityItem& InItem, const TArray<UInventorySlot*>& InSlots);
 
 	UFUNCTION(BlueprintCallable)
@@ -141,17 +144,10 @@ public:
 	template<typename T>
 	TArray<T*> GetSplitSlots(ESplitSlotType InSplitSlotType)
 	{
-		TArray<T*> SplitSlots = TArray<T*>();
-		for (auto Iter : SplitInfos)
+		TArray<T*> SplitSlots;
+		for (auto Iter : GetSplitSlots(InSplitSlotType))
 		{
-			if(Iter.Key == InSplitSlotType)
-			{
-				for (int32 i = Iter.Value.StartIndex; i < Iter.Value.StartIndex + Iter.Value.TotalCount; i++)
-				{
-					SplitSlots.Add(Cast<T>(Slots[i]));
-				}
-				break;
-			}
+			SplitSlots.Add(Cast<T>(Iter));
 		}
 		return SplitSlots;
 	}

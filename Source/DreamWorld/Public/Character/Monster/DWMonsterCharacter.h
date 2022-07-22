@@ -36,7 +36,7 @@ protected:
 public:
 	virtual void Tick(float DeltaTime) override;
 
-	virtual void SetDamageAble(bool bInDamaging) override;
+	virtual void SetAttackDamageAble(bool bInDamaging) override;
 
 	virtual bool CanInteract(IInteractionAgentInterface* InInteractionAgent, EInteractAction InInteractAction) override;
 	

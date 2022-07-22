@@ -16,6 +16,9 @@ class DREAMWORLD_API ADWPlayerController : public AWHPlayerController, public IS
 {
 	GENERATED_BODY()
 
+	friend class ADWCharacter;
+	friend class ADWPlayerCharacter;
+
 public:
 	ADWPlayerController();
 
@@ -33,10 +36,19 @@ protected:
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Inputs")
+	bool bPressedAttack;
+		
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Inputs")
+	bool bPressedDefend;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Inputs")
 	bool bPressedSprint;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Inputs")
 	float DoubleJumpTime;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Inputs")
+	int32 AttackAbilityQueue;
 
 protected:
 	virtual void SetupInputComponent() override;
@@ -49,6 +61,8 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	virtual bool RaycastFromAimPoint(FHitResult& OutHitResult, EDWGameTraceType InGameTraceType, float InRayDistance = 1000.f) const;
+	
+	virtual bool RaycastVoxel(FVoxelHitResult& OutHitResult);
 
 protected:
 	virtual void OnJumpPressed(FKey Key);
@@ -58,6 +72,46 @@ protected:
 	virtual void OnSprintPressed();
 
 	virtual void OnSprintReleased();
+	
+	virtual void ToggleControlMode();
+
+	virtual void ToggleCrouch();
+
+	virtual void ToggleLockTarget();
+
+	virtual void OnDodgePressed();
+
+	virtual void OnDodgeReleased();
+
+	virtual void OnAttackDestroyPressed();
+
+	virtual void OnAttackDestroyRepeat();
+
+	virtual void OnAttackDestroyReleased();
+
+	virtual void OnDefendGeneratePressed();
+
+	virtual void OnDefendGenerateRepeat();
+
+	virtual void OnDefendGenerateReleased();
+
+	virtual void ReleaseSkillAbility1();
+
+	virtual void ReleaseSkillAbility2();
+
+	virtual void ReleaseSkillAbility3();
+
+	virtual void ReleaseSkillAbility4();
+
+	virtual void DoInteractAction1();
+
+	virtual void DoInteractAction2();
+
+	virtual void DoInteractAction3();
+
+	virtual void DoInteractAction4();
+
+	virtual void DoInteractAction5();
 
 	virtual void ToggleInventoryPanel();
 

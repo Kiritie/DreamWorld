@@ -107,7 +107,6 @@ void ADWVoxelChunk::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AAc
 	// 				{
 	// 					characterPart->SetLastVoxelType(VoxelData.VoxelType);
 	// 					voxel.OnTargetEnter(characterPart, FVoxelHitResult(voxelItem, point, normal));
-	// 					UVoxelModuleBPLibrary::DespawnVoxel(voxel);
 	// 				}
 	// 			}
 	// 			character->OnBeginOverlapVoxel(characterPart, FVoxelHitResult(voxelItem, point, normal));
@@ -141,7 +140,6 @@ void ADWVoxelChunk::OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 	// 					{
 	// 						characterPart->SetLastVoxelType(EVoxelType::Unknown);
 	// 						voxel.OnTargetExit(characterPart, FVoxelHitResult(voxelItem, point, normal));
-	// 						UVoxelModuleBPLibrary::DespawnVoxel(voxel);
 	// 					}
 	// 				}
 	// 			}

@@ -26,12 +26,6 @@ void UDWPlayerCharacterState_Default::OnEnter(UFiniteStateBase* InLastFiniteStat
 	Super::OnEnter(InLastFiniteState);
 
 	ADWPlayerCharacter* PlayerCharacter = GetAgent<ADWPlayerCharacter>();
-
-	PlayerCharacter->bPressedAttack = false;
-	PlayerCharacter->bPressedDefend = false;
-	PlayerCharacter->LockedTarget = nullptr;
-
-	PlayerCharacter->SetControlMode(PlayerCharacter->ControlMode);
 }
 
 void UDWPlayerCharacterState_Default::OnRefresh()

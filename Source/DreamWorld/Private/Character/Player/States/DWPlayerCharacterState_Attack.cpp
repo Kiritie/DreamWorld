@@ -35,10 +35,6 @@ void UDWPlayerCharacterState_Attack::OnRefresh()
 void UDWPlayerCharacterState_Attack::OnLeave(UFiniteStateBase* InNextFiniteState)
 {
 	Super::OnLeave(InNextFiniteState);
-	
-	ADWPlayerCharacter* PlayerCharacter = GetAgent<ADWPlayerCharacter>();
-
-	PlayerCharacter->AttackAbilityQueue = 0;
 }
 
 void UDWPlayerCharacterState_Attack::OnTermination()
@@ -49,25 +45,6 @@ void UDWPlayerCharacterState_Attack::OnTermination()
 void UDWPlayerCharacterState_Attack::AttackStart()
 {
 	Super::AttackStart();
-	
-	if (!IsCurrentState()) return;
-	
-	ADWPlayerCharacter* PlayerCharacter = GetAgent<ADWPlayerCharacter>();
-
-	switch (PlayerCharacter->GetAttackType())
-	{
-		case EDWCharacterAttackType::NormalAttack:
-		case EDWCharacterAttackType::FallingAttack:
-		{
-			if(PlayerCharacter->AttackAbilityQueue > 0)
-			{
-				PlayerCharacter->AttackAbilityQueue--;
-			}
-			break;
-		}
-		default: break;
-	}
-
 }
 
 void UDWPlayerCharacterState_Attack::AttackHurt()

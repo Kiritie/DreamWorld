@@ -25,6 +25,11 @@ void UInventory::LoadData(FSaveData* InSaveData, bool bForceMode)
 
 	if(bForceMode)
 	{
+		for(auto Iter : Slots)
+		{
+			UObjectPoolModuleBPLibrary::DespawnObject(Iter);
+		}
+		Slots.Empty();
 		SplitInfos = SaveData.SplitInfos;
 		for (auto Iter : SplitInfos)
 		{
@@ -213,6 +218,11 @@ FQueryItemInfo UInventory::GetItemInfoBySplitType(EQueryItemType InQueryType, FA
 {
 	const FSplitSlotInfo SplitSlotInfo = GetSplitSlotInfo(InSplitSlotType);
 	return GetItemInfoByRange(InQueryType, InItem, SplitSlotInfo.StartIndex, SplitSlotInfo.StartIndex + SplitSlotInfo.TotalCount);
+}
+
+void UInventory::AdditionItem(FAbilityItem& InItem)
+{
+	AdditionItemByRange(InItem);
 }
 
 void UInventory::AdditionItemBySlots(FAbilityItem& InItem, const TArray<UInventorySlot*>& InSlots)

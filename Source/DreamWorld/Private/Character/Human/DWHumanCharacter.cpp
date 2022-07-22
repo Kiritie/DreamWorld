@@ -43,9 +43,9 @@ void ADWHumanCharacter::Tick(float DeltaTime)
 
 }
 
-void ADWHumanCharacter::SetDamageAble(bool bInDamaging)
+void ADWHumanCharacter::SetAttackDamageAble(bool bInDamaging)
 {
-	Super::SetDamageAble(bInDamaging);
+	Super::SetAttackDamageAble(bInDamaging);
 
 	if(GetWeapon()) GetWeapon()->SetCollisionEnable(bInDamaging);
 }

@@ -26,6 +26,8 @@ UCLASS()
 class ADWPlayerCharacter : public ADWHumanCharacter, public IWHPlayerInterface
 {
 	GENERATED_BODY()
+	
+	friend class ADWPlayerController;
 
 	friend class UDWPlayerCharacterState_Attack;
 	friend class UDWPlayerCharacterState_Death;
@@ -35,25 +37,6 @@ class ADWPlayerCharacter : public ADWHumanCharacter, public IWHPlayerInterface
 
 public:
 	ADWPlayerCharacter();
-
-protected:
-	// states
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "CharacterStates")
-	EDWControlMode ControlMode;
-	
-	// stats
-	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "CharacterStats")
-	FVoxelItem VoxelItem;
-
-	// inputs
-	
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CharacterInputs")
-	bool bPressedAttack;
-		
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CharacterInputs")
-	bool bPressedDefend;
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
@@ -76,9 +59,6 @@ protected:
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	USceneCaptureComponent2D* MiniMapCapture;
-
-protected:
-	int32 AttackAbilityQueue;
 	
 protected:
 	// Called when the game starts or when spawned
@@ -104,11 +84,6 @@ public:
 
 	virtual void RefreshEquip(EDWEquipPartType InPartType, UInventoryEquipSlot* EquipSlot) override;
 
-	UFUNCTION(BlueprintCallable)
-	virtual void UpdateVoxelMesh();
-	
-	virtual bool RaycastVoxel(FVoxelHitResult& OutHitResult) override;
-
 	virtual void OnEnterInteract(IInteractionAgentInterface* InInteractionAgent) override;
 
 	virtual void OnLeaveInteract(IInteractionAgentInterface* InInteractionAgent) override;
@@ -119,46 +94,6 @@ protected:
 	virtual void MoveRight_Implementation(float InValue) override;
 
 	virtual void MoveUp_Implementation(float InValue) override;
-	
-	virtual void ToggleControlMode();
-
-	virtual void ToggleCrouch();
-
-	virtual void ToggleLockTarget();
-
-	virtual void OnDodgePressed();
-
-	virtual void OnDodgeReleased();
-
-	virtual void OnAttackDestroyPressed();
-
-	virtual void OnAttackDestroyRepeat();
-
-	virtual void OnAttackDestroyReleased();
-
-	virtual void OnDefendGeneratePressed();
-
-	virtual void OnDefendGenerateRepeat();
-
-	virtual void OnDefendGenerateReleased();
-
-	virtual void ReleaseSkillAbility1();
-
-	virtual void ReleaseSkillAbility2();
-
-	virtual void ReleaseSkillAbility3();
-
-	virtual void ReleaseSkillAbility4();
-
-	virtual void DoInteractAction1();
-
-	virtual void DoInteractAction2();
-
-	virtual void DoInteractAction3();
-
-	virtual void DoInteractAction4();
-
-	virtual void DoInteractAction5();
 
 public:
 	virtual void OnAttributeChange(const FOnAttributeChangeData& InAttributeChangeData) override;
@@ -175,12 +110,10 @@ public:
 	virtual void SetTeamID(FName InTeamID) override;
 	
 	virtual FString GetHeadInfo() const override;
-
-	UFUNCTION(BlueprintPure)
-	EDWControlMode GetControlMode() const { return ControlMode; }
 		
-	UFUNCTION(BlueprintCallable)
-	virtual void SetControlMode(EDWControlMode InControlMode);
+	virtual void SetControlMode(EDWCharacterControlMode InControlMode) override;
+
+	virtual void SetGenerateVoxelItem(FVoxelItem InGenerateVoxelItem) override;
 	
 	UFUNCTION(BlueprintPure)
 	UTargetSystemComponent* GetTargetSystem() const { return TargetSystem; }

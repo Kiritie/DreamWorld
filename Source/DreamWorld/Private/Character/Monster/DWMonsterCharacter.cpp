@@ -52,9 +52,9 @@ void ADWMonsterCharacter::OnAttackPointOverlap(UPrimitiveComponent* OverlappedCo
 	OnHitTarget(OverlappedComponent, OtherActor, OtherComp, OtherBodyIndex, bFromSweep, SweepResult);
 }
 
-void ADWMonsterCharacter::SetDamageAble(bool bInDamaging)
+void ADWMonsterCharacter::SetAttackDamageAble(bool bInDamaging)
 {
-	Super::SetDamageAble(bInDamaging);
+	Super::SetAttackDamageAble(bInDamaging);
 
 	AttackPoint->SetGenerateOverlapEvents(bInDamaging);
 }

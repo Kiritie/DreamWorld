@@ -23,10 +23,6 @@ bool UDWPlayerCharacterState_Interrupt::OnValidate()
 void UDWPlayerCharacterState_Interrupt::OnEnter(UFiniteStateBase* InLastFiniteState)
 {
 	Super::OnEnter(InLastFiniteState);
-	
-	ADWPlayerCharacter* PlayerCharacter = GetAgent<ADWPlayerCharacter>();
-
-	PlayerCharacter->AttackAbilityQueue = 0;
 }
 
 void UDWPlayerCharacterState_Interrupt::OnRefresh()

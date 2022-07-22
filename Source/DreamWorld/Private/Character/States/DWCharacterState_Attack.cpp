@@ -6,6 +6,7 @@
 #include "Ability/Item/Skill/AbilitySkillBase.h"
 #include "Ability/Item/Skill/AbilitySkillDataBase.h"
 #include "Character/DWCharacter.h"
+#include "ObjectPool/ObjectPoolModuleBPLibrary.h"
 
 UDWCharacterState_Attack::UDWCharacterState_Attack()
 {
@@ -47,7 +48,7 @@ void UDWCharacterState_Attack::OnLeave(UFiniteStateBase* InNextFiniteState)
 
 	Character->FreeToAnim();
 	Character->SetMotionRate(1, 1);
-	Character->SetDamageAble(false);
+	Character->SetAttackDamageAble(false);
 	Character->AttackAbilityIndex = 0;
 	Character->SkillAbilityID = FPrimaryAssetId();
 	Character->AttackType = EDWCharacterAttackType::None;
@@ -69,17 +70,17 @@ void UDWCharacterState_Attack::AttackStart()
 		case EDWCharacterAttackType::NormalAttack:
 		case EDWCharacterAttackType::FallingAttack:
 		{
-			Character->SetDamageAble(true);
+			Character->SetAttackDamageAble(true);
 			break;
 		}
 		case EDWCharacterAttackType::SkillAttack:
 		{
-			if (Character->GetSkillAbility(Character->SkillAbilityID).GetItemData<UAbilitySkillDataBase>().SkillClass != nullptr)
+			if (const auto SkillClass = Character->GetSkillAbility(Character->SkillAbilityID).GetItemData<UAbilitySkillDataBase>().SkillClass)
 			{
-				FActorSpawnParameters spawnParams = FActorSpawnParameters();
-				spawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-				AAbilitySkillBase* tmpSkill = GetWorld()->SpawnActor<AAbilitySkillBase>(Character->GetSkillAbility(Character->SkillAbilityID).GetItemData<UAbilitySkillDataBase>().SkillClass, spawnParams);
-				if(tmpSkill) tmpSkill->Initialize(Character, FAbilityItem(Character->SkillAbilityID));
+				if(AAbilitySkillBase* Skill = UObjectPoolModuleBPLibrary::SpawnObject<AAbilitySkillBase>(nullptr, SkillClass))
+				{
+					Skill->Initialize(Character, FAbilityItem(Character->SkillAbilityID));
+				}
 			}
 			break;
 		}
@@ -93,9 +94,9 @@ void UDWCharacterState_Attack::AttackHurt()
 	
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 
-	Character->SetDamageAble(false);
+	Character->SetAttackDamageAble(false);
 	FTimerDelegate TimerDelegate;
-	TimerDelegate.BindLambda([Character](){ Character->SetDamageAble(true); });
+	TimerDelegate.BindLambda([Character](){ Character->SetAttackDamageAble(true); });
 	GetWorld()->GetTimerManager().SetTimerForNextTick(TimerDelegate);
 }
 
@@ -109,7 +110,7 @@ void UDWCharacterState_Attack::AttackEnd()
 	{
 		case EDWCharacterAttackType::NormalAttack:
 		{
-			Character->SetDamageAble(false);
+			Character->SetAttackDamageAble(false);
 			if (++Character->AttackAbilityIndex >= Character->AttackAbilities.Num())
 			{
 				Character->AttackAbilityIndex = 0;

@@ -45,6 +45,8 @@ class DREAMWORLD_API ADWCharacter : public AAbilityCharacterBase, public ITarget
 {
 	GENERATED_BODY()
 
+	friend class ADWPlayerController;
+	
 	friend class UDWCharacterState_Attack;
 	friend class UDWCharacterState_Climb;
 	friend class UDWCharacterState_Crouch;
@@ -71,23 +73,11 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CharacterStats")
 	EDWCharacterNature Nature;
 	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "CharacterStates")
+	EDWCharacterControlMode ControlMode;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CharacterStats")
 	FName TeamID;
-			
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CharacterStats")
-	float AttackDistance;
-	
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CharacterStats")
-	float InteractDistance;
-		
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CharacterStats")
-	float FollowDistance;
-			
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CharacterStats")
-	float PatrolDistance;
-			
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CharacterStats")
-	float PatrolDuration;
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CharacterStats")
@@ -131,14 +121,12 @@ protected:
 
 	EDWCharacterAttackType AttackType;
 
-	EDWCharacterActionType ActionType;
-
 	UPROPERTY()
 	TMap<EDWEquipPartType, AAbilityEquipBase*> Equips;
 	
 	FDWCharacterAttackAbilityData FallingAttackAbility;
 
-	TArray<FDWCharacterAttackAbilityData> AttackAbilities;
+	TMap<EDWWeaponType, FDWCharacterAttackAbilityDatas> AttackAbilities;
 
 	TMap<FPrimaryAssetId, FDWCharacterSkillAbilityData> SkillAbilities;
 
@@ -273,8 +261,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual bool DoAction(EDWCharacterActionType InActionType);
 
-	//UFUNCTION(BlueprintCallable)
-	virtual bool StopAction(EDWCharacterActionType InActionType = EDWCharacterActionType::None, bool bCancelAbility = true);
+	UFUNCTION(BlueprintCallable)
+	virtual bool StopAction(EDWCharacterActionType InActionType);
 
 	UFUNCTION(BlueprintCallable)
 	virtual void EndAction(EDWCharacterActionType InActionType);
@@ -303,11 +291,9 @@ public:
 
 	virtual void AddMovementInput(FVector WorldDirection, float ScaleValue = 1.0f, bool bForce = false) override;
 
-	virtual void SetDamageAble(bool bInDamaging);
+	virtual void SetAttackDamageAble(bool bInDamaging);
 
 	virtual bool RaycastStep(FHitResult& OutHitResult);
-
-	virtual bool RaycastVoxel(FVoxelHitResult& OutHitResult);
 
 public:
 	UFUNCTION(BlueprintPure)
@@ -320,12 +306,12 @@ public:
 	bool HasAttackAbility(int32 InAbilityIndex = -1) const;
 
 	UFUNCTION(BlueprintCallable)
-	bool HasSkillAbility(const FPrimaryAssetId& InSkillID);
+	bool HasSkillAbility(const FPrimaryAssetId& InSkillID) const;
 
-	bool HasSkillAbility(ESkillType InSkillType, int32 InAbilityIndex = -1);
+	bool HasSkillAbility(ESkillType InSkillType, int32 InAbilityIndex = -1) const;
 	
 	UFUNCTION(BlueprintCallable)
-	bool HasActionAbility(EDWCharacterActionType InActionType);
+	bool HasActionAbility(EDWCharacterActionType InActionType) const;
 
 	UFUNCTION(BlueprintCallable)
 	bool CreateTeam(const FName& InTeamName = NAME_None, FString InTeamDetail = TEXT(""));
@@ -433,6 +419,15 @@ public:
 	
 	UFUNCTION(BlueprintPure)
 	EDWCharacterNature GetNature() const { return Nature; }
+	
+	UFUNCTION(BlueprintCallable)
+	void SetNature(EDWCharacterNature InNature) { Nature = InNature; }
+
+	UFUNCTION(BlueprintPure)
+	EDWCharacterControlMode GetControlMode() const { return ControlMode; }
+		
+	UFUNCTION(BlueprintCallable)
+	virtual void SetControlMode(EDWCharacterControlMode InControlMode);
 
 	FDWTeamData* GetTeamData() const;
 
@@ -563,6 +558,21 @@ public:
 	void SetStaminaExpendSpeed(float InValue);
 
 	UFUNCTION(BlueprintPure)
+	float GetAttackDistance() const;
+	
+	UFUNCTION(BlueprintPure)
+	float GetInteractDistance() const;
+
+	UFUNCTION(BlueprintPure)
+	float GetFollowDistance() const;
+
+	UFUNCTION(BlueprintPure)
+	float GetPatrolDistance() const;
+
+	UFUNCTION(BlueprintPure)
+	float GetPatrolDuration() const;
+
+	UFUNCTION(BlueprintPure)
 	ADWCharacter* GetOwnerRider() const { return OwnerRider; }
 
 	UFUNCTION(BlueprintPure)
@@ -575,27 +585,6 @@ public:
 	FVector GetBirthLocation() const { return BirthLocation; }
 
 	UFUNCTION(BlueprintPure)
-	float GetAttackDistance() const { return AttackDistance; }
-	
-	UFUNCTION(BlueprintPure)
-	float GetInteractDistance() const { return InteractDistance; }
-
-	UFUNCTION(BlueprintPure)
-	float GetFollowDistance() const { return FollowDistance; }
-
-	UFUNCTION(BlueprintPure)
-	float GetPatrolDistance() const { return PatrolDistance; }
-
-	UFUNCTION(BlueprintPure)
-	float GetPatrolDuration() const { return PatrolDuration; }
-
-	UFUNCTION(BlueprintPure)
-	float GetDefaultGravityScale() const { return DefaultGravityScale; }
-
-	UFUNCTION(BlueprintPure)
-	float GetDefaultAirControl() const { return DefaultAirControl; }
-
-	UFUNCTION(BlueprintPure)
 	FVector GetAIMoveLocation() const { return AIMoveLocation; }
 
 	UFUNCTION(BlueprintPure)
@@ -606,39 +595,39 @@ public:
 
 	UFUNCTION(BlueprintPure)
 	EDWCharacterAttackType GetAttackType() const { return AttackType; }
+		
+	template<class T>
+	T* GetEquip(EDWEquipPartType InPartType) const
+	{
+		return Cast<T>(GetEquip(InPartType));
+	}
 
 	UFUNCTION(BlueprintPure)
-	EDWCharacterActionType GetActionType() const { return ActionType; }
+	AAbilityEquipBase* GetEquip(EDWEquipPartType InPartType) const;
+			
+	UFUNCTION(BlueprintPure)
+	ADWEquipWeapon* GetWeapon() const;
+				
+	UFUNCTION(BlueprintPure)
+	ADWEquipShield* GetShield() const;
 
 	UFUNCTION(BlueprintPure)
-	bool HasWeapon(EDWWeaponType InWeaponType);
-		
+	EDWWeaponType GetWeaponType() const;
+				
 	UFUNCTION(BlueprintPure)
-	bool HasShield(EDWShieldType InShieldType);
-		
-	UFUNCTION(BlueprintPure)
-	ADWEquipWeapon* GetWeapon();
-	
-	UFUNCTION(BlueprintPure)
-	ADWEquipShield* GetShield();
-		
-	UFUNCTION(BlueprintPure)
-	bool HasArmor(EDWEquipPartType InPartType);
-	
-	UFUNCTION(BlueprintPure)
-	ADWEquipArmor* GetArmor(EDWEquipPartType InPartType);
+	bool CheckWeaponType(EDWWeaponType InWeaponType) const;
 
 	UFUNCTION(BlueprintPure)
-	bool HasEquip(EDWEquipPartType InPartType);
-	
+	EDWShieldType GetShieldType() const;
+				
 	UFUNCTION(BlueprintPure)
-	AAbilityEquipBase* GetEquip(EDWEquipPartType InPartType);
-	
+	bool CheckShieldType(EDWShieldType InShieldType) const;
+
 	UFUNCTION(BlueprintPure)
 	TMap<EDWEquipPartType, AAbilityEquipBase*> GetEquips() const { return Equips; }
 
 	UFUNCTION(BlueprintPure)
-	FDWCharacterAttackAbilityData GetAttackAbility(int32 InAbilityIndex = -1);
+	FDWCharacterAttackAbilityData GetAttackAbility(int32 InAbilityIndex = -1) const;
 		
 	UFUNCTION(BlueprintPure)
 	FDWCharacterSkillAbilityData GetSkillAbility(const FPrimaryAssetId& InSkillID);
@@ -646,10 +635,10 @@ public:
 	FDWCharacterSkillAbilityData GetSkillAbility(ESkillType InSkillType, int32 InAbilityIndex = -1);
 			
 	UFUNCTION(BlueprintPure)
-	FDWCharacterActionAbilityData GetActionAbility(EDWCharacterActionType InActionType = EDWCharacterActionType::None);
+	FDWCharacterActionAbilityData GetActionAbility(EDWCharacterActionType InActionType);
 
 	UFUNCTION(BlueprintPure)
-	TArray<FDWCharacterAttackAbilityData> GetAttackAbilities() const { return AttackAbilities; }
+	TArray<FDWCharacterAttackAbilityData> GetAttackAbilities() const;
 
 	UFUNCTION(BlueprintPure)
 	TMap<FPrimaryAssetId, FDWCharacterSkillAbilityData> GetSkillAbilities() const { return SkillAbilities; }

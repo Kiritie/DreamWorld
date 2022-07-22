@@ -41,5 +41,5 @@ public:
 
 public:
 	UFUNCTION(BlueprintCallable)
-	void CreateArchive(FDWArchiveSaveData InArchiveSaveData);
+	void CreateArchive(UPARAM(ref) FDWArchiveSaveData& InArchiveSaveData);
 };

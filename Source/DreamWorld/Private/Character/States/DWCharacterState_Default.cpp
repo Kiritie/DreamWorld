@@ -37,6 +37,7 @@ void UDWCharacterState_Default::OnEnter(UFiniteStateBase* InLastFiniteState)
 	Character->SetStamina(-1.f);
 	
 	// stats
+	Character->SetControlMode(Character->ControlMode);
 	Character->SetLockedTarget(nullptr);
 	Character->RidingTarget = nullptr;
 	Character->OwnerRider = nullptr;
@@ -46,7 +47,6 @@ void UDWCharacterState_Default::OnEnter(UFiniteStateBase* InLastFiniteState)
 	Character->AIMoveLocation = Vector_Empty;
 	Character->AIMoveStopDistance = 0;
 	Character->NormalAttackRemainTime = 0;
-	Character->ActionType = EDWCharacterActionType::None;
 
 	Character->GetCharacterMovement()->SetActive(false);
 	Character->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);

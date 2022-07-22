@@ -17,7 +17,6 @@ UInventorySlot::UInventorySlot()
 	Owner = nullptr;
 	LimitType = EAbilityItemType::None;
 	SplitType = ESplitSlotType::Default;
-	AbilityHandle = FGameplayAbilitySpecHandle();
 }
 
 void UInventorySlot::InitSlot(UInventory* InOwner, FAbilityItem InItem, EAbilityItemType InLimitType /*= EAbilityItemType::None*/, ESplitSlotType InSplitType /*= ESplitSlotType::Default*/)
@@ -35,11 +34,10 @@ void UInventorySlot::OnSpawn_Implementation(const TArray<FParameter>& InParams)
 
 void UInventorySlot::OnDespawn_Implementation()
 {
-	Item = FAbilityItem::Empty;
+	SetItem(FAbilityItem::Empty);
 	Owner = nullptr;
 	LimitType = EAbilityItemType::None;
 	SplitType = ESplitSlotType::Default;
-	AbilityHandle = FGameplayAbilitySpecHandle();
 }
 
 bool UInventorySlot::CheckSlot(FAbilityItem& InItem) const
@@ -78,12 +76,12 @@ void UInventorySlot::EndSet()
 		IAbilityVitalityInterface* vitality = Cast<IAbilityVitalityInterface>(Owner->GetOwnerActor());
 		if (vitality && Item.GetData().AbilityClass)
 		{
-			AbilityHandle = vitality->AcquireAbility(Item.GetData().AbilityClass, Item.Level);
+			Item.AbilityHandle = vitality->AcquireAbility(Item.GetData().AbilityClass, Item.Level);
 		}
 	}
 	else
 	{
-		AbilityHandle = FGameplayAbilitySpecHandle();
+		Item.AbilityHandle = FGameplayAbilitySpecHandle();
 	}
 }
 
@@ -92,10 +90,6 @@ void UInventorySlot::Replace(UInventorySlot* InSlot)
 	auto tmpItem = GetItem();
 	SetItem(InSlot->GetItem());
 	InSlot->SetItem(tmpItem);
-
-	// const auto abilityHandle = GetAbilityHandle();
-	// SetAbilityHandle(InSlot->GetAbilityHandle());
-	// InSlot->SetAbilityHandle(abilityHandle);
 
 	const auto cooldownInfo = GetCooldownInfo();
 	SetCooldownInfo(InSlot->GetCooldownInfo());
@@ -174,7 +168,7 @@ void UInventorySlot::MoveItem(int InCount /*= -1*/)
 
 	if(Owner->GetConnectInventory())
 	{
-		Owner->GetConnectInventory()->AdditionItemByRange(tmpItem);
+		Owner->GetConnectInventory()->AdditionItem(tmpItem);
 	}
 	else
 	{
@@ -293,11 +287,11 @@ void UInventorySlot::DiscardItem(int InCount /*= -1*/)
 
 bool UInventorySlot::ActiveItem()
 {
-	if(AbilityHandle.IsValid())
+	if(Item.AbilityHandle.IsValid())
 	{
 		if(IAbilityVitalityInterface* Vitality = Cast<IAbilityVitalityInterface>(GetOwner()->GetOwnerActor()))
 		{
-			return Vitality->ActiveAbility(AbilityHandle);
+			return Vitality->ActiveAbility(Item.AbilityHandle);
 		}
 	}
     return false;
@@ -305,11 +299,11 @@ bool UInventorySlot::ActiveItem()
 
 bool UInventorySlot::CancelItem()
 {
-	if(AbilityHandle.IsValid())
+	if(Item.AbilityHandle.IsValid())
 	{
 		if(IAbilityVitalityInterface* Vitality = Cast<IAbilityVitalityInterface>(GetOwner()->GetOwnerActor()))
 		{
-			Vitality->CancelAbilityByHandle(AbilityHandle);
+			Vitality->CancelAbilityByHandle(Item.AbilityHandle);
 			return true;
 		}
 	}

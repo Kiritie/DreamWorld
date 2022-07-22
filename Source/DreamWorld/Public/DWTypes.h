@@ -54,7 +54,7 @@ class UInventorySlot;
  * ??????
  */
 UENUM(BlueprintType)
-enum class EDWControlMode : uint8
+enum class EDWCharacterControlMode : uint8
 {
 	// ???
 	Fighting,
@@ -176,14 +176,16 @@ enum class EDWWeaponType : uint8
 {
 	// 无
 	None,
-	// 物理近战
-	PhysicsMelee,
-	// 物理远程
-	PhysicsRemote,
-	// 魔法近战
-	MagicMelee,
-	// 魔法远程
-	MagicRemote,
+	// 小刀
+	Knife,
+	// 剑
+	Sword,
+	// 弓
+	Bow,
+	// 弩
+	Crossbow,
+	// 法杖
+	Wand
 };
 
 UENUM(BlueprintType)
@@ -214,22 +216,14 @@ struct DREAMWORLD_API FDWCharacterActionAbilityData : public FAbilityData
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	EDWCharacterActionType ActionType;
-
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	bool bCancelable;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	bool bNeedActive;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	bool bNeedFreeToAnim;
+	TSubclassOf<UDWCharacterActionAbility> AbilityClass;
 
 	FORCEINLINE FDWCharacterActionAbilityData()
 	{
 		ActionType = EDWCharacterActionType::None;
-		bCancelable = true;
-		bNeedActive = true;
-		bNeedFreeToAnim = false;
+		AbilityClass = nullptr;
 	}
 };
 
@@ -242,14 +236,33 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	EDWWeaponType WeaponType;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSubclassOf<UDWCharacterAttackAbility> AbilityClass;
+
 	FORCEINLINE FDWCharacterAttackAbilityData()
 	{
 		WeaponType = EDWWeaponType::None;
+		AbilityClass = nullptr;
 	}
 };
 
 USTRUCT(BlueprintType)
-struct DREAMWORLD_API FDWCharacterSkillAbilityData : public FAbilityData
+struct DREAMWORLD_API FDWCharacterAttackAbilityDatas
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	TArray<FDWCharacterAttackAbilityData> Array;
+
+	FORCEINLINE FDWCharacterAttackAbilityDatas()
+	{
+		Array = TArray<FDWCharacterAttackAbilityData>();
+	}
+};
+
+USTRUCT(BlueprintType)
+struct DREAMWORLD_API FDWCharacterSkillAbilityData : public FAbilityItemData
 {
 	GENERATED_BODY()
 
@@ -258,11 +271,15 @@ public:
 	EDWWeaponType WeaponType;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSubclassOf<UDWCharacterSkillAbility> AbilityClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bCancelable;
 
 	FORCEINLINE FDWCharacterSkillAbilityData()
 	{
 		WeaponType = EDWWeaponType::None;
+		AbilityClass = nullptr;
 		bCancelable = false;
 	}
 };
@@ -323,13 +340,9 @@ public:
 	{
 		TeamID = NAME_None;
 		Nature = EDWCharacterNature::AIHostile;
-		AttackDistance = 100.f;
-		InteractDistance = 500.f;
-		FollowDistance = 500.f;
-		PatrolDistance = 1000.f;
-		PatrolDuration = 10.f;
+		ControlMode = EDWCharacterControlMode::Fighting;
 		FallingAttackAbility = FDWCharacterAttackAbilityData();
-		AttackAbilities = TArray<FDWCharacterAttackAbilityData>();
+		AttackAbilities = TMap<EDWWeaponType, FDWCharacterAttackAbilityDatas>();
 		SkillAbilities = TMap<FPrimaryAssetId, FDWCharacterSkillAbilityData>();
 		ActionAbilities = TMap<EDWCharacterActionType, FDWCharacterActionAbilityData>();
 	}
@@ -338,13 +351,9 @@ public:
 	{
 		TeamID = NAME_None;
 		Nature = EDWCharacterNature::AIHostile;
-		AttackDistance = 100.f;
-		InteractDistance = 500.f;
-		FollowDistance = 500.f;
-		PatrolDistance = 1000.f;
-		PatrolDuration = 10.f;
+		ControlMode = EDWCharacterControlMode::Fighting;
 		FallingAttackAbility = FDWCharacterAttackAbilityData();
-		AttackAbilities = TArray<FDWCharacterAttackAbilityData>();
+		AttackAbilities = TMap<EDWWeaponType, FDWCharacterAttackAbilityDatas>();
 		SkillAbilities = TMap<FPrimaryAssetId, FDWCharacterSkillAbilityData>();
 		ActionAbilities = TMap<EDWCharacterActionType, FDWCharacterActionAbilityData>();
 	}
@@ -356,20 +365,8 @@ public:
 	EDWCharacterNature Nature;
 	
 	UPROPERTY()
-	float AttackDistance;
-	
-	UPROPERTY()
-	float InteractDistance;
-		
-	UPROPERTY()
-	float FollowDistance;
-			
-	UPROPERTY()
-	float PatrolDistance;
-			
-	UPROPERTY()
-	float PatrolDuration;
-	
+	EDWCharacterControlMode ControlMode;
+
 	UPROPERTY(BlueprintReadWrite)
 	FInventorySaveData InventoryData;
 
@@ -377,7 +374,7 @@ public:
 	FDWCharacterAttackAbilityData FallingAttackAbility;
 
 	UPROPERTY()
-	TArray<FDWCharacterAttackAbilityData> AttackAbilities;
+	TMap<EDWWeaponType, FDWCharacterAttackAbilityDatas> AttackAbilities;
 
 	UPROPERTY()
 	TMap<FPrimaryAssetId, FDWCharacterSkillAbilityData> SkillAbilities;
@@ -406,6 +403,17 @@ public:
 	FRotator CameraRotation;
 };
 
+UENUM(BlueprintType)
+enum class EDWPlayerInventoryInitType : uint8
+{
+	// 无
+	None,
+	// 少量
+	Small,
+	// 充满
+	Fill
+};
+
 USTRUCT(BlueprintType)
 struct DREAMWORLD_API FDWPlayerSaveData : public FDWPlayerBasicSaveData
 {
@@ -415,26 +423,26 @@ public:
 	FORCEINLINE FDWPlayerSaveData()
 	{
 		ArchiveID = 0;
-		ControlMode = EDWControlMode::Fighting;
+		InventoryInitType = EDWPlayerInventoryInitType::Fill;
 	}
 		
 	FORCEINLINE FDWPlayerSaveData(const FDWCharacterSaveData& InCharacterSaveData) : FDWPlayerBasicSaveData(InCharacterSaveData)
 	{
 		ArchiveID = 0;
-		ControlMode = EDWControlMode::Fighting;
+		InventoryInitType = EDWPlayerInventoryInitType::Fill;
 	}
 
 	FORCEINLINE FDWPlayerSaveData(const FDWPlayerBasicSaveData& InBasicSaveData) : FDWPlayerBasicSaveData(InBasicSaveData)
 	{
 		ArchiveID = 0;
-		ControlMode = EDWControlMode::Fighting;
+		InventoryInitType = EDWPlayerInventoryInitType::Fill;
 	}
 
 	UPROPERTY(BlueprintReadOnly)
 	int32 ArchiveID;
 
-	UPROPERTY(BlueprintReadOnly)
-	EDWControlMode ControlMode;
+	UPROPERTY(BlueprintReadWrite)
+	EDWPlayerInventoryInitType InventoryInitType;
 };
 
 USTRUCT(BlueprintType)

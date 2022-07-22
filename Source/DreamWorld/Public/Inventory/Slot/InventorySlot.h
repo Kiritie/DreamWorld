@@ -36,8 +36,6 @@ protected:
 		
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Default")
 	ESplitSlotType SplitType;
-
-	FGameplayAbilitySpecHandle AbilityHandle;
 	
 public:
 	FOnInventorySlotRefresh OnInventorySlotRefresh;
@@ -159,10 +157,4 @@ public:
 
 	UFUNCTION(BlueprintPure)
 	virtual FAbilityInfo GetAbilityInfo() const;
-
-	UFUNCTION(BlueprintPure)
-	FGameplayAbilitySpecHandle& GetAbilityHandle() { return AbilityHandle; }
-
-	UFUNCTION(BlueprintCallable)
-	void SetAbilityHandle(FGameplayAbilitySpecHandle val) { AbilityHandle = val; }
 };

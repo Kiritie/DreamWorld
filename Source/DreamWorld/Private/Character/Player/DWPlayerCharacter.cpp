@@ -63,6 +63,7 @@
 #include "Character/States/DWCharacterState_Swim.h"
 #include "Character/States/DWCharacterState_Walk.h"
 #include "FSM/Components/FSMComponent.h"
+#include "Global/GlobalBPLibrary.h"
 #include "Voxel/VoxelModuleBPLibrary.h"
 
 //////////////////////////////////////////////////////////////////////////
@@ -153,17 +154,8 @@ ADWPlayerCharacter::ADWPlayerCharacter()
 	FSM->States.Add(UDWCharacterState_Walk::StaticClass());
 
 	// states
-	ControlMode = EDWControlMode::Fighting;
+	ControlMode = EDWCharacterControlMode::Fighting;
 	Nature = EDWCharacterNature::Player;
-
-	// stats
-	VoxelItem = FVoxelItem::EmptyVoxel;
-
-	// inputs
-	bPressedAttack = false;
-	bPressedDefend = false;
-
-	AttackAbilityQueue = 0;
 
 	// Don't rotate when the controller rotates. Let that just affect the camera.
 	bUseControllerRotationPitch = false;
@@ -179,30 +171,6 @@ void ADWPlayerCharacter::SetupPlayerInputComponent(class UInputComponent* Player
 
 	// Set up gameplay key bindings
 	check(PlayerInputComponent);
-
-	PlayerInputComponent->BindAction("Interact1", IE_Pressed, this, &ADWPlayerCharacter::DoInteractAction1);
-	PlayerInputComponent->BindAction("Interact2", IE_Pressed, this, &ADWPlayerCharacter::DoInteractAction1);
-	PlayerInputComponent->BindAction("Interact3", IE_Pressed, this, &ADWPlayerCharacter::DoInteractAction1);
-	PlayerInputComponent->BindAction("Interact4", IE_Pressed, this, &ADWPlayerCharacter::DoInteractAction1);
-	PlayerInputComponent->BindAction("Interact5", IE_Pressed, this, &ADWPlayerCharacter::DoInteractAction1);
-
-	PlayerInputComponent->BindAction("Dodge", IE_Pressed, this, &ADWPlayerCharacter::OnDodgePressed);
-	PlayerInputComponent->BindAction("Dodge", IE_Released, this, &ADWPlayerCharacter::OnDodgeReleased);
-
-	PlayerInputComponent->BindAction("ToggleCrouch", IE_Released, this, &ADWPlayerCharacter::ToggleCrouch);
-	PlayerInputComponent->BindAction("ToggleControlMode", IE_Pressed, this, &ADWPlayerCharacter::ToggleControlMode);
-	PlayerInputComponent->BindAction("ToggleLockSightTarget", IE_Pressed, this, &ADWPlayerCharacter::ToggleLockTarget);
-
-	PlayerInputComponent->BindAction("Attack/Destroy", IE_Pressed, this, &ADWPlayerCharacter::OnAttackDestroyPressed);
-	PlayerInputComponent->BindAction("Attack/Destroy", IE_Released, this, &ADWPlayerCharacter::OnAttackDestroyReleased);
-
-	PlayerInputComponent->BindAction("Defend/Generate", IE_Pressed, this, &ADWPlayerCharacter::OnDefendGeneratePressed);
-	PlayerInputComponent->BindAction("Defend/Generate", IE_Released, this, &ADWPlayerCharacter::OnDefendGenerateReleased);
-
-	PlayerInputComponent->BindAction("ReleaseSkillAbility1", IE_Pressed, this, &ADWPlayerCharacter::ReleaseSkillAbility1);
-	PlayerInputComponent->BindAction("ReleaseSkillAbility2", IE_Pressed, this, &ADWPlayerCharacter::ReleaseSkillAbility2);
-	PlayerInputComponent->BindAction("ReleaseSkillAbility3", IE_Pressed, this, &ADWPlayerCharacter::ReleaseSkillAbility3);
-	PlayerInputComponent->BindAction("ReleaseSkillAbility4", IE_Pressed, this, &ADWPlayerCharacter::ReleaseSkillAbility4);
 }
 
 // Called when the game starts or when spawned
@@ -225,45 +193,55 @@ void ADWPlayerCharacter::OnDespawn_Implementation()
 
 void ADWPlayerCharacter::LoadData(FSaveData* InSaveData, bool bForceMode)
 {
-	Super::LoadData(InSaveData, bForceMode);
-
-	const auto SaveData = InSaveData->CastRef<FDWPlayerSaveData>();
-
-	SetControlMode(SaveData.ControlMode);
+	auto& SaveData = InSaveData->CastRef<FDWPlayerSaveData>();
 	
-	if(!bForceMode && !SaveData.IsSaved())
+	if(bForceMode && !SaveData.IsSaved())
 	{
-		auto VoxelDatas = UAssetModuleBPLibrary::LoadPrimaryAssets<UVoxelData>(UAbilityModuleBPLibrary::GetAssetTypeByItemType(EAbilityItemType::Voxel));
-		for (int32 i = 0; i < VoxelDatas.Num(); i++)
+		switch (SaveData.InventoryInitType)
 		{
-			if(VoxelDatas[i]->VoxelType != EVoxelType::Empty && VoxelDatas[i]->VoxelType != EVoxelType::Unknown)
+			case EDWPlayerInventoryInitType::Small:
 			{
-				FAbilityItem tmpItem = FAbilityItem(VoxelDatas[i]->GetPrimaryAssetId(), VoxelDatas[i]->MaxCount);
-				Inventory->AdditionItemByRange(tmpItem);
+				break;
 			}
-		}
+			case EDWPlayerInventoryInitType::Fill:
+			{
+				auto VoxelDatas = UAssetModuleBPLibrary::LoadPrimaryAssets<UVoxelData>(UAbilityModuleBPLibrary::GetAssetTypeByItemType(EAbilityItemType::Voxel));
+				for (int32 i = 0; i < VoxelDatas.Num(); i++)
+				{
+					if(VoxelDatas[i]->VoxelType != EVoxelType::Empty && VoxelDatas[i]->VoxelType != EVoxelType::Unknown)
+					{
+						FAbilityItem tmpItem = FAbilityItem(VoxelDatas[i]->GetPrimaryAssetId(), VoxelDatas[i]->MaxCount);
+						SaveData.InventoryData.AddItem(tmpItem);
+					}
+				}
 		
-		auto EquipDatas = UAssetModuleBPLibrary::LoadPrimaryAssets<UAbilityEquipDataBase>(UAbilityModuleBPLibrary::GetAssetTypeByItemType(EAbilityItemType::Equip));
-		for (int32 i = 0; i < EquipDatas.Num(); i++)
-		{
-			FAbilityItem tmpItem = FAbilityItem(EquipDatas[i]->GetPrimaryAssetId(), EquipDatas[i]->MaxCount);
-			Inventory->AdditionItemByRange(tmpItem);
-		}
+				auto EquipDatas = UAssetModuleBPLibrary::LoadPrimaryAssets<UAbilityEquipDataBase>(UAbilityModuleBPLibrary::GetAssetTypeByItemType(EAbilityItemType::Equip));
+				for (int32 i = 0; i < EquipDatas.Num(); i++)
+				{
+					FAbilityItem tmpItem = FAbilityItem(EquipDatas[i]->GetPrimaryAssetId(), EquipDatas[i]->MaxCount);
+					SaveData.InventoryData.AddItem(tmpItem);
+				}
 			
-		auto PropDatas = UAssetModuleBPLibrary::LoadPrimaryAssets<UAbilityPropDataBase>(UAbilityModuleBPLibrary::GetAssetTypeByItemType(EAbilityItemType::Prop));
-		for (int32 i = 0; i < PropDatas.Num(); i++)
-		{
-			FAbilityItem tmpItem = FAbilityItem(PropDatas[i]->GetPrimaryAssetId(), PropDatas[i]->MaxCount);
-			Inventory->AdditionItemByRange(tmpItem);
-		}
+				auto PropDatas = UAssetModuleBPLibrary::LoadPrimaryAssets<UAbilityPropDataBase>(UAbilityModuleBPLibrary::GetAssetTypeByItemType(EAbilityItemType::Prop));
+				for (int32 i = 0; i < PropDatas.Num(); i++)
+				{
+					FAbilityItem tmpItem = FAbilityItem(PropDatas[i]->GetPrimaryAssetId(), PropDatas[i]->MaxCount);
+					SaveData.InventoryData.AddItem(tmpItem);
+				}
 
-		auto SkillDatas = UAssetModuleBPLibrary::LoadPrimaryAssets<UAbilitySkillDataBase>(UAbilityModuleBPLibrary::GetAssetTypeByItemType(EAbilityItemType::Skill));
-		for (int32 i = 0; i < SkillDatas.Num(); i++)
-		{
-			FAbilityItem tmpItem = FAbilityItem(SkillDatas[i]->GetPrimaryAssetId(), SkillDatas[i]->MaxCount);
-			Inventory->AdditionItemByRange(tmpItem);
+				auto SkillDatas = UAssetModuleBPLibrary::LoadPrimaryAssets<UAbilitySkillDataBase>(UAbilityModuleBPLibrary::GetAssetTypeByItemType(EAbilityItemType::Skill));
+				for (int32 i = 0; i < SkillDatas.Num(); i++)
+				{
+					FAbilityItem tmpItem = FAbilityItem(SkillDatas[i]->GetPrimaryAssetId(), SkillDatas[i]->MaxCount);
+					SaveData.InventoryData.AddItem(tmpItem);
+				}
+				break;
+			}
+			default: break;
 		}
 	}
+
+	Super::LoadData(InSaveData, bForceMode);
 }
 
 FSaveData* ADWPlayerCharacter::ToData()
@@ -280,53 +258,6 @@ void ADWPlayerCharacter::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	if(IsDead()) return;
-
-	if(IsActive())
-	{
-		if(bPressedAttack)
-		{
-			OnAttackDestroyRepeat();
-		}
-
-		if(bPressedDefend)
-		{
-			OnDefendGenerateRepeat();
-		}
-
-		switch (ControlMode)
-		{
-			case EDWControlMode::Fighting:
-			{
-				if(bPressedAttack || AttackAbilityQueue > 0)
-				{
-					Attack();
-				}
-				else if(IsFreeToAnim() && AttackType == EDWCharacterAttackType::NormalAttack)
-				{
-					UnAttack();
-				}
-
-				if(bPressedDefend)
-				{
-					Defend();
-				}
-				else
-				{
-					UnDefend();
-				}
-			}
-			case EDWControlMode::Creating:
-			{
-				// FVoxelHitResult voxelHitResult;
-				// if(RaycastVoxel(voxelHitResult))
-				// {
-				// 	voxelHitResult.GetVoxel().OnMouseHover(voxelHitResult);
-				// 	UVoxelModuleBPLibrary::DespawnVoxel(voxelHitResult.GetVoxel());
-				// }
-				break;
-			}
-		}
-	}
 }
 
 void ADWPlayerCharacter::LookAtTarget(ADWCharacter* InTargetCharacter)
@@ -342,26 +273,39 @@ FString ADWPlayerCharacter::GetHeadInfo() const
 	return FString::Printf(TEXT("Lv.%d \"%s\" (Exp: %d/%d)"), Level, *Name.ToString(), EXP, GetMaxEXP());
 }
 
-void ADWPlayerCharacter::SetControlMode(EDWControlMode InControlMode)
+void ADWPlayerCharacter::SetControlMode(EDWCharacterControlMode InControlMode)
 {
-	switch (ControlMode = InControlMode)
+	Super::SetControlMode(InControlMode);
+	
+	switch (ControlMode)
 	{
-		case EDWControlMode::Fighting:
+		case EDWCharacterControlMode::Fighting:
 		{
 			VoxelMesh->SetVisibility(false);
 			HammerMesh->SetVisibility(false);
-			if(GetWeapon()) GetWeapon()->Execute_SetActorVisible(GetWeapon(), true);
-			if(GetShield()) GetShield()->Execute_SetActorVisible(GetShield(), true);
 			break;
 		}
-		case EDWControlMode::Creating:
+		case EDWCharacterControlMode::Creating:
 		{
 			VoxelMesh->SetVisibility(true);
 			HammerMesh->SetVisibility(true);
-			if(GetWeapon()) GetWeapon()->Execute_SetActorVisible(GetWeapon(), false);
-			if(GetShield()) GetShield()->Execute_SetActorVisible(GetShield(), false);
 			break;
 		}
+	}
+}
+
+void ADWPlayerCharacter::SetGenerateVoxelItem(FVoxelItem InGenerateVoxelItem)
+{
+	Super::SetGenerateVoxelItem(InGenerateVoxelItem);
+
+	if(!GenerateVoxelItem.IsValid())
+	{
+		VoxelMesh->BuildVoxel(GenerateVoxelItem);
+		VoxelMesh->CreateMesh(0, false);
+	}
+	else
+	{
+		VoxelMesh->ClearMesh();
 	}
 }
 
@@ -383,47 +327,6 @@ void ADWPlayerCharacter::RefreshEquip(EDWEquipPartType InPartType, UInventoryEqu
 		}
 		Super::RefreshEquip(InPartType, EquipSlot);
 	}
-}
-
-void ADWPlayerCharacter::UpdateVoxelMesh()
-{
-	const FAbilityItem tmpItem = UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryBar>()->GetSelectedItem();
-	if(!VoxelItem.IsValid() || !VoxelItem.EqualType(tmpItem))
-	{
-		if(tmpItem.IsValid() && tmpItem.GetData().EqualType(EAbilityItemType::Voxel))
-		{
-			VoxelItem = FVoxelItem(tmpItem.ID);
-			VoxelMesh->BuildVoxel(VoxelItem);
-			VoxelMesh->CreateMesh(0, false);
-		}
-		else
-		{
-			VoxelMesh->ClearMesh();
-			VoxelItem = FVoxelItem::EmptyVoxel;
-		}
-	}
-}
-
-bool ADWPlayerCharacter::RaycastVoxel(FVoxelHitResult& OutHitResult)
-{
-	if(GetController<ADWPlayerController>())
-	{
-		FHitResult hitResult;
-		if(GetController<ADWPlayerController>()->RaycastFromAimPoint(hitResult, EDWGameTraceType::Voxel, InteractDistance) && hitResult.GetActor()->IsA<AVoxelChunk>())
-		{
-			AVoxelChunk* chunk = Cast<AVoxelChunk>(hitResult.GetActor());
-			if(chunk != nullptr)
-			{
-				const FVoxelItem& voxelItem = chunk->GetVoxelItem(chunk->LocationToIndex(hitResult.ImpactPoint - UVoxelModuleBPLibrary::GetWorldData().GetBlockSizedNormal(hitResult.ImpactNormal, 0.01f)));
-				if(voxelItem.IsValid())
-				{
-					OutHitResult = FVoxelHitResult(voxelItem, hitResult.ImpactPoint, hitResult.ImpactNormal);
-					return true;
-				}
-			}
-		}
-	}
-	return false;
 }
 
 void ADWPlayerCharacter::OnEnterInteract(IInteractionAgentInterface* InInteractionAgent)
@@ -481,60 +384,17 @@ void ADWPlayerCharacter::MoveUp_Implementation(float InValue)
 	}
 }
 
-void ADWPlayerCharacter::ToggleControlMode()
-{
-	if(IsBreakAllInput() || !IsFreeToAnim()) return;
-
-	if(ControlMode == EDWControlMode::Fighting)
-	{
-		SetControlMode(EDWControlMode::Creating);
-	}
-	else
-	{
-		SetControlMode(EDWControlMode::Fighting);
-	}
-}
-
-void ADWPlayerCharacter::ToggleCrouch()
-{
-	if(IsBreakAllInput()) return;
-
-	if(!IsCrouching())
-	{
-		Crouch(true);
-	}
-	else
-	{
-		UnCrouch(true);
-	}
-}
-
-void ADWPlayerCharacter::ToggleLockTarget()
-{
-	if(IsBreakAllInput()) return;
-
-	TargetSystem->TargetActor();
-}
-
-void ADWPlayerCharacter::OnDodgePressed()
-{
-	if(IsBreakAllInput()) return;
-
-	Dodge();
-}
-
-void ADWPlayerCharacter::OnDodgeReleased()
-{
-	UnDodge();
-}
-
 bool ADWPlayerCharacter::UseItem(FAbilityItem& InItem)
 {
 	if((InItem.GetData().EqualType(EAbilityItemType::Voxel)))
 	{
-		if(ControlMode == EDWControlMode::Creating)
+		if(ControlMode == EDWCharacterControlMode::Creating)
 		{
-			return Super::UseItem(InItem);
+			FVoxelHitResult voxelHitResult;
+			if (UGlobalBPLibrary::GetPlayerController<ADWPlayerController>()->RaycastVoxel(voxelHitResult))
+			{
+				return GenerateVoxel(static_cast<FVoxelItem&>(InItem), voxelHitResult);
+			}
 		}
 	}
 	else if((InItem.GetData().EqualType(EAbilityItemType::Prop)))
@@ -542,263 +402,6 @@ bool ADWPlayerCharacter::UseItem(FAbilityItem& InItem)
 		return Super::UseItem(InItem);
 	}
 	return false;
-}
-
-void ADWPlayerCharacter::OnAttackDestroyPressed()
-{
-	if(IsBreakAllInput() || UInputModuleBPLibrary::GetGlobalInputMode() != EInputMode::GameOnly) return;
-
-	switch (ControlMode)
-	{
-		case EDWControlMode::Fighting:
-		{
-			if(GetWeapon())
-			{
-				bPressedAttack = true;
-				if(IsFreeToAnim() || IsAttacking())
-				{
-					if(AttackAbilityQueue < 2)
-					{
-						AttackAbilityQueue++; 
-					}
-				}
-			}
-			break;
-		}
-		case EDWControlMode::Creating:
-		{
-			FVoxelHitResult voxelHitResult;
-			if(RaycastVoxel(voxelHitResult))
-			{
-				voxelHitResult.GetVoxel().OnMouseDown(EMouseButton::Left, voxelHitResult);
-				// UVoxelModuleBPLibrary::DespawnVoxel(voxelHitResult.GetVoxel());
-			}
-			break;
-		}
-	}
-}
-
-void ADWPlayerCharacter::OnAttackDestroyRepeat()
-{
-	if(IsBreakAllInput() || UInputModuleBPLibrary::GetGlobalInputMode() != EInputMode::GameOnly) return;
-
-	switch (ControlMode)
-	{
-		case EDWControlMode::Fighting:
-		{
-			bPressedAttack = true;
-			break;
-		}
-		case EDWControlMode::Creating:
-		{
-			FVoxelHitResult voxelHitResult;
-			if(RaycastVoxel(voxelHitResult))
-			{
-				voxelHitResult.GetVoxel().OnMouseHold(EMouseButton::Left, voxelHitResult);
-			}
-			break;
-		}
-	}
-}
-
-void ADWPlayerCharacter::OnAttackDestroyReleased()
-{
-	if(IsBreakAllInput() || UInputModuleBPLibrary::GetGlobalInputMode() != EInputMode::GameOnly) return;
-
-	switch (ControlMode)
-	{
-		case EDWControlMode::Fighting:
-		{
-			bPressedAttack = false;
-			break;
-		}
-		case EDWControlMode::Creating:
-		{
-			FVoxelHitResult voxelHitResult;
-			if(RaycastVoxel(voxelHitResult))
-			{
-				voxelHitResult.GetVoxel().OnMouseUp(EMouseButton::Left, voxelHitResult);
-			}
-			break;
-		}
-	}
-}
-
-void ADWPlayerCharacter::OnDefendGeneratePressed()
-{
-	if(IsBreakAllInput() || UInputModuleBPLibrary::GetGlobalInputMode() != EInputMode::GameOnly) return;
-
-	switch (ControlMode)
-	{
-		case EDWControlMode::Fighting:
-		{
-			if(GetShield())
-			{
-				bPressedDefend = true;
-			}
-			break;
-		}
-		case EDWControlMode::Creating:
-		{
-			FVoxelHitResult voxelHitResult;
-			if(RaycastVoxel(voxelHitResult))
-			{
-				voxelHitResult.GetVoxel().OnMouseDown(EMouseButton::Right, voxelHitResult);
-			}
-			break;
-		}
-	}
-}
-
-void ADWPlayerCharacter::OnDefendGenerateRepeat()
-{
-	if(IsBreakAllInput() || UInputModuleBPLibrary::GetGlobalInputMode() != EInputMode::GameOnly) return;
-
-	switch (ControlMode)
-	{
-		case EDWControlMode::Fighting:
-		{
-			bPressedDefend = true;
-			break;
-		}
-		case EDWControlMode::Creating:
-		{
-			FVoxelHitResult voxelHitResult;
-			if(RaycastVoxel(voxelHitResult))
-			{
-				voxelHitResult.GetVoxel().OnMouseHold(EMouseButton::Right, voxelHitResult);
-			}
-			break;
-		}
-	}
-}
-
-void ADWPlayerCharacter::OnDefendGenerateReleased()
-{
-	if(IsBreakAllInput() || UInputModuleBPLibrary::GetGlobalInputMode() != EInputMode::GameOnly) return;
-
-	switch (ControlMode)
-	{
-		case EDWControlMode::Fighting:
-		{
-			bPressedDefend = false;
-			break;
-		}
-		case EDWControlMode::Creating:
-		{
-			FVoxelHitResult voxelHitResult;
-			if(RaycastVoxel(voxelHitResult))
-			{
-				voxelHitResult.GetVoxel().OnMouseUp(EMouseButton::Right, voxelHitResult);
-			}
-			break;
-		}
-	}
-}
-
-void ADWPlayerCharacter::ReleaseSkillAbility1()
-{
-	if(IsBreakAllInput()) return;
-
-	if(Inventory->GetSplitSlots<UInventorySkillSlot>(ESplitSlotType::Skill).IsValidIndex(0))
-	{
-		Inventory->GetSplitSlots<UInventorySkillSlot>(ESplitSlotType::Skill)[0]->ActiveItem();
-	}
-}
-
-void ADWPlayerCharacter::ReleaseSkillAbility2()
-{
-	if(IsBreakAllInput()) return;
-
-	if(Inventory->GetSplitSlots<UInventorySkillSlot>(ESplitSlotType::Skill).IsValidIndex(1))
-	{
-		Inventory->GetSplitSlots<UInventorySkillSlot>(ESplitSlotType::Skill)[1]->ActiveItem();
-	}
-}
-
-void ADWPlayerCharacter::ReleaseSkillAbility3()
-{
-	if(IsBreakAllInput()) return;
-
-	if(Inventory->GetSplitSlots<UInventorySkillSlot>(ESplitSlotType::Skill).IsValidIndex(2))
-	{
-		Inventory->GetSplitSlots<UInventorySkillSlot>(ESplitSlotType::Skill)[2]->ActiveItem();
-	}
-}
-
-void ADWPlayerCharacter::ReleaseSkillAbility4()
-{
-	if(IsBreakAllInput()) return;
-
-	if(Inventory->GetSplitSlots<UInventorySkillSlot>(ESplitSlotType::Skill).IsValidIndex(3))
-	{
-		Inventory->GetSplitSlots<UInventorySkillSlot>(ESplitSlotType::Skill)[3]->ActiveItem();
-	}
-}
-
-void ADWPlayerCharacter::DoInteractAction1()
-{
-	if(!Interaction->GetInteractionAgent()) return;
-	
-	if(UInteractionComponent* InteractionAgent = Interaction->GetInteractionAgent()->GetInteractionComponent())
-	{
-		if(InteractionAgent->GetValidInteractActions(this).IsValidIndex(0))
-		{
-			InteractionAgent->DoInteract(this, InteractionAgent->GetValidInteractActions(this)[0]);
-		}
-	}
-}
-
-void ADWPlayerCharacter::DoInteractAction2()
-{
-	if(!Interaction->GetInteractionAgent()) return;
-	
-	if(UInteractionComponent* InteractionAgent = Interaction->GetInteractionAgent()->GetInteractionComponent())
-	{
-		if(InteractionAgent->GetValidInteractActions(this).IsValidIndex(1))
-		{
-			InteractionAgent->DoInteract(this, InteractionAgent->GetValidInteractActions(this)[1]);
-		}
-	}
-}
-
-void ADWPlayerCharacter::DoInteractAction3()
-{
-	if(!Interaction->GetInteractionAgent()) return;
-	
-	if(UInteractionComponent* InteractionAgent = Interaction->GetInteractionAgent()->GetInteractionComponent())
-	{
-		if(InteractionAgent->GetValidInteractActions(this).IsValidIndex(2))
-		{
-			InteractionAgent->DoInteract(this, InteractionAgent->GetValidInteractActions(this)[2]);
-		}
-	}
-}
-
-void ADWPlayerCharacter::DoInteractAction4()
-{
-	if(!Interaction->GetInteractionAgent()) return;
-	
-	if(UInteractionComponent* InteractionAgent = Interaction->GetInteractionAgent()->GetInteractionComponent())
-	{
-		if(InteractionAgent->GetValidInteractActions(this).IsValidIndex(3))
-		{
-			InteractionAgent->DoInteract(this, InteractionAgent->GetValidInteractActions(this)[3]);
-		}
-	}
-}
-
-void ADWPlayerCharacter::DoInteractAction5()
-{
-	if(!Interaction->GetInteractionAgent()) return;
-	
-	if(UInteractionComponent* InteractionAgent = Interaction->GetInteractionAgent()->GetInteractionComponent())
-	{
-		if(InteractionAgent->GetValidInteractActions(this).IsValidIndex(4))
-		{
-			InteractionAgent->DoInteract(this, InteractionAgent->GetValidInteractActions(this)[4]);
-		}
-	}
 }
 
 void ADWPlayerCharacter::OnAttributeChange(const FOnAttributeChangeData& InAttributeChangeData)

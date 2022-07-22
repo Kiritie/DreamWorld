@@ -2,7 +2,9 @@
 
 #include "Inventory/Slot/InventoryShortcutSlot.h"
 
+#include "Ability/Item/AbilityItemDataBase.h"
 #include "Character/Player/DWPlayerCharacter.h"
+#include "Global/GlobalBPLibrary.h"
 #include "Inventory/Inventory.h"
 #include "Inventory/Slot/InventorySlot.h"
 #include "Widget/WidgetModuleBPLibrary.h"
@@ -21,12 +23,17 @@ void UInventoryShortcutSlot::InitSlot(UInventory* InOwner, FAbilityItem InItem, 
 void UInventoryShortcutSlot::Refresh()
 {
 	Super::Refresh();
-	if(ADWPlayerCharacter* PlayerCharacter = Cast<ADWPlayerCharacter>(GetOwner()->GetOwnerActor()))
+	if(IsSelected())
 	{
-		if (PlayerCharacter->GetInventory()->GetSelectedSlot() == this)
+		if(Item.GetData().EqualType(EAbilityItemType::Voxel))
 		{
-			PlayerCharacter->UpdateVoxelMesh();
-			UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>()->RefreshActions();
+			UGlobalBPLibrary::GetPlayerCharacter()->SetGenerateVoxelItem(Item);
 		}
+		UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>()->RefreshActions();
 	}
+}
+
+bool UInventoryShortcutSlot::IsSelected()
+{
+	return GetOwner()->GetSelectedSlot() == this;
 }
