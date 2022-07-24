@@ -1,4 +1,4 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
+// Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Character/Player/States/DWPlayerCharacterState_Default.h"
 
@@ -16,9 +16,9 @@ void UDWPlayerCharacterState_Default::OnInitialize(UFSMComponent* InFSMComponent
 	Super::OnInitialize(InFSMComponent, InStateIndex);
 }
 
-bool UDWPlayerCharacterState_Default::OnValidate()
+bool UDWPlayerCharacterState_Default::OnEnterValidate(UFiniteStateBase* InLastFiniteState)
 {
-	return Super::OnValidate();
+	return Super::OnEnterValidate(InLastFiniteState);
 }
 
 void UDWPlayerCharacterState_Default::OnEnter(UFiniteStateBase* InLastFiniteState)

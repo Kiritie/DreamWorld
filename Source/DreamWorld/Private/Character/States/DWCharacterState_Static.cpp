@@ -1,4 +1,4 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
+// Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Character/States/DWCharacterState_Static.h"
 
@@ -21,9 +21,9 @@ void UDWCharacterState_Static::OnInitialize(UFSMComponent* InFSMComponent, int32
 	Super::OnInitialize(InFSMComponent, InStateIndex);
 }
 
-bool UDWCharacterState_Static::OnValidate()
+bool UDWCharacterState_Static::OnEnterValidate(UFiniteStateBase* InLastFiniteState)
 {
-	return Super::OnValidate();
+	return Super::OnEnterValidate(InLastFiniteState);
 }
 
 void UDWCharacterState_Static::OnEnter(UFiniteStateBase* InLastFiniteState)

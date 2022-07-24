@@ -51,9 +51,6 @@ public:
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tags")
-	FGameplayTag FallingTag;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tags")
 	FGameplayTag DodgingTag;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tags")

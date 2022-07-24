@@ -10,10 +10,7 @@ UDWPlayerCharacterAnim::UDWPlayerCharacterAnim()
 {
 }
 
-void UDWPlayerCharacterAnim::UpdateAnimParams(float DeltaSeconds)
+void UDWPlayerCharacterAnim::NativeUpdateAnimation(float DeltaSeconds)
 {
-	Super::UpdateAnimParams(DeltaSeconds);
-
-	if (!OwnerCharacter) return;
-
+	Super::NativeUpdateAnimation(DeltaSeconds);
 }

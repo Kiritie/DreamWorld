@@ -12,10 +12,7 @@ UDWHumanCharacterAnim::UDWHumanCharacterAnim()
 	
 }
 
-void UDWHumanCharacterAnim::UpdateAnimParams(float DeltaSeconds)
+void UDWHumanCharacterAnim::NativeUpdateAnimation(float DeltaSeconds)
 {
-	Super::UpdateAnimParams(DeltaSeconds);
-
-	if (!OwnerCharacter) return;
-
+	Super::NativeUpdateAnimation(DeltaSeconds);
 }

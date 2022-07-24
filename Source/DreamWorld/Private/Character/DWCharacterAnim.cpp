@@ -53,15 +53,10 @@ bool UDWCharacterAnim::HandleNotify(const FAnimNotifyEvent& AnimNotifyEvent)
 
 void UDWCharacterAnim::NativeUpdateAnimation(float DeltaSeconds)
 {
+	Super::NativeUpdateAnimation(DeltaSeconds);
+
 	if (!OwnerCharacter) OwnerCharacter = Cast<ADWCharacter>(TryGetPawnOwner());
 
-	if (!OwnerCharacter) return;
-
-	UpdateAnimParams(DeltaSeconds);
-}
-
-void UDWCharacterAnim::UpdateAnimParams(float DeltaSeconds)
-{
 	if (!OwnerCharacter || !UGlobalBPLibrary::IsPlaying()) return;
 
 	bFalling = OwnerCharacter->IsFalling();

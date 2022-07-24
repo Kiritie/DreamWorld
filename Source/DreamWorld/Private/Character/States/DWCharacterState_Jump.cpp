@@ -1,4 +1,4 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
+// Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Character/States/DWCharacterState_Jump.h"
 
@@ -14,9 +14,9 @@ void UDWCharacterState_Jump::OnInitialize(UFSMComponent* InFSMComponent, int32 I
 	Super::OnInitialize(InFSMComponent, InStateIndex);
 }
 
-bool UDWCharacterState_Jump::OnValidate()
+bool UDWCharacterState_Jump::OnEnterValidate(UFiniteStateBase* InLastFiniteState)
 {
-	if(!Super::OnValidate()) return false;
+	if(!Super::OnEnterValidate(InLastFiniteState)) return false;
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 

@@ -1,4 +1,4 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
+// Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Character/States/DWCharacterState_Death.h"
 
@@ -22,9 +22,9 @@ void UDWCharacterState_Death::OnInitialize(UFSMComponent* InFSMComponent, int32 
 	Super::OnInitialize(InFSMComponent, InStateIndex);
 }
 
-bool UDWCharacterState_Death::OnValidate()
+bool UDWCharacterState_Death::OnEnterValidate(UFiniteStateBase* InLastFiniteState)
 {
-	return Super::OnValidate();
+	return Super::OnEnterValidate(InLastFiniteState);
 }
 
 void UDWCharacterState_Death::OnEnter(UFiniteStateBase* InLastFiniteState)

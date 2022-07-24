@@ -1,4 +1,4 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
+// Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Character/States/DWCharacterState_Walk.h"
 
@@ -15,9 +15,9 @@ void UDWCharacterState_Walk::OnInitialize(UFSMComponent* InFSMComponent, int32 I
 	Super::OnInitialize(InFSMComponent, InStateIndex);
 }
 
-bool UDWCharacterState_Walk::OnValidate()
+bool UDWCharacterState_Walk::OnEnterValidate(UFiniteStateBase* InLastFiniteState)
 {
-	return Super::OnValidate();
+	return Super::OnEnterValidate(InLastFiniteState);
 }
 
 void UDWCharacterState_Walk::OnEnter(UFiniteStateBase* InLastFiniteState)

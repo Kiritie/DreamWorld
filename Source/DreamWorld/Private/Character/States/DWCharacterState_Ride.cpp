@@ -1,4 +1,4 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
+// Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Character/States/DWCharacterState_Ride.h"
 
@@ -19,9 +19,9 @@ void UDWCharacterState_Ride::OnInitialize(UFSMComponent* InFSMComponent, int32 I
 	Super::OnInitialize(InFSMComponent, InStateIndex);
 }
 
-bool UDWCharacterState_Ride::OnValidate()
+bool UDWCharacterState_Ride::OnEnterValidate(UFiniteStateBase* InLastFiniteState)
 {
-	if(!Super::OnValidate()) return false;
+	if(!Super::OnEnterValidate(InLastFiniteState)) return false;
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 

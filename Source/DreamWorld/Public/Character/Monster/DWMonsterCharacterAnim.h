@@ -20,5 +20,5 @@ public:
 	UDWMonsterCharacterAnim();
 
 protected:
-	virtual void UpdateAnimParams(float DeltaSeconds) override;
+	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
 };

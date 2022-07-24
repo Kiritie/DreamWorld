@@ -1,4 +1,4 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
+// Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Character/States/DWCharacterState_Interrupt.h"
 
@@ -19,9 +19,9 @@ void UDWCharacterState_Interrupt::OnInitialize(UFSMComponent* InFSMComponent, in
 	Super::OnInitialize(InFSMComponent, InStateIndex);
 }
 
-bool UDWCharacterState_Interrupt::OnValidate()
+bool UDWCharacterState_Interrupt::OnEnterValidate(UFiniteStateBase* InLastFiniteState)
 {
-	if(!Super::OnValidate()) return false;
+	if(!Super::OnEnterValidate(InLastFiniteState)) return false;
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 

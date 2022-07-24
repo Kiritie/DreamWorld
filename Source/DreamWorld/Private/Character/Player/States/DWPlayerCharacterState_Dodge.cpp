@@ -1,4 +1,4 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
+// Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Character/Player/States/DWPlayerCharacterState_Dodge.h"
 
@@ -15,9 +15,9 @@ void UDWPlayerCharacterState_Dodge::OnInitialize(UFSMComponent* InFSMComponent, 
 	Super::OnInitialize(InFSMComponent, InStateIndex);
 }
 
-bool UDWPlayerCharacterState_Dodge::OnValidate()
+bool UDWPlayerCharacterState_Dodge::OnEnterValidate(UFiniteStateBase* InLastFiniteState)
 {
-	return Super::OnValidate();
+	return Super::OnEnterValidate(InLastFiniteState);
 }
 
 void UDWPlayerCharacterState_Dodge::OnEnter(UFiniteStateBase* InLastFiniteState)

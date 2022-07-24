@@ -1,4 +1,4 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
+// Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Character/Player/States/DWPlayerCharacterState_Death.h"
 #include "Ability/Item/Equip/AbilityEquipBase.h"
@@ -20,9 +20,9 @@ void UDWPlayerCharacterState_Death::OnInitialize(UFSMComponent* InFSMComponent, 
 	Super::OnInitialize(InFSMComponent, InStateIndex);
 }
 
-bool UDWPlayerCharacterState_Death::OnValidate()
+bool UDWPlayerCharacterState_Death::OnEnterValidate(UFiniteStateBase* InLastFiniteState)
 {
-	return Super::OnValidate();
+	return Super::OnEnterValidate(InLastFiniteState);
 }
 
 void UDWPlayerCharacterState_Death::OnEnter(UFiniteStateBase* InLastFiniteState)

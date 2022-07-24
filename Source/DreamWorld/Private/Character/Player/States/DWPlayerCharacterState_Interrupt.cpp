@@ -1,4 +1,4 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
+// Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Character/Player/States/DWPlayerCharacterState_Interrupt.h"
 #include "AbilitySystemComponent.h"
@@ -15,9 +15,9 @@ void UDWPlayerCharacterState_Interrupt::OnInitialize(UFSMComponent* InFSMCompone
 	Super::OnInitialize(InFSMComponent, InStateIndex);
 }
 
-bool UDWPlayerCharacterState_Interrupt::OnValidate()
+bool UDWPlayerCharacterState_Interrupt::OnEnterValidate(UFiniteStateBase* InLastFiniteState)
 {
-	return Super::OnValidate();
+	return Super::OnEnterValidate(InLastFiniteState);
 }
 
 void UDWPlayerCharacterState_Interrupt::OnEnter(UFiniteStateBase* InLastFiniteState)

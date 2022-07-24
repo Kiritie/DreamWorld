@@ -10,8 +10,7 @@ UDWMonsterCharacterAnim::UDWMonsterCharacterAnim()
 {
 }
 
-void UDWMonsterCharacterAnim::UpdateAnimParams(float DeltaSeconds)
+void UDWMonsterCharacterAnim::NativeUpdateAnimation(float DeltaSeconds)
 {
-	Super::UpdateAnimParams(DeltaSeconds);
-
+	Super::NativeUpdateAnimation(DeltaSeconds);
 }
