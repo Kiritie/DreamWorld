@@ -49,7 +49,8 @@ void UProcedure_Playing::OnEnter(UProcedureBase* InLastProcedure)
 
 		if(ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>())
 		{
-			PlayerCharacter->SetActorHiddenInGame(false);
+			PlayerCharacter->Execute_SetActorVisible(PlayerCharacter, true);
+			PlayerCharacter->RefreshAttributes();
 			UCharacterModuleBPLibrary::SwitchCharacter(PlayerCharacter);
 		}
 

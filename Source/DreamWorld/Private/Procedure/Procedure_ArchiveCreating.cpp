@@ -51,7 +51,7 @@ void UProcedure_ArchiveCreating::OnEnter(UProcedureBase* InLastProcedure)
 
 	if(ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>())
 	{
-		PlayerCharacter->SetActorHiddenInGame(false);
+		PlayerCharacter->Execute_SetActorVisible(PlayerCharacter, true);
 	}
 
 	UWidgetModuleBPLibrary::OpenUserWidget<UWidgetArchiveCreatingPanel>();

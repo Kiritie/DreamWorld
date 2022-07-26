@@ -110,6 +110,8 @@ public:
 	virtual void SetTeamID(FName InTeamID) override;
 	
 	virtual FString GetHeadInfo() const override;
+
+	virtual void SetActorVisible_Implementation(bool bNewVisible) override;
 		
 	virtual void SetControlMode(EDWCharacterControlMode InControlMode) override;
 

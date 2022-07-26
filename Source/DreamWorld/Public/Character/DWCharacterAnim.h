@@ -37,10 +37,6 @@ public:
 	bool bClimbing;
 
 protected:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Default")
-	ADWCharacter* OwnerCharacter;
-
-protected:
 	virtual void NativeInitializeAnimation() override;
 
 	virtual bool HandleNotify(const FAnimNotifyEvent& AnimNotifyEvent) override;

@@ -66,13 +66,13 @@ protected:
 	virtual void GenerateChunks(FIndex InIndex) override;
 
 public:
-	virtual void BuildChunkMap(AVoxelChunk* InChunk, int32 InStage) override;
+	virtual void BuildChunkMap(FIndex InIndex, int32 InStage) override;
 
-	virtual void GenerateChunkMap(AVoxelChunk* InChunk) override;
+	virtual void GenerateChunkMap(FIndex InIndex) override;
 
-	virtual void GenerateChunk(AVoxelChunk* InChunk) override;
+	virtual void GenerateChunk(FIndex InIndex) override;
 
-	virtual void DestroyChunk(AVoxelChunk* InChunk) override;
+	virtual void DestroyChunk(FIndex InIndex) override;
 
 public:
 	virtual AVoxelChunk* SpawnChunk(FIndex InIndex, bool bAddToQueue = true) override;

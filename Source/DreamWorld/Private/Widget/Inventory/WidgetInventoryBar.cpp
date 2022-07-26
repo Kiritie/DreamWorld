@@ -173,11 +173,14 @@ void UWidgetInventoryBar::SelectInventorySlot(int32 InSlotIndex)
 	SelectedSlotIndex = InSlotIndex;
 	UpdateSelectBox();
 	GetInventory()->SetSelectedSlot(GetSelectedSlot());
-	if(GetSelectedItem().GetData().EqualType(EAbilityItemType::Voxel))
+	if(GetSelectedItem().IsValid())
 	{
-		UGlobalBPLibrary::GetPlayerCharacter()->SetGenerateVoxelItem(GetSelectedItem());
+		if(GetSelectedItem().GetData().EqualType(EAbilityItemType::Voxel))
+		{
+			UGlobalBPLibrary::GetPlayerCharacter()->SetGenerateVoxelItem(GetSelectedItem());
+		}
+		UWidgetModuleBPLibrary::OpenUserWidget<UWidgetItemInfoBox>(TArray<FParameter> { FParameter::MakeString(GetSelectedItem().GetData().Name.ToString()) });
 	}
-	UWidgetModuleBPLibrary::OpenUserWidget<UWidgetItemInfoBox>(TArray<FParameter> { FParameter::MakeString(GetSelectedItem().GetData().Name.ToString()) });
 	UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>()->RefreshActions();
 }
 

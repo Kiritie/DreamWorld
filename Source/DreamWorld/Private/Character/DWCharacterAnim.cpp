@@ -31,47 +31,51 @@ void UDWCharacterAnim::NativeInitializeAnimation()
 
 bool UDWCharacterAnim::HandleNotify(const FAnimNotifyEvent& AnimNotifyEvent)
 {
-	const FName notifyName = AnimNotifyEvent.GetNotifyEventName();
-	if (notifyName.IsEqual(FName("AnimNotify_Free to animate")))
+	Super::HandleNotify(AnimNotifyEvent);
+	
+	ADWCharacter* Character = Cast<ADWCharacter>(TryGetPawnOwner());
+
+	if(!Character) return false;
+	
+	const FName NotifyName = AnimNotifyEvent.GetNotifyEventName();
+	if (NotifyName.IsEqual(FName("AnimNotify_Free to animate")))
 	{
-		OwnerCharacter->FreeToAnim();
+		Character->FreeToAnim();
 	}
-	else if (notifyName.IsEqual(FName("AnimNotify_Attack start")))
+	else if (NotifyName.IsEqual(FName("AnimNotify_Attack start")))
 	{
-		OwnerCharacter->GetFSMComponent()->GetCurrentState<UDWCharacterState_Attack>()->AttackStart();
+		Character->GetFSMComponent()->GetCurrentState<UDWCharacterState_Attack>()->AttackStart();
 	}
-	else if (notifyName.IsEqual(FName("AnimNotify_Attack hurt")))
+	else if (NotifyName.IsEqual(FName("AnimNotify_Attack hurt")))
 	{
-		OwnerCharacter->GetFSMComponent()->GetCurrentState<UDWCharacterState_Attack>()->AttackHurt();
+		Character->GetFSMComponent()->GetCurrentState<UDWCharacterState_Attack>()->AttackHurt();
 	}
-	else if (notifyName.IsEqual(FName("AnimNotify_Attack end")))
+	else if (NotifyName.IsEqual(FName("AnimNotify_Attack end")))
 	{
-		OwnerCharacter->GetFSMComponent()->GetCurrentState<UDWCharacterState_Attack>()->AttackEnd();
+		Character->GetFSMComponent()->GetCurrentState<UDWCharacterState_Attack>()->AttackEnd();
 	}
 	return false;
 }
 
 void UDWCharacterAnim::NativeUpdateAnimation(float DeltaSeconds)
 {
-	Super::NativeUpdateAnimation(DeltaSeconds);
+	ADWCharacter* Character = Cast<ADWCharacter>(TryGetPawnOwner());
 
-	if (!OwnerCharacter) OwnerCharacter = Cast<ADWCharacter>(TryGetPawnOwner());
+	if(!Character) return;
 
-	if (!OwnerCharacter || !UGlobalBPLibrary::IsPlaying()) return;
+	bFalling = Character->IsFalling();
 
-	bFalling = OwnerCharacter->IsFalling();
+	bSprinting = Character->IsSprinting();
+	bAttacking = Character->IsAttacking();
+	bDefending = Character->IsDefending();
+	bFlying = Character->IsFlying();
+	bRiding = Character->IsRiding();
+	bClimbing = Character->IsClimbing();
+	bCrouching = Character->IsCrouching();
+	bSwimming = Character->IsSwimming();
 
-	bSprinting = OwnerCharacter->IsSprinting();
-	bAttacking = OwnerCharacter->IsAttacking();
-	bDefending = OwnerCharacter->IsDefending();
-	bFlying = OwnerCharacter->IsFlying();
-	bRiding = OwnerCharacter->IsRiding();
-	bClimbing = OwnerCharacter->IsClimbing();
-	bCrouching = OwnerCharacter->IsCrouching();
-	bSwimming = OwnerCharacter->IsSwimming();
+	VerticalSpeed = Character->GetMoveVelocity(false).Z;
+	HorizontalSpeed = Character->GetMoveVelocity().Size();
 
-	VerticalSpeed = OwnerCharacter->GetMoveVelocity(false).Z;
-	HorizontalSpeed = OwnerCharacter->GetMoveVelocity().Size();
-
-	MoveDirection = FMath::FindDeltaAngleDegrees(OwnerCharacter->GetMoveDirection().ToOrientationRotator().Yaw, OwnerCharacter->GetActorRotation().Yaw);
+	MoveDirection = FMath::FindDeltaAngleDegrees(Character->GetMoveDirection().ToOrientationRotator().Yaw, Character->GetActorRotation().Yaw);
 }

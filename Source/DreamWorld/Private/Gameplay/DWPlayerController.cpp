@@ -49,7 +49,6 @@ ADWPlayerController::ADWPlayerController()
 	bPressedAttack = false;
 	bPressedDefend = false;
 	bPressedSprint = false;
-	DoubleJumpTime = 0.f;
 	AttackAbilityQueue = 0;
 }
 
@@ -71,6 +70,7 @@ void ADWPlayerController::LoadData(FSaveData* InSaveData, bool bForceMode)
 	if(bForceMode)
 	{
 		PlayerCharacter = UObjectPoolModuleBPLibrary::SpawnObject<ADWPlayerCharacter>(nullptr, SaveData.GetCharacterData().Class);
+		PlayerCharacter->Execute_SetActorVisible(PlayerCharacter, false);
 		SetPlayerPawn(PlayerCharacter);
 	}
 	else
@@ -102,7 +102,7 @@ void ADWPlayerController::UnloadData(bool bForceMode)
 		else
 		{
 			UnPossess();
-			PlayerCharacter->SetActorHiddenInGame(true);
+			PlayerCharacter->Execute_SetActorVisible(PlayerCharacter, false);
 		}
 	}
 }
@@ -192,7 +192,6 @@ void ADWPlayerController::OnUnPossess()
 	bPressedAttack = false;
 	bPressedDefend = false;
 	bPressedSprint = false;
-	DoubleJumpTime = 0.f;
 	AttackAbilityQueue = 0;
 }
 
@@ -260,11 +259,6 @@ void ADWPlayerController::Tick(float DeltaTime)
 		{
 			PossessedCharacter->UnSprint();
 		}
-
-		if(DoubleJumpTime > 0.f)
-		{
-			DoubleJumpTime -= DeltaTime;
-		}
 	}
 }
 
@@ -312,22 +306,6 @@ void ADWPlayerController::OnJumpPressed(FKey Key)
 	if(!PossessedCharacter || PossessedCharacter->IsBreakAllInput()) return;
 
 	PossessedCharacter->Jump();
-	if(DoubleJumpTime <= 0.f)
-	{
-		DoubleJumpTime = 0.2f;
-	}
-	else
-	{
-		if(!PossessedCharacter->IsFlying())
-		{
-			PossessedCharacter->Fly();
-		}
-		else
-		{
-			PossessedCharacter->UnFly();
-		}
-		DoubleJumpTime = 0.f;
-	}
 }
 
 void ADWPlayerController::OnJumpReleased()
@@ -336,7 +314,7 @@ void ADWPlayerController::OnJumpReleased()
 
 	if(!PossessedCharacter || PossessedCharacter->IsBreakAllInput()) return;
 
-	PossessedCharacter->UnJump();
+	//PossessedCharacter->UnJump();
 }
 
 void ADWPlayerController::OnSprintPressed()

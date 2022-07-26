@@ -8,6 +8,7 @@
 #include "TargetSystemComponent.h"
 #include "TargetSystemTargetableInterface.h"
 #include "Ability/Character/AbilityCharacterBase.h"
+#include "Ability/Character/DWCharacterAttributeSet.h"
 #include "Inventory/InventoryAgentInterface.h"
 #include "Team/DWTeamModuleTypes.h"
 #include "Voxel/Agent/VoxelAgentInterface.h"
@@ -57,7 +58,6 @@ class DREAMWORLD_API ADWCharacter : public AAbilityCharacterBase, public ITarget
 	friend class UDWCharacterState_Fall;
 	friend class UDWCharacterState_Float;
 	friend class UDWCharacterState_Fly;
-	friend class UDWCharacterState_Idle;
 	friend class UDWCharacterState_Interrupt;
 	friend class UDWCharacterState_Jump;
 	friend class UDWCharacterState_Ride;
@@ -145,7 +145,7 @@ protected:
 
 	virtual FSaveData* ToData() override;
 
-	virtual void RefreshFiniteState() override;
+	virtual void RefreshState() override;
 	
 public:
 	virtual void Tick(float DeltaTime) override;
@@ -169,6 +169,9 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	virtual void Interrupt(float InDuration = -1);
+
+	UFUNCTION(BlueprintCallable)
+	virtual void UnInterrupt();
 
 	virtual void Jump() override;
 
@@ -423,6 +426,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetNature(EDWCharacterNature InNature) { Nature = InNature; }
 
+	virtual void SetActorVisible_Implementation(bool bNewVisible) override;
+
 	UFUNCTION(BlueprintPure)
 	EDWCharacterControlMode GetControlMode() const { return ControlMode; }
 		
@@ -436,126 +441,6 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	virtual void SetTeamID(FName InTeamID);
-			
-	UFUNCTION(BlueprintPure)
-	float GetMana() const;
-			
-	UFUNCTION(BlueprintCallable)
-	void SetMana(float InValue);
-
-	UFUNCTION(BlueprintPure)
-	float GetMaxMana() const;
-			
-	UFUNCTION(BlueprintCallable)
-	void SetMaxMana(float InValue);
-		
-	UFUNCTION(BlueprintPure)
-	float GetStamina() const;
-		
-	UFUNCTION(BlueprintCallable)
-	void SetStamina(float InValue);
-
-	UFUNCTION(BlueprintPure)
-	float GetMaxStamina() const;
-		
-	UFUNCTION(BlueprintCallable)
-	void SetMaxStamina(float InValue);
-			
-	UFUNCTION(BlueprintPure)
-	float GetSwimSpeed() const;
-		
-	UFUNCTION(BlueprintCallable)
-	void SetSwimSpeed(float InValue);
-			
-	UFUNCTION(BlueprintPure)
-	float GetRideSpeed() const;
-		
-	UFUNCTION(BlueprintCallable)
-	void SetRideSpeed(float InValue);
-			
-	UFUNCTION(BlueprintPure)
-	float GetFlySpeed() const;
-		
-	UFUNCTION(BlueprintCallable)
-	void SetFlySpeed(float InValue);
-			
-	UFUNCTION(BlueprintPure)
-	float GetDodgeForce() const;
-		
-	UFUNCTION(BlueprintCallable)
-	void SetDodgeForce(float InValue);
-			
-	UFUNCTION(BlueprintPure)
-	float GetAttackForce() const;
-		
-	UFUNCTION(BlueprintCallable)
-	void SetAttackForce(float InValue);
-			
-	UFUNCTION(BlueprintPure)
-	float GetRepulseForce() const;
-		
-	UFUNCTION(BlueprintCallable)
-	void SetRepulseForce(float InValue);
-			
-	UFUNCTION(BlueprintPure)
-	float GetAttackSpeed() const;
-		
-	UFUNCTION(BlueprintCallable)
-	void SetAttackSpeed(float InValue);
-			
-	UFUNCTION(BlueprintPure)
-	float GetAttackCritRate() const;
-		
-	UFUNCTION(BlueprintCallable)
-	void SetAttackCritRate(float InValue);
-			
-	UFUNCTION(BlueprintPure)
-	float GetAttackStealRate() const;
-		
-	UFUNCTION(BlueprintCallable)
-	void SetAttackStealRate(float InValue);
-			
-	UFUNCTION(BlueprintPure)
-	float GetDefendRate() const;
-		
-	UFUNCTION(BlueprintCallable)
-	void SetDefendRate(float InValue);
-
-	UFUNCTION(BlueprintPure)
-	float GetDefendScope() const;
-		
-	UFUNCTION(BlueprintCallable)
-	void SetDefendScope(float InValue);
-
-	UFUNCTION(BlueprintPure)
-	float GetPhysicsDefRate() const;
-		
-	UFUNCTION(BlueprintCallable)
-	void SetPhysicsDefRate(float InValue);
-			
-	UFUNCTION(BlueprintPure)
-	float GetMagicDefRate() const;
-		
-	UFUNCTION(BlueprintCallable)
-	void SetMagicDefRate(float InValue);
-			
-	UFUNCTION(BlueprintPure)
-	float GetToughnessRate() const;
-				
-	UFUNCTION(BlueprintCallable)
-	void SetToughnessRate(float InValue);
-	
-	UFUNCTION(BlueprintPure)
-	float GetStaminaRegenSpeed() const;
-			
-	UFUNCTION(BlueprintCallable)
-	void SetStaminaRegenSpeed(float InValue);
-		
-	UFUNCTION(BlueprintPure)
-	float GetStaminaExpendSpeed() const;
-	
-	UFUNCTION(BlueprintCallable)
-	void SetStaminaExpendSpeed(float InValue);
 
 	UFUNCTION(BlueprintPure)
 	float GetAttackDistance() const;
@@ -650,6 +535,48 @@ public:
 	UDWCharacterPart* GetCharacterPart(EDWCharacterPartType InCharacterPartType) const;
 
 	virtual UBehaviorTree* GetBehaviorTreeAsset() const override;
+
+	ATTRIBUTE_VALUE_ACCESSORS(UDWCharacterAttributeSet, Mana)
+	
+	ATTRIBUTE_VALUE_ACCESSORS(UDWCharacterAttributeSet, MaxMana)
+
+	ATTRIBUTE_VALUE_ACCESSORS(UDWCharacterAttributeSet, Stamina)
+	
+	ATTRIBUTE_VALUE_ACCESSORS(UDWCharacterAttributeSet, MaxStamina)
+	
+	ATTRIBUTE_VALUE_ACCESSORS(UDWCharacterAttributeSet, SwimSpeed)
+	
+	ATTRIBUTE_VALUE_ACCESSORS(UDWCharacterAttributeSet, RideSpeed)
+		
+	ATTRIBUTE_VALUE_ACCESSORS(UDWCharacterAttributeSet, FlySpeed)
+
+	ATTRIBUTE_VALUE_ACCESSORS(UDWCharacterAttributeSet, DodgeForce)
+
+	ATTRIBUTE_VALUE_ACCESSORS(UDWCharacterAttributeSet, AttackForce)
+		
+	ATTRIBUTE_VALUE_ACCESSORS(UDWCharacterAttributeSet, RepulseForce)
+
+	ATTRIBUTE_VALUE_ACCESSORS(UDWCharacterAttributeSet, AttackSpeed)
+
+	ATTRIBUTE_VALUE_ACCESSORS(UDWCharacterAttributeSet, AttackCritRate)
+
+	ATTRIBUTE_VALUE_ACCESSORS(UDWCharacterAttributeSet, AttackStealRate)
+
+	ATTRIBUTE_VALUE_ACCESSORS(UDWCharacterAttributeSet, DefendRate)
+
+	ATTRIBUTE_VALUE_ACCESSORS(UDWCharacterAttributeSet, DefendScope)
+
+	ATTRIBUTE_VALUE_ACCESSORS(UDWCharacterAttributeSet, PhysicsDefRate)
+
+	ATTRIBUTE_VALUE_ACCESSORS(UDWCharacterAttributeSet, MagicDefRate)
+	
+	ATTRIBUTE_VALUE_ACCESSORS(UDWCharacterAttributeSet, ToughnessRate)
+			
+	ATTRIBUTE_VALUE_ACCESSORS(UDWCharacterAttributeSet, StaminaRegenSpeed)
+			
+	ATTRIBUTE_VALUE_ACCESSORS(UDWCharacterAttributeSet, StaminaExpendSpeed)
+
+	ATTRIBUTE_VALUE_ACCESSORS(UDWCharacterAttributeSet, Interrupt)
 
 public:
 	UFUNCTION()

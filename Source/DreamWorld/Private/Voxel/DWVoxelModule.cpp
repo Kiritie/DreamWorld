@@ -127,24 +127,24 @@ void ADWVoxelModule::GenerateChunks(FIndex InIndex)
 	}
 }
 
-void ADWVoxelModule::BuildChunkMap(AVoxelChunk* InChunk, int32 InStage)
+void ADWVoxelModule::BuildChunkMap(FIndex InIndex, int32 InStage)
 {
-	Super::BuildChunkMap(InChunk, InStage);
+	Super::BuildChunkMap(InIndex, InStage);
 }
 
-void ADWVoxelModule::GenerateChunkMap(AVoxelChunk* InChunk)
+void ADWVoxelModule::GenerateChunkMap(FIndex InIndex)
 {
-	Super::GenerateChunkMap(InChunk);
+	Super::GenerateChunkMap(InIndex);
 }
 
-void ADWVoxelModule::GenerateChunk(AVoxelChunk* InChunk)
+void ADWVoxelModule::GenerateChunk(FIndex InIndex)
 {
-	Super::GenerateChunk(InChunk);
+	Super::GenerateChunk(InIndex);
 }
 
-void ADWVoxelModule::DestroyChunk(AVoxelChunk* InChunk)
+void ADWVoxelModule::DestroyChunk(FIndex InIndex)
 {
-	Super::DestroyChunk(InChunk);
+	Super::DestroyChunk(InIndex);
 }
 
 AVoxelChunk* ADWVoxelModule::SpawnChunk(FIndex InIndex, bool bAddToQueue)

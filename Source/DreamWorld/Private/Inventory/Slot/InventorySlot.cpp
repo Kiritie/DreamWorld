@@ -360,10 +360,13 @@ int UInventorySlot::GetMaxVolume() const
 
 FAbilityInfo UInventorySlot::GetAbilityInfo() const
 {
-	FAbilityInfo AbilityInfo;
+	if(!Item.IsValid()) return FAbilityInfo();
+	
 	if(ADWCharacter* Character = Cast<ADWCharacter>(Owner->GetOwnerActor()))
 	{
+		FAbilityInfo AbilityInfo;
 		Character->GetAbilityInfo(Item.GetData().AbilityClass, AbilityInfo);
+		return AbilityInfo;
 	}
-	return AbilityInfo;
+	return FAbilityInfo();
 }

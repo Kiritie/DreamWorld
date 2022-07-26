@@ -273,9 +273,22 @@ FString ADWPlayerCharacter::GetHeadInfo() const
 	return FString::Printf(TEXT("Lv.%d \"%s\" (Exp: %d/%d)"), Level, *Name.ToString(), EXP, GetMaxEXP());
 }
 
+void ADWPlayerCharacter::SetActorVisible_Implementation(bool bNewVisible)
+{
+	Super::SetActorVisible_Implementation(bNewVisible);
+
+	if(bNewVisible && ControlMode == EDWCharacterControlMode::Fighting)
+	{
+		VoxelMesh->SetVisibility(false);
+		HammerMesh->SetVisibility(false);
+	}
+}
+
 void ADWPlayerCharacter::SetControlMode(EDWCharacterControlMode InControlMode)
 {
 	Super::SetControlMode(InControlMode);
+
+	if(!Execute_IsVisible(this)) return;
 	
 	switch (ControlMode)
 	{

@@ -48,7 +48,7 @@ void UProcedure_ArchiveChoosing::OnEnter(UProcedureBase* InLastProcedure)
 	
 	if(ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>())
 	{
-		PlayerCharacter->SetActorHiddenInGame(true);
+		PlayerCharacter->Execute_SetActorVisible(PlayerCharacter, false);
 	}
 
 	UWidgetModuleBPLibrary::OpenUserWidget<UWidgetArchiveChoosingPanel>();

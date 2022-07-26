@@ -45,9 +45,6 @@ protected:
 	bool bPressedSprint;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Inputs")
-	float DoubleJumpTime;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Inputs")
 	int32 AttackAbilityQueue;
 
 protected:

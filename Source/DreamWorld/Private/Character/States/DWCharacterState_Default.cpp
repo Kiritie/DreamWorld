@@ -58,14 +58,30 @@ void UDWCharacterState_Default::OnRefresh()
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 
-	if(Character->GetActorLocation().IsNearlyZero())
+	if(Character->IsPlayer())
 	{
-		FHitResult hitResult;
-		const FVector rayStart = FVector(Character->GetActorLocation().X, Character->GetActorLocation().Y, UVoxelModuleBPLibrary::GetWorldData().ChunkHeightRange * UVoxelModuleBPLibrary::GetWorldData().GetChunkLength() + 500);
-		const FVector rayEnd = FVector(Character->GetActorLocation().X, Character->GetActorLocation().Y, 0);
-		if(AMainModule::GetModuleByClass<AVoxelModule>()->ChunkTraceSingle(rayStart, rayEnd, Character->GetRadius(), Character->GetHalfHeight(), hitResult))
+		if(Character->GetActorLocation().IsNearlyZero())
 		{
-			Character->SetActorLocationAndRotation(hitResult.Location, FRotator::ZeroRotator);
+			switch(UVoxelModuleBPLibrary::GetWorldState())
+			{
+				case EVoxelWorldState::BasicGenerated:
+				case EVoxelWorldState::FullGenerated:
+				{
+					FHitResult hitResult;
+					const FVector rayStart = FVector(Character->GetActorLocation().X, Character->GetActorLocation().Y, UVoxelModuleBPLibrary::GetWorldData().ChunkHeightRange * UVoxelModuleBPLibrary::GetWorldData().GetChunkLength() + 500);
+					const FVector rayEnd = FVector(Character->GetActorLocation().X, Character->GetActorLocation().Y, 0);
+					if(AMainModule::GetModuleByClass<AVoxelModule>()->ChunkTraceSingle(rayStart, rayEnd, Character->GetRadius(), Character->GetHalfHeight(), hitResult))
+					{
+						Character->SetActorLocationAndRotation(hitResult.Location, FRotator::ZeroRotator);
+						FSM->SwitchStateByClass<UDWCharacterState_Walk>();
+					}
+					break;
+				}
+				default: break;
+			}
+		}
+		else
+		{
 			FSM->SwitchStateByClass<UDWCharacterState_Walk>();
 		}
 	}

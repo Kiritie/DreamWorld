@@ -23,7 +23,7 @@ void UInventoryShortcutSlot::InitSlot(UInventory* InOwner, FAbilityItem InItem, 
 void UInventoryShortcutSlot::Refresh()
 {
 	Super::Refresh();
-	if(IsSelected())
+	if(IsSelected() && Item.IsValid())
 	{
 		if(Item.GetData().EqualType(EAbilityItemType::Voxel))
 		{

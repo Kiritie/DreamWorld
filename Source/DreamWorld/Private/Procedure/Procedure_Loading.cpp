@@ -13,6 +13,7 @@
 #include "SaveGame/Archive/DWArchiveSaveGame.h"
 #include "SaveGame/SaveGameModuleBPLibrary.h"
 #include "Voxel/DWVoxelModule.h"
+#include "Voxel/VoxelModuleBPLibrary.h"
 #include "Widget/WidgetGameHUD.h"
 #include "Widget/WidgetLoadingPanel.h"
 #include "Widget/WidgetModuleBPLibrary.h"
@@ -59,18 +60,15 @@ void UProcedure_Loading::OnRefresh()
 {
 	Super::OnRefresh();
 
-	if(ADWVoxelModule* VoxelModule = AMainModule::GetModuleByClass<ADWVoxelModule>())
+	switch(UVoxelModuleBPLibrary::GetWorldState())
 	{
-		switch(VoxelModule->GetWorldState())
+		case EVoxelWorldState::BasicGenerated:
+		case EVoxelWorldState::FullGenerated:
 		{
-			case EVoxelWorldState::BasicGenerated:
-			case EVoxelWorldState::FullGenerated:
-			{
-				UProcedureModuleBPLibrary::SwitchProcedureByClass<UProcedure_Playing>();
-				break;
-			}
-			default: break;
+			UProcedureModuleBPLibrary::SwitchProcedureByClass<UProcedure_Playing>();
+			break;
 		}
+		default: break;
 	}
 }
 

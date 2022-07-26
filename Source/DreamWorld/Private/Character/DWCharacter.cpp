@@ -58,7 +58,6 @@
 #include "Character/States/DWCharacterState_Fall.h"
 #include "Character/States/DWCharacterState_Float.h"
 #include "Character/States/DWCharacterState_Fly.h"
-#include "Character/States/DWCharacterState_Idle.h"
 #include "Character/States/DWCharacterState_Interrupt.h"
 #include "Character/States/DWCharacterState_Jump.h"
 #include "Character/States/DWCharacterState_Ride.h"
@@ -76,9 +75,6 @@
 #include "Voxel/VoxelModuleBPLibrary.h"
 #include "Widget/WidgetModuleBPLibrary.h"
 #include "Widget/Inventory/WidgetInventoryBar.h"
-
-//////////////////////////////////////////////////////////////////////////
-// ADWCharacter
 
 ADWCharacter::ADWCharacter()
 {
@@ -109,7 +105,6 @@ ADWCharacter::ADWCharacter()
 	FSM->States.Add(UDWCharacterState_Fall::StaticClass());
 	FSM->States.Add(UDWCharacterState_Float::StaticClass());
 	FSM->States.Add(UDWCharacterState_Fly::StaticClass());
-	FSM->States.Add(UDWCharacterState_Idle::StaticClass());
 	FSM->States.Add(UDWCharacterState_Interrupt::StaticClass());
 	FSM->States.Add(UDWCharacterState_Jump::StaticClass());
 	FSM->States.Add(UDWCharacterState_Ride::StaticClass());
@@ -324,26 +319,23 @@ FSaveData* ADWCharacter::ToData()
 	return &SaveData;
 }
 
-void ADWCharacter::RefreshFiniteState()
+void ADWCharacter::RefreshState()
 {
-	Super::RefreshFiniteState();
+	Super::RefreshState();
 
-	if(!FSM->GetCurrentState())
+	switch (GetCharacterMovement()->MovementMode)
 	{
-		switch (GetCharacterMovement()->MovementMode)
+		case EMovementMode::MOVE_Flying:
 		{
-			case EMovementMode::MOVE_Flying:
-			{
-				FSM->SwitchStateByClass<UDWCharacterState_Fly>();
-				break;
-			}
-			case EMovementMode::MOVE_Swimming:
-			{
-				FSM->SwitchStateByClass<UDWCharacterState_Swim>();
-				break;
-			}
-			default: break;
+			FSM->SwitchStateByClass<UDWCharacterState_Fly>();
+			break;
 		}
+		case EMovementMode::MOVE_Swimming:
+		{
+			FSM->SwitchStateByClass<UDWCharacterState_Swim>();
+			break;
+		}
+		default: break;
 	}
 }
 
@@ -525,6 +517,14 @@ void ADWCharacter::Interrupt(float InDuration /*= -1*/)
 {
 	FSM->GetStateByClass<UDWCharacterState_Interrupt>()->Duration = InDuration;
 	FSM->SwitchStateByClass<UDWCharacterState_Interrupt>();
+}
+
+void ADWCharacter::UnInterrupt()
+{
+	if(FSM->IsCurrentStateClass<UDWCharacterState_Interrupt>())
+	{
+		FSM->SwitchState(nullptr);
+	}
 }
 
 void ADWCharacter::Jump()
@@ -913,6 +913,7 @@ void ADWCharacter::RefreshEquip(EDWEquipPartType InPartType, UInventoryEquipSlot
 		{
 			Equips[InPartType]->Initialize(this, EquipSlot->GetItem());
 			Equips[InPartType]->OnAssemble();
+			Equips[InPartType]->Execute_SetActorVisible(Equips[InPartType], Execute_IsVisible(this));
 		}
 	}
 	else if(Equips[InPartType])
@@ -1154,7 +1155,7 @@ UWidgetCharacterHP* ADWCharacter::GetWidgetCharacterHPWidget() const
 
 bool ADWCharacter::IsActive(bool bNeedNotDead, bool bNeedFreeToAnim /*= false*/) const
 {
-	return AbilitySystem->HasMatchingGameplayTag(GetCharacterData<UDWCharacterData>().StaticTag) && (!bNeedNotDead || !IsDead()) && (!bNeedFreeToAnim || IsFreeToAnim(false));
+	return !AbilitySystem->HasMatchingGameplayTag(GetCharacterData<UDWCharacterData>().StaticTag) && (!bNeedNotDead || !IsDead()) && (!bNeedFreeToAnim || IsFreeToAnim(false));
 }
 
 bool ADWCharacter::IsFreeToAnim(bool bCheckStates) const
@@ -1232,9 +1233,22 @@ bool ADWCharacter::IsBreakAllInput() const
 	return AbilitySystem->HasMatchingGameplayTag(GetCharacterData<UDWCharacterData>().BreakAllInputTag);
 }
 
+void ADWCharacter::SetActorVisible_Implementation(bool bNewVisible)
+{
+	Super::SetActorVisible_Implementation(bNewVisible);
+	
+	if(bNewVisible && ControlMode == EDWCharacterControlMode::Fighting)
+	{
+		if(GetWeapon()) GetWeapon()->Execute_SetActorVisible(GetWeapon(), true);
+		if(GetShield()) GetShield()->Execute_SetActorVisible(GetShield(), true);
+	}
+}
+
 void ADWCharacter::SetControlMode(EDWCharacterControlMode InControlMode)
 {
 	ControlMode = InControlMode;
+
+	if(!Execute_IsVisible(this)) return;
 
 	switch (ControlMode)
 	{
@@ -1317,206 +1331,6 @@ void ADWCharacter::SetTeamID(FName InTeamID)
 	{
 		GetWidgetCharacterHPWidget()->SetHeadInfo(GetHeadInfo());
 	}
-}
-
-float ADWCharacter::GetMana() const
-{
-	return GetAttributeSet<UDWCharacterAttributeSet>()->GetMana();
-}
-
-void ADWCharacter::SetMana(float InValue)
-{
-	AbilitySystem->ApplyModToAttributeUnsafe(GetAttributeSet<UDWCharacterAttributeSet>()->GetManaAttribute(), EGameplayModOp::Override, InValue);
-}
-
-float ADWCharacter::GetMaxMana() const
-{
-	return GetAttributeSet<UDWCharacterAttributeSet>()->GetMaxMana();
-}
-
-void ADWCharacter::SetMaxMana(float InValue)
-{
-	AbilitySystem->ApplyModToAttributeUnsafe(GetAttributeSet<UDWCharacterAttributeSet>()->GetMaxManaAttribute(), EGameplayModOp::Override, InValue);
-}
-
-float ADWCharacter::GetStamina() const
-{
-	return GetAttributeSet<UDWCharacterAttributeSet>()->GetStamina();
-}
-
-void ADWCharacter::SetStamina(float InValue)
-{
-	AbilitySystem->ApplyModToAttributeUnsafe(GetAttributeSet<UDWCharacterAttributeSet>()->GetStaminaAttribute(), EGameplayModOp::Override, InValue);
-}
-
-float ADWCharacter::GetMaxStamina() const
-{
-	return GetAttributeSet<UDWCharacterAttributeSet>()->GetMaxStamina();
-}
-
-void ADWCharacter::SetMaxStamina(float InValue)
-{
-	AbilitySystem->ApplyModToAttributeUnsafe(GetAttributeSet<UDWCharacterAttributeSet>()->GetMaxStaminaAttribute(), EGameplayModOp::Override, InValue);
-}
-
-float ADWCharacter::GetSwimSpeed() const
-{
-	return GetAttributeSet<UDWCharacterAttributeSet>()->GetSwimSpeed();
-}
-
-void ADWCharacter::SetSwimSpeed(float InValue)
-{
-	AbilitySystem->ApplyModToAttributeUnsafe(GetAttributeSet<UDWCharacterAttributeSet>()->GetSwimSpeedAttribute(), EGameplayModOp::Override, InValue);
-}
-
-float ADWCharacter::GetRideSpeed() const
-{
-	return GetAttributeSet<UDWCharacterAttributeSet>()->GetRideSpeed();
-}
-
-void ADWCharacter::SetRideSpeed(float InValue)
-{
-	AbilitySystem->ApplyModToAttributeUnsafe(GetAttributeSet<UDWCharacterAttributeSet>()->GetRideSpeedAttribute(), EGameplayModOp::Override, InValue);
-}
-
-float ADWCharacter::GetFlySpeed() const
-{
-	return GetAttributeSet<UDWCharacterAttributeSet>()->GetFlySpeed();
-}
-
-void ADWCharacter::SetFlySpeed(float InValue)
-{
-	AbilitySystem->ApplyModToAttributeUnsafe(GetAttributeSet<UDWCharacterAttributeSet>()->GetFlySpeedAttribute(), EGameplayModOp::Override, InValue);
-}
-
-float ADWCharacter::GetDodgeForce() const
-{
-	return GetAttributeSet<UDWCharacterAttributeSet>()->GetDodgeForce();
-}
-
-void ADWCharacter::SetDodgeForce(float InValue)
-{
-	AbilitySystem->ApplyModToAttributeUnsafe(GetAttributeSet<UDWCharacterAttributeSet>()->GetDodgeForceAttribute(), EGameplayModOp::Override, InValue);
-}
-
-float ADWCharacter::GetAttackForce() const
-{
-	return GetAttributeSet<UDWCharacterAttributeSet>()->GetAttackForce();
-}
-
-void ADWCharacter::SetAttackForce(float InValue)
-{
-	AbilitySystem->ApplyModToAttributeUnsafe(GetAttributeSet<UDWCharacterAttributeSet>()->GetAttackForceAttribute(), EGameplayModOp::Override, InValue);
-}
-
-float ADWCharacter::GetRepulseForce() const
-{
-	return GetAttributeSet<UDWCharacterAttributeSet>()->GetRepulseForce();
-}
-
-void ADWCharacter::SetRepulseForce(float InValue)
-{
-	AbilitySystem->ApplyModToAttributeUnsafe(GetAttributeSet<UDWCharacterAttributeSet>()->GetRepulseForceAttribute(), EGameplayModOp::Override, InValue);
-}
-
-float ADWCharacter::GetAttackSpeed() const
-{
-	return GetAttributeSet<UDWCharacterAttributeSet>()->GetAttackSpeed();
-}
-
-void ADWCharacter::SetAttackSpeed(float InValue)
-{
-	AbilitySystem->ApplyModToAttributeUnsafe(GetAttributeSet<UDWCharacterAttributeSet>()->GetAttackSpeedAttribute(), EGameplayModOp::Override, InValue);
-}
-
-float ADWCharacter::GetAttackCritRate() const
-{
-	return GetAttributeSet<UDWCharacterAttributeSet>()->GetAttackCritRate();
-}
-
-void ADWCharacter::SetAttackCritRate(float InValue)
-{
-	AbilitySystem->ApplyModToAttributeUnsafe(GetAttributeSet<UDWCharacterAttributeSet>()->GetAttackCritRateAttribute(), EGameplayModOp::Override, InValue);
-}
-
-float ADWCharacter::GetAttackStealRate() const
-{
-	return GetAttributeSet<UDWCharacterAttributeSet>()->GetAttackStealRate();
-}
-
-void ADWCharacter::SetAttackStealRate(float InValue)
-{
-	AbilitySystem->ApplyModToAttributeUnsafe(GetAttributeSet<UDWCharacterAttributeSet>()->GetAttackStealRateAttribute(), EGameplayModOp::Override, InValue);
-}
-
-float ADWCharacter::GetDefendRate() const
-{
-	return GetAttributeSet<UDWCharacterAttributeSet>()->GetDefendRate();
-}
-
-void ADWCharacter::SetDefendRate(float InValue)
-{
-	AbilitySystem->ApplyModToAttributeUnsafe(GetAttributeSet<UDWCharacterAttributeSet>()->GetDefendRateAttribute(), EGameplayModOp::Override, InValue);
-}
-
-float ADWCharacter::GetDefendScope() const
-{
-	return GetAttributeSet<UDWCharacterAttributeSet>()->GetDefendScope();
-}
-
-void ADWCharacter::SetDefendScope(float InValue)
-{
-	AbilitySystem->ApplyModToAttributeUnsafe(GetAttributeSet<UDWCharacterAttributeSet>()->GetDefendScopeAttribute(), EGameplayModOp::Override, InValue);
-}
-
-float ADWCharacter::GetPhysicsDefRate() const
-{
-	return GetAttributeSet<UDWCharacterAttributeSet>()->GetPhysicsDefRate();
-}
-
-void ADWCharacter::SetPhysicsDefRate(float InValue)
-{
-	AbilitySystem->ApplyModToAttributeUnsafe(GetAttributeSet<UDWCharacterAttributeSet>()->GetPhysicsDefRateAttribute(), EGameplayModOp::Override, InValue);
-}
-
-float ADWCharacter::GetMagicDefRate() const
-{
-	return GetAttributeSet<UDWCharacterAttributeSet>()->GetMagicDefRate();
-}
-
-void ADWCharacter::SetMagicDefRate(float InValue)
-{
-	AbilitySystem->ApplyModToAttributeUnsafe(GetAttributeSet<UDWCharacterAttributeSet>()->GetMagicDefRateAttribute(), EGameplayModOp::Override, InValue);
-}
-
-float ADWCharacter::GetToughnessRate() const
-{
-	return GetAttributeSet<UDWCharacterAttributeSet>()->GetToughnessRate();
-}
-
-void ADWCharacter::SetToughnessRate(float InValue)
-{
-	AbilitySystem->ApplyModToAttributeUnsafe(GetAttributeSet<UDWCharacterAttributeSet>()->GetToughnessRateAttribute(), EGameplayModOp::Override, InValue);
-}
-
-float ADWCharacter::GetStaminaRegenSpeed() const
-{
-	return GetAttributeSet<UDWCharacterAttributeSet>()->GetStaminaRegenSpeed();
-}
-
-void ADWCharacter::SetStaminaRegenSpeed(float InValue)
-{
-	AbilitySystem->ApplyModToAttributeUnsafe(GetAttributeSet<UDWCharacterAttributeSet>()->GetStaminaRegenSpeedAttribute(), EGameplayModOp::Override, InValue);
-}
-
-float ADWCharacter::GetStaminaExpendSpeed() const
-{
-	return GetAttributeSet<UDWCharacterAttributeSet>()->GetStaminaExpendSpeed();
-}
-
-void ADWCharacter::SetStaminaExpendSpeed(float InValue)
-{
-	AbilitySystem->ApplyModToAttributeUnsafe(GetAttributeSet<UDWCharacterAttributeSet>()->GetStaminaExpendSpeedAttribute(), EGameplayModOp::Override, InValue);
 }
 
 float ADWCharacter::GetAttackDistance() const
