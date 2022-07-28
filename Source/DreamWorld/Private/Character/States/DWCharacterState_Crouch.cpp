@@ -3,6 +3,7 @@
 #include "Character/States/DWCharacterState_Crouch.h"
 
 #include "Character/DWCharacter.h"
+#include "Character/DWCharacterData.h"
 
 UDWCharacterState_Crouch::UDWCharacterState_Crouch()
 {
@@ -28,6 +29,8 @@ void UDWCharacterState_Crouch::OnEnter(UFiniteStateBase* InLastFiniteState)
 	Super::OnEnter(InLastFiniteState);
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
+	
+	Character->GetAbilitySystemComponent()->AddLooseGameplayTag(Character->GetCharacterData<UDWCharacterData>().CrouchingTag);
 
 	Character->LimitToAnim();
 }
@@ -44,6 +47,8 @@ void UDWCharacterState_Crouch::OnLeave(UFiniteStateBase* InNextFiniteState)
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 
 	Character->StopAction(EDWCharacterActionType::Crouch);
+	
+	Character->GetAbilitySystemComponent()->RemoveLooseGameplayTag(Character->GetCharacterData<UDWCharacterData>().CrouchingTag);
 
 	Character->FreeToAnim();
 }

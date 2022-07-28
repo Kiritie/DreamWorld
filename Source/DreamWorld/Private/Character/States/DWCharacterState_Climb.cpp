@@ -3,6 +3,7 @@
 #include "Character/States/DWCharacterState_Climb.h"
 
 #include "Character/DWCharacter.h"
+#include "Character/DWCharacterData.h"
 
 UDWCharacterState_Climb::UDWCharacterState_Climb()
 {
@@ -29,6 +30,8 @@ void UDWCharacterState_Climb::OnEnter(UFiniteStateBase* InLastFiniteState)
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 	
+	Character->GetAbilitySystemComponent()->AddLooseGameplayTag(Character->GetCharacterData<UDWCharacterData>().ClimbingTag);
+
 	Character->LimitToAnim();
 }
 
@@ -44,7 +47,9 @@ void UDWCharacterState_Climb::OnLeave(UFiniteStateBase* InNextFiniteState)
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 
 	Character->StopAction(EDWCharacterActionType::Climb);
-	
+		
+	Character->GetAbilitySystemComponent()->RemoveLooseGameplayTag(Character->GetCharacterData<UDWCharacterData>().ClimbingTag);
+
 	Character->FreeToAnim();
 }
 

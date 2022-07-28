@@ -32,7 +32,7 @@ void UDWAITask_AIAttack::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* Node
 {
 	if (!InitTask(OwnerComp)) return;
 
-	if(GetOwnerCharacter<ADWCharacter>()->Distance(AttackTarget, false, false) <= AttackDistance)
+	if(GetOwnerCharacter<ADWCharacter>()->GetDistance(AttackTarget, false, false) <= AttackDistance)
 	{
 		GetOwnerCharacter<ADWCharacter>()->Attack();
 	}

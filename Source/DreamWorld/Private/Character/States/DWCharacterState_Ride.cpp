@@ -4,6 +4,7 @@
 
 #include "Character/CharacterModuleBPLibrary.h"
 #include "Character/DWCharacter.h"
+#include "Character/DWCharacterData.h"
 #include "Components/CapsuleComponent.h"
 #include "Voxel/VoxelModule.h"
 #include "Voxel/VoxelModuleBPLibrary.h"
@@ -35,6 +36,8 @@ void UDWCharacterState_Ride::OnEnter(UFiniteStateBase* InLastFiniteState)
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 	ADWCharacter* RidingTarget = Character->GetRidingTarget();
 
+	Character->GetAbilitySystemComponent()->AddLooseGameplayTag(Character->GetCharacterData<UDWCharacterData>().RidingTag);
+
 	UCharacterModuleBPLibrary::SwitchCharacter(RidingTarget);
 	Character->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	Character->AttachToComponent(RidingTarget->GetMesh(), FAttachmentTransformRules::KeepWorldTransform, FName("RiderPoint"));
@@ -56,6 +59,8 @@ void UDWCharacterState_Ride::OnLeave(UFiniteStateBase* InNextFiniteState)
 	ADWCharacter* RidingTarget = Character->GetRidingTarget();
 
 	Character->StopAction(EDWCharacterActionType::Ride);
+
+	Character->GetAbilitySystemComponent()->RemoveLooseGameplayTag(Character->GetCharacterData<UDWCharacterData>().RidingTag);
 
 	Character->FreeToAnim();
 	if(Character->IsActive()) Character->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);

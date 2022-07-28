@@ -23,8 +23,6 @@ bool UDWCharacterState_Walk::OnEnterValidate(UFiniteStateBase* InLastFiniteState
 void UDWCharacterState_Walk::OnEnter(UFiniteStateBase* InLastFiniteState)
 {
 	Super::OnEnter(InLastFiniteState);
-
-	ADWCharacter* Character = GetAgent<ADWCharacter>();
 }
 
 void UDWCharacterState_Walk::OnRefresh()

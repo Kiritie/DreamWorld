@@ -3,6 +3,7 @@
 #include "Character/States/DWCharacterState_Defend.h"
 
 #include "Character/DWCharacter.h"
+#include "Character/DWCharacterData.h"
 
 UDWCharacterState_Defend::UDWCharacterState_Defend()
 {
@@ -28,6 +29,8 @@ void UDWCharacterState_Defend::OnEnter(UFiniteStateBase* InLastFiniteState)
 	Super::OnEnter(InLastFiniteState);
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
+	
+	Character->GetAbilitySystemComponent()->AddLooseGameplayTag(Character->GetCharacterData<UDWCharacterData>().DefendingTag);
 
 	Character->SetMotionRate(0.5f, 0.1f);
 	Character->LimitToAnim(true, true);
@@ -45,6 +48,8 @@ void UDWCharacterState_Defend::OnLeave(UFiniteStateBase* InNextFiniteState)
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 
 	Character->StopAction(EDWCharacterActionType::Defend);
+	
+	Character->GetAbilitySystemComponent()->RemoveLooseGameplayTag(Character->GetCharacterData<UDWCharacterData>().DefendingTag);
 
 	Character->FreeToAnim();
 	Character->SetMotionRate(1, 1);

@@ -121,11 +121,7 @@ public:
 	UInventorySlot* GetSelectedSlot() const { return SelectedSlot; }
 
 	UFUNCTION(BlueprintCallable)
-	void SetSelectedSlot(UInventorySlot* InSelectedSlot)
-	{
-		this->SelectedSlot = InSelectedSlot;
-		OnSlotSelected.Broadcast(InSelectedSlot);
-	}
+	void SetSelectedSlot(UInventorySlot* InSelectedSlot);
 
 	FOnInventorySlotSelected& GetOnSlotSelected() { return OnSlotSelected; }
 	

@@ -3,6 +3,7 @@
 #include "Character/States/DWCharacterState_Float.h"
 
 #include "Character/DWCharacter.h"
+#include "Character/DWCharacterData.h"
 #include "Character/DWCharacterPart.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
@@ -32,6 +33,10 @@ void UDWCharacterState_Float::OnEnter(UFiniteStateBase* InLastFiniteState)
 	Super::OnEnter(InLastFiniteState);
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
+	
+	Character->GetAbilitySystemComponent()->AddLooseGameplayTag(Character->GetCharacterData<UDWCharacterData>().FloatingTag);
+
+	Character->LimitToAnim();
 
 	Character->GetCharacterMovement()->Velocity = FVector(Character->GetCharacterMovement()->Velocity.X, Character->GetCharacterMovement()->Velocity.Y, 0);
 	const float NeckPosZ = Character->GetCharacterPart(EDWCharacterPartType::Neck)->GetComponentLocation().Z;
@@ -52,6 +57,10 @@ void UDWCharacterState_Float::OnLeave(UFiniteStateBase* InNextFiniteState)
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 
 	Character->StopAction(EDWCharacterActionType::Float);
+	
+	Character->GetAbilitySystemComponent()->RemoveLooseGameplayTag(Character->GetCharacterData<UDWCharacterData>().FloatingTag);
+
+	Character->FreeToAnim();
 
 	Character->GetCharacterMovement()->Velocity = FVector(Character->GetCharacterMovement()->Velocity.X, Character->GetCharacterMovement()->Velocity.Y, Character->GetCharacterMovement()->Velocity.Z * 0.5f);
 }

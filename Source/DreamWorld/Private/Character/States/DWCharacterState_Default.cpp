@@ -33,8 +33,10 @@ void UDWCharacterState_Default::OnEnter(UFiniteStateBase* InLastFiniteState)
 
 	Character->DoAction(EDWCharacterActionType::Revive);
 
-	Character->SetMana(-1.f);
-	Character->SetStamina(-1.f);
+	Character->LimitToAnim();
+
+	Character->SetMana(Character->GetMaxMana());
+	Character->SetStamina(Character->GetMaxStamina());
 	
 	// stats
 	Character->SetControlMode(Character->ControlMode);
@@ -99,6 +101,7 @@ void UDWCharacterState_Default::OnLeave(UFiniteStateBase* InNextFiniteState)
 
 	Character->GetCharacterMovement()->SetActive(true);
 	Character->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	Character->FreeToAnim();
 }
 
 void UDWCharacterState_Default::OnTermination()

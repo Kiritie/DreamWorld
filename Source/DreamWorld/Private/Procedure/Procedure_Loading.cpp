@@ -5,6 +5,8 @@
 
 #include "Character/CharacterModuleBPLibrary.h"
 #include "Character/Player/DWPlayerCharacter.h"
+#include "Character/States/DWCharacterState_Walk.h"
+#include "FSM/Components/FSMComponent.h"
 #include "Gameplay/DWGameState.h"
 #include "Global/GlobalBPLibrary.h"
 #include "Procedure/ProcedureModuleBPLibrary.h"
@@ -65,7 +67,10 @@ void UProcedure_Loading::OnRefresh()
 		case EVoxelWorldState::BasicGenerated:
 		case EVoxelWorldState::FullGenerated:
 		{
-			UProcedureModuleBPLibrary::SwitchProcedureByClass<UProcedure_Playing>();
+			if(UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>()->GetFSMComponent()->IsCurrentStateClass<UDWCharacterState_Walk>())
+			{
+				UProcedureModuleBPLibrary::SwitchProcedureByClass<UProcedure_Playing>();
+			}
 			break;
 		}
 		default: break;

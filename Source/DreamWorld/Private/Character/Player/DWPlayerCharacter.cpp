@@ -82,7 +82,7 @@ ADWPlayerCharacter::ADWPlayerCharacter()
 	GetCharacterMovement()->bOrientRotationToMovement = true; // Character moves in the direction of input...	
 	GetCharacterMovement()->AirControl = 0.3f;
 
-	WidgetCharacterHP->SetAutoCreate(false);
+	CharacterHP->SetAutoCreate(false);
 
 	TargetSystem = CreateDefaultSubobject<UTargetSystemComponent>(FName("TargetSystem"));
 	TargetSystem->bShouldControlRotation = true;
@@ -195,7 +195,7 @@ void ADWPlayerCharacter::LoadData(FSaveData* InSaveData, bool bForceMode)
 {
 	auto& SaveData = InSaveData->CastRef<FDWPlayerSaveData>();
 	
-	if(bForceMode && !SaveData.IsSaved())
+	if(!bForceMode && !SaveData.IsSaved())
 	{
 		switch (SaveData.InventoryInitType)
 		{
@@ -205,7 +205,7 @@ void ADWPlayerCharacter::LoadData(FSaveData* InSaveData, bool bForceMode)
 			}
 			case EDWPlayerInventoryInitType::Fill:
 			{
-				auto VoxelDatas = UAssetModuleBPLibrary::LoadPrimaryAssets<UVoxelData>(UAbilityModuleBPLibrary::GetAssetTypeByItemType(EAbilityItemType::Voxel));
+				auto VoxelDatas = UAssetModuleBPLibrary::LoadPrimaryAssets<UVoxelData>(UAbilityModuleBPLibrary::ItemTypeToAssetType(EAbilityItemType::Voxel));
 				for (int32 i = 0; i < VoxelDatas.Num(); i++)
 				{
 					if(VoxelDatas[i]->VoxelType != EVoxelType::Empty && VoxelDatas[i]->VoxelType != EVoxelType::Unknown)
@@ -215,21 +215,21 @@ void ADWPlayerCharacter::LoadData(FSaveData* InSaveData, bool bForceMode)
 					}
 				}
 		
-				auto EquipDatas = UAssetModuleBPLibrary::LoadPrimaryAssets<UAbilityEquipDataBase>(UAbilityModuleBPLibrary::GetAssetTypeByItemType(EAbilityItemType::Equip));
+				auto EquipDatas = UAssetModuleBPLibrary::LoadPrimaryAssets<UAbilityEquipDataBase>(UAbilityModuleBPLibrary::ItemTypeToAssetType(EAbilityItemType::Equip));
 				for (int32 i = 0; i < EquipDatas.Num(); i++)
 				{
 					FAbilityItem tmpItem = FAbilityItem(EquipDatas[i]->GetPrimaryAssetId(), EquipDatas[i]->MaxCount);
 					SaveData.InventoryData.AddItem(tmpItem);
 				}
 			
-				auto PropDatas = UAssetModuleBPLibrary::LoadPrimaryAssets<UAbilityPropDataBase>(UAbilityModuleBPLibrary::GetAssetTypeByItemType(EAbilityItemType::Prop));
+				auto PropDatas = UAssetModuleBPLibrary::LoadPrimaryAssets<UAbilityPropDataBase>(UAbilityModuleBPLibrary::ItemTypeToAssetType(EAbilityItemType::Prop));
 				for (int32 i = 0; i < PropDatas.Num(); i++)
 				{
 					FAbilityItem tmpItem = FAbilityItem(PropDatas[i]->GetPrimaryAssetId(), PropDatas[i]->MaxCount);
 					SaveData.InventoryData.AddItem(tmpItem);
 				}
 
-				auto SkillDatas = UAssetModuleBPLibrary::LoadPrimaryAssets<UAbilitySkillDataBase>(UAbilityModuleBPLibrary::GetAssetTypeByItemType(EAbilityItemType::Skill));
+				auto SkillDatas = UAssetModuleBPLibrary::LoadPrimaryAssets<UAbilitySkillDataBase>(UAbilityModuleBPLibrary::ItemTypeToAssetType(EAbilityItemType::Skill));
 				for (int32 i = 0; i < SkillDatas.Num(); i++)
 				{
 					FAbilityItem tmpItem = FAbilityItem(SkillDatas[i]->GetPrimaryAssetId(), SkillDatas[i]->MaxCount);
@@ -270,7 +270,7 @@ void ADWPlayerCharacter::LookAtTarget(ADWCharacter* InTargetCharacter)
 
 FString ADWPlayerCharacter::GetHeadInfo() const
 {
-	return FString::Printf(TEXT("Lv.%d \"%s\" (Exp: %d/%d)"), Level, *Name.ToString(), EXP, GetMaxEXP());
+	return FString::Printf(TEXT("Lv.%d \"%s\" (Exp: %d/%d)"), Level, *Name.ToString(), (int32)GetExp(), (int32)GetMaxExp());
 }
 
 void ADWPlayerCharacter::SetActorVisible_Implementation(bool bNewVisible)
@@ -322,23 +322,23 @@ void ADWPlayerCharacter::SetGenerateVoxelItem(FVoxelItem InGenerateVoxelItem)
 	}
 }
 
-void ADWPlayerCharacter::RefreshEquip(EDWEquipPartType InPartType, UInventoryEquipSlot* EquipSlot)
+void ADWPlayerCharacter::RefreshEquip(EDWEquipPartType InPartType, const FAbilityItem& InItem)
 {
-	if(!EquipSlot->IsEmpty())
+	if(InItem.IsValid())
 	{
-		Super::RefreshEquip(InPartType, EquipSlot);
-		if(Equips[InPartType])
+		Super::RefreshEquip(InPartType, InItem);
+		if(GetEquip(InPartType))
 		{
-			PreviewCapture->ShowOnlyActors.Add(Equips[InPartType]);
+			PreviewCapture->ShowOnlyActors.Add(GetEquip(InPartType));
 		}
 	}
 	else
 	{
-		if(Equips[InPartType])
+		if(GetEquip(InPartType))
 		{
-			PreviewCapture->ShowOnlyActors.Remove(Equips[InPartType]);
+			PreviewCapture->ShowOnlyActors.Remove(GetEquip(InPartType));
 		}
-		Super::RefreshEquip(InPartType, EquipSlot);
+		Super::RefreshEquip(InPartType, InItem);
 	}
 }
 
@@ -399,7 +399,7 @@ void ADWPlayerCharacter::MoveUp_Implementation(float InValue)
 
 bool ADWPlayerCharacter::UseItem(FAbilityItem& InItem)
 {
-	if((InItem.GetData().EqualType(EAbilityItemType::Voxel)))
+	if((InItem.GetData().GetItemType() == EAbilityItemType::Voxel))
 	{
 		if(ControlMode == EDWCharacterControlMode::Creating)
 		{
@@ -410,7 +410,7 @@ bool ADWPlayerCharacter::UseItem(FAbilityItem& InItem)
 			}
 		}
 	}
-	else if((InItem.GetData().EqualType(EAbilityItemType::Prop)))
+	else if((InItem.GetData().GetItemType() == EAbilityItemType::Prop))
 	{
 		return Super::UseItem(InItem);
 	}
@@ -422,7 +422,8 @@ void ADWPlayerCharacter::OnAttributeChange(const FOnAttributeChangeData& InAttri
 	Super::OnAttributeChange(InAttributeChangeData);
 
 	const float DeltaValue = InAttributeChangeData.NewValue - InAttributeChangeData.OldValue;
-	if(InAttributeChangeData.Attribute == Cast<UDWCharacterAttributeSet>(AttributeSet)->GetHealthAttribute())
+	
+	if(InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetHealthAttribute())
 	{
 		if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>())
 		{
@@ -433,7 +434,18 @@ void ADWPlayerCharacter::OnAttributeChange(const FOnAttributeChangeData& InAttri
 			UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>()->SetHealthInfo(FString::Printf(TEXT("%d/%d"), (int32)InAttributeChangeData.NewValue, (int32)GetMaxHealth()));
 		}
 	}
-	else if(InAttributeChangeData.Attribute == Cast<UDWCharacterAttributeSet>(AttributeSet)->GetMaxHealthAttribute())
+	else if(InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetExpAttribute())
+	{
+		if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>())
+		{
+			UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>()->SetHeadInfo(GetHeadInfo());
+		}
+		if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>())
+		{
+			UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>()->SetHeadInfo(GetHeadInfo());
+		}
+	}
+	else if(InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetMaxHealthAttribute())
 	{
 		if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>())
 		{
@@ -444,7 +456,7 @@ void ADWPlayerCharacter::OnAttributeChange(const FOnAttributeChangeData& InAttri
 			UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>()->SetHealthInfo(FString::Printf(TEXT("%d/%d"), (int32)InAttributeChangeData.NewValue, (int32)GetMaxHealth()));
 		}
 	}
-	else if(InAttributeChangeData.Attribute == Cast<UDWCharacterAttributeSet>(AttributeSet)->GetManaAttribute())
+	else if(InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetManaAttribute())
 	{
 		if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>())
 		{
@@ -455,7 +467,7 @@ void ADWPlayerCharacter::OnAttributeChange(const FOnAttributeChangeData& InAttri
 			UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>()->SetManaInfo(FString::Printf(TEXT("%d/%d"), (int32)InAttributeChangeData.NewValue, (int32)GetMaxMana()));
 		}
 	}
-	else if(InAttributeChangeData.Attribute == Cast<UDWCharacterAttributeSet>(AttributeSet)->GetMaxManaAttribute())
+	else if(InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetMaxManaAttribute())
 	{
 		if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>())
 		{
@@ -466,7 +478,7 @@ void ADWPlayerCharacter::OnAttributeChange(const FOnAttributeChangeData& InAttri
 			UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>()->SetManaInfo(FString::Printf(TEXT("%d/%d"), (int32)InAttributeChangeData.NewValue, (int32)GetMaxMana()));
 		}
 	}
-	else if(InAttributeChangeData.Attribute == Cast<UDWCharacterAttributeSet>(AttributeSet)->GetMaxStaminaAttribute())
+	else if(InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetMaxStaminaAttribute())
 	{
 		if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>())
 		{
@@ -477,7 +489,7 @@ void ADWPlayerCharacter::OnAttributeChange(const FOnAttributeChangeData& InAttri
 			UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>()->SetStaminaInfo(FString::Printf(TEXT("%d/%d"), (int32)InAttributeChangeData.NewValue, (int32)GetMaxStamina()));
 		}
 	}
-	else if(InAttributeChangeData.Attribute == Cast<UDWCharacterAttributeSet>(AttributeSet)->GetMaxStaminaAttribute())
+	else if(InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetMaxStaminaAttribute())
 	{
 		if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>())
 		{
@@ -488,95 +500,95 @@ void ADWPlayerCharacter::OnAttributeChange(const FOnAttributeChangeData& InAttri
 			UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>()->SetStaminaInfo(FString::Printf(TEXT("%d/%d"), (int32)InAttributeChangeData.NewValue, (int32)GetMaxStamina()));
 		}
 	}
-	else if(InAttributeChangeData.Attribute == Cast<UDWCharacterAttributeSet>(AttributeSet)->GetMoveSpeedAttribute())
+	else if(InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetMoveSpeedAttribute())
 	{
 		if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>())
 		{
 			UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>()->SetMoveSpeed(FString::FromInt(InAttributeChangeData.NewValue));
 		}
 	}
-	else if(InAttributeChangeData.Attribute == Cast<UDWCharacterAttributeSet>(AttributeSet)->GetSwimSpeedAttribute())
+	else if(InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetSwimSpeedAttribute())
 	{
 		if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>())
 		{
 			UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>()->SetSwimSpeed(FString::FromInt(InAttributeChangeData.NewValue));
 		}
 	}
-	else if(InAttributeChangeData.Attribute == Cast<UDWCharacterAttributeSet>(AttributeSet)->GetRideSpeedAttribute())
+	else if(InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetRideSpeedAttribute())
 	{
 		if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>())
 		{
 			UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>()->SetRideSpeed(FString::FromInt(InAttributeChangeData.NewValue));
 		}
 	}
-	else if(InAttributeChangeData.Attribute == Cast<UDWCharacterAttributeSet>(AttributeSet)->GetFlySpeedAttribute())
+	else if(InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetFlySpeedAttribute())
 	{
 		if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>())
 		{
 			UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>()->SetFlySpeed(FString::FromInt(InAttributeChangeData.NewValue));
 		}
 	}
-	else if(InAttributeChangeData.Attribute == Cast<UDWCharacterAttributeSet>(AttributeSet)->GetRotationSpeedAttribute())
+	else if(InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetRotationSpeedAttribute())
 	{
 		GetCharacterMovement()->RotationRate = FRotator(0, InAttributeChangeData.NewValue * (IsSprinting() ? 1.5f : 1), 0) * RotationRate;
 	}
-	else if(InAttributeChangeData.Attribute == Cast<UDWCharacterAttributeSet>(AttributeSet)->GetAttackForceAttribute())
+	else if(InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetAttackForceAttribute())
 	{
 		if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>())
 		{
 			UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>()->SetAttackForce(FString::FromInt(InAttributeChangeData.NewValue));
 		}
 	}
-	else if(InAttributeChangeData.Attribute == Cast<UDWCharacterAttributeSet>(AttributeSet)->GetRepulseForceAttribute())
+	else if(InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetRepulseForceAttribute())
 	{
 		if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>())
 		{
 			UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>()->SetRepulseForce(FString::FromInt(InAttributeChangeData.NewValue));
 		}
 	}
-	else if(InAttributeChangeData.Attribute == Cast<UDWCharacterAttributeSet>(AttributeSet)->GetAttackSpeedAttribute())
+	else if(InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetAttackSpeedAttribute())
 	{
 		if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>())
 		{
 			UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>()->SetAttackSpeed(FString::SanitizeFloat(InAttributeChangeData.NewValue, 1));
 		}
 	}
-	else if(InAttributeChangeData.Attribute == Cast<UDWCharacterAttributeSet>(AttributeSet)->GetAttackCritRateAttribute())
+	else if(InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetAttackCritRateAttribute())
 	{
 		if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>())
 		{
 			UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>()->SetAttackCritRate(FString::Printf(TEXT("%d%%"), (int32)(InAttributeChangeData.NewValue * 100)));
 		}
 	}
-	else if(InAttributeChangeData.Attribute == Cast<UDWCharacterAttributeSet>(AttributeSet)->GetAttackStealRateAttribute())
+	else if(InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetAttackStealRateAttribute())
 	{
 		if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>())
 		{
 			UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>()->SetAttackStealRate(FString::Printf(TEXT("%d%%"), (int32)(InAttributeChangeData.NewValue * 100)));
 		}
 	}
-	else if(InAttributeChangeData.Attribute == Cast<UDWCharacterAttributeSet>(AttributeSet)->GetDefendRateAttribute())
+	else if(InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetDefendRateAttribute())
 	{
 		if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>())
 		{
 			UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>()->SetDefendRate(FString::Printf(TEXT("%d%%"), (int32)(InAttributeChangeData.NewValue * 100)));
 		}
 	}
-	else if(InAttributeChangeData.Attribute == Cast<UDWCharacterAttributeSet>(AttributeSet)->GetPhysicsDefRateAttribute())
+	else if(InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetPhysicsDefRateAttribute())
 	{
 		if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>())
 		{
 			UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>()->SetPhysicsDefRate(FString::Printf(TEXT("%d%%"), (int32)(InAttributeChangeData.NewValue * 100)));
 		}
 	}
-	else if(InAttributeChangeData.Attribute == Cast<UDWCharacterAttributeSet>(AttributeSet)->GetMagicDefRateAttribute())
+	else if(InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetMagicDefRateAttribute())
 	{
 		if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>())
 		{
 			UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>()->SetMagicDefRate(FString::Printf(TEXT("%d%%"), (int32)(InAttributeChangeData.NewValue * 100)));
 		}
 	}
-	else if(InAttributeChangeData.Attribute == Cast<UDWCharacterAttributeSet>(AttributeSet)->GetToughnessRateAttribute())
+	else if(InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetToughnessRateAttribute())
 	{
 		if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>())
 		{
@@ -614,19 +626,6 @@ void ADWPlayerCharacter::SetRaceID(FName InRaceID)
 void ADWPlayerCharacter::SetLevelV(int32 InLevel)
 {
 	Super::SetLevelV(InLevel);
-	if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>())
-	{
-		UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>()->SetHeadInfo(GetHeadInfo());
-	}
-	if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>())
-	{
-		UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>()->SetHeadInfo(GetHeadInfo());
-	}
-}
-
-void ADWPlayerCharacter::SetEXP(int32 InEXP)
-{
-	Super::SetEXP(InEXP);
 	if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>())
 	{
 		UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>()->SetHeadInfo(GetHeadInfo());

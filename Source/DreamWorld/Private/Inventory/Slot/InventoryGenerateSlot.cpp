@@ -6,7 +6,6 @@
 
 UInventoryGenerateSlot::UInventoryGenerateSlot()
 {
-	
 }
 
 void UInventoryGenerateSlot::InitSlot(UInventory* InOwner, FAbilityItem InItem, EAbilityItemType InLimitType /* = EAbilityItemType::None */, ESplitSlotType InSplitType /*= ESplitSlotType::Default*/)

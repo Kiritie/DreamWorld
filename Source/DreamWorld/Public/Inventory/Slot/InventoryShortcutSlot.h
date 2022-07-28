@@ -23,7 +23,4 @@ public:
 	virtual void InitSlot(UInventory* InOwner, FAbilityItem InItem, EAbilityItemType InLimitType /* = EAbilityItemType::None */, ESplitSlotType InSplitType /*= ESplitSlotType::Default*/) override;
 
 	virtual void Refresh() override;
-
-public:
-	virtual bool IsSelected();
 };

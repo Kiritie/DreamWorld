@@ -12,7 +12,6 @@
 
 UInventoryShortcutSlot::UInventoryShortcutSlot()
 {
-	LimitType = EAbilityItemType::Skill;
 }
 
 void UInventoryShortcutSlot::InitSlot(UInventory* InOwner, FAbilityItem InItem, EAbilityItemType InLimitType /* = EAbilityItemType::None */, ESplitSlotType InSplitType /*= ESplitSlotType::Default*/)
@@ -23,17 +22,4 @@ void UInventoryShortcutSlot::InitSlot(UInventory* InOwner, FAbilityItem InItem, 
 void UInventoryShortcutSlot::Refresh()
 {
 	Super::Refresh();
-	if(IsSelected() && Item.IsValid())
-	{
-		if(Item.GetData().EqualType(EAbilityItemType::Voxel))
-		{
-			UGlobalBPLibrary::GetPlayerCharacter()->SetGenerateVoxelItem(Item);
-		}
-		UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>()->RefreshActions();
-	}
-}
-
-bool UInventoryShortcutSlot::IsSelected()
-{
-	return GetOwner()->GetSelectedSlot() == this;
 }

@@ -29,16 +29,15 @@
 // Sets default values
 ADWVitality::ADWVitality()
 {
-	WidgetVitalityHP = CreateDefaultSubobject<UWidgetVitalityHPComponent>(FName("WidgetVitalityHP"));
-	WidgetVitalityHP->SetupAttachment(RootComponent);
-	WidgetVitalityHP->SetRelativeLocation(FVector(0, 0, 50));
+	VitalityHP = CreateDefaultSubobject<UWidgetVitalityHPComponent>(FName("VitalityHP"));
+	VitalityHP->SetupAttachment(RootComponent);
+	VitalityHP->SetRelativeLocation(FVector(0, 0, 50));
 
 	AbilitySystem = CreateDefaultSubobject<UDWAbilitySystemComponent>(FName("AbilitySystem"));
 
 	AttributeSet = CreateDefaultSubobject<UDWVitalityAttributeSet>(FName("AttributeSet"));
 	
 	Inventory = CreateDefaultSubobject<UVitalityInventory>(FName("Inventory"));
-	Inventory->SetOwnerActor(this);
 	Inventory->GetOnSlotSelected().AddDynamic(this, &ADWVitality::OnInventorySlotSelected);
 
 	FSM->DefaultState = UDWVitalityState_Default::StaticClass();
@@ -52,9 +51,9 @@ void ADWVitality::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (GetWidgetVitalityHPWidget() && !GetWidgetVitalityHPWidget()->GetOwnerObject())
+	if (GetVitalityHPWidget() && !GetVitalityHPWidget()->GetOwnerObject())
 	{
-		GetWidgetVitalityHPWidget()->SetOwnerObject(this);
+		GetVitalityHPWidget()->SetOwnerObject(this);
 	}
 }
 
@@ -99,7 +98,7 @@ void ADWVitality::LoadData(FSaveData* InSaveData, bool bForceMode)
 			{
 				SaveData.InventoryData = vitalityData.InventoryData;
 			}
-			auto PropDatas = UAssetModuleBPLibrary::LoadPrimaryAssets<UAbilityPropDataBase>(UAbilityModuleBPLibrary::GetAssetTypeByItemType(EAbilityItemType::Equip));
+			auto PropDatas = UAssetModuleBPLibrary::LoadPrimaryAssets<UAbilityPropDataBase>(UAbilityModuleBPLibrary::ItemTypeToAssetType(EAbilityItemType::Equip));
 			const int32 PropNum = FMath::Clamp(FMath::Rand() < 0.2f ? FMath::RandRange(1, 3) : 0, 0, PropDatas.Num());
 			for (int32 i = 0; i < PropNum; i++)
 			{
@@ -122,7 +121,6 @@ FSaveData* ADWVitality::ToData()
 	SaveData.Name = Name;
 	SaveData.RaceID = RaceID;
 	SaveData.Level = Level;
-	SaveData.EXP = EXP;
 	
 	SaveData.InventoryData = Inventory->ToSaveDataRef<FInventorySaveData>();
 
@@ -211,9 +209,9 @@ void ADWVitality::SetNameV(FName InName)
 {
 	Super::SetNameV(InName);
 
-	if (GetWidgetVitalityHPWidget())
+	if (GetVitalityHPWidget())
 	{
-		GetWidgetVitalityHPWidget()->SetHeadInfo(GetHeadInfo());
+		GetVitalityHPWidget()->SetHeadInfo(GetHeadInfo());
 	}
 }
 
@@ -221,9 +219,9 @@ void ADWVitality::SetRaceID(FName InRaceID)
 {
 	Super::SetRaceID(InRaceID);
 	
-	if (GetWidgetVitalityHPWidget())
+	if (GetVitalityHPWidget())
 	{
-		GetWidgetVitalityHPWidget()->SetHeadInfo(GetHeadInfo());
+		GetVitalityHPWidget()->SetHeadInfo(GetHeadInfo());
 	}
 }
 
@@ -231,37 +229,36 @@ void ADWVitality::SetLevelV(int32 InLevel)
 {
 	Super::SetLevelV(InLevel);
 
-	if (GetWidgetVitalityHPWidget())
+	if (GetVitalityHPWidget())
 	{
-		GetWidgetVitalityHPWidget()->SetHeadInfo(GetHeadInfo());
+		GetVitalityHPWidget()->SetHeadInfo(GetHeadInfo());
 	}
 }
 
-void ADWVitality::SetEXP(int32 InEXP)
+UWidgetVitalityHP* ADWVitality::GetVitalityHPWidget() const
 {
-	Super::SetEXP(InEXP);
-
-	if (GetWidgetVitalityHPWidget())
+	if (VitalityHP->GetUserWidgetObject())
 	{
-		GetWidgetVitalityHPWidget()->SetHeadInfo(GetHeadInfo());
-	}
-}
-
-UWidgetVitalityHP* ADWVitality::GetWidgetVitalityHPWidget() const
-{
-	if (WidgetVitalityHP->GetUserWidgetObject())
-	{
-		return Cast<UWidgetVitalityHP>(WidgetVitalityHP->GetUserWidgetObject());
+		return Cast<UWidgetVitalityHP>(VitalityHP->GetUserWidgetObject());
 	}
 	return nullptr;
+}
+
+UInventory* ADWVitality::GetInventory() const
+{
+	return Inventory;
 }
 
 void ADWVitality::OnInventorySlotSelected(UInventorySlot* InInventorySlot)
 {
 	const FAbilityItem tmpItem = InInventorySlot->GetItem();
-	if(tmpItem.IsValid() && tmpItem.GetData().EqualType(EAbilityItemType::Voxel))
+	if(tmpItem.IsValid() && tmpItem.GetData().GetItemType() == EAbilityItemType::Voxel)
 	{
-		GenerateVoxelItem = tmpItem;
+		SetGenerateVoxelItem(tmpItem);
+	}
+	else
+	{
+		SetGenerateVoxelItem(FVoxelItem::EmptyVoxel);
 	}
 }
 
@@ -270,18 +267,26 @@ void ADWVitality::OnAttributeChange(const FOnAttributeChangeData& InAttributeCha
 	Super::OnAttributeChange(InAttributeChangeData);
 	
 	const float DeltaValue = InAttributeChangeData.NewValue - InAttributeChangeData.OldValue;
-	if(InAttributeChangeData.Attribute == Cast<UDWVitalityAttributeSet>(AttributeSet)->GetHealthAttribute())
+	
+	if(InAttributeChangeData.Attribute == GetAttributeSet<UDWVitalityAttributeSet>()->GetHealthAttribute())
 	{
-		if (GetWidgetVitalityHPWidget())
+		if (GetVitalityHPWidget())
 		{
-			GetWidgetVitalityHPWidget()->SetHealthPercent(InAttributeChangeData.NewValue, GetMaxHealth());
+			GetVitalityHPWidget()->SetHealthPercent(InAttributeChangeData.NewValue, GetMaxHealth());
 		}
 	}
-	else if(InAttributeChangeData.Attribute == Cast<UDWVitalityAttributeSet>(AttributeSet)->GetMaxHealthAttribute())
+	else if(InAttributeChangeData.Attribute == GetAttributeSet<UDWVitalityAttributeSet>()->GetExpAttribute())
 	{
-		if (GetWidgetVitalityHPWidget())
+		if (GetVitalityHPWidget())
 		{
-			GetWidgetVitalityHPWidget()->SetHealthPercent(GetHealth(), InAttributeChangeData.NewValue);
+			GetVitalityHPWidget()->SetHeadInfo(GetHeadInfo());
+		}
+	}
+	else if(InAttributeChangeData.Attribute == GetAttributeSet<UDWVitalityAttributeSet>()->GetMaxHealthAttribute())
+	{
+		if (GetVitalityHPWidget())
+		{
+			GetVitalityHPWidget()->SetHealthPercent(GetHealth(), InAttributeChangeData.NewValue);
 		}
 	}
 }

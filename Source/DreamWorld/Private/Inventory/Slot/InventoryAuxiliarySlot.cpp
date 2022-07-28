@@ -6,7 +6,6 @@
 
 UInventoryAuxiliarySlot::UInventoryAuxiliarySlot()
 {
-	
 }
 
 void UInventoryAuxiliarySlot::InitSlot(UInventory* InOwner, FAbilityItem InItem, EAbilityItemType InLimitType /* = EAbilityItemType::None */, ESplitSlotType InSplitType /*= ESplitSlotType::Default*/)

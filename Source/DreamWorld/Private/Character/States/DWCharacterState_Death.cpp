@@ -44,7 +44,7 @@ void UDWCharacterState_Death::OnRefresh()
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 
-	if (Character->IsDying() && !Character->IsFalling())
+	if (Character->IsDying() && !Character->IsFalling(true) && !bDeathStarted)
 	{
 		DeathStart();
 	}
@@ -66,6 +66,8 @@ void UDWCharacterState_Death::OnTermination()
 
 void UDWCharacterState_Death::DeathStart()
 {
+	bDeathStarted = true;
+	
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 
 	Character->DoAction(EDWCharacterActionType::Death);

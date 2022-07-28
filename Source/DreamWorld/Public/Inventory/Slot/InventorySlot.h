@@ -96,6 +96,10 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual void UseItem(int InCount = -1);
 
+	virtual void AssembleItem();
+
+	virtual void DischargeItem();
+
 	UFUNCTION(BlueprintCallable)
 	virtual void DiscardItem(int InCount = -1);
 	
@@ -131,18 +135,21 @@ public:
 	//////////////////////////////////////////////////////////////////////////
 	/// Getter/Setter
 public:
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintPure)
 	bool IsEmpty() const;
+	
+	UFUNCTION(BlueprintPure)
+	bool IsSelected() const;
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintPure)
 	int GetRemainVolume() const;
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintPure)
 	int GetMaxVolume() const;
 
 	UFUNCTION(BlueprintPure)
 	FAbilityItem& GetItem()  { return Item; }
-	
+
 	UFUNCTION(BlueprintPure)
 	UInventory* GetOwner() const { return Owner; }
 	

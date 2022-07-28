@@ -3,6 +3,7 @@
 #include "Character/States/DWCharacterState_Interrupt.h"
 
 #include "Character/DWCharacter.h"
+#include "Character/DWCharacterData.h"
 #include "Character/States/DWCharacterState_Walk.h"
 #include "FSM/Components/FSMComponent.h"
 
@@ -35,6 +36,8 @@ void UDWCharacterState_Interrupt::OnEnter(UFiniteStateBase* InLastFiniteState)
 	RemainTime = Duration;
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
+	
+	Character->GetAbilitySystemComponent()->AddLooseGameplayTag(Character->GetCharacterData<UDWCharacterData>().InterruptingTag);
 
 	Character->LimitToAnim();
 }
@@ -60,6 +63,9 @@ void UDWCharacterState_Interrupt::OnLeave(UFiniteStateBase* InNextFiniteState)
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 
 	Character->StopAction(EDWCharacterActionType::Interrupt);
+		
+	Character->GetAbilitySystemComponent()->RemoveLooseGameplayTag(Character->GetCharacterData<UDWCharacterData>().InterruptingTag);
+
 	Character->FreeToAnim();
 }
 

@@ -36,9 +36,12 @@ public:
 
 	virtual void EndSet() override;
 
-	UFUNCTION(BlueprintPure)
+	virtual void Assemble();
+
+	virtual void Discharge();
+
+public:
 	EDWEquipPartType GetPartType() const { return PartType; }
 
-	UFUNCTION(BlueprintCallable)
 	void SetPartType(EDWEquipPartType val) { PartType = val; }
 };

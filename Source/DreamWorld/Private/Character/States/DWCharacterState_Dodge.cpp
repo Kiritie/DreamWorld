@@ -3,6 +3,7 @@
 #include "Character/States/DWCharacterState_Dodge.h"
 
 #include "Character/DWCharacter.h"
+#include "Character/DWCharacterData.h"
 #include "Components/CapsuleComponent.h"
 
 UDWCharacterState_Dodge::UDWCharacterState_Dodge()
@@ -29,6 +30,8 @@ void UDWCharacterState_Dodge::OnEnter(UFiniteStateBase* InLastFiniteState)
 	Super::OnEnter(InLastFiniteState);
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
+	
+	Character->GetAbilitySystemComponent()->AddLooseGameplayTag(Character->GetCharacterData<UDWCharacterData>().DodgingTag);
 
 	Character->LimitToAnim();
 	Character->GetCapsuleComponent()->SetGenerateOverlapEvents(false);
@@ -47,6 +50,8 @@ void UDWCharacterState_Dodge::OnLeave(UFiniteStateBase* InNextFiniteState)
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 
 	Character->StopAction(EDWCharacterActionType::Dodge);
+	
+	Character->GetAbilitySystemComponent()->RemoveLooseGameplayTag(Character->GetCharacterData<UDWCharacterData>().DodgingTag);
 
 	Character->FreeToAnim();
 	Character->GetCapsuleComponent()->SetGenerateOverlapEvents(true);

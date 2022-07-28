@@ -328,6 +328,12 @@ void UInventory::DiscardAllItem()
 	}
 }
 
+void UInventory::SetSelectedSlot(UInventorySlot* InSelectedSlot)
+{
+	SelectedSlot = InSelectedSlot;
+	OnSlotSelected.Broadcast(InSelectedSlot);
+}
+
 FAbilityItem& UInventory::GetSelectedItem() const
 {
 	if(GetSelectedSlot())

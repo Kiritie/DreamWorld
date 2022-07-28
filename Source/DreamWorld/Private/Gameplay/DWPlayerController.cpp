@@ -385,6 +385,8 @@ void ADWPlayerController::OnDodgeReleased()
 {
 	ADWCharacter* PossessedCharacter = GetPawn<ADWCharacter>();
 
+	if(!PossessedCharacter || PossessedCharacter->IsBreakAllInput()) return;
+
 	PossessedCharacter->UnDodge();
 }
 

@@ -23,7 +23,6 @@ void ADWEquip::Initialize(AAbilityCharacterBase* InOwnerCharacter)
 	Super::Initialize(InOwnerCharacter);
 	if (const ADWCharacter* Character = Cast<ADWCharacter>(InOwnerCharacter))
 	{
-		Character->GetInventory()->GetSplitSlots<UInventoryEquipSlot>(ESplitSlotType::Equip)[(int32)GetItemData<UDWEquipData>().PartType]->SetPartType(GetItemData<UDWEquipData>().PartType);
 		AttachToComponent(Character->GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, *UGlobalBPLibrary::GetEnumValueAuthoredName(TEXT("EDWEquipPartType"), (int32)GetItemData<UDWEquipData>().PartType));
 	}
 }

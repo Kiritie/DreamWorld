@@ -29,6 +29,10 @@ bool UDWCharacterState_Static::OnEnterValidate(UFiniteStateBase* InLastFiniteSta
 void UDWCharacterState_Static::OnEnter(UFiniteStateBase* InLastFiniteState)
 {
 	Super::OnEnter(InLastFiniteState);
+
+	ADWCharacter* Character = GetAgent<ADWCharacter>();
+	
+	Character->LimitToAnim();
 }
 
 void UDWCharacterState_Static::OnRefresh()
@@ -44,4 +48,8 @@ void UDWCharacterState_Static::OnLeave(UFiniteStateBase* InNextFiniteState)
 void UDWCharacterState_Static::OnTermination()
 {
 	Super::OnTermination();
+
+	ADWCharacter* Character = GetAgent<ADWCharacter>();
+	
+	Character->FreeToAnim();
 }

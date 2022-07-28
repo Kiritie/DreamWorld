@@ -10,10 +10,11 @@
 
 #include "DWVitality.generated.h"
 
+class UVitalityInventory;
 class ADWVoxelChunk;
 class UVitalityInteractionComponent;
 class AVoxelChunk;
-class ADWCharacter;
+class ADWVitality;
 class UBoxComponent;
 class UWidgetVitalityHPComponent;
 class UInventory;
@@ -36,10 +37,10 @@ public:
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-	UWidgetVitalityHPComponent* WidgetVitalityHP;
+	UWidgetVitalityHPComponent* VitalityHP;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-	UInventory* Inventory;
+	UVitalityInventory* Inventory;
 
 protected:
 	// Called when the game starts or when spawned
@@ -80,18 +81,19 @@ public:
 	virtual void SetRaceID(FName InRaceID) override;
 
 	virtual void SetLevelV(int32 InLevel) override;
-
-	virtual void SetEXP(int32 InEXP) override;
+			
+	UFUNCTION(BlueprintPure)
+	UWidgetVitalityHPComponent* GetVitalityHP() const { return VitalityHP; }
 
 	UFUNCTION(BlueprintPure)
-	virtual UInventory* GetInventory() const override { return Inventory; }
-		
+	UWidgetVitalityHP* GetVitalityHPWidget() const;
+
 	UFUNCTION(BlueprintPure)
-	UWidgetVitalityHP* GetWidgetVitalityHPWidget() const;
+	virtual UInventory* GetInventory() const override;
 
 public:
 	UFUNCTION()
-	virtual void OnInventorySlotSelected(UInventorySlot* InInventorySlot);
+	virtual void OnInventorySlotSelected(UInventorySlot* InInventorySlot) override;
 	
 	virtual void OnAttributeChange(const FOnAttributeChangeData& InAttributeChangeData) override;
 	

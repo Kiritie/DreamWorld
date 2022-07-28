@@ -111,7 +111,7 @@ void UDWCharacterState_Attack::AttackEnd()
 		case EDWCharacterAttackType::NormalAttack:
 		{
 			Character->SetAttackDamageAble(false);
-			if (++Character->AttackAbilityIndex >= Character->AttackAbilities.Num())
+			if (++Character->AttackAbilityIndex >= Character->GetAttackAbilities().Num())
 			{
 				Character->AttackAbilityIndex = 0;
 			}

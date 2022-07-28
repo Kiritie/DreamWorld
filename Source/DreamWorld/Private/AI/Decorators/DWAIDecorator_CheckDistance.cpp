@@ -24,7 +24,7 @@ bool UDWAIDecorator_CheckDistance::CalculateRawConditionValue(UBehaviorTreeCompo
 	float TargetDistance = OwnerComp.GetBlackboardComponent()->GetValueAsFloat(TargetDistanceKey.SelectedKeyName);
 	if(OwnerCharacter && TargetCharacter)
 	{
-		return OwnerCharacter->Distance(TargetCharacter, false, false) <= TargetDistance;
+		return OwnerCharacter->GetDistance(TargetCharacter, false, false) <= TargetDistance;
 	}
 	return false;
 }

@@ -3,6 +3,7 @@
 #include "Character/States/DWCharacterState_Jump.h"
 
 #include "Character/DWCharacter.h"
+#include "Character/DWCharacterData.h"
 
 UDWCharacterState_Jump::UDWCharacterState_Jump()
 {
@@ -26,6 +27,10 @@ bool UDWCharacterState_Jump::OnEnterValidate(UFiniteStateBase* InLastFiniteState
 void UDWCharacterState_Jump::OnEnter(UFiniteStateBase* InLastFiniteState)
 {
 	Super::OnEnter(InLastFiniteState);
+
+	ADWCharacter* Character = GetAgent<ADWCharacter>();
+
+	Character->LimitToAnim();
 }
 
 void UDWCharacterState_Jump::OnRefresh()
@@ -40,6 +45,10 @@ void UDWCharacterState_Jump::OnLeave(UFiniteStateBase* InNextFiniteState)
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 
 	Character->StopAction(EDWCharacterActionType::Jump);
+	
+	Character->GetAbilitySystemComponent()->RemoveLooseGameplayTag(Character->GetCharacterData<UDWCharacterData>().JumpingTag);
+
+	Character->FreeToAnim();
 }
 
 void UDWCharacterState_Jump::OnTermination()

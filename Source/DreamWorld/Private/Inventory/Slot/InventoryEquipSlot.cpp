@@ -9,8 +9,6 @@
 
 UInventoryEquipSlot::UInventoryEquipSlot()
 {
-	LimitType = EAbilityItemType::Equip;
-	PartType = EDWEquipPartType::Head;
 }
 
 void UInventoryEquipSlot::InitSlot(UInventory* InOwner, FAbilityItem InItem, EAbilityItemType InLimitType /* = EAbilityItemType::None */, ESplitSlotType InSplitType /*= ESplitSlotType::Default*/)
@@ -41,7 +39,7 @@ void UInventoryEquipSlot::Refresh()
 	auto character = Cast<ADWCharacter>(Owner->GetOwnerActor());
 	if (character != nullptr)
 	{
-		character->RefreshEquip(PartType, this);
+		character->RefreshEquip(PartType, Item);
 	}
 }
 
@@ -55,4 +53,18 @@ void UInventoryEquipSlot::EndSet()
 {
 	Super::EndSet();
 	ActiveItem();
+}
+
+void UInventoryEquipSlot::Assemble()
+{
+	Owner->AdditionItemBySplitType(Item, ESplitSlotType::Equip); 
+	Refresh();
+}
+
+void UInventoryEquipSlot::Discharge()
+{
+	Owner->AdditionItemBySplitType(Item, ESplitSlotType::Default);
+	Owner->AdditionItemBySplitType(Item, ESplitSlotType::Shortcut);
+	Owner->AdditionItemBySplitType(Item, ESplitSlotType::Auxiliary);
+	Refresh();
 }

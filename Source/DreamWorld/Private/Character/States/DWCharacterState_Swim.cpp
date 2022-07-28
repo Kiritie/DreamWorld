@@ -3,6 +3,7 @@
 #include "Character/States/DWCharacterState_Swim.h"
 
 #include "Character/DWCharacter.h"
+#include "Character/DWCharacterData.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Scene/SceneModuleBPLibrary.h"
 #include "Scene/Actor/PhysicsVolume/PhysicsVolumeBase.h"
@@ -31,6 +32,8 @@ void UDWCharacterState_Swim::OnEnter(UFiniteStateBase* InLastFiniteState)
 	Super::OnEnter(InLastFiniteState);
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
+	
+	Character->GetAbilitySystemComponent()->AddLooseGameplayTag(Character->GetCharacterData<UDWCharacterData>().SwimmingTag);
 
 	Character->GetCharacterMovement()->SetMovementMode(MOVE_Swimming);
 	if(USceneModuleBPLibrary::HasPhysicsVolumeByName(FName("Water")))
@@ -56,6 +59,8 @@ void UDWCharacterState_Swim::OnLeave(UFiniteStateBase* InNextFiniteState)
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 
 	Character->StopAction(EDWCharacterActionType::Swim);
+	
+	Character->GetAbilitySystemComponent()->RemoveLooseGameplayTag(Character->GetCharacterData<UDWCharacterData>().SwimmingTag);
 
 	Character->GetCharacterMovement()->SetMovementMode(MOVE_Walking);
 	if(Character->GetCharacterMovement()->UpdatedComponent)

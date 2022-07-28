@@ -4,6 +4,7 @@
 
 #include "Ability/Character/States/AbilityCharacterState_Walk.h"
 #include "Character/DWCharacter.h"
+#include "Character/DWCharacterData.h"
 #include "FSM/Components/FSMComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
@@ -31,6 +32,8 @@ void UDWCharacterState_Fly::OnEnter(UFiniteStateBase* InLastFiniteState)
 	Super::OnEnter(InLastFiniteState);
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
+	
+	Character->GetAbilitySystemComponent()->AddLooseGameplayTag(Character->GetCharacterData<UDWCharacterData>().FlyingTag);
 
 	Character->LimitToAnim();
 	Character->GetCharacterMovement()->SetMovementMode(MOVE_Flying);
@@ -63,6 +66,8 @@ void UDWCharacterState_Fly::OnLeave(UFiniteStateBase* InNextFiniteState)
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 
 	Character->StopAction(EDWCharacterActionType::Fly);
+	
+	Character->GetAbilitySystemComponent()->RemoveLooseGameplayTag(Character->GetCharacterData<UDWCharacterData>().FlyingTag);
 
 	Character->FreeToAnim();
 	Character->GetCharacterMovement()->SetMovementMode(MOVE_Walking);

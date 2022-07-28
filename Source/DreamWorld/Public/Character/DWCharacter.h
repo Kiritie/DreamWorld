@@ -97,7 +97,7 @@ protected:
 	UAIPerceptionStimuliSourceComponent* StimuliSource;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-	UWidgetCharacterHPComponent* WidgetCharacterHP;
+	UWidgetCharacterHPComponent* CharacterHP;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	UCharacterInventory* Inventory;
@@ -165,7 +165,7 @@ public:
 	virtual void FreeToAnim(bool bUnLockRotation = true);
 
 	UFUNCTION(BlueprintCallable)
-	virtual void LimitToAnim(bool bInLockRotation = false, bool bUnSprint = false);
+	virtual void LimitToAnim(bool bLockRotation = false, bool bUnSprint = false);
 
 	UFUNCTION(BlueprintCallable)
 	virtual void Interrupt(float InDuration = -1);
@@ -256,7 +256,7 @@ public:
 	virtual bool DestroyVoxel(const FVoxelHitResult& InVoxelHitResult) override;
 
 	UFUNCTION(BlueprintCallable)
-	virtual void RefreshEquip(EDWEquipPartType InPartType, UInventoryEquipSlot* EquipSlot);
+	virtual void RefreshEquip(EDWEquipPartType InPartType, const FAbilityItem& InItem);
 
 public:
 	virtual bool GetAbilityInfo(TSubclassOf<UAbilityBase> AbilityClass, FAbilityInfo& OutAbilityInfo) override;
@@ -269,12 +269,6 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	virtual void EndAction(EDWCharacterActionType InActionType);
-					
-	UFUNCTION(BlueprintCallable)
-	virtual void ModifyMana(float InDeltaValue);
-									
-	UFUNCTION(BlueprintCallable)
-	virtual void ModifyStamina(float InDeltaValue);
 
 	UFUNCTION(BlueprintCallable)
 	virtual void SetLockedTarget(ADWCharacter* InTargetCharacter);
@@ -352,62 +346,56 @@ public:
 	UAIPerceptionStimuliSourceComponent* GetStimuliSource() const { return StimuliSource; }
 	
 	UFUNCTION(BlueprintPure)
-	UWidgetCharacterHPComponent* GetWidgetCharacterHP() const { return WidgetCharacterHP; }
+	UWidgetCharacterHPComponent* GetCharacterHP() const { return CharacterHP; }
+
+	UFUNCTION(BlueprintPure)
+	UWidgetCharacterHP* GetCharacterHPWidget() const;
 
 	UFUNCTION(BlueprintPure)
 	virtual UInventory* GetInventory() const override;
 
-	UFUNCTION(BlueprintPure)
-	UWidgetCharacterHP* GetWidgetCharacterHPWidget() const;
-
 public:
 	UFUNCTION(BlueprintPure)
-	bool IsActive(bool bNeedNotDead = false, bool bNeedFreeToAnim = false) const;
-																	
-	UFUNCTION(BlueprintPure)
-	bool IsFreeToAnim(bool bCheckStates = true) const;
-
-	UFUNCTION(BlueprintPure)
-	bool IsFalling() const;
+	virtual bool IsFreeToAnim() const;
 	
 	UFUNCTION(BlueprintPure)
-	bool IsDodging() const;
+	virtual bool IsDodging() const;
 
 	UFUNCTION(BlueprintPure)
-	bool IsSprinting() const;
+	virtual bool IsSprinting() const;
 
 	UFUNCTION(BlueprintPure)
-	bool IsCrouching() const;
+	virtual bool IsCrouching(bool bMovementMode = false) const;
 
 	UFUNCTION(BlueprintPure)
-	bool IsSwimming() const;
+	virtual bool IsSwimming(bool bMovementMode = false) const;
 
 	UFUNCTION(BlueprintPure)
-	bool IsFloating() const;
+	virtual bool IsFloating() const;
 
 	UFUNCTION(BlueprintPure)
-	bool IsAttacking() const;
+	virtual bool IsAttacking() const;
 
 	UFUNCTION(BlueprintPure)
-	bool IsDefending() const;
+	virtual bool IsDefending() const;
 
 	UFUNCTION(BlueprintPure)
-	bool IsClimbing() const;
+	virtual bool IsClimbing() const;
 
 	UFUNCTION(BlueprintPure)
-	bool IsRiding() const;
+	virtual bool IsRiding() const;
 
 	UFUNCTION(BlueprintPure)
-	bool IsFlying() const;
+	virtual bool IsFlying(bool bMovementMode = false) const;
 
 	UFUNCTION(BlueprintPure)
-	bool IsInterrupting() const;
+	virtual bool IsInterrupting() const;
 
 	UFUNCTION(BlueprintPure)
-	bool IsLockRotation() const;
+	virtual bool IsLockRotation() const;
 
 	UFUNCTION(BlueprintPure)
-	bool IsBreakAllInput() const;
+	virtual bool IsBreakAllInput() const;
 	
 	virtual bool IsTargetable_Implementation() const override;
 
@@ -417,8 +405,6 @@ public:
 	virtual void SetRaceID(FName InRaceID) override;
 
 	virtual void SetLevelV(int32 InLevel) override;
-
-	virtual void SetEXP(int32 InEXP) override;
 	
 	UFUNCTION(BlueprintPure)
 	EDWCharacterNature GetNature() const { return Nature; }
@@ -536,51 +522,51 @@ public:
 
 	virtual UBehaviorTree* GetBehaviorTreeAsset() const override;
 
-	ATTRIBUTE_VALUE_ACCESSORS(UDWCharacterAttributeSet, Mana)
+	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, Mana)
 	
-	ATTRIBUTE_VALUE_ACCESSORS(UDWCharacterAttributeSet, MaxMana)
+	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, MaxMana)
 
-	ATTRIBUTE_VALUE_ACCESSORS(UDWCharacterAttributeSet, Stamina)
+	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, Stamina)
 	
-	ATTRIBUTE_VALUE_ACCESSORS(UDWCharacterAttributeSet, MaxStamina)
+	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, MaxStamina)
 	
-	ATTRIBUTE_VALUE_ACCESSORS(UDWCharacterAttributeSet, SwimSpeed)
+	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, SwimSpeed)
 	
-	ATTRIBUTE_VALUE_ACCESSORS(UDWCharacterAttributeSet, RideSpeed)
+	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, RideSpeed)
 		
-	ATTRIBUTE_VALUE_ACCESSORS(UDWCharacterAttributeSet, FlySpeed)
+	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, FlySpeed)
 
-	ATTRIBUTE_VALUE_ACCESSORS(UDWCharacterAttributeSet, DodgeForce)
+	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, DodgeForce)
 
-	ATTRIBUTE_VALUE_ACCESSORS(UDWCharacterAttributeSet, AttackForce)
+	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, AttackForce)
 		
-	ATTRIBUTE_VALUE_ACCESSORS(UDWCharacterAttributeSet, RepulseForce)
+	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, RepulseForce)
 
-	ATTRIBUTE_VALUE_ACCESSORS(UDWCharacterAttributeSet, AttackSpeed)
+	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, AttackSpeed)
 
-	ATTRIBUTE_VALUE_ACCESSORS(UDWCharacterAttributeSet, AttackCritRate)
+	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, AttackCritRate)
 
-	ATTRIBUTE_VALUE_ACCESSORS(UDWCharacterAttributeSet, AttackStealRate)
+	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, AttackStealRate)
 
-	ATTRIBUTE_VALUE_ACCESSORS(UDWCharacterAttributeSet, DefendRate)
+	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, DefendRate)
 
-	ATTRIBUTE_VALUE_ACCESSORS(UDWCharacterAttributeSet, DefendScope)
+	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, DefendScope)
 
-	ATTRIBUTE_VALUE_ACCESSORS(UDWCharacterAttributeSet, PhysicsDefRate)
+	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, PhysicsDefRate)
 
-	ATTRIBUTE_VALUE_ACCESSORS(UDWCharacterAttributeSet, MagicDefRate)
+	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, MagicDefRate)
 	
-	ATTRIBUTE_VALUE_ACCESSORS(UDWCharacterAttributeSet, ToughnessRate)
+	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, ToughnessRate)
 			
-	ATTRIBUTE_VALUE_ACCESSORS(UDWCharacterAttributeSet, StaminaRegenSpeed)
+	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, StaminaRegenSpeed)
 			
-	ATTRIBUTE_VALUE_ACCESSORS(UDWCharacterAttributeSet, StaminaExpendSpeed)
+	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, StaminaExpendSpeed)
 
-	ATTRIBUTE_VALUE_ACCESSORS(UDWCharacterAttributeSet, Interrupt)
+	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, Interrupt)
 
 public:
 	UFUNCTION()
-	virtual void OnInventorySlotSelected(UInventorySlot* InInventorySlot);
+	virtual void OnInventorySlotSelected(UInventorySlot* InInventorySlot) override;
 	
 	virtual void OnAttributeChange(const FOnAttributeChangeData& InAttributeChangeData) override;
 	

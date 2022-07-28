@@ -79,6 +79,7 @@ void UDWAIService_RefreshState::TickNode(UBehaviorTreeComponent& OwnerComp, uint
 					}
 					break;
 				}
+				default: break;
 			}
 		}
 		else

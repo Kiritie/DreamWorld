@@ -82,7 +82,7 @@ public:
 
 	virtual bool UseItem(FAbilityItem& InItem) override;
 
-	virtual void RefreshEquip(EDWEquipPartType InPartType, UInventoryEquipSlot* EquipSlot) override;
+	virtual void RefreshEquip(EDWEquipPartType InPartType, const FAbilityItem& InItem) override;
 
 	virtual void OnEnterInteract(IInteractionAgentInterface* InInteractionAgent) override;
 
@@ -104,8 +104,6 @@ public:
 	virtual void SetRaceID(FName InRaceID) override;
 
 	virtual void SetLevelV(int32 InLevel) override;
-
-	virtual void SetEXP(int32 InEXP) override;
 
 	virtual void SetTeamID(FName InTeamID) override;
 	
