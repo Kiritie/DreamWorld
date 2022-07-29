@@ -46,8 +46,8 @@
 ADWPlayerController::ADWPlayerController()
 {
 	// inputs
-	bPressedAttack = false;
-	bPressedDefend = false;
+	bPressedAttackDestroy = false;
+	bPressedDefendGenerate = false;
 	bPressedSprint = false;
 	AttackAbilityQueue = 0;
 }
@@ -189,8 +189,8 @@ void ADWPlayerController::OnUnPossess()
 {
 	Super::OnUnPossess();
 
-	bPressedAttack = false;
-	bPressedDefend = false;
+	bPressedAttackDestroy = false;
+	bPressedDefendGenerate = false;
 	bPressedSprint = false;
 	AttackAbilityQueue = 0;
 }
@@ -205,12 +205,12 @@ void ADWPlayerController::Tick(float DeltaTime)
 
 	if(PossessedCharacter->IsActive())
 	{
-		if(bPressedAttack)
+		if(bPressedAttackDestroy)
 		{
 			OnAttackDestroyRepeat();
 		}
 
-		if(bPressedDefend)
+		if(bPressedDefendGenerate)
 		{
 			OnDefendGenerateRepeat();
 		}
@@ -219,19 +219,19 @@ void ADWPlayerController::Tick(float DeltaTime)
 		{
 			case EDWCharacterControlMode::Fighting:
 			{
-				if(bPressedAttack || AttackAbilityQueue > 0)
+				if(bPressedAttackDestroy || AttackAbilityQueue > 0)
 				{
 					if(PossessedCharacter->Attack() && AttackAbilityQueue > 0)
 					{
 						AttackAbilityQueue--;
 					}
 				}
-				else if(PossessedCharacter->IsFreeToAnim() && PossessedCharacter->AttackType == EDWCharacterAttackType::NormalAttack)
+				else if(!PossessedCharacter->IsAttacking(true))
 				{
 					PossessedCharacter->UnAttack();
 				}
 
-				if(bPressedDefend)
+				if(bPressedDefendGenerate)
 				{
 					PossessedCharacter->Defend();
 				}
@@ -396,19 +396,16 @@ void ADWPlayerController::OnAttackDestroyPressed()
 
 	if(!PossessedCharacter || PossessedCharacter->IsBreakAllInput()) return;
 
+	bPressedAttackDestroy = true;
 	switch (PossessedCharacter->ControlMode)
 	{
 		case EDWCharacterControlMode::Fighting:
 		{
-			if(PossessedCharacter->GetWeapon())
+			if(PossessedCharacter->IsFreeToAnim() || PossessedCharacter->IsAttacking())
 			{
-				bPressedAttack = true;
-				if(PossessedCharacter->IsFreeToAnim() || PossessedCharacter->IsAttacking())
+				if(AttackAbilityQueue < PossessedCharacter->GetAttackAbilities().Num())
 				{
-					if(AttackAbilityQueue < PossessedCharacter->GetAttackAbilities().Num())
-					{
-						AttackAbilityQueue++; 
-					}
+					AttackAbilityQueue++; 
 				}
 			}
 			break;
@@ -431,11 +428,11 @@ void ADWPlayerController::OnAttackDestroyRepeat()
 
 	if(!PossessedCharacter || PossessedCharacter->IsBreakAllInput()) return;
 
+	bPressedAttackDestroy = true;
 	switch (PossessedCharacter->ControlMode)
 	{
 		case EDWCharacterControlMode::Fighting:
 		{
-			bPressedAttack = true;
 			break;
 		}
 		case EDWCharacterControlMode::Creating:
@@ -456,11 +453,11 @@ void ADWPlayerController::OnAttackDestroyReleased()
 
 	if(!PossessedCharacter || PossessedCharacter->IsBreakAllInput()) return;
 
+	bPressedAttackDestroy = false;
 	switch (PossessedCharacter->ControlMode)
 	{
 		case EDWCharacterControlMode::Fighting:
 		{
-			bPressedAttack = false;
 			break;
 		}
 		case EDWCharacterControlMode::Creating:
@@ -481,14 +478,11 @@ void ADWPlayerController::OnDefendGeneratePressed()
 
 	if(!PossessedCharacter || PossessedCharacter->IsBreakAllInput()) return;
 
+	bPressedDefendGenerate = true;
 	switch (PossessedCharacter->ControlMode)
 	{
 		case EDWCharacterControlMode::Fighting:
 		{
-			if(PossessedCharacter->GetShield())
-			{
-				bPressedDefend = true;
-			}
 			break;
 		}
 		case EDWCharacterControlMode::Creating:
@@ -509,11 +503,11 @@ void ADWPlayerController::OnDefendGenerateRepeat()
 
 	if(!PossessedCharacter || PossessedCharacter->IsBreakAllInput()) return;
 
+	bPressedDefendGenerate = true;
 	switch (PossessedCharacter->ControlMode)
 	{
 		case EDWCharacterControlMode::Fighting:
 		{
-			bPressedDefend = true;
 			break;
 		}
 		case EDWCharacterControlMode::Creating:
@@ -534,11 +528,11 @@ void ADWPlayerController::OnDefendGenerateReleased()
 
 	if(!PossessedCharacter || PossessedCharacter->IsBreakAllInput()) return;
 
+	bPressedDefendGenerate = false;
 	switch (PossessedCharacter->ControlMode)
 	{
 		case EDWCharacterControlMode::Fighting:
 		{
-			bPressedDefend = false;
 			break;
 		}
 		case EDWCharacterControlMode::Creating:

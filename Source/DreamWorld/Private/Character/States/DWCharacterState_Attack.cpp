@@ -49,6 +49,7 @@ void UDWCharacterState_Attack::OnLeave(UFiniteStateBase* InNextFiniteState)
 	Character->FreeToAnim();
 	Character->SetMotionRate(1, 1);
 	Character->SetAttackDamageAble(false);
+	Character->StopAnimMontage();
 	Character->AttackAbilityIndex = 0;
 	Character->SkillAbilityID = FPrimaryAssetId();
 	Character->AttackType = EDWCharacterAttackType::None;
@@ -119,6 +120,7 @@ void UDWCharacterState_Attack::AttackEnd()
 		}
 		case EDWCharacterAttackType::SkillAttack:
 		{
+			Character->SkillAbilityID = FPrimaryAssetId();
 			break;
 		}
 		case EDWCharacterAttackType::FallingAttack:
@@ -128,4 +130,5 @@ void UDWCharacterState_Attack::AttackEnd()
 		}
 		default: break;
 	}
+	Character->AttackType = EDWCharacterAttackType::None;
 }

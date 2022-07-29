@@ -3,11 +3,10 @@
 
 #include "Widget/World/WidgetCharacterHP.h"
 
+#include "Character/DWCharacter.h"
+
 UWidgetCharacterHP::UWidgetCharacterHP(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	WidgetName = FName("CharacterHP");
 	InputMode = EInputMode::None;
-	
-	OwnerCharacter = nullptr;
-	Visibility = ESlateVisibility::Hidden;
 }

@@ -74,13 +74,8 @@ ADWPlayerCharacter::ADWPlayerCharacter()
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance ifyou don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	GetCapsuleComponent()->SetCapsuleHalfHeight(69);
-	GetCapsuleComponent()->SetCapsuleRadius(24);
-	GetCapsuleComponent()->SetCollisionProfileName(FName("Character"));
-
-	// Configure character movement
-	GetCharacterMovement()->bOrientRotationToMovement = true; // Character moves in the direction of input...	
-	GetCharacterMovement()->AirControl = 0.3f;
+	GetCapsuleComponent()->SetCapsuleHalfHeight(69.f);
+	GetCapsuleComponent()->SetCapsuleRadius(24.f);
 
 	CharacterHP->SetAutoCreate(false);
 
@@ -152,15 +147,6 @@ ADWPlayerCharacter::ADWPlayerCharacter()
 	FSM->States.Add(UDWCharacterState_Static::StaticClass());
 	FSM->States.Add(UDWCharacterState_Swim::StaticClass());
 	FSM->States.Add(UDWCharacterState_Walk::StaticClass());
-
-	// states
-	ControlMode = EDWCharacterControlMode::Fighting;
-	Nature = EDWCharacterNature::Player;
-
-	// Don't rotate when the controller rotates. Let that just affect the camera.
-	bUseControllerRotationPitch = false;
-	bUseControllerRotationYaw = false;
-	bUseControllerRotationRoll = false;
 
 	AutoPossessAI = EAutoPossessAI::Disabled;
 }

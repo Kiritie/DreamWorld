@@ -92,7 +92,6 @@ public:
 	virtual UInventory* GetInventory() const override;
 
 public:
-	UFUNCTION()
 	virtual void OnInventorySlotSelected(UInventorySlot* InInventorySlot) override;
 	
 	virtual void OnAttributeChange(const FOnAttributeChangeData& InAttributeChangeData) override;

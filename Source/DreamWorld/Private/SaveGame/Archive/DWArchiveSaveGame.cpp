@@ -46,8 +46,6 @@ void UDWArchiveSaveGame::OnLoad_Implementation(bool bForceMode)
 
 	AMainModule::GetModuleByClass<AVoxelModule>()->LoadSaveData(&DWArchiveSaveData.WorldData, bForceMode);
 	UGlobalBPLibrary::GetPlayerController<ADWPlayerController>()->LoadSaveData(&DWArchiveSaveData.PlayerData, bForceMode);
-
-	WHDebug(FString::Printf(TEXT("Loading archive : %d"), DWArchiveSaveData.ID));
 }
 
 void UDWArchiveSaveGame::OnUnload_Implementation(bool bForceMode)

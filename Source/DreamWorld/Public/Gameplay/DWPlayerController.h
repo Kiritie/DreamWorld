@@ -36,10 +36,10 @@ protected:
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Inputs")
-	bool bPressedAttack;
+	bool bPressedAttackDestroy;
 		
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Inputs")
-	bool bPressedDefend;
+	bool bPressedDefendGenerate;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Inputs")
 	bool bPressedSprint;

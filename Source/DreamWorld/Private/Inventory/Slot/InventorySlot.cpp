@@ -67,7 +67,6 @@ void UInventorySlot::Refresh()
 	OnInventorySlotRefresh.Broadcast();
 	if(IsSelected())
 	{
-		GetOwner()->GetOnSlotSelected().Broadcast(this);
 		UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>()->RefreshActions();
 	}
 }
@@ -303,7 +302,7 @@ void UInventorySlot::DiscardItem(int InCount /*= -1*/)
 	if(!OwnerCharacter || OwnerCharacter->DoAction(EDWCharacterActionType::Discard))
 	{
 		FAbilityItem tmpItem = FAbilityItem(Item, InCount);
-		if (auto chunk = AMainModule::GetModuleByClass<AVoxelModule>()->FindChunk(Owner->GetOwnerActor()->GetActorLocation()))
+		if (auto chunk = AMainModule::GetModuleByClass<AVoxelModule>()->FindChunkByLocation(Owner->GetOwnerActor()->GetActorLocation()))
 		{
 			UAbilityModuleBPLibrary::SpawnPickUp(tmpItem, Owner->GetOwnerActor()->GetActorLocation() + FMath::RandPointInBox(FBox(FVector(-20, -20, -10), FVector(20, 20, 10))), chunk);
 		}

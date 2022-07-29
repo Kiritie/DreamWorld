@@ -38,22 +38,22 @@ bool UDWCharacterAnim::HandleNotify(const FAnimNotifyEvent& AnimNotifyEvent)
 
 	if(!Character) return false;
 
-	const FString NotifyName = AnimNotifyEvent.GetNotifyEventName().ToString().Mid(12);
+	const FString NotifyName = AnimNotifyEvent.GetNotifyEventName().ToString().Mid(11);
 	if (NotifyName.Equals(TEXT("Free to animate")))
 	{
 		Character->FreeToAnim();
 	}
 	else if (NotifyName.Equals(TEXT("Attack start")))
 	{
-		Character->GetFSMComponent()->GetCurrentState<UDWCharacterState_Attack>()->AttackStart();
+		Character->GetFSMComponent()->GetStateByClass<UDWCharacterState_Attack>()->AttackStart();
 	}
 	else if (NotifyName.Equals(TEXT("Attack hurt")))
 	{
-		Character->GetFSMComponent()->GetCurrentState<UDWCharacterState_Attack>()->AttackHurt();
+		Character->GetFSMComponent()->GetStateByClass<UDWCharacterState_Attack>()->AttackHurt();
 	}
 	else if (NotifyName.Equals(TEXT("Attack end")))
 	{
-		Character->GetFSMComponent()->GetCurrentState<UDWCharacterState_Attack>()->AttackEnd();
+		Character->GetFSMComponent()->GetStateByClass<UDWCharacterState_Attack>()->AttackEnd();
 	}
 	return false;
 }

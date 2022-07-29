@@ -38,7 +38,6 @@ ADWVitality::ADWVitality()
 	AttributeSet = CreateDefaultSubobject<UDWVitalityAttributeSet>(FName("AttributeSet"));
 	
 	Inventory = CreateDefaultSubobject<UVitalityInventory>(FName("Inventory"));
-	Inventory->GetOnSlotSelected().AddDynamic(this, &ADWVitality::OnInventorySlotSelected);
 
 	FSM->DefaultState = UDWVitalityState_Default::StaticClass();
 	FSM->States.Empty();
@@ -50,11 +49,6 @@ ADWVitality::ADWVitality()
 void ADWVitality::BeginPlay()
 {
 	Super::BeginPlay();
-
-	if (GetVitalityHPWidget() && !GetVitalityHPWidget()->GetOwnerObject())
-	{
-		GetVitalityHPWidget()->SetOwnerObject(this);
-	}
 }
 
 void ADWVitality::OnSpawn_Implementation(const TArray<FParameter>& InParams)
@@ -237,9 +231,9 @@ void ADWVitality::SetLevelV(int32 InLevel)
 
 UWidgetVitalityHP* ADWVitality::GetVitalityHPWidget() const
 {
-	if (VitalityHP->GetUserWidgetObject())
+	if (VitalityHP->GetWorldWidget())
 	{
-		return Cast<UWidgetVitalityHP>(VitalityHP->GetUserWidgetObject());
+		return Cast<UWidgetVitalityHP>(VitalityHP->GetWorldWidget());
 	}
 	return nullptr;
 }

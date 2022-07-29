@@ -17,10 +17,6 @@ class DREAMWORLD_API UWidgetCharacterHP : public UWorldWidgetBase
 
 public:
 	UWidgetCharacterHP(const FObjectInitializer& ObjectInitializer);
-	
-protected:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Default")
-	ADWCharacter* OwnerCharacter;
 
 public:
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
@@ -34,8 +30,4 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
 	void SetStaminaPercent(float InStamina, float InMaxStamina);
-
-	ADWCharacter* GetOwnerCharacter() const { return OwnerCharacter; }
-	
-	void SetOwnerCharacter(ADWCharacter* val) { OwnerCharacter = val; }
 };

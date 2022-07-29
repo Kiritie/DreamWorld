@@ -48,7 +48,6 @@ void UDWCharacterState_Default::OnEnter(UFiniteStateBase* InLastFiniteState)
 	Character->AttackAbilityIndex = 0;
 	Character->AIMoveLocation = Vector_Empty;
 	Character->AIMoveStopDistance = 0;
-	Character->NormalAttackRemainTime = 0;
 
 	Character->GetCharacterMovement()->SetActive(false);
 	Character->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
@@ -72,7 +71,7 @@ void UDWCharacterState_Default::OnRefresh()
 					FHitResult hitResult;
 					const FVector rayStart = FVector(Character->GetActorLocation().X, Character->GetActorLocation().Y, UVoxelModuleBPLibrary::GetWorldData().ChunkHeightRange * UVoxelModuleBPLibrary::GetWorldData().GetChunkLength() + 500);
 					const FVector rayEnd = FVector(Character->GetActorLocation().X, Character->GetActorLocation().Y, 0);
-					if(AMainModule::GetModuleByClass<AVoxelModule>()->ChunkTraceSingle(rayStart, rayEnd, Character->GetRadius(), Character->GetHalfHeight(), hitResult))
+					if(UVoxelModuleBPLibrary::ChunkTraceSingle(rayStart, rayEnd, Character->GetRadius(), Character->GetHalfHeight(), hitResult))
 					{
 						Character->SetActorLocationAndRotation(hitResult.Location, FRotator::ZeroRotator);
 						FSM->SwitchStateByClass<UDWCharacterState_Walk>();
@@ -99,9 +98,9 @@ void UDWCharacterState_Default::OnLeave(UFiniteStateBase* InNextFiniteState)
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 
+	Character->FreeToAnim();
 	Character->GetCharacterMovement()->SetActive(true);
 	Character->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-	Character->FreeToAnim();
 }
 
 void UDWCharacterState_Default::OnTermination()

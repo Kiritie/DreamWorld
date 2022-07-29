@@ -31,7 +31,6 @@ class UDWCharacterAnim;
 class UWidgetCharacterHPComponent;
 class UAbilityBase;
 class UAbilitySystemComponentBase;
-class UAIPerceptionStimuliSourceComponent;
 class UCharacterInventory;
 class UBehaviorTree;
 class UDWAIBlackboard;
@@ -70,9 +69,6 @@ public:
 	
 protected:
 	// stats
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CharacterStats")
-	EDWCharacterNature Nature;
-	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "CharacterStates")
 	EDWCharacterControlMode ControlMode;
 
@@ -94,9 +90,6 @@ protected:
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-	UAIPerceptionStimuliSourceComponent* StimuliSource;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	UWidgetCharacterHPComponent* CharacterHP;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
@@ -108,8 +101,6 @@ protected:
 	float DefaultAirControl;
 	
 	float AIMoveStopDistance;
-
-	float NormalAttackRemainTime;
 
 	FVector AIMoveLocation;
 
@@ -144,6 +135,8 @@ protected:
 	virtual void LoadData(FSaveData* InSaveData, bool bForceMode) override;
 
 	virtual FSaveData* ToData() override;
+
+	virtual void SetActorVisible_Implementation(bool bNewVisible) override;
 
 	virtual void RefreshState() override;
 	
@@ -343,9 +336,6 @@ public:
 
 public:
 	UFUNCTION(BlueprintPure)
-	UAIPerceptionStimuliSourceComponent* GetStimuliSource() const { return StimuliSource; }
-	
-	UFUNCTION(BlueprintPure)
 	UWidgetCharacterHPComponent* GetCharacterHP() const { return CharacterHP; }
 
 	UFUNCTION(BlueprintPure)
@@ -374,7 +364,7 @@ public:
 	virtual bool IsFloating() const;
 
 	UFUNCTION(BlueprintPure)
-	virtual bool IsAttacking() const;
+	virtual bool IsAttacking(bool bAttackType = false) const;
 
 	UFUNCTION(BlueprintPure)
 	virtual bool IsDefending() const;
@@ -405,14 +395,6 @@ public:
 	virtual void SetRaceID(FName InRaceID) override;
 
 	virtual void SetLevelV(int32 InLevel) override;
-	
-	UFUNCTION(BlueprintPure)
-	EDWCharacterNature GetNature() const { return Nature; }
-	
-	UFUNCTION(BlueprintCallable)
-	void SetNature(EDWCharacterNature InNature) { Nature = InNature; }
-
-	virtual void SetActorVisible_Implementation(bool bNewVisible) override;
 
 	UFUNCTION(BlueprintPure)
 	EDWCharacterControlMode GetControlMode() const { return ControlMode; }
@@ -427,6 +409,9 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	virtual void SetTeamID(FName InTeamID);
+	
+	UFUNCTION(BlueprintPure)
+	EDWCharacterNature GetNature() const;
 
 	UFUNCTION(BlueprintPure)
 	float GetAttackDistance() const;
@@ -565,7 +550,6 @@ public:
 	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, Interrupt)
 
 public:
-	UFUNCTION()
 	virtual void OnInventorySlotSelected(UInventorySlot* InInventorySlot) override;
 	
 	virtual void OnAttributeChange(const FOnAttributeChangeData& InAttributeChangeData) override;

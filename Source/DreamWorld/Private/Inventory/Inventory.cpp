@@ -2,6 +2,7 @@
 
 #include "Inventory/Inventory.h"
 
+#include "Inventory/InventoryAgentInterface.h"
 #include "Inventory/Slot/InventorySlot.h"
 #include "Inventory/Slot/InventoryAuxiliarySlot.h"
 #include "Inventory/Slot/InventoryEquipSlot.h"
@@ -331,6 +332,10 @@ void UInventory::DiscardAllItem()
 void UInventory::SetSelectedSlot(UInventorySlot* InSelectedSlot)
 {
 	SelectedSlot = InSelectedSlot;
+	if(IInventoryAgentInterface* InventoryAgent = Cast<IInventoryAgentInterface>(GetOwnerActor()))
+	{
+		InventoryAgent->OnInventorySlotSelected(InSelectedSlot);
+	}
 	OnSlotSelected.Broadcast(InSelectedSlot);
 }
 

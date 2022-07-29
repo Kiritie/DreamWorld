@@ -339,7 +339,6 @@ public:
 	FORCEINLINE FDWCharacterSaveData()
 	{
 		TeamID = NAME_None;
-		Nature = EDWCharacterNature::AIHostile;
 		ControlMode = EDWCharacterControlMode::Fighting;
 		FallingAttackAbility = FDWCharacterAttackAbilityData();
 		AttackAbilities = TMap<EDWWeaponType, FDWCharacterAttackAbilityDatas>();
@@ -350,7 +349,6 @@ public:
 	FORCEINLINE FDWCharacterSaveData(const FCharacterSaveData& InCharacterSaveData) : FCharacterSaveData(InCharacterSaveData)
 	{
 		TeamID = NAME_None;
-		Nature = EDWCharacterNature::AIHostile;
 		ControlMode = EDWCharacterControlMode::Fighting;
 		FallingAttackAbility = FDWCharacterAttackAbilityData();
 		AttackAbilities = TMap<EDWWeaponType, FDWCharacterAttackAbilityDatas>();
@@ -360,9 +358,6 @@ public:
 	
 	UPROPERTY(BlueprintReadOnly)
 	FName TeamID;
-
-	UPROPERTY()
-	EDWCharacterNature Nature;
 	
 	UPROPERTY()
 	EDWCharacterControlMode ControlMode;
