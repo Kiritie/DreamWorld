@@ -73,6 +73,7 @@
 #include "Voxel/Datas/VoxelData.h"
 #include "Voxel/DWVoxelChunk.h"
 #include "Voxel/VoxelModuleBPLibrary.h"
+#include "Widget/WidgetItemInfoBox.h"
 #include "Widget/WidgetModuleBPLibrary.h"
 #include "Widget/Inventory/WidgetInventoryBar.h"
 
@@ -179,19 +180,19 @@ void ADWCharacter::LoadData(FSaveData* InSaveData, bool bForceMode)
 			{
 				for(auto& Iter1 : Iter.Value.Array)
 				{
-					Iter1.AbilityHandle = AcquireAbility(Iter1.AbilityClass, Iter1.AbilityLevel);
+					Iter1.AbilityHandle = AbilitySystem->K2_GiveAbility(Iter1.AbilityClass, Iter1.AbilityLevel);
 				}
 			}
 			
 			for(auto& Iter : SkillAbilities)
 			{
-				Iter.Value.AbilityHandle = AcquireAbility(Iter.Value.AbilityClass, Iter.Value.AbilityLevel);
+				Iter.Value.AbilityHandle = AbilitySystem->K2_GiveAbility(Iter.Value.AbilityClass, Iter.Value.AbilityLevel);
 			}
 
 			for(auto& Iter : ActionAbilities)
 			{
-				Iter.Value.AbilityHandle = AcquireAbility(Iter.Value.AbilityClass, Iter.Value.AbilityLevel);
-				const FGameplayAbilitySpec Spec = GetAbilitySpecByHandle(Iter.Value.AbilityHandle);
+				Iter.Value.AbilityHandle = AbilitySystem->K2_GiveAbility(Iter.Value.AbilityClass, Iter.Value.AbilityLevel);
+				const FGameplayAbilitySpec Spec = AbilitySystem->FindAbilitySpecForHandle(Iter.Value.AbilityHandle);
 				if(Spec.Ability && Spec.Ability->IsA<UDWCharacterActionAbility>())
 				{
 					Cast<UDWCharacterActionAbility>(Spec.Ability)->SetActionType(Iter.Key);
@@ -200,12 +201,12 @@ void ADWCharacter::LoadData(FSaveData* InSaveData, bool bForceMode)
 
 			if (FallingAttackAbility.AbilityClass != nullptr)
 			{
-				FallingAttackAbility.AbilityHandle = AcquireAbility(FallingAttackAbility.AbilityClass, FallingAttackAbility.AbilityLevel);
+				FallingAttackAbility.AbilityHandle = AbilitySystem->K2_GiveAbility(FallingAttackAbility.AbilityClass, FallingAttackAbility.AbilityLevel);
 			}
 
 			if(GetCharacterData().AbilityClass != nullptr)
 			{
-				DefaultAbility.AbilityHandle = AcquireAbility(GetCharacterData().AbilityClass, DefaultAbility.AbilityLevel);
+				DefaultAbility.AbilityHandle = AbilitySystem->K2_GiveAbility(GetCharacterData().AbilityClass, DefaultAbility.AbilityLevel);
 			}
 		}
 		else
@@ -219,7 +220,7 @@ void ADWCharacter::LoadData(FSaveData* InSaveData, bool bForceMode)
 				UAssetModuleBPLibrary::ReadDataTable(CharacterData.AttackAbilityTable, _AttackAbilities);
 				for(auto Iter : _AttackAbilities)
 				{
-					Iter.AbilityHandle = AcquireAbility(Iter.AbilityClass, Iter.AbilityLevel);
+					Iter.AbilityHandle = AbilitySystem->K2_GiveAbility(Iter.AbilityClass, Iter.AbilityLevel);
 					if(!AttackAbilities.Contains(Iter.WeaponType)) AttackAbilities.Add(Iter.WeaponType);
 					AttackAbilities[Iter.WeaponType].Array.Add(Iter);
 				}
@@ -228,7 +229,7 @@ void ADWCharacter::LoadData(FSaveData* InSaveData, bool bForceMode)
 				UAssetModuleBPLibrary::ReadDataTable(CharacterData.SkillAbilityTable, _SkillAbilities);
 				for(auto Iter : _SkillAbilities)
 				{
-					Iter.AbilityHandle = AcquireAbility(Iter.AbilityClass, Iter.AbilityLevel);
+					Iter.AbilityHandle = AbilitySystem->K2_GiveAbility(Iter.AbilityClass, Iter.AbilityLevel);
 					SkillAbilities.Add(Iter.AbilityID, Iter);
 				}
 
@@ -236,8 +237,8 @@ void ADWCharacter::LoadData(FSaveData* InSaveData, bool bForceMode)
 				UAssetModuleBPLibrary::ReadDataTable(CharacterData.ActionAbilityTable, _ActionAbilities);
 				for(auto Iter : _ActionAbilities)
 				{
-					Iter.AbilityHandle = AcquireAbility(Iter.AbilityClass, Iter.AbilityLevel);
-					const FGameplayAbilitySpec Spec = GetAbilitySpecByHandle(Iter.AbilityHandle);
+					Iter.AbilityHandle = AbilitySystem->K2_GiveAbility(Iter.AbilityClass, Iter.AbilityLevel);
+					const FGameplayAbilitySpec Spec = AbilitySystem->FindAbilitySpecForHandle(Iter.AbilityHandle);
 					if(Spec.Ability && Spec.Ability->IsA<UDWCharacterActionAbility>())
 					{
 						Cast<UDWCharacterActionAbility>(Spec.Ability)->SetActionType(Iter.ActionType);
@@ -248,14 +249,14 @@ void ADWCharacter::LoadData(FSaveData* InSaveData, bool bForceMode)
 				if (CharacterData.FallingAttackAbility.AbilityClass != nullptr)
 				{
 					FallingAttackAbility = CharacterData.FallingAttackAbility;
-					FallingAttackAbility.AbilityHandle = AcquireAbility(FallingAttackAbility.AbilityClass, FallingAttackAbility.AbilityLevel);
+					FallingAttackAbility.AbilityHandle = AbilitySystem->K2_GiveAbility(FallingAttackAbility.AbilityClass, FallingAttackAbility.AbilityLevel);
 				}
 
 				if(CharacterData.AbilityClass != nullptr)
 				{
 					DefaultAbility = FAbilityData();
 					DefaultAbility.AbilityLevel = SaveData.Level;
-					DefaultAbility.AbilityHandle = AcquireAbility(CharacterData.AbilityClass, DefaultAbility.AbilityLevel);
+					DefaultAbility.AbilityHandle = AbilitySystem->K2_GiveAbility(CharacterData.AbilityClass, DefaultAbility.AbilityLevel);
 				}
 				
 				SaveData.InventoryData = CharacterData.InventoryData;
@@ -272,7 +273,7 @@ void ADWCharacter::LoadData(FSaveData* InSaveData, bool bForceMode)
 				}
 			}
 		}
-		ActiveAbility(DefaultAbility.AbilityHandle);
+		AbilitySystem->TryActivateAbility(DefaultAbility.AbilityHandle);
 
 		Inventory->SetOwnerActor(this);
 	}
@@ -335,14 +336,10 @@ void ADWCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	// WHDebug(FString::Printf(TEXT("Free to anim = %s"), *UGlobalBPLibrary::BoolToString(IsFreeToAnim())));
-
 	if (IsDead()) return;
 
 	if (IsActive())
 	{
-		Inventory->Refresh(DeltaTime);
-
 		if (LockedTarget)
 		{
 			if (!LockedTarget->IsDead() && FVector::Distance(GetActorLocation(), LockedTarget->GetActorLocation()) <= 1000.f)
@@ -616,7 +613,7 @@ bool ADWCharacter::Attack(int32 InAbilityIndex /*= -1*/)
 	{
 		if (HasAttackAbility(InAbilityIndex))
 		{
-			if (ActiveAbility(GetAttackAbility(InAbilityIndex).AbilityHandle))
+			if (AbilitySystem->TryActivateAbility(GetAttackAbility(InAbilityIndex).AbilityHandle))
 			{
 				AttackAbilityIndex = InAbilityIndex;
 				AttackType = EDWCharacterAttackType::NormalAttack;
@@ -634,7 +631,7 @@ bool ADWCharacter::Attack(int32 InAbilityIndex /*= -1*/)
 
 bool ADWCharacter::SkillAttack(const FPrimaryAssetId& InSkillID)
 {
-	if (HasSkillAbility(InSkillID))
+	if (HasSkillAbility(InSkillID, true))
 	{
 		const auto AbilityData = GetSkillAbility(InSkillID);
 		switch(AbilityData.GetItemData<UAbilitySkillDataBase>().SkillMode)
@@ -643,12 +640,17 @@ bool ADWCharacter::SkillAttack(const FPrimaryAssetId& InSkillID)
 			{
 				if(CheckWeaponType(AbilityData.WeaponType))
 				{
-					if(ActiveAbility(AbilityData.AbilityHandle))
+					if(AbilitySystem->TryActivateAbility(AbilityData.AbilityHandle))
 					{
 						SkillAbilityID = InSkillID;
 						AttackType = EDWCharacterAttackType::SkillAttack;
 						FSM->SwitchStateByClass<UDWCharacterState_Attack>();
 						return true;
+					}
+					else if(AbilitySystem->GetAbilityInfoByHandle(GetSkillAbility(InSkillID).AbilityHandle).CooldownRemaining > 0.f)
+					{
+						UWidgetModuleBPLibrary::OpenUserWidget<UWidgetItemInfoBox>({ FParameter::MakeString(TEXT("该技能处于冷却中！")) });
+						return false;
 					}
 				}
 				break;
@@ -665,7 +667,7 @@ bool ADWCharacter::SkillAttack(const FPrimaryAssetId& InSkillID)
 
 bool ADWCharacter::SkillAttack(ESkillType InSkillType, int32 InAbilityIndex)
 {
-	if (HasSkillAbility(InSkillType, InAbilityIndex))
+	if (HasSkillAbility(InSkillType, InAbilityIndex, true))
 	{
 		const auto AbilityData = GetSkillAbility(InSkillType, InAbilityIndex);
 		SkillAttack(AbilityData.AbilityID);
@@ -679,7 +681,7 @@ bool ADWCharacter::FallingAttack()
 	{
 		if(CheckWeaponType(FallingAttackAbility.WeaponType))
 		{
-			if (ActiveAbility(FallingAttackAbility.AbilityHandle))
+			if (AbilitySystem->TryActivateAbility(FallingAttackAbility.AbilityHandle))
 			{
 				AttackType = EDWCharacterAttackType::FallingAttack;
 				FSM->SwitchStateByClass<UDWCharacterState_Attack>();
@@ -753,99 +755,22 @@ void ADWCharacter::PickUp(AAbilityPickUpBase* InPickUp)
 {
 	if(InPickUp)
 	{
-		Inventory->AdditionItem(InPickUp->GetItem());
+		Inventory->AddItemByRange(InPickUp->GetItem(), -1);
 	}
 }
 
-bool ADWCharacter::GenerateVoxel(FVoxelItem& InVoxelItem)
+bool ADWCharacter::GenerateVoxel(const FVoxelHitResult& InVoxelHitResult)
 {
-	bool bSuccess = false;
-	FQueryItemInfo QueryItemInfo;
-	if(!IsPlayer())
+	if(!GenerateVoxelItem.IsValid()) return false;
+	
+	FQueryItemInfo QueryItemInfo = Inventory->QueryItemByRange(EQueryItemType::Remove, FAbilityItem(GenerateVoxelItem, 1), -1);
+	if(QueryItemInfo.IsSuccess() && DoAction(EDWCharacterActionType::Generate))
 	{
-		QueryItemInfo = Inventory->GetItemInfoByRange(EQueryItemType::Remove, static_cast<FAbilityItem>(InVoxelItem));
-	}
-	else if(Inventory->GetSelectedItem().EqualType(static_cast<FAbilityItem>(InVoxelItem)))
-	{
-		QueryItemInfo = FQueryItemInfo(Inventory->GetSelectedItem(), TArray<UInventorySlot*>{ Inventory->GetSelectedSlot() });
-	}
-	if(QueryItemInfo.Item.IsValid() && DoAction(EDWCharacterActionType::Generate))
-	{
-		AVoxelChunk* chunk = InVoxelItem.Owner;
-		const FIndex index = InVoxelItem.Index;
-		const FVoxelItem& voxelItem = chunk->GetVoxelItem(index);
-
-		if(!voxelItem.IsValid() || voxelItem.GetData<UVoxelData>().Transparency == EVoxelTransparency::Transparent && voxelItem != InVoxelItem)
+		if(Super::GenerateVoxel(InVoxelHitResult))
 		{
-			//FRotator rotation = (Owner->VoxelIndexToLocation(index) + tmpVoxel.GetData<UVoxelData>().GetCeilRange() * 0.5f * AVoxelModule::GetWorldInfo().BlockSize - UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>()->GetActorLocation()).ToOrientationRotator();
-			//rotation = FRotator(FRotator::ClampAxis(FMath::RoundToInt(rotation.Pitch / 90) * 90.f), FRotator::ClampAxis(FMath::RoundToInt(rotation.Yaw / 90) * 90.f), FRotator::ClampAxis(FMath::RoundToInt(rotation.Roll / 90) * 90.f));
-			//tmpVoxel.Rotation = rotation;
-
-			FHitResult HitResult;
-			if (!UVoxelModuleBPLibrary::VoxelTraceSingle(InVoxelItem, chunk->IndexToLocation(index), HitResult))
-			{
-				if(voxelItem.IsValid())
-				{
-					bSuccess = chunk->ReplaceVoxel(voxelItem, InVoxelItem);
-				}
-				else
-				{
-					bSuccess = chunk->GenerateVoxel(index, InVoxelItem);
-				}
-			}
+			Inventory->RemoveItemByQueryInfo(QueryItemInfo);
+			return true;
 		}
-	}
-	if(bSuccess) Inventory->RemoveItemBySlots(QueryItemInfo.Item, QueryItemInfo.Slots);
-	return bSuccess;
-}
-
-bool ADWCharacter::GenerateVoxel(FVoxelItem& InVoxelItem, const FVoxelHitResult& InVoxelHitResult)
-{
-	bool bSuccess = false;
-	FQueryItemInfo QueryItemInfo;
-	if(!IsPlayer())
-	{
-		QueryItemInfo = Inventory->GetItemInfoByRange(EQueryItemType::Remove, static_cast<FAbilityItem>(InVoxelItem));
-	}
-	else if(Inventory->GetSelectedItem().EqualType(static_cast<FAbilityItem>(InVoxelItem)))
-	{
-		QueryItemInfo = FQueryItemInfo(Inventory->GetSelectedItem(), TArray<UInventorySlot*>{ Inventory->GetSelectedSlot() });
-	}
-	if(QueryItemInfo.Item.IsValid() && DoAction(EDWCharacterActionType::Generate))
-	{
-		AVoxelChunk* chunk = InVoxelHitResult.GetOwner();
-		const FIndex index = chunk->LocationToIndex(InVoxelHitResult.Point - UVoxelModuleBPLibrary::GetWorldData().GetBlockSizedNormal(InVoxelHitResult.Normal)) + FIndex(InVoxelHitResult.Normal);
-		const FVoxelItem& voxelItem = chunk->GetVoxelItem(index);
-
-		if(!voxelItem.IsValid() || voxelItem.GetData<UVoxelData>().Transparency == EVoxelTransparency::Transparent && voxelItem != InVoxelHitResult.VoxelItem)
-		{
-			//FRotator rotation = (Owner->VoxelIndexToLocation(index) + tmpVoxel.GetData<UVoxelData>().GetCeilRange() * 0.5f * AVoxelModule::GetWorldInfo().BlockSize - UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>()->GetActorLocation()).ToOrientationRotator();
-			//rotation = FRotator(FRotator::ClampAxis(FMath::RoundToInt(rotation.Pitch / 90) * 90.f), FRotator::ClampAxis(FMath::RoundToInt(rotation.Yaw / 90) * 90.f), FRotator::ClampAxis(FMath::RoundToInt(rotation.Roll / 90) * 90.f));
-			//tmpVoxel.Rotation = rotation;
-
-			FHitResult HitResult;
-			if (!UVoxelModuleBPLibrary::VoxelTraceSingle(InVoxelItem, chunk->IndexToLocation(index), HitResult))
-			{
-				if(voxelItem.IsValid())
-				{
-					bSuccess = chunk->ReplaceVoxel(voxelItem, InVoxelItem);
-				}
-				else
-				{
-					bSuccess = chunk->GenerateVoxel(index, InVoxelItem);
-				}
-			}
-		}
-	}
-	if(bSuccess) Inventory->RemoveItemBySlots(QueryItemInfo.Item, QueryItemInfo.Slots);
-	return bSuccess;
-}
-
-bool ADWCharacter::DestroyVoxel(FVoxelItem& InVoxelItem)
-{
-	if(DoAction(EDWCharacterActionType::Destroy))
-	{
-		Super::DestroyVoxel(InVoxelItem);
 	}
 	return false;
 }
@@ -886,44 +811,12 @@ void ADWCharacter::RefreshEquip(EDWEquipPartType InPartType, const FAbilityItem&
 	}
 }
 
-bool ADWCharacter::GetAbilityInfo(TSubclassOf<UAbilityBase> AbilityClass, FAbilityInfo& OutAbilityInfo)
-{
-	if (AbilitySystem && AbilityClass != nullptr)
-	{
-		float Cost = 0;
-		float Cooldown = 0;
-		EAbilityCostType CostType = EAbilityCostType::None;
-		UAbilityBase* Ability = AbilityClass.GetDefaultObject();
-		if (Ability->GetCostGameplayEffect()->Modifiers.Num() > 0)
-		{
-			const FGameplayModifierInfo ModifierInfo = Ability->GetCostGameplayEffect()->Modifiers[0];
-			ModifierInfo.ModifierMagnitude.GetStaticMagnitudeIfPossible(1, Cost);
-			if (ModifierInfo.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetHealthAttribute())
-			{
-				CostType = EAbilityCostType::Health;
-			}
-			else if (ModifierInfo.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetManaAttribute())
-			{
-				CostType = EAbilityCostType::Mana;
-			}
-			else if (ModifierInfo.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetStaminaAttribute())
-			{
-				CostType = EAbilityCostType::Stamina;
-			}
-		}
-		Ability->GetCooldownGameplayEffect()->DurationMagnitude.GetStaticMagnitudeIfPossible(1, Cooldown);
-		OutAbilityInfo = FAbilityInfo(CostType, Cost, Cooldown);
-		return true;
-	}
-	return false;
-}
-
 bool ADWCharacter::DoAction(EDWCharacterActionType InActionType)
 {
 	if (!HasActionAbility(InActionType)) return false;
 
 	const FDWCharacterActionAbilityData AbilityData = GetActionAbility(InActionType);
-	return ActiveAbility(AbilityData.AbilityHandle);
+	return AbilitySystem->TryActivateAbility(AbilityData.AbilityHandle);
 }
 
 bool ADWCharacter::StopAction(EDWCharacterActionType InActionType)
@@ -931,7 +824,7 @@ bool ADWCharacter::StopAction(EDWCharacterActionType InActionType)
 	if (!HasActionAbility(InActionType)) return false;
 
 	const FDWCharacterActionAbilityData AbilityData = GetActionAbility(InActionType);
-	CancelAbilityByHandle(AbilityData.AbilityHandle);
+	AbilitySystem->CancelAbilityHandle(AbilityData.AbilityHandle);
 	return true;
 }
 
@@ -1360,10 +1253,11 @@ bool ADWCharacter::HasAttackAbility(int32 InAbilityIndex) const
 	return false;
 }
 
-bool ADWCharacter::HasSkillAbility(const FPrimaryAssetId& InSkillID) const
+bool ADWCharacter::HasSkillAbility(const FPrimaryAssetId& InSkillID, bool bNeedAssembled) const
 {
 	if(SkillAbilities.Contains(InSkillID))
 	{
+		if(!bNeedAssembled) return true;
 		auto SkillSlots = Inventory->GetSplitSlots<UInventorySkillSlot>(ESplitSlotType::Skill);
 		for (int32 i = 0; i < SkillSlots.Num(); i++)
 		{
@@ -1376,7 +1270,7 @@ bool ADWCharacter::HasSkillAbility(const FPrimaryAssetId& InSkillID) const
 	return false;
 }
 
-bool ADWCharacter::HasSkillAbility(ESkillType InSkillType, int32 InAbilityIndex) const
+bool ADWCharacter::HasSkillAbility(ESkillType InSkillType, int32 InAbilityIndex, bool bNeedAssembled) const
 {
 	TArray<FDWCharacterSkillAbilityData> Abilities = TArray<FDWCharacterSkillAbilityData>();
 	for (auto Iter : SkillAbilities)
@@ -1386,12 +1280,13 @@ bool ADWCharacter::HasSkillAbility(ESkillType InSkillType, int32 InAbilityIndex)
 			Abilities.Add(Iter.Value);
 		}
 	}
-	if(InAbilityIndex != -1 ? Abilities.IsValidIndex(InAbilityIndex) : Abilities.Num() > 0)
+	if(Abilities.IsValidIndex(InAbilityIndex))
 	{
+		if(!bNeedAssembled) return true;
 		auto SkillSlots = Inventory->GetSplitSlots<UInventorySkillSlot>(ESplitSlotType::Skill);
 		for (int32 i = 0; i < SkillSlots.Num(); i++)
 		{
-			if(SkillSlots[i]->GetItem().ID == Abilities[InAbilityIndex != -1 ? InAbilityIndex : 0].AbilityID)
+			if(SkillSlots[i]->GetItem().ID == Abilities[InAbilityIndex].AbilityID)
 			{
 				return true;
 			}
@@ -1534,16 +1429,15 @@ UBehaviorTree* ADWCharacter::GetBehaviorTreeAsset() const
 	return GetCharacterData<UDWCharacterData>().BehaviorTreeAsset;
 }
 
-void ADWCharacter::OnInventorySlotSelected(UInventorySlot* InInventorySlot)
+void ADWCharacter::OnSelectedItemChange(const FAbilityItem& InItem)
 {
-	const FAbilityItem tmpItem = InInventorySlot->GetItem();
-	if(tmpItem.IsValid() && tmpItem.GetData().GetItemType() == EAbilityItemType::Voxel)
+	if(InItem.IsValid() && InItem.GetData().GetItemType() == EAbilityItemType::Voxel)
 	{
-		SetGenerateVoxelItem(tmpItem);
+		SetGenerateVoxelItem(InItem);
 	}
 	else
 	{
-		SetGenerateVoxelItem(FVoxelItem::EmptyVoxel);
+		SetGenerateVoxelItem(FVoxelItem::Empty);
 	}
 }
 
@@ -1639,12 +1533,9 @@ void ADWCharacter::HandleDamage(EDamageType DamageType, const float LocalDamageD
 			{
 				SourceCharacter->ModifyHealth(LocalDamageDone * SourceCharacter->GetAttackStealRate());
 			}
-			if(!IsDead() && !IsPlayer())
+			if(!IsPlayer() && !GetController<ADWAIController>()->GetBlackboard()->GetTargetCharacter())
 			{
-				if(!GetController<ADWAIController>()->GetTargetCharacter())
-				{
-					GetController<ADWAIController>()->SetTargetCharacter(SourceCharacter);
-				}
+				GetController<ADWAIController>()->GetBlackboard()->SetTargetCharacter(SourceCharacter);
 			}
 		}
 	}

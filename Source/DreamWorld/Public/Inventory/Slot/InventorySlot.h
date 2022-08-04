@@ -9,7 +9,8 @@
 class UInventory;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnInventorySlotRefresh);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnInventorySlotCooldownRefresh);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnInventorySlotActivated);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnInventorySlotCanceled);
 
 /**
  * 物品槽
@@ -29,7 +30,7 @@ protected:
 	FAbilityItem Item;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Default")
-	UInventory* Owner;
+	UInventory* Inventory;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Default")
 	EAbilityItemType LimitType;
@@ -39,17 +40,24 @@ protected:
 	
 public:
 	FOnInventorySlotRefresh OnInventorySlotRefresh;
-	FOnInventorySlotRefresh OnInventorySlotCooldownRefresh;
+	FOnInventorySlotActivated OnInventorySlotActivated;
+	FOnInventorySlotCanceled OnInventorySlotCanceled;
 
 	//////////////////////////////////////////////////////////////////////////
 	/// Initialize
 public:
 	UFUNCTION(BlueprintCallable)
-	virtual void InitSlot(UInventory* InOwner, FAbilityItem InItem, EAbilityItemType InLimitType/* = EAbilityItemType::None*/, ESplitSlotType InSplitType/* = ESplitSlotType::Default*/);
+	virtual void OnInitialize(UInventory* InInventory, FAbilityItem InItem, EAbilityItemType InLimitType/* = EAbilityItemType::None*/, ESplitSlotType InSplitType/* = ESplitSlotType::Default*/);
 	
 	virtual void OnSpawn_Implementation(const TArray<FParameter>& InParams) override;
 
 	virtual void OnDespawn_Implementation() override;
+
+	UFUNCTION(BlueprintCallable)
+	virtual void OnItemPreChange(FAbilityItem& InNewItem);
+		
+	UFUNCTION(BlueprintCallable)
+	virtual void OnItemChanged(FAbilityItem& InOldItem);
 
 	//////////////////////////////////////////////////////////////////////////
 	/// Checks
@@ -68,12 +76,6 @@ public:
 public:
 	UFUNCTION(BlueprintCallable)
 	virtual void Refresh();
-
-	UFUNCTION(BlueprintCallable)
-	virtual void PreSet(FAbilityItem& InItem);
-		
-	UFUNCTION(BlueprintCallable)
-	virtual void EndSet();
 
 	UFUNCTION(BlueprintCallable)
 	virtual void Replace(UInventorySlot* InSlot);
@@ -113,26 +115,6 @@ public:
 	virtual void ClearItem();
 
 	//////////////////////////////////////////////////////////////////////////
-	/// Cooldown
-public:
-	void StartCooldown();
-
-	void StopCooldown();
-
-	void RefreshCooldown(float DeltaSeconds);
-
-protected:
-	UPROPERTY(BlueprintReadOnly)
-	FCooldownInfo CooldownInfo;
-
-public:
-	UFUNCTION(BlueprintPure)
-	FCooldownInfo GetCooldownInfo() const { return CooldownInfo; }
-
-	UFUNCTION(BlueprintCallable)
-	void SetCooldownInfo(const FCooldownInfo& InCooldownInfo) { CooldownInfo = InCooldownInfo; }
-
-	//////////////////////////////////////////////////////////////////////////
 	/// Getter/Setter
 public:
 	UFUNCTION(BlueprintPure)
@@ -141,17 +123,15 @@ public:
 	UFUNCTION(BlueprintPure)
 	bool IsSelected() const;
 
-	UFUNCTION(BlueprintPure)
-	int GetRemainVolume() const;
+	int GetRemainVolume(FAbilityItem InItem = FAbilityItem::Empty) const;
 
-	UFUNCTION(BlueprintPure)
-	int GetMaxVolume() const;
+	int GetMaxVolume(FAbilityItem InItem = FAbilityItem::Empty) const;
 
 	UFUNCTION(BlueprintPure)
 	FAbilityItem& GetItem()  { return Item; }
 
 	UFUNCTION(BlueprintPure)
-	UInventory* GetOwner() const { return Owner; }
+	UInventory* GetInventory() const { return Inventory; }
 	
 	UFUNCTION(BlueprintPure)
 	EAbilityItemType GetLimitType() const { return LimitType; }

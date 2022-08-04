@@ -11,9 +11,9 @@ UInventoryEquipSlot::UInventoryEquipSlot()
 {
 }
 
-void UInventoryEquipSlot::InitSlot(UInventory* InOwner, FAbilityItem InItem, EAbilityItemType InLimitType /* = EAbilityItemType::None */, ESplitSlotType InSplitType /*= ESplitSlotType::Default*/)
+void UInventoryEquipSlot::OnInitialize(UInventory* InInventory, FAbilityItem InItem, EAbilityItemType InLimitType /* = EAbilityItemType::None */, ESplitSlotType InSplitType /*= ESplitSlotType::Default*/)
 {
-	Super::InitSlot(InOwner, InItem, InLimitType, InSplitType);
+	Super::OnInitialize(InInventory, InItem, InLimitType, InSplitType);
 }
 
 void UInventoryEquipSlot::OnSpawn_Implementation(const TArray<FParameter>& InParams)
@@ -36,35 +36,35 @@ bool UInventoryEquipSlot::CheckSlot(FAbilityItem& InItem) const
 void UInventoryEquipSlot::Refresh()
 {
 	Super::Refresh();
-	auto character = Cast<ADWCharacter>(Owner->GetOwnerActor());
+	auto character = Cast<ADWCharacter>(Inventory->GetOwnerActor());
 	if (character != nullptr)
 	{
 		character->RefreshEquip(PartType, Item);
 	}
 }
 
-void UInventoryEquipSlot::PreSet(FAbilityItem& InItem)
+void UInventoryEquipSlot::OnItemPreChange(FAbilityItem& InNewItem)
 {
-	Super::PreSet(InItem);
+	Super::OnItemPreChange(InNewItem);
 	CancelItem();
 }
 
-void UInventoryEquipSlot::EndSet()
+void UInventoryEquipSlot::OnItemChanged(FAbilityItem& InOldItem)
 {
-	Super::EndSet();
+	Super::OnItemChanged(InOldItem);
 	ActiveItem();
 }
 
 void UInventoryEquipSlot::Assemble()
 {
-	Owner->AdditionItemBySplitType(Item, ESplitSlotType::Equip); 
+	Inventory->AddItemBySplitType(Item, ESplitSlotType::Equip); 
 	Refresh();
 }
 
 void UInventoryEquipSlot::Discharge()
 {
-	Owner->AdditionItemBySplitType(Item, ESplitSlotType::Default);
-	Owner->AdditionItemBySplitType(Item, ESplitSlotType::Shortcut);
-	Owner->AdditionItemBySplitType(Item, ESplitSlotType::Auxiliary);
+	Inventory->AddItemBySplitType(Item, ESplitSlotType::Default);
+	Inventory->AddItemBySplitType(Item, ESplitSlotType::Shortcut);
+	Inventory->AddItemBySplitType(Item, ESplitSlotType::Auxiliary);
 	Refresh();
 }

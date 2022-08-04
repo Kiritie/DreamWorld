@@ -3,14 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "AI/DWAIDecoratorBase.h"
+#include "AI/DWAIDecorator.h"
 #include "DWAIDecorator_CheckDistance.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class DREAMWORLD_API UDWAIDecorator_CheckDistance : public UDWAIDecoratorBase
+class DREAMWORLD_API UDWAIDecorator_CheckDistance : public UDWAIDecorator
 {
 	GENERATED_UCLASS_BODY()
 

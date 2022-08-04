@@ -39,9 +39,9 @@ void UVitalityInventory::ClearAllItem()
 	Super::ClearAllItem();
 }
 
-FQueryItemInfo UVitalityInventory::GetItemInfoByRange(EQueryItemType InActionType, FAbilityItem InItem, int32 InStartIndex, int32 InEndIndex)
+FQueryItemInfo UVitalityInventory::QueryItemByRange(EQueryItemType InActionType, FAbilityItem InItem, int32 InStartIndex, int32 InEndIndex)
 {
-	return Super::GetItemInfoByRange(InActionType, InItem, InStartIndex, InEndIndex);
+	return Super::QueryItemByRange(InActionType, InItem, InStartIndex, InEndIndex);
 }
 
 ADWVitality* UVitalityInventory::GetOwnerVitality() const

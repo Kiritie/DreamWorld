@@ -3,14 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "AI/DWAITaskBase.h"
+#include "AI/DWAITask.h"
 #include "DWAITask_ClearTargets.generated.h"
 
 /**
  * AI任务_清除目标
  */
 UCLASS()
-class DREAMWORLD_API UDWAITask_ClearTargets : public UDWAITaskBase
+class DREAMWORLD_API UDWAITask_ClearTargets : public UDWAITask
 {
 	GENERATED_UCLASS_BODY()
 
@@ -22,7 +22,7 @@ protected:
 	FBlackboardKeySelector IsLostTargetKey;
 	
 	UPROPERTY(EditAnywhere, Category = "Blackboard")
-	FBlackboardKeySelector LostTargetLocationKey;
+	FBlackboardKeySelector TargetLocationKey;
 
 protected:
 	virtual EBTNodeResult::Type AbortTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;

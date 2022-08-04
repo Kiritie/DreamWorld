@@ -67,11 +67,7 @@ public:
 
 	virtual void OnInteract(IInteractionAgentInterface* InInteractionAgent, EInteractAction InInteractAction) override;
 
-	virtual bool GenerateVoxel(FVoxelItem& InVoxelItem) override;
-
-	virtual bool GenerateVoxel(FVoxelItem& InVoxelItem, const FVoxelHitResult& InVoxelHitResult) override;
-
-	virtual bool DestroyVoxel(FVoxelItem& InVoxelItem) override;
+	virtual bool GenerateVoxel(const FVoxelHitResult& InVoxelHitResult) override;
 
 	virtual bool DestroyVoxel(const FVoxelHitResult& InVoxelHitResult) override;
 
@@ -92,7 +88,7 @@ public:
 	virtual UInventory* GetInventory() const override;
 
 public:
-	virtual void OnInventorySlotSelected(UInventorySlot* InInventorySlot) override;
+	virtual void OnSelectedItemChange(const FAbilityItem& InItem) override;
 	
 	virtual void OnAttributeChange(const FOnAttributeChangeData& InAttributeChangeData) override;
 	

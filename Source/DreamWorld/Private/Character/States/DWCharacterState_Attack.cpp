@@ -3,6 +3,7 @@
 #include "Character/States/DWCharacterState_Attack.h"
 
 #include "TimerManager.h"
+#include "Ability/Components/AbilitySystemComponentBase.h"
 #include "Ability/Item/Skill/AbilitySkillBase.h"
 #include "Ability/Item/Skill/AbilitySkillDataBase.h"
 #include "Character/DWCharacter.h"
@@ -76,11 +77,14 @@ void UDWCharacterState_Attack::AttackStart()
 		}
 		case EDWCharacterAttackType::SkillAttack:
 		{
-			if (const auto SkillClass = Character->GetSkillAbility(Character->SkillAbilityID).GetItemData<UAbilitySkillDataBase>().SkillClass)
+			if(Character->AbilitySystem->TryActivateAbility(Character->GetSkillAbility(Character->SkillAbilityID).AbilityHandle))
 			{
-				if(AAbilitySkillBase* Skill = UObjectPoolModuleBPLibrary::SpawnObject<AAbilitySkillBase>(nullptr, SkillClass))
+				if (const auto SkillClass = Character->GetSkillAbility(Character->SkillAbilityID).GetItemData<UAbilitySkillDataBase>().SkillClass)
 				{
-					Skill->Initialize(Character, FAbilityItem(Character->SkillAbilityID));
+					if(AAbilitySkillBase* Skill = UObjectPoolModuleBPLibrary::SpawnObject<AAbilitySkillBase>(nullptr, SkillClass))
+					{
+						Skill->Initialize(Character, FAbilityItem(Character->SkillAbilityID));
+					}
 				}
 			}
 			break;

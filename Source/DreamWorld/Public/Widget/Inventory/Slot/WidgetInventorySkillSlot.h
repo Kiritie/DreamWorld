@@ -21,12 +21,12 @@ public:
 	UWidgetInventorySkillSlot(const FObjectInitializer& ObjectInitializer);
 
 public:
-	virtual void InitSlot(UInventorySlot* InOwnerSlot) override;
+	virtual void OnInitialize(UInventorySlot* InOwnerSlot) override;
 
 	virtual void UseItem(int InCount) override;
 
 public:
-	virtual void Refresh() override;
+	virtual void OnRefresh() override;
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components", meta = (BindWidget, OptionalWidget = false))

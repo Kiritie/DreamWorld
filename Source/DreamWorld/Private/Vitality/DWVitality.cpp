@@ -68,8 +68,6 @@ void ADWVitality::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	if(IsDead()) return;
-
-	Inventory->Refresh(DeltaTime);
 }
 
 void ADWVitality::Serialize(FArchive& Ar)
@@ -165,33 +163,20 @@ void ADWVitality::OnInteract(IInteractionAgentInterface* InInteractionAgent, EIn
 	}
 }
 
-bool ADWVitality::GenerateVoxel(FVoxelItem& InVoxelItem)
+bool ADWVitality::GenerateVoxel(const FVoxelHitResult& InVoxelHitResult)
 {
-	bool bSuccess = false;
-	FQueryItemInfo QueryItemInfo = Inventory->GetItemInfoByRange(EQueryItemType::Remove, static_cast<FAbilityItem>(InVoxelItem));
-	if(QueryItemInfo.Item.IsValid())
+	if(!GenerateVoxelItem.IsValid()) return false;
+	
+	FQueryItemInfo QueryItemInfo = Inventory->QueryItemByRange(EQueryItemType::Remove, FAbilityItem(GenerateVoxelItem, 1), -1);
+	if(QueryItemInfo.IsSuccess())
 	{
-		bSuccess = Super::GenerateVoxel(InVoxelItem);
+		if(Super::GenerateVoxel(InVoxelHitResult))
+		{
+			Inventory->RemoveItemByQueryInfo(QueryItemInfo);
+			return true;
+		}
 	}
-	if(bSuccess) Inventory->RemoveItemBySlots(QueryItemInfo.Item, QueryItemInfo.Slots);
-	return bSuccess;
-}
-
-bool ADWVitality::GenerateVoxel(FVoxelItem& InVoxelItem, const FVoxelHitResult& InVoxelHitResult)
-{
-	bool bSuccess = false;
-	FQueryItemInfo QueryItemInfo = Inventory->GetItemInfoByRange(EQueryItemType::Remove, static_cast<FAbilityItem>(InVoxelItem));
-	if(QueryItemInfo.Item.IsValid())
-	{
-		bSuccess = Super::GenerateVoxel(InVoxelItem, InVoxelHitResult);
-	}
-	if(bSuccess) Inventory->RemoveItemBySlots(QueryItemInfo.Item, QueryItemInfo.Slots);
-	return bSuccess;
-}
-
-bool ADWVitality::DestroyVoxel(FVoxelItem& InVoxelItem)
-{
-	return Super::DestroyVoxel(InVoxelItem);
+	return false;
 }
 
 bool ADWVitality::DestroyVoxel(const FVoxelHitResult& InVoxelHitResult)
@@ -243,16 +228,15 @@ UInventory* ADWVitality::GetInventory() const
 	return Inventory;
 }
 
-void ADWVitality::OnInventorySlotSelected(UInventorySlot* InInventorySlot)
+void ADWVitality::OnSelectedItemChange(const FAbilityItem& InItem)
 {
-	const FAbilityItem tmpItem = InInventorySlot->GetItem();
-	if(tmpItem.IsValid() && tmpItem.GetData().GetItemType() == EAbilityItemType::Voxel)
+	if(InItem.IsValid() && InItem.GetData().GetItemType() == EAbilityItemType::Voxel)
 	{
-		SetGenerateVoxelItem(tmpItem);
+		SetGenerateVoxelItem(InItem);
 	}
 	else
 	{
-		SetGenerateVoxelItem(FVoxelItem::EmptyVoxel);
+		SetGenerateVoxelItem(FVoxelItem::Empty);
 	}
 }
 

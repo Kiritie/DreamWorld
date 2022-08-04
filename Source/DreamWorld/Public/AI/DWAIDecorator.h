@@ -4,13 +4,13 @@
 
 #include "DreamWorld/DreamWorld.h"
 #include "AI/Base/AIDecoratorBase.h"
-#include "DWAIDecoratorBase.generated.h"
+#include "DWAIDecorator.generated.h"
 
 /**
  * AIװ��������
  */
 UCLASS()
-class DREAMWORLD_API UDWAIDecoratorBase : public UAIDecoratorBase
+class DREAMWORLD_API UDWAIDecorator : public UAIDecoratorBase
 {
 	GENERATED_UCLASS_BODY()
 	

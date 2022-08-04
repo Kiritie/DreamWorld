@@ -4,6 +4,7 @@
 
 #include "Ability/AbilityModuleBPLibrary.h"
 #include "Ability/Abilities/ItemAbilityBase.h"
+#include "Ability/Components/AbilitySystemComponentBase.h"
 #include "Ability/Item/AbilityItemDataBase.h"
 #include "Inventory/Inventory.h"
 #include "Character/Player/DWPlayerCharacter.h"
@@ -11,21 +12,22 @@
 #include "Voxel/VoxelModule.h"
 #include "Voxel/Chunks/VoxelChunk.h"
 #include "Widget/WidgetGameHUD.h"
+#include "Widget/WidgetItemInfoBox.h"
 #include "Widget/WidgetModuleBPLibrary.h"
 #include "Widget/Inventory/Slot/WidgetInventorySlot.h"
 
 UInventorySlot::UInventorySlot()
 {
 	Item = FAbilityItem::Empty;
-	Owner = nullptr;
+	Inventory = nullptr;
 	LimitType = EAbilityItemType::None;
 	SplitType = ESplitSlotType::Default;
 }
 
-void UInventorySlot::InitSlot(UInventory* InOwner, FAbilityItem InItem, EAbilityItemType InLimitType /*= EAbilityItemType::None*/, ESplitSlotType InSplitType /*= ESplitSlotType::Default*/)
+void UInventorySlot::OnInitialize(UInventory* InInventory, FAbilityItem InItem, EAbilityItemType InLimitType /*= EAbilityItemType::None*/, ESplitSlotType InSplitType /*= ESplitSlotType::Default*/)
 {
 	Item = InItem;
-	Owner = InOwner;
+	Inventory = InInventory;
 	LimitType = InLimitType;
 	SplitType = InSplitType;
 }
@@ -38,7 +40,7 @@ void UInventorySlot::OnSpawn_Implementation(const TArray<FParameter>& InParams)
 void UInventorySlot::OnDespawn_Implementation()
 {
 	SetItem(FAbilityItem::Empty);
-	Owner = nullptr;
+	Inventory = nullptr;
 	LimitType = EAbilityItemType::None;
 	SplitType = ESplitSlotType::Default;
 }
@@ -50,7 +52,7 @@ bool UInventorySlot::CheckSlot(FAbilityItem& InItem) const
 
 bool UInventorySlot::CanPutIn(FAbilityItem& InItem) const
 {
-	return (IsEmpty() && CheckSlot(InItem)) || (Item.EqualType(InItem) && GetRemainVolume() > 0);
+	return (IsEmpty() && CheckSlot(InItem)) || (Item.EqualType(InItem) && GetRemainVolume(InItem) > 0);
 }
 
 bool UInventorySlot::Contains(FAbilityItem& InItem) const
@@ -64,31 +66,35 @@ void UInventorySlot::Refresh()
 	{
 		SetItem(FAbilityItem::Empty, false);
 	}
-	OnInventorySlotRefresh.Broadcast();
 	if(IsSelected())
 	{
 		UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>()->RefreshActions();
 	}
+	OnInventorySlotRefresh.Broadcast();
 }
 
-void UInventorySlot::PreSet(FAbilityItem& InItem)
+void UInventorySlot::OnItemPreChange(FAbilityItem& InNewItem)
 {
 	
 }
 
-void UInventorySlot::EndSet()
+void UInventorySlot::OnItemChanged(FAbilityItem& InOldItem)
 {
 	if(Item.IsValid())
 	{
-		IAbilityVitalityInterface* vitality = Cast<IAbilityVitalityInterface>(Owner->GetOwnerActor());
-		if (vitality && Item.GetData().AbilityClass)
+		IAbilityVitalityInterface* Vitality = Cast<IAbilityVitalityInterface>(Inventory->GetOwnerActor());
+		if (Vitality && Item.GetData().AbilityClass)
 		{
-			Item.AbilityHandle = vitality->AcquireAbility(Item.GetData().AbilityClass, Item.Level);
+			Item.AbilityHandle = Vitality->GetAbilitySystemComponent()->K2_GiveAbility(Item.GetData().AbilityClass, Item.Level);
 		}
 	}
 	else
 	{
 		Item.AbilityHandle = FGameplayAbilitySpecHandle();
+	}
+	if(IInventoryAgentInterface* InventoryAgent = Cast<IInventoryAgentInterface>(Inventory->GetOwnerActor()))
+	{
+		InventoryAgent->OnSelectedItemChange(GetItem());
 	}
 }
 
@@ -97,18 +103,15 @@ void UInventorySlot::Replace(UInventorySlot* InSlot)
 	auto tmpItem = GetItem();
 	SetItem(InSlot->GetItem());
 	InSlot->SetItem(tmpItem);
-
-	const auto cooldownInfo = GetCooldownInfo();
-	SetCooldownInfo(InSlot->GetCooldownInfo());
-	InSlot->SetCooldownInfo(cooldownInfo);
 }
 
 void UInventorySlot::SetItem(FAbilityItem& InItem, bool bRefresh)
 {
-	PreSet(InItem);
+	OnItemPreChange(InItem);
+	FAbilityItem OldItem = Item;
 	Item = InItem;
-	Item.Count = FMath::Clamp(Item.Count, 0, GetMaxVolume());
-	EndSet();
+	Item.Count = FMath::Clamp(Item.Count, 0, GetMaxVolume(InItem));
+	OnItemChanged(OldItem);
 	if(bRefresh)
 	{
 		Refresh();
@@ -119,15 +122,15 @@ void UInventorySlot::AddItem(FAbilityItem& InItem)
 {
 	if (Contains(InItem))
 	{
-		int tmpNum = InItem.Count - GetRemainVolume();
-		Item.Count = FMath::Clamp(Item.Count + InItem.Count, 0, GetMaxVolume());
-		InItem.Count = tmpNum;
+		int tmpNum = InItem.Count - GetRemainVolume(InItem);
+		Item.Count = FMath::Clamp(Item.Count + InItem.Count, 0, GetMaxVolume(InItem));
+		InItem.Count = FMath::Max(tmpNum, 0);
 		Refresh();
 	}
 	else
 	{
 		SetItem(InItem);
-		InItem.Count -= GetMaxVolume();
+		InItem.Count -= GetMaxVolume(InItem);
 	}
 }
 
@@ -136,8 +139,8 @@ void UInventorySlot::SubItem(FAbilityItem& InItem)
 	if (Contains(InItem))
 	{
 		int tmpNum = InItem.Count - Item.Count;
-		Item.Count = FMath::Clamp(Item.Count - InItem.Count, 0, GetMaxVolume());
-		InItem.Count = tmpNum;
+		Item.Count = FMath::Clamp(Item.Count - InItem.Count, 0, GetMaxVolume(InItem));
+		InItem.Count = FMath::Max(tmpNum, 0);
 		Refresh();
 	}
 }
@@ -148,7 +151,7 @@ void UInventorySlot::SplitItem(int InCount /*= -1*/)
 
 	if(InCount == - 1) InCount = Item.Count;
 	const int tmpCount = Item.Count / InCount;
-	auto QueryItemInfo = Owner->GetItemInfoByRange(EQueryItemType::Addition, Item);
+	auto QueryItemInfo = Inventory->QueryItemByRange(EQueryItemType::Add, Item);
 	for (int i = 0; i < InCount; i++)
 	{
 		FAbilityItem tmpItem = FAbilityItem(Item, tmpCount);
@@ -173,9 +176,9 @@ void UInventorySlot::MoveItem(int InCount /*= -1*/)
 	if (InCount == -1) InCount = Item.Count;
 	FAbilityItem tmpItem = FAbilityItem(Item, InCount);
 
-	if(Owner->GetConnectInventory())
+	if(Inventory->GetConnectInventory())
 	{
-		Owner->GetConnectInventory()->AdditionItem(tmpItem);
+		Inventory->GetConnectInventory()->AddItemByRange(tmpItem);
 	}
 	else
 	{
@@ -183,28 +186,28 @@ void UInventorySlot::MoveItem(int InCount /*= -1*/)
 		{
 			case ESplitSlotType::Default:
 			{
-				Owner->AdditionItemBySplitType(tmpItem, ESplitSlotType::Shortcut);
-				Owner->AdditionItemBySplitType(tmpItem, ESplitSlotType::Auxiliary);
+				Inventory->AddItemBySplitType(tmpItem, ESplitSlotType::Shortcut);
+				Inventory->AddItemBySplitType(tmpItem, ESplitSlotType::Auxiliary);
 				break;
 			}
 			case ESplitSlotType::Shortcut:
 			{
-				Owner->AdditionItemBySplitType(tmpItem, ESplitSlotType::Default);
-				Owner->AdditionItemBySplitType(tmpItem, ESplitSlotType::Auxiliary);
+				Inventory->AddItemBySplitType(tmpItem, ESplitSlotType::Default);
+				Inventory->AddItemBySplitType(tmpItem, ESplitSlotType::Auxiliary);
 				break;
 			}
 			case ESplitSlotType::Auxiliary:
 			{
-				Owner->AdditionItemBySplitType(tmpItem, ESplitSlotType::Default);
-				Owner->AdditionItemBySplitType(tmpItem, ESplitSlotType::Shortcut);
+				Inventory->AddItemBySplitType(tmpItem, ESplitSlotType::Default);
+				Inventory->AddItemBySplitType(tmpItem, ESplitSlotType::Shortcut);
 				break;
 			}
 			case ESplitSlotType::Equip:
 			case ESplitSlotType::Skill:
 			{
-				Owner->AdditionItemBySplitType(tmpItem, ESplitSlotType::Default);
-				Owner->AdditionItemBySplitType(tmpItem, ESplitSlotType::Shortcut);
-				Owner->AdditionItemBySplitType(tmpItem, ESplitSlotType::Auxiliary);
+				Inventory->AddItemBySplitType(tmpItem, ESplitSlotType::Default);
+				Inventory->AddItemBySplitType(tmpItem, ESplitSlotType::Shortcut);
+				Inventory->AddItemBySplitType(tmpItem, ESplitSlotType::Auxiliary);
 				break;
 			}
 			default: break;
@@ -221,7 +224,7 @@ void UInventorySlot::UseItem(int InCount /*= -1*/)
 
 	if(InCount == -1) InCount = Item.Count;
 
-	ADWCharacter* OwnerCharacter = Cast<ADWCharacter>(GetOwner()->GetOwnerActor());
+	ADWCharacter* OwnerCharacter = Cast<ADWCharacter>(GetInventory()->GetOwnerActor());
 
 	if(!OwnerCharacter || OwnerCharacter->DoAction(EDWCharacterActionType::Use))
 	{
@@ -253,13 +256,13 @@ void UInventorySlot::AssembleItem()
 	{
 		case EAbilityItemType::Equip:
 		{
-			Owner->AdditionItemBySplitType(Item, ESplitSlotType::Equip); 
+			Inventory->AddItemBySplitType(Item, ESplitSlotType::Equip); 
 			Refresh();
 			break;
 		}
 		case EAbilityItemType::Skill:
 		{
-			Owner->AdditionItemBySplitType(Item, ESplitSlotType::Skill);
+			Inventory->AddItemBySplitType(Item, ESplitSlotType::Skill);
 			Refresh();
 			break;
 		}
@@ -275,17 +278,17 @@ void UInventorySlot::DischargeItem()
 	{
 		case EAbilityItemType::Equip:
 		{
-			Owner->AdditionItemBySplitType(Item, ESplitSlotType::Default);
-			Owner->AdditionItemBySplitType(Item, ESplitSlotType::Shortcut);
-			Owner->AdditionItemBySplitType(Item, ESplitSlotType::Auxiliary);
+			Inventory->AddItemBySplitType(Item, ESplitSlotType::Default);
+			Inventory->AddItemBySplitType(Item, ESplitSlotType::Shortcut);
+			Inventory->AddItemBySplitType(Item, ESplitSlotType::Auxiliary);
 			Refresh();
 			break;
 		}
 		case EAbilityItemType::Skill:
 		{
-			Owner->AdditionItemBySplitType(Item, ESplitSlotType::Default);
-			Owner->AdditionItemBySplitType(Item, ESplitSlotType::Shortcut);
-			Owner->AdditionItemBySplitType(Item, ESplitSlotType::Auxiliary);
+			Inventory->AddItemBySplitType(Item, ESplitSlotType::Default);
+			Inventory->AddItemBySplitType(Item, ESplitSlotType::Shortcut);
+			Inventory->AddItemBySplitType(Item, ESplitSlotType::Auxiliary);
 			Refresh();
 			break;
 		}
@@ -297,14 +300,14 @@ void UInventorySlot::DiscardItem(int InCount /*= -1*/)
 {
 	if (IsEmpty()) return;
 
-	ADWCharacter* OwnerCharacter = Cast<ADWCharacter>(GetOwner()->GetOwnerActor());
+	ADWCharacter* OwnerCharacter = Cast<ADWCharacter>(GetInventory()->GetOwnerActor());
 
 	if(!OwnerCharacter || OwnerCharacter->DoAction(EDWCharacterActionType::Discard))
 	{
 		FAbilityItem tmpItem = FAbilityItem(Item, InCount);
-		if (auto chunk = AMainModule::GetModuleByClass<AVoxelModule>()->FindChunkByLocation(Owner->GetOwnerActor()->GetActorLocation()))
+		if (auto chunk = AMainModule::GetModuleByClass<AVoxelModule>()->FindChunkByLocation(Inventory->GetOwnerActor()->GetActorLocation()))
 		{
-			UAbilityModuleBPLibrary::SpawnPickUp(tmpItem, Owner->GetOwnerActor()->GetActorLocation() + FMath::RandPointInBox(FBox(FVector(-20, -20, -10), FVector(20, 20, 10))), chunk);
+			UAbilityModuleBPLibrary::SpawnPickUp(tmpItem, Inventory->GetOwnerActor()->GetActorLocation() + FMath::RandPointInBox(FBox(FVector(-20, -20, -10), FVector(20, 20, 10))), chunk);
 		}
 		SubItem(tmpItem);
 	}
@@ -313,10 +316,19 @@ void UInventorySlot::DiscardItem(int InCount /*= -1*/)
 bool UInventorySlot::ActiveItem()
 {
 	if(IsEmpty()) return false;
-	
-	if(IAbilityVitalityInterface* Vitality = Cast<IAbilityVitalityInterface>(GetOwner()->GetOwnerActor()))
+
+	if(IAbilityVitalityInterface* Vitality = Cast<IAbilityVitalityInterface>(GetInventory()->GetOwnerActor()))
 	{
-		return Vitality->ActiveAbility(Item.AbilityHandle);
+		if(Vitality->GetAbilitySystemComponent()->TryActivateAbility(Item.AbilityHandle))
+		{
+			OnInventorySlotActivated.Broadcast();
+			return true;
+		}
+		else if(GetAbilityInfo().CooldownRemaining > 0.f)
+		{
+			UWidgetModuleBPLibrary::OpenUserWidget<UWidgetItemInfoBox>({ FParameter::MakeString(FString::Printf(TEXT("该%s处于冷却中！"), *UGlobalBPLibrary::GetEnumValueDisplayName(TEXT("EAbilityItemType"), (int32)Item.GetData().GetItemType()).ToString())) });
+			return false;
+		}
 	}
     return false;
 }
@@ -325,9 +337,10 @@ bool UInventorySlot::CancelItem()
 {
 	if(IsEmpty()) return false;
 	
-	if(IAbilityVitalityInterface* Vitality = Cast<IAbilityVitalityInterface>(GetOwner()->GetOwnerActor()))
+	if(IAbilityVitalityInterface* Vitality = Cast<IAbilityVitalityInterface>(GetInventory()->GetOwnerActor()))
 	{
-		Vitality->CancelAbilityByHandle(Item.AbilityHandle);
+		Vitality->GetAbilitySystemComponent()->CancelAbilityHandle(Item.AbilityHandle);
+		OnInventorySlotCanceled.Broadcast();
 		return true;
 	}
 	return false;
@@ -340,32 +353,6 @@ void UInventorySlot::ClearItem()
 	SetItem(FAbilityItem::Empty);
 }
 
-void UInventorySlot::StartCooldown()
-{
-	CooldownInfo.bCooldowning = true;
-	CooldownInfo.TotalTime = GetAbilityInfo().Cooldown;
-	CooldownInfo.RemainTime = CooldownInfo.TotalTime;
-}
-
-void UInventorySlot::StopCooldown()
-{
-	CooldownInfo.bCooldowning = false;
-	CooldownInfo.RemainTime = 0.f;
-}
-
-void UInventorySlot::RefreshCooldown(float DeltaSeconds)
-{
-	if(CooldownInfo.bCooldowning)
-	{
-		CooldownInfo.RemainTime -= DeltaSeconds;
-		if(CooldownInfo.RemainTime <= 0.f)
-		{
-			StopCooldown();
-		}
-		OnInventorySlotCooldownRefresh.Broadcast();
-	}
-}
-
 bool UInventorySlot::IsEmpty() const
 {
 	return Item.IsEmpty();
@@ -373,28 +360,28 @@ bool UInventorySlot::IsEmpty() const
 
 bool UInventorySlot::IsSelected() const
 {
-	return GetOwner()->GetSelectedSlot() == this;
+	return GetInventory()->GetSelectedSlot() == this;
 }
 
-int UInventorySlot::GetRemainVolume() const
+int UInventorySlot::GetRemainVolume(FAbilityItem InItem) const
 {
-	return GetMaxVolume() - Item.Count;
+	const FAbilityItem TmpItem = InItem.IsValid() ? InItem : Item;
+	return GetMaxVolume(TmpItem) - Item.Count;
 }
 
-int UInventorySlot::GetMaxVolume() const
+int UInventorySlot::GetMaxVolume(FAbilityItem InItem) const
 {
-	return Item.IsValid() ? Item.GetData().MaxCount : 0;
+	const FAbilityItem TmpItem = InItem.IsValid() ? InItem : Item;
+	return TmpItem.IsValid() ? TmpItem.GetData().MaxCount : 0;
 }
 
 FAbilityInfo UInventorySlot::GetAbilityInfo() const
 {
 	if(IsEmpty()) return FAbilityInfo();
 	
-	if(ADWCharacter* Character = Cast<ADWCharacter>(Owner->GetOwnerActor()))
+	if(ADWCharacter* Character = Cast<ADWCharacter>(Inventory->GetOwnerActor()))
 	{
-		FAbilityInfo AbilityInfo;
-		Character->GetAbilityInfo(Item.GetData().AbilityClass, AbilityInfo);
-		return AbilityInfo;
+		return Character->GetAbilitySystemComponent<UAbilitySystemComponentBase>()->GetAbilityInfoByHandle(Item.AbilityHandle);
 	}
 	return FAbilityInfo();
 }

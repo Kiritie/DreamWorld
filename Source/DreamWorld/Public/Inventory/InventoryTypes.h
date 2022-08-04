@@ -8,7 +8,7 @@
 class UWidgetInventorySlot;
 class UInventorySlot;
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInventorySlotSelected, UInventorySlot*, InInventorySlot);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnSelectedItemChange, UInventorySlot*, InInventorySlot);
 
 UENUM(BlueprintType)
 enum class ESplitSlotType : uint8
@@ -43,8 +43,14 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	FAbilityItem Item;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TArray<UInventorySlot*> Slots;
+
+public:
+	FORCEINLINE bool IsSuccess() const
+	{
+		return Item.IsValid(true);
+	}
 };
 
 USTRUCT(BlueprintType)
@@ -158,10 +164,10 @@ public:
 UENUM(BlueprintType)
 enum class EQueryItemType : uint8
 {
+	// 获取
+	Get,
 	// 添加
-	Addition,
+	Add,
 	// 移除
 	Remove,
-	// 清除
-	Clear
 };

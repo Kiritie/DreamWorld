@@ -26,13 +26,9 @@ void UCharacterInventory::UnloadData(bool bForceMode)
 	Super::UnloadData(bForceMode);
 }
 
-FQueryItemInfo UCharacterInventory::GetItemInfoByRange(EQueryItemType InActionType, FAbilityItem InItem, int32 InStartIndex, int32 InEndIndex)
+FQueryItemInfo UCharacterInventory::QueryItemByRange(EQueryItemType InActionType, FAbilityItem InItem, int32 InStartIndex, int32 InEndIndex)
 {
-	if (InStartIndex == -1 && HasSplitSlotInfo(ESplitSlotType::Shortcut) && GetOwnerCharacter() && GetOwnerCharacter()->IsPlayer())
-	{
-		InStartIndex = GetSplitSlotInfo(ESplitSlotType::Shortcut).StartIndex + UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryBar>()->GetSelectedSlotIndex();
-	}
-	return Super::GetItemInfoByRange(InActionType, InItem, InStartIndex, InEndIndex);
+	return Super::QueryItemByRange(InActionType, InItem, InStartIndex, InEndIndex);
 }
 
 void UCharacterInventory::DiscardAllItem()
@@ -43,9 +39,4 @@ void UCharacterInventory::DiscardAllItem()
 void UCharacterInventory::ClearAllItem()
 {
 	Super::ClearAllItem();
-}
-
-ADWCharacter* UCharacterInventory::GetOwnerCharacter() const
-{
-	return Cast<ADWCharacter>(OwnerActor);
 }

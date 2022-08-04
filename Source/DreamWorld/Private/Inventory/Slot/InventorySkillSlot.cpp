@@ -17,23 +17,23 @@ UInventorySkillSlot::UInventorySkillSlot()
 {
 }
 
-void UInventorySkillSlot::InitSlot(UInventory* InOwner, FAbilityItem InItem, EAbilityItemType InLimitType /* = EAbilityItemType::None */, ESplitSlotType InSplitType /*= ESplitSlotType::Default*/)
+void UInventorySkillSlot::OnInitialize(UInventory* InInventory, FAbilityItem InItem, EAbilityItemType InLimitType /* = EAbilityItemType::None */, ESplitSlotType InSplitType /*= ESplitSlotType::Default*/)
 {
-	Super::InitSlot(InOwner, InItem, InLimitType, InSplitType);
+	Super::OnInitialize(InInventory, InItem, InLimitType, InSplitType);
 }
 
-void UInventorySkillSlot::PreSet(FAbilityItem& InItem)
+void UInventorySkillSlot::OnItemPreChange(FAbilityItem& InNewItem)
 {
-	Super::PreSet(InItem);
-	if(InItem.IsValid() && Item.GetData<UAbilitySkillDataBase>().SkillMode == ESkillMode::Passive)
+	Super::OnItemPreChange(InNewItem);
+	if(Item.IsValid() && Item.GetData<UAbilitySkillDataBase>().SkillMode == ESkillMode::Passive)
 	{
 		CancelItem();
 	}
 }
 
-void UInventorySkillSlot::EndSet()
+void UInventorySkillSlot::OnItemChanged(FAbilityItem& InOldItem)
 {
-	Super::EndSet();
+	Super::OnItemChanged(InOldItem);
 	if(Item.IsValid() && Item.GetData<UAbilitySkillDataBase>().SkillMode == ESkillMode::Passive)
 	{
 		ActiveItem();
@@ -44,20 +44,12 @@ bool UInventorySkillSlot::ActiveItem()
 {
 	if(IsEmpty()) return false;
 	
-	if(ADWCharacter* Character = Cast<ADWCharacter>(Owner->GetOwnerActor()))
+	if(ADWCharacter* Character = Cast<ADWCharacter>(Inventory->GetOwnerActor()))
 	{
-		if (Character->SkillAttack(Item.ID))
+		if(Character->SkillAttack(Item.ID))
 		{
-			Super::ActiveItem();
-			if(Item.GetData<UAbilitySkillDataBase>().SkillMode == ESkillMode::Initiative)
-			{
-				StartCooldown();
-			}
+			OnInventorySlotActivated.Broadcast();
 			return true;
-		}
-		else if(CooldownInfo.bCooldowning)
-		{
-			UWidgetModuleBPLibrary::OpenUserWidget<UWidgetItemInfoBox>({ FParameter::MakeString(TEXT("该技能处于冷却中！")) });
 		}
 	}
 	return false;
@@ -69,29 +61,19 @@ bool UInventorySkillSlot::CancelItem()
 	
 	if (GetSkillData().bCancelable)
 	{
-		Super::CancelItem();
-		if(Item.GetData<UAbilitySkillDataBase>().SkillMode == ESkillMode::Initiative)
-		{
-			StopCooldown();
-		}
-		return true;
+		return Super::CancelItem();
 	}
 	return false;
 }
 
 FAbilityInfo UInventorySkillSlot::GetAbilityInfo() const
 {
-	FAbilityInfo AbilityInfo;
-	if(ADWCharacter* Character = Cast<ADWCharacter>(Owner->GetOwnerActor()))
-	{
-		Character->GetAbilityInfo(Item.GetData().AbilityClass, AbilityInfo);
-	}
-	return AbilityInfo;
+	return Super::GetAbilityInfo();
 }
 
 FDWCharacterSkillAbilityData UInventorySkillSlot::GetSkillData() const
 {
-	if(ADWCharacter* Character = Cast<ADWCharacter>(Owner->GetOwnerActor()))
+	if(ADWCharacter* Character = Cast<ADWCharacter>(Inventory->GetOwnerActor()))
 	{
 		return Character->GetSkillAbility(Item.ID);
 	}

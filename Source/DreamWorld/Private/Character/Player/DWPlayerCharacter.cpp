@@ -293,11 +293,11 @@ void ADWPlayerCharacter::SetControlMode(EDWCharacterControlMode InControlMode)
 	}
 }
 
-void ADWPlayerCharacter::SetGenerateVoxelItem(FVoxelItem InGenerateVoxelItem)
+void ADWPlayerCharacter::SetGenerateVoxelItem(const FVoxelItem& InGenerateVoxelItem)
 {
 	Super::SetGenerateVoxelItem(InGenerateVoxelItem);
 
-	if(!GenerateVoxelItem.IsValid())
+	if(GenerateVoxelItem.IsValid())
 	{
 		VoxelMesh->BuildVoxel(GenerateVoxelItem);
 		VoxelMesh->CreateMesh(0, false);
@@ -385,22 +385,7 @@ void ADWPlayerCharacter::MoveUp_Implementation(float InValue)
 
 bool ADWPlayerCharacter::UseItem(FAbilityItem& InItem)
 {
-	if((InItem.GetData().GetItemType() == EAbilityItemType::Voxel))
-	{
-		if(ControlMode == EDWCharacterControlMode::Creating)
-		{
-			FVoxelHitResult voxelHitResult;
-			if (UGlobalBPLibrary::GetPlayerController<ADWPlayerController>()->RaycastVoxel(voxelHitResult))
-			{
-				return GenerateVoxel(static_cast<FVoxelItem&>(InItem), voxelHitResult);
-			}
-		}
-	}
-	else if((InItem.GetData().GetItemType() == EAbilityItemType::Prop))
-	{
-		return Super::UseItem(InItem);
-	}
-	return false;
+	return Super::UseItem(InItem);
 }
 
 void ADWPlayerCharacter::OnAttributeChange(const FOnAttributeChangeData& InAttributeChangeData)

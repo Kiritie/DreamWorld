@@ -35,41 +35,44 @@ void UDWCharacterPart::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 	if(AVoxelChunk* Chunk = Cast<AVoxelChunk>(GetOwnerCharacter()->Execute_GetContainer(GetOwnerCharacter()).GetObject()))
 	{
 		FVoxelItem& VoxelItem = Chunk->GetVoxelItem(Chunk->LocationToIndex(GetComponentLocation()));
-		const UVoxelData& VoxelData = VoxelItem.GetData<UVoxelData>();
-		const FVoxelHitResult VoxelHitResult = FVoxelHitResult(VoxelItem, GetComponentLocation(), GetOwnerCharacter()->GetMoveDirection(false));
-		if(VoxelItem.IsValid())
+		if(VoxelItem != LastOverlapVoxel)
 		{
-			if(!LastOverlapVoxel.IsValid() || LastOverlapVoxel.Index != VoxelItem.Index)
+			const FVoxelHitResult VoxelHitResult = FVoxelHitResult(VoxelItem, GetComponentLocation(), GetOwnerCharacter()->GetMoveDirection(false));
+			if(VoxelItem.IsValid())
 			{
+				const UVoxelData& VoxelData = VoxelItem.GetData<UVoxelData>();
+				if(!LastOverlapVoxel.IsValid() || LastOverlapVoxel.Index != VoxelItem.Index)
+				{
+					if(LastOverlapVoxel.IsValid())
+					{
+						OnExitVoxel(LastOverlapVoxel.GetVoxel(), VoxelHitResult);
+						LastOverlapVoxel = FVoxelItem();
+					}
+					LastOverlapVoxel = VoxelItem;
+					VoxelItem.GetVoxel().OnAgentEnter(GetOwnerCharacter(), VoxelHitResult);
+				}
 				if(LastOverlapVoxel.IsValid())
 				{
-					OnExitVoxel(LastOverlapVoxel.GetVoxel(), VoxelHitResult);
-					LastOverlapVoxel = FVoxelItem();
+					OnStayVoxel(LastOverlapVoxel.GetVoxel(), VoxelHitResult);
 				}
-				LastOverlapVoxel = VoxelItem;
-				VoxelItem.GetVoxel().OnTargetEnter(GetOwnerCharacter(), VoxelHitResult);
 			}
-			if(LastOverlapVoxel.IsValid())
+			else if(LastOverlapVoxel.IsValid())
 			{
-				OnStayVoxel(LastOverlapVoxel.GetVoxel(), VoxelHitResult);
+				LastOverlapVoxel.GetVoxel().OnAgentExit(GetOwnerCharacter(), VoxelHitResult);
+				LastOverlapVoxel = FVoxelItem();
 			}
-		}
-		else if(LastOverlapVoxel.IsValid())
-		{
-			LastOverlapVoxel.GetVoxel().OnTargetExit(GetOwnerCharacter(), VoxelHitResult);
-			LastOverlapVoxel = FVoxelItem();
 		}
 	}
 }
 
 void UDWCharacterPart::OnHitVoxel(UVoxel& InVoxel, const FVoxelHitResult& InHitResult)
 {
-	InVoxel.OnTargetHit(GetOwnerCharacter(), InHitResult);
+	InVoxel.OnAgentHit(GetOwnerCharacter(), InHitResult);
 }
 
 void UDWCharacterPart::OnEnterVoxel(UVoxel& InVoxel, const FVoxelHitResult& InHitResult)
 {
-	InVoxel.OnTargetEnter(GetOwnerCharacter(), InHitResult);
+	InVoxel.OnAgentEnter(GetOwnerCharacter(), InHitResult);
 
 	UVoxelData& VoxelData = InVoxel.GetData();
 	switch (VoxelData.VoxelType)
@@ -98,12 +101,12 @@ void UDWCharacterPart::OnEnterVoxel(UVoxel& InVoxel, const FVoxelHitResult& InHi
 
 void UDWCharacterPart::OnStayVoxel(UVoxel& InVoxel, const FVoxelHitResult& InHitResult)
 {
-	InVoxel.OnTargetStay(GetOwnerCharacter(), InHitResult);
+	InVoxel.OnAgentStay(GetOwnerCharacter(), InHitResult);
 }
 
 void UDWCharacterPart::OnExitVoxel(UVoxel& InVoxel, const FVoxelHitResult& InHitResult)
 {
-	InVoxel.OnTargetExit(GetOwnerCharacter(), InHitResult);
+	InVoxel.OnAgentExit(GetOwnerCharacter(), InHitResult);
 
 	UVoxelData& VoxelData = InVoxel.GetData();
 	switch (VoxelData.VoxelType)

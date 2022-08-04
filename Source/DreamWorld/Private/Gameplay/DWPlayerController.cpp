@@ -314,7 +314,7 @@ void ADWPlayerController::OnJumpReleased()
 
 	if(!PossessedCharacter || PossessedCharacter->IsBreakAllInput()) return;
 
-	//PossessedCharacter->UnJump();
+	// PossessedCharacter->UnJump();
 }
 
 void ADWPlayerController::OnSprintPressed()
@@ -387,7 +387,7 @@ void ADWPlayerController::OnDodgeReleased()
 
 	if(!PossessedCharacter || PossessedCharacter->IsBreakAllInput()) return;
 
-	PossessedCharacter->UnDodge();
+	// PossessedCharacter->UnDodge();
 }
 
 void ADWPlayerController::OnAttackDestroyPressed()
@@ -415,7 +415,7 @@ void ADWPlayerController::OnAttackDestroyPressed()
 			FVoxelHitResult voxelHitResult;
 			if(RaycastVoxel(voxelHitResult))
 			{
-				voxelHitResult.GetVoxel().OnMouseDown(EMouseButton::Left, voxelHitResult);
+				voxelHitResult.GetVoxel().OnActionTrigger(PossessedCharacter, EVoxelActionType::Action1, voxelHitResult);
 			}
 			break;
 		}
@@ -437,11 +437,6 @@ void ADWPlayerController::OnAttackDestroyRepeat()
 		}
 		case EDWCharacterControlMode::Creating:
 		{
-			FVoxelHitResult voxelHitResult;
-			if(RaycastVoxel(voxelHitResult))
-			{
-				voxelHitResult.GetVoxel().OnMouseHold(EMouseButton::Left, voxelHitResult);
-			}
 			break;
 		}
 	}
@@ -462,11 +457,6 @@ void ADWPlayerController::OnAttackDestroyReleased()
 		}
 		case EDWCharacterControlMode::Creating:
 		{
-			FVoxelHitResult voxelHitResult;
-			if(RaycastVoxel(voxelHitResult))
-			{
-				voxelHitResult.GetVoxel().OnMouseUp(EMouseButton::Left, voxelHitResult);
-			}
 			break;
 		}
 	}
@@ -490,7 +480,7 @@ void ADWPlayerController::OnDefendGeneratePressed()
 			FVoxelHitResult voxelHitResult;
 			if(RaycastVoxel(voxelHitResult))
 			{
-				voxelHitResult.GetVoxel().OnMouseDown(EMouseButton::Right, voxelHitResult);
+				voxelHitResult.GetVoxel().OnActionTrigger(PossessedCharacter, EVoxelActionType::Action2, voxelHitResult);
 			}
 			break;
 		}
@@ -512,11 +502,6 @@ void ADWPlayerController::OnDefendGenerateRepeat()
 		}
 		case EDWCharacterControlMode::Creating:
 		{
-			FVoxelHitResult voxelHitResult;
-			if(RaycastVoxel(voxelHitResult))
-			{
-				voxelHitResult.GetVoxel().OnMouseHold(EMouseButton::Right, voxelHitResult);
-			}
 			break;
 		}
 	}
@@ -537,11 +522,6 @@ void ADWPlayerController::OnDefendGenerateReleased()
 		}
 		case EDWCharacterControlMode::Creating:
 		{
-			FVoxelHitResult voxelHitResult;
-			if(RaycastVoxel(voxelHitResult))
-			{
-				voxelHitResult.GetVoxel().OnMouseUp(EMouseButton::Right, voxelHitResult);
-			}
 			break;
 		}
 	}

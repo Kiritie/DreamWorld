@@ -37,7 +37,7 @@ protected:
 	UInventorySlot* SelectedSlot;
 
 	UPROPERTY(BlueprintAssignable)
-	FOnInventorySlotSelected OnSlotSelected;
+	FOnSelectedItemChange OnSlotSelected;
 	
 	//////////////////////////////////////////////////////////////////////////
 	/// Data
@@ -51,27 +51,25 @@ protected:
 	//////////////////////////////////////////////////////////////////////////
 	/// Actions
 public:
-	UFUNCTION(BlueprintCallable)
-	virtual void Refresh(float DeltaSeconds);
+	UFUNCTION(BlueprintPure)
+	virtual FQueryItemInfo QueryItemByRange(EQueryItemType InQueryType, FAbilityItem InItem, int32 InStartIndex = 0, int32 InEndIndex = -1);
 
 	UFUNCTION(BlueprintPure)
-	virtual FQueryItemInfo GetItemInfoByRange(EQueryItemType InQueryType, FAbilityItem InItem, int32 InStartIndex = 0, int32 InEndIndex = -1);
+	virtual FQueryItemInfo QueryItemBySplitType(EQueryItemType InQueryType, FAbilityItem InItem, ESplitSlotType InSplitSlotType);
 
-	UFUNCTION(BlueprintPure)
-	virtual FQueryItemInfo GetItemInfoBySplitType(EQueryItemType InQueryType, FAbilityItem InItem, ESplitSlotType InSplitSlotType);
+public:
+	UFUNCTION(BlueprintCallable)
+	virtual void AddItemBySlots(FAbilityItem& InItem, const TArray<UInventorySlot*>& InSlots);
+
+	UFUNCTION(BlueprintCallable)
+	virtual void AddItemByRange(FAbilityItem& InItem, int32 InStartIndex = 0, int32 InEndIndex = -1);
+
+	UFUNCTION(BlueprintCallable)
+	virtual void AddItemBySplitType(FAbilityItem& InItem, ESplitSlotType InSplitSlotType);
 		
 	UFUNCTION(BlueprintCallable)
-	virtual void AdditionItem(FAbilityItem& InItem);
+	virtual void AddItemByQueryInfo(FQueryItemInfo& InQueryInfo);
 
-	UFUNCTION(BlueprintCallable)
-	virtual void AdditionItemBySlots(FAbilityItem& InItem, const TArray<UInventorySlot*>& InSlots);
-
-	UFUNCTION(BlueprintCallable)
-	virtual void AdditionItemByRange(FAbilityItem& InItem, int32 InStartIndex = 0, int32 InEndIndex = -1);
-
-	UFUNCTION(BlueprintCallable)
-	virtual void AdditionItemBySplitType(FAbilityItem& InItem, ESplitSlotType InSplitSlotType);
-		
 	UFUNCTION(BlueprintCallable)
 	virtual void RemoveItemBySlots(FAbilityItem& InItem, const TArray<UInventorySlot*>& InSlots);
 
@@ -80,6 +78,9 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	virtual void RemoveItemBySplitType(FAbilityItem& InItem, ESplitSlotType InSplitSlotType);
+
+	UFUNCTION(BlueprintCallable)
+	virtual void RemoveItemByQueryInfo(FQueryItemInfo& InQueryInfo);
 
 	UFUNCTION(BlueprintCallable)
 	virtual void MoveItemByRange(UInventory* InTargetInventory, FAbilityItem& InItem, int32 InSelfStartIndex = 0, int32 InSelfEndIndex = -1, int32 InTargetStartIndex = 0, int32 InTargetEndIndex = -1);
@@ -99,6 +100,12 @@ public:
 	//////////////////////////////////////////////////////////////////////////
 	/// Setter/Getter
 public:
+	template<class T>
+	T* GetOwnerActor() const
+	{
+		return Cast<T>(OwnerActor);
+	}
+	
 	UFUNCTION(BlueprintPure)
 	AActor* GetOwnerActor() const { return OwnerActor; }
 	
@@ -123,7 +130,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetSelectedSlot(UInventorySlot* InSelectedSlot);
 
-	FOnInventorySlotSelected& GetOnSlotSelected() { return OnSlotSelected; }
+	FOnSelectedItemChange& GetOnSlotSelected() { return OnSlotSelected; }
 	
 	UFUNCTION(BlueprintPure)
 	FAbilityItem& GetSelectedItem() const;

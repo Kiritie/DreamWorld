@@ -240,11 +240,7 @@ public:
 
 	virtual void PickUp(AAbilityPickUpBase* InPickUp) override;
 
-	virtual bool GenerateVoxel(FVoxelItem& InVoxelItem) override;
-
-	virtual bool GenerateVoxel(FVoxelItem& InVoxelItem, const FVoxelHitResult& InVoxelHitResult) override;
-
-	virtual bool DestroyVoxel(FVoxelItem& InVoxelItem) override;
+	virtual bool GenerateVoxel(const FVoxelHitResult& InVoxelHitResult) override;
 
 	virtual bool DestroyVoxel(const FVoxelHitResult& InVoxelHitResult) override;
 
@@ -252,8 +248,6 @@ public:
 	virtual void RefreshEquip(EDWEquipPartType InPartType, const FAbilityItem& InItem);
 
 public:
-	virtual bool GetAbilityInfo(TSubclassOf<UAbilityBase> AbilityClass, FAbilityInfo& OutAbilityInfo) override;
-
 	UFUNCTION(BlueprintCallable)
 	virtual bool DoAction(EDWCharacterActionType InActionType);
 
@@ -293,12 +287,12 @@ public:
 	bool IsTeamMate(ADWCharacter* InTargetCharacter) const;
 
 	UFUNCTION(BlueprintPure)
-	bool HasAttackAbility(int32 InAbilityIndex = -1) const;
+	bool HasAttackAbility(int32 InAbilityIndex = 0) const;
 
 	UFUNCTION(BlueprintCallable)
-	bool HasSkillAbility(const FPrimaryAssetId& InSkillID) const;
+	bool HasSkillAbility(const FPrimaryAssetId& InSkillID, bool bNeedAssembled = false) const;
 
-	bool HasSkillAbility(ESkillType InSkillType, int32 InAbilityIndex = -1) const;
+	bool HasSkillAbility(ESkillType InSkillType, int32 InAbilityIndex = 0, bool bNeedAssembled = false) const;
 	
 	UFUNCTION(BlueprintCallable)
 	bool HasActionAbility(EDWCharacterActionType InActionType) const;
@@ -550,7 +544,7 @@ public:
 	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, Interrupt)
 
 public:
-	virtual void OnInventorySlotSelected(UInventorySlot* InInventorySlot) override;
+	virtual void OnSelectedItemChange(const FAbilityItem& InItem) override;
 	
 	virtual void OnAttributeChange(const FOnAttributeChangeData& InAttributeChangeData) override;
 	

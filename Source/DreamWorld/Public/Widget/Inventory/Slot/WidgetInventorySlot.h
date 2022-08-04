@@ -22,6 +22,8 @@ public:
 
 protected:
 	virtual void NativePreConstruct() override;
+
+	virtual void NativeConstruct() override;
 	
 	virtual bool NativeOnDrop( const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation ) override;
 
@@ -36,9 +38,22 @@ protected:
 	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
 
 public:
-	UFUNCTION(BlueprintCallable)
-	virtual void InitSlot(UInventorySlot* InOwnerSlot);
+	UFUNCTION()
+	virtual void OnInitialize(UInventorySlot* InOwnerSlot);
 
+	UFUNCTION()
+	virtual void OnRefresh();
+
+	UFUNCTION()
+	virtual void OnActivated();
+	
+	UFUNCTION()
+	virtual void OnCanceled();
+	
+	UFUNCTION()
+	virtual void OnCooldown();
+
+public:
 	UFUNCTION(BlueprintCallable)
 	virtual void SplitItem(int InCount = -1);
 	
@@ -51,15 +66,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual void DiscardItem(int InCount = -1);
 
-public:
 	UFUNCTION(BlueprintCallable)
-	virtual void Refresh();
-				
-	UFUNCTION(BlueprintCallable)
-	void RefreshCooldown();
-	
-	UFUNCTION(BlueprintCallable)
-	void SetBorderColor(FLinearColor InColor);
+	virtual void SetBorderColor(FLinearColor InColor);
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Default")
@@ -90,6 +98,8 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FText KeyCode;
 
+	FTimerHandle CooldownTimerHandle;
+
 public:
 	FText GetKeyCode() const { return KeyCode; }
 	
@@ -108,4 +118,7 @@ public:
 
 	UFUNCTION(BlueprintPure)
 	UInventorySlot* GetOwnerSlot() const { return OwnerSlot; }
+
+	UFUNCTION(BlueprintPure)
+	UInventory* GetInventory() const;
 };

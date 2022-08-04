@@ -26,5 +26,5 @@ public:
 
 	void SetEquipPartType(const FText& InEquipPartType) { this->EquipPartType = InEquipPartType; }
 
-	virtual void InitSlot(UInventorySlot* InOwnerSlot) override;
+	virtual void OnInitialize(UInventorySlot* InOwnerSlot) override;
 };

@@ -30,7 +30,7 @@ public:
 
 	virtual void ClearAllItem() override;
 
-	virtual FQueryItemInfo GetItemInfoByRange(EQueryItemType InActionType, FAbilityItem InItem, int32 InStartIndex = 0, int32 InEndIndex = -1) override;
+	virtual FQueryItemInfo QueryItemByRange(EQueryItemType InActionType, FAbilityItem InItem, int32 InStartIndex = 0, int32 InEndIndex = -1) override;
 
 public:
 	UFUNCTION(BlueprintPure)

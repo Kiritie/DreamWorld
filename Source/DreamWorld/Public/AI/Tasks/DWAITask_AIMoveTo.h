@@ -3,14 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "AI/DWAITaskBase.h"
+#include "AI/DWAITask.h"
 #include "DWAITask_AIMoveTo.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class DREAMWORLD_API UDWAITask_AIMoveTo : public UDWAITaskBase
+class DREAMWORLD_API UDWAITask_AIMoveTo : public UDWAITask
 {
 	GENERATED_UCLASS_BODY()
 	

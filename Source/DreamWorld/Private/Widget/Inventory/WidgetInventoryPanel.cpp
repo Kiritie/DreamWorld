@@ -49,7 +49,7 @@ void UWidgetInventoryPanel::OnInitialize_Implementation(AActor* InOwner)
 			{
 				if(UWidgetInventorySlot* DefaultSlot = Cast<UWidgetInventorySlot>(UWidgetBlueprintLibrary::Create(this, DefaultSlotClass, nullptr)))
 				{
-					DefaultSlot->InitSlot(DefaultSlots[i]);
+					DefaultSlot->OnInitialize(DefaultSlots[i]);
 					if(UWrapBoxSlot* WrapBoxSlot = DefaultContent->AddChildToWrapBox(DefaultSlot))
 					{
 						WrapBoxSlot->SetPadding(FMargin(2.5f, 2.5f, 2.5f, 2.5f));
@@ -62,7 +62,7 @@ void UWidgetInventoryPanel::OnInitialize_Implementation(AActor* InOwner)
 		{
 			for(int32 i = 0; i < UISlotDatas[ESplitSlotType::Default].Slots.Num(); i++)
 			{
-				UISlotDatas[ESplitSlotType::Default].Slots[i]->InitSlot(DefaultSlots[i]);
+				UISlotDatas[ESplitSlotType::Default].Slots[i]->OnInitialize(DefaultSlots[i]);
 			}
 		}
 	}
@@ -75,7 +75,7 @@ void UWidgetInventoryPanel::OnInitialize_Implementation(AActor* InOwner)
 			{
 				if(UWidgetInventoryEquipSlot* EquipSlot = Cast<UWidgetInventoryEquipSlot>(UWidgetBlueprintLibrary::Create(this, EquipSlotClass, nullptr)))
 				{
-					EquipSlot->InitSlot(EquipSlots[i]);
+					EquipSlot->OnInitialize(EquipSlots[i]);
 					EquipSlot->SetEquipPartType(UGlobalBPLibrary::GetEnumValueDisplayName(TEXT("EEquipPartType"), i));
 					if(UGridSlot* GridSlot = i % 2 == 0 ? LeftEquipContent->AddChildToGrid(EquipSlot) : RightEquipContent->AddChildToGrid(EquipSlot))
 					{
@@ -90,7 +90,7 @@ void UWidgetInventoryPanel::OnInitialize_Implementation(AActor* InOwner)
 		{
 			for(int32 i = 0; i < UISlotDatas[ESplitSlotType::Equip].Slots.Num(); i++)
 			{
-				UISlotDatas[ESplitSlotType::Equip].Slots[i]->InitSlot(EquipSlots[i]);
+				UISlotDatas[ESplitSlotType::Equip].Slots[i]->OnInitialize(EquipSlots[i]);
 			}
 		}
 	}

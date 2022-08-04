@@ -3,11 +3,14 @@
 
 #include "Widget/Inventory/Slot/WidgetInventorySlot.h"
 
+#include "TimerManager.h"
 #include "Ability/Item/AbilityItemDataBase.h"
+#include "Ability/Vitality/AbilityVitalityInterface.h"
 #include "Blueprint/DragDropOperation.h"
 #include "Components/Border.h"
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
+#include "Inventory/Inventory.h"
 #include "Widget/Inventory/WidgetInventory.h"
 #include "Inventory/Slot/InventorySlot.h"
 #include "Kismet/KismetTextLibrary.h"
@@ -28,6 +31,11 @@ void UWidgetInventorySlot::NativePreConstruct()
 		MaskMatInst->SetVectorParameterValue(FName("Color"), FLinearColor(0.f, 0.f, 0.f, 0.3f));
 		MaskMatInst->SetScalarParameterValue(FName("Progress"), 0.5f);
 	}
+}
+
+void UWidgetInventorySlot::NativeConstruct()
+{
+	Super::NativeConstruct();
 }
 
 bool UWidgetInventorySlot::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
@@ -111,21 +119,92 @@ FReply UWidgetInventorySlot::NativeOnMouseButtonDown(const FGeometry& InGeometry
 	return Super::NativeOnMouseButtonDown(InGeometry, InMouseEvent);
 }
 
-void UWidgetInventorySlot::InitSlot(UInventorySlot* InOwnerSlot)
+void UWidgetInventorySlot::OnInitialize(UInventorySlot* InOwnerSlot)
 {
 	if(InOwnerSlot == OwnerSlot) return;
 	
 	if(OwnerSlot)
 	{
-		OwnerSlot->OnInventorySlotRefresh.RemoveDynamic(this, &UWidgetInventorySlot::Refresh);
-		OwnerSlot->OnInventorySlotCooldownRefresh.RemoveDynamic(this, &UWidgetInventorySlot::RefreshCooldown);
+		OwnerSlot->OnInventorySlotRefresh.RemoveDynamic(this, &UWidgetInventorySlot::OnRefresh);
+		OwnerSlot->OnInventorySlotActivated.RemoveDynamic(this, &UWidgetInventorySlot::OnActivated);
+		OwnerSlot->OnInventorySlotCanceled.RemoveDynamic(this, &UWidgetInventorySlot::OnCanceled);
 	}
 	OwnerSlot = InOwnerSlot;
-	OwnerSlot->OnInventorySlotRefresh.AddDynamic(this, &UWidgetInventorySlot::Refresh);
-	OwnerSlot->OnInventorySlotCooldownRefresh.AddDynamic(this, &UWidgetInventorySlot::RefreshCooldown);
+	OwnerSlot->OnInventorySlotRefresh.AddDynamic(this, &UWidgetInventorySlot::OnRefresh);
 	
-	Refresh();
-	RefreshCooldown();
+	OnRefresh();
+}
+
+void UWidgetInventorySlot::OnRefresh()
+{
+	if(!IsEmpty())
+	{
+		ImgIcon->SetVisibility(ESlateVisibility::Visible);
+		ImgIcon->SetBrushFromTexture(GetItem().GetData().Icon);
+		if(TxtCount)
+		{
+			if(GetItem().Count > 1)
+			{
+				TxtCount->SetVisibility(ESlateVisibility::Visible);
+				TxtCount->SetText(FText::FromString(FString::FromInt(GetItem().Count)));
+			}
+			else
+			{
+				TxtCount->SetVisibility(ESlateVisibility::Hidden);
+			}
+		}
+	}
+	else
+	{
+		ImgIcon->SetVisibility(ESlateVisibility::Hidden);
+		if(TxtCount)
+		{
+			TxtCount->SetVisibility(ESlateVisibility::Hidden);
+		}
+	}
+}
+
+void UWidgetInventorySlot::OnActivated()
+{
+	if(OwnerSlot)
+	{
+		const FAbilityInfo CooldownInfo = OwnerSlot->GetAbilityInfo();
+		if(CooldownInfo.CooldownRemaining > 0.f)
+		{
+			GetWorld()->GetTimerManager().SetTimer(CooldownTimerHandle, this, &UWidgetInventorySlot::OnCooldown, 0.1f, true);
+		}
+	}
+}
+
+void UWidgetInventorySlot::OnCanceled()
+{
+	if(OwnerSlot)
+	{
+		ImgMask->SetVisibility(ESlateVisibility::Hidden);
+		TxtCooldown->SetVisibility(ESlateVisibility::Hidden);
+		GetWorld()->GetTimerManager().ClearTimer(CooldownTimerHandle);
+	}
+}
+
+void UWidgetInventorySlot::OnCooldown()
+{
+	if(OwnerSlot)
+	{
+		const FAbilityInfo CooldownInfo = OwnerSlot->GetAbilityInfo();
+		if(CooldownInfo.CooldownRemaining > 0.f)
+		{
+			ImgMask->SetVisibility(ESlateVisibility::Visible);
+			TxtCooldown->SetVisibility(ESlateVisibility::Visible);
+			TxtCooldown->SetText(UKismetTextLibrary::Conv_FloatToText(CooldownInfo.CooldownRemaining, ERoundingMode::HalfToEven, false, true, 1, 324, 0, 1));
+			MaskMatInst->SetScalarParameterValue(FName("Progress"), 1.f - CooldownInfo.CooldownRemaining / CooldownInfo.CooldownDuration);
+		}
+		else
+		{
+			ImgMask->SetVisibility(ESlateVisibility::Hidden);
+			TxtCooldown->SetVisibility(ESlateVisibility::Hidden);
+			GetWorld()->GetTimerManager().ClearTimer(CooldownTimerHandle);
+		}
+	}
 }
 
 void UWidgetInventorySlot::SplitItem(int InCount)
@@ -160,55 +239,6 @@ void UWidgetInventorySlot::DiscardItem(int InCount)
 	}
 }
 
-void UWidgetInventorySlot::Refresh()
-{
-	if(!IsEmpty())
-	{
-		ImgIcon->SetVisibility(ESlateVisibility::Visible);
-		ImgIcon->SetBrushFromTexture(GetItem().GetData().Icon);
-		if(TxtCount)
-		{
-			if(GetItem().Count > 1)
-			{
-				TxtCount->SetVisibility(ESlateVisibility::Visible);
-				TxtCount->SetText(FText::FromString(FString::FromInt(GetItem().Count)));
-			}
-			else
-			{
-				TxtCount->SetVisibility(ESlateVisibility::Hidden);
-			}
-		}
-	}
-	else
-	{
-		ImgIcon->SetVisibility(ESlateVisibility::Hidden);
-		if(TxtCount)
-		{
-			TxtCount->SetVisibility(ESlateVisibility::Hidden);
-		}
-	}
-}
-
-void UWidgetInventorySlot::RefreshCooldown()
-{
-	if(OwnerSlot)
-	{
-		const FCooldownInfo CooldownInfo = OwnerSlot->GetCooldownInfo();
-		if(CooldownInfo.bCooldowning)
-		{
-			ImgMask->SetVisibility(ESlateVisibility::Visible);
-			TxtCooldown->SetVisibility(ESlateVisibility::Visible);
-			TxtCooldown->SetText(UKismetTextLibrary::Conv_FloatToText(CooldownInfo.RemainTime, ERoundingMode::HalfToEven, false, true, 1, 324, 0, 1));
-			MaskMatInst->SetScalarParameterValue(FName("Progress"), 1.f - CooldownInfo.RemainTime / CooldownInfo.TotalTime);
-		}
-		else
-		{
-			ImgMask->SetVisibility(ESlateVisibility::Hidden);
-			TxtCooldown->SetVisibility(ESlateVisibility::Hidden);
-		}
-	}
-}
-
 void UWidgetInventorySlot::SetBorderColor(FLinearColor InColor)
 {
 	Border->SetBrushColor(InColor);
@@ -224,4 +254,10 @@ FAbilityItem& UWidgetInventorySlot::GetItem() const
 {
 	if(OwnerSlot) return OwnerSlot->GetItem();
 	return FAbilityItem::Empty;
+}
+
+UInventory* UWidgetInventorySlot::GetInventory() const
+{
+	if(OwnerSlot) return OwnerSlot->GetInventory();
+	return nullptr;
 }

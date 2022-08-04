@@ -3,7 +3,7 @@
 #pragma once
 
 #include "DreamWorld/DreamWorld.h"
-#include "AI/DWAITaskBase.h"
+#include "AI/DWAITask.h"
 #include "DWAITask_AIFollow.generated.h"
 
 class ADWCharacter;
@@ -12,7 +12,7 @@ class ADWCharacter;
  * AI任务_跟随
  */
 UCLASS()
-class DREAMWORLD_API UDWAITask_AIFollow : public UDWAITaskBase
+class DREAMWORLD_API UDWAITask_AIFollow : public UDWAITask
 {
 	GENERATED_UCLASS_BODY()
 

@@ -28,13 +28,9 @@ protected:
 	virtual void UnloadData(bool bForceMode) override;
 
 public:
-	virtual FQueryItemInfo GetItemInfoByRange(EQueryItemType InActionType, FAbilityItem InItem, int32 InStartIndex = 0, int32 InEndIndex = -1) override;
+	virtual FQueryItemInfo QueryItemByRange(EQueryItemType InActionType, FAbilityItem InItem, int32 InStartIndex = 0, int32 InEndIndex = -1) override;
 
 	virtual void DiscardAllItem() override;
 
 	virtual void ClearAllItem() override;
-
-public:
-	UFUNCTION(BlueprintPure)
-	ADWCharacter* GetOwnerCharacter() const;
 };

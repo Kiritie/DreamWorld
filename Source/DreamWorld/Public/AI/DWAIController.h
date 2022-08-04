@@ -29,49 +29,4 @@ protected:
 
 public:
 	virtual void Tick(float DeltaTime) override;
-
-	UFUNCTION()
-	virtual void OnTargetCharacterStateChanged(UFiniteStateBase* InFiniteState);
-
-	UFUNCTION(BlueprintPure)
-	EDWCharacterNature GetCharacterNature() const;
-
-	UFUNCTION(BlueprintCallable)
-	void SetCharacterNature(EDWCharacterNature InCharacterNature);
-	
-	UFUNCTION(BlueprintPure)
-	float GetAttackDistance() const;
-
-	UFUNCTION(BlueprintCallable)
-	void SetAttackDistance(float InAttackDistance);
-		
-	UFUNCTION(BlueprintPure)
-	float GetFollowDistance() const;
-
-	UFUNCTION(BlueprintCallable)
-	void SetFollowDistance(float InFollowDistance);
-			
-	UFUNCTION(BlueprintPure)
-	float GetPatrolDistance() const;
-
-	UFUNCTION(BlueprintCallable)
-	void SetPatrolDistance(float InPatrolDistance);
-				
-	UFUNCTION(BlueprintPure)
-	float GetPatrolDuration() const;
-
-	UFUNCTION(BlueprintCallable)
-	void SetPatrolDuration(float InPatrolDuration);
-
-	UFUNCTION(BlueprintPure)
-	bool IsLostTarget() const;
-	
-	UFUNCTION(BlueprintCallable)
-	void SetLostTarget(bool bLostTarget, FVector InLostTargetLocation = FVector::ZeroVector);
-
-	UFUNCTION(BlueprintPure)
-	ADWCharacter* GetTargetCharacter() const;
-	
-	UFUNCTION(BlueprintCallable)
-	void SetTargetCharacter(ADWCharacter* InTargetCharacter);
 };

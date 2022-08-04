@@ -17,9 +17,13 @@ class DREAMWORLD_API UDWAIBlackboard : public UAIBlackboardBase
 public:
 	virtual void PostLoad() override;
 
-	virtual void Initialize(UBlackboardComponent* InComponent, ACharacterBase* InCharacter) override;
+	virtual void OnInitialize(UBlackboardComponent* InComponent, ACharacterBase* InCharacter) override;
 
-	virtual void Refresh() override;
+	virtual void OnRefresh() override;
+
+	virtual void OnValuePreChange(FName InValueName) override;
+
+	virtual void OnValueChanged(FName InValueName) override;
 
 public:
 	BLACKBOARD_VALUE_ACCESSORS_ENUM(CharacterNature);
@@ -27,7 +31,4 @@ public:
 	BLACKBOARD_VALUE_ACCESSORS_FLOAT(FollowDistance);
 	BLACKBOARD_VALUE_ACCESSORS_FLOAT(PatrolDistance);
 	BLACKBOARD_VALUE_ACCESSORS_FLOAT(PatrolDuration);
-	BLACKBOARD_VALUE_ACCESSORS_OBJECT(TargetCharacter);
-	BLACKBOARD_VALUE_ACCESSORS_BOOL(IsLostTarget);
-	BLACKBOARD_VALUE_ACCESSORS_VECTOR(LostTargetLocation);
 };

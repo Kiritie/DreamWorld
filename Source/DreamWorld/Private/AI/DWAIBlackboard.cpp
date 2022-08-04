@@ -4,6 +4,7 @@
 #include "AI/DWAIBlackboard.h"
 
 #include "Character/DWCharacter.h"
+#include "FSM/Components/FSMComponent.h"
 
 void UDWAIBlackboard::PostLoad()
 {
@@ -14,27 +15,40 @@ void UDWAIBlackboard::PostLoad()
 	// BLACKBOARD_VALUE_GENERATE_FLOAT(FollowDistance);
 	// BLACKBOARD_VALUE_GENERATE_FLOAT(PatrolDistance);
 	// BLACKBOARD_VALUE_GENERATE_FLOAT(PatrolDuration);
-	// BLACKBOARD_VALUE_GENERATE_OBJECT(TargetCharacter, ADWCharacter);
-	// BLACKBOARD_VALUE_GENERATE_BOOL(IsLostTarget);
-	// BLACKBOARD_VALUE_GENERATE_VECTOR(LostTargetLocation);
 }
 
-void UDWAIBlackboard::Initialize(UBlackboardComponent* InComponent, ACharacterBase* InCharacter)
+void UDWAIBlackboard::OnInitialize(UBlackboardComponent* InComponent, ACharacterBase* InCharacter)
 {
-	Super::Initialize(InComponent, InCharacter);
-
-	SetTargetCharacter(nullptr);
-	SetIsLostTarget(false);
-	SetLostTargetLocation(FVector::ZeroVector);
+	Super::OnInitialize(InComponent, InCharacter);
 }
 
-void UDWAIBlackboard::Refresh()
+void UDWAIBlackboard::OnRefresh()
 {
-	Super::Refresh();
+	Super::OnRefresh();
+
+	if(!GetCharacter<ADWCharacter>()) return;
 
 	SetCharacterNature((uint8)GetCharacter<ADWCharacter>()->GetNature());
 	SetAttackDistance(GetCharacter<ADWCharacter>()->GetAttackDistance());
 	SetFollowDistance(GetCharacter<ADWCharacter>()->GetFollowDistance());
 	SetPatrolDistance(GetCharacter<ADWCharacter>()->GetPatrolDistance());
 	SetPatrolDuration(GetCharacter<ADWCharacter>()->GetPatrolDuration());
+
+	if(GetTargetCharacter<ADWCharacter>())
+	{
+		if(GetCharacter<ADWCharacter>()->IsDead() || GetTargetCharacter<ADWCharacter>()->IsDead())
+		{
+			SetTargetCharacter(nullptr);
+		}
+	}
+}
+
+void UDWAIBlackboard::OnValuePreChange(FName InValueName)
+{
+	Super::OnValuePreChange(InValueName);
+}
+
+void UDWAIBlackboard::OnValueChanged(FName InValueName)
+{
+	Super::OnValueChanged(InValueName);
 }

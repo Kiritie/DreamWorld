@@ -26,7 +26,7 @@ void UDWPlayerCharacterState_Dodge::OnEnter(UFiniteStateBase* InLastFiniteState)
 
 	ADWPlayerCharacter* PlayerCharacter = GetAgent<ADWPlayerCharacter>();
 
-	PlayerCharacter->GetTargetSystem()->SetShouldControlRotation(false);
+	// PlayerCharacter->GetTargetSystem()->SetShouldControlRotation(false);
 }
 
 void UDWPlayerCharacterState_Dodge::OnRefresh()
@@ -40,7 +40,7 @@ void UDWPlayerCharacterState_Dodge::OnLeave(UFiniteStateBase* InNextFiniteState)
 
 	ADWPlayerCharacter* PlayerCharacter = GetAgent<ADWPlayerCharacter>();
 
-	PlayerCharacter->GetTargetSystem()->SetShouldControlRotation(true);
+	// PlayerCharacter->GetTargetSystem()->SetShouldControlRotation(true);
 }
 
 void UDWPlayerCharacterState_Dodge::OnTermination()

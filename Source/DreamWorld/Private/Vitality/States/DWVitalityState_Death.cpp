@@ -6,6 +6,7 @@
 #include "Ability/AbilityModuleBPLibrary.h"
 #include "Ability/Vitality/AbilityVitalityBase.h"
 #include "Inventory/Inventory.h"
+#include "Inventory/VitalityInventory.h"
 #include "Vitality/DWVitality.h"
 
 UDWVitalityState_Death::UDWVitalityState_Death()

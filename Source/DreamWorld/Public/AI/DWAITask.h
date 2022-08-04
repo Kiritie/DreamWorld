@@ -4,13 +4,13 @@
 
 #include "DreamWorld/DreamWorld.h"
 #include "AI/Base/AITaskBase.h"
-#include "DWAITaskBase.generated.h"
+#include "DWAITask.generated.h"
 
 /**
  * AI任务基类
  */
 UCLASS()
-class DREAMWORLD_API UDWAITaskBase : public UAITaskBase
+class DREAMWORLD_API UDWAITask : public UAITaskBase
 {
 	GENERATED_UCLASS_BODY()
 	

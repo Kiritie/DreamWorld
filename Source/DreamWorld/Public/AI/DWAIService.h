@@ -4,13 +4,13 @@
 
 #include "DreamWorld/DreamWorld.h"
 #include "AI/Base/AIServiceBase.h"
-#include "DWAIServiceBase.generated.h"
+#include "DWAIService.generated.h"
 
 /**
  * AI�������
  */
 UCLASS()
-class DREAMWORLD_API UDWAIServiceBase : public UAIServiceBase
+class DREAMWORLD_API UDWAIService : public UAIServiceBase
 {
 	GENERATED_UCLASS_BODY()
 

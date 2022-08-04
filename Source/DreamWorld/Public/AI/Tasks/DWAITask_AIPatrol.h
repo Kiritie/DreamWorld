@@ -3,14 +3,14 @@
 #pragma once
 
 #include "DreamWorld/DreamWorld.h"
-#include "AI/DWAITaskBase.h"
+#include "AI/DWAITask.h"
 #include "DWAITask_AIPatrol.generated.h"
 
 /**
  * AI任务_巡逻
  */
 UCLASS()
-class DREAMWORLD_API UDWAITask_AIPatrol : public UDWAITaskBase
+class DREAMWORLD_API UDWAITask_AIPatrol : public UDWAITask
 {
 	GENERATED_UCLASS_BODY()
 

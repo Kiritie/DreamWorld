@@ -22,7 +22,7 @@ protected:
 	EDWEquipPartType PartType;
 
 public:
-	virtual void InitSlot(UInventory* InOwner, FAbilityItem InItem, EAbilityItemType InLimitType /* = EAbilityItemType::None */, ESplitSlotType InSplitType /*= ESplitSlotType::Default*/) override;
+	virtual void OnInitialize(UInventory* InInventory, FAbilityItem InItem, EAbilityItemType InLimitType /* = EAbilityItemType::None */, ESplitSlotType InSplitType /*= ESplitSlotType::Default*/) override;
 
 	virtual void OnSpawn_Implementation(const TArray<FParameter>& InParams) override;
 
@@ -32,9 +32,9 @@ public:
 	
 	virtual void Refresh() override;
 
-	virtual void PreSet(FAbilityItem& InItem) override;
+	virtual void OnItemPreChange(FAbilityItem& InNewItem) override;
 
-	virtual void EndSet() override;
+	virtual void OnItemChanged(FAbilityItem& InOldItem) override;
 
 	virtual void Assemble();
 

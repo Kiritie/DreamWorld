@@ -12,7 +12,7 @@ UDWAITask_ClearTargets::UDWAITask_ClearTargets(const FObjectInitializer& ObjectI
 	
 	TargetCharacterKey.AddObjectFilter(this, GET_MEMBER_NAME_CHECKED(UDWAITask_ClearTargets, TargetCharacterKey), ADWCharacter::StaticClass());
 	IsLostTargetKey.AddBoolFilter(this, GET_MEMBER_NAME_CHECKED(UDWAITask_ClearTargets, IsLostTargetKey));
-	LostTargetLocationKey.AddVectorFilter(this, GET_MEMBER_NAME_CHECKED(UDWAITask_ClearTargets, LostTargetLocationKey));
+	TargetLocationKey.AddVectorFilter(this, GET_MEMBER_NAME_CHECKED(UDWAITask_ClearTargets, TargetLocationKey));
 }
 
 EBTNodeResult::Type UDWAITask_ClearTargets::AbortTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
@@ -28,7 +28,7 @@ EBTNodeResult::Type UDWAITask_ClearTargets::ExecuteTask(UBehaviorTreeComponent& 
 
 	OwnerComp.GetBlackboardComponent()->SetValueAsObject(TargetCharacterKey.SelectedKeyName, nullptr);
 	OwnerComp.GetBlackboardComponent()->SetValueAsBool(IsLostTargetKey.SelectedKeyName, false);
-	OwnerComp.GetBlackboardComponent()->SetValueAsVector(LostTargetLocationKey.SelectedKeyName, FVector());
+	OwnerComp.GetBlackboardComponent()->SetValueAsVector(TargetLocationKey.SelectedKeyName, FVector());
 	
 	return EBTNodeResult::Succeeded;
 }
