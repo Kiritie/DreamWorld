@@ -26,7 +26,7 @@ void ADWVitalityVoxel::BeginPlay()
 {
 	Super::BeginPlay();
 
-	FVector range = GetVoxelData().GetFinalRange();
+	FVector range = GetVoxelData().GetRange();
 	BoxComponent->SetBoxExtent(range * UVoxelModuleBPLibrary::GetWorldData().BlockSize);
 	//AddActorLocalOffset(FVector::UpVector * range.Z * VoxelMesh->BlockScale * 0.5f);
 

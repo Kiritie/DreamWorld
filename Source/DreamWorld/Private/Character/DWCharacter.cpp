@@ -503,6 +503,7 @@ void ADWCharacter::Sprint()
 	if (!IsSprinting() && IsFreeToAnim())
 	{
 		AbilitySystem->AddLooseGameplayTag(GetCharacterData<UDWCharacterData>().SprintingTag);
+		GetCharacterMovement()->MaxWalkSpeed = GetMoveSpeed() * 1.5f * MovementRate;
 	}
 }
 
@@ -511,6 +512,7 @@ void ADWCharacter::UnSprint()
 	if (IsSprinting())
 	{
 		AbilitySystem->RemoveLooseGameplayTag(GetCharacterData<UDWCharacterData>().SprintingTag);
+		GetCharacterMovement()->MaxWalkSpeed = GetMoveSpeed() * MovementRate;
 	}
 }
 

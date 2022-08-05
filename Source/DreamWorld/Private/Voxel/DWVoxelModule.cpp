@@ -172,6 +172,6 @@ bool ADWVoxelModule::ChunkTraceSingle(FVector RayStart, FVector RayEnd, float In
 
 bool ADWVoxelModule::VoxelTraceSingle(const FVoxelItem& InVoxelItem, FVector InPoint, FHitResult& OutHitResult)
 {
-	FVector size = InVoxelItem.GetData<UVoxelData>().GetCeilRange(InVoxelItem.Rotation, InVoxelItem.Scale) * GetWorldData().BlockSize * 0.5f;
+	FVector size = InVoxelItem.GetData<UVoxelData>().GetRange(InVoxelItem.Rotation, InVoxelItem.Scale) * GetWorldData().BlockSize * 0.5f;
 	return UKismetSystemLibrary::BoxTraceSingle(this, InPoint + size, InPoint + size, size * 0.95f, FRotator::ZeroRotator, UDWHelper::GetGameTrace(EDWGameTraceType::Voxel), false, TArray<AActor*>(), EDrawDebugTrace::None, OutHitResult, true);
 }

@@ -66,10 +66,6 @@ void UInventorySlot::Refresh()
 	{
 		SetItem(FAbilityItem::Empty, false);
 	}
-	if(IsSelected())
-	{
-		UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>()->RefreshActions();
-	}
 	OnInventorySlotRefresh.Broadcast();
 }
 
@@ -92,9 +88,13 @@ void UInventorySlot::OnItemChanged(FAbilityItem& InOldItem)
 	{
 		Item.AbilityHandle = FGameplayAbilitySpecHandle();
 	}
-	if(IInventoryAgentInterface* InventoryAgent = Cast<IInventoryAgentInterface>(Inventory->GetOwnerActor()))
+	if(IsSelected())
 	{
-		InventoryAgent->OnSelectedItemChange(GetItem());
+		if(IInventoryAgentInterface* InventoryAgent = Cast<IInventoryAgentInterface>(Inventory->GetOwnerActor()))
+		{
+			InventoryAgent->OnSelectedItemChange(GetItem());
+		}
+		UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>()->RefreshActions();
 	}
 }
 
