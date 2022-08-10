@@ -170,9 +170,9 @@ void ADWVoxelChunk::BuildMap(int32 InStage)
 	Super::BuildMap(InStage);
 }
 
-void ADWVoxelChunk::GenerateMap()
+void ADWVoxelChunk::BuildMesh()
 {
-	Super::GenerateMap();
+	Super::BuildMesh();
 }
 
 void ADWVoxelChunk::SpawnActors()

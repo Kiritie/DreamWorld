@@ -66,7 +66,7 @@ public:
 
 	virtual void BuildMap(int32 InStage) override;
 
-	virtual void GenerateMap() override;
+	virtual void BuildMesh() override;
 
 	virtual void SpawnActors() override;
 

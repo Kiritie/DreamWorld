@@ -63,22 +63,16 @@ void UDWCharacterState_Default::OnRefresh()
 	{
 		if(Character->GetActorLocation().IsNearlyZero())
 		{
-			switch(UVoxelModuleBPLibrary::GetWorldState())
+			if(UVoxelModuleBPLibrary::IsBasicGenerated())
 			{
-				case EVoxelWorldState::BasicGenerated:
-				case EVoxelWorldState::FullGenerated:
+				FHitResult hitResult;
+				const FVector rayStart = FVector(Character->GetActorLocation().X, Character->GetActorLocation().Y, UVoxelModuleBPLibrary::GetWorldData().ChunkHeightRange * UVoxelModuleBPLibrary::GetWorldData().GetChunkLength() + 500);
+				const FVector rayEnd = FVector(Character->GetActorLocation().X, Character->GetActorLocation().Y, 0);
+				if(UVoxelModuleBPLibrary::ChunkTraceSingle(rayStart, rayEnd, Character->GetRadius(), Character->GetHalfHeight(), hitResult))
 				{
-					FHitResult hitResult;
-					const FVector rayStart = FVector(Character->GetActorLocation().X, Character->GetActorLocation().Y, UVoxelModuleBPLibrary::GetWorldData().ChunkHeightRange * UVoxelModuleBPLibrary::GetWorldData().GetChunkLength() + 500);
-					const FVector rayEnd = FVector(Character->GetActorLocation().X, Character->GetActorLocation().Y, 0);
-					if(UVoxelModuleBPLibrary::ChunkTraceSingle(rayStart, rayEnd, Character->GetRadius(), Character->GetHalfHeight(), hitResult))
-					{
-						Character->SetActorLocationAndRotation(hitResult.Location, FRotator::ZeroRotator);
-						FSM->SwitchStateByClass<UDWCharacterState_Walk>();
-					}
-					break;
+					Character->SetActorLocationAndRotation(hitResult.Location, FRotator::ZeroRotator);
+					FSM->SwitchStateByClass<UDWCharacterState_Walk>();
 				}
-				default: break;
 			}
 		}
 		else

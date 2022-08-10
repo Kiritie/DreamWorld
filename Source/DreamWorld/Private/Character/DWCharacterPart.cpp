@@ -34,7 +34,7 @@ void UDWCharacterPart::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 
 	if(AVoxelChunk* Chunk = Cast<AVoxelChunk>(GetOwnerCharacter()->Execute_GetContainer(GetOwnerCharacter()).GetObject()))
 	{
-		FVoxelItem& VoxelItem = Chunk->GetVoxelItem(Chunk->LocationToIndex(GetComponentLocation()));
+		const FVoxelItem& VoxelItem = Chunk->GetVoxelItem(Chunk->LocationToIndex(GetComponentLocation()));
 		if(VoxelItem != LastOverlapVoxel)
 		{
 			const FVoxelHitResult VoxelHitResult = FVoxelHitResult(VoxelItem, GetComponentLocation(), GetOwnerCharacter()->GetMoveDirection(false));
@@ -108,7 +108,7 @@ void UDWCharacterPart::OnExitVoxel(UVoxel& InVoxel, const FVoxelHitResult& InHit
 {
 	InVoxel.OnAgentExit(GetOwnerCharacter(), InHitResult);
 
-	UVoxelData& VoxelData = InVoxel.GetData();
+	const UVoxelData& VoxelData = InVoxel.GetData();
 	switch (VoxelData.VoxelType)
 	{
 		case EVoxelType::Water:

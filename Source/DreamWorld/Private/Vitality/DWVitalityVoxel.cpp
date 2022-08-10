@@ -32,7 +32,7 @@ void ADWVitalityVoxel::BeginPlay()
 
 	if (GetVoxelData().IsValid())
 	{
-		VoxelMesh->Initialize(EVoxelMeshType::Vitality);
+		VoxelMesh->Initialize(EVoxelMeshNature::Vitality);
 		VoxelMesh->BuildVoxel(FVoxelItem(VoxelID));
 		VoxelMesh->CreateMesh(0, false);
 	}

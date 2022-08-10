@@ -106,7 +106,7 @@ ADWPlayerCharacter::ADWPlayerCharacter()
 	VoxelMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	VoxelMesh->SetCastShadow(false);
 	VoxelMesh->SetVisibility(false);
-	VoxelMesh->Initialize(EVoxelMeshType::PickUp);
+	VoxelMesh->Initialize(EVoxelMeshNature::PickUp);
 
 	HammerMesh = CreateDefaultSubobject<USkeletalMeshComponent>(FName("HammerMesh"));
 	HammerMesh->SetupAttachment(GetMesh(), FName("HammerMesh"));
@@ -194,7 +194,7 @@ void ADWPlayerCharacter::LoadData(FSaveData* InSaveData, bool bForceMode)
 				auto VoxelDatas = UAssetModuleBPLibrary::LoadPrimaryAssets<UVoxelData>(UAbilityModuleBPLibrary::ItemTypeToAssetType(EAbilityItemType::Voxel));
 				for (int32 i = 0; i < VoxelDatas.Num(); i++)
 				{
-					if(VoxelDatas[i]->VoxelType != EVoxelType::Empty && VoxelDatas[i]->VoxelType != EVoxelType::Unknown)
+					if(VoxelDatas[i]->VoxelType != EVoxelType::Empty && VoxelDatas[i]->VoxelType != EVoxelType::Unknown && VoxelDatas[i]->PartType == EVoxelPartType::Main)
 					{
 						FAbilityItem tmpItem = FAbilityItem(VoxelDatas[i]->GetPrimaryAssetId(), VoxelDatas[i]->MaxCount);
 						SaveData.InventoryData.AddItem(tmpItem);

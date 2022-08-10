@@ -10,7 +10,10 @@
 #include "Procedure/ProcedureModuleBPLibrary.h"
 #include "Procedure/Procedure_ArchiveChoosing.h"
 #include "Procedure/Procedure_ArchiveCreating.h"
+#include "Procedure/Procedure_Initializing.h"
 #include "Procedure/Procedure_Loading.h"
+#include "Procedure/Procedure_Overed.h"
+#include "Procedure/Procedure_Pausing.h"
 #include "Procedure/Procedure_Playing.h"
 #include "Procedure/Procedure_Starting.h"
 #include "ReferencePool/ReferencePoolModuleBPLibrary.h"
@@ -59,14 +62,7 @@ void ADWVoxelModule::OnPreparatory_Implementation()
 
 void ADWVoxelModule::OnRefresh_Implementation(float DeltaSeconds)
 {
-	if(UProcedureModuleBPLibrary::IsCurrentProcedureClass<UProcedure_Starting>()
-		|| UProcedureModuleBPLibrary::IsCurrentProcedureClass<UProcedure_ArchiveChoosing>()
-		|| UProcedureModuleBPLibrary::IsCurrentProcedureClass<UProcedure_ArchiveCreating>()
-		|| UProcedureModuleBPLibrary::IsCurrentProcedureClass<UProcedure_Loading>()
-		|| UProcedureModuleBPLibrary::IsCurrentProcedureClass<UProcedure_Playing>())
-	{
-		Super::OnRefresh_Implementation(DeltaSeconds);
-	}
+	Super::OnRefresh_Implementation(DeltaSeconds);
 }
 
 void ADWVoxelModule::OnPause_Implementation()
@@ -104,26 +100,21 @@ void ADWVoxelModule::OnWorldStateChanged()
 	Super::OnWorldStateChanged();
 }
 
-void ADWVoxelModule::GeneratePreviews()
+void ADWVoxelModule::GenerateVoxels()
 {
-	Super::GeneratePreviews();
+	Super::GenerateVoxels();
 }
 
-void ADWVoxelModule::GenerateTerrain()
+void ADWVoxelModule::GenerateWorld()
 {
-	Super::GenerateTerrain();
-}
+	if(UProcedureModuleBPLibrary::IsCurrentProcedureClass<UProcedure_Pausing>() || UProcedureModuleBPLibrary::IsCurrentProcedureClass<UProcedure_Overed>()) return;
 
-void ADWVoxelModule::GenerateChunks(FIndex InIndex)
-{
-	Super::GenerateChunks(InIndex);
+	Super::GenerateWorld();
 
-	if (ChunkSpawnQueue.Num() > 0) return;
-
-	if(BoundsMesh != nullptr)
+	if(BoundsMesh && LastGenerateIndex != FIndex(-1, -1, -1))
 	{
-		BoundsMesh->SetRelativeLocation(UVoxelModuleBPLibrary::ChunkIndexToLocation(InIndex));
-		BoundsMesh->SetRelativeScale3D(FVector(GetWorldLength() * GetWorldData().BlockSize * 0.01f, GetWorldLength() * GetWorldData().BlockSize * 0.01f, 15.f));
+		BoundsMesh->SetRelativeLocation(UVoxelModuleBPLibrary::ChunkIndexToLocation(LastGenerateIndex));
+		BoundsMesh->SetRelativeScale3D(FVector(GetWorldLength() * WorldData->BlockSize * 0.01f, GetWorldLength() * WorldData->BlockSize * 0.01f, 15.f));
 	}
 }
 
@@ -132,9 +123,9 @@ void ADWVoxelModule::BuildChunkMap(FIndex InIndex, int32 InStage)
 	Super::BuildChunkMap(InIndex, InStage);
 }
 
-void ADWVoxelModule::GenerateChunkMap(FIndex InIndex)
+void ADWVoxelModule::BuildChunkMesh(FIndex InIndex)
 {
-	Super::GenerateChunkMap(InIndex);
+	Super::BuildChunkMesh(InIndex);
 }
 
 void ADWVoxelModule::GenerateChunk(FIndex InIndex)
@@ -154,10 +145,10 @@ AVoxelChunk* ADWVoxelModule::SpawnChunk(FIndex InIndex, bool bAddToQueue)
 
 bool ADWVoxelModule::ChunkTraceSingle(AVoxelChunk* InChunk, float InRadius, float InHalfHeight, FHitResult& OutHitResult)
 {
-	FVector rayStart = InChunk->GetActorLocation() + FVector(FMath::FRandRange(1.f, GetWorldData().ChunkSize - 1), FMath::FRandRange(1.f, GetWorldData().ChunkSize), GetWorldData().ChunkSize) * GetWorldData().BlockSize;
-	rayStart.X = ((int32)(rayStart.X / GetWorldData().BlockSize) + 0.5f) * GetWorldData().BlockSize;
-	rayStart.Y = ((int32)(rayStart.Y / GetWorldData().BlockSize) + 0.5f) * GetWorldData().BlockSize;
-	FVector rayEnd = rayStart + FVector::DownVector * GetWorldData().GetChunkLength();
+	FVector rayStart = InChunk->GetActorLocation() + FVector(FMath::FRandRange(1.f, WorldData->ChunkSize - 1), FMath::FRandRange(1.f, WorldData->ChunkSize), WorldData->ChunkSize) * WorldData->BlockSize;
+	rayStart.X = ((int32)(rayStart.X / WorldData->BlockSize) + 0.5f) * WorldData->BlockSize;
+	rayStart.Y = ((int32)(rayStart.Y / WorldData->BlockSize) + 0.5f) * WorldData->BlockSize;
+	FVector rayEnd = rayStart + FVector::DownVector * WorldData->GetChunkLength();
 	return ChunkTraceSingle(rayStart, rayEnd, InRadius * 0.95f, InHalfHeight * 0.95f, OutHitResult);
 }
 
@@ -172,6 +163,6 @@ bool ADWVoxelModule::ChunkTraceSingle(FVector RayStart, FVector RayEnd, float In
 
 bool ADWVoxelModule::VoxelTraceSingle(const FVoxelItem& InVoxelItem, FVector InPoint, FHitResult& OutHitResult)
 {
-	FVector size = InVoxelItem.GetData<UVoxelData>().GetRange(InVoxelItem.Rotation, InVoxelItem.Scale) * GetWorldData().BlockSize * 0.5f;
+	const FVector size = InVoxelItem.GetRange() * WorldData->BlockSize * 0.5f;
 	return UKismetSystemLibrary::BoxTraceSingle(this, InPoint + size, InPoint + size, size * 0.95f, FRotator::ZeroRotator, UDWHelper::GetGameTrace(EDWGameTraceType::Voxel), false, TArray<AActor*>(), EDrawDebugTrace::None, OutHitResult, true);
 }

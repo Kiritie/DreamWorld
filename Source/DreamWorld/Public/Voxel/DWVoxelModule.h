@@ -59,16 +59,14 @@ protected:
 	virtual void OnWorldStateChanged() override;
 
 protected:
-	virtual void GeneratePreviews() override;
+	virtual void GenerateVoxels() override;
 
-	virtual void GenerateTerrain() override;
-
-	virtual void GenerateChunks(FIndex InIndex) override;
+	virtual void GenerateWorld() override;
 
 public:
 	virtual void BuildChunkMap(FIndex InIndex, int32 InStage) override;
 
-	virtual void GenerateChunkMap(FIndex InIndex) override;
+	virtual void BuildChunkMesh(FIndex InIndex) override;
 
 	virtual void GenerateChunk(FIndex InIndex) override;
 

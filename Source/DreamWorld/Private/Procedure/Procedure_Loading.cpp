@@ -62,18 +62,9 @@ void UProcedure_Loading::OnRefresh()
 {
 	Super::OnRefresh();
 
-	switch(UVoxelModuleBPLibrary::GetWorldState())
+	if(UVoxelModuleBPLibrary::IsBasicGenerated() && UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>()->GetFSMComponent()->IsCurrentStateClass<UDWCharacterState_Walk>())
 	{
-		case EVoxelWorldState::BasicGenerated:
-		case EVoxelWorldState::FullGenerated:
-		{
-			if(UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>()->GetFSMComponent()->IsCurrentStateClass<UDWCharacterState_Walk>())
-			{
-				UProcedureModuleBPLibrary::SwitchProcedureByClass<UProcedure_Playing>();
-			}
-			break;
-		}
-		default: break;
+		UProcedureModuleBPLibrary::SwitchProcedureByClass<UProcedure_Playing>();
 	}
 }
 
