@@ -342,6 +342,13 @@ void ADWPlayerCharacter::OnLeaveInteract(IInteractionAgentInterface* InInteracti
 	UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>()->RefreshActions();
 }
 
+void ADWPlayerCharacter::OnInteract(IInteractionAgentInterface* InInteractionAgent, EInteractAction InInteractAction)
+{
+	Super::OnInteract(InInteractionAgent, InInteractAction);
+	
+	UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>()->RefreshActions();
+}
+
 void ADWPlayerCharacter::MoveForward_Implementation(float InValue)
 {
 	if(IsBreakAllInput()) return;
@@ -380,6 +387,16 @@ void ADWPlayerCharacter::MoveUp_Implementation(float InValue)
 		const FRotator YawRotation(0, Rotation.Yaw, 0);
 		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 		AddMovementInput(FVector(Direction.X * 0.1f, Direction.Y * 0.1f, 1.f) * InValue, 0.5f);
+	}
+}
+
+void ADWPlayerCharacter::OnSelectedItemChange(const FAbilityItem& InItem)
+{
+	Super::OnSelectedItemChange(InItem);
+
+	if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>())
+	{
+		UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>()->RefreshActions();
 	}
 }
 

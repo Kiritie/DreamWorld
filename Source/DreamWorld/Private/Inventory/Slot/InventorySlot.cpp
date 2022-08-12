@@ -94,7 +94,6 @@ void UInventorySlot::OnItemChanged(FAbilityItem& InOldItem)
 		{
 			InventoryAgent->OnSelectedItemChange(GetItem());
 		}
-		UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>()->RefreshActions();
 	}
 }
 
@@ -122,7 +121,7 @@ void UInventorySlot::AddItem(FAbilityItem& InItem)
 {
 	if (Contains(InItem))
 	{
-		int tmpNum = InItem.Count - GetRemainVolume(InItem);
+		int32 tmpNum = InItem.Count - GetRemainVolume(InItem);
 		Item.Count = FMath::Clamp(Item.Count + InItem.Count, 0, GetMaxVolume(InItem));
 		InItem.Count = FMath::Max(tmpNum, 0);
 		Refresh();
@@ -138,25 +137,25 @@ void UInventorySlot::SubItem(FAbilityItem& InItem)
 {
 	if (Contains(InItem))
 	{
-		int tmpNum = InItem.Count - Item.Count;
+		int32 tmpNum = InItem.Count - Item.Count;
 		Item.Count = FMath::Clamp(Item.Count - InItem.Count, 0, GetMaxVolume(InItem));
 		InItem.Count = FMath::Max(tmpNum, 0);
 		Refresh();
 	}
 }
 
-void UInventorySlot::SplitItem(int InCount /*= -1*/)
+void UInventorySlot::SplitItem(int32 InCount /*= -1*/)
 {
 	if (IsEmpty()) return;
 
 	if(InCount == - 1) InCount = Item.Count;
-	const int tmpCount = Item.Count / InCount;
+	const int32 tmpCount = Item.Count / InCount;
 	auto QueryItemInfo = Inventory->QueryItemByRange(EQueryItemType::Add, Item);
-	for (int i = 0; i < InCount; i++)
+	for (int32 i = 0; i < InCount; i++)
 	{
 		FAbilityItem tmpItem = FAbilityItem(Item, tmpCount);
 		Item.Count -= tmpItem.Count;
-		for (int j = 0; j < QueryItemInfo.Slots.Num(); j++)
+		for (int32 j = 0; j < QueryItemInfo.Slots.Num(); j++)
 		{
 			if (QueryItemInfo.Slots[j]->IsEmpty() && QueryItemInfo.Slots[j] != this)
 			{
@@ -169,7 +168,7 @@ void UInventorySlot::SplitItem(int InCount /*= -1*/)
 	Refresh();
 }
 
-void UInventorySlot::MoveItem(int InCount /*= -1*/)
+void UInventorySlot::MoveItem(int32 InCount /*= -1*/)
 {
 	if (IsEmpty()) return;
 
@@ -218,7 +217,7 @@ void UInventorySlot::MoveItem(int InCount /*= -1*/)
 	SubItem(tmpItem);
 }
 
-void UInventorySlot::UseItem(int InCount /*= -1*/)
+void UInventorySlot::UseItem(int32 InCount /*= -1*/)
 {
 	if (IsEmpty()) return;
 
@@ -296,7 +295,7 @@ void UInventorySlot::DischargeItem()
 	}
 }
 
-void UInventorySlot::DiscardItem(int InCount /*= -1*/)
+void UInventorySlot::DiscardItem(int32 InCount /*= -1*/)
 {
 	if (IsEmpty()) return;
 
@@ -363,13 +362,18 @@ bool UInventorySlot::IsSelected() const
 	return GetInventory()->GetSelectedSlot() == this;
 }
 
-int UInventorySlot::GetRemainVolume(FAbilityItem InItem) const
+int32 UInventorySlot::GetSplitIndex(ESplitSlotType InSplitSlotType)
+{
+	return GetInventory()->GetSplitSlots(InSplitSlotType).Find(this);
+}
+
+int32 UInventorySlot::GetRemainVolume(FAbilityItem InItem) const
 {
 	const FAbilityItem TmpItem = InItem.IsValid() ? InItem : Item;
 	return GetMaxVolume(TmpItem) - Item.Count;
 }
 
-int UInventorySlot::GetMaxVolume(FAbilityItem InItem) const
+int32 UInventorySlot::GetMaxVolume(FAbilityItem InItem) const
 {
 	const FAbilityItem TmpItem = InItem.IsValid() ? InItem : Item;
 	return TmpItem.IsValid() ? TmpItem.GetData().MaxCount : 0;

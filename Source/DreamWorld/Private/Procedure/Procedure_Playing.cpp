@@ -47,19 +47,15 @@ void UProcedure_Playing::OnEnter(UProcedureBase* InLastProcedure)
 	{
 		UAudioModuleBPLibrary::PlaySingleSound2D(BGMSound, FName("BGM"));
 
+		UWidgetModuleBPLibrary::OpenUserWidget<UWidgetGameHUD>();
+		UWidgetModuleBPLibrary::OpenUserWidget<UWidgetInventoryBar>();
+
 		if(ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>())
 		{
 			PlayerCharacter->Execute_SetActorVisible(PlayerCharacter, true);
 			PlayerCharacter->RefreshAttributes();
 			UCharacterModuleBPLibrary::SwitchCharacter(PlayerCharacter);
 		}
-
-		UWidgetModuleBPLibrary::OpenUserWidget<UWidgetGameHUD>();
-		UWidgetModuleBPLibrary::OpenUserWidget<UWidgetInventoryBar>();
-		
-		UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>()->Initialize(UGlobalBPLibrary::GetPlayerCharacter());
-		UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryBar>()->Initialize(UGlobalBPLibrary::GetPlayerCharacter());
-		UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>()->Initialize(UGlobalBPLibrary::GetPlayerCharacter());
 	}
 }
 

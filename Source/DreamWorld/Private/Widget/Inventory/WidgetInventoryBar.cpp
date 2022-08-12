@@ -14,6 +14,8 @@
 #include "Inventory/Inventory.h"
 #include "Widget/Inventory/WidgetInventoryPanel.h"
 #include "Inventory/Slot/InventorySlot.h"
+#include "Procedure/ProcedureModuleBPLibrary.h"
+#include "Procedure/Procedure_Playing.h"
 #include "Widget/WidgetModuleBPLibrary.h"
 #include "Widget/WidgetGameHUD.h"
 #include "Widget/WidgetItemInfoBox.h"
@@ -40,6 +42,11 @@ UWidgetInventoryBar::UWidgetInventoryBar(const FObjectInitializer& ObjectInitial
 
 void UWidgetInventoryBar::OnInitialize_Implementation(AActor* InOwner)
 {
+	if(GetInventory())
+	{
+		GetInventory()->GetOnSlotSelected().RemoveDynamic(this, &UWidgetInventoryBar::OnInventorySlotSelected);
+	}
+
 	Super::OnInitialize_Implementation(InOwner);
 
 	if(!GetInventory()) return;
@@ -131,6 +138,17 @@ void UWidgetInventoryBar::OnInitialize_Implementation(AActor* InOwner)
 			}
 		}
 	}
+
+	GetInventory()->GetOnSlotSelected().AddDynamic(this, &UWidgetInventoryBar::OnInventorySlotSelected);
+
+	if(GetInventory()->GetSelectedSlot())
+	{
+		SelectInventorySlot(GetInventory()->GetSelectedSlot()->GetSplitIndex(ESplitSlotType::Shortcut), false);
+	}
+	else
+	{
+		SelectInventorySlot(0);
+	}
 }
 
 void UWidgetInventoryBar::OnOpen_Implementation(const TArray<FParameter>& InParams, bool bInstant)
@@ -152,6 +170,14 @@ void UWidgetInventoryBar::OnRefresh_Implementation()
 	Super::OnRefresh_Implementation();
 }
 
+void UWidgetInventoryBar::OnInventorySlotSelected(UInventorySlot* InInventorySlot)
+{
+	if(InInventorySlot)
+	{
+		SelectInventorySlot(InInventorySlot->GetSplitIndex(ESplitSlotType::Shortcut), false);
+	}
+}
+
 void UWidgetInventoryBar::PrevInventorySlot()
 {
 	if(SelectedSlotIndex > 0)
@@ -168,23 +194,27 @@ void UWidgetInventoryBar::NextInventorySlot()
 		SelectInventorySlot(0);
 }
 
-void UWidgetInventoryBar::SelectInventorySlot(int32 InSlotIndex)
+void UWidgetInventoryBar::SelectInventorySlot(int32 InSlotIndex, bool bRefreshInventory)
 {
 	SelectedSlotIndex = InSlotIndex;
-	UInventorySlot* SelectedSlot = GetSelectedSlot();
-	GetInventory()->SetSelectedSlot(SelectedSlot);
-	if(!SelectedSlot->IsEmpty())
+	if(UInventorySlot* SelectedSlot = GetSelectedSlot())
 	{
-		UWidgetModuleBPLibrary::OpenUserWidget<UWidgetItemInfoBox>({ FParameter::MakeString(SelectedSlot->GetItem().GetData().Name.ToString()) });
+		if(bRefreshInventory)
+		{
+			GetInventory()->SetSelectedSlot(SelectedSlot);
+		}
+		if(!SelectedSlot->IsEmpty() && UProcedureModuleBPLibrary::IsCurrentProcedureClass<UProcedure_Playing>())
+		{
+			UWidgetModuleBPLibrary::OpenUserWidget<UWidgetItemInfoBox>({ FParameter::MakeString(SelectedSlot->GetItem().GetData().Name.ToString()) });
+		}
 	}
-	UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>()->RefreshActions();
 	UpdateSelectBox();
 }
 
 UInventorySlot* UWidgetInventoryBar::GetSelectedSlot() const
 {
 	auto SplitUISlots = GetSplitUISlots(ESplitSlotType::Shortcut);
-	if(SplitUISlots.Num() > SelectedSlotIndex)
+	if(SplitUISlots.IsValidIndex(SelectedSlotIndex))
 	{
 		return SplitUISlots[SelectedSlotIndex]->GetOwnerSlot();
 	}

@@ -86,6 +86,10 @@ void UInventory::LoadData(FSaveData* InSaveData, bool bForceMode)
 	for (int32 i = 0; i < Slots.Num(); i++)
 	{
 		Slots[i]->SetItem(SaveData.Items.IsValidIndex(i) ? SaveData.Items[i] : FAbilityItem::Empty);
+		if(i == SaveData.SelectedIndex)
+		{
+			SetSelectedSlot(Slots[i]);
+		}
 	}
 }
 
@@ -95,6 +99,10 @@ FSaveData* UInventory::ToData()
 
 	SaveData.Reset();
 	SaveData.SplitInfos = SplitInfos;
+	if(SelectedSlot)
+	{
+		SaveData.SelectedIndex = SelectedSlot->GetSplitIndex();
+	}
 
 	for (int32 i = 0; i < Slots.Num(); i++)
 	{
@@ -380,6 +388,8 @@ FSplitSlotInfo UInventory::GetSplitSlotInfo(ESplitSlotType InSplitSlotType) cons
 
 TArray<UInventorySlot*> UInventory::GetSplitSlots(ESplitSlotType InSplitSlotType)
 {
+	if(InSplitSlotType == ESplitSlotType::None) return Slots;
+	
 	TArray<UInventorySlot*> SplitSlots = TArray<UInventorySlot*>();
 
 	for (auto Iter : SplitInfos)

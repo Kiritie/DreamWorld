@@ -54,6 +54,9 @@ public:
 
 	virtual void OnRefresh_Implementation() override;
 
+	UFUNCTION()
+	virtual void OnInventorySlotSelected(UInventorySlot* InInventorySlot);
+
 public:
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
 	void UpdateSelectBox();
@@ -65,7 +68,7 @@ public:
 	void NextInventorySlot();
 	
 	UFUNCTION(BlueprintCallable)
-	void SelectInventorySlot(int32 InSlotIndex);
+	void SelectInventorySlot(int32 InSlotIndex, bool bRefreshInventory = true);
 
 	UFUNCTION(BlueprintPure)
 	UInventorySlot* GetSelectedSlot() const;

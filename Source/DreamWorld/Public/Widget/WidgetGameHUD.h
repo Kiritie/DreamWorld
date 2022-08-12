@@ -49,10 +49,10 @@ public:
 	void RefreshActions();
 
 protected:
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
+	UFUNCTION(BlueprintImplementableEvent)
 	void ShowActions(const TArray<EInteractAction>& InActions);
 		
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
+	UFUNCTION(BlueprintImplementableEvent)
 	void HideActions();
 
 	UFUNCTION()

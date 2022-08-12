@@ -88,6 +88,8 @@ public:
 
 	virtual void OnLeaveInteract(IInteractionAgentInterface* InInteractionAgent) override;
 
+	virtual void OnInteract(IInteractionAgentInterface* InInteractionAgent, EInteractAction InInteractAction) override;
+
 protected:
 	virtual void MoveForward_Implementation(float InValue) override;
 
@@ -96,6 +98,8 @@ protected:
 	virtual void MoveUp_Implementation(float InValue) override;
 
 public:
+	virtual void OnSelectedItemChange(const FAbilityItem& InItem) override;
+	
 	virtual void OnAttributeChange(const FOnAttributeChangeData& InAttributeChangeData) override;
 
 public:

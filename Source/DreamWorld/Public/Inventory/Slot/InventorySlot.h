@@ -90,20 +90,20 @@ public:
 	virtual void SubItem(FAbilityItem& InItem);
 			
 	UFUNCTION(BlueprintCallable)
-	virtual void SplitItem(int InCount = -1);
+	virtual void SplitItem(int32 InCount = -1);
 			
 	UFUNCTION(BlueprintCallable)
-	virtual void MoveItem(int InCount = -1);
+	virtual void MoveItem(int32 InCount = -1);
 
 	UFUNCTION(BlueprintCallable)
-	virtual void UseItem(int InCount = -1);
+	virtual void UseItem(int32 InCount = -1);
 
 	virtual void AssembleItem();
 
 	virtual void DischargeItem();
 
 	UFUNCTION(BlueprintCallable)
-	virtual void DiscardItem(int InCount = -1);
+	virtual void DiscardItem(int32 InCount = -1);
 	
 	UFUNCTION(BlueprintCallable)
 	virtual bool ActiveItem();
@@ -123,9 +123,11 @@ public:
 	UFUNCTION(BlueprintPure)
 	bool IsSelected() const;
 
-	int GetRemainVolume(FAbilityItem InItem = FAbilityItem::Empty) const;
+	int32 GetSplitIndex(ESplitSlotType InSplitSlotType = ESplitSlotType::None);
 
-	int GetMaxVolume(FAbilityItem InItem = FAbilityItem::Empty) const;
+	int32 GetRemainVolume(FAbilityItem InItem = FAbilityItem::Empty) const;
+
+	int32 GetMaxVolume(FAbilityItem InItem = FAbilityItem::Empty) const;
 
 	UFUNCTION(BlueprintPure)
 	FAbilityItem& GetItem()  { return Item; }

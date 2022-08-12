@@ -118,6 +118,7 @@ public:
 	{
 		SplitInfos = TMap<ESplitSlotType, FSplitSlotInfo>();
 		Items = TArray<FAbilityItem>();
+		SelectedIndex = -1;
 	}
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -126,6 +127,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<FAbilityItem> Items;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	int32 SelectedIndex;
+
 public:
 	virtual void Reset() override
 	{
@@ -133,6 +137,7 @@ public:
 
 		SplitInfos.Empty();
 		Items.Empty();
+		SelectedIndex = -1;
 	}
 
 	FSplitSlotInfo GetSplitSlotInfo(ESplitSlotType InSplitSlotType) const

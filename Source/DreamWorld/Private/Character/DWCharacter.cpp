@@ -423,6 +423,7 @@ bool ADWCharacter::CanInteract(IInteractionAgentInterface* InInteractionAgent, E
 
 void ADWCharacter::OnInteract(IInteractionAgentInterface* InInteractionAgent, EInteractAction InInteractAction)
 {
+	Super::OnInteract(InInteractionAgent, InInteractAction);
 	switch (InInteractAction)
 	{
 		case EInteractAction::Revive:
