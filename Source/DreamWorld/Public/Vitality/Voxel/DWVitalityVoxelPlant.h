@@ -4,7 +4,7 @@
 
 #include "DWVitalityVoxel.h"
 #include "DreamWorld/DreamWorld.h"
-#include "DWVitalityPlant.generated.h"
+#include "DWVitalityVoxelPlant.generated.h"
 
 class UVoxelMeshComponent;
 
@@ -12,13 +12,13 @@ class UVoxelMeshComponent;
  * 有生命的植物
  */
 UCLASS()
-class DREAMWORLD_API ADWVitalityPlant : public ADWVitalityVoxel
+class DREAMWORLD_API ADWVitalityVoxelPlant : public ADWVitalityVoxel
 {
 	GENERATED_BODY()
 
 public:
 	// Sets default values for this actor's properties
-	ADWVitalityPlant();
+	ADWVitalityVoxelPlant();
 
 protected:
 	// Called when the game starts or when spawned

@@ -96,8 +96,8 @@ void UInventory::LoadData(FSaveData* InSaveData, bool bForceMode)
 FSaveData* UInventory::ToData()
 {
 	static FInventorySaveData SaveData;
+	SaveData = FInventorySaveData();
 
-	SaveData.Reset();
 	SaveData.SplitInfos = SplitInfos;
 	if(SelectedSlot)
 	{

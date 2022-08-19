@@ -16,6 +16,7 @@
 #include "SaveGame/Archive/DWArchiveSaveGame.h"
 #include "SaveGame/General/DWGeneralSaveGame.h"
 #include "SaveGame/SaveGameModuleBPLibrary.h"
+#include "Scene/SceneModule.h"
 #include "Voxel/DWVoxelModule.h"
 #include "Widget/WidgetMainMenu.h"
 #include "Widget/WidgetModuleBPLibrary.h"
@@ -62,6 +63,7 @@ void UProcedure_Starting::OnEnter(UProcedureBase* InLastProcedure)
 		AMainModule::GetModuleByClass<AVoxelModule>()->UnloadSaveData(false);
 		UGlobalBPLibrary::GetPlayerController<ADWPlayerController>()->UnloadSaveData(false);
 	}
+	AMainModule::PauseModuleByClass<ASceneModule>();
 
 	Super::OnEnter(InLastProcedure);
 }

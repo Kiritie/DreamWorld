@@ -65,8 +65,8 @@ void ADWPlayerController::OnPreparatory_Implementation()
 void ADWPlayerController::LoadData(FSaveData* InSaveData, bool bForceMode)
 {
 	ADWPlayerCharacter* PlayerCharacter = nullptr;
-	
-	auto SaveData = InSaveData->CastRef<FDWPlayerSaveData>();
+
+	const auto& SaveData = InSaveData->CastRef<FDWPlayerSaveData>();
 	if(bForceMode)
 	{
 		PlayerCharacter = UObjectPoolModuleBPLibrary::SpawnObject<ADWPlayerCharacter>(nullptr, SaveData.GetCharacterData().Class);
@@ -271,7 +271,12 @@ bool ADWPlayerController::RaycastFromAimPoint(FHitResult& OutHitResult, EDWGameT
 	{
 		const FVector rayStart = PlayerCameraManager->GetCameraLocation();
 		const FVector rayEnd = rayStart + rayDirection * InRayDistance;
-		return UKismetSystemLibrary::LineTraceSingle(this, rayStart, rayEnd, UDWHelper::GetGameTrace(InGameTraceType), false, TArray<AActor*>(), EDrawDebugTrace::None, OutHitResult, true);
+		TArray<AActor*> ignoreActors;
+		if(ADWCharacter* possessedCharacter = GetPawn<ADWCharacter>())
+		{
+			ignoreActors.Add(possessedCharacter);
+		}
+		return UKismetSystemLibrary::LineTraceSingle(this, rayStart, rayEnd, UDWHelper::GetGameTrace(InGameTraceType), false, ignoreActors, EDrawDebugTrace::None, OutHitResult, true);
 	}
 	return false;
 }

@@ -61,8 +61,8 @@ void ADWSaveGameModule::LoadData(FSaveData* InSaveData, bool bForceMode)
 
 FSaveData* ADWSaveGameModule::ToData()
 {
-	static auto SaveData = Super::ToData()->CastRef<FDWGeneralSaveData>();
-	SaveData.Reset();
+	static FDWGeneralSaveData SaveData;
+	SaveData = Super::ToData()->CastRef<FGeneralSaveData>();
 	SaveData.CameraDistance = UCameraModuleBPLibrary::GetCurrentCameraDistance();
 	return &SaveData;
 }

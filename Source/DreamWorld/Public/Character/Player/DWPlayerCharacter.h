@@ -47,19 +47,13 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	UCameraComponent* FollowCamera;
-		
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-	UVoxelMeshComponent* VoxelMesh;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-	USkeletalMeshComponent* HammerMesh;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	USceneCaptureComponent2D* PreviewCapture;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	USceneCaptureComponent2D* MiniMapCapture;
-	
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

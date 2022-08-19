@@ -303,11 +303,10 @@ FSaveData* ADWCharacter::ToData()
 void ADWCharacter::SetActorVisible_Implementation(bool bNewVisible)
 {
 	Super::SetActorVisible_Implementation(bNewVisible);
-	
-	if(bNewVisible && ControlMode == EDWCharacterControlMode::Fighting)
+
+	if(bNewVisible)
 	{
-		if(GetWeapon()) GetWeapon()->Execute_SetActorVisible(GetWeapon(), true);
-		if(GetShield()) GetShield()->Execute_SetActorVisible(GetShield(), true);
+		SetControlMode(ControlMode);
 	}
 }
 

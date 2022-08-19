@@ -9,6 +9,7 @@
 #include "Gameplay/DWGameState.h"
 #include "Global/GlobalBPLibrary.h"
 #include "Procedure/Procedure_Loading.h"
+#include "Scene/SceneModule.h"
 #include "Widget/WidgetGameHUD.h"
 #include "Widget/WidgetModuleBPLibrary.h"
 #include "Widget/Inventory/WidgetInventoryBar.h"
@@ -57,6 +58,7 @@ void UProcedure_Playing::OnEnter(UProcedureBase* InLastProcedure)
 			UCharacterModuleBPLibrary::SwitchCharacter(PlayerCharacter);
 		}
 	}
+	AMainModule::UnPauseModuleByClass<ASceneModule>();
 }
 
 void UProcedure_Playing::OnRefresh()

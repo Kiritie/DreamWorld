@@ -6,6 +6,7 @@
 #include "Character/DWCharacter.h"
 #include "DWHumanCharacter.generated.h"
 
+class AVoxelEntity;
 class UBoxComponent;
 class UStaticMeshComponent;
 class ADWEquipWeapon;
@@ -25,11 +26,26 @@ public:
 	ADWHumanCharacter();
 
 protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	UChildActorComponent* VoxelMesh;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	USkeletalMeshComponent* HammerMesh;
+
+protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	virtual void OnSpawn_Implementation(const TArray<FParameter>& InParams) override;
+
+	virtual void OnDespawn_Implementation() override;
+
 public:
 	virtual void Tick(float DeltaTime) override;
+
+	virtual void SetControlMode(EDWCharacterControlMode InControlMode) override;
+
+	virtual void SetGenerateVoxelItem(const FVoxelItem& InGenerateVoxelItem) override;
 
 	virtual void SetAttackDamageAble(bool bInDamaging) override;
 };

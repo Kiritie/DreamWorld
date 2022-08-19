@@ -131,15 +131,6 @@ public:
 	int32 SelectedIndex;
 
 public:
-	virtual void Reset() override
-	{
-		FSaveData::Reset();
-
-		SplitInfos.Empty();
-		Items.Empty();
-		SelectedIndex = -1;
-	}
-
 	FSplitSlotInfo GetSplitSlotInfo(ESplitSlotType InSplitSlotType) const
 	{
 		if(SplitInfos.Contains(InSplitSlotType))

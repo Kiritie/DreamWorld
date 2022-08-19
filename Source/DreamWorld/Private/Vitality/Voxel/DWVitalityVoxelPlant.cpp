@@ -1,26 +1,26 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Vitality/DWVitalityPlant.h"
+#include "Vitality/Voxel/DWVitalityVoxelPlant.h"
 
 #include "Components/BoxComponent.h"
 #include "Voxel/Components/VoxelMeshComponent.h"
 
 // Sets default values
-ADWVitalityPlant::ADWVitalityPlant()
+ADWVitalityVoxelPlant::ADWVitalityVoxelPlant()
 {
 
 }
 
 // Called when the game starts or when spawned
-void ADWVitalityPlant::BeginPlay()
+void ADWVitalityVoxelPlant::BeginPlay()
 {
 	Super::BeginPlay();
 
 }
 
 // Called every frame
-void ADWVitalityPlant::Tick(float DeltaTime)
+void ADWVitalityVoxelPlant::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 

@@ -12,6 +12,8 @@
 #include "BehaviorTree/BehaviorTree.h"
 #include "AI/DWAIBlackboard.h"
 #include "Item/Equip/Weapon/DWEquipWeapon.h"
+#include "ObjectPool/ObjectPoolModuleBPLibrary.h"
+#include "Voxel/Voxels/Entity/VoxelEntity.h"
 
 ADWHumanCharacter::ADWHumanCharacter()
 {
@@ -27,6 +29,18 @@ ADWHumanCharacter::ADWHumanCharacter()
 	GetCharacterMovement()->AirControl = 0.3f;
 
 	GetMesh()->SetRelativeLocation(FVector(0, 0, -70));
+	
+	VoxelMesh = CreateDefaultSubobject<UChildActorComponent>(FName("VoxelMesh"));
+	VoxelMesh->SetupAttachment(GetMesh(), FName("VoxelMesh"));
+	VoxelMesh->SetRelativeLocationAndRotation(FVector(0, 0, 0), FRotator(0, 0, 0));
+	VoxelMesh->SetChildActorClass(AVoxelEntity::StaticClass());
+
+	HammerMesh = CreateDefaultSubobject<USkeletalMeshComponent>(FName("HammerMesh"));
+	HammerMesh->SetupAttachment(GetMesh(), FName("HammerMesh"));
+	HammerMesh->SetRelativeLocationAndRotation(FVector(0, 0, 0), FRotator(0, 0, 0));
+	HammerMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	HammerMesh->SetCastShadow(false);
+	HammerMesh->SetVisibility(false);
 }
 
 // Called when the game starts or when spawned
@@ -36,11 +50,59 @@ void ADWHumanCharacter::BeginPlay()
 
 }
 
+void ADWHumanCharacter::OnSpawn_Implementation(const TArray<FParameter>& InParams)
+{
+	Super::OnSpawn_Implementation(InParams);
+}
+
+void ADWHumanCharacter::OnDespawn_Implementation()
+{
+	Super::OnDespawn_Implementation();
+	
+	if(AVoxelEntity* VoxelEntity = Cast<AVoxelEntity>(VoxelMesh->GetChildActor()))
+	{
+		VoxelEntity->Initialize(FPrimaryAssetId());
+	}
+}
+
 // Called every frame
 void ADWHumanCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+void ADWHumanCharacter::SetControlMode(EDWCharacterControlMode InControlMode)
+{
+	Super::SetControlMode(InControlMode);
+
+	if(!Execute_IsVisible(this)) return;
+	
+	switch (ControlMode)
+	{
+		case EDWCharacterControlMode::Fighting:
+		{
+			VoxelMesh->SetVisibility(false);
+			HammerMesh->SetVisibility(false);
+			break;
+		}
+		case EDWCharacterControlMode::Creating:
+		{
+			VoxelMesh->SetVisibility(true);
+			HammerMesh->SetVisibility(true);
+			break;
+		}
+	}
+}
+
+void ADWHumanCharacter::SetGenerateVoxelItem(const FVoxelItem& InGenerateVoxelItem)
+{
+	Super::SetGenerateVoxelItem(InGenerateVoxelItem);
+
+	if(AVoxelEntity* VoxelEntity = Cast<AVoxelEntity>(VoxelMesh->GetChildActor()))
+	{
+		VoxelEntity->Initialize(GenerateVoxelItem.ID);
+	}
 }
 
 void ADWHumanCharacter::SetAttackDamageAble(bool bInDamaging)

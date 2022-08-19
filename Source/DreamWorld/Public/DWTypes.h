@@ -465,13 +465,6 @@ public:
 	}
 
 public:
-	virtual void Reset() override
-	{
-		FSaveData::Reset();
-		CharacterDatas.Empty();
-		VitalityDatas.Empty();
-	}
-
 	virtual void MakeSaved() override
 	{
 		Super::MakeSaved();
@@ -507,12 +500,6 @@ public:
 	TMap<FVector, FDWVoxelChunkSaveData> ChunkDatas;
 
 public:
-	virtual void Reset() override
-	{
-		FSaveData::Reset();
-		ChunkDatas.Empty();
-	}
-
 	virtual void MakeSaved() override
 	{
 		Super::MakeSaved();
@@ -600,6 +587,12 @@ struct DREAMWORLD_API FDWGeneralSaveData : public FGeneralSaveData
 
 public:
 	FORCEINLINE FDWGeneralSaveData()
+	{
+		bAutoJump = true;
+		CameraDistance = 150.f;
+	}
+
+	FORCEINLINE FDWGeneralSaveData(const FGeneralSaveData& InGeneralSaveData) : FGeneralSaveData(InGeneralSaveData)
 	{
 		bAutoJump = true;
 		CameraDistance = 150.f;

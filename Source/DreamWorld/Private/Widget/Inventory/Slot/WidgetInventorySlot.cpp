@@ -140,7 +140,15 @@ void UWidgetInventorySlot::OnRefresh()
 	if(!IsEmpty())
 	{
 		ImgIcon->SetVisibility(ESlateVisibility::Visible);
-		ImgIcon->SetBrushFromTexture(GetItem().GetData().Icon);
+		const auto& ItemData = GetItem().GetData();
+		if(ItemData.IconMat)
+		{
+			ImgIcon->SetBrushFromMaterial(ItemData.IconMat);
+		}
+		else
+		{
+			ImgIcon->SetBrushFromTexture(ItemData.Icon);
+		}
 		if(TxtCount)
 		{
 			if(GetItem().Count > 1)

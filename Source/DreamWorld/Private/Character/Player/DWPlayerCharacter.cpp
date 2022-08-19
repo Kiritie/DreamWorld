@@ -65,6 +65,7 @@
 #include "FSM/Components/FSMComponent.h"
 #include "Global/GlobalBPLibrary.h"
 #include "Voxel/VoxelModuleBPLibrary.h"
+#include "Voxel/Voxels/Entity/VoxelEntity.h"
 
 //////////////////////////////////////////////////////////////////////////
 // ADWPlayerCharacter
@@ -99,21 +100,6 @@ ADWPlayerCharacter::ADWPlayerCharacter()
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
 	GetMesh()->SetRelativeLocation(FVector(0, 0, -70));
-
-	VoxelMesh = CreateDefaultSubobject<UVoxelMeshComponent>(FName("VoxelMesh"));
-	VoxelMesh->SetupAttachment(GetMesh(), FName("VoxelMesh"));
-	VoxelMesh->SetRelativeLocationAndRotation(FVector(0, 0, 0), FRotator(0, 0, 0));
-	VoxelMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	VoxelMesh->SetCastShadow(false);
-	VoxelMesh->SetVisibility(false);
-	VoxelMesh->Initialize(EVoxelMeshNature::PickUp);
-
-	HammerMesh = CreateDefaultSubobject<USkeletalMeshComponent>(FName("HammerMesh"));
-	HammerMesh->SetupAttachment(GetMesh(), FName("HammerMesh"));
-	HammerMesh->SetRelativeLocationAndRotation(FVector(0, 0, 0), FRotator(0, 0, 0));
-	HammerMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	HammerMesh->SetCastShadow(false);
-	HammerMesh->SetVisibility(false);
 
 	PreviewCapture = CreateDefaultSubobject<USceneCaptureComponent2D>(FName("SceneCapture"));
 	PreviewCapture->ProjectionType = ECameraProjectionMode::Orthographic;
@@ -273,39 +259,11 @@ void ADWPlayerCharacter::SetActorVisible_Implementation(bool bNewVisible)
 void ADWPlayerCharacter::SetControlMode(EDWCharacterControlMode InControlMode)
 {
 	Super::SetControlMode(InControlMode);
-
-	if(!Execute_IsVisible(this)) return;
-	
-	switch (ControlMode)
-	{
-		case EDWCharacterControlMode::Fighting:
-		{
-			VoxelMesh->SetVisibility(false);
-			HammerMesh->SetVisibility(false);
-			break;
-		}
-		case EDWCharacterControlMode::Creating:
-		{
-			VoxelMesh->SetVisibility(true);
-			HammerMesh->SetVisibility(true);
-			break;
-		}
-	}
 }
 
 void ADWPlayerCharacter::SetGenerateVoxelItem(const FVoxelItem& InGenerateVoxelItem)
 {
 	Super::SetGenerateVoxelItem(InGenerateVoxelItem);
-
-	if(GenerateVoxelItem.IsValid())
-	{
-		VoxelMesh->BuildVoxel(GenerateVoxelItem);
-		VoxelMesh->CreateMesh(0, false);
-	}
-	else
-	{
-		VoxelMesh->ClearMesh();
-	}
 }
 
 void ADWPlayerCharacter::RefreshEquip(EDWEquipPartType InPartType, const FAbilityItem& InItem)
