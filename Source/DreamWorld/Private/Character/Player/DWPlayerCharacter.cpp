@@ -261,9 +261,9 @@ void ADWPlayerCharacter::SetControlMode(EDWCharacterControlMode InControlMode)
 	Super::SetControlMode(InControlMode);
 }
 
-void ADWPlayerCharacter::SetGenerateVoxelItem(const FVoxelItem& InGenerateVoxelItem)
+void ADWPlayerCharacter::SetGenerateVoxelID(const FPrimaryAssetId& InGenerateVoxelID)
 {
-	Super::SetGenerateVoxelItem(InGenerateVoxelItem);
+	Super::SetGenerateVoxelID(InGenerateVoxelID);
 }
 
 void ADWPlayerCharacter::RefreshEquip(EDWEquipPartType InPartType, const FAbilityItem& InItem)

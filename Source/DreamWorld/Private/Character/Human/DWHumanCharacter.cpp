@@ -95,13 +95,13 @@ void ADWHumanCharacter::SetControlMode(EDWCharacterControlMode InControlMode)
 	}
 }
 
-void ADWHumanCharacter::SetGenerateVoxelItem(const FVoxelItem& InGenerateVoxelItem)
+void ADWHumanCharacter::SetGenerateVoxelID(const FPrimaryAssetId& InGenerateVoxelID)
 {
-	Super::SetGenerateVoxelItem(InGenerateVoxelItem);
+	Super::SetGenerateVoxelID(InGenerateVoxelID);
 
 	if(AVoxelEntity* VoxelEntity = Cast<AVoxelEntity>(VoxelMesh->GetChildActor()))
 	{
-		VoxelEntity->Initialize(GenerateVoxelItem.ID);
+		VoxelEntity->Initialize(GenerateVoxelID);
 	}
 }
 

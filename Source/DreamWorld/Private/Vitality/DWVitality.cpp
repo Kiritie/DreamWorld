@@ -165,9 +165,9 @@ void ADWVitality::OnInteract(IInteractionAgentInterface* InInteractionAgent, EIn
 
 bool ADWVitality::GenerateVoxel(const FVoxelHitResult& InVoxelHitResult)
 {
-	if(!GenerateVoxelItem.IsValid()) return false;
+	if(!GenerateVoxelID.IsValid()) return false;
 	
-	FQueryItemInfo QueryItemInfo = Inventory->QueryItemByRange(EQueryItemType::Remove, FAbilityItem(GenerateVoxelItem, 1), -1);
+	FQueryItemInfo QueryItemInfo = Inventory->QueryItemByRange(EQueryItemType::Remove, FAbilityItem(GenerateVoxelID, 1), -1);
 	if(QueryItemInfo.IsSuccess())
 	{
 		if(Super::GenerateVoxel(InVoxelHitResult))
@@ -232,11 +232,11 @@ void ADWVitality::OnSelectedItemChange(const FAbilityItem& InItem)
 {
 	if(InItem.IsValid() && InItem.GetData().GetItemType() == EAbilityItemType::Voxel)
 	{
-		SetGenerateVoxelItem(InItem);
+		SetGenerateVoxelID(InItem.ID);
 	}
 	else
 	{
-		SetGenerateVoxelItem(FVoxelItem::Empty);
+		SetGenerateVoxelID(FPrimaryAssetId());
 	}
 }
 

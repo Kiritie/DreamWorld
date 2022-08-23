@@ -292,20 +292,13 @@ void ADWVoxelChunk::AddSceneActor(AActor* InActor)
 
 	if(!InActor || !InActor->Implements<USceneActorInterface>() || ISceneActorInterface::Execute_GetContainer(InActor) == this) return;
 
-	if(ISceneActorInterface::Execute_GetContainer(InActor))
-	{
-		ISceneActorInterface::Execute_GetContainer(InActor)->RemoveSceneActor(InActor);
-	}
-
 	if(ADWCharacter* Character = Cast<ADWCharacter>(InActor))
 	{
-		Character->Execute_SetContainer(Character, this);
 		Characters.Add(Character);
 	}
 	else if(ADWVitality* Vitality = Cast<ADWVitality>(InActor))
 	{
 		Vitality->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
-		Vitality->Execute_SetContainer(Vitality, this);
 		Vitalitys.Add(Vitality);
 	}
 }
@@ -318,13 +311,11 @@ void ADWVoxelChunk::RemoveSceneActor(AActor* InActor)
 
 	if(ADWCharacter* Character = Cast<ADWCharacter>(InActor))
 	{
-		Character->Execute_SetContainer(Character, nullptr);
 		Characters.Remove(Character);
 	}
 	else if(ADWVitality* Vitality = Cast<ADWVitality>(InActor))
 	{
 		Vitality->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
-		Vitality->Execute_SetContainer(Vitality, nullptr);
 		Vitalitys.Remove(Vitality);
 	}
 }

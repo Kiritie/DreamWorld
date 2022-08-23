@@ -360,16 +360,13 @@ void ADWCharacter::Tick(float DeltaTime)
 		}
 
 		const FVector Location = GetMesh()->GetSocketLocation(FName("Foot"));
-		if(AVoxelModule* VoxelModule = AMainModule::GetModuleByClass<AVoxelModule>())
+		if(AVoxelChunk* Chunk = UVoxelModuleBPLibrary::FindChunkByLocation(Location))
 		{
-			if(AVoxelChunk* Chunk = UVoxelModuleBPLibrary::FindChunkByLocation(Location))
-			{
-				Chunk->AddSceneActor(this);
-			}
-			else if(Container)
-			{
-				Cast<AVoxelChunk>(Container.GetObject())->RemoveSceneActor(this);
-			}
+			Chunk->AddSceneActor(this);
+		}
+		else if(Container)
+		{
+			Cast<AVoxelChunk>(Container.GetObject())->RemoveSceneActor(this);
 		}
 
 		if (IsSprinting() && GetMoveDirection().Size() > 0.2f)
@@ -763,9 +760,9 @@ void ADWCharacter::PickUp(AAbilityPickUpBase* InPickUp)
 
 bool ADWCharacter::GenerateVoxel(const FVoxelHitResult& InVoxelHitResult)
 {
-	if(!GenerateVoxelItem.IsValid()) return false;
+	if(!GenerateVoxelID.IsValid()) return false;
 	
-	FQueryItemInfo QueryItemInfo = Inventory->QueryItemByRange(EQueryItemType::Remove, FAbilityItem(GenerateVoxelItem, 1), -1);
+	FQueryItemInfo QueryItemInfo = Inventory->QueryItemByRange(EQueryItemType::Remove, FAbilityItem(GenerateVoxelID, 1), -1);
 	if(QueryItemInfo.IsSuccess() && DoAction(EDWCharacterActionType::Generate))
 	{
 		if(Super::GenerateVoxel(InVoxelHitResult))
@@ -793,6 +790,7 @@ void ADWCharacter::RefreshEquip(EDWEquipPartType InPartType, const FAbilityItem&
 	{
 		if(Equip && !Equip->GetItemData().EqualID(InItem.ID))
 		{
+			Equip->OnDischarge();
 			UObjectPoolModuleBPLibrary::DespawnObject(Equip);
 			Equip = nullptr;
 		}
@@ -832,6 +830,8 @@ bool ADWCharacter::StopAction(EDWCharacterActionType InActionType)
 
 void ADWCharacter::EndAction(EDWCharacterActionType InActionType)
 {
+	if (!HasActionAbility(InActionType)) return;
+
 	switch(InActionType)
 	{
 		case EDWCharacterActionType::Death:
@@ -1435,11 +1435,11 @@ void ADWCharacter::OnSelectedItemChange(const FAbilityItem& InItem)
 {
 	if(InItem.IsValid() && InItem.GetData().GetItemType() == EAbilityItemType::Voxel)
 	{
-		SetGenerateVoxelItem(InItem);
+		SetGenerateVoxelID(InItem.ID);
 	}
 	else
 	{
-		SetGenerateVoxelItem(FVoxelItem::Empty);
+		SetGenerateVoxelID(FPrimaryAssetId());
 	}
 }
 

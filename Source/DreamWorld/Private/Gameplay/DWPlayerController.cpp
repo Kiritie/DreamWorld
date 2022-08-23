@@ -290,8 +290,7 @@ bool ADWPlayerController::RaycastVoxel(FVoxelHitResult& OutHitResult)
 	FHitResult hitResult;
 	if(RaycastFromAimPoint(hitResult, EDWGameTraceType::Voxel, PlayerCharacter->GetInteractDistance()) && hitResult.GetActor()->IsA<AVoxelChunk>())
 	{
-		AVoxelChunk* chunk = Cast<AVoxelChunk>(hitResult.GetActor());
-		if(chunk != nullptr)
+		if(AVoxelChunk* chunk = Cast<AVoxelChunk>(hitResult.GetActor()))
 		{
 			const FVoxelItem& voxelItem = chunk->GetVoxelItem(chunk->LocationToIndex(hitResult.ImpactPoint - UVoxelModuleBPLibrary::GetWorldData().GetBlockSizedNormal(hitResult.ImpactNormal, 0.01f)), true);
 			if(voxelItem.IsValid())

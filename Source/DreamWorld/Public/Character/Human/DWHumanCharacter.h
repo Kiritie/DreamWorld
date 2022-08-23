@@ -45,7 +45,7 @@ public:
 
 	virtual void SetControlMode(EDWCharacterControlMode InControlMode) override;
 
-	virtual void SetGenerateVoxelItem(const FVoxelItem& InGenerateVoxelItem) override;
+	virtual void SetGenerateVoxelID(const FPrimaryAssetId& InGenerateVoxelID) override;
 
 	virtual void SetAttackDamageAble(bool bInDamaging) override;
 };

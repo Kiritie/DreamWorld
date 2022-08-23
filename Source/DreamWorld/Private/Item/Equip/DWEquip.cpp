@@ -21,18 +21,18 @@ ADWEquip::ADWEquip()
 void ADWEquip::Initialize(AAbilityCharacterBase* InOwnerCharacter)
 {
 	Super::Initialize(InOwnerCharacter);
-	if (const ADWCharacter* Character = Cast<ADWCharacter>(InOwnerCharacter))
-	{
-		AttachToComponent(Character->GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, *UGlobalBPLibrary::GetEnumValueAuthoredName(TEXT("EDWEquipPartType"), (int32)GetItemData<UDWEquipData>().PartType));
-	}
 }
 
 void ADWEquip::OnAssemble_Implementation()
 {
 	Super::OnAssemble_Implementation();
+
+	AttachToComponent(OwnerCharacter->GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, *UGlobalBPLibrary::GetEnumValueAuthoredName(TEXT("EDWEquipPartType"), (int32)GetItemData<UDWEquipData>().PartType));
 }
 
 void ADWEquip::OnDischarge_Implementation()
 {
 	Super::OnDischarge_Implementation();
+
+	DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 }

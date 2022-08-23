@@ -111,7 +111,7 @@ public:
 		
 	virtual void SetControlMode(EDWCharacterControlMode InControlMode) override;
 
-	virtual void SetGenerateVoxelItem(const FVoxelItem& InGenerateVoxelItem) override;
+	virtual void SetGenerateVoxelID(const FPrimaryAssetId& InGenerateVoxelID) override;
 	
 	UFUNCTION(BlueprintPure)
 	UTargetSystemComponent* GetTargetSystem() const { return TargetSystem; }
