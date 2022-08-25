@@ -10,10 +10,4 @@ UCLASS()
 class DREAMWORLD_API UDWHelper : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
-
-	//////////////////////////////////////////////////////////////////////////
-	// Trace
-public:
-	UFUNCTION(BlueprintPure, Category = "DWHelper")
-	static ETraceTypeQuery GetGameTrace(EDWGameTraceType InGameTraceType);
 };

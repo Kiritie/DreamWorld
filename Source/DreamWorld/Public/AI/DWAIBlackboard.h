@@ -17,8 +17,9 @@ class DREAMWORLD_API UDWAIBlackboard : public UAIBlackboardBase
 public:
 	virtual void PostLoad() override;
 
-	virtual void OnInitialize(UBlackboardComponent* InComponent, ACharacterBase* InCharacter) override;
+	virtual void Initialize(UBlackboardComponent* InComponent, ACharacterBase* InCharacter) override;
 
+protected:
 	virtual void OnRefresh() override;
 
 	virtual void OnValuePreChange(FName InValueName) override;

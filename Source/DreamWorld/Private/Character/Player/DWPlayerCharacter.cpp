@@ -22,7 +22,6 @@
 #include "Gameplay/DWGameMode.h"
 #include "Perception/PawnSensingComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
-#include "Widget/Components/WidgetCharacterHPComponent.h"
 #include "Widget/Inventory/WidgetInventoryBar.h"
 #include "Widget/Inventory/Slot/WidgetInventorySlot.h"
 #include "Widget/Inventory/WidgetInventoryPanel.h"
@@ -66,6 +65,7 @@
 #include "Global/GlobalBPLibrary.h"
 #include "Voxel/VoxelModuleBPLibrary.h"
 #include "Voxel/Voxels/Entity/VoxelEntity.h"
+#include "Widget/World/WorldWidgetComponent.h"
 
 //////////////////////////////////////////////////////////////////////////
 // ADWPlayerCharacter
@@ -115,6 +115,7 @@ ADWPlayerCharacter::ADWPlayerCharacter()
 	MiniMapCapture->SetupAttachment(RootComponent);
 	MiniMapCapture->SetRelativeLocationAndRotation(FVector(0, 0, 500), FRotator(0, 90, 0));
 
+	FSM->bShowDebugMessage = true;
 	FSM->DefaultState = UDWCharacterState_Default::StaticClass();
 	FSM->States.Empty();
 	FSM->States.Add(UDWPlayerCharacterState_Attack::StaticClass());

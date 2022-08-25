@@ -41,13 +41,10 @@ void ADWVitalityVoxel::LoadData(FSaveData* InSaveData, bool bForceMode)
 	VoxelID = GetVitalityData<UDWVitalityVoxelData>().VoxelID;
 	if(VoxelID.IsValid())
 	{
+		VoxelMesh->CreateVoxel(VoxelID);
 		const FVector range = GetVoxelData().GetRange();
         BoxComponent->SetBoxExtent(range * UVoxelModuleBPLibrary::GetWorldData().BlockSize * 0.5f);
-		BoxComponent->SetRelativeLocation(FVector(0.f, 0.f, range.Z * UVoxelModuleBPLibrary::GetWorldData().BlockSize * 0.5f));
-		// SetActorLocation(SaveData.SpawnLocation + )
-        //AddActorLocalOffset(FVector::UpVector * range.Z * VoxelMesh->BlockScale * 0.5f);
 	}
-	VoxelMesh->CreateVoxel(VoxelID);
 }
 
 FSaveData* ADWVitalityVoxel::ToData()

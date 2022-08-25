@@ -74,11 +74,4 @@ public:
 
 public:
 	virtual AVoxelChunk* SpawnChunk(FIndex InIndex, bool bAddToQueue = true) override;
-
-public:
-	virtual bool ChunkTraceSingle(AVoxelChunk* InChunk, float InRadius, float InHalfHeight, FHitResult& OutHitResult) override;
-
-	virtual bool ChunkTraceSingle(FVector RayStart, FVector RayEnd, float InRadius, float InHalfHeight, FHitResult& OutHitResult) override;
-
-	virtual bool VoxelTraceSingle(const FVoxelItem& InVoxelItem, FVector InPoint, FHitResult& OutHitResult) override;
 };

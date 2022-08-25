@@ -11,6 +11,7 @@
 #include "Character/DWCharacterData.h"
 #include "Character/Base/CharacterBase.h"
 #include "Components/BoxComponent.h"
+#include "Global/GlobalTypes.h"
 #include "Main/MainModule.h"
 #include "Team/DWTeamModule.h"
 #include "Vitality/DWVitality.h"
@@ -191,21 +192,20 @@ void ADWVoxelChunk::SpawnActors()
 			UAbilityModuleBPLibrary::SpawnCharacter(&chunkData.CharacterDatas[i], this);
 		}
 	}
-	else if(IsEntity())
+	else
 	{
-		if(FIndex::Distance(Index, UVoxelModuleBPLibrary::GetWorldData().LastVitalityRaceIndex) > UVoxelModuleBPLibrary::GetWorldData().VitalityRaceDensity / UVoxelModuleBPLibrary::GetWorldData().GetChunkLength())
+		if(FIndex::Distance(Index, UVoxelModuleBPLibrary::GetWorldData().LastVitalityRaceIndex) > UVoxelModuleBPLibrary::GetWorldData().ChunkSize / UVoxelModuleBPLibrary::GetWorldData().VitalityRaceDensity)
 		{
-			auto raceData = UAbilityModuleBPLibrary::RandomVitalityRaceData();
+			auto raceData = UAbilityModuleBPLibrary::GetRandomRaceData<FVitalityRaceData>();
 			for(int32 i = 0; i < raceData.Items.Num(); i++)
 			{
 				const FAbilityItem& vitalityItem = raceData.Items[i];
 				const UAbilityVitalityDataBase& vitalityData = vitalityItem.GetData<UAbilityVitalityDataBase>();
 				for(int32 j = 0; j < vitalityItem.Count; j++)
 				{
-					for(int32 k = 0; k < 10; k++)
-					{
+					DON(k, 10,
 						FHitResult hitResult;
-						if(Module->ChunkTraceSingle(this, FMath::Max(vitalityData.Range.X, vitalityData.Range.Y) * 0.5f * UVoxelModuleBPLibrary::GetWorldData().BlockSize, vitalityData.Range.Z * 0.5f * UVoxelModuleBPLibrary::GetWorldData().BlockSize, hitResult))
+						if(Module->ChunkTraceSingle(this, FMath::Max(vitalityData.Range.X, vitalityData.Range.Y) * 0.5f * UVoxelModuleBPLibrary::GetWorldData().BlockSize, vitalityData.Range.Z * 0.5f * UVoxelModuleBPLibrary::GetWorldData().BlockSize, (ECollisionChannel)EDWGameTraceType::Chunk, {}, hitResult))
 						{
 							auto saveData = FDWVitalitySaveData();
 							saveData.ID = vitalityData.GetPrimaryAssetId();
@@ -218,24 +218,23 @@ void ADWVoxelChunk::SpawnActors()
 							UVoxelModuleBPLibrary::GetWorldData().LastVitalityRaceIndex = Index;
 							break;
 						}
-					}
+					)
 				}
 			}
 		}
-		if(FIndex::Distance(Index, UVoxelModuleBPLibrary::GetWorldData().LastCharacterRaceIndex) > UVoxelModuleBPLibrary::GetWorldData().CharacterRaceDensity / UVoxelModuleBPLibrary::GetWorldData().GetChunkLength())
+		if(FIndex::Distance(Index, UVoxelModuleBPLibrary::GetWorldData().LastCharacterRaceIndex) > UVoxelModuleBPLibrary::GetWorldData().ChunkSize / UVoxelModuleBPLibrary::GetWorldData().CharacterRaceDensity)
 		{
 			ADWCharacter* captain = nullptr;
-			auto raceData = UAbilityModuleBPLibrary::RandomCharacterRaceData();
+			auto raceData = UAbilityModuleBPLibrary::GetRandomRaceData<FCharacterRaceData>();
 			for(int32 i = 0; i < raceData.Items.Num(); i++)
 			{
 				const FAbilityItem& characterItem = raceData.Items[i];
 				const UAbilityCharacterDataBase& characterData = characterItem.GetData<UAbilityCharacterDataBase>();
 				for(int32 j = 0; j < characterItem.Count; j++)
 				{
-					for(int32 k = 0; k < 10; k++)
-					{
+					DON(k, 10,
 						FHitResult hitResult;
-						if(Module->ChunkTraceSingle(this, FMath::Max(characterData.Range.X, characterData.Range.Y) * 0.5f * UVoxelModuleBPLibrary::GetWorldData().BlockSize, characterData.Range.Z * 0.5f * UVoxelModuleBPLibrary::GetWorldData().BlockSize, hitResult))
+						if(Module->ChunkTraceSingle(this, FMath::Max(characterData.Range.X, characterData.Range.Y) * 0.5f * UVoxelModuleBPLibrary::GetWorldData().BlockSize, characterData.Range.Z * 0.5f * UVoxelModuleBPLibrary::GetWorldData().BlockSize, (ECollisionChannel)EDWGameTraceType::Chunk, {}, hitResult))
 						{
 							auto saveData = FDWCharacterSaveData();
 							saveData.ID = characterData.GetPrimaryAssetId();
@@ -262,7 +261,7 @@ void ADWVoxelChunk::SpawnActors()
 							UVoxelModuleBPLibrary::GetWorldData().LastCharacterRaceIndex = Index;
 							break;
 						}
-					}
+					)
 				}
 			}
 		}

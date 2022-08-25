@@ -56,11 +56,7 @@ protected:
 
 public:
 	virtual void Tick(float DeltaTime) override;
-
-	virtual bool RaycastFromAimPoint(FHitResult& OutHitResult, EDWGameTraceType InGameTraceType, float InRayDistance = 1000.f) const;
 	
-	virtual bool RaycastVoxel(FVoxelHitResult& OutHitResult);
-
 protected:
 	virtual void OnJumpPressed(FKey Key);
 

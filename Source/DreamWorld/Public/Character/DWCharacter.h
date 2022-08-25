@@ -15,6 +15,7 @@
 
 #include "DWCharacter.generated.h"
 
+class UWorldWidgetComponent;
 class UDWCharacterData;
 class ADWVoxelChunk;
 class UCharacterInteractionComponent;
@@ -28,7 +29,6 @@ class AVoxelChunk;
 class UVoxel;
 class AController;
 class UDWCharacterAnim;
-class UWidgetCharacterHPComponent;
 class UAbilityBase;
 class UAbilitySystemComponentBase;
 class UCharacterInventory;
@@ -90,7 +90,7 @@ protected:
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-	UWidgetCharacterHPComponent* CharacterHP;
+	UWorldWidgetComponent* CharacterHP;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	UCharacterInventory* Inventory;
@@ -330,7 +330,7 @@ public:
 
 public:
 	UFUNCTION(BlueprintPure)
-	UWidgetCharacterHPComponent* GetCharacterHP() const { return CharacterHP; }
+	UWorldWidgetComponent* GetCharacterHP() const { return CharacterHP; }
 
 	UFUNCTION(BlueprintPure)
 	UWidgetCharacterHP* GetCharacterHPWidget() const;

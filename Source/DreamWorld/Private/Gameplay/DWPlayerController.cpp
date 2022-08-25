@@ -64,9 +64,9 @@ void ADWPlayerController::OnPreparatory_Implementation()
 
 void ADWPlayerController::LoadData(FSaveData* InSaveData, bool bForceMode)
 {
-	ADWPlayerCharacter* PlayerCharacter = nullptr;
-
 	const auto& SaveData = InSaveData->CastRef<FDWPlayerSaveData>();
+
+	ADWPlayerCharacter* PlayerCharacter;
 	if(bForceMode)
 	{
 		PlayerCharacter = UObjectPoolModuleBPLibrary::SpawnObject<ADWPlayerCharacter>(nullptr, SaveData.GetCharacterData().Class);
@@ -262,47 +262,6 @@ void ADWPlayerController::Tick(float DeltaTime)
 	}
 }
 
-bool ADWPlayerController::RaycastFromAimPoint(FHitResult& OutHitResult, EDWGameTraceType InGameTraceType, float InRayDistance) const
-{
-	int32 viewportSizeX, viewportSizeY;
-	FVector sightPos, rayDirection;
-	GetViewportSize(viewportSizeX, viewportSizeY);
-	if(DeprojectScreenPositionToWorld(viewportSizeX * 0.5f, viewportSizeY * 0.5f, sightPos, rayDirection))
-	{
-		const FVector rayStart = PlayerCameraManager->GetCameraLocation();
-		const FVector rayEnd = rayStart + rayDirection * InRayDistance;
-		TArray<AActor*> ignoreActors;
-		if(ADWCharacter* possessedCharacter = GetPawn<ADWCharacter>())
-		{
-			ignoreActors.Add(possessedCharacter);
-		}
-		return UKismetSystemLibrary::LineTraceSingle(this, rayStart, rayEnd, UDWHelper::GetGameTrace(InGameTraceType), false, ignoreActors, EDrawDebugTrace::None, OutHitResult, true);
-	}
-	return false;
-}
-
-bool ADWPlayerController::RaycastVoxel(FVoxelHitResult& OutHitResult)
-{
-	ADWPlayerCharacter* PlayerCharacter = GetPawn<ADWPlayerCharacter>();
-
-	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput()) return false;
-	
-	FHitResult hitResult;
-	if(RaycastFromAimPoint(hitResult, EDWGameTraceType::Voxel, PlayerCharacter->GetInteractDistance()) && hitResult.GetActor()->IsA<AVoxelChunk>())
-	{
-		if(AVoxelChunk* chunk = Cast<AVoxelChunk>(hitResult.GetActor()))
-		{
-			const FVoxelItem& voxelItem = chunk->GetVoxelItem(chunk->LocationToIndex(hitResult.ImpactPoint - UVoxelModuleBPLibrary::GetWorldData().GetBlockSizedNormal(hitResult.ImpactNormal, 0.01f)), true);
-			if(voxelItem.IsValid())
-			{
-				OutHitResult = FVoxelHitResult(voxelItem, hitResult.ImpactPoint, hitResult.ImpactNormal);
-				return true;
-			}
-		}
-	}
-	return false;
-}
-
 void ADWPlayerController::OnJumpPressed(FKey Key)
 {
 	ADWCharacter* PossessedCharacter = GetPawn<ADWCharacter>();
@@ -417,7 +376,7 @@ void ADWPlayerController::OnAttackDestroyPressed()
 		case EDWCharacterControlMode::Creating:
 		{
 			FVoxelHitResult voxelHitResult;
-			if(RaycastVoxel(voxelHitResult))
+			if(UVoxelModuleBPLibrary::VoxelRaycastSinge(PossessedCharacter->GetInteractDistance(), (ECollisionChannel)EDWGameTraceType::Voxel, {}, voxelHitResult))
 			{
 				voxelHitResult.GetVoxel().OnActionTrigger(PossessedCharacter, EVoxelActionType::Action1, voxelHitResult);
 			}
@@ -482,7 +441,7 @@ void ADWPlayerController::OnDefendGeneratePressed()
 		case EDWCharacterControlMode::Creating:
 		{
 			FVoxelHitResult voxelHitResult;
-			if(RaycastVoxel(voxelHitResult))
+			if(UVoxelModuleBPLibrary::VoxelRaycastSinge(PossessedCharacter->GetInteractDistance(), (ECollisionChannel)EDWGameTraceType::Voxel, {}, voxelHitResult))
 			{
 				voxelHitResult.GetVoxel().OnActionTrigger(PossessedCharacter, EVoxelActionType::Action2, voxelHitResult);
 			}

@@ -8,5 +8,27 @@
 UWidgetVitalityHP::UWidgetVitalityHP(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	WidgetName = FName("VitalityHP");
-	InputMode = EInputMode::None;
+
+	WidgetAlignment = FVector2D(0.5f);
+	bWidgetAutoVisibility = true;
+	WidgetShowDistance = 1000.f;
+}
+
+void UWidgetVitalityHP::OnTick_Implementation(float DeltaSeconds)
+{
+	Super::OnTick_Implementation(DeltaSeconds);
+
+	if(GetWidgetSpace() == EWidgetSpace::Screen)
+	{
+		if(bWidgetAutoVisibility && GetVisibility() == ESlateVisibility::SelfHitTestInvisible)
+		{
+			if(const ADWVitality* Vitality = Cast<ADWVitality>(GetOwnerActor()))
+			{
+				if(Vitality->IsDead())
+				{
+					SetVisibility(ESlateVisibility::Hidden);
+				}
+			}
+		}
+	}
 }

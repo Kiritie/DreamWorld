@@ -10,13 +10,13 @@
 
 #include "DWVitality.generated.h"
 
+class UWorldWidgetComponent;
 class UVitalityInventory;
 class ADWVoxelChunk;
 class UVitalityInteractionComponent;
 class AVoxelChunk;
 class ADWVitality;
 class UBoxComponent;
-class UWidgetVitalityHPComponent;
 class UInventory;
 class UAttributeSetBase;
 
@@ -37,7 +37,7 @@ public:
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-	UWidgetVitalityHPComponent* VitalityHP;
+	UWorldWidgetComponent* VitalityHP;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	UVitalityInventory* Inventory;
@@ -79,7 +79,7 @@ public:
 	virtual void SetLevelV(int32 InLevel) override;
 			
 	UFUNCTION(BlueprintPure)
-	UWidgetVitalityHPComponent* GetVitalityHP() const { return VitalityHP; }
+	UWorldWidgetComponent* GetVitalityHP() const { return VitalityHP; }
 
 	UFUNCTION(BlueprintPure)
 	UWidgetVitalityHP* GetVitalityHPWidget() const;

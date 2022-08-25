@@ -24,7 +24,6 @@
 #include "Voxel/DWVoxelModule.h"
 #include "Voxel/VoxelModule.h"
 #include "Voxel/Chunks/VoxelChunk.h"
-#include "Widget/Components/WidgetCharacterHPComponent.h"
 #include "Widget/World/WidgetCharacterHP.h"
 #include "Ability/Character/DWCharacterAbility.h"
 #include "Ability/Character/DWCharacterActionAbility.h"
@@ -76,12 +75,18 @@
 #include "Widget/WidgetItemInfoBox.h"
 #include "Widget/WidgetModuleBPLibrary.h"
 #include "Widget/Inventory/WidgetInventoryBar.h"
+#include "Widget/World/WorldWidgetComponent.h"
 
 ADWCharacter::ADWCharacter()
 {
-	CharacterHP = CreateDefaultSubobject<UWidgetCharacterHPComponent>(FName("CharacterHP"));
+	CharacterHP = CreateDefaultSubobject<UWorldWidgetComponent>(FName("CharacterHP"));
 	CharacterHP->SetupAttachment(RootComponent);
-	CharacterHP->SetRelativeLocation(FVector(0, 0, 70));
+	CharacterHP->SetRelativeLocation(FVector(0, 0, 90));
+	static ConstructorHelpers::FClassFinder<UWidgetCharacterHP> CharacterHPClassFinder(TEXT("WidgetBlueprint'/Game/Blueprints/Widget/World/WB_CharacterHP.WB_CharacterHP_C'"));
+	if(CharacterHPClassFinder.Succeeded())
+	{
+		CharacterHP->SetWorldWidgetClass(CharacterHPClassFinder.Class);
+	}
 
 	AbilitySystem = CreateDefaultSubobject<UDWAbilitySystemComponent>(FName("AbilitySystem"));
 
@@ -1233,7 +1238,7 @@ bool ADWCharacter::RaycastStep(FHitResult& OutHitResult)
 {
 	const FVector rayStart = GetActorLocation() + FVector::DownVector * (GetHalfHeight() - GetCharacterMovement()->MaxStepHeight);
 	const FVector rayEnd = rayStart + GetMoveDirection() * (GetRadius() + UVoxelModuleBPLibrary::GetWorldData().BlockSize * FMath::Clamp(GetMoveDirection().Size() * 0.005f, 0.5f, 1.3f));
-	return UKismetSystemLibrary::LineTraceSingle(this, rayStart, rayEnd, UDWHelper::GetGameTrace(EDWGameTraceType::Step), false, TArray<AActor*>(), EDrawDebugTrace::None, OutHitResult, true);
+	return UKismetSystemLibrary::LineTraceSingle(this, rayStart, rayEnd, UGlobalBPLibrary::GetGameTraceChannel((ECollisionChannel)EDWGameTraceType::Step), false, {}, EDrawDebugTrace::None, OutHitResult, true);
 }
 
 bool ADWCharacter::HasTeam() const

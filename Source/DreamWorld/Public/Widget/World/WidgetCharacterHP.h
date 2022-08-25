@@ -19,6 +19,9 @@ public:
 	UWidgetCharacterHP(const FObjectInitializer& ObjectInitializer);
 
 public:
+	virtual void OnTick_Implementation(float DeltaSeconds) override;
+
+public:
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
 	void SetHeadInfo(const FString& InHeadInfo);
 	

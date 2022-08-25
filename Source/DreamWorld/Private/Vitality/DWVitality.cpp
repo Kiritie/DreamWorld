@@ -16,6 +16,7 @@
 #include "FSM/Components/FSMComponent.h"
 #include "Inventory/VitalityInventory.h"
 #include "Inventory/Slot/InventorySlot.h"
+#include "UObject/ConstructorHelpers.h"
 #include "Vitality/DWVitalityData.h"
 #include "Vitality/States/DWVitalityState_Death.h"
 #include "Vitality/States/DWVitalityState_Default.h"
@@ -23,15 +24,20 @@
 #include "Voxel/VoxelModule.h"
 #include "Voxel/Chunks/VoxelChunk.h"
 #include "Voxel/Datas/VoxelData.h"
-#include "Widget/Components/WidgetVitalityHPComponent.h"
 #include "Widget/World/WidgetVitalityHP.h"
+#include "Widget/World/WorldWidgetComponent.h"
 
 // Sets default values
 ADWVitality::ADWVitality()
 {
-	VitalityHP = CreateDefaultSubobject<UWidgetVitalityHPComponent>(FName("VitalityHP"));
+	VitalityHP = CreateDefaultSubobject<UWorldWidgetComponent>(FName("VitalityHP"));
 	VitalityHP->SetupAttachment(RootComponent);
 	VitalityHP->SetRelativeLocation(FVector(0, 0, 50));
+	static ConstructorHelpers::FClassFinder<UWidgetVitalityHP> VitalityHPClassFinder(TEXT("WidgetBlueprint'/Game/Blueprints/Widget/World/WB_VitalityHP.WB_VitalityHP_C'"));
+	if(VitalityHPClassFinder.Succeeded())
+	{
+		VitalityHP->SetWidgetClass(VitalityHPClassFinder.Class);
+	}
 
 	AbilitySystem = CreateDefaultSubobject<UDWAbilitySystemComponent>(FName("AbilitySystem"));
 

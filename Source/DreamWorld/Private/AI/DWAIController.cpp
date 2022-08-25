@@ -37,4 +37,16 @@ void ADWAIController::OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimu
 void ADWAIController::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	ADWCharacter* OwnerCharacter = GetPawn<ADWCharacter>();
+
+	if(!OwnerCharacter) return;
+
+	if(IsRunningBehaviorTree())
+	{
+		if(OwnerCharacter->IsDead())
+		{
+			StopBehaviorTree();
+		}
+	}
 }

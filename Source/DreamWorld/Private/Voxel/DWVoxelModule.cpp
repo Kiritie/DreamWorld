@@ -26,6 +26,7 @@
 #include "Widget/Inventory/WidgetInventoryBar.h"
 #include "Widget/Inventory/WidgetInventoryPanel.h"
 #include "SaveGame/SaveGameModuleBPLibrary.h"
+#include "UObject/ConstructorHelpers.h"
 
 // Sets default values
 ADWVoxelModule::ADWVoxelModule()
@@ -36,6 +37,26 @@ ADWVoxelModule::ADWVoxelModule()
 	BoundsMesh->SetRelativeScale3D(FVector::ZeroVector);
 	BoundsMesh->SetRelativeRotation(FRotator(0, 0, 0));
 	BoundsMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	
+	WorldBasicData.ChunkMaterials.Empty();
+	static ConstructorHelpers::FObjectFinder<UMaterialInterface> SolidMatFinder(TEXT("MaterialInstanceConstant'/Game/Materials/Voxel/M_DW_Voxels_Solid.M_DW_Voxels_Solid'"));
+	static ConstructorHelpers::FObjectFinder<UMaterialInterface> UnlitSolidMatFinder(TEXT("MaterialInstanceConstant'/Game/Materials/Voxel/M_DW_Voxels_Solid_Unlit.M_DW_Voxels_Solid_Unlit'"));
+	if(SolidMatFinder.Succeeded() && UnlitSolidMatFinder.Succeeded())
+	{
+		WorldBasicData.ChunkMaterials.Add(FVoxelChunkMaterial(SolidMatFinder.Object, UnlitSolidMatFinder.Object, FVector2D(0.0625f, 0.5f)));
+	}
+	static ConstructorHelpers::FObjectFinder<UMaterialInterface> SemiTransparentMatFinder(TEXT("MaterialInstanceConstant'/Game/Materials/Voxel/M_DW_Voxels_SemiTransparent.M_DW_Voxels_SemiTransparent'"));
+	static ConstructorHelpers::FObjectFinder<UMaterialInterface> UnlitSemiTransparentMatFinder(TEXT("MaterialInstanceConstant'/Game/Materials/Voxel/M_DW_Voxels_SemiTransparent_Unlit.M_DW_Voxels_SemiTransparent_Unlit'"));
+	if(SemiTransparentMatFinder.Succeeded() && UnlitSemiTransparentMatFinder.Succeeded())
+	{
+		WorldBasicData.ChunkMaterials.Add(FVoxelChunkMaterial(SemiTransparentMatFinder.Object, UnlitSemiTransparentMatFinder.Object, FVector2D(0.0625f, 0.5f)));
+	}
+	static ConstructorHelpers::FObjectFinder<UMaterialInterface> TransparentMatFinder(TEXT("MaterialInstanceConstant'/Game/Materials/Voxel/M_DW_Voxels_Transparent.M_DW_Voxels_Transparent'"));
+	static ConstructorHelpers::FObjectFinder<UMaterialInterface> UnlitTransparentMatFinder(TEXT("MaterialInstanceConstant'/Game/Materials/Voxel/M_DW_Voxels_Transparent_Unlit.M_DW_Voxels_Transparent_Unlit'"));
+	if(TransparentMatFinder.Succeeded() && UnlitTransparentMatFinder.Succeeded())
+	{
+		WorldBasicData.ChunkMaterials.Add(FVoxelChunkMaterial(TransparentMatFinder.Object, UnlitTransparentMatFinder.Object, FVector2D(0.0625f, 0.5f)));
+	}
 }
 
 #if WITH_EDITOR
@@ -141,28 +162,4 @@ void ADWVoxelModule::DestroyChunk(FIndex InIndex)
 AVoxelChunk* ADWVoxelModule::SpawnChunk(FIndex InIndex, bool bAddToQueue)
 {
 	return Super::SpawnChunk(InIndex, bAddToQueue);
-}
-
-bool ADWVoxelModule::ChunkTraceSingle(AVoxelChunk* InChunk, float InRadius, float InHalfHeight, FHitResult& OutHitResult)
-{
-	FVector rayStart = InChunk->GetActorLocation() + FVector(FMath::FRandRange(1.f, WorldData->ChunkSize - 1), FMath::FRandRange(1.f, WorldData->ChunkSize), WorldData->ChunkSize) * WorldData->BlockSize;
-	rayStart.X = ((int32)(rayStart.X / WorldData->BlockSize) + 0.5f) * WorldData->BlockSize;
-	rayStart.Y = ((int32)(rayStart.Y / WorldData->BlockSize) + 0.5f) * WorldData->BlockSize;
-	FVector rayEnd = rayStart + FVector::DownVector * WorldData->GetChunkLength();
-	return ChunkTraceSingle(rayStart, rayEnd, InRadius * 0.95f, InHalfHeight * 0.95f, OutHitResult);
-}
-
-bool ADWVoxelModule::ChunkTraceSingle(FVector RayStart, FVector RayEnd, float InRadius, float InHalfHeight, FHitResult& OutHitResult)
-{
-	if (UKismetSystemLibrary::CapsuleTraceSingle(this, RayStart, RayEnd, InRadius, InHalfHeight, UDWHelper::GetGameTrace(EDWGameTraceType::Chunk), false, TArray<AActor*>(), EDrawDebugTrace::None, OutHitResult, true))
-	{
-		return OutHitResult.ImpactPoint.Z > 0;
-	}
-	return false;
-}
-
-bool ADWVoxelModule::VoxelTraceSingle(const FVoxelItem& InVoxelItem, FVector InPoint, FHitResult& OutHitResult)
-{
-	const FVector size = InVoxelItem.GetRange() * WorldData->BlockSize * 0.5f;
-	return UKismetSystemLibrary::BoxTraceSingle(this, InPoint + size, InPoint + size, size * 0.95f, FRotator::ZeroRotator, UDWHelper::GetGameTrace(EDWGameTraceType::Voxel), false, TArray<AActor*>(), EDrawDebugTrace::None, OutHitResult, true);
 }

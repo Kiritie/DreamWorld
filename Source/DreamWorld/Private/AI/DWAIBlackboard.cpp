@@ -17,14 +17,9 @@ void UDWAIBlackboard::PostLoad()
 	// BLACKBOARD_VALUE_GENERATE_FLOAT(PatrolDuration);
 }
 
-void UDWAIBlackboard::OnInitialize(UBlackboardComponent* InComponent, ACharacterBase* InCharacter)
+void UDWAIBlackboard::Initialize(UBlackboardComponent* InComponent, ACharacterBase* InCharacter)
 {
-	Super::OnInitialize(InComponent, InCharacter);
-}
-
-void UDWAIBlackboard::OnRefresh()
-{
-	Super::OnRefresh();
+	Super::Initialize(InComponent, InCharacter);
 
 	if(!GetCharacter<ADWCharacter>()) return;
 
@@ -33,6 +28,13 @@ void UDWAIBlackboard::OnRefresh()
 	SetFollowDistance(GetCharacter<ADWCharacter>()->GetFollowDistance());
 	SetPatrolDistance(GetCharacter<ADWCharacter>()->GetPatrolDistance());
 	SetPatrolDuration(GetCharacter<ADWCharacter>()->GetPatrolDuration());
+}
+
+void UDWAIBlackboard::OnRefresh()
+{
+	Super::OnRefresh();
+
+	if(!GetCharacter<ADWCharacter>()) return;
 
 	if(GetTargetCharacter<ADWCharacter>())
 	{
