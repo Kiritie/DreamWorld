@@ -19,17 +19,11 @@ void UWidgetCharacterHP::OnTick_Implementation(float DeltaSeconds)
 {
 	Super::OnTick_Implementation(DeltaSeconds);
 
-	if(GetWidgetSpace() == EWidgetSpace::Screen)
+	if(bWidgetAutoVisibility && GetVisibility() == ESlateVisibility::SelfHitTestInvisible)
 	{
-		if(bWidgetAutoVisibility && GetVisibility() == ESlateVisibility::SelfHitTestInvisible)
+		if(GetOwnerActor<ADWCharacter>() && GetOwnerActor<ADWCharacter>()->IsDead())
 		{
-			if(const ADWCharacter* Character = Cast<ADWCharacter>(GetOwnerActor()))
-			{
-				if(Character->IsDead())
-				{
-					SetVisibility(ESlateVisibility::Hidden);
-				}
-			}
+			SetVisibility(ESlateVisibility::Hidden);
 		}
 	}
 }

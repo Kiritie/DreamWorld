@@ -126,7 +126,7 @@ protected:
 protected:
 	virtual void BeginPlay() override;
 
-	virtual int32 GetLimit_Implementation() const override { return -1; }
+	virtual int32 GetLimit_Implementation() const override { return 0; }
 
 	virtual void OnSpawn_Implementation(const TArray<FParameter>& InParams) override;
 

@@ -22,7 +22,7 @@ UInventory::UInventory()
 
 void UInventory::LoadData(FSaveData* InSaveData, bool bForceMode)
 {
-	auto SaveData = InSaveData->CastRef<FInventorySaveData>();
+	auto& SaveData = InSaveData->CastRef<FInventorySaveData>();
 
 	if(bForceMode)
 	{

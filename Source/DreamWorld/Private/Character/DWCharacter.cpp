@@ -82,6 +82,7 @@ ADWCharacter::ADWCharacter()
 	CharacterHP = CreateDefaultSubobject<UWorldWidgetComponent>(FName("CharacterHP"));
 	CharacterHP->SetupAttachment(RootComponent);
 	CharacterHP->SetRelativeLocation(FVector(0, 0, 90));
+	CharacterHP->SetWidgetSpace(EWidgetSpace::Screen);
 	static ConstructorHelpers::FClassFinder<UWidgetCharacterHP> CharacterHPClassFinder(TEXT("WidgetBlueprint'/Game/Blueprints/Widget/World/WB_CharacterHP.WB_CharacterHP_C'"));
 	if(CharacterHPClassFinder.Succeeded())
 	{
@@ -278,7 +279,10 @@ void ADWCharacter::LoadData(FSaveData* InSaveData, bool bForceMode)
 				}
 			}
 		}
-		AbilitySystem->TryActivateAbility(DefaultAbility.AbilityHandle);
+		if(DefaultAbility.IsValid())
+		{
+			AbilitySystem->TryActivateAbility(DefaultAbility.AbilityHandle);
+		}
 
 		Inventory->SetOwnerActor(this);
 	}

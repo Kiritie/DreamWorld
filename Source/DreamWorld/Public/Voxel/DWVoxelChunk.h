@@ -61,8 +61,8 @@ protected:
 	// Chunk
 public:
 	virtual void Initialize(AVoxelModule* InModule, FIndex InIndex, int32 InBatch) override;
-	
-	virtual void Generate(bool bForceMode) override;
+
+	virtual void Generate(bool bBuildMesh, bool bForceMode) override;
 
 	virtual void BuildMap(int32 InStage) override;
 

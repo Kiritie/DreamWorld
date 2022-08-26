@@ -49,6 +49,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual void OnInitialize(UInventory* InInventory, FAbilityItem InItem, EAbilityItemType InLimitType/* = EAbilityItemType::None*/, ESplitSlotType InSplitType/* = ESplitSlotType::Default*/);
 	
+	virtual int32 GetLimit_Implementation() const override { return -1; }
+
 	virtual void OnSpawn_Implementation(const TArray<FParameter>& InParams) override;
 
 	virtual void OnDespawn_Implementation() override;

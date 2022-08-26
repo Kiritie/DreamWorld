@@ -18,17 +18,11 @@ void UWidgetVitalityHP::OnTick_Implementation(float DeltaSeconds)
 {
 	Super::OnTick_Implementation(DeltaSeconds);
 
-	if(GetWidgetSpace() == EWidgetSpace::Screen)
+	if(bWidgetAutoVisibility && GetVisibility() == ESlateVisibility::SelfHitTestInvisible)
 	{
-		if(bWidgetAutoVisibility && GetVisibility() == ESlateVisibility::SelfHitTestInvisible)
+		if(GetOwnerActor<ADWVitality>() && GetOwnerActor<ADWVitality>()->IsDead())
 		{
-			if(const ADWVitality* Vitality = Cast<ADWVitality>(GetOwnerActor()))
-			{
-				if(Vitality->IsDead())
-				{
-					SetVisibility(ESlateVisibility::Hidden);
-				}
-			}
+			SetVisibility(ESlateVisibility::Hidden);
 		}
 	}
 }

@@ -64,12 +64,12 @@ void ADWPlayerController::OnPreparatory_Implementation()
 
 void ADWPlayerController::LoadData(FSaveData* InSaveData, bool bForceMode)
 {
-	const auto& SaveData = InSaveData->CastRef<FDWPlayerSaveData>();
+	auto& SaveData = InSaveData->CastRef<FDWPlayerSaveData>();
 
 	ADWPlayerCharacter* PlayerCharacter;
 	if(bForceMode)
 	{
-		PlayerCharacter = UObjectPoolModuleBPLibrary::SpawnObject<ADWPlayerCharacter>(nullptr, SaveData.GetCharacterData().Class);
+		PlayerCharacter = UObjectPoolModuleBPLibrary::SpawnObject<ADWPlayerCharacter>({ FParameter::MakePointer(&SaveData.ID) }, SaveData.GetCharacterData().Class);
 		PlayerCharacter->Execute_SetActorVisible(PlayerCharacter, false);
 		SetPlayerPawn(PlayerCharacter);
 	}

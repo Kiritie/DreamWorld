@@ -9,6 +9,6 @@ public class DreamWorldEditorTarget : TargetRules
 	{
 		Type = TargetType.Editor;
 		DefaultBuildSettings = BuildSettingsVersion.V2;
-		ExtraModuleNames.Add("DreamWorld");
+		ExtraModuleNames.AddRange(new string[] { "DreamWorld" });
 	}
 }

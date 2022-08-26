@@ -33,10 +33,11 @@ ADWVitality::ADWVitality()
 	VitalityHP = CreateDefaultSubobject<UWorldWidgetComponent>(FName("VitalityHP"));
 	VitalityHP->SetupAttachment(RootComponent);
 	VitalityHP->SetRelativeLocation(FVector(0, 0, 50));
+	VitalityHP->SetWidgetSpace(EWidgetSpace::Screen);
 	static ConstructorHelpers::FClassFinder<UWidgetVitalityHP> VitalityHPClassFinder(TEXT("WidgetBlueprint'/Game/Blueprints/Widget/World/WB_VitalityHP.WB_VitalityHP_C'"));
 	if(VitalityHPClassFinder.Succeeded())
 	{
-		VitalityHP->SetWidgetClass(VitalityHPClassFinder.Class);
+		VitalityHP->SetWorldWidgetClass(VitalityHPClassFinder.Class);
 	}
 
 	AbilitySystem = CreateDefaultSubobject<UDWAbilitySystemComponent>(FName("AbilitySystem"));
