@@ -163,3 +163,13 @@ AVoxelChunk* ADWVoxelModule::SpawnChunk(FIndex InIndex, bool bAddToQueue)
 {
 	return Super::SpawnChunk(InIndex, bAddToQueue);
 }
+
+ECollisionChannel ADWVoxelModule::GetChunkTraceType() const
+{
+	return (ECollisionChannel)EDWGameTraceType::Chunk;
+}
+
+ECollisionChannel ADWVoxelModule::GetVoxelTraceType() const
+{
+	return (ECollisionChannel)EDWGameTraceType::Voxel;
+}

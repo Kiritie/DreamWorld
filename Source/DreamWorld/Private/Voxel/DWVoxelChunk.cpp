@@ -194,18 +194,16 @@ void ADWVoxelChunk::SpawnActors()
 	}
 	else if(Module->IsChunkGenerated(Index, true))
 	{
-		if(FIndex::Distance(Index, UVoxelModuleBPLibrary::GetWorldData().LastVitalityRaceIndex) > UVoxelModuleBPLibrary::GetWorldData().ChunkSize / UVoxelModuleBPLibrary::GetWorldData().VitalityRaceDensity, true)
+		TArray<FVitalityRaceData> raceDatas = UAbilityModuleBPLibrary::GetNoiseRaceDatas<FVitalityRaceData>(Index, UVoxelModuleBPLibrary::GetWorldData().WorldSeed);
+		for(auto& raceData : raceDatas)
 		{
-			auto raceData = UAbilityModuleBPLibrary::GetRandomRaceData<FVitalityRaceData>();
-			for(int32 i = 0; i < raceData.Items.Num(); i++)
+			for(auto& vitalityItem : raceData.Items)
 			{
-				const FAbilityItem& vitalityItem = raceData.Items[i];
-				const UAbilityVitalityDataBase& vitalityData = vitalityItem.GetData<UAbilityVitalityDataBase>();
-				for(int32 j = 0; j < vitalityItem.Count; j++)
-				{
-					DON(k, 10,
+				const auto& vitalityData = vitalityItem.GetData<UAbilityVitalityDataBase>();
+				DON(i, vitalityItem.Count,
+					DON(j, 10,
 						FHitResult hitResult;
-						if(Module->ChunkTraceSingle(Index, FMath::Max(vitalityData.Range.X, vitalityData.Range.Y) * 0.5f * UVoxelModuleBPLibrary::GetWorldData().BlockSize, vitalityData.Range.Z * 0.5f * UVoxelModuleBPLibrary::GetWorldData().BlockSize, (ECollisionChannel)EDWGameTraceType::Chunk, {}, hitResult))
+						if(UVoxelModuleBPLibrary::ChunkTraceSingle(Index, FMath::Max(vitalityData.Range.X, vitalityData.Range.Y) * 0.5f * UVoxelModuleBPLibrary::GetWorldData().BlockSize, vitalityData.Range.Z * 0.5f * UVoxelModuleBPLibrary::GetWorldData().BlockSize, (ECollisionChannel)EDWGameTraceType::Chunk, {}, hitResult))
 						{
 							auto saveData = FDWVitalitySaveData();
 							saveData.ID = vitalityData.GetPrimaryAssetId();
@@ -215,56 +213,55 @@ void ADWVoxelChunk::SpawnActors()
 							saveData.SpawnLocation = hitResult.Location;
 							saveData.SpawnRotation = FRotator(0, FMath::RandRange(0, 360), 0);
 							UAbilityModuleBPLibrary::SpawnVitality(&saveData, this);
-							UVoxelModuleBPLibrary::GetWorldData().LastVitalityRaceIndex = Index;
 							break;
 						}
 					)
-				}
+				)
 			}
 		}
-		if(FIndex::Distance(Index, UVoxelModuleBPLibrary::GetWorldData().LastCharacterRaceIndex) > UVoxelModuleBPLibrary::GetWorldData().ChunkSize / UVoxelModuleBPLibrary::GetWorldData().CharacterRaceDensity, true)
-		{
-			ADWCharacter* captain = nullptr;
-			auto raceData = UAbilityModuleBPLibrary::GetRandomRaceData<FCharacterRaceData>();
-			for(int32 i = 0; i < raceData.Items.Num(); i++)
-			{
-				const FAbilityItem& characterItem = raceData.Items[i];
-				const UAbilityCharacterDataBase& characterData = characterItem.GetData<UAbilityCharacterDataBase>();
-				for(int32 j = 0; j < characterItem.Count; j++)
-				{
-					DON(k, 10,
-						FHitResult hitResult;
-						if(Module->ChunkTraceSingle(Index, FMath::Max(characterData.Range.X, characterData.Range.Y) * 0.5f * UVoxelModuleBPLibrary::GetWorldData().BlockSize, characterData.Range.Z * 0.5f * UVoxelModuleBPLibrary::GetWorldData().BlockSize, (ECollisionChannel)EDWGameTraceType::Chunk, {}, hitResult))
-						{
-							auto saveData = FDWCharacterSaveData();
-							saveData.ID = characterData.GetPrimaryAssetId();
-							saveData.Name = *characterData.Name.ToString();
-							saveData.RaceID = raceData.ID;
-							saveData.Level = characterItem.Level;
-							saveData.SpawnLocation = hitResult.Location;
-							saveData.SpawnRotation = FRotator(0, FMath::RandRange(0, 360), 0);
-							if(ADWCharacter* character = Cast<ADWCharacter>(UAbilityModuleBPLibrary::SpawnCharacter(&saveData, this)))
-							{
-								if(captain == nullptr)
-								{
-									captain = character;
-									if(ADWTeamModule* TeamModule = AMainModule::GetModuleByClass<ADWTeamModule>())
-									{
-										TeamModule->CreateTeam(captain);
-									}
-								}
-								else
-								{
-									captain->AddTeamMate(character);
-								}
-							}
-							UVoxelModuleBPLibrary::GetWorldData().LastCharacterRaceIndex = Index;
-							break;
-						}
-					)
-				}
-			}
-		}
+		//if(FIndex::Distance(Index, UVoxelModuleBPLibrary::GetWorldData().LastCharacterRaceIndex) > UVoxelModuleBPLibrary::GetWorldData().ChunkSize / UVoxelModuleBPLibrary::GetWorldData().CharacterRaceDensity, true)
+		//{
+		//	ADWCharacter* captain = nullptr;
+		//	auto raceData = UAbilityModuleBPLibrary::GetNoiseRaceDatas<FCharacterRaceData>();
+		//	for(int32 i = 0; i < raceData.Items.Num(); i++)
+		//	{
+		//		const FAbilityItem& characterItem = raceData.Items[i];
+		//		const UAbilityCharacterDataBase& characterData = characterItem.GetData<UAbilityCharacterDataBase>();
+		//		for(int32 j = 0; j < characterItem.Count; j++)
+		//		{
+		//			DON(k, 10,
+		//				FHitResult hitResult;
+		//				if(UVoxelModuleBPLibrary::ChunkTraceSingle(Index, FMath::Max(characterData.Range.X, characterData.Range.Y) * 0.5f * UVoxelModuleBPLibrary::GetWorldData().BlockSize, characterData.Range.Z * 0.5f * UVoxelModuleBPLibrary::GetWorldData().BlockSize, (ECollisionChannel)EDWGameTraceType::Chunk, {}, hitResult))
+		//				{
+		//					auto saveData = FDWCharacterSaveData();
+		//					saveData.ID = characterData.GetPrimaryAssetId();
+		//					saveData.Name = *characterData.Name.ToString();
+		//					saveData.RaceID = raceData.ID;
+		//					saveData.Level = characterItem.Level;
+		//					saveData.SpawnLocation = hitResult.Location;
+		//					saveData.SpawnRotation = FRotator(0, FMath::RandRange(0, 360), 0);
+		//					if(ADWCharacter* character = Cast<ADWCharacter>(UAbilityModuleBPLibrary::SpawnCharacter(&saveData, this)))
+		//					{
+		//						if(captain == nullptr)
+		//						{
+		//							captain = character;
+		//							if(ADWTeamModule* TeamModule = AMainModule::GetModuleByClass<ADWTeamModule>())
+		//							{
+		//								TeamModule->CreateTeam(captain);
+		//							}
+		//						}
+		//						else
+		//						{
+		//							captain->AddTeamMate(character);
+		//						}
+		//					}
+		//					UVoxelModuleBPLibrary::GetWorldData().LastCharacterRaceIndex = Index;
+		//					break;
+		//				}
+		//			)
+		//		}
+		//	}
+		//}
 	}
 }
 
