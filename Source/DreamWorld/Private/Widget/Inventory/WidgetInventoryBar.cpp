@@ -7,8 +7,10 @@
 #include "Blueprint/WidgetBlueprintLibrary.h"
 #include "Widget/Inventory/Slot/WidgetInventorySlot.h"
 #include "Character/Player/DWPlayerCharacter.h"
+#include "Components/CanvasPanelSlot.h"
 #include "Components/GridPanel.h"
 #include "Components/GridSlot.h"
+#include "Components/SizeBox.h"
 #include "GameFramework/InputSettings.h"
 #include "Global/GlobalBPLibrary.h"
 #include "Inventory/Inventory.h"
@@ -92,7 +94,7 @@ void UWidgetInventoryBar::OnInitialize_Implementation(AActor* InOwner)
 				if(UWidgetInventoryAuxiliarySlot* AuxiliarySlot = Cast<UWidgetInventoryAuxiliarySlot>(UWidgetBlueprintLibrary::Create(this, AuxiliarySlotClass, nullptr)))
 				{
 					AuxiliarySlot->OnInitialize(AuxiliarySlots[i]);
-					AuxiliarySlot->SetKeyCode(UGlobalBPLibrary::GetInputActionKeyCodeByName(FString::Printf(TEXT("ReleaseAuxiliaryAbility%d"), i + 1)));
+					//AuxiliarySlot->SetKeyCode(UGlobalBPLibrary::GetInputActionKeyCodeByName(FString::Printf(TEXT("ReleaseAuxiliaryAbility%d"), i + 1)));
 					if(UGridSlot* GridSlot = AuxiliaryContent->AddChildToGrid(AuxiliarySlot))
 					{
 						GridSlot->SetPadding(FMargin(0.f, 0.f, 5.f, 0.f));
@@ -208,7 +210,25 @@ void UWidgetInventoryBar::SelectInventorySlot(int32 InSlotIndex, bool bRefreshIn
 			UWidgetModuleBPLibrary::OpenUserWidget<UWidgetItemInfoBox>({ FParameter::MakeString(SelectedSlot->GetItem().GetData().Name.ToString()) });
 		}
 	}
-	UpdateSelectBox();
+	if(SelectBox)
+	{
+		if(UCanvasPanelSlot* SelectBoxSlot = Cast<UCanvasPanelSlot>(SelectBox->Slot))
+		{
+			SelectBoxSlot->SetPosition(FVector2D(SelectedSlotIndex * 85.f, 0));
+		}
+	}
+}
+
+void UWidgetInventoryBar::SetSkillBoxVisible(bool bValue)
+{
+	if(LeftSkillBox)
+	{
+		LeftSkillBox->SetVisibility(bValue ? ESlateVisibility::HitTestInvisible : ESlateVisibility::Hidden);
+	}
+	if(RightSkillBox)
+	{
+		RightSkillBox->SetVisibility(bValue ? ESlateVisibility::HitTestInvisible : ESlateVisibility::Hidden);
+	}
 }
 
 UInventorySlot* UWidgetInventoryBar::GetSelectedSlot() const

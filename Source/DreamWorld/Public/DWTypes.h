@@ -394,7 +394,7 @@ public:
 		CameraRotation = FRotator::ZeroRotator;
 	}
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY()
 	FRotator CameraRotation;
 };
 
@@ -589,13 +589,13 @@ public:
 	FORCEINLINE FDWGeneralSaveData()
 	{
 		bAutoJump = true;
-		CameraDistance = 150.f;
+		CameraDistance = 200.f;
 	}
 
 	FORCEINLINE FDWGeneralSaveData(const FGeneralSaveData& InGeneralSaveData) : FGeneralSaveData(InGeneralSaveData)
 	{
 		bAutoJump = true;
-		CameraDistance = 150.f;
+		CameraDistance = 200.f;
 	}
 
 public:

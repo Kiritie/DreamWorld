@@ -46,7 +46,7 @@ void UWidgetGameHUD::OnClose_Implementation(bool bInstant)
 
 void UWidgetGameHUD::RefreshActions()
 {
-	if(ADWCharacter* OwnerCharacter = Cast<ADWCharacter>(GetOwnerActor()))
+	if(ADWCharacter* OwnerCharacter = Cast<ADWCharacter>(OwnerActor))
 	{
 		if(const IInteractionAgentInterface* OverlappingAgent = OwnerCharacter->GetInteractionComponent()->GetOverlappingAgent())
 		{

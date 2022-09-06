@@ -178,11 +178,6 @@ void ADWPlayerController::OnPossess(APawn* InPawn)
 		UWidgetModuleBPLibrary::InitializeUserWidget<UWidgetInventoryPanel>(InPawn);
 	}
 	Super::OnPossess(InPawn);
-
-	if(USaveGameModuleBPLibrary::GetSaveGame<UDWGeneralSaveGame>())
-	{
-		UCameraModuleBPLibrary::SetCameraDistance(USaveGameModuleBPLibrary::GetSaveGame<UDWGeneralSaveGame>()->GetCameraDistance(), true);
-	}
 }
 
 void ADWPlayerController::OnUnPossess()
@@ -376,7 +371,7 @@ void ADWPlayerController::OnAttackDestroyPressed()
 		case EDWCharacterControlMode::Creating:
 		{
 			FVoxelHitResult voxelHitResult;
-			if(UVoxelModuleBPLibrary::VoxelRaycastSinge(PossessedCharacter->GetInteractDistance(), (ECollisionChannel)EDWGameTraceType::Voxel, {}, voxelHitResult))
+			if(UVoxelModuleBPLibrary::VoxelRaycastSinge(PossessedCharacter->GetInteractDistance(), {}, voxelHitResult))
 			{
 				voxelHitResult.GetVoxel().OnActionTrigger(PossessedCharacter, EVoxelActionType::Action1, voxelHitResult);
 			}
@@ -441,7 +436,7 @@ void ADWPlayerController::OnDefendGeneratePressed()
 		case EDWCharacterControlMode::Creating:
 		{
 			FVoxelHitResult voxelHitResult;
-			if(UVoxelModuleBPLibrary::VoxelRaycastSinge(PossessedCharacter->GetInteractDistance(), (ECollisionChannel)EDWGameTraceType::Voxel, {}, voxelHitResult))
+			if(UVoxelModuleBPLibrary::VoxelRaycastSinge(PossessedCharacter->GetInteractDistance(), {}, voxelHitResult))
 			{
 				voxelHitResult.GetVoxel().OnActionTrigger(PossessedCharacter, EVoxelActionType::Action2, voxelHitResult);
 			}

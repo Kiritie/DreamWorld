@@ -7,6 +7,7 @@
 #include "Asset/AssetModule.h"
 #include "Audio/AudioModule.h"
 #include "Camera/CameraModule.h"
+#include "Camera/DWCameraModule.h"
 #include "Character/CharacterModule.h"
 #include "Character/DWCharacterModule.h"
 #include "Debug/DebugModule.h"
@@ -38,7 +39,7 @@ ADWMainModule::ADWMainModule()
 	ModuleClasses.Add(AAIModule::StaticClass());
 	ModuleClasses.Add(AAssetModule::StaticClass());
 	ModuleClasses.Add(AAudioModule::StaticClass());
-	ModuleClasses.Add(ACameraModule::StaticClass());
+	ModuleClasses.Add(ADWCameraModule::StaticClass());
 	ModuleClasses.Add(ADWCharacterModule::StaticClass());
 	ModuleClasses.Add(ADebugModule::StaticClass());
 	ModuleClasses.Add(AEventModule::StaticClass());

@@ -21,13 +21,10 @@ public:
 	UWidgetInventoryBar(const FObjectInitializer& ObjectInitializer);
 
 protected:
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Default")
-	int32 SelectedSlotIndex;
-
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components", meta = (BindWidget, OptionalWidget = false))
 	class UGridPanel* ShortcutContent;
 
-	// UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components", meta = (BindWidget, OptionalWidget = false))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components", meta = (BindWidget, OptionalWidget = false))
 	class UGridPanel* AuxiliaryContent;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components", meta = (BindWidget, OptionalWidget = false))
@@ -35,6 +32,18 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components", meta = (BindWidget, OptionalWidget = false))
 	class UGridPanel* RightSkillContent;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components", meta = (BindWidget, OptionalWidget = false))
+	class USizeBox* LeftSkillBox;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components", meta = (BindWidget, OptionalWidget = false))
+	class USizeBox* RightSkillBox;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components", meta = (BindWidget, OptionalWidget = false))
+	class USizeBox* SelectBox;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Default")
+	int32 SelectedSlotIndex;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TSubclassOf<class UWidgetInventoryShortcutSlot> ShortcutSlotClass;
@@ -58,9 +67,6 @@ public:
 	virtual void OnInventorySlotSelected(UInventorySlot* InInventorySlot);
 
 public:
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
-	void UpdateSelectBox();
-
 	UFUNCTION(BlueprintCallable)
 	void PrevInventorySlot();
 
@@ -69,7 +75,11 @@ public:
 	
 	UFUNCTION(BlueprintCallable)
 	void SelectInventorySlot(int32 InSlotIndex, bool bRefreshInventory = true);
+	
+	UFUNCTION(BlueprintCallable)
+	void SetSkillBoxVisible(bool bValue);
 
+public:
 	UFUNCTION(BlueprintPure)
 	UInventorySlot* GetSelectedSlot() const;
 	

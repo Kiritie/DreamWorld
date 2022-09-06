@@ -6,6 +6,7 @@
 #include "Gameplay/DWPlayerController.h"
 #include "Global/GlobalBPLibrary.h"
 #include "Kismet/GameplayStatics.h"
+#include "SaveGame/SaveGameModule.h"
 
 UDWGeneralSaveGame::UDWGeneralSaveGame()
 {

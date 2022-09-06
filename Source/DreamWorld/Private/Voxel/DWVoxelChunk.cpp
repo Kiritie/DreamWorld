@@ -62,10 +62,7 @@ FSaveData* ADWVoxelChunk::ToData()
 
 	for(auto& Iter : Characters)
 	{
-		if(Iter->GetNature() != EDWCharacterNature::Player)
-		{
-			SaveData.CharacterDatas.Add(Iter->ToSaveDataRef<FDWCharacterSaveData>(true));
-		}
+		SaveData.CharacterDatas.Add(Iter->ToSaveDataRef<FDWCharacterSaveData>(true));
 	}
 
 	for(auto& Iter : Vitalitys)
@@ -203,7 +200,7 @@ void ADWVoxelChunk::SpawnActors()
 				DON(i, vitalityItem.Count,
 					DON(j, 10,
 						FHitResult hitResult;
-						if(UVoxelModuleBPLibrary::ChunkTraceSingle(Index, FMath::Max(vitalityData.Range.X, vitalityData.Range.Y) * 0.5f * UVoxelModuleBPLibrary::GetWorldData().BlockSize, vitalityData.Range.Z * 0.5f * UVoxelModuleBPLibrary::GetWorldData().BlockSize, (ECollisionChannel)EDWGameTraceType::Chunk, {}, hitResult))
+						if(UVoxelModuleBPLibrary::ChunkTraceSingle(Index, FMath::Max(vitalityData.Range.X, vitalityData.Range.Y) * 0.5f * UVoxelModuleBPLibrary::GetWorldData().BlockSize, vitalityData.Range.Z * 0.5f * UVoxelModuleBPLibrary::GetWorldData().BlockSize, {}, hitResult))
 						{
 							auto saveData = FDWVitalitySaveData();
 							saveData.ID = vitalityData.GetPrimaryAssetId();
@@ -288,7 +285,10 @@ void ADWVoxelChunk::AddSceneActor(AActor* InActor)
 
 	if(ADWCharacter* Character = Cast<ADWCharacter>(InActor))
 	{
-		Characters.Add(Character);
+		if(!Character->IsPlayer())
+		{
+			Characters.Add(Character);
+		}
 	}
 	else if(ADWVitality* Vitality = Cast<ADWVitality>(InActor))
 	{

@@ -62,7 +62,8 @@ void UProcedure_Loading::OnRefresh()
 {
 	Super::OnRefresh();
 
-	if(UVoxelModuleBPLibrary::IsBasicGenerated() && UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>()->GetFSMComponent()->IsCurrentStateClass<UDWCharacterState_Walk>())
+	const ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>();
+	if(UVoxelModuleBPLibrary::IsBasicGenerated() && PlayerCharacter && PlayerCharacter->GetFSMComponent()->IsCurrentStateClass<UDWCharacterState_Walk>())
 	{
 		UProcedureModuleBPLibrary::SwitchProcedureByClass<UProcedure_Playing>();
 	}

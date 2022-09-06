@@ -45,6 +45,7 @@
 #include "Ability/AbilityModuleBPLibrary.h"
 #include "Ability/AbilityModuleTypes.h"
 #include "Ability/Components/CharacterInteractionComponent.h"
+#include "Camera/CameraModuleBPLibrary.h"
 #include "Character/Player/States/DWPlayerCharacterState_Attack.h"
 #include "Character/Player/States/DWPlayerCharacterState_Death.h"
 #include "Character/Player/States/DWPlayerCharacterState_Default.h"
@@ -222,6 +223,7 @@ FSaveData* ADWPlayerCharacter::ToData()
 	static FDWPlayerSaveData SaveData;
 	SaveData = Super::ToData()->CastRef<FDWCharacterSaveData>();
 	SaveData.ControlMode = ControlMode;
+	SaveData.CameraRotation = UCameraModuleBPLibrary::GetCurrentCameraRotation();
 	return &SaveData;
 }
 
@@ -260,6 +262,26 @@ void ADWPlayerCharacter::SetActorVisible_Implementation(bool bNewVisible)
 void ADWPlayerCharacter::SetControlMode(EDWCharacterControlMode InControlMode)
 {
 	Super::SetControlMode(InControlMode);
+
+	switch (ControlMode)
+	{
+		case EDWCharacterControlMode::Fighting:
+		{
+			if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryBar>())
+			{
+				UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryBar>()->SetSkillBoxVisible(true);
+			}
+			break;
+		}
+		case EDWCharacterControlMode::Creating:
+		{
+			if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryBar>())
+			{
+				UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryBar>()->SetSkillBoxVisible(false);
+			}
+			break;
+		}
+	}
 }
 
 void ADWPlayerCharacter::SetGenerateVoxelID(const FPrimaryAssetId& InGenerateVoxelID)
@@ -291,21 +313,30 @@ void ADWPlayerCharacter::OnEnterInteract(IInteractionAgentInterface* InInteracti
 {
 	Super::OnEnterInteract(InInteractionAgent);
 
-	UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>()->RefreshActions();
+	if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>())
+	{
+		UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>()->RefreshActions();
+	}
 }
 
 void ADWPlayerCharacter::OnLeaveInteract(IInteractionAgentInterface* InInteractionAgent)
 {
 	Super::OnLeaveInteract(InInteractionAgent);
 
-	UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>()->RefreshActions();
+	if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>())
+	{
+		UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>()->RefreshActions();
+	}
 }
 
 void ADWPlayerCharacter::OnInteract(IInteractionAgentInterface* InInteractionAgent, EInteractAction InInteractAction)
 {
 	Super::OnInteract(InInteractionAgent, InInteractAction);
 	
-	UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>()->RefreshActions();
+	if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>())
+	{
+		UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>()->RefreshActions();
+	}
 }
 
 void ADWPlayerCharacter::MoveForward_Implementation(float InValue)
