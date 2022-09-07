@@ -32,6 +32,8 @@ ADWVoxelChunk::ADWVoxelChunk()
 
 	Characters = TArray<ADWCharacter*>();
 	Vitalitys = TArray<ADWVitality*>();
+
+	bRaceGenerated = false;
 }
 
 // Called when the game starts or when spawned
@@ -48,6 +50,8 @@ void ADWVoxelChunk::OnSpawn_Implementation(const TArray<FParameter>& InParams)
 void ADWVoxelChunk::OnDespawn_Implementation()
 {
 	Super::OnDespawn_Implementation();
+	
+	bRaceGenerated = false;
 }
 
 void ADWVoxelChunk::LoadData(FSaveData* InSaveData, bool bForceMode)
@@ -92,9 +96,9 @@ void ADWVoxelChunk::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AAc
 	// 			Debug(FString::Printf(TEXT("%s"), *SweepResult.ImpactNormal.ToString()));
 	// 			const FVector normal = FVector(FMath::Min((character->GetMoveDirection(false) * 2.5f).X, 1.f), FMath::Min((character->GetMoveDirection(false) * 2.5f).Y, 1.f), FMath::Min((character->GetMoveDirection(false) * 2.5f).Z, 1.f));
 	// 			const FVector point = characterPart->GetComponentLocation() + characterPart->GetScaledCapsuleRadius() * normal + UVoxelModuleBPLibrary::GetWorldData().GetBlockSizedNormal(normal);
-	// 			if(FVector::Distance(character->GetActorLocation(), point) > 100)
+	// 			if(FVector::Distance(character->GetLocation(), point) > 100)
 	// 			{
-	// 				Debug(FString::Printf(TEXT("%f"), FVector::Distance(character->GetActorLocation(), point)));
+	// 				Debug(FString::Printf(TEXT("%f"), FVector::Distance(character->GetLocation(), point)));
 	// 			}
 	// 			UKismetSystemLibrary::DrawDebugBox(this, point, FVector(5), FColor::Green, FRotator::ZeroRotator, 100);
 	// 			const FVoxelItem& voxelItem = GetVoxelItem(LocationToIndex(point));
@@ -176,22 +180,32 @@ void ADWVoxelChunk::BuildMesh()
 void ADWVoxelChunk::SpawnActors()
 {
 	Super::SpawnActors();
+}
 
-	if(UVoxelModuleBPLibrary::GetWorldData().IsExistChunkData(Index))
+void ADWVoxelChunk::LoadActors(FSaveData* InSaveData)
+{
+	Super::LoadActors(InSaveData);
+
+	auto& SaveData = InSaveData->CastRef<FDWVoxelChunkSaveData>();
+	for(int32 i = 0; i < SaveData.VitalityDatas.Num(); i++)
 	{
-		auto chunkData = *UVoxelModuleBPLibrary::GetWorldData().GetChunkData<FDWVoxelChunkSaveData>(Index);
-		for(int32 i = 0; i < chunkData.VitalityDatas.Num(); i++)
-		{
-			UAbilityModuleBPLibrary::SpawnVitality(&chunkData.VitalityDatas[i], this);
-		}
-		for(int32 i = 0; i < chunkData.CharacterDatas.Num(); i++)
-		{
-			UAbilityModuleBPLibrary::SpawnCharacter(&chunkData.CharacterDatas[i], this);
-		}
+		UAbilityModuleBPLibrary::SpawnVitality(&SaveData.VitalityDatas[i], this);
 	}
-	else if(Module->IsChunkGenerated(Index, true))
+	for(int32 i = 0; i < SaveData.CharacterDatas.Num(); i++)
 	{
-		TArray<FVitalityRaceData> raceDatas = UAbilityModuleBPLibrary::GetNoiseRaceDatas<FVitalityRaceData>(Index, UVoxelModuleBPLibrary::GetWorldData().WorldSeed);
+		UAbilityModuleBPLibrary::SpawnCharacter(&SaveData.CharacterDatas[i], this);
+	}
+}
+
+void ADWVoxelChunk::GenerateActors()
+{
+	Super::GenerateActors();
+
+	const FVector2D worldLocation = FVector2D(GetLocation().X, GetLocation().Y) + UVoxelModuleBPLibrary::GetWorldData().GetChunkLength() * 0.5f;
+	
+	TArray<FVitalityRaceData> raceDatas;
+	if(UAbilityModuleBPLibrary::GetNoiseRaceDatas(worldLocation, UVoxelModuleBPLibrary::GetWorldData().WorldSeed, raceDatas))
+	{
 		for(auto& raceData : raceDatas)
 		{
 			for(auto& vitalityItem : raceData.Items)
@@ -208,7 +222,7 @@ void ADWVoxelChunk::SpawnActors()
 							saveData.RaceID = raceData.ID;
 							saveData.Level = vitalityItem.Level;
 							saveData.SpawnLocation = hitResult.Location;
-							saveData.SpawnRotation = FRotator(0, FMath::RandRange(0, 360), 0);
+							saveData.SpawnRotation = FRotator(0.f, FMath::RandRange(0.f, 360.f), 0.f);
 							UAbilityModuleBPLibrary::SpawnVitality(&saveData, this);
 							break;
 						}
@@ -216,50 +230,50 @@ void ADWVoxelChunk::SpawnActors()
 				)
 			}
 		}
-		//if(FIndex::Distance(Index, UVoxelModuleBPLibrary::GetWorldData().LastCharacterRaceIndex) > UVoxelModuleBPLibrary::GetWorldData().ChunkSize / UVoxelModuleBPLibrary::GetWorldData().CharacterRaceDensity, true)
-		//{
-		//	ADWCharacter* captain = nullptr;
-		//	auto raceData = UAbilityModuleBPLibrary::GetNoiseRaceDatas<FCharacterRaceData>();
-		//	for(int32 i = 0; i < raceData.Items.Num(); i++)
-		//	{
-		//		const FAbilityItem& characterItem = raceData.Items[i];
-		//		const UAbilityCharacterDataBase& characterData = characterItem.GetData<UAbilityCharacterDataBase>();
-		//		for(int32 j = 0; j < characterItem.Count; j++)
-		//		{
-		//			DON(k, 10,
-		//				FHitResult hitResult;
-		//				if(UVoxelModuleBPLibrary::ChunkTraceSingle(Index, FMath::Max(characterData.Range.X, characterData.Range.Y) * 0.5f * UVoxelModuleBPLibrary::GetWorldData().BlockSize, characterData.Range.Z * 0.5f * UVoxelModuleBPLibrary::GetWorldData().BlockSize, (ECollisionChannel)EDWGameTraceType::Chunk, {}, hitResult))
-		//				{
-		//					auto saveData = FDWCharacterSaveData();
-		//					saveData.ID = characterData.GetPrimaryAssetId();
-		//					saveData.Name = *characterData.Name.ToString();
-		//					saveData.RaceID = raceData.ID;
-		//					saveData.Level = characterItem.Level;
-		//					saveData.SpawnLocation = hitResult.Location;
-		//					saveData.SpawnRotation = FRotator(0, FMath::RandRange(0, 360), 0);
-		//					if(ADWCharacter* character = Cast<ADWCharacter>(UAbilityModuleBPLibrary::SpawnCharacter(&saveData, this)))
-		//					{
-		//						if(captain == nullptr)
-		//						{
-		//							captain = character;
-		//							if(ADWTeamModule* TeamModule = AMainModule::GetModuleByClass<ADWTeamModule>())
-		//							{
-		//								TeamModule->CreateTeam(captain);
-		//							}
-		//						}
-		//						else
-		//						{
-		//							captain->AddTeamMate(character);
-		//						}
-		//					}
-		//					UVoxelModuleBPLibrary::GetWorldData().LastCharacterRaceIndex = Index;
-		//					break;
-		//				}
-		//			)
-		//		}
-		//	}
-		//}
 	}
+	//if(FIndex::Distance(Index, UVoxelModuleBPLibrary::GetWorldData().LastCharacterRaceIndex) > UVoxelModuleBPLibrary::GetWorldData().ChunkSize / UVoxelModuleBPLibrary::GetWorldData().CharacterRaceDensity, true)
+	//{
+	//	ADWCharacter* captain = nullptr;
+	//	auto raceData = UAbilityModuleBPLibrary::GetNoiseRaceDatas<FCharacterRaceData>();
+	//	for(int32 i = 0; i < raceData.Items.Num(); i++)
+	//	{
+	//		const FAbilityItem& characterItem = raceData.Items[i];
+	//		const UAbilityCharacterDataBase& characterData = characterItem.GetData<UAbilityCharacterDataBase>();
+	//		for(int32 j = 0; j < characterItem.Count; j++)
+	//		{
+	//			DON(k, 10,
+	//				FHitResult hitResult;
+	//				if(UVoxelModuleBPLibrary::ChunkTraceSingle(Index, FMath::Max(characterData.Range.X, characterData.Range.Y) * 0.5f * UVoxelModuleBPLibrary::GetWorldData().BlockSize, characterData.Range.Z * 0.5f * UVoxelModuleBPLibrary::GetWorldData().BlockSize, (ECollisionChannel)EDWGameTraceType::Chunk, {}, hitResult))
+	//				{
+	//					auto saveData = FDWCharacterSaveData();
+	//					saveData.ID = characterData.GetPrimaryAssetId();
+	//					saveData.Name = *characterData.Name.ToString();
+	//					saveData.RaceID = raceData.ID;
+	//					saveData.Level = characterItem.Level;
+	//					saveData.SpawnLocation = hitResult.Location;
+	//					saveData.SpawnRotation = FRotator(0, FMath::RandRange(0, 360), 0);
+	//					if(ADWCharacter* character = Cast<ADWCharacter>(UAbilityModuleBPLibrary::SpawnCharacter(&saveData, this)))
+	//					{
+	//						if(captain == nullptr)
+	//						{
+	//							captain = character;
+	//							if(ADWTeamModule* TeamModule = AMainModule::GetModuleByClass<ADWTeamModule>())
+	//							{
+	//								TeamModule->CreateTeam(captain);
+	//							}
+	//						}
+	//						else
+	//						{
+	//							captain->AddTeamMate(character);
+	//						}
+	//					}
+	//					UVoxelModuleBPLibrary::GetWorldData().LastCharacterRaceIndex = Index;
+	//					break;
+	//				}
+	//			)
+	//		}
+	//	}
+	//}
 }
 
 void ADWVoxelChunk::DestroyActors()

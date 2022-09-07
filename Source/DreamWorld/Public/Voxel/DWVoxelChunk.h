@@ -57,6 +57,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = "Stats")
 	TArray<ADWVitality*> Vitalitys;
 
+	UPROPERTY(VisibleAnywhere, Category = "Stats")
+	bool bRaceGenerated;
+
 	//////////////////////////////////////////////////////////////////////////
 	// Chunk
 public:
@@ -69,6 +72,10 @@ public:
 	virtual void BuildMesh() override;
 
 	virtual void SpawnActors() override;
+
+	virtual void LoadActors(FSaveData* InSaveData) override;
+
+	virtual void GenerateActors() override;
 
 	virtual void DestroyActors() override;
 
