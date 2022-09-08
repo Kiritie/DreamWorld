@@ -615,13 +615,13 @@ enum class EDWGameTraceType : uint8
 	// ??
 	None = 0,
 	// ?????
-	Chunk = (int32)ECC_GameTraceChannel6,
+	Chunk = (uint8)ECC_GameTraceChannel9,
 	// ????
-	Voxel = (int32)ECC_GameTraceChannel7,
+	Voxel = (uint8)ECC_GameTraceChannel10,
 	// ????
-	Sight = (int32)ECC_GameTraceChannel8,
+	Sight = (uint8)ECC_GameTraceChannel11,
 	// ???
-	Step = (int32)ECC_GameTraceChannel9
+	Step = (uint8)ECC_GameTraceChannel12
 };
 
 /**

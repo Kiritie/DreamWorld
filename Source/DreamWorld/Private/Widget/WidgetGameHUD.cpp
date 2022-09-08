@@ -69,7 +69,7 @@ void UWidgetGameHUD::OnChangeInputMode(UObject* InSender, UEventHandle_ChangeInp
 		}
 		else
 		{
-			SetCrosshairVisible(true);
+			SetCrosshairVisible(false);
 		}
 	}
 	else

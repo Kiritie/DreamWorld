@@ -132,9 +132,9 @@ void ADWVoxelModule::GenerateWorld()
 
 	Super::GenerateWorld();
 
-	if(BoundsMesh && LastGenerateIndex != FIndex(-1, -1, -1))
+	if(BoundsMesh && LastGenerateIndex != Index_Empty)
 	{
-		BoundsMesh->SetRelativeLocation(UVoxelModuleBPLibrary::ChunkIndexToLocation(LastGenerateIndex));
+		BoundsMesh->SetRelativeLocation(UVoxelModuleBPLibrary::ChunkIndexToLocation(FIndex(LastGenerateIndex.X, LastGenerateIndex.Y, 0)));
 		BoundsMesh->SetRelativeScale3D(FVector(GetWorldLength() * WorldData->BlockSize * 0.01f, GetWorldLength() * WorldData->BlockSize * 0.01f, 15.f));
 	}
 }

@@ -2,6 +2,7 @@
 
 #include "Character/States/DWCharacterState_Default.h"
 
+#include "Ability/Character/AbilityCharacterDataBase.h"
 #include "Character/DWCharacter.h"
 #include "Character/States/DWCharacterState_Walk.h"
 #include "Components/CapsuleComponent.h"
@@ -9,6 +10,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Voxel/VoxelModule.h"
 #include "Voxel/VoxelModuleBPLibrary.h"
+#include "Voxel/Chunks/VoxelChunk.h"
 
 UDWCharacterState_Default::UDWCharacterState_Default()
 {
@@ -65,14 +67,24 @@ void UDWCharacterState_Default::OnRefresh()
 		{
 			if(UVoxelModuleBPLibrary::IsBasicGenerated())
 			{
-				FHitResult hitResult;
-				const FVector rayStart = FVector(Character->GetActorLocation().X, Character->GetActorLocation().Y, UVoxelModuleBPLibrary::GetWorldData().GetWorldHeight(true) + 500.f);
-				const FVector rayEnd = FVector(Character->GetActorLocation().X, Character->GetActorLocation().Y, 0);
-				if(UVoxelModuleBPLibrary::ChunkTraceSingle(rayStart, rayEnd, Character->GetRadius(), Character->GetHalfHeight(), {}, hitResult))
-				{
-					Character->SetActorLocationAndRotation(hitResult.Location, FRotator::ZeroRotator);
-					FSM->SwitchStateByClass<UDWCharacterState_Walk>();
-				}
+				const auto& characterData = Character->GetCharacterData();
+				const auto& worldData = UVoxelModuleBPLibrary::GetWorldData();
+				const float& chunkRadius = worldData.GetChunkLength() * 0.5f;
+				DON(i, 10,
+					const FVector rayStart = FVector(i == 0 ? 0.f : worldData.RandomStream.FRandRange(-chunkRadius, chunkRadius), i == 0 ? 0.f : worldData.RandomStream.FRandRange(-chunkRadius, chunkRadius), worldData.GetWorldHeight(true));
+					const FVector rayEnd = FVector(rayStart.X, rayStart.Y, 0.f);
+					FHitResult hitResult1;
+					if(UVoxelModuleBPLibrary::ChunkTraceSingle(rayStart, rayEnd, characterData.Radius, characterData.HalfHeight, {}, hitResult1))
+					{
+						FHitResult hitResult2;
+						if(!UVoxelModuleBPLibrary::VoxelTraceSingle(hitResult1.Location, hitResult1.Location, characterData.Radius * 0.95f, characterData.HalfHeight * 0.95f, {}, hitResult2))
+						{
+							Character->SetActorLocationAndRotation(hitResult1.Location, FRotator::ZeroRotator);
+							FSM->SwitchStateByClass<UDWCharacterState_Walk>();
+							break;
+						}
+					}
+				)
 			}
 		}
 		else
