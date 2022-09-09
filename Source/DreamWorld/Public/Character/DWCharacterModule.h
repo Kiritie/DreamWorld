@@ -11,7 +11,9 @@ UCLASS()
 class DREAMWORLD_API ADWCharacterModule : public ACharacterModule
 {
 	GENERATED_BODY()
-	
+		
+	MODULE_INSTANCE_DECLARE(ADWCharacterModule)
+
 public:	
 	// ParamSets default values for this actor's properties
 	ADWCharacterModule();

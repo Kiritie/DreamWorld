@@ -60,7 +60,7 @@ void UProcedure_Starting::OnEnter(UProcedureBase* InLastProcedure)
 	}
 	else if(InLastProcedure->IsA<UProcedure_Pausing>())
 	{
-		AMainModule::GetModuleByClass<AVoxelModule>()->UnloadSaveData(false);
+		AVoxelModule::Get()->UnloadSaveData(false);
 		UGlobalBPLibrary::GetPlayerController<ADWPlayerController>()->UnloadSaveData(false);
 	}
 	AMainModule::PauseModuleByClass<ASceneModule>();

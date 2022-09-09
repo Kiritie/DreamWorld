@@ -8,6 +8,8 @@
 #include "ReferencePool/ReferencePoolModuleBPLibrary.h"
 #include "Voxel/Chunks/VoxelChunk.h"
 #include "Voxel/Datas/VoxelData.h"
+		
+MODULE_INSTANCE_IMPLEMENTATION(ADWTeamModule)
 
 // Sets default values
 ADWTeamModule::ADWTeamModule()

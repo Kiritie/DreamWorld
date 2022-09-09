@@ -43,7 +43,7 @@ void ADWVitalityVoxel::LoadData(FSaveData* InSaveData, bool bForceMode)
 	{
 		VoxelMesh->CreateVoxel(VoxelID);
 		const FVector range = GetVoxelData().GetRange();
-        BoxComponent->SetBoxExtent(range * UVoxelModuleBPLibrary::GetWorldData().BlockSize * 0.5f);
+        BoxComponent->SetBoxExtent(range * AVoxelModule::Get()->GetWorldData().BlockSize * 0.5f);
 	}
 }
 

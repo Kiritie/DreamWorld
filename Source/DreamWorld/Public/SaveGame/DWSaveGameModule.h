@@ -11,7 +11,9 @@ UCLASS()
 class DREAMWORLD_API ADWSaveGameModule : public ASaveGameModule
 {
 	GENERATED_BODY()
-	
+		
+	MODULE_INSTANCE_DECLARE(ADWSaveGameModule)
+
 public:	
 	// ParamSets default values for this actor's properties
 	ADWSaveGameModule();

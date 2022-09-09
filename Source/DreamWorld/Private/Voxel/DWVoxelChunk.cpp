@@ -95,7 +95,7 @@ void ADWVoxelChunk::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AAc
 	// 			Debug(FString::Printf(TEXT("%s"), *SweepResult.ImpactPoint.ToString()));
 	// 			Debug(FString::Printf(TEXT("%s"), *SweepResult.ImpactNormal.ToString()));
 	// 			const FVector normal = FVector(FMath::Min((character->GetMoveDirection(false) * 2.5f).X, 1.f), FMath::Min((character->GetMoveDirection(false) * 2.5f).Y, 1.f), FMath::Min((character->GetMoveDirection(false) * 2.5f).Z, 1.f));
-	// 			const FVector point = characterPart->GetComponentLocation() + characterPart->GetScaledCapsuleRadius() * normal + UVoxelModuleBPLibrary::GetWorldData().GetBlockSizedNormal(normal);
+	// 			const FVector point = characterPart->GetComponentLocation() + characterPart->GetScaledCapsuleRadius() * normal + AVoxelModule::Get()->GetWorldData().GetBlockSizedNormal(normal);
 	// 			if(FVector::Distance(character->GetLocation(), point) > 100)
 	// 			{
 	// 				Debug(FString::Printf(TEXT("%f"), FVector::Distance(character->GetLocation(), point)));
@@ -128,7 +128,7 @@ void ADWVoxelChunk::OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 	// 		if(ACharacterBase* character = characterPart->GetOwnerCharacter())
 	// 		{
 	// 			const FVector normal = FVector(FMath::Min((character->GetMoveDirection(false) * 2.5f).X, 1.f), FMath::Min((character->GetMoveDirection(false) * 2.5f).Y, 1.f), FMath::Min((character->GetMoveDirection(false) * 2.5f).Z, 1.f));
-	// 			const FVector point = characterPart->GetComponentLocation() - characterPart->GetScaledCapsuleRadius() * normal - UVoxelModuleBPLibrary::GetWorldData().GetBlockSizedNormal(normal);
+	// 			const FVector point = characterPart->GetComponentLocation() - characterPart->GetScaledCapsuleRadius() * normal - AVoxelModule::Get()->GetWorldData().GetBlockSizedNormal(normal);
 	// 			UKismetSystemLibrary::DrawDebugBox(this, point, FVector(5), FColor::Red, FRotator::ZeroRotator, 100);
 	// 			const FVoxelItem& voxelItem = GetVoxelItem(LocationToIndex(point));
 	// 			const UVoxelAsset VoxelData = voxelItem.GetData<UVoxelAsset>();
@@ -201,8 +201,8 @@ void ADWVoxelChunk::GenerateActors()
 {
 	Super::GenerateActors();
 
-	const auto& worldData = UVoxelModuleBPLibrary::GetWorldData();
-	const FVector2D worldLocation = FVector2D(GetLocation().X, GetLocation().Y) + worldData.GetChunkLength() * 0.5f;
+	const auto& worldData = AVoxelModule::Get()->GetWorldData();
+	const FVector2D worldLocation = FVector2D(GetChunkLocation().X, GetChunkLocation().Y) + worldData.GetChunkLength() * 0.5f;
 	
 	TArray<FVitalityRaceData> vitalityRaceDatas;
 	if(UAbilityModuleBPLibrary::GetNoiseRaceDatas(worldLocation, worldData.WorldSeed, vitalityRaceDatas))
@@ -267,7 +267,7 @@ void ADWVoxelChunk::GenerateActors()
 									if(!captain)
 									{
 										captain = character;
-										AMainModule::GetModuleByClass<ADWTeamModule>()->CreateTeam(captain);
+										ADWTeamModule::Get()->CreateTeam(captain);
 									}
 									else
 									{
@@ -307,14 +307,10 @@ void ADWVoxelChunk::AddSceneActor(AActor* InActor)
 
 	if(ADWCharacter* Character = Cast<ADWCharacter>(InActor))
 	{
-		if(!Character->IsPlayer())
-		{
-			Characters.Add(Character);
-		}
+		Characters.Add(Character);
 	}
 	else if(ADWVitality* Vitality = Cast<ADWVitality>(InActor))
 	{
-		Vitality->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
 		Vitalitys.Add(Vitality);
 	}
 
@@ -331,7 +327,6 @@ void ADWVoxelChunk::RemoveSceneActor(AActor* InActor)
 	}
 	else if(ADWVitality* Vitality = Cast<ADWVitality>(InActor))
 	{
-		Vitality->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 		Vitalitys.Remove(Vitality);
 	}
 

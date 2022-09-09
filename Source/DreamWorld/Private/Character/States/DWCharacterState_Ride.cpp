@@ -70,7 +70,7 @@ void UDWCharacterState_Ride::OnLeave(UFiniteStateBase* InNextFiniteState)
 		UCharacterModuleBPLibrary::SwitchCharacter(Character);
 		FHitResult hitResult;
 		const FVector offset = Character->GetActorRightVector() * (Character->GetRadius() + RidingTarget->GetRadius());
-		const FVector rayStart = FVector(Character->GetActorLocation().X, Character->GetActorLocation().Y, UVoxelModuleBPLibrary::GetWorldData().ChunkHeightRange * UVoxelModuleBPLibrary::GetWorldData().GetChunkLength() + 500) + offset;
+		const FVector rayStart = FVector(Character->GetActorLocation().X, Character->GetActorLocation().Y, AVoxelModule::Get()->GetWorldData().ChunkHeightRange * AVoxelModule::Get()->GetWorldData().GetChunkLength() + 500) + offset;
 		const FVector rayEnd = FVector(Character->GetActorLocation().X, Character->GetActorLocation().Y, 0) + offset;
 		if (UVoxelModuleBPLibrary::ChunkTraceSingle(rayStart, rayEnd, Character->GetRadius(), Character->GetHalfHeight(), {}, hitResult))
 		{

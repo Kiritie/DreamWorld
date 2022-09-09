@@ -12,6 +12,8 @@ class DREAMWORLD_API ADWCameraModule : public ACameraModule
 {
 	GENERATED_BODY()
 	
+	MODULE_INSTANCE_DECLARE(ADWCameraModule)
+
 public:	
 	// ParamSets default values for this actor's properties
 	ADWCameraModule();

@@ -368,14 +368,16 @@ void ADWCharacter::Tick(float DeltaTime)
 			}
 		}
 
-		const FVector Location = GetMesh()->GetSocketLocation(FName("Foot"));
-		if(AVoxelChunk* Chunk = UVoxelModuleBPLibrary::FindChunkByLocation(Location))
+		if(!IsPlayer())
 		{
-			Chunk->AddSceneActor(this);
-		}
-		else if(Container)
-		{
-			Cast<AVoxelChunk>(Container.GetObject())->RemoveSceneActor(this);
+			if(AVoxelChunk* Chunk = UVoxelModuleBPLibrary::FindChunkByLocation(GetActorLocation()))
+			{
+				Chunk->AddSceneActor(this);
+			}
+			else if(Container)
+			{
+				Container->RemoveSceneActor(this);
+			}
 		}
 
 		if (IsSprinting() && GetMoveDirection().Size() > 0.2f)
@@ -1053,7 +1055,7 @@ void ADWCharacter::SetControlMode(EDWCharacterControlMode InControlMode)
 
 FDWTeamData* ADWCharacter::GetTeamData() const
 {
-	if(ADWTeamModule* TeamModule = AMainModule::GetModuleByClass<ADWTeamModule>())
+	if(ADWTeamModule* TeamModule = ADWTeamModule::Get())
 	{
 		return TeamModule->GetTeamData(TeamID);
 	}
@@ -1241,7 +1243,7 @@ TArray<FDWCharacterAttackAbilityData> ADWCharacter::GetAttackAbilities() const
 bool ADWCharacter::RaycastStep(FHitResult& OutHitResult)
 {
 	const FVector rayStart = GetActorLocation() + FVector::DownVector * (GetHalfHeight() - GetCharacterMovement()->MaxStepHeight);
-	const FVector rayEnd = rayStart + GetMoveDirection() * (GetRadius() + UVoxelModuleBPLibrary::GetWorldData().BlockSize * FMath::Clamp(GetMoveDirection().Size() * 0.005f, 0.5f, 1.3f));
+	const FVector rayEnd = rayStart + GetMoveDirection() * (GetRadius() + AVoxelModule::Get()->GetWorldData().BlockSize * FMath::Clamp(GetMoveDirection().Size() * 0.005f, 0.5f, 1.3f));
 	return UKismetSystemLibrary::LineTraceSingle(this, rayStart, rayEnd, UGlobalBPLibrary::GetGameTraceChannel((ECollisionChannel)EDWGameTraceType::Step), false, {}, EDrawDebugTrace::None, OutHitResult, true);
 }
 
@@ -1315,7 +1317,7 @@ bool ADWCharacter::HasActionAbility(EDWCharacterActionType InActionType) const
 
 bool ADWCharacter::CreateTeam(const FName& InTeamName /*= MANE_None*/, FString InTeamDetail /*= TEXT("")*/)
 {
-	if(ADWTeamModule* TeamModule = AMainModule::GetModuleByClass<ADWTeamModule>())
+	if(ADWTeamModule* TeamModule = ADWTeamModule::Get())
 	{
 		return TeamModule->CreateTeam(this, InTeamName, InTeamDetail);
 	}
@@ -1324,7 +1326,7 @@ bool ADWCharacter::CreateTeam(const FName& InTeamName /*= MANE_None*/, FString I
 
 bool ADWCharacter::DissolveTeam()
 {
-	if(ADWTeamModule* TeamModule = AMainModule::GetModuleByClass<ADWTeamModule>())
+	if(ADWTeamModule* TeamModule = ADWTeamModule::Get())
 	{
 		return TeamModule->DissolveTeam(TeamID, this);
 	}
@@ -1333,7 +1335,7 @@ bool ADWCharacter::DissolveTeam()
 
 bool ADWCharacter::JoinTeam(const FName& InTeamID)
 {
-	if(ADWTeamModule* TeamModule = AMainModule::GetModuleByClass<ADWTeamModule>())
+	if(ADWTeamModule* TeamModule = ADWTeamModule::Get())
 	{
 		if(TeamModule->IsExistTeam(InTeamID))
 		{

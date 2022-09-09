@@ -27,6 +27,8 @@
 #include "Widget/Inventory/WidgetInventoryPanel.h"
 #include "SaveGame/SaveGameModuleBPLibrary.h"
 #include "UObject/ConstructorHelpers.h"
+	
+MODULE_INSTANCE_IMPLEMENTATION(ADWVoxelModule)
 
 // Sets default values
 ADWVoxelModule::ADWVoxelModule()
@@ -134,7 +136,7 @@ void ADWVoxelModule::GenerateWorld()
 
 	if(BoundsMesh && LastGenerateIndex != Index_Empty)
 	{
-		BoundsMesh->SetRelativeLocation(UVoxelModuleBPLibrary::ChunkIndexToLocation(FIndex(LastGenerateIndex.X, LastGenerateIndex.Y, 0)));
+		BoundsMesh->SetRelativeLocation(AVoxelModule::ChunkIndexToLocation(FIndex(LastGenerateIndex.X, LastGenerateIndex.Y, 0)));
 		BoundsMesh->SetRelativeScale3D(FVector(GetWorldLength() * WorldData->BlockSize * 0.01f, GetWorldLength() * WorldData->BlockSize * 0.01f, 15.f));
 	}
 }

@@ -304,7 +304,7 @@ void UInventorySlot::DiscardItem(int32 InCount /*= -1*/)
 	if(!OwnerCharacter || OwnerCharacter->DoAction(EDWCharacterActionType::Discard))
 	{
 		FAbilityItem tmpItem = FAbilityItem(Item, InCount);
-		if (auto chunk = AMainModule::GetModuleByClass<AVoxelModule>()->FindChunkByLocation(Inventory->GetOwnerActor()->GetActorLocation()))
+		if (auto chunk = AVoxelModule::Get()->FindChunkByLocation(Inventory->GetOwnerActor()->GetActorLocation()))
 		{
 			UAbilityModuleBPLibrary::SpawnPickUp(tmpItem, Inventory->GetOwnerActor()->GetActorLocation() + FMath::RandPointInBox(FBox(FVector(-20, -20, -10), FVector(20, 20, 10))), chunk);
 		}

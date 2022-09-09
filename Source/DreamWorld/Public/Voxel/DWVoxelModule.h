@@ -14,7 +14,9 @@ UCLASS()
 class DREAMWORLD_API ADWVoxelModule : public AVoxelModule
 {
 	GENERATED_BODY()
-	
+		
+	MODULE_INSTANCE_DECLARE(ADWVoxelModule)
+
 public:	
 	// Sets default values for this actor's properties
 	ADWVoxelModule();
