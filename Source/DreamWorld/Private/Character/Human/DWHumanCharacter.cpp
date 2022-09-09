@@ -13,13 +13,11 @@
 #include "AI/DWAIBlackboard.h"
 #include "Item/Equip/Weapon/DWEquipWeapon.h"
 #include "ObjectPool/ObjectPoolModuleBPLibrary.h"
+#include "Voxel/Components/VoxelMeshComponent.h"
 #include "Voxel/Voxels/Entity/VoxelEntity.h"
 
 ADWHumanCharacter::ADWHumanCharacter()
 {
-	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
-
 	// Set size for collision capsule
 	GetCapsuleComponent()->SetCapsuleHalfHeight(69);
 	GetCapsuleComponent()->SetCapsuleRadius(24);
@@ -29,11 +27,6 @@ ADWHumanCharacter::ADWHumanCharacter()
 	GetCharacterMovement()->AirControl = 0.3f;
 
 	GetMesh()->SetRelativeLocation(FVector(0, 0, -70));
-	
-	VoxelMesh = CreateDefaultSubobject<UChildActorComponent>(FName("VoxelMesh"));
-	VoxelMesh->SetupAttachment(GetMesh(), FName("VoxelMesh"));
-	VoxelMesh->SetRelativeLocationAndRotation(FVector(0, 0, 0), FRotator(0, 0, 0));
-	VoxelMesh->SetChildActorClass(AVoxelEntity::StaticClass());
 
 	HammerMesh = CreateDefaultSubobject<USkeletalMeshComponent>(FName("HammerMesh"));
 	HammerMesh->SetupAttachment(GetMesh(), FName("HammerMesh"));
@@ -58,11 +51,9 @@ void ADWHumanCharacter::OnSpawn_Implementation(const TArray<FParameter>& InParam
 void ADWHumanCharacter::OnDespawn_Implementation()
 {
 	Super::OnDespawn_Implementation();
-	
-	if(AVoxelEntity* VoxelEntity = Cast<AVoxelEntity>(VoxelMesh->GetChildActor()))
-	{
-		VoxelEntity->Initialize(FPrimaryAssetId());
-	}
+
+	UObjectPoolModuleBPLibrary::DespawnObject(VoxelEntity);
+	VoxelEntity = nullptr;
 }
 
 // Called every frame
@@ -82,13 +73,13 @@ void ADWHumanCharacter::SetControlMode(EDWCharacterControlMode InControlMode)
 	{
 		case EDWCharacterControlMode::Fighting:
 		{
-			VoxelMesh->SetVisibility(false);
+			if(VoxelEntity) VoxelEntity->Execute_SetActorVisible(VoxelEntity, false);
 			HammerMesh->SetVisibility(false);
 			break;
 		}
 		case EDWCharacterControlMode::Creating:
 		{
-			VoxelMesh->SetVisibility(true);
+			if(VoxelEntity) VoxelEntity->Execute_SetActorVisible(VoxelEntity, true);
 			HammerMesh->SetVisibility(true);
 			break;
 		}
@@ -99,9 +90,23 @@ void ADWHumanCharacter::SetGenerateVoxelID(const FPrimaryAssetId& InGenerateVoxe
 {
 	Super::SetGenerateVoxelID(InGenerateVoxelID);
 
-	if(AVoxelEntity* VoxelEntity = Cast<AVoxelEntity>(VoxelMesh->GetChildActor()))
+	if(InGenerateVoxelID.IsValid())
 	{
-		VoxelEntity->Initialize(GenerateVoxelID);
+		if(!VoxelEntity)
+		{
+			VoxelEntity = UObjectPoolModuleBPLibrary::SpawnObject<AVoxelEntity>();
+			VoxelEntity->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("VoxelMesh"));
+			VoxelEntity->Execute_SetActorVisible(VoxelEntity, Execute_IsVisible(this) && ControlMode == EDWCharacterControlMode::Creating);
+			VoxelEntity->GetMeshComponent()->OffsetScale = FVector(0.f, 0.f, 1.f);
+			VoxelEntity->GetMeshComponent()->CenterOffset = FVector(0.f, 0.f, 0.5f);
+		}
+		VoxelEntity->Initialize(InGenerateVoxelID);
+	}
+	else if(VoxelEntity)
+	{
+		VoxelEntity->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+		UObjectPoolModuleBPLibrary::DespawnObject(VoxelEntity);
+		VoxelEntity = nullptr;
 	}
 }
 

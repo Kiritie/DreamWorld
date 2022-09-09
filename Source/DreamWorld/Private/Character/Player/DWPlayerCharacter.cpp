@@ -254,7 +254,7 @@ void ADWPlayerCharacter::SetActorVisible_Implementation(bool bNewVisible)
 
 	if(bNewVisible && ControlMode == EDWCharacterControlMode::Fighting)
 	{
-		VoxelMesh->SetVisibility(false);
+		if(VoxelEntity) VoxelEntity->Execute_SetActorVisible(VoxelEntity, false);
 		HammerMesh->SetVisibility(false);
 	}
 }

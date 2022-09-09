@@ -27,10 +27,10 @@ public:
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-	UChildActorComponent* VoxelMesh;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	USkeletalMeshComponent* HammerMesh;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	AVoxelEntity* VoxelEntity;
 
 protected:
 	// Called when the game starts or when spawned

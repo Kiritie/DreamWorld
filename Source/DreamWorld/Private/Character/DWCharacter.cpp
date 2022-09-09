@@ -417,7 +417,7 @@ bool ADWCharacter::CanInteract(IInteractionAgentInterface* InInteractionAgent, E
 	{
 		case EInteractAction::Revive:
 		{
-			if(!IsDead() && !IsDying())
+			if(IsDead())
 			{
 				return true;
 			}
