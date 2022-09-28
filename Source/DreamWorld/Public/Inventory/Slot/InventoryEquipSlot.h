@@ -36,10 +36,6 @@ public:
 
 	virtual void OnItemChanged(FAbilityItem& InOldItem) override;
 
-	virtual void Assemble();
-
-	virtual void Discharge();
-
 public:
 	EDWEquipPartType GetPartType() const { return PartType; }
 

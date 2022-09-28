@@ -105,8 +105,8 @@ public:
 	virtual void DischargeItem();
 
 	UFUNCTION(BlueprintCallable)
-	virtual void DiscardItem(int32 InCount = -1);
-	
+	virtual void DiscardItem(int32 InCount = -1, bool bOffsetX = true);
+
 	UFUNCTION(BlueprintCallable)
 	virtual bool ActiveItem();
 		
@@ -125,6 +125,9 @@ public:
 	UFUNCTION(BlueprintPure)
 	bool IsSelected() const;
 
+	UFUNCTION(BlueprintPure)
+	bool IsMatched() const;
+	
 	int32 GetSplitIndex(ESplitSlotType InSplitSlotType = ESplitSlotType::None);
 
 	int32 GetRemainVolume(FAbilityItem InItem = FAbilityItem::Empty) const;

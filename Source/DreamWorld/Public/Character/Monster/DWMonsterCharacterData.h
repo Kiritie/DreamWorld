@@ -11,4 +11,17 @@ class DREAMWORLD_API UDWMonsterCharacterData : public UDWCharacterData
 
 public:
 	UDWMonsterCharacterData();
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	USoundBase* AttackHitSound;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	USoundBase* AttackMissSound;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UParticleSystem* AttackHitEffect;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UParticleSystem* AttackMissEffect;
 };

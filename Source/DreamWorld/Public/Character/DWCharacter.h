@@ -255,7 +255,7 @@ public:
 	virtual bool StopAction(EDWCharacterActionType InActionType);
 
 	UFUNCTION(BlueprintCallable)
-	virtual void EndAction(EDWCharacterActionType InActionType);
+	virtual void EndAction(EDWCharacterActionType InActionType, bool bWasCancelled);
 
 	UFUNCTION(BlueprintCallable)
 	virtual void SetLockedTarget(ADWCharacter* InTargetCharacter);
@@ -339,6 +339,9 @@ public:
 	virtual UInventory* GetInventory() const override;
 
 public:
+	UFUNCTION(BlueprintPure)
+	virtual bool IsExhausted() const;
+	
 	UFUNCTION(BlueprintPure)
 	virtual bool IsFreeToAnim() const;
 	
@@ -548,7 +551,7 @@ public:
 	
 	virtual void OnAttributeChange(const FOnAttributeChangeData& InAttributeChangeData) override;
 	
-	virtual void HandleDamage(EDamageType DamageType, const float LocalDamageDone, bool bHasCrited, FHitResult HitResult, const FGameplayTagContainer& SourceTags, AActor* SourceActor) override;
+	virtual void HandleDamage(EDamageType DamageType, const float LocalDamageDone, bool bHasCrited, bool bHasDefend, FHitResult HitResult, const FGameplayTagContainer& SourceTags, AActor* SourceActor) override;
 	
 	virtual void HandleInterrupt(float InterruptDuration);
 };

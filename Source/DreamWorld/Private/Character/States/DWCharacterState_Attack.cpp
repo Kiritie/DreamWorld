@@ -8,6 +8,7 @@
 #include "Ability/Item/Skill/AbilitySkillDataBase.h"
 #include "Character/DWCharacter.h"
 #include "ObjectPool/ObjectPoolModuleBPLibrary.h"
+#include "Character/DWCharacterData.h"
 
 UDWCharacterState_Attack::UDWCharacterState_Attack()
 {
@@ -21,7 +22,11 @@ void UDWCharacterState_Attack::OnInitialize(UFSMComponent* InFSMComponent, int32
 
 bool UDWCharacterState_Attack::OnEnterValidate(UFiniteStateBase* InLastFiniteState)
 {
-	return Super::OnEnterValidate(InLastFiniteState);
+	if(!Super::OnEnterValidate(InLastFiniteState)) return false;
+
+	ADWCharacter* Character = GetAgent<ADWCharacter>();
+
+	return Character->DoAction(EDWCharacterActionType::Attack);
 }
 
 void UDWCharacterState_Attack::OnEnter(UFiniteStateBase* InLastFiniteState)
@@ -29,6 +34,8 @@ void UDWCharacterState_Attack::OnEnter(UFiniteStateBase* InLastFiniteState)
 	Super::OnEnter(InLastFiniteState);
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
+
+	Character->GetAbilitySystemComponent()->AddLooseGameplayTag(Character->GetCharacterData<UDWCharacterData>().AttackingTag);
 
 	Character->LimitToAnim(true, true);
 	Character->SetMotionRate(0, 0);
@@ -44,6 +51,10 @@ void UDWCharacterState_Attack::OnLeave(UFiniteStateBase* InNextFiniteState)
 	Super::OnLeave(InNextFiniteState);
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
+
+	Character->StopAction(EDWCharacterActionType::Attack);
+
+	Character->GetAbilitySystemComponent()->RemoveLooseGameplayTag(Character->GetCharacterData<UDWCharacterData>().AttackingTag);
 
 	AttackEnd();
 
@@ -77,14 +88,12 @@ void UDWCharacterState_Attack::AttackStart()
 		}
 		case EDWCharacterAttackType::SkillAttack:
 		{
-			if(Character->AbilitySystem->TryActivateAbility(Character->GetSkillAbility(Character->SkillAbilityID).AbilityHandle))
+			const auto SkillAbilityData = Character->GetSkillAbility(Character->SkillAbilityID);
+			if(const auto SkillClass = SkillAbilityData.GetItemData<UAbilitySkillDataBase>().SkillClass)
 			{
-				if (const auto SkillClass = Character->GetSkillAbility(Character->SkillAbilityID).GetItemData<UAbilitySkillDataBase>().SkillClass)
+				if(AAbilitySkillBase* Skill = UObjectPoolModuleBPLibrary::SpawnObject<AAbilitySkillBase>(nullptr, SkillClass))
 				{
-					if(AAbilitySkillBase* Skill = UObjectPoolModuleBPLibrary::SpawnObject<AAbilitySkillBase>(nullptr, SkillClass))
-					{
-						Skill->Initialize(Character, FAbilityItem(Character->SkillAbilityID));
-					}
+					Skill->Initialize(Character, FAbilityItem(Character->SkillAbilityID));
 				}
 			}
 			break;

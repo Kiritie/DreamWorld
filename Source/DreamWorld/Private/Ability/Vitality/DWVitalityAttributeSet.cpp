@@ -2,10 +2,11 @@
 
 #include "GameplayEffectExtension.h"
 #include "Character/DWCharacter.h"
+#include "DWTypes.h"
 
 UDWVitalityAttributeSet::UDWVitalityAttributeSet()
 {
-	
+	DamageHandle = UDWDamageHandle::StaticClass();
 }
 
 void UDWVitalityAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue)

@@ -8,7 +8,7 @@
 UWidgetMainMenu::UWidgetMainMenu(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	WidgetName = FName("MainMenu");
-	WidgetCategory = EWidgetCategory::Temporary;
+	WidgetType = EWidgetType::Temporary;
 	InputMode = EInputMode::UIOnly;
 }
 

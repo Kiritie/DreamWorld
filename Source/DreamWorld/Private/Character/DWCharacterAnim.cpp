@@ -30,32 +30,34 @@ void UDWCharacterAnim::NativeInitializeAnimation()
 	
 }
 
-bool UDWCharacterAnim::HandleNotify(const FAnimNotifyEvent& AnimNotifyEvent)
+void UDWCharacterAnim::NativeHandleNotify(const FString& AnimNotifyName)
 {
-	Super::HandleNotify(AnimNotifyEvent);
-	
+	Super::NativeHandleNotify(AnimNotifyName);
+
 	ADWCharacter* Character = Cast<ADWCharacter>(TryGetPawnOwner());
 
-	if(!Character) return false;
+	if(!Character) return;
 
-	const FString NotifyName = AnimNotifyEvent.GetNotifyEventName().ToString().Mid(11);
-	if (NotifyName.Equals(TEXT("Free to animate")))
+	if(AnimNotifyName.Equals(TEXT("Free to animate")))
 	{
 		Character->FreeToAnim();
 	}
-	else if (NotifyName.Equals(TEXT("Attack start")))
+	else if(AnimNotifyName.Equals(TEXT("Limit to animate")))
+	{
+		Character->LimitToAnim();
+	}
+	else if(AnimNotifyName.Equals(TEXT("Attack start")))
 	{
 		Character->GetFSMComponent()->GetStateByClass<UDWCharacterState_Attack>()->AttackStart();
 	}
-	else if (NotifyName.Equals(TEXT("Attack hurt")))
+	else if(AnimNotifyName.Equals(TEXT("Attack hurt")))
 	{
 		Character->GetFSMComponent()->GetStateByClass<UDWCharacterState_Attack>()->AttackHurt();
 	}
-	else if (NotifyName.Equals(TEXT("Attack end")))
+	else if(AnimNotifyName.Equals(TEXT("Attack end")))
 	{
 		Character->GetFSMComponent()->GetStateByClass<UDWCharacterState_Attack>()->AttackEnd();
 	}
-	return false;
 }
 
 void UDWCharacterAnim::NativeUpdateAnimation(float DeltaSeconds)

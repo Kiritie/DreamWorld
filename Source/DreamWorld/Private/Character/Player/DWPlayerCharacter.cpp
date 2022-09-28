@@ -401,15 +401,15 @@ void ADWPlayerCharacter::OnAttributeChange(const FOnAttributeChangeData& InAttri
 
 	const float DeltaValue = InAttributeChangeData.NewValue - InAttributeChangeData.OldValue;
 	
-	if(InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetHealthAttribute())
+	if(InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetHealthAttribute() || InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetMaxHealthAttribute())
 	{
 		if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>())
 		{
-			UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>()->SetHealthPercent(InAttributeChangeData.NewValue, GetMaxHealth());
+			UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>()->SetHealthPercent(GetHealth(), GetMaxHealth());
 		}
 		if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>())
 		{
-			UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>()->SetHealthInfo(FString::Printf(TEXT("%d/%d"), (int32)InAttributeChangeData.NewValue, (int32)GetMaxHealth()));
+			UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>()->SetHealthInfo(FString::Printf(TEXT("%d/%d"), (int32)GetHealth(), (int32)GetMaxHealth()));
 		}
 	}
 	else if(InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetExpAttribute())
@@ -423,59 +423,26 @@ void ADWPlayerCharacter::OnAttributeChange(const FOnAttributeChangeData& InAttri
 			UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>()->SetHeadInfo(GetHeadInfo());
 		}
 	}
-	else if(InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetMaxHealthAttribute())
+	else if(InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetManaAttribute() || InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetMaxManaAttribute())
 	{
 		if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>())
 		{
-			UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>()->SetHealthPercent(InAttributeChangeData.NewValue, GetMaxHealth());
+			UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>()->SetManaPercent(GetMana(), GetMaxMana());
 		}
 		if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>())
 		{
-			UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>()->SetHealthInfo(FString::Printf(TEXT("%d/%d"), (int32)InAttributeChangeData.NewValue, (int32)GetMaxHealth()));
+			UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>()->SetManaInfo(FString::Printf(TEXT("%d/%d"), (int32)GetMana(), (int32)GetMaxMana()));
 		}
 	}
-	else if(InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetManaAttribute())
+	else if(InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetStaminaAttribute() || InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetMaxStaminaAttribute())
 	{
 		if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>())
 		{
-			UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>()->SetManaPercent(InAttributeChangeData.NewValue, GetMaxMana());
+			UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>()->SetStaminaPercent(GetStamina(), GetMaxStamina());
 		}
 		if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>())
 		{
-			UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>()->SetManaInfo(FString::Printf(TEXT("%d/%d"), (int32)InAttributeChangeData.NewValue, (int32)GetMaxMana()));
-		}
-	}
-	else if(InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetMaxManaAttribute())
-	{
-		if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>())
-		{
-			UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>()->SetManaPercent(InAttributeChangeData.NewValue, GetMaxMana());
-		}
-		if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>())
-		{
-			UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>()->SetManaInfo(FString::Printf(TEXT("%d/%d"), (int32)InAttributeChangeData.NewValue, (int32)GetMaxMana()));
-		}
-	}
-	else if(InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetMaxStaminaAttribute())
-	{
-		if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>())
-		{
-			UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>()->SetStaminaPercent(InAttributeChangeData.NewValue, GetMaxStamina());
-		}
-		if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>())
-		{
-			UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>()->SetStaminaInfo(FString::Printf(TEXT("%d/%d"), (int32)InAttributeChangeData.NewValue, (int32)GetMaxStamina()));
-		}
-	}
-	else if(InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetMaxStaminaAttribute())
-	{
-		if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>())
-		{
-			UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>()->SetStaminaPercent(InAttributeChangeData.NewValue, GetMaxStamina());
-		}
-		if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>())
-		{
-			UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>()->SetStaminaInfo(FString::Printf(TEXT("%d/%d"), (int32)InAttributeChangeData.NewValue, (int32)GetMaxStamina()));
+			UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>()->SetStaminaInfo(FString::Printf(TEXT("%d/%d"), (int32)GetStamina(), (int32)GetMaxStamina()));
 		}
 	}
 	else if(InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetMoveSpeedAttribute())

@@ -54,17 +54,3 @@ void UInventoryEquipSlot::OnItemChanged(FAbilityItem& InOldItem)
 	Super::OnItemChanged(InOldItem);
 	ActiveItem();
 }
-
-void UInventoryEquipSlot::Assemble()
-{
-	Inventory->AddItemBySplitType(Item, ESplitSlotType::Equip); 
-	Refresh();
-}
-
-void UInventoryEquipSlot::Discharge()
-{
-	Inventory->AddItemBySplitType(Item, ESplitSlotType::Default);
-	Inventory->AddItemBySplitType(Item, ESplitSlotType::Shortcut);
-	Inventory->AddItemBySplitType(Item, ESplitSlotType::Auxiliary);
-	Refresh();
-}

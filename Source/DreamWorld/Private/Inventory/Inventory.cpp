@@ -228,6 +228,18 @@ FQueryItemInfo UInventory::QueryItemBySplitType(EQueryItemType InQueryType, FAbi
 	return QueryItemByRange(InQueryType, InItem, SplitSlotInfo.StartIndex, SplitSlotInfo.StartIndex + SplitSlotInfo.TotalCount);
 }
 
+FQueryItemInfo UInventory::QueryItemBySplitTypes(EQueryItemType InQueryType, FAbilityItem InItem, const TArray<ESplitSlotType>& InSplitSlotTypes)
+{
+	FQueryItemInfo QueryItemInfo;
+	for(auto Iter : InSplitSlotTypes)
+	{
+		QueryItemInfo += QueryItemBySplitType(InQueryType, InItem, Iter);
+		InItem.Count -= QueryItemInfo.Item.Count;
+		if(InItem.Count <= 0) break;
+	}
+	return QueryItemInfo;
+}
+
 void UInventory::AddItemBySlots(FAbilityItem& InItem, const TArray<UInventorySlot*>& InSlots)
 {
 	for (int i = 0; i < InSlots.Num(); i++)
@@ -250,6 +262,16 @@ void UInventory::AddItemByRange(FAbilityItem& InItem, int32 InStartIndex, int32 
 void UInventory::AddItemBySplitType(FAbilityItem& InItem, ESplitSlotType InSplitSlotType)
 {
 	auto QueryItemInfo = QueryItemBySplitType(EQueryItemType::Add, InItem, InSplitSlotType);
+	for (int i = 0; i < QueryItemInfo.Slots.Num(); i++)
+	{
+		QueryItemInfo.Slots[i]->AddItem(InItem);
+		if (InItem.Count <= 0) break;
+	}
+}
+
+void UInventory::AddItemBySplitTypes(FAbilityItem& InItem, const TArray<ESplitSlotType>& InSplitSlotTypes)
+{
+	auto QueryItemInfo = QueryItemBySplitTypes(EQueryItemType::Add, InItem, InSplitSlotTypes);
 	for (int i = 0; i < QueryItemInfo.Slots.Num(); i++)
 	{
 		QueryItemInfo.Slots[i]->AddItem(InItem);
@@ -284,6 +306,16 @@ void UInventory::RemoveItemByRange(FAbilityItem& InItem, int32 InStartIndex, int
 void UInventory::RemoveItemBySplitType(FAbilityItem& InItem, ESplitSlotType InSplitSlotType)
 {
 	auto QueryItemInfo = QueryItemBySplitType(EQueryItemType::Remove, InItem, InSplitSlotType);
+	for (int i = 0; i < QueryItemInfo.Slots.Num(); i++)
+	{
+		QueryItemInfo.Slots[i]->SubItem(InItem);
+		if (InItem.Count <= 0) break;
+	}
+}
+
+void UInventory::RemoveItemBySplitTypes(FAbilityItem& InItem, const TArray<ESplitSlotType>& InSplitSlotTypes)
+{
+	auto QueryItemInfo = QueryItemBySplitTypes(EQueryItemType::Remove, InItem, InSplitSlotTypes);
 	for (int i = 0; i < QueryItemInfo.Slots.Num(); i++)
 	{
 		QueryItemInfo.Slots[i]->SubItem(InItem);
@@ -337,7 +369,7 @@ void UInventory::DiscardAllItem()
 {
 	for (int i = 0; i < Slots.Num(); i++)
 	{
-		Slots[i]->DiscardItem();
+		Slots[i]->DiscardItem(-1, false);
 	}
 }
 

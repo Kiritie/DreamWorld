@@ -8,7 +8,7 @@ ADWSkillMelee::ADWSkillMelee()
 
 }
 
-void ADWSkillMelee::Initialize(AAbilityCharacterBase* InOwnerCharacter)
+void ADWSkillMelee::Initialize_Implementation(AAbilityCharacterBase* InOwnerCharacter, const FAbilityItem& InItem)
 {
-	Super::Initialize(InOwnerCharacter);
+	Super::Initialize_Implementation(InOwnerCharacter, InItem);
 }

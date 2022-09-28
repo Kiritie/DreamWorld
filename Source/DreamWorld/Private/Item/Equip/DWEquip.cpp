@@ -18,9 +18,9 @@ ADWEquip::ADWEquip()
 
 }
 
-void ADWEquip::Initialize(AAbilityCharacterBase* InOwnerCharacter)
+void ADWEquip::Initialize_Implementation(AAbilityCharacterBase* InOwnerCharacter, const FAbilityItem& InItem)
 {
-	Super::Initialize(InOwnerCharacter);
+	Super::Initialize_Implementation(InOwnerCharacter, InItem);
 }
 
 void ADWEquip::OnAssemble_Implementation()

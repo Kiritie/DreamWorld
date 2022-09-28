@@ -42,6 +42,7 @@
 #include "Voxel/Voxels/Voxel.h"
 #include "Widget/Inventory/WidgetInventoryBar.h"
 #include "Widget/Inventory/WidgetInventoryPanel.h"
+#include "Camera/CameraModule.h"
 
 ADWPlayerController::ADWPlayerController()
 {
@@ -164,9 +165,9 @@ void ADWPlayerController::SetupInputComponent()
 	InputComponent->BindAction("SelectInventorySlot9", IE_Pressed, this, &ADWPlayerController::SelectInventorySlot9);
 	InputComponent->BindAction("SelectInventorySlot10", IE_Pressed, this, &ADWPlayerController::SelectInventorySlot10);
 
-	InputComponent->BindAction("ToggleInventoryPanel", IE_Pressed, this, &ADWPlayerController::ToggleInventoryPanel);
+	InputComponent->BindAction("OpenInventoryPanel", IE_Pressed, this, &ADWPlayerController::OpenInventoryPanel);
 
-	InputComponent->BindAction("Pause/ContinueGame", IE_Pressed, this, &ADWPlayerController::PauseOrContinueGame);
+	InputComponent->BindAction("PauseGame", IE_Pressed, this, &ADWPlayerController::PauseGame);
 }
 
 void ADWPlayerController::OnPossess(APawn* InPawn)
@@ -200,38 +201,42 @@ void ADWPlayerController::Tick(float DeltaTime)
 
 	if(PossessedCharacter->IsActive())
 	{
-		if(bPressedAttackDestroy)
-		{
-			OnAttackDestroyRepeat();
-		}
-
-		if(bPressedDefendGenerate)
-		{
-			OnDefendGenerateRepeat();
-		}
-
 		switch (PossessedCharacter->ControlMode)
 		{
 			case EDWCharacterControlMode::Fighting:
 			{
-				if(bPressedAttackDestroy || AttackAbilityQueue > 0)
+				if(!PossessedCharacter->IsExhausted())
 				{
-					if(PossessedCharacter->Attack() && AttackAbilityQueue > 0)
+					if(bPressedAttackDestroy || AttackAbilityQueue > 0)
 					{
-						AttackAbilityQueue--;
+						if(PossessedCharacter->Attack() && AttackAbilityQueue > 0)
+						{
+							AttackAbilityQueue--;
+						}
 					}
-				}
-				else if(!PossessedCharacter->IsAttacking(true))
-				{
-					PossessedCharacter->UnAttack();
-				}
+					else if(!PossessedCharacter->IsAttacking(true))
+					{
+						PossessedCharacter->UnAttack();
+					}
 
-				if(bPressedDefendGenerate)
-				{
-					PossessedCharacter->Defend();
+					if(bPressedDefendGenerate)
+					{
+						PossessedCharacter->Defend();
+					}
+					else
+					{
+						PossessedCharacter->UnDefend();
+					}
 				}
 				else
 				{
+					if(!PossessedCharacter->IsAttacking(true))
+					{
+						PossessedCharacter->UnAttack();
+					}
+
+					AttackAbilityQueue = 0;
+
 					PossessedCharacter->UnDefend();
 				}
 			}
@@ -380,26 +385,6 @@ void ADWPlayerController::OnAttackDestroyPressed()
 	}
 }
 
-void ADWPlayerController::OnAttackDestroyRepeat()
-{
-	ADWCharacter* PossessedCharacter = GetPawn<ADWCharacter>();
-
-	if(!PossessedCharacter || PossessedCharacter->IsBreakAllInput()) return;
-
-	bPressedAttackDestroy = true;
-	switch (PossessedCharacter->ControlMode)
-	{
-		case EDWCharacterControlMode::Fighting:
-		{
-			break;
-		}
-		case EDWCharacterControlMode::Creating:
-		{
-			break;
-		}
-	}
-}
-
 void ADWPlayerController::OnAttackDestroyReleased()
 {
 	ADWCharacter* PossessedCharacter = GetPawn<ADWCharacter>();
@@ -440,26 +425,6 @@ void ADWPlayerController::OnDefendGeneratePressed()
 			{
 				voxelHitResult.GetVoxel().OnActionTrigger(PossessedCharacter, EVoxelActionType::Action2, voxelHitResult);
 			}
-			break;
-		}
-	}
-}
-
-void ADWPlayerController::OnDefendGenerateRepeat()
-{
-	ADWCharacter* PossessedCharacter = GetPawn<ADWCharacter>();
-
-	if(!PossessedCharacter || PossessedCharacter->IsBreakAllInput()) return;
-
-	bPressedDefendGenerate = true;
-	switch (PossessedCharacter->ControlMode)
-	{
-		case EDWCharacterControlMode::Fighting:
-		{
-			break;
-		}
-		case EDWCharacterControlMode::Creating:
-		{
 			break;
 		}
 	}
@@ -608,7 +573,7 @@ void ADWPlayerController::DoInteractAction5()
 	}
 }
 
-void ADWPlayerController::ToggleInventoryPanel()
+void ADWPlayerController::OpenInventoryPanel()
 {
 	ADWPlayerCharacter* PlayerCharacter = GetPlayerPawn<ADWPlayerCharacter>();
 	
@@ -616,7 +581,7 @@ void ADWPlayerController::ToggleInventoryPanel()
 	
 	if(UProcedureModuleBPLibrary::IsCurrentProcedureClass<UProcedure_Playing>())
 	{
-		UWidgetModuleBPLibrary::ToggleUserWidget<UWidgetInventoryPanel>(false);
+		UWidgetModuleBPLibrary::OpenUserWidget<UWidgetInventoryPanel>(false);
 	}
 }
 
@@ -672,7 +637,7 @@ void ADWPlayerController::PrevInventorySlot()
 {
 	ADWPlayerCharacter* PlayerCharacter = GetPlayerPawn<ADWPlayerCharacter>();
 	
-	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput()) return;
+	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput() || UInputModuleBPLibrary::IsInputKeyDown(ACameraModule::Get()->GetCameraZoomKey())) return;
 	
 	if(UProcedureModuleBPLibrary::IsCurrentProcedureClass<UProcedure_Playing>())
 	{
@@ -684,7 +649,7 @@ void ADWPlayerController::NextInventorySlot()
 {
 	ADWPlayerCharacter* PlayerCharacter = GetPlayerPawn<ADWPlayerCharacter>();
 	
-	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput()) return;
+	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput() || UInputModuleBPLibrary::IsInputKeyDown(ACameraModule::Get()->GetCameraZoomKey())) return;
 	
 	if(UProcedureModuleBPLibrary::IsCurrentProcedureClass<UProcedure_Playing>())
 	{
@@ -812,14 +777,10 @@ void ADWPlayerController::SelectInventorySlot10()
 	}
 }
 
-void ADWPlayerController::PauseOrContinueGame()
+void ADWPlayerController::PauseGame()
 {
 	if(UProcedureModuleBPLibrary::IsCurrentProcedureClass<UProcedure_Playing>())
 	{
 		UProcedureModuleBPLibrary::SwitchProcedureByClass<UProcedure_Pausing>();
-	}
-	else if(UProcedureModuleBPLibrary::IsCurrentProcedureClass<UProcedure_Pausing>())
-	{
-		UProcedureModuleBPLibrary::SwitchProcedureByClass<UProcedure_Playing>();
 	}
 }

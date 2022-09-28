@@ -12,4 +12,11 @@ class DREAMWORLD_API UDWSkillRemoteData : public UAbilitySkillDataBase
 
 public:
 	UDWSkillRemoteData();
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	USoundBase* AttackHitSound;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UParticleSystem* AttackHitEffect;
 };

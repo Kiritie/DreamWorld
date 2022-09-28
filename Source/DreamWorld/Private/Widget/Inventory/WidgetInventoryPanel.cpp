@@ -18,9 +18,14 @@
 
 UWidgetInventoryPanel::UWidgetInventoryPanel(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
+	bIsFocusable = true;
+
 	WidgetName = FName("InventoryPanel");
-	WidgetCategory = EWidgetCategory::Permanent;
-	InputMode = EInputMode::GameAndUI;
+	ParentName = FName("GameHUD");
+	InputMode = EInputMode::UIOnly;
+
+	WidgetType = EWidgetType::Temporary;
+	WidgetCreateType = EWidgetCreateType::AutoCreate;
 
 	WidgetOpenFinishType = EWidgetOpenFinishType::Procedure;
 	WidgetCloseFinishType = EWidgetCloseFinishType::Procedure;

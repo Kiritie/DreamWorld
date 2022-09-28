@@ -92,19 +92,22 @@ void UWidgetInventorySlot::NativeOnMouseLeave(const FPointerEvent& InMouseEvent)
 
 FReply UWidgetInventorySlot::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
 {
-	const FName KeyName = InMouseEvent.GetEffectingButton().GetFName();
-	if(KeyName.IsEqual(FName("RightMouseButton")))
+	if(InMouseEvent.GetEffectingButton() == FKey("RightMouseButton"))
 	{
-		if(InMouseEvent.IsLeftShiftDown())
+		if(InMouseEvent.IsLeftControlDown())
 		{
 			MoveItem(-1);
+		}
+		else if(InMouseEvent.IsLeftShiftDown())
+		{
+			UseItem(-1);
 		}
 		else
 		{
 			UseItem(1);
 		}
 	}
-	else if(KeyName.IsEqual(FName("MiddleMouseButton")))
+	else if(InMouseEvent.GetEffectingButton() == FKey("MiddleMouseButton"))
 	{
 		if(InMouseEvent.IsLeftShiftDown())
 		{
@@ -129,14 +132,20 @@ void UWidgetInventorySlot::OnInitialize(UInventorySlot* InOwnerSlot)
 		OwnerSlot->OnInventorySlotActivated.RemoveDynamic(this, &UWidgetInventorySlot::OnActivated);
 		OwnerSlot->OnInventorySlotCanceled.RemoveDynamic(this, &UWidgetInventorySlot::OnCanceled);
 	}
+
 	OwnerSlot = InOwnerSlot;
+
 	OwnerSlot->OnInventorySlotRefresh.AddDynamic(this, &UWidgetInventorySlot::OnRefresh);
-	
+	OwnerSlot->OnInventorySlotActivated.AddDynamic(this, &UWidgetInventorySlot::OnActivated);
+	OwnerSlot->OnInventorySlotCanceled.AddDynamic(this, &UWidgetInventorySlot::OnCanceled);
+
 	OnRefresh();
 }
 
 void UWidgetInventorySlot::OnRefresh()
 {
+	if(!OwnerSlot) return;
+
 	if(!IsEmpty())
 	{
 		ImgIcon->SetVisibility(ESlateVisibility::Visible);
@@ -161,6 +170,14 @@ void UWidgetInventorySlot::OnRefresh()
 				TxtCount->SetVisibility(ESlateVisibility::Hidden);
 			}
 		}
+		if(IsCooldowning())
+		{
+			StartCooldown();
+		}
+		else
+		{
+			StopCooldown();
+		}
 	}
 	else
 	{
@@ -169,29 +186,37 @@ void UWidgetInventorySlot::OnRefresh()
 		{
 			TxtCount->SetVisibility(ESlateVisibility::Hidden);
 		}
+		StopCooldown();
 	}
 }
 
 void UWidgetInventorySlot::OnActivated()
 {
-	if(OwnerSlot)
-	{
-		const FAbilityInfo CooldownInfo = OwnerSlot->GetAbilityInfo();
-		if(CooldownInfo.CooldownRemaining > 0.f)
-		{
-			GetWorld()->GetTimerManager().SetTimer(CooldownTimerHandle, this, &UWidgetInventorySlot::OnCooldown, 0.1f, true);
-		}
-	}
+	StartCooldown();
 }
 
 void UWidgetInventorySlot::OnCanceled()
 {
-	if(OwnerSlot)
+	StopCooldown();
+}
+
+void UWidgetInventorySlot::StartCooldown()
+{
+	if(IsCooldowning())
 	{
-		ImgMask->SetVisibility(ESlateVisibility::Hidden);
-		TxtCooldown->SetVisibility(ESlateVisibility::Hidden);
-		GetWorld()->GetTimerManager().ClearTimer(CooldownTimerHandle);
+		GetWorld()->GetTimerManager().SetTimer(CooldownTimerHandle, this, &UWidgetInventorySlot::OnCooldown, 0.1f, true);
 	}
+	else
+	{
+		StopCooldown();
+	}
+}
+
+void UWidgetInventorySlot::StopCooldown()
+{
+	ImgMask->SetVisibility(ESlateVisibility::Hidden);
+	TxtCooldown->SetVisibility(ESlateVisibility::Hidden);
+	GetWorld()->GetTimerManager().ClearTimer(CooldownTimerHandle);
 }
 
 void UWidgetInventorySlot::OnCooldown()
@@ -208,9 +233,7 @@ void UWidgetInventorySlot::OnCooldown()
 		}
 		else
 		{
-			ImgMask->SetVisibility(ESlateVisibility::Hidden);
-			TxtCooldown->SetVisibility(ESlateVisibility::Hidden);
-			GetWorld()->GetTimerManager().ClearTimer(CooldownTimerHandle);
+			StopCooldown();
 		}
 	}
 }
@@ -256,6 +279,12 @@ bool UWidgetInventorySlot::IsEmpty() const
 {
 	if (OwnerSlot) return OwnerSlot->IsEmpty();
 	return true;
+}
+
+bool UWidgetInventorySlot::IsCooldowning() const
+{
+	if(OwnerSlot) return OwnerSlot->IsMatched() && OwnerSlot->GetAbilityInfo().CooldownRemaining > 0.f;
+	return false;
 }
 
 FAbilityItem& UWidgetInventorySlot::GetItem() const

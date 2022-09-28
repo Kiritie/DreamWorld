@@ -67,7 +67,7 @@ void UDWCharacterState_Default::OnRefresh()
 		{
 			if(UVoxelModuleBPLibrary::IsBasicGenerated())
 			{
-				const auto& characterData = Character->GetCharacterData();
+				const auto& characterData = Character->GetCharacterData<UAbilityCharacterDataBase>();
 				const auto& worldData = AVoxelModule::Get()->GetWorldData();
 				const float& chunkRadius = worldData.GetChunkLength() * 0.5f;
 				DON(i, 10,

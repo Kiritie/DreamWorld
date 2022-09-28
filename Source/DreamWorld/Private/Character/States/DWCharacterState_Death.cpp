@@ -11,6 +11,9 @@
 #include "Inventory/CharacterInventory.h"
 #include "Inventory/Inventory.h"
 #include "Voxel/Chunks/VoxelChunk.h"
+#include "Ability/Character/AbilityCharacterBase.h"
+#include "ObjectPool/ObjectPoolModuleBPLibrary.h"
+#include "Ability/Character/AbilityCharacterDataBase.h"
 
 UDWCharacterState_Death::UDWCharacterState_Death()
 {
@@ -41,13 +44,6 @@ void UDWCharacterState_Death::OnEnter(UFiniteStateBase* InLastFiniteState)
 void UDWCharacterState_Death::OnRefresh()
 {
 	Super::OnRefresh();
-
-	ADWCharacter* Character = GetAgent<ADWCharacter>();
-
-	if (Character->IsDying() && !Character->IsFalling(true) && !bDeathStarted)
-	{
-		DeathStart();
-	}
 }
 
 void UDWCharacterState_Death::OnLeave(UFiniteStateBase* InNextFiniteState)
@@ -66,8 +62,8 @@ void UDWCharacterState_Death::OnTermination()
 
 void UDWCharacterState_Death::DeathStart()
 {
-	bDeathStarted = true;
-	
+	Super::DeathStart();
+
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 
 	Character->DoAction(EDWCharacterActionType::Death);
@@ -77,28 +73,19 @@ void UDWCharacterState_Death::DeathEnd()
 {
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 
+	Character->GetAbilitySystemComponent()->RemoveLooseGameplayTag(Character->GetCharacterData<UAbilityCharacterDataBase>().DyingTag);
+	Character->GetAbilitySystemComponent()->AddLooseGameplayTag(Character->GetCharacterData<UAbilityCharacterDataBase>().DeadTag);
+
 	Character->StopAction(EDWCharacterActionType::Death);
 
 	Character->Inventory->DiscardAllItem();
 
 	if(!Character->IsPlayer())
 	{
-		if(Character->GetController())
-		{
-			Character->GetController()->UnPossess();
-		}
-		if (Character->HasTeam())
-		{
-			Character->GetTeamData()->RemoveMember(Character);
-		}
-		for(auto Iter : Character->Equips)
-		{
-			if(Iter.Value)
-			{
-				Iter.Value->Destroy();
-			}
-		}
+		UObjectPoolModuleBPLibrary::DespawnObject(Character);
 	}
-
-	Super::DeathEnd();
+	else
+	{
+		Character->Execute_SetActorVisible(Character, false);
+	}
 }

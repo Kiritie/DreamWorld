@@ -28,9 +28,13 @@
 UWidgetInventoryBar::UWidgetInventoryBar(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	WidgetName = FName("InventoryBar");
-	WidgetCategory = EWidgetCategory::Permanent;
+	ParentName = FName("GameHUD");
 	InputMode = EInputMode::GameOnly;
 	
+	WidgetCreateType = EWidgetCreateType::AutoCreateAndOpen;
+
+	WidgetZOrder = 1;
+
 	SelectedSlotIndex = 0;
 
 	ShortcutSlotClass = LoadClass<UWidgetInventoryShortcutSlot>(nullptr, TEXT("WidgetBlueprint'/Game/Blueprints/Widget/Inventory/Slot/WB_InventoryShortcutSlot.WB_InventoryShortcutSlot_C'"));
@@ -223,11 +227,11 @@ void UWidgetInventoryBar::SetSkillBoxVisible(bool bValue)
 {
 	if(LeftSkillBox)
 	{
-		LeftSkillBox->SetVisibility(bValue ? ESlateVisibility::HitTestInvisible : ESlateVisibility::Hidden);
+		LeftSkillBox->SetVisibility(bValue ? ESlateVisibility::SelfHitTestInvisible : ESlateVisibility::Hidden);
 	}
 	if(RightSkillBox)
 	{
-		RightSkillBox->SetVisibility(bValue ? ESlateVisibility::HitTestInvisible : ESlateVisibility::Hidden);
+		RightSkillBox->SetVisibility(bValue ? ESlateVisibility::SelfHitTestInvisible : ESlateVisibility::Hidden);
 	}
 }
 

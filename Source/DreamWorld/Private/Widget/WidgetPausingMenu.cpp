@@ -2,12 +2,17 @@
 
 
 #include "Widget/WidgetPausingMenu.h"
+#include "Procedure/ProcedureModuleBPLibrary.h"
+#include "Procedure/Procedure_Pausing.h"
+#include "Procedure/Procedure_Playing.h"
 
 UWidgetPausingMenu::UWidgetPausingMenu(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	WidgetName = FName("PausingMenu");
-	WidgetCategory = EWidgetCategory::Temporary;
-	InputMode = EInputMode::GameAndUI;
+	WidgetType = EWidgetType::Temporary;
+	InputMode = EInputMode::UIOnly;
+
+	bIsFocusable = true;
 }
 
 void UWidgetPausingMenu::OnInitialize_Implementation(AActor* InOwner)
@@ -27,4 +32,17 @@ void UWidgetPausingMenu::OnClose_Implementation(bool bInstant)
 	Super::OnClose_Implementation(bInstant);
 
 	FinishClose(bInstant);
+}
+
+FReply UWidgetPausingMenu::NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent)
+{
+	if(InKeyEvent.GetKey() == FKey("Escape"))
+	{
+		if(UProcedureModuleBPLibrary::IsCurrentProcedureClass<UProcedure_Pausing>())
+		{
+			UProcedureModuleBPLibrary::SwitchProcedureByClass<UProcedure_Playing>();
+			return FReply::Handled();
+		}
+	}
+	return FReply::Unhandled();
 }

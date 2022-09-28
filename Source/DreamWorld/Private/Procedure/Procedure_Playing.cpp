@@ -53,7 +53,6 @@ void UProcedure_Playing::OnEnter(UProcedureBase* InLastProcedure)
 		UAudioModuleBPLibrary::PlaySingleSound2D(BGMSound, FName("BGM"));
 
 		UWidgetModuleBPLibrary::OpenUserWidget<UWidgetGameHUD>();
-		UWidgetModuleBPLibrary::OpenUserWidget<UWidgetInventoryBar>();
 
 		if(ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>())
 		{

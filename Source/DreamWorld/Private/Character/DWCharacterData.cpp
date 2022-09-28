@@ -35,6 +35,7 @@ UDWCharacterData::UDWCharacterData()
 	AttackingTag = FGameplayTag::RequestGameplayTag("State.Character.Attacking");
 	DefendingTag = FGameplayTag::RequestGameplayTag("State.Character.Defending");
 	InterruptingTag = FGameplayTag::RequestGameplayTag("State.Character.Interrupting");
+	ExhaustedTag = FGameplayTag::RequestGameplayTag("State.Character.Exhausted");
 	FreeToAnimTag = FGameplayTag::RequestGameplayTag("State.Character.FreeToAnim");
 	LockRotationTag = FGameplayTag::RequestGameplayTag("State.Character.LockRotation");
 	BreakAllInputTag = FGameplayTag::RequestGameplayTag("State.Character.BreakAllInput");

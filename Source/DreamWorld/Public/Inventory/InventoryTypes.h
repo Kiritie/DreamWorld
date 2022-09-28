@@ -1,4 +1,4 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
+// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 #include "SaveGame/SaveGameModuleTypes.h"
@@ -50,6 +50,26 @@ public:
 	FORCEINLINE bool IsSuccess() const
 	{
 		return Item.IsValid(true);
+	}
+
+	FORCEINLINE friend FQueryItemInfo operator+(FQueryItemInfo& A, FQueryItemInfo& B)
+	{
+		A.Item += B.Item;
+		for(auto Iter : B.Slots)
+		{
+			A.Slots.Add(Iter);
+		}
+		return A;
+	}
+
+	FORCEINLINE friend FQueryItemInfo operator+=(FQueryItemInfo& A, FQueryItemInfo B)
+	{
+		A.Item = B.Item;
+		for(auto Iter : B.Slots)
+		{
+			A.Slots.Add(Iter);
+		}
+		return A;
 	}
 };
 

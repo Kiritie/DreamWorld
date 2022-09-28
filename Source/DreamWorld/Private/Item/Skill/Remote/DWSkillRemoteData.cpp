@@ -2,4 +2,6 @@
 
 UDWSkillRemoteData::UDWSkillRemoteData()
 {
+	AttackHitSound = nullptr;
+	AttackHitEffect = nullptr;
 }

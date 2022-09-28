@@ -78,13 +78,9 @@ protected:
 
 	virtual void OnAttackDestroyPressed();
 
-	virtual void OnAttackDestroyRepeat();
-
 	virtual void OnAttackDestroyReleased();
 
 	virtual void OnDefendGeneratePressed();
-
-	virtual void OnDefendGenerateRepeat();
 
 	virtual void OnDefendGenerateReleased();
 
@@ -106,7 +102,7 @@ protected:
 
 	virtual void DoInteractAction5();
 
-	virtual void ToggleInventoryPanel();
+	virtual void OpenInventoryPanel();
 
 	virtual void UseInventoryItem();
 
@@ -140,5 +136,5 @@ protected:
 		
 	virtual void SelectInventorySlot10();
 
-	virtual void PauseOrContinueGame();
+	virtual void PauseGame();
 };

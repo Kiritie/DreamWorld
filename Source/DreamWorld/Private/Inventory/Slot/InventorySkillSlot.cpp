@@ -25,7 +25,7 @@ void UInventorySkillSlot::OnInitialize(UInventory* InInventory, FAbilityItem InI
 void UInventorySkillSlot::OnItemPreChange(FAbilityItem& InNewItem)
 {
 	Super::OnItemPreChange(InNewItem);
-	if(Item.IsValid() && Item.GetData<UAbilitySkillDataBase>().SkillMode == ESkillMode::Passive)
+	if(Item.GetData<UAbilitySkillDataBase>().SkillMode == ESkillMode::Passive)
 	{
 		CancelItem();
 	}
@@ -34,7 +34,7 @@ void UInventorySkillSlot::OnItemPreChange(FAbilityItem& InNewItem)
 void UInventorySkillSlot::OnItemChanged(FAbilityItem& InOldItem)
 {
 	Super::OnItemChanged(InOldItem);
-	if(Item.IsValid() && Item.GetData<UAbilitySkillDataBase>().SkillMode == ESkillMode::Passive)
+	if(Item.GetData<UAbilitySkillDataBase>().SkillMode == ESkillMode::Passive)
 	{
 		ActiveItem();
 	}
@@ -42,15 +42,11 @@ void UInventorySkillSlot::OnItemChanged(FAbilityItem& InOldItem)
 
 bool UInventorySkillSlot::ActiveItem()
 {
-	if(IsEmpty()) return false;
+	if(!Super::ActiveItem()) return false;
 	
 	if(ADWCharacter* Character = Cast<ADWCharacter>(Inventory->GetOwnerActor()))
 	{
-		if(Character->SkillAttack(Item.ID))
-		{
-			OnInventorySlotActivated.Broadcast();
-			return true;
-		}
+		return Character->SkillAttack(Item.ID);
 	}
 	return false;
 }

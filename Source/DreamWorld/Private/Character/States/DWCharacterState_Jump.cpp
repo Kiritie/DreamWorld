@@ -45,8 +45,6 @@ void UDWCharacterState_Jump::OnLeave(UFiniteStateBase* InNextFiniteState)
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 
 	Character->StopAction(EDWCharacterActionType::Jump);
-	
-	Character->GetAbilitySystemComponent()->RemoveLooseGameplayTag(Character->GetCharacterData<UDWCharacterData>().JumpingTag);
 
 	Character->FreeToAnim();
 }

@@ -41,6 +41,7 @@ public:
 	UFUNCTION()
 	virtual void OnInitialize(UInventorySlot* InOwnerSlot);
 
+protected:
 	UFUNCTION()
 	virtual void OnRefresh();
 
@@ -49,7 +50,14 @@ public:
 	
 	UFUNCTION()
 	virtual void OnCanceled();
-	
+		
+protected:
+	UFUNCTION()
+	virtual void StartCooldown();
+			
+	UFUNCTION()
+	virtual void StopCooldown();
+
 	UFUNCTION()
 	virtual void OnCooldown();
 
@@ -112,6 +120,9 @@ protected:
 public:
 	UFUNCTION(BlueprintPure)
 	bool IsEmpty() const;
+
+	UFUNCTION(BlueprintPure)
+	bool IsCooldowning() const;
 
 	UFUNCTION(BlueprintPure)
 	FAbilityItem& GetItem() const;

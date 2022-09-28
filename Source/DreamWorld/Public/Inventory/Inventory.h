@@ -56,6 +56,9 @@ public:
 
 	UFUNCTION(BlueprintPure)
 	virtual FQueryItemInfo QueryItemBySplitType(EQueryItemType InQueryType, FAbilityItem InItem, ESplitSlotType InSplitSlotType);
+	
+	UFUNCTION(BlueprintPure)
+	virtual FQueryItemInfo QueryItemBySplitTypes(EQueryItemType InQueryType, FAbilityItem InItem, const TArray<ESplitSlotType>& InSplitSlotTypes);
 
 public:
 	UFUNCTION(BlueprintCallable)
@@ -68,6 +71,9 @@ public:
 	virtual void AddItemBySplitType(FAbilityItem& InItem, ESplitSlotType InSplitSlotType);
 		
 	UFUNCTION(BlueprintCallable)
+	virtual void AddItemBySplitTypes(FAbilityItem& InItem, const TArray<ESplitSlotType>& InSplitSlotTypes);
+
+	UFUNCTION(BlueprintCallable)
 	virtual void AddItemByQueryInfo(FQueryItemInfo& InQueryInfo);
 
 	UFUNCTION(BlueprintCallable)
@@ -78,6 +84,9 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	virtual void RemoveItemBySplitType(FAbilityItem& InItem, ESplitSlotType InSplitSlotType);
+	
+	UFUNCTION(BlueprintCallable)
+	virtual void RemoveItemBySplitTypes(FAbilityItem& InItem, const TArray<ESplitSlotType>& InSplitSlotTypes);
 
 	UFUNCTION(BlueprintCallable)
 	virtual void RemoveItemByQueryInfo(FQueryItemInfo& InQueryInfo);

@@ -14,6 +14,7 @@
 #include "Inventory/Slot/InventorySlot.h"
 #include "Item/Prop/DWPropData.h"
 #include "Voxel/Datas/VoxelData.h"
+#include "Ability/Vitality/AbilityVitalityInterface.h"
 
 ADWMonsterCharacter::ADWMonsterCharacter()
 {
@@ -46,7 +47,10 @@ void ADWMonsterCharacter::Tick(float DeltaTime)
 
 void ADWMonsterCharacter::OnAttackPointOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	OnHitTarget(OverlappedComponent, OtherActor, OtherComp, OtherBodyIndex, bFromSweep, SweepResult);
+	if(OtherActor != this)
+	{
+		OnHitTarget(OverlappedComponent, OtherActor, OtherComp, OtherBodyIndex, bFromSweep, SweepResult);
+	}
 }
 
 void ADWMonsterCharacter::SetAttackDamageAble(bool bInDamaging)

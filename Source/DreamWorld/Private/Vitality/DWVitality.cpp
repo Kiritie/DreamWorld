@@ -276,17 +276,17 @@ void ADWVitality::OnAttributeChange(const FOnAttributeChangeData& InAttributeCha
 	}
 }
 
-void ADWVitality::HandleDamage(EDamageType DamageType, const float LocalDamageDone, bool bHasCrited, FHitResult HitResult, const FGameplayTagContainer& SourceTags, AActor* SourceActor)
+void ADWVitality::HandleDamage(EDamageType DamageType, const float LocalDamageDone, bool bHasCrited, bool bHasDefend, FHitResult HitResult, const FGameplayTagContainer& SourceTags, AActor* SourceActor)
 {
-	Super::HandleDamage(DamageType, LocalDamageDone, bHasCrited, HitResult, SourceTags, SourceActor);
+	Super::HandleDamage(DamageType, LocalDamageDone, bHasCrited, bHasDefend, HitResult, SourceTags, SourceActor);
 	
 	if(SourceActor && SourceActor != this)
 	{
-		if(ADWCharacter* SourceVitality = Cast<ADWCharacter>(SourceActor))
+		if(ADWCharacter* SourceCharacter = Cast<ADWCharacter>(SourceActor))
 		{
 			if(DamageType == EDamageType::Physics)
 			{
-				SourceVitality->ModifyHealth(LocalDamageDone * SourceVitality->GetAttackStealRate());
+				SourceCharacter->ModifyHealth(LocalDamageDone * SourceCharacter->GetAttackStealRate());
 			}
 		}
 	}

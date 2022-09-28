@@ -14,7 +14,9 @@
 UWidgetGameHUD::UWidgetGameHUD(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	WidgetName = FName("GameHUD");
-	WidgetCategory = EWidgetCategory::Permanent;
+	ChildNames.Add(FName("InventoryBar"));
+	ChildNames.Add(FName("InventoryPanel"));
+	WidgetType = EWidgetType::Permanent;
 	InputMode = EInputMode::GameOnly;
 }
 
@@ -76,4 +78,17 @@ void UWidgetGameHUD::OnChangeInputMode(UObject* InSender, UEventHandle_ChangeInp
 	{
 		SetCrosshairVisible(true);
 	}
+}
+
+FReply UWidgetGameHUD::NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent)
+{
+	if(InKeyEvent.GetKey() == FKey("Escape"))
+	{
+		if(TemporaryChild)
+		{
+			TemporaryChild->Close();
+			return FReply::Handled();
+		}
+	}
+	return FReply::Unhandled();
 }

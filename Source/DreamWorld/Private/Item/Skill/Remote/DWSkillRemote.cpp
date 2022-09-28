@@ -8,7 +8,7 @@ ADWSkillRemote::ADWSkillRemote()
 
 }
 
-void ADWSkillRemote::Initialize(AAbilityCharacterBase* InOwnerCharacter)
+void ADWSkillRemote::Initialize_Implementation(AAbilityCharacterBase* InOwnerCharacter, const FAbilityItem& InItem)
 {
-	Super::Initialize(InOwnerCharacter);
+	Super::Initialize_Implementation(InOwnerCharacter, InItem);
 }

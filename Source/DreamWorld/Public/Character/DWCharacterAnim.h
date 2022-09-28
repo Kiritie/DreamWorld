@@ -39,7 +39,7 @@ public:
 protected:
 	virtual void NativeInitializeAnimation() override;
 
-	virtual bool HandleNotify(const FAnimNotifyEvent& AnimNotifyEvent) override;
+	virtual void NativeHandleNotify(const FString& AnimNotifyName) override;
 
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
 };

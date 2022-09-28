@@ -6,8 +6,14 @@
 UWidgetInventoryBox::UWidgetInventoryBox(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	WidgetName = FName("InventoryBox");
-	WidgetCategory = EWidgetCategory::Permanent;
-	InputMode = EInputMode::GameAndUI;
+	ParentName = FName("GameHUD");
+	InputMode = EInputMode::UIOnly;
+
+	WidgetType = EWidgetType::Temporary;
+	WidgetCreateType = EWidgetCreateType::AutoCreate;
+
+	WidgetOpenFinishType = EWidgetOpenFinishType::Procedure;
+	WidgetCloseFinishType = EWidgetCloseFinishType::Procedure;
 }
 
 void UWidgetInventoryBox::OnInitialize_Implementation(AActor* InOwner)

@@ -8,7 +8,7 @@ ADWProp::ADWProp()
 
 }
 
-void ADWProp::Initialize(AAbilityCharacterBase* InOwnerCharacter)
+void ADWProp::Initialize_Implementation(AAbilityCharacterBase* InOwnerCharacter, const FAbilityItem& InItem)
 {
-	Super::Initialize(InOwnerCharacter);
+	Super::Initialize_Implementation(InOwnerCharacter, InItem);
 }

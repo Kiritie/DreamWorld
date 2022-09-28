@@ -99,6 +99,8 @@ enum class EDWCharacterActionType : uint8
 	// ????
 	Dodge,
 	// ????
+	Sprint,
+	// ????
 	Climb,
 	// ???
 	Swim,
@@ -119,11 +121,9 @@ enum class EDWCharacterActionType : uint8
 	// ????
 	Destroy,
 	// ???????
-	GetHit,
-	// ????????
-	AttackHit,
+	Attack,
 	// ???????
-	AttackMiss,
+	GetHit,
 	// ???????
 	Defend,
 	// ???????
@@ -691,4 +691,15 @@ enum class EDWInteractAction : uint8
 	Ride = EInteractAction::Custom4 UMETA(DisplayName="骑乘"),
 	// 取消骑乘
 	UnRide = EInteractAction::Custom5 UMETA(DisplayName="取消骑乘")
+};
+
+UCLASS(Blueprintable, meta = (ShowWorldContextPin))
+class DREAMWORLD_API UDWDamageHandle : public UDamageHandle
+{
+	GENERATED_BODY()
+
+public:
+	UDWDamageHandle() {}
+
+	virtual void HandleDamage(AActor* SourceActor, AActor* TargetActor, float DamageValue, EDamageType DamageType, const FHitResult& HitResult, const FGameplayTagContainer& SourceTags) override;
 };
