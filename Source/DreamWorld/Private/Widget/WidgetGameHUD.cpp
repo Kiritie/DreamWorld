@@ -18,6 +18,10 @@ UWidgetGameHUD::UWidgetGameHUD(const FObjectInitializer& ObjectInitializer) : Su
 	ChildNames.Add(FName("InventoryPanel"));
 	WidgetType = EWidgetType::Permanent;
 	InputMode = EInputMode::GameOnly;
+
+	WidgetRefreshType = EWidgetRefreshType::Tick;
+
+	bIsFocusable = true;
 }
 
 void UWidgetGameHUD::OnCreate_Implementation(AActor* InOwner)
@@ -46,21 +50,6 @@ void UWidgetGameHUD::OnClose_Implementation(bool bInstant)
 	FinishClose(bInstant);
 }
 
-void UWidgetGameHUD::RefreshActions()
-{
-	if(ADWCharacter* OwnerCharacter = Cast<ADWCharacter>(OwnerActor))
-	{
-		if(const IInteractionAgentInterface* OverlappingAgent = OwnerCharacter->GetInteractionComponent()->GetOverlappingAgent())
-		{
-			ShowActions(OverlappingAgent->GetInteractionComponent()->GetValidInteractActions(OwnerCharacter));
-		}
-		else
-		{
-			HideActions();
-		}
-	}
-}
-
 void UWidgetGameHUD::OnChangeInputMode(UObject* InSender, UEventHandle_ChangeInputMode* InEventHandle)
 {
 	if(ADWCharacter* OwnerCharacter = Cast<ADWCharacter>(OwnerActor))
@@ -77,6 +66,23 @@ void UWidgetGameHUD::OnChangeInputMode(UObject* InSender, UEventHandle_ChangeInp
 	else
 	{
 		SetCrosshairVisible(true);
+	}
+}
+
+void UWidgetGameHUD::OnRefresh_Implementation()
+{
+	Super::OnRefresh_Implementation();
+
+	if(ADWCharacter* OwnerCharacter = Cast<ADWCharacter>(OwnerActor))
+	{
+		if(const IInteractionAgentInterface* InteractionAgent = OwnerCharacter->GetInteractionComponent()->GetInteractionAgent())
+		{
+			ShowActions(InteractionAgent->GetInteractionComponent()->GetValidInteractActions(OwnerCharacter));
+		}
+		else
+		{
+			HideActions();
+		}
 	}
 }
 

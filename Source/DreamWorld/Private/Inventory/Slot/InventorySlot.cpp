@@ -55,6 +55,36 @@ bool UInventorySlot::CanPutIn(FAbilityItem& InItem) const
 	return (IsEmpty() && CheckSlot(InItem)) || (Item.EqualType(InItem) && GetRemainVolume(InItem) > 0);
 }
 
+bool UInventorySlot::IsMatch(FAbilityItem InItem, bool bForce) const
+{
+	if(!InItem.IsValid()) return false;
+
+	const auto ItemType = InItem.GetData().GetItemType();
+	switch(SplitType)
+	{
+		case ESplitSlotType::Default:
+		case ESplitSlotType::Shortcut:
+		case ESplitSlotType::Auxiliary:
+		{
+			if(!bForce)
+			{
+				return ItemType != EAbilityItemType::Skill && ItemType != EAbilityItemType::Equip;
+			}
+			break;
+		}
+		case ESplitSlotType::Skill:
+		{
+			return ItemType == EAbilityItemType::Skill;
+		}
+		case ESplitSlotType::Equip:
+		{
+			return ItemType == EAbilityItemType::Equip;
+		}
+		default: break;
+	}
+	return false;
+}
+
 bool UInventorySlot::Contains(FAbilityItem& InItem) const
 {
 	return !IsEmpty() && Item.EqualType(InItem);
@@ -316,6 +346,13 @@ bool UInventorySlot::ActiveItem()
 		if(Vitality->GetAbilitySystemComponent()->TryActivateAbility(Item.AbilityHandle))
 		{
 			OnInventorySlotActivated.Broadcast();
+			for(auto Iter : GetInventory()->QueryItemByRange(EQueryItemType::Get, Item).Slots)
+			{
+				if(Iter != this)
+				{
+					Iter->OnInventorySlotActivated.Broadcast();
+				}
+			}
 			return true;
 		}
 		else if(GetAbilityInfo().IsCooldownning())
@@ -357,30 +394,11 @@ bool UInventorySlot::IsSelected() const
 	return GetInventory()->GetSelectedSlot() == this;
 }
 
-bool UInventorySlot::IsMatched() const
+bool UInventorySlot::IsMatched(bool bForce) const
 {
 	if(IsEmpty()) return false;
 
-	const auto ItemType = Item.GetData().GetItemType();
-	switch(SplitType)
-	{
-		case ESplitSlotType::Default:
-		case ESplitSlotType::Shortcut:
-		case ESplitSlotType::Auxiliary:
-		{
-			return ItemType != EAbilityItemType::Skill && ItemType != EAbilityItemType::Equip;
-		}
-		case ESplitSlotType::Skill:
-		{
-			return ItemType == EAbilityItemType::Skill;
-		}
-		case ESplitSlotType::Equip:
-		{
-			return ItemType == EAbilityItemType::Equip;
-		}
-		default: break;
-	}
-	return false;
+	return IsMatch(Item, bForce);
 }
 
 int32 UInventorySlot::GetSplitIndex(ESplitSlotType InSplitSlotType)

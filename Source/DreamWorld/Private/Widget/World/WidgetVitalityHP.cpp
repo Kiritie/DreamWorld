@@ -17,8 +17,13 @@ UWidgetVitalityHP::UWidgetVitalityHP(const FObjectInitializer& ObjectInitializer
 void UWidgetVitalityHP::OnTick_Implementation(float DeltaSeconds)
 {
 	Super::OnTick_Implementation(DeltaSeconds);
+}
 
-	if(bWidgetAutoVisibility && GetVisibility() == ESlateVisibility::SelfHitTestInvisible)
+void UWidgetVitalityHP::RefreshVisibility_Implementation()
+{
+	Super::RefreshVisibility_Implementation();
+
+	if(GetVisibility() == ESlateVisibility::SelfHitTestInvisible)
 	{
 		if(GetOwnerActor<ADWVitality>() && GetOwnerActor<ADWVitality>()->IsDead())
 		{

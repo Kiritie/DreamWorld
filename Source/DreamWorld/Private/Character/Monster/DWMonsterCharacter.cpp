@@ -81,7 +81,7 @@ bool ADWMonsterCharacter::CanInteract(IInteractionAgentInterface* InInteractionA
 		{
 			if(ADWCharacter* InInteractionCharacter = Cast<ADWCharacter>(InInteractionAgent))
 			{
-				if(!IsEnemy(InInteractionCharacter) && InInteractionCharacter->IsA<ADWHumanCharacter>() && InInteractionCharacter->GetRidingTarget() != this)
+				if(!IsEnemy(InInteractionCharacter) && InInteractionCharacter->GetRidingTarget() != this)
 				{
 					return true;
 				}
@@ -92,7 +92,7 @@ bool ADWMonsterCharacter::CanInteract(IInteractionAgentInterface* InInteractionA
 		{
 			if(ADWCharacter* InInteractionCharacter = Cast<ADWCharacter>(InInteractionAgent))
 			{
-				if(!IsEnemy(InInteractionCharacter) && InInteractionCharacter->IsA<ADWHumanCharacter>() && InInteractionCharacter->GetRidingTarget() == this)
+				if(!IsEnemy(InInteractionCharacter) && InInteractionCharacter->GetRidingTarget() == this)
 				{
 					return true;
 				}

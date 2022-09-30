@@ -22,6 +22,9 @@ public:
 	virtual void OnTick_Implementation(float DeltaSeconds) override;
 
 public:
+	virtual void RefreshVisibility_Implementation() override;
+
+public:
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
 	void SetHeadInfo(const FString& InHeadInfo);
 	

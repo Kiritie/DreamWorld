@@ -17,11 +17,16 @@ UDWAITask_AIPatrol::UDWAITask_AIPatrol(const FObjectInitializer& ObjectInitializ
 
 	PatrolDistanceKey.AddFloatFilter(this, GET_MEMBER_NAME_CHECKED(UDWAITask_AIPatrol, PatrolDistanceKey));
 	PatrolDurationKey.AddFloatFilter(this, GET_MEMBER_NAME_CHECKED(UDWAITask_AIPatrol, PatrolDurationKey));
+	PatrolLocationKey.AddVectorFilter(this, GET_MEMBER_NAME_CHECKED(UDWAITask_AIPatrol, PatrolLocationKey));
 }
 
 bool UDWAITask_AIPatrol::InitTask(UBehaviorTreeComponent& OwnerComp)
 {
-	return Super::InitTask(OwnerComp);
+	if (!Super::InitTask(OwnerComp)) return false;
+
+	PatrolLocation = OwnerComp.GetBlackboardComponent()->GetValueAsVector(PatrolLocationKey.SelectedKeyName);
+
+	return true;
 }
 
 void UDWAITask_AIPatrol::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
@@ -56,7 +61,8 @@ EBTNodeResult::Type UDWAITask_AIPatrol::ExecuteTask(UBehaviorTreeComponent& Owne
 	PatrolDuration= OwnerComp.GetBlackboardComponent()->GetValueAsFloat(PatrolDurationKey.SelectedKeyName);
 
 	PatrolDuration = FMath::RandRange(PatrolDuration - 2, PatrolDuration + 2);
-	PatrolLocation = GetOwnerCharacter<ADWCharacter>()->GetBirthLocation() + FRotator(0, FMath::RandRange(0, 360), 0).Vector() * FMath::FRandRange(0, PatrolDistance);
+
+	OwnerComp.GetBlackboardComponent()->SetValueAsVector(PatrolLocationKey.SelectedKeyName, GetOwnerCharacter<ADWCharacter>()->GetBirthLocation() + FRotator(0, FMath::RandRange(0, 360), 0).Vector() * FMath::FRandRange(0, PatrolDistance));
 
 	return EBTNodeResult::InProgress;
 }

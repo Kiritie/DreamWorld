@@ -502,13 +502,13 @@ void ADWPlayerController::DoInteractAction1()
 {
 	ADWPlayerCharacter* PlayerCharacter = GetPlayerPawn<ADWPlayerCharacter>();
 	
-	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput() || !PlayerCharacter->Interaction->GetOverlappingAgent()) return;
+	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput() || !PlayerCharacter->Interaction->GetInteractionAgent()) return;
 	
-	if(UInteractionComponent* OverlappingAgent = PlayerCharacter->Interaction->GetOverlappingAgent()->GetInteractionComponent())
+	if(UInteractionComponent* Interaction = PlayerCharacter->Interaction->GetInteractionComponent())
 	{
-		if(OverlappingAgent->GetValidInteractActions(GetPlayerPawn<ADWPlayerCharacter>()).IsValidIndex(0))
+		if(Interaction->GetValidInteractActions(GetPlayerPawn<ADWPlayerCharacter>()).IsValidIndex(0))
 		{
-			OverlappingAgent->DoInteract(PlayerCharacter, OverlappingAgent->GetValidInteractActions(GetPlayerPawn<ADWPlayerCharacter>())[0]);
+			Interaction->DoInteract(PlayerCharacter, Interaction->GetValidInteractActions(GetPlayerPawn<ADWPlayerCharacter>())[0]);
 		}
 	}
 }
@@ -517,13 +517,13 @@ void ADWPlayerController::DoInteractAction2()
 {
 	ADWPlayerCharacter* PlayerCharacter = GetPlayerPawn<ADWPlayerCharacter>();
 	
-	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput() || !PlayerCharacter->Interaction->GetOverlappingAgent()) return;
+	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput() || !PlayerCharacter->Interaction->GetInteractionAgent()) return;
 	
-	if(UInteractionComponent* OverlappingAgent = PlayerCharacter->Interaction->GetOverlappingAgent()->GetInteractionComponent())
+	if(UInteractionComponent* Interaction = PlayerCharacter->Interaction->GetInteractionComponent())
 	{
-		if(OverlappingAgent->GetValidInteractActions(GetPlayerPawn<ADWPlayerCharacter>()).IsValidIndex(1))
+		if(Interaction->GetValidInteractActions(GetPlayerPawn<ADWPlayerCharacter>()).IsValidIndex(1))
 		{
-			OverlappingAgent->DoInteract(PlayerCharacter, OverlappingAgent->GetValidInteractActions(GetPlayerPawn<ADWPlayerCharacter>())[1]);
+			Interaction->DoInteract(PlayerCharacter, Interaction->GetValidInteractActions(GetPlayerPawn<ADWPlayerCharacter>())[1]);
 		}
 	}
 }
@@ -532,13 +532,13 @@ void ADWPlayerController::DoInteractAction3()
 {
 	ADWPlayerCharacter* PlayerCharacter = GetPlayerPawn<ADWPlayerCharacter>();
 	
-	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput() || !PlayerCharacter->Interaction->GetOverlappingAgent()) return;
+	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput() || !PlayerCharacter->Interaction->GetInteractionAgent()) return;
 	
-	if(UInteractionComponent* OverlappingAgent = PlayerCharacter->Interaction->GetOverlappingAgent()->GetInteractionComponent())
+	if(UInteractionComponent* Interaction = PlayerCharacter->Interaction->GetInteractionComponent())
 	{
-		if(OverlappingAgent->GetValidInteractActions(GetPlayerPawn<ADWPlayerCharacter>()).IsValidIndex(2))
+		if(Interaction->GetValidInteractActions(GetPlayerPawn<ADWPlayerCharacter>()).IsValidIndex(2))
 		{
-			OverlappingAgent->DoInteract(PlayerCharacter, OverlappingAgent->GetValidInteractActions(GetPlayerPawn<ADWPlayerCharacter>())[2]);
+			Interaction->DoInteract(PlayerCharacter, Interaction->GetValidInteractActions(GetPlayerPawn<ADWPlayerCharacter>())[2]);
 		}
 	}
 }
@@ -547,13 +547,13 @@ void ADWPlayerController::DoInteractAction4()
 {
 	ADWPlayerCharacter* PlayerCharacter = GetPlayerPawn<ADWPlayerCharacter>();
 	
-	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput() || !PlayerCharacter->Interaction->GetOverlappingAgent()) return;
+	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput() || !PlayerCharacter->Interaction->GetInteractionAgent()) return;
 	
-	if(UInteractionComponent* OverlappingAgent = PlayerCharacter->Interaction->GetOverlappingAgent()->GetInteractionComponent())
+	if(UInteractionComponent* Interaction = PlayerCharacter->Interaction->GetInteractionComponent())
 	{
-		if(OverlappingAgent->GetValidInteractActions(GetPlayerPawn<ADWPlayerCharacter>()).IsValidIndex(3))
+		if(Interaction->GetValidInteractActions(GetPlayerPawn<ADWPlayerCharacter>()).IsValidIndex(3))
 		{
-			OverlappingAgent->DoInteract(PlayerCharacter, OverlappingAgent->GetValidInteractActions(GetPlayerPawn<ADWPlayerCharacter>())[3]);
+			Interaction->DoInteract(PlayerCharacter, Interaction->GetValidInteractActions(GetPlayerPawn<ADWPlayerCharacter>())[3]);
 		}
 	}
 }
@@ -562,13 +562,13 @@ void ADWPlayerController::DoInteractAction5()
 {
 	ADWPlayerCharacter* PlayerCharacter = GetPlayerPawn<ADWPlayerCharacter>();
 	
-	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput() || !PlayerCharacter->Interaction->GetOverlappingAgent()) return;
+	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput() || !PlayerCharacter->Interaction->GetInteractionAgent()) return;
 	
-	if(UInteractionComponent* OverlappingAgent = PlayerCharacter->Interaction->GetOverlappingAgent()->GetInteractionComponent())
+	if(UInteractionComponent* Interaction = PlayerCharacter->Interaction->GetInteractionComponent())
 	{
-		if(OverlappingAgent->GetValidInteractActions(GetPlayerPawn<ADWPlayerCharacter>()).IsValidIndex(4))
+		if(Interaction->GetValidInteractActions(GetPlayerPawn<ADWPlayerCharacter>()).IsValidIndex(4))
 		{
-			OverlappingAgent->DoInteract(PlayerCharacter, OverlappingAgent->GetValidInteractActions(GetPlayerPawn<ADWPlayerCharacter>())[4]);
+			Interaction->DoInteract(PlayerCharacter, Interaction->GetValidInteractActions(GetPlayerPawn<ADWPlayerCharacter>())[4]);
 		}
 	}
 }

@@ -27,6 +27,8 @@ public:
 
 	virtual void OnOpen_Implementation(const TArray<FParameter>& InParams, bool bInstant) override;
 
+	virtual void OnRefresh_Implementation() override;
+
 	virtual void OnClose_Implementation(bool bInstant) override;
 	
 	virtual FReply NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent) override;
@@ -46,9 +48,6 @@ public:
 	
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
 	void SetCrosshairVisible(bool bValue);
-				
-	UFUNCTION(BlueprintCallable)
-	void RefreshActions();
 
 protected:
 	UFUNCTION(BlueprintImplementableEvent)

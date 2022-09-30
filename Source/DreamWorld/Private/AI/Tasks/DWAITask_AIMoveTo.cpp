@@ -9,6 +9,7 @@
 #include "BehaviorTree/BlackboardComponent.h"
 #include "AIModule/Classes/BehaviorTree/Blackboard/BlackboardKeyType_Object.h"
 #include "AIModule/Classes/BehaviorTree/Blackboard/BlackboardKeyType_Vector.h"
+#include "BehaviorTree/BehaviorTree.h"
 
 UDWAITask_AIMoveTo::UDWAITask_AIMoveTo(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -23,6 +24,14 @@ UDWAITask_AIMoveTo::UDWAITask_AIMoveTo(const FObjectInitializer& ObjectInitializ
 	TargetDistance = 0.f;
 	DurationTime = -1.f;
 	LocalRemainTime = 0.f;
+}
+
+void UDWAITask_AIMoveTo::InitializeFromAsset(UBehaviorTree& Asset)
+{
+	Super::InitializeFromAsset(Asset);
+
+	TargetKey.ResolveSelectedKey(*Asset.BlackboardAsset);
+	DistanceKey.ResolveSelectedKey(*Asset.BlackboardAsset);
 }
 
 bool UDWAITask_AIMoveTo::InitTask(UBehaviorTreeComponent& OwnerComp)

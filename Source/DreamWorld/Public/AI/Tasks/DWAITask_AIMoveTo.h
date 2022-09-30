@@ -35,6 +35,8 @@ private:
 	float LocalRemainTime;
 
 protected:
+	virtual void InitializeFromAsset(UBehaviorTree& Asset) override;
+	
 	virtual bool InitTask(UBehaviorTreeComponent& OwnerComp) override;
 
 	virtual void TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds) override;

@@ -36,12 +36,9 @@ void UDWAIBlackboard::OnRefresh()
 
 	if(!GetCharacter<ADWCharacter>()) return;
 
-	if(GetTargetCharacter<ADWCharacter>())
+	if(GetTargetCharacter<ADWCharacter>() && GetTargetCharacter<ADWCharacter>()->IsDead())
 	{
-		if(GetCharacter<ADWCharacter>()->IsDead() || GetTargetCharacter<ADWCharacter>()->IsDead())
-		{
-			SetTargetCharacter(nullptr);
-		}
+		SetTargetCharacter(nullptr);
 	}
 }
 

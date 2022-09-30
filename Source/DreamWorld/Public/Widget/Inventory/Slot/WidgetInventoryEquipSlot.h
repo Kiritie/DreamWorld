@@ -22,9 +22,10 @@ protected:
 	FText EquipPartType;
 
 public:
+	virtual void OnInitialize(UInventorySlot* InOwnerSlot) override;
+
+public:
 	FText GetEquipPartType() const { return EquipPartType; }
 
 	void SetEquipPartType(const FText& InEquipPartType) { this->EquipPartType = InEquipPartType; }
-
-	virtual void OnInitialize(UInventorySlot* InOwnerSlot) override;
 };

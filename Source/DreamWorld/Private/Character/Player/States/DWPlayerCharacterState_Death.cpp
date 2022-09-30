@@ -9,6 +9,7 @@
 #include "Voxel/Chunks/VoxelChunk.h"
 #include "Widget/WidgetGameHUD.h"
 #include "Widget/WidgetModuleBPLibrary.h"
+#include "Ability/Components/InteractionComponent.h"
 
 UDWPlayerCharacterState_Death::UDWPlayerCharacterState_Death()
 {
@@ -35,14 +36,13 @@ void UDWPlayerCharacterState_Death::OnEnter(UFiniteStateBase* InLastFiniteState)
 	{
 		PlayerCharacter->GetTargetSystem()->TargetLockOff();
 	}
+
+	PlayerCharacter->GetInteractionComponent()->SetInteractionAgent(PlayerCharacter);
 }
 
 void UDWPlayerCharacterState_Death::OnRefresh()
 {
 	Super::OnRefresh();
-
-	ADWPlayerCharacter* PlayerCharacter = GetAgent<ADWPlayerCharacter>();
-
 }
 
 void UDWPlayerCharacterState_Death::OnLeave(UFiniteStateBase* InNextFiniteState)
@@ -51,6 +51,7 @@ void UDWPlayerCharacterState_Death::OnLeave(UFiniteStateBase* InNextFiniteState)
 
 	ADWPlayerCharacter* PlayerCharacter = GetAgent<ADWPlayerCharacter>();
 
+	PlayerCharacter->GetInteractionComponent()->SetInteractionAgent(nullptr);
 }
 
 void UDWPlayerCharacterState_Death::OnTermination()
@@ -60,18 +61,12 @@ void UDWPlayerCharacterState_Death::OnTermination()
 
 void UDWPlayerCharacterState_Death::DeathStart()
 {
-	ADWPlayerCharacter* PlayerCharacter = GetAgent<ADWPlayerCharacter>();
-
+	Super::DeathStart();
 }
 
 void UDWPlayerCharacterState_Death::DeathEnd()
 {
 	Super::DeathEnd();
 
-	ADWPlayerCharacter* PlayerCharacter = GetAgent<ADWPlayerCharacter>();
-
-	if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>())
-	{
-		UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>()->SetCrosshairVisible(false);
-	}
+	
 }

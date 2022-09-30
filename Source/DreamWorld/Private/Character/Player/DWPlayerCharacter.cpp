@@ -312,31 +312,16 @@ void ADWPlayerCharacter::RefreshEquip(EDWEquipPartType InPartType, const FAbilit
 void ADWPlayerCharacter::OnEnterInteract(IInteractionAgentInterface* InInteractionAgent)
 {
 	Super::OnEnterInteract(InInteractionAgent);
-
-	if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>())
-	{
-		UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>()->RefreshActions();
-	}
 }
 
 void ADWPlayerCharacter::OnLeaveInteract(IInteractionAgentInterface* InInteractionAgent)
 {
 	Super::OnLeaveInteract(InInteractionAgent);
-
-	if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>())
-	{
-		UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>()->RefreshActions();
-	}
 }
 
 void ADWPlayerCharacter::OnInteract(IInteractionAgentInterface* InInteractionAgent, EInteractAction InInteractAction)
 {
 	Super::OnInteract(InInteractionAgent, InInteractAction);
-	
-	if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>())
-	{
-		UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>()->RefreshActions();
-	}
 }
 
 void ADWPlayerCharacter::MoveForward_Implementation(float InValue)
@@ -383,11 +368,6 @@ void ADWPlayerCharacter::MoveUp_Implementation(float InValue)
 void ADWPlayerCharacter::OnSelectedItemChange(const FAbilityItem& InItem)
 {
 	Super::OnSelectedItemChange(InItem);
-
-	if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>())
-	{
-		UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>()->RefreshActions();
-	}
 }
 
 bool ADWPlayerCharacter::UseItem(FAbilityItem& InItem)

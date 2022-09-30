@@ -8,10 +8,6 @@
 
 class UInventory;
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnInventorySlotRefresh);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnInventorySlotActivated);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnInventorySlotCanceled);
-
 /**
  * 物品槽
  */
@@ -69,7 +65,10 @@ public:
 
 	UFUNCTION(BlueprintPure)
 	virtual bool CanPutIn(FAbilityItem& InItem) const;
-					
+						
+	UFUNCTION(BlueprintPure)
+	virtual bool IsMatch(FAbilityItem InItem, bool bForce = false) const;
+
 	UFUNCTION(BlueprintPure)
 	virtual bool Contains(FAbilityItem& InItem) const;
 
@@ -126,8 +125,8 @@ public:
 	bool IsSelected() const;
 
 	UFUNCTION(BlueprintPure)
-	bool IsMatched() const;
-	
+	bool IsMatched(bool bForce = false) const;
+
 	int32 GetSplitIndex(ESplitSlotType InSplitSlotType = ESplitSlotType::None);
 
 	int32 GetRemainVolume(FAbilityItem InItem = FAbilityItem::Empty) const;

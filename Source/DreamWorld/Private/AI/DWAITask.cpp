@@ -9,6 +9,11 @@ UDWAITask::UDWAITask(const FObjectInitializer& ObjectInitializer) : Super(Object
 {
 }
 
+bool UDWAITask::InitTask(UBehaviorTreeComponent& OwnerComp)
+{
+	return Super::InitTask(OwnerComp);
+}
+
 void UDWAITask::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
 {
 	if (!InitTask(OwnerComp)) return;

@@ -10,6 +10,10 @@ class UInventorySlot;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnSelectedItemChange, UInventorySlot*, InInventorySlot);
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnInventorySlotRefresh);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnInventorySlotActivated);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnInventorySlotCanceled);
+
 UENUM(BlueprintType)
 enum class ESplitSlotType : uint8
 {

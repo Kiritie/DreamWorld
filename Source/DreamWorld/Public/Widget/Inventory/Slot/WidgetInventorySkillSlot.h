@@ -23,10 +23,11 @@ public:
 public:
 	virtual void OnInitialize(UInventorySlot* InOwnerSlot) override;
 
-	virtual void UseItem(int InCount) override;
+protected:
+	virtual void OnRefresh() override;
 
 public:
-	virtual void OnRefresh() override;
+	virtual void UseItem(int InCount) override;
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components", meta = (BindWidget, OptionalWidget = false))

@@ -152,6 +152,20 @@ FQueryItemInfo UInventory::QueryItemByRange(EQueryItemType InQueryType, FAbility
 		case EQueryItemType::Add:
 		{
 			if (InItem.Count <= 0) goto End;
+			#define Query1(bNeedMatch, bNeedContains) \
+			for (int32 i = (InEndIndex == -1 ? 0 : InStartIndex); i < (InEndIndex == -1 ? Slots.Num() : InEndIndex); i++) \
+			{ \
+				if (Slots[i]->CanPutIn(InItem) && (!bNeedMatch || Slots[i]->IsMatch(InItem, true)) && (!bNeedContains || Slots[i]->Contains(InItem))) \
+				{ \
+					if (!QueryItemInfo.Slots.Contains(Slots[i])) \
+					{ \
+						QueryItemInfo.Slots.Add(Slots[i]); \
+						InItem.Count -= Slots[i]->GetRemainVolume(InItem); \
+						if (InItem.Count <= 0) goto End; \
+					} \
+				} \
+			}
+			Query1(true, false)
 			if (Slots[InStartIndex]->CanPutIn(InItem))
 			{
 				if (!QueryItemInfo.Slots.Contains(Slots[InStartIndex]))
@@ -161,30 +175,8 @@ FQueryItemInfo UInventory::QueryItemByRange(EQueryItemType InQueryType, FAbility
 					if (InItem.Count <= 0) goto End;
 				}
 			}
-			for (int32 i = (InEndIndex == -1 ? 0 : InStartIndex); i < (InEndIndex == -1 ? Slots.Num() : InEndIndex); i++)
-			{
-				if (Slots[i]->Contains(InItem) && Slots[i]->CanPutIn(InItem))
-				{
-					if (!QueryItemInfo.Slots.Contains(Slots[i]))
-					{
-						QueryItemInfo.Slots.Add(Slots[i]);
-						InItem.Count -= Slots[i]->GetRemainVolume(InItem);
-						if (InItem.Count <= 0) goto End;
-					}
-				}
-			}
-			for (int32 i = (InEndIndex == -1 ? 0 : InStartIndex); i < (InEndIndex == -1 ? Slots.Num() : InEndIndex); i++)
-			{
-				if (Slots[i]->CanPutIn(InItem))
-				{
-					if (!QueryItemInfo.Slots.Contains(Slots[i]))
-					{
-						QueryItemInfo.Slots.Add(Slots[i]);
-						InItem.Count -= Slots[i]->GetRemainVolume(InItem);
-						if (InItem.Count <= 0) goto End;
-					}
-				}
-			}
+			Query1(false, true)
+			Query1(false, false)
 			break;
 		}
 		case EQueryItemType::Remove:

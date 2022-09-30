@@ -14,6 +14,8 @@ UWidgetInventoryBox::UWidgetInventoryBox(const FObjectInitializer& ObjectInitial
 
 	WidgetOpenFinishType = EWidgetOpenFinishType::Procedure;
 	WidgetCloseFinishType = EWidgetCloseFinishType::Procedure;
+
+	bIsFocusable = true;
 }
 
 void UWidgetInventoryBox::OnInitialize_Implementation(AActor* InOwner)

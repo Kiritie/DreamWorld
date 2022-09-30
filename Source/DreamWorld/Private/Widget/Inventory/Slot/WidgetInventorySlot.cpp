@@ -135,9 +135,12 @@ void UWidgetInventorySlot::OnInitialize(UInventorySlot* InOwnerSlot)
 
 	OwnerSlot = InOwnerSlot;
 
-	OwnerSlot->OnInventorySlotRefresh.AddDynamic(this, &UWidgetInventorySlot::OnRefresh);
-	OwnerSlot->OnInventorySlotActivated.AddDynamic(this, &UWidgetInventorySlot::OnActivated);
-	OwnerSlot->OnInventorySlotCanceled.AddDynamic(this, &UWidgetInventorySlot::OnCanceled);
+	if(OwnerSlot)
+	{
+		OwnerSlot->OnInventorySlotRefresh.AddDynamic(this, &UWidgetInventorySlot::OnRefresh);
+		OwnerSlot->OnInventorySlotActivated.AddDynamic(this, &UWidgetInventorySlot::OnActivated);
+		OwnerSlot->OnInventorySlotCanceled.AddDynamic(this, &UWidgetInventorySlot::OnCanceled);
+	}
 
 	OnRefresh();
 }
@@ -192,7 +195,14 @@ void UWidgetInventorySlot::OnRefresh()
 
 void UWidgetInventorySlot::OnActivated()
 {
-	StartCooldown();
+	if(IsCooldowning())
+	{
+		StartCooldown();
+	}
+	else
+	{
+		StopCooldown();
+	}
 }
 
 void UWidgetInventorySlot::OnCanceled()
@@ -202,14 +212,7 @@ void UWidgetInventorySlot::OnCanceled()
 
 void UWidgetInventorySlot::StartCooldown()
 {
-	if(IsCooldowning())
-	{
-		GetWorld()->GetTimerManager().SetTimer(CooldownTimerHandle, this, &UWidgetInventorySlot::OnCooldown, 0.1f, true);
-	}
-	else
-	{
-		StopCooldown();
-	}
+	GetWorld()->GetTimerManager().SetTimer(CooldownTimerHandle, this, &UWidgetInventorySlot::OnCooldown, 0.1f, true);
 }
 
 void UWidgetInventorySlot::StopCooldown()

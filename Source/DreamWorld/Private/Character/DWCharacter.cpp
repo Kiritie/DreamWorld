@@ -407,7 +407,7 @@ bool ADWCharacter::CanInteract(IInteractionAgentInterface* InInteractionAgent, E
 	{
 		case EInteractAction::Revive:
 		{
-			if(IsDead())
+			if(IsDead(false))
 			{
 				return true;
 			}
@@ -842,7 +842,7 @@ void ADWCharacter::EndAction(EDWCharacterActionType InActionType, bool bWasCance
 	{
 		case EDWCharacterActionType::Death:
 		{
-			FSM->GetCurrentState<UDWCharacterState_Death>()->DeathEnd();
+			FSM->GetStateByClass<UDWCharacterState_Death>()->DeathEnd();
 			break;
 		}
 		case EDWCharacterActionType::Crouch:
@@ -1304,7 +1304,7 @@ bool ADWCharacter::HasTeam() const
 
 bool ADWCharacter::IsTeamMate(ADWCharacter* InTargetCharacter) const
 {
-	return HasTeam() && InTargetCharacter->TeamID == TeamID;
+	return !HasTeam() || InTargetCharacter->TeamID == TeamID;
 }
 
 bool ADWCharacter::HasAttackAbility(int32 InAbilityIndex) const

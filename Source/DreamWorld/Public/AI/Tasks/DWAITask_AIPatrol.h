@@ -20,6 +20,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "Blackboard")
 	FBlackboardKeySelector PatrolDurationKey;
+	
+	UPROPERTY(EditAnywhere, Category = "Blackboard")
+	FBlackboardKeySelector PatrolLocationKey;
 
 private:
 	float PatrolDistance;

@@ -15,6 +15,8 @@ class DREAMWORLD_API UDWAITask : public UAITaskBase
 	GENERATED_UCLASS_BODY()
 	
 protected:
+	virtual bool InitTask(UBehaviorTreeComponent& OwnerComp) override;
+
 	virtual void TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds) override;
 
 	virtual EBTNodeResult::Type AbortTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;

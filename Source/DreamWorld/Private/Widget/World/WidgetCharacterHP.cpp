@@ -18,8 +18,13 @@ UWidgetCharacterHP::UWidgetCharacterHP(const FObjectInitializer& ObjectInitializ
 void UWidgetCharacterHP::OnTick_Implementation(float DeltaSeconds)
 {
 	Super::OnTick_Implementation(DeltaSeconds);
+}
 
-	if(bWidgetAutoVisibility && GetVisibility() == ESlateVisibility::SelfHitTestInvisible)
+void UWidgetCharacterHP::RefreshVisibility_Implementation()
+{
+	Super::RefreshVisibility_Implementation();
+
+	if(GetVisibility() == ESlateVisibility::SelfHitTestInvisible)
 	{
 		if(GetOwnerActor<ADWCharacter>() && GetOwnerActor<ADWCharacter>()->IsDead())
 		{
