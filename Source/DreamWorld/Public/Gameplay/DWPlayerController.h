@@ -44,9 +44,6 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Inputs")
 	bool bPressedSprint;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Inputs")
-	int32 AttackAbilityQueue;
-
 protected:
 	virtual void SetupInputComponent() override;
 
@@ -71,6 +68,8 @@ protected:
 	virtual void ToggleCrouch();
 
 	virtual void ToggleLockTarget();
+	
+	virtual void ChangeHand();
 
 	virtual void OnDodgePressed();
 
@@ -103,6 +102,8 @@ protected:
 	virtual void DoInteractAction5();
 
 	virtual void OpenInventoryPanel();
+	
+	virtual void OpenGeneratePanel();
 
 	virtual void UseInventoryItem();
 

@@ -17,7 +17,11 @@ void UDWCharacterState_Walk::OnInitialize(UFSMComponent* InFSMComponent, int32 I
 
 bool UDWCharacterState_Walk::OnEnterValidate(UFiniteStateBase* InLastFiniteState)
 {
-	return Super::OnEnterValidate(InLastFiniteState);
+	if(!Super::OnEnterValidate(InLastFiniteState)) return false;
+
+	ADWCharacter* Character = GetAgent<ADWCharacter>();
+
+	return Character->DoAction(EDWCharacterActionType::Walk);
 }
 
 void UDWCharacterState_Walk::OnEnter(UFiniteStateBase* InLastFiniteState)
@@ -33,6 +37,10 @@ void UDWCharacterState_Walk::OnRefresh()
 void UDWCharacterState_Walk::OnLeave(UFiniteStateBase* InNextFiniteState)
 {
 	Super::OnLeave(InNextFiniteState);
+
+	ADWCharacter* Character = GetAgent<ADWCharacter>();
+	
+	Character->StopAction(EDWCharacterActionType::Walk);
 }
 
 void UDWCharacterState_Walk::OnTermination()

@@ -9,12 +9,11 @@
 
 UDWAITask_AIDefend::UDWAITask_AIDefend(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
-	bNotifyTick = true;
-
 	DefendTarget = nullptr;
 	DefendTargetKey.AddObjectFilter(this, GET_MEMBER_NAME_CHECKED(UDWAITask_AIDefend, DefendTargetKey), ADWCharacter::StaticClass());
-	AIMoveRemainTime = FMath::FRandRange(1.f, 2.f);
-	AIMoveLocation = FVector::ZeroVector;
+	AttackDistanceKey.AddFloatFilter(this, GET_MEMBER_NAME_CHECKED(UDWAITask_AIDefend, AttackDistanceKey));
+
+	AttackDistance = 0.f;
 }
 
 bool UDWAITask_AIDefend::InitTask(UBehaviorTreeComponent& OwnerComp)
@@ -22,42 +21,66 @@ bool UDWAITask_AIDefend::InitTask(UBehaviorTreeComponent& OwnerComp)
 	if(!Super::InitTask(OwnerComp)) return false;
 
 	DefendTarget = Cast<ADWCharacter>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(DefendTargetKey.SelectedKeyName));
+	AttackDistance = OwnerComp.GetBlackboardComponent()->GetValueAsFloat(AttackDistanceKey.SelectedKeyName);
+
 	return DefendTarget && DefendTarget->IsValidLowLevel();
 }
 
 void UDWAITask_AIDefend::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
 {
+	Super::TickTask(OwnerComp, NodeMemory, DeltaSeconds);
+
 	if (!InitTask(OwnerComp)) return;
 
-	AIMoveRemainTime -= DeltaSeconds;
-	if (AIMoveRemainTime <= 0)
+	if(GetOwnerCharacter<ADWCharacter>()->IsDefending())
 	{
-		//AIMoveLocation = GetOwnerCharacter<ADWCharacter>()->GetPatrolLocation(AIMoveRemainTime);
+		GetOwnerCharacter<ADWCharacter>()->DoAIMove(GetAIMoveLocation());
 	}
-	if (GetOwnerCharacter<ADWCharacter>()->DoAIMove(AIMoveLocation))
+	else
 	{
-		AIMoveRemainTime = FMath::FRandRange(1.f, 2.f);
+		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
 	}
 }
 
 EBTNodeResult::Type UDWAITask_AIDefend::AbortTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
+	Super::AbortTask(OwnerComp, NodeMemory);
+
 	if (!InitTask(OwnerComp)) return EBTNodeResult::Failed;
 
-	GetOwnerCharacter<ADWCharacter>()->UnDefend();
-	GetOwnerCharacter<ADWCharacter>()->SetLockedTarget(nullptr);
+	//GetOwnerCharacter<ADWCharacter>()->UnDefend();
+	//GetOwnerCharacter<ADWCharacter>()->SetLockedTarget(nullptr);
 
 	return EBTNodeResult::Aborted;
 }
 
 EBTNodeResult::Type UDWAITask_AIDefend::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
+	Super::ExecuteTask(OwnerComp, NodeMemory);
+
 	if (!InitTask(OwnerComp)) return EBTNodeResult::Failed;
 
 	GetOwnerCharacter<ADWCharacter>()->Defend();
 	GetOwnerCharacter<ADWCharacter>()->SetLockedTarget(DefendTarget);
 
-	//GetOwnerCharacter<ADWCharacter>()->SetMotionRate(1, 1);
-
 	return EBTNodeResult::InProgress;
+}
+
+void UDWAITask_AIDefend::OnTaskFinished(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, EBTNodeResult::Type TaskResult)
+{
+	Super::OnTaskFinished(OwnerComp, NodeMemory, TaskResult);
+
+	if (!InitTask(OwnerComp)) return;
+
+	GetOwnerCharacter<ADWCharacter>()->UnDefend();
+	GetOwnerCharacter<ADWCharacter>()->SetLockedTarget(nullptr);
+}
+
+FVector UDWAITask_AIDefend::GetAIMoveLocation() const
+{
+	if(DefendTarget)
+	{
+		return DefendTarget->GetActorLocation() + (-GetOwnerCharacter()->GetActorForwardVector()) * (AttackDistance + 100.f);
+	}
+	return FVector::ZeroVector;
 }

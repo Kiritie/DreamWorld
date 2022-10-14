@@ -6,7 +6,6 @@
 #include "GameplayEffectTypes.h"
 #include "Ability/AbilityModuleTypes.h"
 #include "Asset/AssetModuleBPLibrary.h"
-#include "Inventory/InventoryTypes.h"
 #include "Parameter/ParameterModuleTypes.h"
 #include "SaveGame/SaveGameModuleTypes.h"
 #include "Voxel/VoxelModuleTypes.h"
@@ -94,6 +93,10 @@ enum class EDWCharacterActionType : uint8
 	Revive,
 	// ???
 	Jump,
+	// ???
+	Fall,
+	// ???
+	Walk,
 	// ???
 	Crouch,
 	// ????
@@ -271,16 +274,16 @@ public:
 	EDWWeaponType WeaponType;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TSubclassOf<UDWCharacterSkillAbility> AbilityClass;
-
+	bool bCancelAble;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	bool bCancelable;
+	TSubclassOf<UDWCharacterSkillAbility> AbilityClass;
 
 	FORCEINLINE FDWCharacterSkillAbilityData()
 	{
 		WeaponType = EDWWeaponType::None;
+		bCancelAble = false;
 		AbilityClass = nullptr;
-		bCancelable = false;
 	}
 };
 
@@ -317,17 +320,13 @@ struct DREAMWORLD_API FDWVitalitySaveData : public FVitalitySaveData
 public:
 	FORCEINLINE FDWVitalitySaveData()
 	{
-		InventoryData = FInventorySaveData();
+		
 	}
 	
 	FORCEINLINE FDWVitalitySaveData(const FVitalitySaveData& InVitalitySaveData) : FVitalitySaveData(InVitalitySaveData)
 	{
-		InventoryData = FInventorySaveData();
+		
 	}
-	
-public:
-	UPROPERTY(BlueprintReadWrite)
-	FInventorySaveData InventoryData;
 };
 
 USTRUCT(BlueprintType)
@@ -339,6 +338,7 @@ public:
 	FORCEINLINE FDWCharacterSaveData()
 	{
 		TeamID = NAME_None;
+		BirthLocation = FVector::ZeroVector;
 		ControlMode = EDWCharacterControlMode::Fighting;
 		FallingAttackAbility = FDWCharacterAttackAbilityData();
 		AttackAbilities = TMap<EDWWeaponType, FDWCharacterAttackAbilityDatas>();
@@ -349,6 +349,7 @@ public:
 	FORCEINLINE FDWCharacterSaveData(const FCharacterSaveData& InCharacterSaveData) : FCharacterSaveData(InCharacterSaveData)
 	{
 		TeamID = NAME_None;
+		BirthLocation = FVector::ZeroVector;
 		ControlMode = EDWCharacterControlMode::Fighting;
 		FallingAttackAbility = FDWCharacterAttackAbilityData();
 		AttackAbilities = TMap<EDWWeaponType, FDWCharacterAttackAbilityDatas>();
@@ -358,12 +359,12 @@ public:
 	
 	UPROPERTY(BlueprintReadOnly)
 	FName TeamID;
-	
+			
+	UPROPERTY()
+	FVector BirthLocation;
+
 	UPROPERTY()
 	EDWCharacterControlMode ControlMode;
-
-	UPROPERTY(BlueprintReadWrite)
-	FInventorySaveData InventoryData;
 
 	UPROPERTY()
 	FDWCharacterAttackAbilityData FallingAttackAbility;
@@ -604,6 +605,26 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float CameraDistance;
+};
+
+USTRUCT(BlueprintType)
+struct DREAMWORLD_API FDWGenerateItemData : public FTableRowBase
+{
+	GENERATED_BODY()
+
+public:
+	FORCEINLINE FDWGenerateItemData()
+	{
+		Item = FAbilityItem();
+		Raws = TArray<FAbilityItem>();
+	}
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FAbilityItem Item;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<FAbilityItem> Raws;
 };
 
 /**

@@ -9,7 +9,7 @@
 #include "TargetSystemTargetableInterface.h"
 #include "Ability/Character/AbilityCharacterBase.h"
 #include "Ability/Character/DWCharacterAttributeSet.h"
-#include "Inventory/InventoryAgentInterface.h"
+#include "Ability/Inventory/InventoryAgentInterface.h"
 #include "Team/DWTeamModuleTypes.h"
 #include "Voxel/Agent/VoxelAgentInterface.h"
 
@@ -41,7 +41,7 @@ class AAbilitySkillBase;
  * 角色
  */
 UCLASS()
-class DREAMWORLD_API ADWCharacter : public AAbilityCharacterBase, public ITargetSystemTargetableInterface, public IInventoryAgentInterface
+class DREAMWORLD_API ADWCharacter : public AAbilityCharacterBase, public ITargetSystemTargetableInterface
 {
 	GENERATED_BODY()
 
@@ -68,6 +68,10 @@ public:
 	ADWCharacter();
 	
 protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	UWorldWidgetComponent* CharacterHP;
+
+protected:
 	// stats
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "CharacterStates")
 	EDWCharacterControlMode ControlMode;
@@ -75,36 +79,27 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CharacterStats")
 	FName TeamID;
 
-protected:
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CharacterStats")
-	FVector BirthLocation;
-	
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CharacterStats")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "CharacterStats")
 	ADWCharacter* OwnerRider;
 	
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CharacterStats")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "CharacterStats")
 	ADWCharacter* RidingTarget;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CharacterStats")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "CharacterStats")
 	ADWCharacter* LockedTarget;
 
 protected:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-	UWorldWidgetComponent* CharacterHP;
+	FVector BirthLocation;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-	UCharacterInventory* Inventory;
-
-protected:
-	float DefaultGravityScale;
-
-	float DefaultAirControl;
+	bool bAttackHitAble;
 	
 	float AIMoveStopDistance;
 
 	FVector AIMoveLocation;
 
 	int32 AttackAbilityIndex;
+		
+	int32 AttackAbilityQueue;
 
 	FPrimaryAssetId SkillAbilityID;
 
@@ -154,11 +149,25 @@ public:
 
 	virtual void OnInteract(IInteractionAgentInterface* InInteractionAgent, EInteractAction InInteractAction) override;
 
+	virtual void OnActiveItem(const FAbilityItem& InItem, bool bPassive, bool bSuccess) override;
+		
+	virtual void OnCancelItem(const FAbilityItem& InItem, bool bPassive) override;
+
+	virtual void OnAssembleItem(const FAbilityItem& InItem) override;
+
+	virtual void OnDischargeItem(const FAbilityItem& InItem) override;
+
+	virtual void OnDiscardItem(const FAbilityItem& InItem, bool bInPlace) override;
+
+	virtual void OnSelectItem(const FAbilityItem& InItem) override;
+
+	virtual void OnAuxiliaryItem(const FAbilityItem& InItem) override;
+
 	UFUNCTION(BlueprintCallable)
 	virtual void FreeToAnim(bool bUnLockRotation = true);
 
 	UFUNCTION(BlueprintCallable)
-	virtual void LimitToAnim(bool bLockRotation = false, bool bUnSprint = false);
+	virtual void LimitToAnim(bool bLockRotation = false);
 
 	UFUNCTION(BlueprintCallable)
 	virtual void Interrupt(float InDuration = -1);
@@ -223,9 +232,9 @@ public:
 	virtual bool SkillAttack(const FPrimaryAssetId& InSkillID);
 
 	virtual bool SkillAttack(ESkillType InSkillType, int32 InAbilityIndex = -1);
-		
+	
 	UFUNCTION(BlueprintCallable)
-	virtual bool FallingAttack();
+	virtual bool SkillAttackImpl(const FPrimaryAssetId& InSkillID);
 
 	UFUNCTION(BlueprintCallable)
 	virtual void UnAttack();
@@ -235,8 +244,6 @@ public:
 	
 	UFUNCTION(BlueprintCallable)
 	virtual void UnDefend();
-
-	virtual bool UseItem(FAbilityItem& InItem);
 
 	virtual void PickUp(AAbilityPickUpBase* InPickUp) override;
 
@@ -259,7 +266,10 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	virtual void SetLockedTarget(ADWCharacter* InTargetCharacter);
-		
+				
+	UFUNCTION(BlueprintPure)
+	virtual bool CanLookAtTarget(ADWCharacter* InTargetCharacter);
+
 	UFUNCTION(BlueprintCallable)
 	virtual void LookAtTarget(ADWCharacter* InTargetCharacter);
 
@@ -274,8 +284,14 @@ public:
 	virtual void StopAIMove(bool bMulticast = false) override;
 
 	virtual void AddMovementInput(FVector WorldDirection, float ScaleValue = 1.0f, bool bForce = false) override;
+									
+	virtual void SetMotionRate_Implementation(float InMovementRate, float InRotationRate) override;
+				
+	virtual bool IsAttackHitAble() const;
 
-	virtual void SetAttackDamageAble(bool bInDamaging);
+	virtual void SetAttackHitAble(bool bValue);
+		
+	virtual void ClearAttackHitTargets();
 
 	virtual bool RaycastStep(FHitResult& OutHitResult);
 
@@ -321,22 +337,10 @@ public:
 	TArray<ADWCharacter*> GetTeamMates();
 
 	UFUNCTION(BlueprintPure)
-	virtual bool IsPlayer() const;
+	virtual bool IsPlayer(bool bCheckNature = false) const;
 	
 	UFUNCTION(BlueprintPure)
 	virtual bool IsEnemy(ADWCharacter* InTargetCharacter) const;
-									
-	virtual void SetMotionRate_Implementation(float InMovementRate, float InRotationRate) override;
-
-public:
-	UFUNCTION(BlueprintPure)
-	UWorldWidgetComponent* GetCharacterHP() const { return CharacterHP; }
-
-	UFUNCTION(BlueprintPure)
-	UWidgetCharacterHP* GetCharacterHPWidget() const;
-
-	UFUNCTION(BlueprintPure)
-	virtual UInventory* GetInventory() const override;
 
 public:
 	UFUNCTION(BlueprintPure)
@@ -361,7 +365,7 @@ public:
 	virtual bool IsFloating() const;
 
 	UFUNCTION(BlueprintPure)
-	virtual bool IsAttacking(bool bAttackType = false) const;
+	virtual bool IsAttacking(bool bCheckAttacked = false) const;
 
 	UFUNCTION(BlueprintPure)
 	virtual bool IsDefending() const;
@@ -393,11 +397,17 @@ public:
 
 	virtual void SetLevelV(int32 InLevel) override;
 
-	UFUNCTION(BlueprintPure)
-	EDWCharacterControlMode GetControlMode() const { return ControlMode; }
-		
 	UFUNCTION(BlueprintCallable)
 	virtual void SetControlMode(EDWCharacterControlMode InControlMode);
+
+	UFUNCTION(BlueprintPure)
+	EDWCharacterControlMode GetControlMode() const { return ControlMode; }
+
+	UFUNCTION(BlueprintPure)
+	UWorldWidgetComponent* GetCharacterHP() const { return CharacterHP; }
+
+	UFUNCTION(BlueprintPure)
+	UWidgetCharacterHP* GetCharacterHPWidget() const;
 
 	FDWTeamData* GetTeamData() const;
 
@@ -483,9 +493,9 @@ public:
 	FDWCharacterAttackAbilityData GetAttackAbility(int32 InAbilityIndex = -1) const;
 		
 	UFUNCTION(BlueprintPure)
-	FDWCharacterSkillAbilityData GetSkillAbility(const FPrimaryAssetId& InSkillID);
+	FDWCharacterSkillAbilityData GetSkillAbility(const FPrimaryAssetId& InSkillID, bool bNeedAssembled = false);
 		
-	FDWCharacterSkillAbilityData GetSkillAbility(ESkillType InSkillType, int32 InAbilityIndex = -1);
+	FDWCharacterSkillAbilityData GetSkillAbility(ESkillType InSkillType, int32 InAbilityIndex = -1, bool bNeedAssembled = false);
 			
 	UFUNCTION(BlueprintPure)
 	FDWCharacterActionAbilityData GetActionAbility(EDWCharacterActionType InActionType);
@@ -547,8 +557,6 @@ public:
 	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, Interrupt)
 
 public:
-	virtual void OnSelectedItemChange(const FAbilityItem& InItem) override;
-	
 	virtual void OnAttributeChange(const FOnAttributeChangeData& InAttributeChangeData) override;
 	
 	virtual void HandleDamage(EDamageType DamageType, const float LocalDamageDone, bool bHasCrited, bool bHasDefend, FHitResult HitResult, const FGameplayTagContainer& SourceTags, AActor* SourceActor) override;

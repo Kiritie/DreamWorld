@@ -38,7 +38,7 @@ public:
 	virtual void AttackStart();
 
 	UFUNCTION(BlueprintCallable)
-	virtual void AttackHurt();
+	virtual void AttackStep();
 
 	UFUNCTION(BlueprintCallable)
 	virtual void AttackEnd();

@@ -21,6 +21,7 @@
 #include "Widget/WidgetMainMenu.h"
 #include "Widget/WidgetModuleBPLibrary.h"
 #include "Widget/Archive/WidgetArchiveChoosingPanel.h"
+#include "Widget/WidgetContextBox.h"
 
 UProcedure_Starting::UProcedure_Starting()
 {
@@ -62,6 +63,7 @@ void UProcedure_Starting::OnEnter(UProcedureBase* InLastProcedure)
 	{
 		AVoxelModule::Get()->UnloadSaveData(false);
 		UGlobalBPLibrary::GetPlayerController<ADWPlayerController>()->UnloadSaveData(false);
+		UWidgetModuleBPLibrary::GetUserWidget<UWidgetContextBox>()->ClearContext();
 	}
 	AMainModule::PauseModuleByClass<ASceneModule>();
 

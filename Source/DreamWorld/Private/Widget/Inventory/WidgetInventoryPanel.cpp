@@ -12,8 +12,8 @@
 #include "Components/WrapBox.h"
 #include "Components/WrapBoxSlot.h"
 #include "Global/GlobalBPLibrary.h"
-#include "Inventory/CharacterInventory.h"
-#include "Inventory/Slot/InventorySlot.h"
+#include "Ability/Inventory/CharacterInventory.h"
+#include "Ability/Inventory/Slot/InventorySlot.h"
 #include "Widget/Inventory/Slot/WidgetInventoryEquipSlot.h"
 
 UWidgetInventoryPanel::UWidgetInventoryPanel(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)

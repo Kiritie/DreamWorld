@@ -36,7 +36,7 @@ public:
 public:
 	virtual void AttackStart() override;
 
-	virtual void AttackHurt() override;
+	virtual void AttackStep() override;
 
 	virtual void AttackEnd() override;
 };

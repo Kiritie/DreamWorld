@@ -1,12 +1,12 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
+// Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Vitality/States/DWVitalityState_Death.h"
 
 #include "AbilitySystemComponent.h"
 #include "Ability/AbilityModuleBPLibrary.h"
 #include "Ability/Vitality/AbilityVitalityBase.h"
-#include "Inventory/Inventory.h"
-#include "Inventory/VitalityInventory.h"
+#include "Ability/Inventory/Inventory.h"
+#include "Ability/Inventory/VitalityInventory.h"
 #include "Vitality/DWVitality.h"
 
 UDWVitalityState_Death::UDWVitalityState_Death()

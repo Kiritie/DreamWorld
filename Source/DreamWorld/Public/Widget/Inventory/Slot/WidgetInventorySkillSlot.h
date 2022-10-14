@@ -7,8 +7,6 @@
 #include "WidgetInventorySlot.h"
 #include "WidgetInventorySkillSlot.generated.h"
 
-class UWidgetInventory;
-
 /**
  * UI技能槽
  */

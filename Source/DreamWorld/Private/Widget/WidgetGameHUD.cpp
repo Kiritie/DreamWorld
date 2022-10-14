@@ -16,6 +16,9 @@ UWidgetGameHUD::UWidgetGameHUD(const FObjectInitializer& ObjectInitializer) : Su
 	WidgetName = FName("GameHUD");
 	ChildNames.Add(FName("InventoryBar"));
 	ChildNames.Add(FName("InventoryPanel"));
+	ChildNames.Add(FName("GeneratePanel"));
+	ChildNames.Add(FName("ContextBox"));
+	ChildNames.Add(FName("ItemInfoBox"));
 	WidgetType = EWidgetType::Permanent;
 	InputMode = EInputMode::GameOnly;
 
@@ -50,34 +53,15 @@ void UWidgetGameHUD::OnClose_Implementation(bool bInstant)
 	FinishClose(bInstant);
 }
 
-void UWidgetGameHUD::OnChangeInputMode(UObject* InSender, UEventHandle_ChangeInputMode* InEventHandle)
-{
-	if(ADWCharacter* OwnerCharacter = Cast<ADWCharacter>(OwnerActor))
-	{
-		if(!OwnerCharacter->IsDead() && InEventHandle->InputMode == EInputMode::GameOnly)
-		{
-			SetCrosshairVisible(true);
-		}
-		else
-		{
-			SetCrosshairVisible(false);
-		}
-	}
-	else
-	{
-		SetCrosshairVisible(true);
-	}
-}
-
 void UWidgetGameHUD::OnRefresh_Implementation()
 {
 	Super::OnRefresh_Implementation();
 
 	if(ADWCharacter* OwnerCharacter = Cast<ADWCharacter>(OwnerActor))
 	{
-		if(const IInteractionAgentInterface* InteractionAgent = OwnerCharacter->GetInteractionComponent()->GetInteractionAgent())
+		if(auto Interaction = OwnerCharacter->GetInteractionComponent()->GetInteractingComponent())
 		{
-			ShowActions(InteractionAgent->GetInteractionComponent()->GetValidInteractActions(OwnerCharacter));
+			ShowActions(Interaction->GetValidInteractActions(OwnerCharacter));
 		}
 		else
 		{
@@ -97,4 +81,23 @@ FReply UWidgetGameHUD::NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEv
 		}
 	}
 	return FReply::Unhandled();
+}
+
+void UWidgetGameHUD::OnChangeInputMode(UObject* InSender, UEventHandle_ChangeInputMode* InEventHandle)
+{
+	if(ADWCharacter* OwnerCharacter = Cast<ADWCharacter>(OwnerActor))
+	{
+		if(!OwnerCharacter->IsDead() && InEventHandle->InputMode == EInputMode::GameOnly)
+		{
+			SetCrosshairVisible(true);
+		}
+		else
+		{
+			SetCrosshairVisible(false);
+		}
+	}
+	else
+	{
+		SetCrosshairVisible(true);
+	}
 }

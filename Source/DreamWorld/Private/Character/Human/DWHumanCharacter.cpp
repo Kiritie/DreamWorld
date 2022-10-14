@@ -15,6 +15,9 @@
 #include "ObjectPool/ObjectPoolModuleBPLibrary.h"
 #include "Voxel/Components/VoxelMeshComponent.h"
 #include "Voxel/Voxels/Entity/VoxelEntity.h"
+#include "Ability/Item/Equip/AbilityEquipBase.h"
+#include "Ability/Item/Equip/AbilityEquipDataBase.h"
+#include "Voxel/Datas/VoxelData.h"
 
 ADWHumanCharacter::ADWHumanCharacter()
 {
@@ -34,6 +37,9 @@ ADWHumanCharacter::ADWHumanCharacter()
 	HammerMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	HammerMesh->SetCastShadow(false);
 	HammerMesh->SetVisibility(false);
+
+	GenerateVoxelEntity = nullptr;
+	AuxiliaryVoxelEntity = nullptr;
 }
 
 // Called when the game starts or when spawned
@@ -52,8 +58,10 @@ void ADWHumanCharacter::OnDespawn_Implementation()
 {
 	Super::OnDespawn_Implementation();
 
-	UObjectPoolModuleBPLibrary::DespawnObject(VoxelEntity);
-	VoxelEntity = nullptr;
+	UObjectPoolModuleBPLibrary::DespawnObject(GenerateVoxelEntity);
+	UObjectPoolModuleBPLibrary::DespawnObject(AuxiliaryVoxelEntity);
+	GenerateVoxelEntity = nullptr;
+	AuxiliaryVoxelEntity = nullptr;
 }
 
 // Called every frame
@@ -61,6 +69,81 @@ void ADWHumanCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+void ADWHumanCharacter::OnSelectItem(const FAbilityItem& InItem)
+{
+	Super::OnSelectItem(InItem);
+
+	if(InItem.IsValid() && InItem.GetType() == EAbilityItemType::Voxel)
+	{
+		if(!GenerateVoxelEntity)
+		{
+			GenerateVoxelEntity = UObjectPoolModuleBPLibrary::SpawnObject<AVoxelEntity>();
+			GenerateVoxelEntity->Execute_SetActorVisible(GenerateVoxelEntity, Execute_IsVisible(this) && ControlMode == EDWCharacterControlMode::Creating);
+			GenerateVoxelEntity->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("GenerateVoxelMesh"));
+			GenerateVoxelEntity->GetMeshComponent()->SetCastShadow(false);
+			GenerateVoxelEntity->GetMeshComponent()->OffsetScale = FVector(0.f, 0.f, 1.f);
+			GenerateVoxelEntity->GetMeshComponent()->CenterOffset = FVector(0.f, 0.f, 0.5f);
+		}
+		GenerateVoxelEntity->Initialize(InItem.ID);
+	}
+	else if(GenerateVoxelEntity)
+	{
+		GenerateVoxelEntity->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+		UObjectPoolModuleBPLibrary::DespawnObject(GenerateVoxelEntity);
+		GenerateVoxelEntity = nullptr;
+	}
+}
+
+void ADWHumanCharacter::OnAuxiliaryItem(const FAbilityItem& InItem)
+{
+	Super::OnAuxiliaryItem(InItem);
+
+	if(InItem.IsValid() && InItem.GetType() == EAbilityItemType::Voxel && InItem.GetData<UVoxelData>().VoxelType == EVoxelType::Torch)
+	{
+		if(!AuxiliaryVoxelEntity)
+		{
+			AuxiliaryVoxelEntity = UObjectPoolModuleBPLibrary::SpawnObject<AVoxelEntity>();
+			AuxiliaryVoxelEntity->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("AuxiliaryVoxelMesh"));
+			AuxiliaryVoxelEntity->GetMeshComponent()->SetCastShadow(false);
+		}
+		AuxiliaryVoxelEntity->Initialize(InItem.ID);
+	}
+	else if(AuxiliaryVoxelEntity)
+	{
+		AuxiliaryVoxelEntity->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+		UObjectPoolModuleBPLibrary::DespawnObject(AuxiliaryVoxelEntity);
+		AuxiliaryVoxelEntity = nullptr;
+	}
+}
+
+void ADWHumanCharacter::RefreshEquip(EDWEquipPartType InPartType, const FAbilityItem& InItem)
+{
+	AAbilityEquipBase* Equip = GetEquip(InPartType);
+	if (InItem.IsValid())
+	{
+		if(Equip && !Equip->GetItemData().EqualID(InItem.ID))
+		{
+			Equip->OnDischarge();
+			UObjectPoolModuleBPLibrary::DespawnObject(Equip);
+			Equip = nullptr;
+		}
+		if(!Equip)
+		{
+			Equip = UObjectPoolModuleBPLibrary::SpawnObject<AAbilityEquipBase>(nullptr, InItem.GetData<UAbilityEquipDataBase>().EquipClass);
+			Equip->Initialize(this, InItem);
+			Equip->OnAssemble();
+			Equip->Execute_SetActorVisible(Equip, Execute_IsVisible(this) && ControlMode == EDWCharacterControlMode::Fighting);
+			Equips.Emplace(InPartType, Equip);
+		}
+	}
+	else if(Equip)
+	{
+		Equip->OnDischarge();
+		UObjectPoolModuleBPLibrary::DespawnObject(Equip);
+		Equips.Remove(InPartType);
+	}
 }
 
 void ADWHumanCharacter::SetControlMode(EDWCharacterControlMode InControlMode)
@@ -73,46 +156,29 @@ void ADWHumanCharacter::SetControlMode(EDWCharacterControlMode InControlMode)
 	{
 		case EDWCharacterControlMode::Fighting:
 		{
-			if(VoxelEntity) VoxelEntity->Execute_SetActorVisible(VoxelEntity, false);
+			if(GenerateVoxelEntity) GenerateVoxelEntity->Execute_SetActorVisible(GenerateVoxelEntity, false);
 			HammerMesh->SetVisibility(false);
 			break;
 		}
 		case EDWCharacterControlMode::Creating:
 		{
-			if(VoxelEntity) VoxelEntity->Execute_SetActorVisible(VoxelEntity, true);
+			if(GenerateVoxelEntity) GenerateVoxelEntity->Execute_SetActorVisible(GenerateVoxelEntity, true);
 			HammerMesh->SetVisibility(true);
 			break;
 		}
 	}
 }
 
-void ADWHumanCharacter::SetGenerateVoxelID(const FPrimaryAssetId& InGenerateVoxelID)
+void ADWHumanCharacter::SetAttackHitAble(bool bValue)
 {
-	Super::SetGenerateVoxelID(InGenerateVoxelID);
+	Super::SetAttackHitAble(bValue);
 
-	if(InGenerateVoxelID.IsValid())
-	{
-		if(!VoxelEntity)
-		{
-			VoxelEntity = UObjectPoolModuleBPLibrary::SpawnObject<AVoxelEntity>();
-			VoxelEntity->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("VoxelMesh"));
-			VoxelEntity->Execute_SetActorVisible(VoxelEntity, Execute_IsVisible(this) && ControlMode == EDWCharacterControlMode::Creating);
-			VoxelEntity->GetMeshComponent()->OffsetScale = FVector(0.f, 0.f, 1.f);
-			VoxelEntity->GetMeshComponent()->CenterOffset = FVector(0.f, 0.f, 0.5f);
-		}
-		VoxelEntity->Initialize(InGenerateVoxelID);
-	}
-	else if(VoxelEntity)
-	{
-		VoxelEntity->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
-		UObjectPoolModuleBPLibrary::DespawnObject(VoxelEntity);
-		VoxelEntity = nullptr;
-	}
+	if(GetWeapon()) GetWeapon()->Execute_SetHitAble(GetWeapon(), bValue);
 }
 
-void ADWHumanCharacter::SetAttackDamageAble(bool bInDamaging)
+void ADWHumanCharacter::ClearAttackHitTargets()
 {
-	Super::SetAttackDamageAble(bInDamaging);
+	Super::ClearAttackHitTargets();
 
-	if(GetWeapon()) GetWeapon()->SetCollisionEnable(bInDamaging);
+	if(GetWeapon()) GetWeapon()->Execute_ClearHitTargets(GetWeapon());
 }

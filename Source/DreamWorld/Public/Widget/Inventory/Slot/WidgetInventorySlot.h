@@ -3,17 +3,14 @@
 #pragma once
 
 #include "DreamWorld/DreamWorld.h"
-#include "Blueprint/UserWidget.h"
+#include "Ability/Inventory/Widget/WidgetInventorySlotBase.h"
 #include "WidgetInventorySlot.generated.h"
-
-class UWidgetInventory;
-class UInventorySlot;
 
 /**
  * UI物品槽
  */
 UCLASS(BlueprintType)
-class DREAMWORLD_API UWidgetInventorySlot : public UUserWidget
+class DREAMWORLD_API UWidgetInventorySlot : public UWidgetInventorySlotBase
 {
 	GENERATED_BODY()
 
@@ -35,52 +32,32 @@ protected:
 
 	virtual void NativeOnMouseLeave(const FPointerEvent& InMouseEvent) override;
 
+	virtual FReply NativeOnMouseMove( const FGeometry& InGeometry, const FPointerEvent& InMouseEvent ) override;
+
 	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
 
 public:
-	UFUNCTION()
-	virtual void OnInitialize(UInventorySlot* InOwnerSlot);
+	virtual void OnInitialize(UInventorySlot* InOwnerSlot) override;
 
 protected:
-	UFUNCTION()
-	virtual void OnRefresh();
+	virtual void OnRefresh() override;
 
-	UFUNCTION()
-	virtual void OnActivated();
+	virtual void OnActivated() override;
 	
-	UFUNCTION()
-	virtual void OnCanceled();
+	virtual void OnCanceled() override;
 		
 protected:
-	UFUNCTION()
-	virtual void StartCooldown();
+	virtual void StartCooldown() override;
 			
-	UFUNCTION()
-	virtual void StopCooldown();
+	virtual void StopCooldown() override;
 
-	UFUNCTION()
-	virtual void OnCooldown();
+	virtual void OnCooldown() override;
 
 public:
-	UFUNCTION(BlueprintCallable)
-	virtual void SplitItem(int InCount = -1);
-	
-	UFUNCTION(BlueprintCallable)
-	virtual void MoveItem(int InCount = -1);
-
-	UFUNCTION(BlueprintCallable)
-	virtual void UseItem(int InCount = -1);
-
-	UFUNCTION(BlueprintCallable)
-	virtual void DiscardItem(int InCount = -1);
-
 	UFUNCTION(BlueprintCallable)
 	virtual void SetBorderColor(FLinearColor InColor);
 
 protected:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Default")
-	UInventorySlot* OwnerSlot;
-
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components", meta = (BindWidget, OptionalWidget = false))
 	class UBorder* Border;
 
@@ -102,34 +79,14 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components", meta = (BindWidget, OptionalWidget = false))
 	class UTextBlock* TxtKeyCode;
 
-protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FText KeyCode;
 
-	FTimerHandle CooldownTimerHandle;
+	UPROPERTY()
+	UMaterialInstanceDynamic* MaskMatInst;
 
 public:
 	FText GetKeyCode() const { return KeyCode; }
 	
 	void SetKeyCode(const FText& InKeyCode) { this->KeyCode = InKeyCode; }
-
-protected:
-	UPROPERTY()
-	UMaterialInstanceDynamic* MaskMatInst;
-
-public:
-	UFUNCTION(BlueprintPure)
-	bool IsEmpty() const;
-
-	UFUNCTION(BlueprintPure)
-	bool IsCooldowning() const;
-
-	UFUNCTION(BlueprintPure)
-	FAbilityItem& GetItem() const;
-
-	UFUNCTION(BlueprintPure)
-	UInventorySlot* GetOwnerSlot() const { return OwnerSlot; }
-
-	UFUNCTION(BlueprintPure)
-	UInventory* GetInventory() const;
 };

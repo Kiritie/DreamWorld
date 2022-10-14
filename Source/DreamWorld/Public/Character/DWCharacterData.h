@@ -78,6 +78,15 @@ public:
 	FGameplayTag AttackingTag;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tags")
+	FGameplayTag NormalAttackingTag;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tags")
+	FGameplayTag FallingAttackingTag;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tags")
+	FGameplayTag SkillAttackingTag;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tags")
 	FGameplayTag DefendingTag;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tags")

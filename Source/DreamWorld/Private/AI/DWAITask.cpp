@@ -7,6 +7,8 @@
 
 UDWAITask::UDWAITask(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
+	DurationTime = -1.f;
+	LocalRemainTime = 0.f;
 }
 
 bool UDWAITask::InitTask(UBehaviorTreeComponent& OwnerComp)
@@ -18,6 +20,14 @@ void UDWAITask::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, f
 {
 	if (!InitTask(OwnerComp)) return;
 
+	if(LocalRemainTime != -1.f)
+	{
+		LocalRemainTime -= DeltaSeconds;
+		if(LocalRemainTime <= 0.f)
+		{
+			FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
+		}
+	}
 }
 
 EBTNodeResult::Type UDWAITask::AbortTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
@@ -30,6 +40,8 @@ EBTNodeResult::Type UDWAITask::AbortTask(UBehaviorTreeComponent& OwnerComp, uint
 EBTNodeResult::Type UDWAITask::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
 	if(!InitTask(OwnerComp)) return EBTNodeResult::Failed;
+
+	LocalRemainTime = DurationTime;
 
 	return EBTNodeResult::Succeeded;
 }

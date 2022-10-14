@@ -10,8 +10,8 @@
 #include "Components/StaticMeshComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Global/GlobalBPLibrary.h"
-#include "Inventory/Inventory.h"
-#include "Inventory/Slot/InventoryEquipSlot.h"
+#include "Ability/Inventory/Inventory.h"
+#include "Ability/Inventory/Slot/InventoryEquipSlot.h"
 
 ADWEquip::ADWEquip()
 {

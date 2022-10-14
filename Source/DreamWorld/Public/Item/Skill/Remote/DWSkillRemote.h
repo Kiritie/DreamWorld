@@ -18,4 +18,7 @@ public:
 
 public:
 	virtual void Initialize_Implementation(AAbilityCharacterBase* InOwnerCharacter, const FAbilityItem& InItem = FAbilityItem::Empty) override;
+
+public:
+	virtual void OnHitTarget_Implementation(AActor* InTarget, const FHitResult& InHitResult);
 };

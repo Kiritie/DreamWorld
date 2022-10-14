@@ -7,6 +7,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Scene/SceneModuleBPLibrary.h"
 #include "Scene/Actor/PhysicsVolume/PhysicsVolumeBase.h"
+#include "Character/States/DWCharacterState_Float.h"
 
 UDWCharacterState_Swim::UDWCharacterState_Swim()
 {
@@ -35,16 +36,21 @@ void UDWCharacterState_Swim::OnEnter(UFiniteStateBase* InLastFiniteState)
 	
 	Character->GetAbilitySystemComponent()->AddLooseGameplayTag(Character->GetCharacterData<UDWCharacterData>().SwimmingTag);
 
-	Character->GetCharacterMovement()->SetMovementMode(MOVE_Swimming);
-	if(USceneModuleBPLibrary::HasPhysicsVolumeByName(FName("Water")))
+	Character->LimitToAnim();
+
+	if(!InLastFiniteState || !InLastFiniteState->IsA<UDWCharacterState_Float>())
 	{
-		if(Character->GetCharacterMovement()->UpdatedComponent)
+		if(USceneModuleBPLibrary::HasPhysicsVolumeByName(FName("Water")))
 		{
-			Character->GetCharacterMovement()->UpdatedComponent->SetPhysicsVolume(USceneModuleBPLibrary::GetPhysicsVolumeByName(FName("Water")), true);
+			Character->GetCharacterMovement()->SetMovementMode(MOVE_Swimming);
+			if(Character->GetCharacterMovement()->UpdatedComponent)
+			{
+				Character->GetCharacterMovement()->UpdatedComponent->SetPhysicsVolume(USceneModuleBPLibrary::GetPhysicsVolumeByName(FName("Water")), true);
+			}
+			//FVector Velocity = Character->GetMovementComponent()->Velocity;
+			//Character->GetMovementComponent()->Velocity = FVector(Velocity.X, Velocity.Y, 0);
 		}
 	}
-	//FVector Velocity = Character->GetMovementComponent()->Velocity;
-	//Character->GetMovementComponent()->Velocity = FVector(Velocity.X, Velocity.Y, 0);
 }
 
 void UDWCharacterState_Swim::OnRefresh()
@@ -61,14 +67,19 @@ void UDWCharacterState_Swim::OnLeave(UFiniteStateBase* InNextFiniteState)
 	Character->StopAction(EDWCharacterActionType::Swim);
 	
 	Character->GetAbilitySystemComponent()->RemoveLooseGameplayTag(Character->GetCharacterData<UDWCharacterData>().SwimmingTag);
+	
+	Character->FreeToAnim();
 
-	Character->GetCharacterMovement()->SetMovementMode(MOVE_Walking);
-	if(Character->GetCharacterMovement()->UpdatedComponent)
+	if(!InNextFiniteState || !InNextFiniteState->IsA<UDWCharacterState_Float>())
 	{
-		Character->GetCharacterMovement()->UpdatedComponent->SetPhysicsVolume(GetWorld()->GetDefaultPhysicsVolume(), true);
+		Character->GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+		if(Character->GetCharacterMovement()->UpdatedComponent)
+		{
+			Character->GetCharacterMovement()->UpdatedComponent->SetPhysicsVolume(USceneModuleBPLibrary::GetDefaultPhysicsVolume(), true);
+		}
+		//FVector Velocity = Character->GetMovementComponent()->Velocity;
+		//Character->GetMovementComponent()->Velocity = FVector(Velocity.X, Velocity.Y, 0);
 	}
-	//FVector Velocity = Character->GetMovementComponent()->Velocity;
-	//Character->GetMovementComponent()->Velocity = FVector(Velocity.X, Velocity.Y, 0);
 }
 
 void UDWCharacterState_Swim::OnTermination()

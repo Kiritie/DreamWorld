@@ -51,7 +51,7 @@ void UDWCharacterState_Interrupt::OnRefresh()
 		RemainTime -= GetWorld()->GetDeltaSeconds();
 		if (RemainTime <= 0)
 		{
-			FSM->SwitchStateByClass<UDWCharacterState_Walk>();
+			FSM->SwitchState(nullptr);
 		}
 	}
 }

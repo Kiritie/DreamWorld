@@ -46,10 +46,10 @@ void UDWCharacterPart::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 					if(LastOverlapVoxel.IsValid())
 					{
 						OnExitVoxel(LastOverlapVoxel.GetVoxel(), VoxelHitResult);
-						LastOverlapVoxel = FVoxelItem();
+						LastOverlapVoxel = FVoxelItem::Empty;
 					}
 					LastOverlapVoxel = VoxelItem;
-					VoxelItem.GetVoxel().OnAgentEnter(GetOwnerCharacter(), VoxelHitResult);
+					OnEnterVoxel(VoxelItem.GetVoxel(), VoxelHitResult);
 				}
 				if(LastOverlapVoxel.IsValid())
 				{
@@ -58,8 +58,8 @@ void UDWCharacterPart::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 			}
 			else if(LastOverlapVoxel.IsValid())
 			{
-				LastOverlapVoxel.GetVoxel().OnAgentExit(GetOwnerCharacter(), VoxelHitResult);
-				LastOverlapVoxel = FVoxelItem();
+				OnExitVoxel(LastOverlapVoxel.GetVoxel(), VoxelHitResult);
+				LastOverlapVoxel = FVoxelItem::Empty;
 			}
 		}
 	}
@@ -82,13 +82,9 @@ void UDWCharacterPart::OnEnterVoxel(UVoxel& InVoxel, const FVoxelHitResult& InHi
 			switch (CharacterPartType)
 			{
 				case EDWCharacterPartType::Chest:
-				{
-					GetOwnerCharacter()->Swim();
-					break;
-				}
 				case EDWCharacterPartType::Neck:
 				{
-					GetOwnerCharacter()->UnFloat();
+					GetOwnerCharacter()->Swim();
 					break;
 				}
 				default: break;
@@ -117,17 +113,21 @@ void UDWCharacterPart::OnExitVoxel(UVoxel& InVoxel, const FVoxelHitResult& InHit
 			{
 				case EDWCharacterPartType::Chest:
 				{
-					if(InHitResult.VoxelItem.GetVoxelData().VoxelType != EVoxelType::Water)
+					if(!InHitResult.IsValid() || InHitResult.VoxelItem.GetVoxelData().VoxelType != EVoxelType::Water)
 					{
-						GetOwnerCharacter()->UnSwim();
+						GetOwnerCharacter()->UnFloat();
 					}
 					break;
 				}
 				case EDWCharacterPartType::Neck:
 				{
-					if(InHitResult.VoxelItem.GetVoxelData().VoxelType != EVoxelType::Water)
+					if(!InHitResult.IsValid() || InHitResult.VoxelItem.GetVoxelData().VoxelType != EVoxelType::Water)
 					{
 						GetOwnerCharacter()->Float(InVoxel.GetOwner()->IndexToLocation(InVoxel.GetIndex()).Z + AVoxelModule::Get()->GetWorldData().BlockSize);
+					}
+					else
+					{
+						GetOwnerCharacter()->Swim();
 					}
 					break;
 				}

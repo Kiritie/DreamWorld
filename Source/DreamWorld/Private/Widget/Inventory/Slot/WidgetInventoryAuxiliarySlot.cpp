@@ -3,12 +3,6 @@
 
 #include "Widget/Inventory/Slot/WidgetInventoryAuxiliarySlot.h"
 
-#include "Character/DWCharacter.h"
-#include "Inventory/Slot/InventorySlot.h"
-#include "Inventory/Slot/InventorySkillSlot.h"
-#include "Components/TextBlock.h"
-#include "Kismet/KismetTextLibrary.h"
-
 UWidgetInventoryAuxiliarySlot::UWidgetInventoryAuxiliarySlot(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	

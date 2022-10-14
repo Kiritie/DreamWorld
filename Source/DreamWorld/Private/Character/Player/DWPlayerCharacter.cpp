@@ -25,14 +25,13 @@
 #include "Widget/Inventory/WidgetInventoryBar.h"
 #include "Widget/Inventory/Slot/WidgetInventorySlot.h"
 #include "Widget/Inventory/WidgetInventoryPanel.h"
-#include "Inventory/CharacterInventory.h"
-#include "Inventory/Slot/InventorySlot.h"
+#include "Ability/Inventory/Slot/InventorySlot.h"
 #include "Gameplay/DWGameState.h"
-#include "Inventory/Slot/InventorySkillSlot.h"
+#include "Ability/Inventory/Slot/InventorySkillSlot.h"
 #include "Gameplay/DWGameInstance.h"
 #include "Input/InputModuleBPLibrary.h"
 #include "Widget/WidgetGameHUD.h"
-#include "Inventory/Slot/InventoryEquipSlot.h"
+#include "Ability/Inventory/Slot/InventoryEquipSlot.h"
 #include "Voxel/DWVoxelModule.h"
 #include "Voxel/VoxelModule.h"
 #include "Voxel/Chunks/VoxelChunk.h"
@@ -67,6 +66,8 @@
 #include "Voxel/VoxelModuleBPLibrary.h"
 #include "Voxel/Voxels/Entity/VoxelEntity.h"
 #include "Widget/World/WorldWidgetComponent.h"
+#include "Ability/Inventory/CharacterInventory.h"
+#include "Widget/WidgetContextBox.h"
 
 //////////////////////////////////////////////////////////////////////////
 // ADWPlayerCharacter
@@ -82,10 +83,13 @@ ADWPlayerCharacter::ADWPlayerCharacter()
 	CharacterHP->SetAutoCreate(false);
 
 	TargetSystem = CreateDefaultSubobject<UTargetSystemComponent>(FName("TargetSystem"));
-	TargetSystem->bShouldControlRotation = true;
+	TargetSystem->bShouldControlRotation = false;
 	TargetSystem->TargetableActors = ADWCharacter::StaticClass();
 	TargetSystem->TargetableCollisionChannel = ECC_GameTraceChannel1;
 	TargetSystem->LockedOnWidgetParentSocket = FName("LockPoint");
+	TargetSystem->OnTargetLockedOn.AddDynamic(this, &ADWPlayerCharacter::OnTargetLockedOn);
+	TargetSystem->OnTargetLockedOff.AddDynamic(this, &ADWPlayerCharacter::OnTargetLockedOff);
+	TargetSystem->OnTargetSetRotation.AddDynamic(this, &ADWPlayerCharacter::OnTargetSetRotation);
 	
 	// Create a camera boom (pulls in towards the player ifthere is a collision)
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(FName("CameraBoom"));
@@ -222,7 +226,6 @@ FSaveData* ADWPlayerCharacter::ToData()
 {
 	static FDWPlayerSaveData SaveData;
 	SaveData = Super::ToData()->CastRef<FDWCharacterSaveData>();
-	SaveData.ControlMode = ControlMode;
 	SaveData.CameraRotation = UCameraModuleBPLibrary::GetCurrentCameraRotation();
 	return &SaveData;
 }
@@ -235,12 +238,27 @@ void ADWPlayerCharacter::Tick(float DeltaTime)
 	if(IsDead()) return;
 }
 
+void ADWPlayerCharacter::Death(IAbilityVitalityInterface* InKiller /* = nullptr */)
+{
+	Super::Death(InKiller);
+	if(InKiller)
+	{
+		UWidgetModuleBPLibrary::GetUserWidget<UWidgetContextBox>()->AddMessage(FString::Printf(TEXT("你被 %s 杀死了！"), *InKiller->GetNameV().ToString()));
+	}
+}
+
+bool ADWPlayerCharacter::CanLookAtTarget(ADWCharacter* InTargetCharacter)
+{
+	return true;
+}
+
 void ADWPlayerCharacter::LookAtTarget(ADWCharacter* InTargetCharacter)
 {
-	Super::LookAtTarget(InTargetCharacter);
-	const FVector tmpDirection = InTargetCharacter->GetActorLocation() + FVector::DownVector * InTargetCharacter->GetHalfHeight() - GetActorLocation();
-	const FRotator tmpRotator = tmpDirection.ToOrientationRotator();
-	GetController<ADWPlayerController>()->SetControlRotation(tmpRotator);
+	if(IsAttacking() || IsDefending())
+	{
+		const FVector tmpDirection = InTargetCharacter->GetActorLocation() - GetActorLocation();
+		SetActorRotation(FRotator(0, tmpDirection.ToOrientationRotator().Yaw, 0));
+	}
 }
 
 FString ADWPlayerCharacter::GetHeadInfo() const
@@ -254,7 +272,7 @@ void ADWPlayerCharacter::SetActorVisible_Implementation(bool bNewVisible)
 
 	if(bNewVisible && ControlMode == EDWCharacterControlMode::Fighting)
 	{
-		if(VoxelEntity) VoxelEntity->Execute_SetActorVisible(VoxelEntity, false);
+		if(GenerateVoxelEntity) GenerateVoxelEntity->Execute_SetActorVisible(GenerateVoxelEntity, false);
 		HammerMesh->SetVisibility(false);
 	}
 }
@@ -287,6 +305,21 @@ void ADWPlayerCharacter::SetControlMode(EDWCharacterControlMode InControlMode)
 void ADWPlayerCharacter::SetGenerateVoxelID(const FPrimaryAssetId& InGenerateVoxelID)
 {
 	Super::SetGenerateVoxelID(InGenerateVoxelID);
+}
+
+void ADWPlayerCharacter::OnTargetLockedOn(AActor* InTargetActor)
+{
+	SetLockedTarget(Cast<ADWCharacter>(InTargetActor));
+}
+
+void ADWPlayerCharacter::OnTargetLockedOff(AActor* InTargetActor)
+{
+	SetLockedTarget(nullptr);
+}
+
+void ADWPlayerCharacter::OnTargetSetRotation(AActor* InTargetActor, FRotator InControlRotation)
+{
+	UCameraModuleBPLibrary::SetCameraRotation(InControlRotation.Yaw, InControlRotation.Pitch);
 }
 
 void ADWPlayerCharacter::RefreshEquip(EDWEquipPartType InPartType, const FAbilityItem& InItem)
@@ -324,13 +357,29 @@ void ADWPlayerCharacter::OnInteract(IInteractionAgentInterface* InInteractionAge
 	Super::OnInteract(InInteractionAgent, InInteractAction);
 }
 
+void ADWPlayerCharacter::ChangeHand()
+{
+	TArray<UInventorySlot*> AuxilarySlots = Inventory->GetSplitSlots(ESplitSlotType::Auxiliary);
+	if(AuxilarySlots.Num() > 0 && Inventory->GetSelectedSlot())
+	{
+		AuxilarySlots[0]->Replace(Inventory->GetSelectedSlot());
+	}
+}
+
+void ADWPlayerCharacter::Turn_Implementation(float InValue)
+{
+	if(IsBreakAllInput()) return;
+
+	TargetSystem->TargetActorWithAxisInput(InValue);
+}
+
 void ADWPlayerCharacter::MoveForward_Implementation(float InValue)
 {
 	if(IsBreakAllInput()) return;
 
 	FVector Direction;
 	const FRotator Rotation = GetControlRotation();
-	if(IsFlying() || IsSwimming())
+	if(IsFlying() || IsSwimming() || IsFloating())
 	{
 		Direction = Rotation.Vector();
 	}
@@ -356,23 +405,18 @@ void ADWPlayerCharacter::MoveUp_Implementation(float InValue)
 {
 	if(IsBreakAllInput()) return;
 	
-	if(IsFlying() || IsSwimming())
+	if(IsFlying() || IsSwimming() || IsFloating())
 	{
 		const FRotator Rotation = GetControlRotation();
 		const FRotator YawRotation(0, Rotation.Yaw, 0);
-		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
-		AddMovementInput(FVector(Direction.X * 0.1f, Direction.Y * 0.1f, 1.f) * InValue, 0.5f);
+		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+		AddMovementInput(FVector(Direction.X * 0.2f, Direction.Y * 0.2f, 0.5f * InValue), 1.f);
 	}
 }
 
-void ADWPlayerCharacter::OnSelectedItemChange(const FAbilityItem& InItem)
+void ADWPlayerCharacter::OnSelectItem(const FAbilityItem& InItem)
 {
-	Super::OnSelectedItemChange(InItem);
-}
-
-bool ADWPlayerCharacter::UseItem(FAbilityItem& InItem)
-{
-	return Super::UseItem(InItem);
+	Super::OnSelectItem(InItem);
 }
 
 void ADWPlayerCharacter::OnAttributeChange(const FOnAttributeChangeData& InAttributeChangeData)

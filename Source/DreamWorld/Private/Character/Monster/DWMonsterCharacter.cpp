@@ -5,27 +5,21 @@
 
 #include "Ability/Components/CharacterInteractionComponent.h"
 #include "Ability/Item/Prop/AbilityPropDataBase.h"
-#include "Components/BoxComponent.h"
 #include "BehaviorTree/BehaviorTree.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "AI/DWAIBlackboard.h"
 #include "Character/Human/DWHumanCharacter.h"
-#include "Inventory/Inventory.h"
-#include "Inventory/Slot/InventorySlot.h"
+#include "Ability/Inventory/Inventory.h"
+#include "Ability/Inventory/Slot/InventorySlot.h"
 #include "Item/Prop/DWPropData.h"
 #include "Voxel/Datas/VoxelData.h"
 #include "Ability/Vitality/AbilityVitalityInterface.h"
+#include "Ability/Components/DWCharacterAttackPointComponent.h"
 
 ADWMonsterCharacter::ADWMonsterCharacter()
 {
-	AttackPoint = CreateDefaultSubobject<UBoxComponent>(TEXT("AttackPoint"));
+	AttackPoint = CreateDefaultSubobject<UDWCharacterAttackPointComponent>(TEXT("AttackPoint"));
 	AttackPoint->SetupAttachment(GetMesh(), TEXT("AttackPoint"));
-	AttackPoint->SetRelativeLocationAndRotation(FVector(0, 0, 0), FRotator(0, 0, 0));
-	AttackPoint->SetRelativeScale3D(FVector(1, 1, 1));
-	AttackPoint->SetBoxExtent(FVector(20, 20, 20));
-	AttackPoint->SetCollisionProfileName(TEXT("Weapon"));
-	AttackPoint->SetGenerateOverlapEvents(false);
-	AttackPoint->OnComponentBeginOverlap.AddDynamic(this, &ADWMonsterCharacter::OnAttackPointOverlap);
 
 	Interaction->AddInteractionAction((EInteractAction)EDWInteractAction::Ride);
 	Interaction->AddInteractionAction((EInteractAction)EDWInteractAction::Feed);
@@ -43,21 +37,6 @@ void ADWMonsterCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-}
-
-void ADWMonsterCharacter::OnAttackPointOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-{
-	if(OtherActor != this)
-	{
-		OnHitTarget(OverlappedComponent, OtherActor, OtherComp, OtherBodyIndex, bFromSweep, SweepResult);
-	}
-}
-
-void ADWMonsterCharacter::SetAttackDamageAble(bool bInDamaging)
-{
-	Super::SetAttackDamageAble(bInDamaging);
-
-	AttackPoint->SetGenerateOverlapEvents(bInDamaging);
 }
 
 bool ADWMonsterCharacter::CanInteract(IInteractionAgentInterface* InInteractionAgent, EInteractAction InInteractAction)
@@ -138,4 +117,31 @@ void ADWMonsterCharacter::OnInteract(IInteractionAgentInterface* InInteractionAg
 		}
 		default: break;
 	}
+}
+
+void ADWMonsterCharacter::SetAttackHitAble(bool bValue)
+{
+	Super::SetAttackHitAble(bValue);
+
+	for(auto Iter : GetAttackPoints())
+	{
+		Iter->Execute_SetHitAble(Iter, bValue);
+	}
+}
+
+void ADWMonsterCharacter::ClearAttackHitTargets()
+{
+	Super::ClearAttackHitTargets();
+
+	for(auto Iter : GetAttackPoints())
+	{
+		Iter->Execute_ClearHitTargets(Iter);
+	}
+}
+
+TArray<UDWCharacterAttackPointComponent*> ADWMonsterCharacter::GetAttackPoints()
+{
+	TArray<UDWCharacterAttackPointComponent*> AttackPoints;
+	GetComponents(AttackPoints);
+	return AttackPoints;
 }

@@ -2,7 +2,6 @@
 
 
 #include "Widget/Inventory/Slot/WidgetInventoryEquipSlot.h"
-#include "Inventory/Slot/InventorySlot.h"
 
 UWidgetInventoryEquipSlot::UWidgetInventoryEquipSlot(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {

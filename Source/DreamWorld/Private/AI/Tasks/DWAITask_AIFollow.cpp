@@ -10,8 +10,6 @@
 
 UDWAITask_AIFollow::UDWAITask_AIFollow(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
-	bNotifyTick = true;
-	
 	TargetCharacter = nullptr;
 	TargetDistance = 0.f;
 
@@ -30,6 +28,8 @@ bool UDWAITask_AIFollow::InitTask(UBehaviorTreeComponent& OwnerComp)
 
 void UDWAITask_AIFollow::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
 {
+	Super::TickTask(OwnerComp, NodeMemory, DeltaSeconds);
+
 	if (!InitTask(OwnerComp)) return;
 
 	GetOwnerCharacter<ADWCharacter>()->DoAIMove(TargetCharacter, TargetDistance, true);
@@ -37,18 +37,18 @@ void UDWAITask_AIFollow::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* Node
 
 EBTNodeResult::Type UDWAITask_AIFollow::AbortTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
-	if (!InitTask(OwnerComp)) return EBTNodeResult::Failed;
+	Super::AbortTask(OwnerComp, NodeMemory);
 
-	GetOwnerCharacter<ADWCharacter>()->SetLockedTarget(nullptr);
+	if (!InitTask(OwnerComp)) return EBTNodeResult::Failed;
 
 	return EBTNodeResult::Aborted;
 }
 
 EBTNodeResult::Type UDWAITask_AIFollow::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
-	if (!InitTask(OwnerComp)) return EBTNodeResult::Failed;
+	Super::ExecuteTask(OwnerComp, NodeMemory);
 
-	GetOwnerCharacter<ADWCharacter>()->SetMotionRate(1, 1);
+	if (!InitTask(OwnerComp)) return EBTNodeResult::Failed;
 
 	return EBTNodeResult::InProgress;
 }

@@ -50,9 +50,9 @@ void UDWCharacterAnim::NativeHandleNotify(const FString& AnimNotifyName)
 	{
 		Character->GetFSMComponent()->GetStateByClass<UDWCharacterState_Attack>()->AttackStart();
 	}
-	else if(AnimNotifyName.Equals(TEXT("Attack hurt")))
+	else if(AnimNotifyName.Equals(TEXT("Attack step")))
 	{
-		Character->GetFSMComponent()->GetStateByClass<UDWCharacterState_Attack>()->AttackHurt();
+		Character->GetFSMComponent()->GetStateByClass<UDWCharacterState_Attack>()->AttackStep();
 	}
 	else if(AnimNotifyName.Equals(TEXT("Attack end")))
 	{
@@ -75,7 +75,7 @@ void UDWCharacterAnim::NativeUpdateAnimation(float DeltaSeconds)
 	bRiding = Character->IsRiding();
 	bClimbing = Character->IsClimbing();
 	bCrouching = Character->IsCrouching();
-	bSwimming = Character->IsSwimming();
+	bSwimming = Character->IsSwimming() || Character->IsFloating();
 
 	VerticalSpeed = Character->GetMoveVelocity(false).Z;
 	HorizontalSpeed = Character->GetMoveVelocity().Size();

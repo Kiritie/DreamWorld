@@ -72,9 +72,11 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 public:
-	virtual void LookAtTarget(ADWCharacter* InTargetCharacter) override;
+	virtual void Death(IAbilityVitalityInterface* InKiller /* = nullptr */) override;
 
-	virtual bool UseItem(FAbilityItem& InItem) override;
+	virtual bool CanLookAtTarget(ADWCharacter* InTargetCharacter) override;
+
+	virtual void LookAtTarget(ADWCharacter* InTargetCharacter) override;
 
 	virtual void RefreshEquip(EDWEquipPartType InPartType, const FAbilityItem& InItem) override;
 
@@ -84,7 +86,11 @@ public:
 
 	virtual void OnInteract(IInteractionAgentInterface* InInteractionAgent, EInteractAction InInteractAction) override;
 
+	virtual void ChangeHand();
+
 protected:
+	virtual void Turn_Implementation(float InValue) override;
+
 	virtual void MoveForward_Implementation(float InValue) override;
 
 	virtual void MoveRight_Implementation(float InValue) override;
@@ -92,7 +98,7 @@ protected:
 	virtual void MoveUp_Implementation(float InValue) override;
 
 public:
-	virtual void OnSelectedItemChange(const FAbilityItem& InItem) override;
+	virtual void OnSelectItem(const FAbilityItem& InItem) override;
 	
 	virtual void OnAttributeChange(const FOnAttributeChangeData& InAttributeChangeData) override;
 
@@ -113,8 +119,18 @@ public:
 
 	virtual void SetGenerateVoxelID(const FPrimaryAssetId& InGenerateVoxelID) override;
 	
+	UFUNCTION()
+	virtual void OnTargetLockedOn(AActor* InTargetActor);
+		
+	UFUNCTION()
+	virtual void OnTargetLockedOff(AActor* InTargetActor);
+
+	UFUNCTION()
+	virtual void OnTargetSetRotation(AActor* InTargetActor, FRotator InControlRotation);
+	
+public:
 	UFUNCTION(BlueprintPure)
-	UTargetSystemComponent* GetTargetSystem() const { return TargetSystem; }
+	virtual UTargetSystemComponent* GetTargetSystem() const { return TargetSystem; }
 
 	virtual UCameraComponent* GetCameraComp_Implementation() override { return FollowCamera; }
 

@@ -25,9 +25,9 @@
 #include "Gameplay/DWGameMode.h"
 #include "Global/GlobalBPLibrary.h"
 #include "Input/InputModuleBPLibrary.h"
-#include "Inventory/Slot/InventorySlot.h"
-#include "Inventory/CharacterInventory.h"
-#include "Inventory/Slot/InventorySkillSlot.h"
+#include "Ability/Inventory/Slot/InventorySlot.h"
+#include "Ability/Inventory/CharacterInventory.h"
+#include "Ability/Inventory/Slot/InventorySkillSlot.h"
 #include "Procedure/ProcedureModuleBPLibrary.h"
 #include "Procedure/Procedure_Pausing.h"
 #include "Procedure/Procedure_Playing.h"
@@ -43,6 +43,8 @@
 #include "Widget/Inventory/WidgetInventoryBar.h"
 #include "Widget/Inventory/WidgetInventoryPanel.h"
 #include "Camera/CameraModule.h"
+#include "Widget/WidgetGeneratePanel.h"
+#include "Widget/WidgetShopPanel.h"
 
 ADWPlayerController::ADWPlayerController()
 {
@@ -50,7 +52,6 @@ ADWPlayerController::ADWPlayerController()
 	bPressedAttackDestroy = false;
 	bPressedDefendGenerate = false;
 	bPressedSprint = false;
-	AttackAbilityQueue = 0;
 }
 
 void ADWPlayerController::OnInitialize_Implementation()
@@ -136,6 +137,7 @@ void ADWPlayerController::SetupInputComponent()
 	InputComponent->BindAction("ToggleCrouch", IE_Released, this, &ADWPlayerController::ToggleCrouch);
 	InputComponent->BindAction("ToggleControlMode", IE_Pressed, this, &ADWPlayerController::ToggleControlMode);
 	InputComponent->BindAction("ToggleLockSightTarget", IE_Pressed, this, &ADWPlayerController::ToggleLockTarget);
+	InputComponent->BindAction("ChangeHand", IE_Pressed, this, &ADWPlayerController::ChangeHand);
 
 	InputComponent->BindAction("Attack/Destroy", IE_Pressed, this, &ADWPlayerController::OnAttackDestroyPressed);
 	InputComponent->BindAction("Attack/Destroy", IE_Released, this, &ADWPlayerController::OnAttackDestroyReleased);
@@ -166,6 +168,8 @@ void ADWPlayerController::SetupInputComponent()
 	InputComponent->BindAction("SelectInventorySlot10", IE_Pressed, this, &ADWPlayerController::SelectInventorySlot10);
 
 	InputComponent->BindAction("OpenInventoryPanel", IE_Pressed, this, &ADWPlayerController::OpenInventoryPanel);
+	
+	InputComponent->BindAction("OpenGeneratePanel", IE_Pressed, this, &ADWPlayerController::OpenGeneratePanel);
 
 	InputComponent->BindAction("PauseGame", IE_Pressed, this, &ADWPlayerController::PauseGame);
 }
@@ -177,6 +181,8 @@ void ADWPlayerController::OnPossess(APawn* InPawn)
 		UWidgetModuleBPLibrary::InitializeUserWidget<UWidgetGameHUD>(InPawn);
 		UWidgetModuleBPLibrary::InitializeUserWidget<UWidgetInventoryBar>(InPawn);
 		UWidgetModuleBPLibrary::InitializeUserWidget<UWidgetInventoryPanel>(InPawn);
+		UWidgetModuleBPLibrary::InitializeUserWidget<UWidgetGeneratePanel>(InPawn);
+		UWidgetModuleBPLibrary::InitializeUserWidget<UWidgetShopPanel>(InPawn);
 	}
 	Super::OnPossess(InPawn);
 }
@@ -188,7 +194,6 @@ void ADWPlayerController::OnUnPossess()
 	bPressedAttackDestroy = false;
 	bPressedDefendGenerate = false;
 	bPressedSprint = false;
-	AttackAbilityQueue = 0;
 }
 
 void ADWPlayerController::Tick(float DeltaTime)
@@ -197,46 +202,29 @@ void ADWPlayerController::Tick(float DeltaTime)
 
 	ADWCharacter* PossessedCharacter = GetPawn<ADWCharacter>();
 
-	if(!PossessedCharacter || PossessedCharacter->IsDead()) return;
+	if(!PossessedCharacter) return;
 
-	if(PossessedCharacter->IsActive())
+	if(PossessedCharacter->IsActive(true))
 	{
 		switch (PossessedCharacter->ControlMode)
 		{
 			case EDWCharacterControlMode::Fighting:
 			{
-				if(!PossessedCharacter->IsExhausted())
+				if(bPressedAttackDestroy || PossessedCharacter->AttackAbilityQueue > 0)
 				{
-					if(bPressedAttackDestroy || AttackAbilityQueue > 0)
-					{
-						if(PossessedCharacter->Attack() && AttackAbilityQueue > 0)
-						{
-							AttackAbilityQueue--;
-						}
-					}
-					else if(!PossessedCharacter->IsAttacking(true))
-					{
-						PossessedCharacter->UnAttack();
-					}
+					PossessedCharacter->Attack();
+				}
+				else if(!PossessedCharacter->IsAttacking(true))
+				{
+					PossessedCharacter->UnAttack();
+				}
 
-					if(bPressedDefendGenerate)
-					{
-						PossessedCharacter->Defend();
-					}
-					else
-					{
-						PossessedCharacter->UnDefend();
-					}
+				if(bPressedDefendGenerate)
+				{
+					PossessedCharacter->Defend();
 				}
 				else
 				{
-					if(!PossessedCharacter->IsAttacking(true))
-					{
-						PossessedCharacter->UnAttack();
-					}
-
-					AttackAbilityQueue = 0;
-
 					PossessedCharacter->UnDefend();
 				}
 			}
@@ -251,7 +239,7 @@ void ADWPlayerController::Tick(float DeltaTime)
 			}
 		}
 
-		if(bPressedSprint && PossessedCharacter->GetMoveVelocity().Size() > 0.2f)
+		if(bPressedSprint)
 		{
 			PossessedCharacter->Sprint();
 		}
@@ -335,6 +323,15 @@ void ADWPlayerController::ToggleLockTarget()
 	PlayerCharacter->TargetSystem->TargetActor();
 }
 
+void ADWPlayerController::ChangeHand()
+{
+	ADWPlayerCharacter* PlayerCharacter = GetPawn<ADWPlayerCharacter>();
+
+	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput()) return;
+
+	PlayerCharacter->ChangeHand();
+}
+
 void ADWPlayerController::OnDodgePressed()
 {
 	ADWCharacter* PossessedCharacter = GetPawn<ADWCharacter>();
@@ -366,9 +363,9 @@ void ADWPlayerController::OnAttackDestroyPressed()
 		{
 			if(PossessedCharacter->IsFreeToAnim() || PossessedCharacter->IsAttacking())
 			{
-				if(AttackAbilityQueue < PossessedCharacter->GetAttackAbilities().Num())
+				if(PossessedCharacter->AttackAbilityQueue < PossessedCharacter->GetAttackAbilities().Num())
 				{
-					AttackAbilityQueue++; 
+					PossessedCharacter->AttackAbilityQueue++; 
 				}
 			}
 			break;
@@ -456,9 +453,9 @@ void ADWPlayerController::ReleaseSkillAbility1()
 	
 	if(!PossessedCharacter || PossessedCharacter->IsBreakAllInput()) return;
 
-	if(PossessedCharacter->Inventory->GetSplitSlots<UInventorySkillSlot>(ESplitSlotType::Skill).IsValidIndex(0))
+	if(PossessedCharacter->Inventory->GetSplitSlots(ESplitSlotType::Skill).IsValidIndex(0))
 	{
-		PossessedCharacter->Inventory->GetSplitSlots<UInventorySkillSlot>(ESplitSlotType::Skill)[0]->ActiveItem();
+		PossessedCharacter->Inventory->GetSplitSlots(ESplitSlotType::Skill)[0]->ActiveItem();
 	}
 }
 
@@ -468,9 +465,9 @@ void ADWPlayerController::ReleaseSkillAbility2()
 	
 	if(!PossessedCharacter || PossessedCharacter->IsBreakAllInput()) return;
 
-	if(PossessedCharacter->Inventory->GetSplitSlots<UInventorySkillSlot>(ESplitSlotType::Skill).IsValidIndex(1))
+	if(PossessedCharacter->Inventory->GetSplitSlots(ESplitSlotType::Skill).IsValidIndex(1))
 	{
-		PossessedCharacter->Inventory->GetSplitSlots<UInventorySkillSlot>(ESplitSlotType::Skill)[1]->ActiveItem();
+		PossessedCharacter->Inventory->GetSplitSlots(ESplitSlotType::Skill)[1]->ActiveItem();
 	}
 }
 
@@ -480,9 +477,9 @@ void ADWPlayerController::ReleaseSkillAbility3()
 	
 	if(!PossessedCharacter || PossessedCharacter->IsBreakAllInput()) return;
 
-	if(PossessedCharacter->Inventory->GetSplitSlots<UInventorySkillSlot>(ESplitSlotType::Skill).IsValidIndex(2))
+	if(PossessedCharacter->Inventory->GetSplitSlots(ESplitSlotType::Skill).IsValidIndex(2))
 	{
-		PossessedCharacter->Inventory->GetSplitSlots<UInventorySkillSlot>(ESplitSlotType::Skill)[2]->ActiveItem();
+		PossessedCharacter->Inventory->GetSplitSlots(ESplitSlotType::Skill)[2]->ActiveItem();
 	}
 }
 
@@ -492,9 +489,9 @@ void ADWPlayerController::ReleaseSkillAbility4()
 	
 	if(!PossessedCharacter || PossessedCharacter->IsBreakAllInput()) return;
 
-	if(PossessedCharacter->Inventory->GetSplitSlots<UInventorySkillSlot>(ESplitSlotType::Skill).IsValidIndex(3))
+	if(PossessedCharacter->Inventory->GetSplitSlots(ESplitSlotType::Skill).IsValidIndex(3))
 	{
-		PossessedCharacter->Inventory->GetSplitSlots<UInventorySkillSlot>(ESplitSlotType::Skill)[3]->ActiveItem();
+		PossessedCharacter->Inventory->GetSplitSlots(ESplitSlotType::Skill)[3]->ActiveItem();
 	}
 }
 
@@ -502,9 +499,9 @@ void ADWPlayerController::DoInteractAction1()
 {
 	ADWPlayerCharacter* PlayerCharacter = GetPlayerPawn<ADWPlayerCharacter>();
 	
-	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput() || !PlayerCharacter->Interaction->GetInteractionAgent()) return;
+	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput() || !PlayerCharacter->Interaction->GetInteractingAgent()) return;
 	
-	if(UInteractionComponent* Interaction = PlayerCharacter->Interaction->GetInteractionComponent())
+	if(UInteractionComponent* Interaction = PlayerCharacter->Interaction->GetInteractingComponent())
 	{
 		if(Interaction->GetValidInteractActions(GetPlayerPawn<ADWPlayerCharacter>()).IsValidIndex(0))
 		{
@@ -517,9 +514,9 @@ void ADWPlayerController::DoInteractAction2()
 {
 	ADWPlayerCharacter* PlayerCharacter = GetPlayerPawn<ADWPlayerCharacter>();
 	
-	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput() || !PlayerCharacter->Interaction->GetInteractionAgent()) return;
+	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput() || !PlayerCharacter->Interaction->GetInteractingAgent()) return;
 	
-	if(UInteractionComponent* Interaction = PlayerCharacter->Interaction->GetInteractionComponent())
+	if(UInteractionComponent* Interaction = PlayerCharacter->Interaction->GetInteractingComponent())
 	{
 		if(Interaction->GetValidInteractActions(GetPlayerPawn<ADWPlayerCharacter>()).IsValidIndex(1))
 		{
@@ -532,9 +529,9 @@ void ADWPlayerController::DoInteractAction3()
 {
 	ADWPlayerCharacter* PlayerCharacter = GetPlayerPawn<ADWPlayerCharacter>();
 	
-	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput() || !PlayerCharacter->Interaction->GetInteractionAgent()) return;
+	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput() || !PlayerCharacter->Interaction->GetInteractingAgent()) return;
 	
-	if(UInteractionComponent* Interaction = PlayerCharacter->Interaction->GetInteractionComponent())
+	if(UInteractionComponent* Interaction = PlayerCharacter->Interaction->GetInteractingComponent())
 	{
 		if(Interaction->GetValidInteractActions(GetPlayerPawn<ADWPlayerCharacter>()).IsValidIndex(2))
 		{
@@ -547,9 +544,9 @@ void ADWPlayerController::DoInteractAction4()
 {
 	ADWPlayerCharacter* PlayerCharacter = GetPlayerPawn<ADWPlayerCharacter>();
 	
-	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput() || !PlayerCharacter->Interaction->GetInteractionAgent()) return;
+	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput() || !PlayerCharacter->Interaction->GetInteractingAgent()) return;
 	
-	if(UInteractionComponent* Interaction = PlayerCharacter->Interaction->GetInteractionComponent())
+	if(UInteractionComponent* Interaction = PlayerCharacter->Interaction->GetInteractingComponent())
 	{
 		if(Interaction->GetValidInteractActions(GetPlayerPawn<ADWPlayerCharacter>()).IsValidIndex(3))
 		{
@@ -562,9 +559,9 @@ void ADWPlayerController::DoInteractAction5()
 {
 	ADWPlayerCharacter* PlayerCharacter = GetPlayerPawn<ADWPlayerCharacter>();
 	
-	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput() || !PlayerCharacter->Interaction->GetInteractionAgent()) return;
+	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput() || !PlayerCharacter->Interaction->GetInteractingAgent()) return;
 	
-	if(UInteractionComponent* Interaction = PlayerCharacter->Interaction->GetInteractionComponent())
+	if(UInteractionComponent* Interaction = PlayerCharacter->Interaction->GetInteractingComponent())
 	{
 		if(Interaction->GetValidInteractActions(GetPlayerPawn<ADWPlayerCharacter>()).IsValidIndex(4))
 		{
@@ -582,6 +579,18 @@ void ADWPlayerController::OpenInventoryPanel()
 	if(UProcedureModuleBPLibrary::IsCurrentProcedureClass<UProcedure_Playing>())
 	{
 		UWidgetModuleBPLibrary::OpenUserWidget<UWidgetInventoryPanel>(false);
+	}
+}
+
+void ADWPlayerController::OpenGeneratePanel()
+{
+	ADWPlayerCharacter* PlayerCharacter = GetPlayerPawn<ADWPlayerCharacter>();
+	
+	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput()) return;
+	
+	if(UProcedureModuleBPLibrary::IsCurrentProcedureClass<UProcedure_Playing>())
+	{
+		UWidgetModuleBPLibrary::OpenUserWidget<UWidgetGeneratePanel>(false);
 	}
 }
 
@@ -617,7 +626,7 @@ void ADWPlayerController::DiscardInventoryItem()
 	
 	if(UProcedureModuleBPLibrary::IsCurrentProcedureClass<UProcedure_Playing>())
 	{
-		UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryBar>()->GetSelectedSlot()->DiscardItem(1);
+		UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryBar>()->GetSelectedSlot()->DiscardItem(1, false);
 	}
 }
 
@@ -629,7 +638,7 @@ void ADWPlayerController::DiscardAllInventoryItem()
 	
 	if(UProcedureModuleBPLibrary::IsCurrentProcedureClass<UProcedure_Playing>())
 	{
-		UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryBar>()->GetSelectedSlot()->DiscardItem(-1);
+		UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryBar>()->GetSelectedSlot()->DiscardItem(-1, false);
 	}
 }
 

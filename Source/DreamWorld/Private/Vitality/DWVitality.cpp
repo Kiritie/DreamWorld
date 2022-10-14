@@ -10,12 +10,10 @@
 #include "Components/BoxComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Vitality/DWVitality.h"
-
 #include "Ability/Item/Prop/AbilityPropDataBase.h"
 #include "Character/DWCharacter.h"
 #include "FSM/Components/FSMComponent.h"
-#include "Inventory/VitalityInventory.h"
-#include "Inventory/Slot/InventorySlot.h"
+#include "Ability/Inventory/Slot/InventorySlot.h"
 #include "UObject/ConstructorHelpers.h"
 #include "Vitality/DWVitalityData.h"
 #include "Vitality/States/DWVitalityState_Death.h"
@@ -26,6 +24,7 @@
 #include "Voxel/Datas/VoxelData.h"
 #include "Widget/World/WidgetVitalityHP.h"
 #include "Widget/World/WorldWidgetComponent.h"
+#include "Inventory/DWVitalityInventory.h"
 
 // Sets default values
 ADWVitality::ADWVitality()
@@ -44,7 +43,7 @@ ADWVitality::ADWVitality()
 
 	AttributeSet = CreateDefaultSubobject<UDWVitalityAttributeSet>(FName("AttributeSet"));
 	
-	Inventory = CreateDefaultSubobject<UVitalityInventory>(FName("Inventory"));
+	Inventory = CreateDefaultSubobject<UDWVitalityInventory>(FName("Inventory"));
 
 	FSM->DefaultState = UDWVitalityState_Default::StaticClass();
 	FSM->States.Empty();
@@ -84,8 +83,6 @@ void ADWVitality::Serialize(FArchive& Ar)
 
 void ADWVitality::LoadData(FSaveData* InSaveData, bool bForceMode)
 {
-	Super::LoadData(InSaveData, bForceMode);
-	
 	auto& SaveData = InSaveData->CastRef<FDWVitalitySaveData>();
 
 	if(bForceMode)
@@ -105,26 +102,15 @@ void ADWVitality::LoadData(FSaveData* InSaveData, bool bForceMode)
 				SaveData.InventoryData.AddItem(tmpItem);
 			}
 		}
-		Inventory->SetOwnerActor(this);
 	}
 
-	Inventory->LoadSaveData(&SaveData.InventoryData, bForceMode);
+	Super::LoadData(InSaveData, bForceMode);
 }
 
 FSaveData* ADWVitality::ToData()
 {
 	static FDWVitalitySaveData SaveData;
 	SaveData = Super::ToData()->CastRef<FVitalitySaveData>();
-
-	SaveData.ID = AssetID;
-	SaveData.Name = Name;
-	SaveData.RaceID = RaceID;
-	SaveData.Level = Level;
-	
-	SaveData.InventoryData = Inventory->ToSaveDataRef<FInventorySaveData>();
-
-	SaveData.SpawnLocation = GetActorLocation();
-	SaveData.SpawnRotation = GetActorRotation();
 
 	return &SaveData;
 }
@@ -168,6 +154,41 @@ void ADWVitality::OnInteract(IInteractionAgentInterface* InInteractionAgent, EIn
 		}
 		default: break;
 	}
+}
+
+void ADWVitality::OnActiveItem(const FAbilityItem& InItem, bool bPassive, bool bSuccess)
+{
+	Super::OnActiveItem(InItem, bPassive, bSuccess);
+}
+
+void ADWVitality::OnCancelItem(const FAbilityItem& InItem, bool bPassive)
+{
+	Super::OnCancelItem(InItem, bPassive);
+}
+
+void ADWVitality::OnAssembleItem(const FAbilityItem& InItem)
+{
+	Super::OnAssembleItem(InItem);
+}
+
+void ADWVitality::OnDischargeItem(const FAbilityItem& InItem)
+{
+	Super::OnDischargeItem(InItem);
+}
+
+void ADWVitality::OnDiscardItem(const FAbilityItem& InItem, bool bInPlace)
+{
+	Super::OnDiscardItem(InItem, bInPlace);
+}
+
+void ADWVitality::OnSelectItem(const FAbilityItem& InItem)
+{
+	Super::OnSelectItem(InItem);
+}
+
+void ADWVitality::OnAuxiliaryItem(const FAbilityItem& InItem)
+{
+	Super::OnAuxiliaryItem(InItem);
 }
 
 bool ADWVitality::GenerateVoxel(const FVoxelHitResult& InVoxelHitResult)
@@ -228,23 +249,6 @@ UWidgetVitalityHP* ADWVitality::GetVitalityHPWidget() const
 		return Cast<UWidgetVitalityHP>(VitalityHP->GetWorldWidget());
 	}
 	return nullptr;
-}
-
-UInventory* ADWVitality::GetInventory() const
-{
-	return Inventory;
-}
-
-void ADWVitality::OnSelectedItemChange(const FAbilityItem& InItem)
-{
-	if(InItem.IsValid() && InItem.GetData().GetItemType() == EAbilityItemType::Voxel)
-	{
-		SetGenerateVoxelID(InItem.ID);
-	}
-	else
-	{
-		SetGenerateVoxelID(FPrimaryAssetId());
-	}
 }
 
 void ADWVitality::OnAttributeChange(const FOnAttributeChangeData& InAttributeChangeData)

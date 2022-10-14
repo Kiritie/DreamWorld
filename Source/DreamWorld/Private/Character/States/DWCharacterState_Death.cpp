@@ -8,12 +8,11 @@
 #include "Character/DWCharacter.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "Inventory/CharacterInventory.h"
-#include "Inventory/Inventory.h"
 #include "Voxel/Chunks/VoxelChunk.h"
 #include "Ability/Character/AbilityCharacterBase.h"
 #include "ObjectPool/ObjectPoolModuleBPLibrary.h"
 #include "Ability/Character/AbilityCharacterDataBase.h"
+#include "Ability/Inventory/CharacterInventory.h"
 
 UDWCharacterState_Death::UDWCharacterState_Death()
 {
@@ -39,6 +38,7 @@ void UDWCharacterState_Death::OnEnter(UFiniteStateBase* InLastFiniteState)
 	Character->SetMana(0.f);
 	Character->SetStamina(0.f);
 	Character->SetLockedTarget(nullptr);
+	Character->LimitToAnim();
 }
 
 void UDWCharacterState_Death::OnRefresh()

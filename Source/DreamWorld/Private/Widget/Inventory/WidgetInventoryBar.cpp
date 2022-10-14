@@ -13,9 +13,9 @@
 #include "Components/SizeBox.h"
 #include "GameFramework/InputSettings.h"
 #include "Global/GlobalBPLibrary.h"
-#include "Inventory/Inventory.h"
+#include "Ability/Inventory/Inventory.h"
 #include "Widget/Inventory/WidgetInventoryPanel.h"
-#include "Inventory/Slot/InventorySlot.h"
+#include "Ability/Inventory/Slot/InventorySlot.h"
 #include "Procedure/ProcedureModuleBPLibrary.h"
 #include "Procedure/Procedure_Playing.h"
 #include "Widget/WidgetModuleBPLibrary.h"
@@ -50,7 +50,7 @@ void UWidgetInventoryBar::OnInitialize_Implementation(AActor* InOwner)
 {
 	if(GetInventory())
 	{
-		GetInventory()->GetOnSlotSelected().RemoveDynamic(this, &UWidgetInventoryBar::OnInventorySlotSelected);
+		GetInventory()->OnSlotSelected.RemoveDynamic(this, &UWidgetInventoryBar::OnInventorySlotSelected);
 	}
 
 	Super::OnInitialize_Implementation(InOwner);
@@ -99,6 +99,7 @@ void UWidgetInventoryBar::OnInitialize_Implementation(AActor* InOwner)
 				{
 					AuxiliarySlot->OnInitialize(AuxiliarySlots[i]);
 					//AuxiliarySlot->SetKeyCode(UGlobalBPLibrary::GetInputActionKeyCodeByName(FString::Printf(TEXT("ReleaseAuxiliaryAbility%d"), i + 1)));
+					AuxiliarySlot->SetKeyCode(FText::FromString(TEXT("X")));
 					if(UGridSlot* GridSlot = AuxiliaryContent->AddChildToGrid(AuxiliarySlot))
 					{
 						GridSlot->SetPadding(FMargin(0.f, 0.f, 5.f, 0.f));
@@ -145,7 +146,7 @@ void UWidgetInventoryBar::OnInitialize_Implementation(AActor* InOwner)
 		}
 	}
 
-	GetInventory()->GetOnSlotSelected().AddDynamic(this, &UWidgetInventoryBar::OnInventorySlotSelected);
+	GetInventory()->OnSlotSelected.AddDynamic(this, &UWidgetInventoryBar::OnInventorySlotSelected);
 
 	if(GetInventory()->GetSelectedSlot())
 	{

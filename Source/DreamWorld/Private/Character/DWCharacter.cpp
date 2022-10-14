@@ -14,7 +14,7 @@
 #include "AI/DWAIController.h"
 #include "Character/DWCharacterPart.h"
 #include "Global/GlobalBPLibrary.h"
-#include "Inventory/CharacterInventory.h"
+#include "Ability/Inventory/CharacterInventory.h"
 #include "Perception/AIPerceptionStimuliSourceComponent.h"
 #include "Perception/AISense_Damage.h"
 #include "Perception/AISense_Sight.h"
@@ -64,8 +64,8 @@
 #include "Character/States/DWCharacterState_Swim.h"
 #include "Character/States/DWCharacterState_Walk.h"
 #include "FSM/Components/FSMComponent.h"
-#include "Inventory/Slot/InventoryEquipSlot.h"
-#include "Inventory/Slot/InventorySkillSlot.h"
+#include "Ability/Inventory/Slot/InventoryEquipSlot.h"
+#include "Ability/Inventory/Slot/InventorySkillSlot.h"
 #include "Item/Prop/DWPropData.h"
 #include "Main/MainModuleBPLibrary.h"
 #include "Team/DWTeamModule.h"
@@ -76,6 +76,7 @@
 #include "Widget/WidgetModuleBPLibrary.h"
 #include "Widget/Inventory/WidgetInventoryBar.h"
 #include "Widget/World/WorldWidgetComponent.h"
+#include "Inventory/DWCharacterInventory.h"
 
 ADWCharacter::ADWCharacter()
 {
@@ -93,7 +94,7 @@ ADWCharacter::ADWCharacter()
 
 	AttributeSet = CreateDefaultSubobject<UDWCharacterAttributeSet>(FName("AttributeSet"));
 
-	Inventory = CreateDefaultSubobject<UCharacterInventory>(FName("Inventory"));
+	Inventory = CreateDefaultSubobject<UDWCharacterInventory>(FName("Inventory"));
 
 	FSM->DefaultState = UDWCharacterState_Default::StaticClass();
 	FSM->States.Empty();
@@ -125,6 +126,7 @@ ADWCharacter::ADWCharacter()
 
 	// local
 	AttackAbilityIndex = 0;
+	AttackAbilityQueue = 0;
 	SkillAbilityID = FPrimaryAssetId();
 	AttackType = EDWCharacterAttackType::None;
 	BirthLocation = FVector(0, 0, 0);
@@ -165,8 +167,6 @@ void ADWCharacter::OnDespawn_Implementation()
 
 void ADWCharacter::LoadData(FSaveData* InSaveData, bool bForceMode)
 {
-	Super::LoadData(InSaveData, bForceMode);
-	
 	auto& SaveData = InSaveData->CastRef<FDWCharacterSaveData>();
 	
 	if(bForceMode)
@@ -176,6 +176,7 @@ void ADWCharacter::LoadData(FSaveData* InSaveData, bool bForceMode)
 
 		if(SaveData.IsSaved())
 		{
+			BirthLocation = SaveData.BirthLocation;
 			DefaultAbility = SaveData.DefaultAbility;
 			FallingAttackAbility = SaveData.FallingAttackAbility;
 			AttackAbilities = SaveData.AttackAbilities;
@@ -212,7 +213,7 @@ void ADWCharacter::LoadData(FSaveData* InSaveData, bool bForceMode)
 		}
 		else
 		{
-			BirthLocation = GetActorLocation();
+			BirthLocation = SaveData.SpawnLocation;
 
 			const UDWCharacterData& CharacterData = GetCharacterData<UDWCharacterData>();
 			if(CharacterData.IsValid())
@@ -273,11 +274,9 @@ void ADWCharacter::LoadData(FSaveData* InSaveData, bool bForceMode)
 		{
 			AbilitySystem->TryActivateAbility(DefaultAbility.AbilityHandle);
 		}
-
-		Inventory->SetOwnerActor(this);
 	}
-	
-	Inventory->LoadSaveData(&SaveData.InventoryData, bForceMode);
+
+	Super::LoadData(InSaveData, bForceMode);
 }
 
 FSaveData* ADWCharacter::ToData()
@@ -286,11 +285,9 @@ FSaveData* ADWCharacter::ToData()
 	SaveData = Super::ToData()->CastRef<FCharacterSaveData>();
 
 	SaveData.TeamID = TeamID;
+	SaveData.BirthLocation = BirthLocation;
 	SaveData.ControlMode = ControlMode;
 
-	SaveData.InventoryData = Inventory->ToSaveDataRef<FInventorySaveData>();
-
-	SaveData.DefaultAbility = DefaultAbility;
 	SaveData.FallingAttackAbility = FallingAttackAbility;
 	SaveData.AttackAbilities = AttackAbilities;
 	SaveData.SkillAbilities = SkillAbilities;
@@ -311,8 +308,6 @@ void ADWCharacter::SetActorVisible_Implementation(bool bNewVisible)
 
 void ADWCharacter::RefreshState()
 {
-	Super::RefreshState();
-
 	switch (GetCharacterMovement()->MovementMode)
 	{
 		case EMovementMode::MOVE_Flying:
@@ -325,7 +320,10 @@ void ADWCharacter::RefreshState()
 			FSM->SwitchStateByClass<UDWCharacterState_Swim>();
 			break;
 		}
-		default: break;
+		default:
+		{
+			Super::RefreshState();
+		}
 	}
 }
 
@@ -340,7 +338,7 @@ void ADWCharacter::Tick(float DeltaTime)
 	{
 		if (LockedTarget)
 		{
-			if (!LockedTarget->IsDead() && FVector::Distance(GetActorLocation(), LockedTarget->GetActorLocation()) <= 1000.f)
+			if (CanLookAtTarget(LockedTarget))
 			{
 				LookAtTarget(LockedTarget);
 			}
@@ -358,21 +356,25 @@ void ADWCharacter::Tick(float DeltaTime)
 			}
 		}
 
-		if(!IsPlayer())
+		if(AVoxelChunk* Chunk = UVoxelModuleBPLibrary::FindChunkByLocation(GetActorLocation()))
 		{
-			if(AVoxelChunk* Chunk = UVoxelModuleBPLibrary::FindChunkByLocation(GetActorLocation()))
-			{
-				Chunk->AddSceneActor(this);
-			}
-			else if(Container)
-			{
-				Container->RemoveSceneActor(this);
-			}
+			Chunk->AddSceneActor(this);
+		}
+		else if(Container)
+		{
+			Container->RemoveSceneActor(this);
 		}
 
-		if(IsSprinting() && GetMoveDirection().Size() > 0.2f)
+		if(IsSprinting())
 		{
-			ModifyStamina(ATTRIBUTE_DELTAVALUE_CLAMP(Stamina, -GetStaminaExpendSpeed() * DeltaTime));
+			if(GetMoveDirection().Size() > 0.2f)
+			{
+				ModifyStamina(ATTRIBUTE_DELTAVALUE_CLAMP(Stamina, -GetStaminaExpendSpeed() * DeltaTime));
+			}
+			else
+			{
+				UnSprint();
+			}
 		}
 		else if(IsFreeToAnim())
 		{
@@ -431,6 +433,56 @@ void ADWCharacter::OnInteract(IInteractionAgentInterface* InInteractionAgent, EI
 	}
 }
 
+void ADWCharacter::OnActiveItem(const FAbilityItem& InItem, bool bPassive, bool bSuccess)
+{
+	Super::OnActiveItem(InItem, bPassive, bSuccess);
+
+	if(!bPassive)
+	{
+		if(bSuccess)
+		{
+			if(InItem.GetType() == EAbilityItemType::Prop)
+			{
+				DoAction(EDWCharacterActionType::Use);
+			}
+		}
+		else if(IsPlayer())
+		{
+			UWidgetModuleBPLibrary::OpenUserWidget<UWidgetItemInfoBox>({ FParameter::MakeString(FString::Printf(TEXT("该%s还未准备好！"), *UGlobalBPLibrary::GetEnumValueDisplayName(TEXT("EAbilityItemType"), (int32)InItem.GetType()).ToString())) });
+		}
+	}
+}
+
+void ADWCharacter::OnCancelItem(const FAbilityItem& InItem, bool bPassive)
+{
+	Super::OnCancelItem(InItem, bPassive);
+}
+
+void ADWCharacter::OnAssembleItem(const FAbilityItem& InItem)
+{
+	Super::OnAssembleItem(InItem);
+}
+
+void ADWCharacter::OnDischargeItem(const FAbilityItem& InItem)
+{
+	Super::OnDischargeItem(InItem);
+}
+
+void ADWCharacter::OnDiscardItem(const FAbilityItem& InItem, bool bInPlace)
+{
+	Super::OnDiscardItem(InItem, bInPlace);
+}
+
+void ADWCharacter::OnSelectItem(const FAbilityItem& InItem)
+{
+	Super::OnSelectItem(InItem);
+}
+
+void ADWCharacter::OnAuxiliaryItem(const FAbilityItem& InItem)
+{
+	Super::OnAuxiliaryItem(InItem);
+}
+
 void ADWCharacter::FreeToAnim(bool bUnLockRotation /*= true*/)
 {
 	if (!IsFreeToAnim()/* && !IsFlying() && !IsFalling() && !IsRiding() && !IsClimbing() && !IsDodging() && !IsDefending() && !IsInterrupting()*/)
@@ -443,7 +495,7 @@ void ADWCharacter::FreeToAnim(bool bUnLockRotation /*= true*/)
 	}
 }
 
-void ADWCharacter::LimitToAnim(bool bLockRotation /*= false*/, bool bUnSprint /*= false*/)
+void ADWCharacter::LimitToAnim(bool bLockRotation /*= false*/)
 {
 	if (IsFreeToAnim())
 	{
@@ -452,10 +504,6 @@ void ADWCharacter::LimitToAnim(bool bLockRotation /*= false*/, bool bUnSprint /*
 	if (bLockRotation && !IsLockRotation())
 	{
 		AbilitySystem->AddLooseGameplayTag(GetCharacterData<UDWCharacterData>().LockRotationTag);
-	}
-	if (bUnSprint)
-	{
-		UnSprint();
 	}
 }
 
@@ -498,7 +546,7 @@ void ADWCharacter::UnDodge()
 
 void ADWCharacter::Sprint()
 {
-	if (!IsSprinting())
+	if (!IsSprinting() && GetStamina() > 0.f && GetMoveVelocity().Size() > 0.2f)
 	{
 		DoAction(EDWCharacterActionType::Sprint);
 	}
@@ -606,78 +654,81 @@ void ADWCharacter::UnFly()
 bool ADWCharacter::Attack(int32 InAbilityIndex /*= -1*/)
 {
 	if(InAbilityIndex == -1) InAbilityIndex = AttackAbilityIndex;
-	
-	if(!IsFalling())
+
+	if(!IsFalling(true))
 	{
-		if (HasAttackAbility(InAbilityIndex))
+		if(HasAttackAbility(InAbilityIndex))
 		{
-			if (AbilitySystem->TryActivateAbility(GetAttackAbility(InAbilityIndex).AbilityHandle))
+			const auto AbilityData = GetAttackAbility(InAbilityIndex);
+			if(CheckWeaponType(AbilityData.WeaponType))
 			{
-				AttackAbilityIndex = InAbilityIndex;
-				AttackType = EDWCharacterAttackType::NormalAttack;
-				FSM->SwitchStateByClass<UDWCharacterState_Attack>();
-				return true;
+				if(FSM->SwitchStateByClass<UDWCharacterState_Attack>())
+				{
+					if (AbilitySystem->TryActivateAbility(AbilityData.AbilityHandle))
+					{
+						AttackType = EDWCharacterAttackType::NormalAttack;
+						AttackAbilityIndex = InAbilityIndex;
+						if(AttackAbilityQueue > 0)
+						{
+							AttackAbilityQueue--;
+						}
+						return true;
+					}
+				}
 			}
 		}
 	}
-	else
+	else if(FallingAttackAbility.IsValid())
 	{
-		return FallingAttack();
+		if(CheckWeaponType(FallingAttackAbility.WeaponType))
+		{
+			if(FSM->SwitchStateByClass<UDWCharacterState_Attack>())
+			{
+				if(AbilitySystem->TryActivateAbility(FallingAttackAbility.AbilityHandle))
+				{
+					AttackType = EDWCharacterAttackType::FallingAttack;
+					if(AttackAbilityQueue > 0)
+					{
+						AttackAbilityQueue--;
+					}
+					return true;
+				}
+			}
+		}
 	}
+	AttackAbilityQueue = 0;
 	return false;
 }
 
 bool ADWCharacter::SkillAttack(const FPrimaryAssetId& InSkillID)
 {
-	if (HasSkillAbility(InSkillID, true))
+	if(auto SkillSlot = Inventory->GetSkillSlotByID(InSkillID))
 	{
-		const auto AbilityData = GetSkillAbility(InSkillID);
-		switch(AbilityData.GetItemData<UAbilitySkillDataBase>().SkillMode)
-		{
-			case ESkillMode::Initiative:
-			{
-				if(CheckWeaponType(AbilityData.WeaponType))
-				{
-					if(AbilitySystem->TryActivateAbility(AbilityData.AbilityHandle))
-					{
-						SkillAbilityID = InSkillID;
-						AttackType = EDWCharacterAttackType::SkillAttack;
-						FSM->SwitchStateByClass<UDWCharacterState_Attack>();
-						return true;
-					}
-				}
-				break;
-			}
-			case ESkillMode::Passive:
-			{
-				return true;
-			}
-			default: break;
-		}
+		return SkillSlot->ActiveItem();
 	}
 	return false;
 }
 
 bool ADWCharacter::SkillAttack(ESkillType InSkillType, int32 InAbilityIndex)
 {
-	if (HasSkillAbility(InSkillType, InAbilityIndex, true))
+	if(auto SkillSlot = Inventory->GetSkillSlotByID(GetSkillAbility(InSkillType, InAbilityIndex, true).AbilityID))
 	{
-		const auto AbilityData = GetSkillAbility(InSkillType, InAbilityIndex);
-		SkillAttack(AbilityData.AbilityID);
+		return SkillSlot->ActiveItem();
 	}
 	return false;
 }
 
-bool ADWCharacter::FallingAttack()
+bool ADWCharacter::SkillAttackImpl(const FPrimaryAssetId& InSkillID)
 {
-	if(FallingAttackAbility.IsValid())
+	const auto AbilityData = GetSkillAbility(InSkillID);
+	if(CheckWeaponType(AbilityData.WeaponType))
 	{
-		if(CheckWeaponType(FallingAttackAbility.WeaponType))
+		if(FSM->SwitchStateByClass<UDWCharacterState_Attack>())
 		{
-			if (AbilitySystem->TryActivateAbility(FallingAttackAbility.AbilityHandle))
+			if(AbilitySystem->TryActivateAbility(AbilityData.AbilityHandle))
 			{
-				AttackType = EDWCharacterAttackType::FallingAttack;
-				FSM->SwitchStateByClass<UDWCharacterState_Attack>();
+				AttackType = EDWCharacterAttackType::SkillAttack;
+				SkillAbilityID = InSkillID;
 				return true;
 			}
 		}
@@ -706,50 +757,9 @@ void ADWCharacter::UnDefend()
 	}
 }
 
-bool ADWCharacter::UseItem(FAbilityItem& InItem)
-{
-	switch (InItem.GetData().GetItemType())
-	{
-		case EAbilityItemType::Prop:
-		{
-			const UDWPropData& PropData = InItem.GetData<UDWPropData>();
-			switch (PropData.PropType)
-			{
-				case EDWPropType::Potion:
-				{
-					if(PropData.Name.ToString().StartsWith(TEXT("生命")))
-					{
-						return GetHealth() < GetMaxHealth();
-					}
-					else if(PropData.Name.ToString().StartsWith(TEXT("魔法")))
-					{
-						return GetMana() < GetMaxMana();
-					}
-					else if(PropData.Name.ToString().StartsWith(TEXT("体力")))
-					{
-						return GetStamina() < GetMaxStamina();
-					}
-					break;
-				}
-				case EDWPropType::Food:
-				{
-					return GetHealth() < GetMaxHealth() || GetStamina() < GetMaxStamina();
-				}
-				default: break;
-			}
-			break;
-		}
-		default: break;
-	}
-	return false;
-}
-
 void ADWCharacter::PickUp(AAbilityPickUpBase* InPickUp)
 {
-	if(InPickUp)
-	{
-		Inventory->AddItemByRange(InPickUp->GetItem(), -1);
-	}
+	Super::PickUp(InPickUp);
 }
 
 bool ADWCharacter::GenerateVoxel(const FVoxelHitResult& InVoxelHitResult)
@@ -779,30 +789,6 @@ bool ADWCharacter::DestroyVoxel(const FVoxelHitResult& InVoxelHitResult)
 
 void ADWCharacter::RefreshEquip(EDWEquipPartType InPartType, const FAbilityItem& InItem)
 {
-	AAbilityEquipBase* Equip = GetEquip(InPartType);
-	if (InItem.IsValid())
-	{
-		if(Equip && !Equip->GetItemData().EqualID(InItem.ID))
-		{
-			Equip->OnDischarge();
-			UObjectPoolModuleBPLibrary::DespawnObject(Equip);
-			Equip = nullptr;
-		}
-		if(!Equip)
-		{
-			Equip = UObjectPoolModuleBPLibrary::SpawnObject<AAbilityEquipBase>(nullptr, InItem.GetData<UAbilityEquipDataBase>().EquipClass);
-			Equip->Initialize(this, InItem);
-			Equip->OnAssemble();
-			Equip->Execute_SetActorVisible(Equip, Execute_IsVisible(this) && ControlMode == EDWCharacterControlMode::Fighting);
-			Equips.Emplace(InPartType, Equip);
-		}
-	}
-	else if(Equip)
-	{
-		Equip->OnDischarge();
-		UObjectPoolModuleBPLibrary::DespawnObject(Equip);
-		Equips.Remove(InPartType);
-	}
 }
 
 bool ADWCharacter::DoAction(EDWCharacterActionType InActionType)
@@ -842,7 +828,10 @@ void ADWCharacter::EndAction(EDWCharacterActionType InActionType, bool bWasCance
 	{
 		case EDWCharacterActionType::Death:
 		{
-			FSM->GetStateByClass<UDWCharacterState_Death>()->DeathEnd();
+			if(FSM->IsCurrentStateClass<UDWCharacterState_Death>())
+			{
+				FSM->GetCurrentState<UDWCharacterState_Death>()->DeathEnd();
+			}
 			break;
 		}
 		case EDWCharacterActionType::Crouch:
@@ -901,21 +890,17 @@ void ADWCharacter::EndAction(EDWCharacterActionType InActionType, bool bWasCance
 
 void ADWCharacter::SetLockedTarget(ADWCharacter* InTargetCharacter)
 {
-	if(InTargetCharacter)
-	{
-		LockedTarget = InTargetCharacter;
-		GetCharacterMovement()->bOrientRotationToMovement = false;
-	}
-	else
-	{
-		LockedTarget = nullptr;
-		GetCharacterMovement()->bOrientRotationToMovement = true;
-	}
+	LockedTarget = InTargetCharacter;
+}
+
+bool ADWCharacter::CanLookAtTarget(ADWCharacter* InTargetCharacter)
+{
+	return !LockedTarget->IsDead() && FVector::Distance(GetActorLocation(), LockedTarget->GetActorLocation()) <= 1000.f;
 }
 
 void ADWCharacter::LookAtTarget(ADWCharacter* InTargetCharacter)
 {
-	if(InTargetCharacter && !IsDodging())
+	if(!IsDodging())
 	{
 		const FVector tmpDirection = InTargetCharacter->GetActorLocation() - GetActorLocation();
 		SetActorRotation(FRotator(0, tmpDirection.ToOrientationRotator().Yaw, 0));
@@ -961,22 +946,21 @@ void ADWCharacter::AddMovementInput(FVector WorldDirection, float ScaleValue, bo
 {
 	if (IsBreakAllInput()) return;
 
-	switch(GetCharacterMovement()->MovementMode)
+	if(IsFloating())
 	{
-		case EMovementMode::MOVE_Swimming:
+		if(WorldDirection.Z > -0.5f)
 		{
-			if(IsFloating() && WorldDirection.Z > -0.5f)
-			{
-				WorldDirection.Z = 0;
-			}
-			break;
+			WorldDirection.Z = 0;
 		}
-		default: break;
+		if(ScaleValue < 0.f)
+		{
+			ScaleValue = 0.f;
+		}
 	}
 
 	Super::AddMovementInput(WorldDirection, ScaleValue, bForce);
 
-	if (!IsPlayerControlled())
+	if (!IsPlayer())
 	{
 		FHitResult hitResult;
 		if (RaycastStep(hitResult))
@@ -986,23 +970,13 @@ void ADWCharacter::AddMovementInput(FVector WorldDirection, float ScaleValue, bo
 	}
 }
 
-void ADWCharacter::SetAttackDamageAble(bool bInDamaging)
+void ADWCharacter::SetMotionRate_Implementation(float InMovementRate, float InRotationRate)
 {
-	
-}
-
-UWidgetCharacterHP* ADWCharacter::GetCharacterHPWidget() const
-{
-	if (CharacterHP->GetWorldWidget())
-	{
-		return Cast<UWidgetCharacterHP>(CharacterHP->GetWorldWidget());
-	}
-	return nullptr;
-}
-
-UInventory* ADWCharacter::GetInventory() const
-{
-	return Inventory;
+	MovementRate = InMovementRate;
+	RotationRate = InRotationRate;
+	GetCharacterMovement()->MaxWalkSpeed = GetMoveSpeed() * (IsSprinting() ? 1.5f : 1) * MovementRate;
+	GetCharacterMovement()->MaxSwimSpeed = GetSwimSpeed() * (IsSprinting() ? 1.5f : 1) * MovementRate;
+	GetCharacterMovement()->RotationRate = FRotator(0, GetRotationSpeed() * (IsSprinting() ? 1.5f : 1) * RotationRate, 0);
 }
 
 bool ADWCharacter::IsExhausted() const
@@ -1040,9 +1014,9 @@ bool ADWCharacter::IsFloating() const
 	return AbilitySystem->HasMatchingGameplayTag(GetCharacterData<UDWCharacterData>().FloatingTag);
 }
 
-bool ADWCharacter::IsAttacking(bool bAttackType) const
+bool ADWCharacter::IsAttacking(bool bCheckAttacked) const
 {
-	return !bAttackType ? AbilitySystem->HasMatchingGameplayTag(GetCharacterData<UDWCharacterData>().AttackingTag) : AttackType != EDWCharacterAttackType::None;
+	return !bCheckAttacked ? AbilitySystem->HasMatchingGameplayTag(GetCharacterData<UDWCharacterData>().AttackingTag) : (AttackType != EDWCharacterAttackType::None);
 }
 
 bool ADWCharacter::IsDefending() const
@@ -1101,6 +1075,15 @@ void ADWCharacter::SetControlMode(EDWCharacterControlMode InControlMode)
 			break;
 		}
 	}
+}
+
+UWidgetCharacterHP* ADWCharacter::GetCharacterHPWidget() const
+{
+	if (CharacterHP->GetWorldWidget())
+	{
+		return Cast<UWidgetCharacterHP>(CharacterHP->GetWorldWidget());
+	}
+	return nullptr;
 }
 
 FDWTeamData* ADWCharacter::GetTeamData() const
@@ -1246,18 +1229,18 @@ FDWCharacterAttackAbilityData ADWCharacter::GetAttackAbility(int32 InAbilityInde
 	return FDWCharacterAttackAbilityData();
 }
 
-FDWCharacterSkillAbilityData ADWCharacter::GetSkillAbility(const FPrimaryAssetId& InSkillID)
+FDWCharacterSkillAbilityData ADWCharacter::GetSkillAbility(const FPrimaryAssetId& InSkillID, bool bNeedAssembled)
 {
-	if(HasSkillAbility(InSkillID))
+	if(HasSkillAbility(InSkillID, bNeedAssembled))
 	{
 		return SkillAbilities[InSkillID];
 	}
 	return FDWCharacterSkillAbilityData();
 }
 
-FDWCharacterSkillAbilityData ADWCharacter::GetSkillAbility(ESkillType InSkillType, int32 InAbilityIndex)
+FDWCharacterSkillAbilityData ADWCharacter::GetSkillAbility(ESkillType InSkillType, int32 InAbilityIndex, bool bNeedAssembled)
 {
-	if(HasSkillAbility(InSkillType, InAbilityIndex))
+	if(HasSkillAbility(InSkillType, InAbilityIndex, bNeedAssembled))
 	{
 		TArray<FDWCharacterSkillAbilityData> Abilities = TArray<FDWCharacterSkillAbilityData>();
 		for (auto Iter : SkillAbilities)
@@ -1288,6 +1271,21 @@ TArray<FDWCharacterAttackAbilityData> ADWCharacter::GetAttackAbilities() const
 		return AttackAbilities[GetWeaponType()].Array;
 	}
 	return TArray<FDWCharacterAttackAbilityData>();
+}
+
+bool ADWCharacter::IsAttackHitAble() const
+{
+	return bAttackHitAble;
+}
+
+void ADWCharacter::SetAttackHitAble(bool bValue)
+{
+	bAttackHitAble = bValue;
+}
+
+void ADWCharacter::ClearAttackHitTargets()
+{
+
 }
 
 bool ADWCharacter::RaycastStep(FHitResult& OutHitResult)
@@ -1436,9 +1434,9 @@ TArray<ADWCharacter*> ADWCharacter::GetTeamMates()
 	return GetTeamData()->GetMembers(this);
 }
 
-bool ADWCharacter::IsPlayer() const
+bool ADWCharacter::IsPlayer(bool bCheckNature) const
 {
-	return GetNature() == EDWCharacterNature::Player;
+	return !bCheckNature ? UGlobalBPLibrary::GetPlayerCharacter() == this : GetNature() == EDWCharacterNature::Player;
 }
 
 bool ADWCharacter::IsEnemy(ADWCharacter* InTargetCharacter) const
@@ -1467,12 +1465,6 @@ bool ADWCharacter::IsEnemy(ADWCharacter* InTargetCharacter) const
 	return !IsTeamMate(InTargetCharacter) && !InTargetCharacter->GetRaceID().IsEqual(RaceID);
 }
 
-void ADWCharacter::SetMotionRate_Implementation(float InMovementRate, float InRotationRate)
-{
-	MovementRate = InMovementRate;
-	RotationRate = InRotationRate;
-}
-
 UDWCharacterPart* ADWCharacter::GetCharacterPart(EDWCharacterPartType InCharacterPartType) const
 {
 	TArray<UDWCharacterPart*> Parts;
@@ -1490,18 +1482,6 @@ UDWCharacterPart* ADWCharacter::GetCharacterPart(EDWCharacterPartType InCharacte
 UBehaviorTree* ADWCharacter::GetBehaviorTreeAsset() const
 {
 	return GetCharacterData<UDWCharacterData>().BehaviorTreeAsset;
-}
-
-void ADWCharacter::OnSelectedItemChange(const FAbilityItem& InItem)
-{
-	if(InItem.IsValid() && InItem.GetData().GetItemType() == EAbilityItemType::Voxel)
-	{
-		SetGenerateVoxelID(InItem.ID);
-	}
-	else
-	{
-		SetGenerateVoxelID(FPrimaryAssetId());
-	}
 }
 
 void ADWCharacter::OnAttributeChange(const FOnAttributeChangeData& InAttributeChangeData)
@@ -1537,13 +1517,20 @@ void ADWCharacter::OnAttributeChange(const FOnAttributeChangeData& InAttributeCh
 		{
 			GetCharacterHPWidget()->SetStaminaPercent(GetStamina(), GetMaxStamina());
 		}
-		if(!IsExhausted() && GetStamina() <= 0.f)
+		if(GetStamina() <= 0.f)
 		{
-			AbilitySystem->AddLooseGameplayTag(GetCharacterData<UDWCharacterData>().ExhaustedTag);
+			if(!IsExhausted())
+			{
+				UnSprint();
+				AbilitySystem->AddLooseGameplayTag(GetCharacterData<UDWCharacterData>().ExhaustedTag);
+			}
 		}
-		else if(IsExhausted())
+		else if(GetStamina() >= 10.f)
 		{
-			AbilitySystem->RemoveLooseGameplayTag(GetCharacterData<UDWCharacterData>().ExhaustedTag);
+			if(IsExhausted())
+			{
+				AbilitySystem->RemoveLooseGameplayTag(GetCharacterData<UDWCharacterData>().ExhaustedTag);
+			}
 		}
 	}
 	else if(InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetMaxStaminaAttribute())
@@ -1574,7 +1561,7 @@ void ADWCharacter::OnAttributeChange(const FOnAttributeChangeData& InAttributeCh
 	}
 	else if(InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetRotationSpeedAttribute())
 	{
-		GetCharacterMovement()->RotationRate = FRotator(0, InAttributeChangeData.NewValue * (IsSprinting() ? 1.5f : 1), 0) * RotationRate;
+		GetCharacterMovement()->RotationRate = FRotator(0, InAttributeChangeData.NewValue * (IsSprinting() ? 1.5f : 1) * RotationRate, 0);
 	}
 }
 

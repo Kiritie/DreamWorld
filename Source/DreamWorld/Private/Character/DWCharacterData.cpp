@@ -33,6 +33,9 @@ UDWCharacterData::UDWCharacterData()
 	RidingTag = FGameplayTag::RequestGameplayTag("State.Character.Riding");
 	FlyingTag = FGameplayTag::RequestGameplayTag("State.Character.Flying");
 	AttackingTag = FGameplayTag::RequestGameplayTag("State.Character.Attacking");
+	NormalAttackingTag = FGameplayTag::RequestGameplayTag("State.Character.NormalAttacking");
+	FallingAttackingTag = FGameplayTag::RequestGameplayTag("State.Character.FallingAttacking");
+	SkillAttackingTag = FGameplayTag::RequestGameplayTag("State.Character.SkillAttacking");
 	DefendingTag = FGameplayTag::RequestGameplayTag("State.Character.Defending");
 	InterruptingTag = FGameplayTag::RequestGameplayTag("State.Character.Interrupting");
 	ExhaustedTag = FGameplayTag::RequestGameplayTag("State.Character.Exhausted");

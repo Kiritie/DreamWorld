@@ -2,5 +2,4 @@
 
 UDWCharacterAttackAbility::UDWCharacterAttackAbility()
 {
-	AnimMontage = nullptr;
 }

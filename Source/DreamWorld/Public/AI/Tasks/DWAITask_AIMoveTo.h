@@ -20,19 +20,14 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "Blackboard")
 	FBlackboardKeySelector DistanceKey;
-	
-	UPROPERTY(EditAnywhere, Category = "Blackboard")
-	float DurationTime;
 
 private:
 	UPROPERTY()
 	ADWCharacter* TargetCharacter;
 
 	FVector TargetLocation;
-
+	
 	float TargetDistance;
-
-	float LocalRemainTime;
 
 protected:
 	virtual void InitializeFromAsset(UBehaviorTree& Asset) override;
@@ -44,4 +39,6 @@ protected:
 	virtual EBTNodeResult::Type AbortTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
 
 	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
+
+	virtual void OnTaskFinished(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, EBTNodeResult::Type TaskResult) override;
 };

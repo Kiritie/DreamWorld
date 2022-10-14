@@ -9,6 +9,7 @@
 #include "Character/DWCharacter.h"
 #include "ObjectPool/ObjectPoolModuleBPLibrary.h"
 #include "Character/DWCharacterData.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 UDWCharacterState_Attack::UDWCharacterState_Attack()
 {
@@ -26,7 +27,7 @@ bool UDWCharacterState_Attack::OnEnterValidate(UFiniteStateBase* InLastFiniteSta
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 
-	return Character->DoAction(EDWCharacterActionType::Attack);
+	return Character->ControlMode == EDWCharacterControlMode::Fighting && Character->DoAction(EDWCharacterActionType::Attack);
 }
 
 void UDWCharacterState_Attack::OnEnter(UFiniteStateBase* InLastFiniteState)
@@ -36,9 +37,6 @@ void UDWCharacterState_Attack::OnEnter(UFiniteStateBase* InLastFiniteState)
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 
 	Character->GetAbilitySystemComponent()->AddLooseGameplayTag(Character->GetCharacterData<UDWCharacterData>().AttackingTag);
-
-	Character->LimitToAnim(true, true);
-	Character->SetMotionRate(0, 0);
 }
 
 void UDWCharacterState_Attack::OnRefresh()
@@ -59,10 +57,10 @@ void UDWCharacterState_Attack::OnLeave(UFiniteStateBase* InNextFiniteState)
 	AttackEnd();
 
 	Character->FreeToAnim();
-	Character->SetMotionRate(1, 1);
-	Character->SetAttackDamageAble(false);
+	Character->SetAttackHitAble(false);
 	Character->StopAnimMontage();
 	Character->AttackAbilityIndex = 0;
+	Character->AttackAbilityQueue = 0;
 	Character->SkillAbilityID = FPrimaryAssetId();
 	Character->AttackType = EDWCharacterAttackType::None;
 }
@@ -81,9 +79,16 @@ void UDWCharacterState_Attack::AttackStart()
 	switch (Character->AttackType)
 	{
 		case EDWCharacterAttackType::NormalAttack:
+		{
+			Character->ClearAttackHitTargets();
+			Character->SetAttackHitAble(true);
+			break;
+		}
 		case EDWCharacterAttackType::FallingAttack:
 		{
-			Character->SetAttackDamageAble(true);
+			Character->ClearAttackHitTargets();
+			Character->SetAttackHitAble(true);
+			Character->GetCharacterMovement()->GravityScale = 3.f;
 			break;
 		}
 		case EDWCharacterAttackType::SkillAttack:
@@ -93,8 +98,13 @@ void UDWCharacterState_Attack::AttackStart()
 			{
 				if(AAbilitySkillBase* Skill = UObjectPoolModuleBPLibrary::SpawnObject<AAbilitySkillBase>(nullptr, SkillClass))
 				{
-					Skill->Initialize(Character, FAbilityItem(Character->SkillAbilityID));
+					Skill->Initialize(Character, FAbilityItem(SkillAbilityData.AbilityID));
 				}
+			}
+			else
+			{
+				Character->ClearAttackHitTargets();
+				Character->SetAttackHitAble(true);
 			}
 			break;
 		}
@@ -102,16 +112,15 @@ void UDWCharacterState_Attack::AttackStart()
 	}
 }
 
-void UDWCharacterState_Attack::AttackHurt()
+void UDWCharacterState_Attack::AttackStep()
 {
 	if (!IsCurrentState()) return;
 	
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 
-	Character->SetAttackDamageAble(false);
-	FTimerDelegate TimerDelegate;
-	TimerDelegate.BindLambda([Character](){ Character->SetAttackDamageAble(true); });
-	GetWorld()->GetTimerManager().SetTimerForNextTick(TimerDelegate);
+	bool bHitAble = !Character->IsAttackHitAble();
+	if(bHitAble) Character->ClearAttackHitTargets();
+	Character->SetAttackHitAble(bHitAble);
 }
 
 void UDWCharacterState_Attack::AttackEnd()
@@ -124,21 +133,28 @@ void UDWCharacterState_Attack::AttackEnd()
 	{
 		case EDWCharacterAttackType::NormalAttack:
 		{
-			Character->SetAttackDamageAble(false);
+			Character->SetAttackHitAble(false);
 			if (++Character->AttackAbilityIndex >= Character->GetAttackAbilities().Num())
 			{
 				Character->AttackAbilityIndex = 0;
 			}
 			break;
 		}
-		case EDWCharacterAttackType::SkillAttack:
-		{
-			Character->SkillAbilityID = FPrimaryAssetId();
-			break;
-		}
 		case EDWCharacterAttackType::FallingAttack:
 		{
+			Character->SetAttackHitAble(false);
 			Character->StopAnimMontage();
+			Character->GetCharacterMovement()->GravityScale = Character->GetDefaultGravityScale();
+			break;
+		}
+		case EDWCharacterAttackType::SkillAttack:
+		{
+			const auto AbilityData = Character->GetSkillAbility(Character->SkillAbilityID);
+			if(!AbilityData.GetItemData<UAbilitySkillDataBase>().SkillClass)
+			{
+				Character->SetAttackHitAble(false);
+			}
+			Character->SkillAbilityID = FPrimaryAssetId();
 			break;
 		}
 		default: break;

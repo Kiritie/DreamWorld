@@ -47,9 +47,9 @@ void UDWPlayerCharacterState_Attack::AttackStart()
 	Super::AttackStart();
 }
 
-void UDWPlayerCharacterState_Attack::AttackHurt()
+void UDWPlayerCharacterState_Attack::AttackStep()
 {
-	Super::AttackHurt();
+	Super::AttackStep();
 }
 
 void UDWPlayerCharacterState_Attack::AttackEnd()

@@ -21,7 +21,7 @@ bool UDWCharacterState_Defend::OnEnterValidate(UFiniteStateBase* InLastFiniteSta
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 
-	return Character->DoAction(EDWCharacterActionType::Defend);
+	return Character->ControlMode == EDWCharacterControlMode::Fighting && Character->DoAction(EDWCharacterActionType::Defend);
 }
 
 void UDWCharacterState_Defend::OnEnter(UFiniteStateBase* InLastFiniteState)
@@ -33,7 +33,7 @@ void UDWCharacterState_Defend::OnEnter(UFiniteStateBase* InLastFiniteState)
 	Character->GetAbilitySystemComponent()->AddLooseGameplayTag(Character->GetCharacterData<UDWCharacterData>().DefendingTag);
 
 	Character->SetMotionRate(0.5f, 0.1f);
-	Character->LimitToAnim(true, true);
+	Character->LimitToAnim();
 }
 
 void UDWCharacterState_Defend::OnRefresh()

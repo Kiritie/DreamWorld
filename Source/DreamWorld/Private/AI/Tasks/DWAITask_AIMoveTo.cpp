@@ -13,8 +13,6 @@
 
 UDWAITask_AIMoveTo::UDWAITask_AIMoveTo(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
-	bNotifyTick = true;
-
 	TargetKey.AddObjectFilter(this, GET_MEMBER_NAME_CHECKED(UDWAITask_AIMoveTo, TargetKey), ADWCharacter::StaticClass());
 	TargetKey.AddVectorFilter(this, GET_MEMBER_NAME_CHECKED(UDWAITask_AIMoveTo, TargetKey));
 	DistanceKey.AddFloatFilter(this, GET_MEMBER_NAME_CHECKED(UDWAITask_AIMoveTo, DistanceKey));
@@ -22,8 +20,6 @@ UDWAITask_AIMoveTo::UDWAITask_AIMoveTo(const FObjectInitializer& ObjectInitializ
 	TargetCharacter = nullptr;
 	TargetLocation = FVector();
 	TargetDistance = 0.f;
-	DurationTime = -1.f;
-	LocalRemainTime = 0.f;
 }
 
 void UDWAITask_AIMoveTo::InitializeFromAsset(UBehaviorTree& Asset)
@@ -53,6 +49,8 @@ bool UDWAITask_AIMoveTo::InitTask(UBehaviorTreeComponent& OwnerComp)
 
 void UDWAITask_AIMoveTo::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
 {
+	Super::TickTask(OwnerComp, NodeMemory, DeltaSeconds);
+
 	if(!InitTask(OwnerComp)) return;
 
 	if (TargetKey.SelectedKeyType == UBlackboardKeyType_Vector::StaticClass())
@@ -69,29 +67,35 @@ void UDWAITask_AIMoveTo::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* Node
 			FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
 		}
 	}
-	if(LocalRemainTime != -1.f)
-	{
-		LocalRemainTime -= DeltaSeconds;
-		if(LocalRemainTime <= 0.f)
-		{
-			FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
-		}
-	}
 }
 
 EBTNodeResult::Type UDWAITask_AIMoveTo::AbortTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
+	Super::AbortTask(OwnerComp, NodeMemory);
+
 	if (!InitTask(OwnerComp)) return EBTNodeResult::Failed;
+
+	//GetOwnerCharacter<ADWCharacter>()->SetMotionRate(1.f, 1.f);
+
 	return EBTNodeResult::Aborted;
 }
 
 EBTNodeResult::Type UDWAITask_AIMoveTo::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
+	Super::ExecuteTask(OwnerComp, NodeMemory);
+
 	if (!InitTask(OwnerComp)) return EBTNodeResult::Failed;
 
-	LocalRemainTime = DurationTime;
 	GetOwnerCharacter<ADWCharacter>()->SetMotionRate(0.7f, 0.7f);
-	GetOwnerCharacter<ADWCharacter>()->SetLockedTarget(nullptr);
 	
 	return EBTNodeResult::InProgress;
+}
+
+void UDWAITask_AIMoveTo::OnTaskFinished(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, EBTNodeResult::Type TaskResult)
+{
+	Super::OnTaskFinished(OwnerComp, NodeMemory, TaskResult);
+
+	if (!InitTask(OwnerComp)) return;
+
+	GetOwnerCharacter<ADWCharacter>()->SetMotionRate(1.f, 1.f);
 }

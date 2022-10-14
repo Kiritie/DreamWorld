@@ -11,6 +11,7 @@
 UWidgetItemInfoBox::UWidgetItemInfoBox(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	WidgetName = FName("ItemInfoBox");
+	ParentName = FName("GameHUD");
 	WidgetType = EWidgetType::Permanent;
 	InputMode = EInputMode::None;
 }
@@ -28,13 +29,9 @@ void UWidgetItemInfoBox::OnInitialize_Implementation(AActor* InOwner)
 void UWidgetItemInfoBox::OnOpen_Implementation(const TArray<FParameter>& InParams, bool bInstant)
 {
 	Super::OnOpen_Implementation(InParams, bInstant);
-
-	FinishOpen(bInstant);
 }
 
 void UWidgetItemInfoBox::OnClose_Implementation(bool bInstant)
 {
 	Super::OnClose_Implementation(bInstant);
-
-	FinishClose(bInstant);
 }

@@ -6,7 +6,7 @@
 #include "Character/DWCharacter.h"
 #include "DWMonsterCharacter.generated.h"
 
-class UBoxComponent;
+class UDWCharacterAttackPointComponent;
 
 /**
  * �����ɫ
@@ -21,24 +21,25 @@ public:
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-	UBoxComponent* AttackPoint;
+	UDWCharacterAttackPointComponent* AttackPoint;
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	UFUNCTION()
-	void OnAttackPointOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-
-	UFUNCTION(BlueprintImplementableEvent)
-	void OnHitTarget(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-
 public:
 	virtual void Tick(float DeltaTime) override;
 
-	virtual void SetAttackDamageAble(bool bInDamaging) override;
-
+public:
 	virtual bool CanInteract(IInteractionAgentInterface* InInteractionAgent, EInteractAction InInteractAction) override;
 	
 	virtual void OnInteract(IInteractionAgentInterface* InInteractionAgent, EInteractAction InInteractAction) override;
+
+	virtual void SetAttackHitAble(bool bValue) override;
+
+	virtual void ClearAttackHitTargets() override;
+
+public:
+	UFUNCTION(BlueprintPure)
+	TArray<UDWCharacterAttackPointComponent*> GetAttackPoints();
 };

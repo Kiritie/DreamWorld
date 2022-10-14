@@ -6,7 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "AbilitySystemInterface.h"
 #include "Ability/Vitality/AbilityVitalityBase.h"
-#include "Inventory/InventoryAgentInterface.h"
+#include "Ability/Inventory/InventoryAgentInterface.h"
 
 #include "DWVitality.generated.h"
 
@@ -24,7 +24,7 @@ class UAttributeSetBase;
  * ������������
  */
 UCLASS()
-class DREAMWORLD_API ADWVitality : public AAbilityVitalityBase, public IInventoryAgentInterface
+class DREAMWORLD_API ADWVitality : public AAbilityVitalityBase
 {
 	GENERATED_BODY()
 
@@ -38,9 +38,6 @@ public:
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	UWorldWidgetComponent* VitalityHP;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-	UVitalityInventory* Inventory;
 
 protected:
 	// Called when the game starts or when spawned
@@ -69,6 +66,20 @@ public:
 
 	virtual void OnInteract(IInteractionAgentInterface* InInteractionAgent, EInteractAction InInteractAction) override;
 
+	virtual void OnActiveItem(const FAbilityItem& InItem, bool bPassive, bool bSuccess) override;
+		
+	virtual void OnCancelItem(const FAbilityItem& InItem, bool bPassive) override;
+
+	virtual void OnAssembleItem(const FAbilityItem& InItem) override;
+
+	virtual void OnDischargeItem(const FAbilityItem& InItem) override;
+
+	virtual void OnDiscardItem(const FAbilityItem& InItem, bool bInPlace) override;
+
+	virtual void OnSelectItem(const FAbilityItem& InItem) override;
+
+	virtual void OnAuxiliaryItem(const FAbilityItem& InItem) override;
+
 	virtual bool GenerateVoxel(const FVoxelHitResult& InVoxelHitResult) override;
 
 	virtual bool DestroyVoxel(const FVoxelHitResult& InVoxelHitResult) override;
@@ -86,12 +97,7 @@ public:
 	UFUNCTION(BlueprintPure)
 	UWidgetVitalityHP* GetVitalityHPWidget() const;
 
-	UFUNCTION(BlueprintPure)
-	virtual UInventory* GetInventory() const override;
-
 public:
-	virtual void OnSelectedItemChange(const FAbilityItem& InItem) override;
-	
 	virtual void OnAttributeChange(const FOnAttributeChangeData& InAttributeChangeData) override;
 	
 	virtual void HandleDamage(EDamageType DamageType, const float LocalDamageDone, bool bHasCrited, bool bHasDefend, FHitResult HitResult, const FGameplayTagContainer& SourceTags, AActor* SourceActor) override;

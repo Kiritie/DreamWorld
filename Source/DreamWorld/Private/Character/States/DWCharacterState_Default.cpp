@@ -73,13 +73,13 @@ void UDWCharacterState_Default::OnRefresh()
 				DON(i, 10,
 					const FVector rayStart = FVector(i == 0 ? 0.f : worldData.RandomStream.FRandRange(-chunkRadius, chunkRadius), i == 0 ? 0.f : worldData.RandomStream.FRandRange(-chunkRadius, chunkRadius), worldData.GetWorldHeight(true));
 					const FVector rayEnd = FVector(rayStart.X, rayStart.Y, 0.f);
-					FHitResult hitResult1;
-					if(UVoxelModuleBPLibrary::ChunkTraceSingle(rayStart, rayEnd, characterData.Radius, characterData.HalfHeight, {}, hitResult1))
+					FHitResult hitResult;
+					if(UVoxelModuleBPLibrary::ChunkTraceSingle(rayStart, rayEnd, characterData.Radius, characterData.HalfHeight, {}, hitResult))
 					{
-						FHitResult hitResult2;
-						if(!UVoxelModuleBPLibrary::VoxelTraceSingle(hitResult1.Location, hitResult1.Location, characterData.Radius * 0.95f, characterData.HalfHeight * 0.95f, {}, hitResult2))
+						FVoxelItem& voxelItem = UVoxelModuleBPLibrary::FindVoxelByLocation(hitResult.Location);
+						if(!voxelItem.IsValid())
 						{
-							Character->SetActorLocationAndRotation(hitResult1.Location, FRotator::ZeroRotator);
+							Character->SetActorLocationAndRotation(hitResult.Location, FRotator::ZeroRotator);
 							FSM->SwitchStateByClass<UDWCharacterState_Walk>();
 							break;
 						}

@@ -17,14 +17,15 @@ class DREAMWORLD_API UDWAITask_AIDefend : public UDWAITask
 protected:
 	UPROPERTY(EditAnywhere, Category = "Blackboard")
 	FBlackboardKeySelector DefendTargetKey;
+	
+	UPROPERTY(EditAnywhere, Category = "Blackboard")
+	FBlackboardKeySelector AttackDistanceKey;
 
 private:
-	float AIMoveRemainTime;
-
-	FVector AIMoveLocation;
-
 	UPROPERTY()
 	ADWCharacter* DefendTarget;
+
+	float AttackDistance;
 
 protected:
 	virtual bool InitTask(UBehaviorTreeComponent& OwnerComp) override;
@@ -34,4 +35,9 @@ protected:
 	virtual EBTNodeResult::Type AbortTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
 
 	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
+
+	virtual void OnTaskFinished(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, EBTNodeResult::Type TaskResult) override;
+
+protected:
+	virtual FVector GetAIMoveLocation() const;
 };

@@ -13,7 +13,14 @@ UCLASS()
 class DREAMWORLD_API UDWAITask : public UAITaskBase
 {
 	GENERATED_UCLASS_BODY()
-	
+		
+protected:
+	UPROPERTY(EditAnywhere, Category = "Blackboard")
+	float DurationTime;
+
+private:
+	float LocalRemainTime;
+
 protected:
 	virtual bool InitTask(UBehaviorTreeComponent& OwnerComp) override;
 

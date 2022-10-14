@@ -3,22 +3,25 @@
 
 #include "Widget/Inventory/Slot/WidgetInventorySlot.h"
 
-#include "TimerManager.h"
 #include "Ability/Item/AbilityItemDataBase.h"
 #include "Ability/Vitality/AbilityVitalityInterface.h"
 #include "Blueprint/DragDropOperation.h"
 #include "Components/Border.h"
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
-#include "Inventory/Inventory.h"
+#include "Ability/Inventory/Inventory.h"
 #include "Widget/Inventory/WidgetInventory.h"
-#include "Inventory/Slot/InventorySlot.h"
+#include "Ability/Inventory/Slot/InventorySlot.h"
 #include "Kismet/KismetTextLibrary.h"
 #include "Materials/MaterialInstanceDynamic.h"
+#include "Blueprint/WidgetLayoutLibrary.h"
+#include "Components/CanvasPanelSlot.h"
+#include "Widget/Inventory/WidgetInventoryItemInfoBox.h"
+#include "Widget/WidgetModuleBPLibrary.h"
+#include "Global/GlobalBPLibrary.h"
 
 UWidgetInventorySlot::UWidgetInventorySlot(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
-	OwnerSlot = nullptr;
 }
 
 void UWidgetInventorySlot::NativePreConstruct()
@@ -81,6 +84,12 @@ void UWidgetInventorySlot::NativeOnMouseEnter(const FGeometry& InGeometry, const
 	Super::NativeOnMouseEnter(InGeometry, InMouseEvent);
 
 	SetBorderColor(FLinearColor(1.0f, 0.843f, 0.0f, 1.0f));
+
+	if(!IsEmpty())
+	{
+		const auto& ItemData = GetItem().GetData();
+		UWidgetModuleBPLibrary::OpenUserWidget<UWidgetInventoryItemInfoBox>({ FParameter::MakeText(ItemData.Name), FParameter::MakeText(ItemData.Detail) });
+	}
 }
 
 void UWidgetInventorySlot::NativeOnMouseLeave(const FPointerEvent& InMouseEvent)
@@ -88,6 +97,29 @@ void UWidgetInventorySlot::NativeOnMouseLeave(const FPointerEvent& InMouseEvent)
 	Super::NativeOnMouseLeave(InMouseEvent);
 
 	SetBorderColor(FLinearColor(0.0f, 1.0f, 1.0f, 0.7f));
+
+	if(!IsEmpty())
+	{
+		UWidgetModuleBPLibrary::CloseUserWidget<UWidgetInventoryItemInfoBox>();
+	}
+}
+
+FReply UWidgetInventorySlot::NativeOnMouseMove(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
+{
+	if(!IsEmpty())
+	{
+		if(auto InventoryItemInfoBox = UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryItemInfoBox>())
+		{
+			if(auto InventoryItemInfoBoxSlot = Cast<UCanvasPanelSlot>(InventoryItemInfoBox->Slot))
+			{
+				float PosX, PosY;
+				UWidgetLayoutLibrary::GetMousePositionScaledByDPI(UGlobalBPLibrary::GetPlayerController(), PosX, PosY);
+				InventoryItemInfoBoxSlot->SetPosition(FVector2D(PosX, PosY));
+			}
+		}
+	}
+
+	return Super::NativeOnMouseMove(InGeometry, InMouseEvent);
 }
 
 FReply UWidgetInventorySlot::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
@@ -124,29 +156,13 @@ FReply UWidgetInventorySlot::NativeOnMouseButtonDown(const FGeometry& InGeometry
 
 void UWidgetInventorySlot::OnInitialize(UInventorySlot* InOwnerSlot)
 {
-	if(InOwnerSlot == OwnerSlot) return;
-	
-	if(OwnerSlot)
-	{
-		OwnerSlot->OnInventorySlotRefresh.RemoveDynamic(this, &UWidgetInventorySlot::OnRefresh);
-		OwnerSlot->OnInventorySlotActivated.RemoveDynamic(this, &UWidgetInventorySlot::OnActivated);
-		OwnerSlot->OnInventorySlotCanceled.RemoveDynamic(this, &UWidgetInventorySlot::OnCanceled);
-	}
-
-	OwnerSlot = InOwnerSlot;
-
-	if(OwnerSlot)
-	{
-		OwnerSlot->OnInventorySlotRefresh.AddDynamic(this, &UWidgetInventorySlot::OnRefresh);
-		OwnerSlot->OnInventorySlotActivated.AddDynamic(this, &UWidgetInventorySlot::OnActivated);
-		OwnerSlot->OnInventorySlotCanceled.AddDynamic(this, &UWidgetInventorySlot::OnCanceled);
-	}
-
-	OnRefresh();
+	Super::OnInitialize(InOwnerSlot);
 }
 
 void UWidgetInventorySlot::OnRefresh()
 {
+	Super::OnRefresh();
+
 	if(!OwnerSlot) return;
 
 	if(!IsEmpty())
@@ -173,13 +189,9 @@ void UWidgetInventorySlot::OnRefresh()
 				TxtCount->SetVisibility(ESlateVisibility::Hidden);
 			}
 		}
-		if(IsCooldowning())
+		if(IsHovered())
 		{
-			StartCooldown();
-		}
-		else
-		{
-			StopCooldown();
+			UWidgetModuleBPLibrary::OpenUserWidget<UWidgetInventoryItemInfoBox>({ FParameter::MakeText(ItemData.Name), FParameter::MakeText(ItemData.Detail) });
 		}
 	}
 	else
@@ -189,15 +201,47 @@ void UWidgetInventorySlot::OnRefresh()
 		{
 			TxtCount->SetVisibility(ESlateVisibility::Hidden);
 		}
-		StopCooldown();
+		if(IsHovered())
+		{
+			UWidgetModuleBPLibrary::CloseUserWidget<UWidgetInventoryItemInfoBox>();
+		}
 	}
 }
 
 void UWidgetInventorySlot::OnActivated()
 {
-	if(IsCooldowning())
+	Super::OnActivated();
+}
+
+void UWidgetInventorySlot::OnCanceled()
+{
+	Super::OnCanceled();
+}
+
+void UWidgetInventorySlot::StartCooldown()
+{
+	Super::StartCooldown();
+}
+
+void UWidgetInventorySlot::StopCooldown()
+{
+	Super::StopCooldown();
+
+	ImgMask->SetVisibility(ESlateVisibility::Hidden);
+	TxtCooldown->SetVisibility(ESlateVisibility::Hidden);
+}
+
+void UWidgetInventorySlot::OnCooldown()
+{
+	if(!OwnerSlot) return;
+
+	const FAbilityInfo CooldownInfo = OwnerSlot->GetAbilityInfo();
+	if(CooldownInfo.CooldownRemaining > 0.f)
 	{
-		StartCooldown();
+		ImgMask->SetVisibility(ESlateVisibility::Visible);
+		TxtCooldown->SetVisibility(ESlateVisibility::Visible);
+		TxtCooldown->SetText(UKismetTextLibrary::Conv_FloatToText(CooldownInfo.CooldownRemaining, ERoundingMode::HalfToEven, false, true, 1, 324, 0, 1));
+		MaskMatInst->SetScalarParameterValue(FName("Progress"), 1.f - CooldownInfo.CooldownRemaining / CooldownInfo.CooldownDuration);
 	}
 	else
 	{
@@ -205,99 +249,7 @@ void UWidgetInventorySlot::OnActivated()
 	}
 }
 
-void UWidgetInventorySlot::OnCanceled()
-{
-	StopCooldown();
-}
-
-void UWidgetInventorySlot::StartCooldown()
-{
-	GetWorld()->GetTimerManager().SetTimer(CooldownTimerHandle, this, &UWidgetInventorySlot::OnCooldown, 0.1f, true);
-}
-
-void UWidgetInventorySlot::StopCooldown()
-{
-	ImgMask->SetVisibility(ESlateVisibility::Hidden);
-	TxtCooldown->SetVisibility(ESlateVisibility::Hidden);
-	GetWorld()->GetTimerManager().ClearTimer(CooldownTimerHandle);
-}
-
-void UWidgetInventorySlot::OnCooldown()
-{
-	if(OwnerSlot)
-	{
-		const FAbilityInfo CooldownInfo = OwnerSlot->GetAbilityInfo();
-		if(CooldownInfo.CooldownRemaining > 0.f)
-		{
-			ImgMask->SetVisibility(ESlateVisibility::Visible);
-			TxtCooldown->SetVisibility(ESlateVisibility::Visible);
-			TxtCooldown->SetText(UKismetTextLibrary::Conv_FloatToText(CooldownInfo.CooldownRemaining, ERoundingMode::HalfToEven, false, true, 1, 324, 0, 1));
-			MaskMatInst->SetScalarParameterValue(FName("Progress"), 1.f - CooldownInfo.CooldownRemaining / CooldownInfo.CooldownDuration);
-		}
-		else
-		{
-			StopCooldown();
-		}
-	}
-}
-
-void UWidgetInventorySlot::SplitItem(int InCount)
-{
-	if(OwnerSlot)
-	{
-		OwnerSlot->SplitItem(InCount);
-	}
-}
-
-void UWidgetInventorySlot::MoveItem(int InCount)
-{
-	if(OwnerSlot)
-	{
-		OwnerSlot->MoveItem(InCount);
-	}
-}
-
-void UWidgetInventorySlot::UseItem(int InCount)
-{
-	if(OwnerSlot)
-	{
-		OwnerSlot->UseItem(InCount);
-	}
-}
-
-void UWidgetInventorySlot::DiscardItem(int InCount)
-{
-	if(OwnerSlot)
-	{
-		OwnerSlot->DiscardItem(InCount);
-	}
-}
-
 void UWidgetInventorySlot::SetBorderColor(FLinearColor InColor)
 {
 	Border->SetBrushColor(InColor);
-}
-
-bool UWidgetInventorySlot::IsEmpty() const
-{
-	if (OwnerSlot) return OwnerSlot->IsEmpty();
-	return true;
-}
-
-bool UWidgetInventorySlot::IsCooldowning() const
-{
-	if(OwnerSlot) return OwnerSlot->IsMatched() && OwnerSlot->GetAbilityInfo().CooldownRemaining > 0.f;
-	return false;
-}
-
-FAbilityItem& UWidgetInventorySlot::GetItem() const
-{
-	if(OwnerSlot) return OwnerSlot->GetItem();
-	return FAbilityItem::Empty;
-}
-
-UInventory* UWidgetInventorySlot::GetInventory() const
-{
-	if(OwnerSlot) return OwnerSlot->GetInventory();
-	return nullptr;
 }

@@ -5,7 +5,7 @@
 #include "AI/DWAIController.h"
 #include "Character/Player/DWPlayerCharacter.h"
 #include "Components/CapsuleComponent.h"
-#include "Inventory/Inventory.h"
+#include "Ability/Inventory/Inventory.h"
 #include "Voxel/Chunks/VoxelChunk.h"
 #include "Widget/WidgetGameHUD.h"
 #include "Widget/WidgetModuleBPLibrary.h"
@@ -32,12 +32,9 @@ void UDWPlayerCharacterState_Death::OnEnter(UFiniteStateBase* InLastFiniteState)
 
 	ADWPlayerCharacter* PlayerCharacter = GetAgent<ADWPlayerCharacter>();
 
-	if(PlayerCharacter->GetTargetSystem()->IsLocked())
-	{
-		PlayerCharacter->GetTargetSystem()->TargetLockOff();
-	}
+	PlayerCharacter->GetTargetSystem()->TargetLockOff();
 
-	PlayerCharacter->GetInteractionComponent()->SetInteractionAgent(PlayerCharacter);
+	PlayerCharacter->GetInteractionComponent()->SetInteractingAgent(PlayerCharacter);
 }
 
 void UDWPlayerCharacterState_Death::OnRefresh()
@@ -51,7 +48,7 @@ void UDWPlayerCharacterState_Death::OnLeave(UFiniteStateBase* InNextFiniteState)
 
 	ADWPlayerCharacter* PlayerCharacter = GetAgent<ADWPlayerCharacter>();
 
-	PlayerCharacter->GetInteractionComponent()->SetInteractionAgent(nullptr);
+	PlayerCharacter->GetInteractionComponent()->SetInteractingAgent(nullptr);
 }
 
 void UDWPlayerCharacterState_Death::OnTermination()

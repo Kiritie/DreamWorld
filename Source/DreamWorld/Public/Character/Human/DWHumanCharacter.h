@@ -30,7 +30,10 @@ protected:
 	USkeletalMeshComponent* HammerMesh;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	AVoxelEntity* VoxelEntity;
+	AVoxelEntity* GenerateVoxelEntity;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	AVoxelEntity* AuxiliaryVoxelEntity;
 
 protected:
 	// Called when the game starts or when spawned
@@ -43,9 +46,17 @@ protected:
 public:
 	virtual void Tick(float DeltaTime) override;
 
+public:
+	virtual void OnSelectItem(const FAbilityItem& InItem) override;
+
+	virtual void OnAuxiliaryItem(const FAbilityItem& InItem) override;
+
+	virtual void RefreshEquip(EDWEquipPartType InPartType, const FAbilityItem& InItem) override;
+
+public:
+	virtual void SetAttackHitAble(bool bValue) override;
+
+	virtual void ClearAttackHitTargets() override;
+
 	virtual void SetControlMode(EDWCharacterControlMode InControlMode) override;
-
-	virtual void SetGenerateVoxelID(const FPrimaryAssetId& InGenerateVoxelID) override;
-
-	virtual void SetAttackDamageAble(bool bInDamaging) override;
 };

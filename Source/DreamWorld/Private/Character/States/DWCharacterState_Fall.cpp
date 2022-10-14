@@ -16,7 +16,11 @@ void UDWCharacterState_Fall::OnInitialize(UFSMComponent* InFSMComponent, int32 I
 
 bool UDWCharacterState_Fall::OnEnterValidate(UFiniteStateBase* InLastFiniteState)
 {
-	return Super::OnEnterValidate(InLastFiniteState);
+	if(!Super::OnEnterValidate(InLastFiniteState)) return false;
+
+	ADWCharacter* Character = GetAgent<ADWCharacter>();
+
+	return Character->DoAction(EDWCharacterActionType::Fall);
 }
 
 void UDWCharacterState_Fall::OnEnter(UFiniteStateBase* InLastFiniteState)
@@ -40,6 +44,8 @@ void UDWCharacterState_Fall::OnLeave(UFiniteStateBase* InNextFiniteState)
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 
 	Character->FreeToAnim();
+
+	Character->StopAction(EDWCharacterActionType::Fall);
 }
 
 void UDWCharacterState_Fall::OnTermination()
