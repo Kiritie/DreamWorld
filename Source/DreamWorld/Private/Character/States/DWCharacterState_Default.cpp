@@ -36,9 +36,6 @@ void UDWCharacterState_Default::OnEnter(UFiniteStateBase* InLastFiniteState)
 	Character->DoAction(EDWCharacterActionType::Revive);
 
 	Character->LimitToAnim();
-
-	Character->SetMana(Character->GetMaxMana());
-	Character->SetStamina(Character->GetMaxStamina());
 	
 	// stats
 	Character->SetControlMode(Character->ControlMode);

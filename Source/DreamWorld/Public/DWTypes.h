@@ -404,10 +404,10 @@ enum class EDWPlayerInventoryInitType : uint8
 {
 	// 无
 	None,
-	// 少量
-	Small,
+	// 基础
+	Basic,
 	// 充满
-	Fill
+	All
 };
 
 USTRUCT(BlueprintType)
@@ -419,23 +419,35 @@ public:
 	FORCEINLINE FDWPlayerSaveData()
 	{
 		ArchiveID = 0;
-		InventoryInitType = EDWPlayerInventoryInitType::Fill;
+		BodyColorIndex = 0;
+		CapeColorIndex = 0;
+		InventoryInitType = EDWPlayerInventoryInitType::Basic;
 	}
 		
 	FORCEINLINE FDWPlayerSaveData(const FDWCharacterSaveData& InCharacterSaveData) : FDWPlayerBasicSaveData(InCharacterSaveData)
 	{
 		ArchiveID = 0;
-		InventoryInitType = EDWPlayerInventoryInitType::Fill;
+		BodyColorIndex = 0;
+		CapeColorIndex = 0;
+		InventoryInitType = EDWPlayerInventoryInitType::Basic;
 	}
 
 	FORCEINLINE FDWPlayerSaveData(const FDWPlayerBasicSaveData& InBasicSaveData) : FDWPlayerBasicSaveData(InBasicSaveData)
 	{
 		ArchiveID = 0;
-		InventoryInitType = EDWPlayerInventoryInitType::Fill;
+		BodyColorIndex = 0;
+		CapeColorIndex = 0;
+		InventoryInitType = EDWPlayerInventoryInitType::Basic;
 	}
 
 	UPROPERTY(BlueprintReadOnly)
 	int32 ArchiveID;
+	
+	UPROPERTY(BlueprintReadWrite)
+	int32 BodyColorIndex;
+		
+	UPROPERTY(BlueprintReadWrite)
+	int32 CapeColorIndex;
 
 	UPROPERTY(BlueprintReadWrite)
 	EDWPlayerInventoryInitType InventoryInitType;

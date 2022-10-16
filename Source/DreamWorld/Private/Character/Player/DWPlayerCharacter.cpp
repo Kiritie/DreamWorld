@@ -68,6 +68,7 @@
 #include "Widget/World/WorldWidgetComponent.h"
 #include "Ability/Inventory/CharacterInventory.h"
 #include "Widget/WidgetContextBox.h"
+#include "Ability/Item/Raw/AbilityRawDataBase.h"
 
 //////////////////////////////////////////////////////////////////////////
 // ADWPlayerCharacter
@@ -173,15 +174,23 @@ void ADWPlayerCharacter::LoadData(FSaveData* InSaveData, bool bForceMode)
 {
 	auto& SaveData = InSaveData->CastRef<FDWPlayerSaveData>();
 	
+	SetBodyColor(SaveData.BodyColorIndex);
+	SetCapeColor(SaveData.CapeColorIndex);
+
 	if(!bForceMode && !SaveData.IsSaved())
 	{
 		switch (SaveData.InventoryInitType)
 		{
-			case EDWPlayerInventoryInitType::Small:
+			case EDWPlayerInventoryInitType::None:
+			{
+				SaveData.InventoryData.ClearAllItem();
+				break;
+			}
+			case EDWPlayerInventoryInitType::Basic:
 			{
 				break;
 			}
-			case EDWPlayerInventoryInitType::Fill:
+			case EDWPlayerInventoryInitType::All:
 			{
 				auto VoxelDatas = UAssetModuleBPLibrary::LoadPrimaryAssets<UVoxelData>(UAbilityModuleBPLibrary::ItemTypeToAssetType(EAbilityItemType::Voxel));
 				for (int32 i = 0; i < VoxelDatas.Num(); i++)
@@ -191,6 +200,13 @@ void ADWPlayerCharacter::LoadData(FSaveData* InSaveData, bool bForceMode)
 						FAbilityItem tmpItem = FAbilityItem(VoxelDatas[i]->GetPrimaryAssetId(), VoxelDatas[i]->MaxCount);
 						SaveData.InventoryData.AddItem(tmpItem);
 					}
+				}
+		
+				auto RawDatas = UAssetModuleBPLibrary::LoadPrimaryAssets<UAbilityRawDataBase>(UAbilityModuleBPLibrary::ItemTypeToAssetType(EAbilityItemType::Raw));
+				for (int32 i = 0; i < RawDatas.Num(); i++)
+				{
+					FAbilityItem tmpItem = FAbilityItem(RawDatas[i]->GetPrimaryAssetId(), RawDatas[i]->MaxCount);
+					SaveData.InventoryData.AddItem(tmpItem);
 				}
 		
 				auto EquipDatas = UAssetModuleBPLibrary::LoadPrimaryAssets<UAbilityEquipDataBase>(UAbilityModuleBPLibrary::ItemTypeToAssetType(EAbilityItemType::Equip));
@@ -215,7 +231,6 @@ void ADWPlayerCharacter::LoadData(FSaveData* InSaveData, bool bForceMode)
 				}
 				break;
 			}
-			default: break;
 		}
 	}
 
@@ -227,6 +242,8 @@ FSaveData* ADWPlayerCharacter::ToData()
 	static FDWPlayerSaveData SaveData;
 	SaveData = Super::ToData()->CastRef<FDWCharacterSaveData>();
 	SaveData.CameraRotation = UCameraModuleBPLibrary::GetCurrentCameraRotation();
+	SaveData.BodyColorIndex = GetBodyColor();
+	SaveData.CapeColorIndex = GetCapeColor();
 	return &SaveData;
 }
 
@@ -421,8 +438,6 @@ void ADWPlayerCharacter::OnSelectItem(const FAbilityItem& InItem)
 
 void ADWPlayerCharacter::OnAttributeChange(const FOnAttributeChangeData& InAttributeChangeData)
 {
-	Super::OnAttributeChange(InAttributeChangeData);
-
 	const float DeltaValue = InAttributeChangeData.NewValue - InAttributeChangeData.OldValue;
 	
 	if(InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetHealthAttribute() || InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetMaxHealthAttribute())
@@ -437,6 +452,28 @@ void ADWPlayerCharacter::OnAttributeChange(const FOnAttributeChangeData& InAttri
 		}
 	}
 	else if(InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetExpAttribute())
+	{
+		if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetContextBox>())
+		{
+			if(DeltaValue > 0.f)
+			{
+				UWidgetModuleBPLibrary::GetUserWidget<UWidgetContextBox>()->AddMessage(FString::Printf(TEXT("获得: %d点经验值"), (int32)DeltaValue));
+			}
+			if(InAttributeChangeData.NewValue >= GetAttributeSet<UDWCharacterAttributeSet>()->GetMaxExp())
+			{
+				UWidgetModuleBPLibrary::GetUserWidget<UWidgetContextBox>()->AddMessage(FString::Printf(TEXT("你已升到 %d 级！"), Level));
+			}
+		}
+		if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>())
+		{
+			UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>()->SetHeadInfo(GetHeadInfo());
+		}
+		if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>())
+		{
+			UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>()->SetHeadInfo(GetHeadInfo());
+		}
+	}
+	else if(InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetMaxExpAttribute())
 	{
 		if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>())
 		{
@@ -564,6 +601,7 @@ void ADWPlayerCharacter::OnAttributeChange(const FOnAttributeChangeData& InAttri
 			UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>()->SetToughnessRate(FString::Printf(TEXT("%d%%"), (int32)(InAttributeChangeData.NewValue * 100)));
 		}
 	}
+	Super::OnAttributeChange(InAttributeChangeData);
 }
 
 void ADWPlayerCharacter::SetNameV(FName InName)
@@ -592,9 +630,10 @@ void ADWPlayerCharacter::SetRaceID(FName InRaceID)
 	}
 }
 
-void ADWPlayerCharacter::SetLevelV(int32 InLevel)
+bool ADWPlayerCharacter::SetLevelV(int32 InLevel)
 {
-	Super::SetLevelV(InLevel);
+	if(!Super::SetLevelV(InLevel)) return false;
+
 	if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>())
 	{
 		UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>()->SetHeadInfo(GetHeadInfo());
@@ -603,6 +642,7 @@ void ADWPlayerCharacter::SetLevelV(int32 InLevel)
 	{
 		UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>()->SetHeadInfo(GetHeadInfo());
 	}
+	return true;
 }
 
 void ADWPlayerCharacter::SetTeamID(FName InTeamID)

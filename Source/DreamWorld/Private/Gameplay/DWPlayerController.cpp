@@ -81,7 +81,7 @@ void ADWPlayerController::LoadData(FSaveData* InSaveData, bool bForceMode)
 	}
 	if(PlayerCharacter)
 	{
-		PlayerCharacter->LoadSaveData(InSaveData, bForceMode);
+		PlayerCharacter->LoadSaveData(InSaveData, bForceMode, true);
 	}
 }
 

@@ -89,7 +89,7 @@ public:
 
 	virtual void SetRaceID(FName InRaceID) override;
 
-	virtual void SetLevelV(int32 InLevel) override;
+	virtual bool SetLevelV(int32 InLevel) override;
 			
 	UFUNCTION(BlueprintPure)
 	UWorldWidgetComponent* GetVitalityHP() const { return VitalityHP; }

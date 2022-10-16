@@ -133,7 +133,6 @@ ADWCharacter::ADWCharacter()
 	AIMoveLocation = Vector_Empty;
 	AIMoveStopDistance = 0;
 
-	DefaultAbility = FAbilityData();
 	AttackAbilities = TMap<EDWWeaponType, FDWCharacterAttackAbilityDatas>();
 	SkillAbilities = TMap<FPrimaryAssetId, FDWCharacterSkillAbilityData>();
 	ActionAbilities = TMap<EDWCharacterActionType, FDWCharacterActionAbilityData>();
@@ -177,7 +176,6 @@ void ADWCharacter::LoadData(FSaveData* InSaveData, bool bForceMode)
 		if(SaveData.IsSaved())
 		{
 			BirthLocation = SaveData.BirthLocation;
-			DefaultAbility = SaveData.DefaultAbility;
 			FallingAttackAbility = SaveData.FallingAttackAbility;
 			AttackAbilities = SaveData.AttackAbilities;
 			SkillAbilities = SaveData.SkillAbilities;
@@ -204,11 +202,6 @@ void ADWCharacter::LoadData(FSaveData* InSaveData, bool bForceMode)
 			if (FallingAttackAbility.AbilityClass)
 			{
 				FallingAttackAbility.AbilityHandle = AbilitySystem->K2_GiveAbility(FallingAttackAbility.AbilityClass, FallingAttackAbility.AbilityLevel);
-			}
-
-			if(GetCharacterData<UAbilityCharacterDataBase>().AbilityClass)
-			{
-				DefaultAbility.AbilityHandle = AbilitySystem->K2_GiveAbility(GetCharacterData<UAbilityCharacterDataBase>().AbilityClass, DefaultAbility.AbilityLevel);
 			}
 		}
 		else
@@ -248,13 +241,6 @@ void ADWCharacter::LoadData(FSaveData* InSaveData, bool bForceMode)
 					FallingAttackAbility = CharacterData.FallingAttackAbility;
 					FallingAttackAbility.AbilityHandle = AbilitySystem->K2_GiveAbility(FallingAttackAbility.AbilityClass, FallingAttackAbility.AbilityLevel);
 				}
-
-				if(CharacterData.AbilityClass)
-				{
-					DefaultAbility = FAbilityData();
-					DefaultAbility.AbilityLevel = SaveData.Level;
-					DefaultAbility.AbilityHandle = AbilitySystem->K2_GiveAbility(CharacterData.AbilityClass, DefaultAbility.AbilityLevel);
-				}
 				
 				SaveData.InventoryData = CharacterData.InventoryData;
 
@@ -269,10 +255,6 @@ void ADWCharacter::LoadData(FSaveData* InSaveData, bool bForceMode)
 					}
 				}
 			}
-		}
-		if(DefaultAbility.IsValid())
-		{
-			AbilitySystem->TryActivateAbility(DefaultAbility.AbilityHandle);
 		}
 	}
 
@@ -294,6 +276,14 @@ FSaveData* ADWCharacter::ToData()
 	SaveData.ActionAbilities = ActionAbilities;
 
 	return &SaveData;
+}
+
+void ADWCharacter::ResetData()
+{
+	Super::ResetData();
+
+	SetMana(GetMaxMana());
+	SetStamina(GetMaxStamina());
 }
 
 void ADWCharacter::SetActorVisible_Implementation(bool bNewVisible)
@@ -1120,16 +1110,15 @@ void ADWCharacter::SetRaceID(FName InRaceID)
 	}
 }
 
-void ADWCharacter::SetLevelV(int32 InLevel)
+bool ADWCharacter::SetLevelV(int32 InLevel)
 {
-	Super::SetLevelV(InLevel);
-
-	FallingAttackAbility.AbilityLevel = InLevel;
+	if(!Super::SetLevelV(InLevel)) return false;
 
 	if (GetCharacterHPWidget())
 	{
 		GetCharacterHPWidget()->SetHeadInfo(GetHeadInfo());
 	}
+	return true;
 }
 
 void ADWCharacter::SetTeamID(FName InTeamID)
@@ -1302,7 +1291,7 @@ bool ADWCharacter::HasTeam() const
 
 bool ADWCharacter::IsTeamMate(ADWCharacter* InTargetCharacter) const
 {
-	return !HasTeam() || InTargetCharacter->TeamID == TeamID;
+	return InTargetCharacter->TeamID == TeamID;
 }
 
 bool ADWCharacter::HasAttackAbility(int32 InAbilityIndex) const
@@ -1462,7 +1451,15 @@ bool ADWCharacter::IsEnemy(ADWCharacter* InTargetCharacter) const
 			break;
 		}
 	}
-	return !IsTeamMate(InTargetCharacter) && !InTargetCharacter->GetRaceID().IsEqual(RaceID);
+	if(IsTeamMate(InTargetCharacter))
+	{
+		return false;
+	}
+	else if(InTargetCharacter->GetRaceID().IsEqual(RaceID))
+	{
+		return false;
+	}
+	return true;
 }
 
 UDWCharacterPart* ADWCharacter::GetCharacterPart(EDWCharacterPartType InCharacterPartType) const
@@ -1486,22 +1483,20 @@ UBehaviorTree* ADWCharacter::GetBehaviorTreeAsset() const
 
 void ADWCharacter::OnAttributeChange(const FOnAttributeChangeData& InAttributeChangeData)
 {
-	Super::OnAttributeChange(InAttributeChangeData);
-	
 	const float DeltaValue = InAttributeChangeData.NewValue - InAttributeChangeData.OldValue;
 
-	if(InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetHealthAttribute() || InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetMaxHealthAttribute())
-	{
-		if (GetCharacterHPWidget())
-		{
-			GetCharacterHPWidget()->SetHealthPercent(GetHealth(), GetMaxHealth());
-		}
-	}
-	else if(InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetExpAttribute())
+	if(InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetExpAttribute() || InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetMaxExpAttribute())
 	{
 		if (GetCharacterHPWidget())
 		{
 			GetCharacterHPWidget()->SetHeadInfo(GetHeadInfo());
+		}
+	}
+	else if(InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetHealthAttribute() || InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetMaxHealthAttribute())
+	{
+		if (GetCharacterHPWidget())
+		{
+			GetCharacterHPWidget()->SetHealthPercent(GetHealth(), GetMaxHealth());
 		}
 	}
 	else if(InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetManaAttribute() || InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetMaxManaAttribute())
@@ -1563,6 +1558,7 @@ void ADWCharacter::OnAttributeChange(const FOnAttributeChangeData& InAttributeCh
 	{
 		GetCharacterMovement()->RotationRate = FRotator(0, InAttributeChangeData.NewValue * (IsSprinting() ? 1.5f : 1) * RotationRate, 0);
 	}
+	Super::OnAttributeChange(InAttributeChangeData);
 }
 
 void ADWCharacter::HandleDamage(EDamageType DamageType, const float LocalDamageDone, bool bHasCrited, bool bHasDefend, FHitResult HitResult, const FGameplayTagContainer& SourceTags, AActor* SourceActor)

@@ -232,14 +232,15 @@ void ADWVitality::SetRaceID(FName InRaceID)
 	}
 }
 
-void ADWVitality::SetLevelV(int32 InLevel)
+bool ADWVitality::SetLevelV(int32 InLevel)
 {
-	Super::SetLevelV(InLevel);
+	if(!Super::SetLevelV(InLevel)) return false;
 
 	if (GetVitalityHPWidget())
 	{
 		GetVitalityHPWidget()->SetHeadInfo(GetHeadInfo());
 	}
+	return true;
 }
 
 UWidgetVitalityHP* ADWVitality::GetVitalityHPWidget() const
@@ -253,31 +254,23 @@ UWidgetVitalityHP* ADWVitality::GetVitalityHPWidget() const
 
 void ADWVitality::OnAttributeChange(const FOnAttributeChangeData& InAttributeChangeData)
 {
-	Super::OnAttributeChange(InAttributeChangeData);
-	
 	const float DeltaValue = InAttributeChangeData.NewValue - InAttributeChangeData.OldValue;
 	
-	if(InAttributeChangeData.Attribute == GetAttributeSet<UDWVitalityAttributeSet>()->GetHealthAttribute())
-	{
-		if (GetVitalityHPWidget())
-		{
-			GetVitalityHPWidget()->SetHealthPercent(InAttributeChangeData.NewValue, GetMaxHealth());
-		}
-	}
-	else if(InAttributeChangeData.Attribute == GetAttributeSet<UDWVitalityAttributeSet>()->GetExpAttribute())
+	if(InAttributeChangeData.Attribute == GetAttributeSet<UDWVitalityAttributeSet>()->GetExpAttribute() || InAttributeChangeData.Attribute == GetAttributeSet<UDWVitalityAttributeSet>()->GetMaxExpAttribute())
 	{
 		if (GetVitalityHPWidget())
 		{
 			GetVitalityHPWidget()->SetHeadInfo(GetHeadInfo());
 		}
 	}
-	else if(InAttributeChangeData.Attribute == GetAttributeSet<UDWVitalityAttributeSet>()->GetMaxHealthAttribute())
+	else if(InAttributeChangeData.Attribute == GetAttributeSet<UDWVitalityAttributeSet>()->GetHealthAttribute() || InAttributeChangeData.Attribute == GetAttributeSet<UDWVitalityAttributeSet>()->GetMaxHealthAttribute())
 	{
 		if (GetVitalityHPWidget())
 		{
-			GetVitalityHPWidget()->SetHealthPercent(GetHealth(), InAttributeChangeData.NewValue);
+			GetVitalityHPWidget()->SetHealthPercent(GetHealth(), GetMaxHealth());
 		}
 	}
+	Super::OnAttributeChange(InAttributeChangeData);
 }
 
 void ADWVitality::HandleDamage(EDamageType DamageType, const float LocalDamageDone, bool bHasCrited, bool bHasDefend, FHitResult HitResult, const FGameplayTagContainer& SourceTags, AActor* SourceActor)

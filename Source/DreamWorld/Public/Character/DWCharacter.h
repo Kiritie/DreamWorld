@@ -131,6 +131,8 @@ protected:
 
 	virtual FSaveData* ToData() override;
 
+	virtual void ResetData() override;
+
 	virtual void SetActorVisible_Implementation(bool bNewVisible) override;
 
 	virtual void RefreshState() override;
@@ -395,7 +397,7 @@ public:
 
 	virtual void SetRaceID(FName InRaceID) override;
 
-	virtual void SetLevelV(int32 InLevel) override;
+	virtual bool SetLevelV(int32 InLevel) override;
 
 	UFUNCTION(BlueprintCallable)
 	virtual void SetControlMode(EDWCharacterControlMode InControlMode);

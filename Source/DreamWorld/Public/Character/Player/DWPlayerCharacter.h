@@ -107,7 +107,7 @@ public:
 
 	virtual void SetRaceID(FName InRaceID) override;
 
-	virtual void SetLevelV(int32 InLevel) override;
+	virtual bool SetLevelV(int32 InLevel) override;
 
 	virtual void SetTeamID(FName InTeamID) override;
 	
@@ -127,7 +127,20 @@ public:
 
 	UFUNCTION()
 	virtual void OnTargetSetRotation(AActor* InTargetActor, FRotator InControlRotation);
-	
+
+protected:
+	UFUNCTION(BlueprintImplementableEvent, BlueprintPure)
+	int32 GetBodyColor();
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintPure)
+	int32 GetCapeColor();
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	void SetBodyColor(int32 InColorIndex);
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	void SetCapeColor(int32 InColorIndex);
+
 public:
 	UFUNCTION(BlueprintPure)
 	virtual UTargetSystemComponent* GetTargetSystem() const { return TargetSystem; }

@@ -4,6 +4,8 @@
 
 UDWCharacterData::UDWCharacterData()
 {
+	MaxLevel = 50;
+
 	Nature = EDWCharacterNature::AIHostile;
 	AttackDistance = 100.f;
 	InteractDistance = 500.f;

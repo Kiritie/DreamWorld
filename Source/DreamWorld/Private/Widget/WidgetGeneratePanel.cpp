@@ -221,7 +221,7 @@ void UWidgetGeneratePanel::OnGenerateButtonClicked()
 		{
 			Inventory->RemoveItemByRange(Iter);
 		}
-		Inventory->AddItemByRange(GenerateItemData.Item);
+		Inventory->AddItemByRange(GenerateItemData.Item, -1);
 	}
 }
 

@@ -5,6 +5,8 @@
 
 UDWVitalityVoxelData::UDWVitalityVoxelData()
 {
+	MaxLevel = 10;
+
 	VoxelID = FPrimaryAssetId();
 
 	Class = ADWVitalityVoxel::StaticClass();
