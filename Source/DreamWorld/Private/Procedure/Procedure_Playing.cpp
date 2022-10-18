@@ -3,11 +3,13 @@
 
 #include "Procedure/Procedure_Playing.h"
 
+#include "AchievementSubSystem.h"
 #include "Audio/AudioModuleBPLibrary.h"
 #include "Camera/CameraModuleBPLibrary.h"
 #include "Character/CharacterModuleBPLibrary.h"
 #include "Character/Player/DWPlayerCharacter.h"
 #include "Gameplay/DWGameState.h"
+#include "Gameplay/WHGameInstance.h"
 #include "Global/GlobalBPLibrary.h"
 #include "Procedure/Procedure_Loading.h"
 #include "SaveGame/SaveGameModuleBPLibrary.h"
@@ -65,6 +67,8 @@ void UProcedure_Playing::OnEnter(UProcedureBase* InLastProcedure)
 		}
 	}
 	AMainModule::UnPauseModuleByClass<ASceneModule>();
+
+	UGlobalBPLibrary::GetGameInstance()->GetSubsystem<UAchievementSubSystem>()->Unlock(FName("FirstPlay"));
 }
 
 void UProcedure_Playing::OnRefresh()

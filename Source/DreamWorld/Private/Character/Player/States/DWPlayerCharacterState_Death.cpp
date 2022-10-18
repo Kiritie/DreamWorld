@@ -1,15 +1,13 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Character/Player/States/DWPlayerCharacterState_Death.h"
-#include "Ability/Item/Equip/AbilityEquipBase.h"
-#include "AI/DWAIController.h"
+
+#include "AchievementSubSystem.h"
 #include "Character/Player/DWPlayerCharacter.h"
-#include "Components/CapsuleComponent.h"
-#include "Ability/Inventory/Inventory.h"
-#include "Voxel/Chunks/VoxelChunk.h"
-#include "Widget/WidgetGameHUD.h"
 #include "Widget/WidgetModuleBPLibrary.h"
 #include "Ability/Components/InteractionComponent.h"
+#include "Gameplay/WHGameInstance.h"
+#include "Global/GlobalBPLibrary.h"
 
 UDWPlayerCharacterState_Death::UDWPlayerCharacterState_Death()
 {
@@ -35,6 +33,8 @@ void UDWPlayerCharacterState_Death::OnEnter(UFiniteStateBase* InLastFiniteState)
 	PlayerCharacter->GetTargetSystem()->TargetLockOff();
 
 	PlayerCharacter->GetInteractionComponent()->SetInteractingAgent(PlayerCharacter);
+
+	UGlobalBPLibrary::GetGameInstance()->GetSubsystem<UAchievementSubSystem>()->Unlock(FName("FirstDeath"));
 }
 
 void UDWPlayerCharacterState_Death::OnRefresh()

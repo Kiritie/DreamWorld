@@ -2,6 +2,7 @@
 
 #include "Character/DWCharacter.h"
 
+#include "AchievementSubSystem.h"
 #include "TimerManager.h"
 #include "Ability/AbilityModuleBPLibrary.h"
 #include "Ability/Abilities/ItemAbilityBase.h"
@@ -66,6 +67,7 @@
 #include "FSM/Components/FSMComponent.h"
 #include "Ability/Inventory/Slot/InventoryEquipSlot.h"
 #include "Ability/Inventory/Slot/InventorySkillSlot.h"
+#include "Gameplay/WHGameInstance.h"
 #include "Item/Prop/DWPropData.h"
 #include "Main/MainModuleBPLibrary.h"
 #include "Team/DWTeamModule.h"
@@ -762,6 +764,7 @@ bool ADWCharacter::GenerateVoxel(const FVoxelHitResult& InVoxelHitResult)
 		if(Super::GenerateVoxel(InVoxelHitResult))
 		{
 			Inventory->RemoveItemByQueryInfo(QueryItemInfo);
+			UGlobalBPLibrary::GetGameInstance()->GetSubsystem<UAchievementSubSystem>()->Unlock(FName("FirstGenerateVoxel"));
 			return true;
 		}
 	}
@@ -772,7 +775,11 @@ bool ADWCharacter::DestroyVoxel(const FVoxelHitResult& InVoxelHitResult)
 {
 	if(DoAction(EDWCharacterActionType::Destroy))
 	{
-		Super::DestroyVoxel(InVoxelHitResult);
+		if(Super::DestroyVoxel(InVoxelHitResult))
+		{
+			UGlobalBPLibrary::GetGameInstance()->GetSubsystem<UAchievementSubSystem>()->Unlock(FName("FirstDestroyVoxel"));
+			return true;
+		}
 	}
 	return false;
 }

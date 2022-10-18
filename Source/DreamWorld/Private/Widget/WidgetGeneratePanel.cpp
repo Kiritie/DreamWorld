@@ -3,6 +3,7 @@
 
 #include "Widget/WidgetGeneratePanel.h"
 
+#include "AchievementSubSystem.h"
 #include "Blueprint/WidgetBlueprintLibrary.h"
 #include "Widget/Inventory/WidgetInventoryBar.h"
 #include "Widget/Inventory/Slot/WidgetInventorySlot.h"
@@ -20,6 +21,7 @@
 #include "Components/Button.h"
 #include "Ability/Inventory/Inventory.h"
 #include "Character/DWCharacter.h"
+#include "Gameplay/WHGameInstance.h"
 
 UWidgetGeneratePanel::UWidgetGeneratePanel(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -222,6 +224,8 @@ void UWidgetGeneratePanel::OnGenerateButtonClicked()
 			Inventory->RemoveItemByRange(Iter);
 		}
 		Inventory->AddItemByRange(GenerateItemData.Item, -1);
+
+		UGlobalBPLibrary::GetGameInstance()->GetSubsystem<UAchievementSubSystem>()->Unlock(FName("FirstGenerateItem"));
 	}
 }
 

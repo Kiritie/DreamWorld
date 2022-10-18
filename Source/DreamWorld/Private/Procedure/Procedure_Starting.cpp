@@ -67,6 +67,11 @@ void UProcedure_Starting::OnEnter(UProcedureBase* InLastProcedure)
 	}
 	AMainModule::PauseModuleByClass<ASceneModule>();
 
+	if(const ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>())
+	{
+		CameraViewOffset = FVector(PlayerCharacter->GetActorLocation().X, PlayerCharacter->GetActorLocation().Y, CameraViewOffset.Z);
+	}
+
 	Super::OnEnter(InLastProcedure);
 }
 

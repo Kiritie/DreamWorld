@@ -74,6 +74,8 @@ public:
 public:
 	virtual void Death(IAbilityVitalityInterface* InKiller /* = nullptr */) override;
 
+	virtual void Kill(IAbilityVitalityInterface* InTarget) override;
+
 	virtual bool CanLookAtTarget(ADWCharacter* InTargetCharacter) override;
 
 	virtual void LookAtTarget(ADWCharacter* InTargetCharacter) override;

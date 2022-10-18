@@ -2,13 +2,12 @@
 
 #include "Character/Player/DWPlayerCharacter.h"
 
+#include "AchievementSubSystem.h"
 #include "Ability/Character/DWCharacterAttributeSet.h"
 #include "Ability/Components/InteractionComponent.h"
-#include "Item/Equip/Shield/DWEquipShield.h"
 #include "Item/Equip/Weapon/DWEquipWeapon.h"
 #include "Asset/AssetModuleBPLibrary.h"
 #include "Ability/Item/AbilityItemDataBase.h"
-#include "Character/Player/DWPlayerCharacterAnim.h"
 #include "Gameplay/DWPlayerController.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
@@ -17,25 +16,15 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Components/SceneCaptureComponent2D.h"
 #include "Components/SkeletalMeshComponent.h"
-#include "Components/BoxComponent.h"
 #include "Voxel/Components/VoxelMeshComponent.h"
-#include "Gameplay/DWGameMode.h"
-#include "Perception/PawnSensingComponent.h"
-#include "Kismet/KismetSystemLibrary.h"
 #include "Widget/Inventory/WidgetInventoryBar.h"
 #include "Widget/Inventory/Slot/WidgetInventorySlot.h"
 #include "Widget/Inventory/WidgetInventoryPanel.h"
 #include "Ability/Inventory/Slot/InventorySlot.h"
 #include "Gameplay/DWGameState.h"
-#include "Ability/Inventory/Slot/InventorySkillSlot.h"
-#include "Gameplay/DWGameInstance.h"
-#include "Input/InputModuleBPLibrary.h"
 #include "Widget/WidgetGameHUD.h"
-#include "Ability/Inventory/Slot/InventoryEquipSlot.h"
 #include "Voxel/DWVoxelModule.h"
-#include "Voxel/VoxelModule.h"
 #include "Voxel/Chunks/VoxelChunk.h"
-#include "Voxel/Voxels/Voxel.h"
 #include "Widget/WidgetModuleBPLibrary.h"
 #include "Voxel/Datas/VoxelData.h"
 #include "Ability/Item/Equip/AbilityEquipDataBase.h"
@@ -43,7 +32,6 @@
 #include "Ability/Item/Skill/AbilitySkillDataBase.h"
 #include "Ability/AbilityModuleBPLibrary.h"
 #include "Ability/AbilityModuleTypes.h"
-#include "Ability/Components/CharacterInteractionComponent.h"
 #include "Camera/CameraModuleBPLibrary.h"
 #include "Character/Player/States/DWPlayerCharacterState_Attack.h"
 #include "Character/Player/States/DWPlayerCharacterState_Death.h"
@@ -63,12 +51,13 @@
 #include "Character/States/DWCharacterState_Walk.h"
 #include "FSM/Components/FSMComponent.h"
 #include "Global/GlobalBPLibrary.h"
-#include "Voxel/VoxelModuleBPLibrary.h"
 #include "Voxel/Voxels/Entity/VoxelEntity.h"
 #include "Widget/World/WorldWidgetComponent.h"
 #include "Ability/Inventory/CharacterInventory.h"
 #include "Widget/WidgetContextBox.h"
 #include "Ability/Item/Raw/AbilityRawDataBase.h"
+#include "Gameplay/WHGameInstance.h"
+#include "Vitality/DWVitality.h"
 
 //////////////////////////////////////////////////////////////////////////
 // ADWPlayerCharacter
@@ -261,6 +250,20 @@ void ADWPlayerCharacter::Death(IAbilityVitalityInterface* InKiller /* = nullptr 
 	if(InKiller)
 	{
 		UWidgetModuleBPLibrary::GetUserWidget<UWidgetContextBox>()->AddMessage(FString::Printf(TEXT("你被 %s 杀死了！"), *InKiller->GetNameV().ToString()));
+	}
+}
+
+void ADWPlayerCharacter::Kill(IAbilityVitalityInterface* InTarget)
+{
+	Super::Kill(InTarget);
+
+	if(Cast<ADWCharacter>(InTarget))
+	{
+		UGlobalBPLibrary::GetGameInstance()->GetSubsystem<UAchievementSubSystem>()->Unlock(FName("FirstKillMonster"));
+	}
+	else if(Cast<ADWVitality>(InTarget))
+	{
+		UGlobalBPLibrary::GetGameInstance()->GetSubsystem<UAchievementSubSystem>()->Unlock(FName("FirstKillVitality"));
 	}
 }
 
