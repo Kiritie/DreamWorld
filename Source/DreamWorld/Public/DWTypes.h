@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Engine/DataTable.h"
 #include "Abilities/GameplayAbilityTargetTypes.h"
 #include "GameplayAbilitySpec.h"
 #include "GameplayEffectTypes.h"
@@ -9,6 +8,7 @@
 #include "Parameter/ParameterModuleTypes.h"
 #include "SaveGame/SaveGameModuleTypes.h"
 #include "Voxel/VoxelModuleTypes.h"
+#include "Asset/AssetModuleTypes.h"
 
 #include "DWTypes.generated.h"
 
@@ -288,7 +288,7 @@ public:
 };
 
 USTRUCT(BlueprintType)
-struct DREAMWORLD_API FDWEffectData : public FTableRowBase
+struct DREAMWORLD_API FDWEffectData : public FDataTableRowBase
 {
 	GENERATED_BODY()
 
@@ -402,11 +402,11 @@ public:
 UENUM(BlueprintType)
 enum class EDWPlayerInventoryInitType : uint8
 {
-	// 无
-	None,
-	// 基础
-	Basic,
-	// 充满
+	// 默认
+	Default,
+	// 空
+	Empty,
+	// 充满（调试用）
 	All
 };
 
@@ -421,7 +421,7 @@ public:
 		ArchiveID = 0;
 		BodyColorIndex = 0;
 		CapeColorIndex = 0;
-		InventoryInitType = EDWPlayerInventoryInitType::Basic;
+		InventoryInitType = EDWPlayerInventoryInitType::Default;
 	}
 		
 	FORCEINLINE FDWPlayerSaveData(const FDWCharacterSaveData& InCharacterSaveData) : FDWPlayerBasicSaveData(InCharacterSaveData)
@@ -429,7 +429,7 @@ public:
 		ArchiveID = 0;
 		BodyColorIndex = 0;
 		CapeColorIndex = 0;
-		InventoryInitType = EDWPlayerInventoryInitType::Basic;
+		InventoryInitType = EDWPlayerInventoryInitType::Default;
 	}
 
 	FORCEINLINE FDWPlayerSaveData(const FDWPlayerBasicSaveData& InBasicSaveData) : FDWPlayerBasicSaveData(InBasicSaveData)
@@ -437,7 +437,7 @@ public:
 		ArchiveID = 0;
 		BodyColorIndex = 0;
 		CapeColorIndex = 0;
-		InventoryInitType = EDWPlayerInventoryInitType::Basic;
+		InventoryInitType = EDWPlayerInventoryInitType::Default;
 	}
 
 	UPROPERTY(BlueprintReadOnly)
@@ -620,7 +620,7 @@ public:
 };
 
 USTRUCT(BlueprintType)
-struct DREAMWORLD_API FDWGenerateItemData : public FTableRowBase
+struct DREAMWORLD_API FDWGenerateItemData : public FDataTableRowBase
 {
 	GENERATED_BODY()
 

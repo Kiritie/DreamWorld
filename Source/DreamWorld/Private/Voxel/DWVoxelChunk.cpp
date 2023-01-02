@@ -54,9 +54,9 @@ void ADWVoxelChunk::OnDespawn_Implementation()
 	bRaceGenerated = false;
 }
 
-void ADWVoxelChunk::LoadData(FSaveData* InSaveData, bool bForceMode)
+void ADWVoxelChunk::LoadData(FSaveData* InSaveData, EPhase InPhase)
 {
-	Super::LoadData(InSaveData, bForceMode);
+	Super::LoadData(InSaveData, InPhase);
 }
  
 FSaveData* ADWVoxelChunk::ToData()
@@ -162,9 +162,9 @@ void ADWVoxelChunk::Initialize(AVoxelModule* InModule, FIndex InIndex, int32 InB
 	Super::Initialize(InModule, InIndex, InBatch);
 }
 
-void ADWVoxelChunk::Generate(bool bBuildMesh, bool bForceMode)
+void ADWVoxelChunk::Generate(EPhase InPhase)
 {
-	Super::Generate(bBuildMesh, bForceMode);
+	Super::Generate(InPhase);
 }
 
 void ADWVoxelChunk::BuildMap(int32 InStage)
@@ -228,6 +228,7 @@ void ADWVoxelChunk::GenerateActors()
 								saveData.Level = vitalityItem.Level;
 								saveData.SpawnLocation = hitResult.Location;
 								saveData.SpawnRotation = FRotator(0.f, FMath::RandRange(0.f, 360.f), 0.f);
+								saveData.InventoryData = vitalityData.InventoryData;
 								UAbilityModuleBPLibrary::SpawnVitality(&saveData, this);
 								break;
 							}
@@ -262,6 +263,7 @@ void ADWVoxelChunk::GenerateActors()
 								saveData.Level = characterItem.Level;
 								saveData.SpawnLocation = hitResult.Location;
 								saveData.SpawnRotation = FRotator(0.f, FMath::RandRange(0.f, 360.f), 0.f);
+								saveData.InventoryData = characterData.InventoryData;
 								if(ADWCharacter* character = Cast<ADWCharacter>(UAbilityModuleBPLibrary::SpawnCharacter(&saveData, this)))
 								{
 									if(!captain)

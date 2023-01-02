@@ -2,6 +2,8 @@
 
 
 #include "Character/DWCharacterModule.h"
+#include "Asset/AssetModuleBPLibrary.h"
+#include "Ability/AbilityModuleTypes.h"
 
 MODULE_INSTANCE_IMPLEMENTATION(ADWCharacterModule)
 
@@ -46,4 +48,17 @@ void ADWCharacterModule::OnPause_Implementation()
 void ADWCharacterModule::OnUnPause_Implementation()
 {
 	Super::OnUnPause_Implementation();
+}
+
+FDWPlayerBasicSaveData& ADWCharacterModule::GetPlayerBasicData()
+{
+	FPlayerRaceData PlayerRaceData;
+	UAssetModuleBPLibrary::GetDataTableRow(0, PlayerRaceData);
+	PlayerBasicData.RaceID = PlayerRaceData.ID;
+	if(PlayerRaceData.Items.Num() > 0)
+	{
+		PlayerBasicData.ID = PlayerRaceData.Items[0].ID;
+		PlayerBasicData.Level = PlayerRaceData.Items[0].Level;
+	}
+	return PlayerBasicData;
 }

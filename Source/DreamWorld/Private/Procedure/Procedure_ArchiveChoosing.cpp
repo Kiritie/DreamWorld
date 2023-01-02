@@ -92,7 +92,7 @@ void UProcedure_ArchiveChoosing::ChooseArchive(int32 InArchiveID)
 {
 	if(USaveGameModuleBPLibrary::GetActiveSaveIndex<UDWArchiveSaveGame>() != InArchiveID)
 	{
-		USaveGameModuleBPLibrary::LoadSaveGame<UDWArchiveSaveGame>(InArchiveID, true);
+		USaveGameModuleBPLibrary::LoadSaveGame<UDWArchiveSaveGame>(InArchiveID, EPhase::Primary);
 	}
 	UProcedureModuleBPLibrary::SwitchProcedureByClass<UProcedure_Loading>();
 }

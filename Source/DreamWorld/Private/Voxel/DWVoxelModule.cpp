@@ -103,9 +103,26 @@ void ADWVoxelModule::OnTermination_Implementation()
 	Super::OnTermination_Implementation();
 }
 
-void ADWVoxelModule::LoadData(FSaveData* InSaveData, bool bForceMode)
+void ADWVoxelModule::LoadData(FSaveData* InSaveData, EPhase InPhase)
 {
-	Super::LoadData(InSaveData, bForceMode);
+	switch(InPhase)
+	{
+		case EPhase::Primary:
+		{
+			if(!WorldData)
+			{
+				WorldData = new FDWVoxelWorldSaveData();
+			}
+			break;
+		}
+		case EPhase::Second:
+		case EPhase::Final:
+		{
+			break;
+		}
+	}
+
+	Super::LoadData(InSaveData, InPhase);
 }
 
 FSaveData* ADWVoxelModule::ToData()
@@ -113,9 +130,9 @@ FSaveData* ADWVoxelModule::ToData()
 	return Super::ToData();
 }
 
-void ADWVoxelModule::UnloadData(bool bForceMode)
+void ADWVoxelModule::UnloadData(EPhase InPhase)
 {
-	Super::UnloadData(bForceMode);
+	Super::UnloadData(InPhase);
 }
 
 void ADWVoxelModule::OnWorldStateChanged()

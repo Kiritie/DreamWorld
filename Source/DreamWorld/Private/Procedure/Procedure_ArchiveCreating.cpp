@@ -21,6 +21,8 @@
 #include "Widget/WidgetModuleBPLibrary.h"
 #include "Widget/Archive/WidgetArchiveChoosingPanel.h"
 #include "Widget/Archive/WidgetArchiveCreatingPanel.h"
+#include "Voxel/VoxelModule.h"
+#include "DWTypes.h"
 
 UProcedure_ArchiveCreating::UProcedure_ArchiveCreating()
 {
@@ -76,6 +78,18 @@ void UProcedure_ArchiveCreating::OnGuide()
 void UProcedure_ArchiveCreating::OnLeave(UProcedureBase* InNextProcedure)
 {
 	Super::OnLeave(InNextProcedure);
+}
+
+void UProcedure_ArchiveCreating::CreatePlayer(FDWPlayerSaveData& InPlayerSaveData, EPhase InPhase)
+{
+	UGlobalBPLibrary::GetPlayerController<ADWPlayerController>()->LoadSaveData(&InPlayerSaveData, InPhase);
+	USaveGameModuleBPLibrary::GetSaveGame<UDWArchiveSaveGame>()->GetSaveDataRef<FDWArchiveSaveData>().PlayerData = InPlayerSaveData;
+}
+
+void UProcedure_ArchiveCreating::CreateWorld(FDWVoxelWorldSaveData& InWorldSaveData, EPhase InPhase)
+{
+	AVoxelModule::Get()->LoadSaveData(&InWorldSaveData, InPhase);
+	USaveGameModuleBPLibrary::GetSaveGame<UDWArchiveSaveGame>()->GetSaveDataRef<FDWArchiveSaveData>().WorldData = InWorldSaveData;
 }
 
 void UProcedure_ArchiveCreating::CreateArchive(FDWArchiveSaveData& InArchiveSaveData)

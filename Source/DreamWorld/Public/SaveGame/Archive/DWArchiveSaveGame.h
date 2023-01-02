@@ -23,9 +23,9 @@ public:
 
 	virtual void OnSave_Implementation() override;
 
-	virtual void OnLoad_Implementation(bool bForceMode) override;
+	virtual void OnLoad_Implementation(EPhase InPhase) override;
 
-	virtual void OnUnload_Implementation(bool bForceMode) override;
+	virtual void OnUnload_Implementation(EPhase InPhase) override;
 	
 	virtual void OnRefresh_Implementation() override;
 

@@ -27,10 +27,7 @@ void UDWArchiveSaveGame::OnCreate_Implementation(int32 InSaveIndex)
 
 	DWArchiveSaveData.ID = InSaveIndex;
 	DWArchiveSaveData.WorldData = ADWVoxelModule::Get()->GetWorldBasicData();
-	if(ADWCharacterModule::Get())
-	{
-		DWArchiveSaveData.PlayerData = ADWCharacterModule::Get()->GetPlayerBasicData();
-	}
+	DWArchiveSaveData.PlayerData = ADWCharacterModule::Get()->GetPlayerBasicData();
 }
 
 void UDWArchiveSaveGame::OnSave_Implementation()
@@ -38,24 +35,24 @@ void UDWArchiveSaveGame::OnSave_Implementation()
 	Super::OnSave_Implementation();
 }
 
-void UDWArchiveSaveGame::OnLoad_Implementation(bool bForceMode)
+void UDWArchiveSaveGame::OnLoad_Implementation(EPhase InPhase)
 {
-	Super::OnLoad_Implementation(bForceMode);
+	Super::OnLoad_Implementation(InPhase);
 
 	WHDebug(FString::Printf(TEXT("Loading archive : %d"), DWArchiveSaveData.ID));
 
-	AVoxelModule::Get()->LoadSaveData(&DWArchiveSaveData.WorldData, bForceMode);
-	UGlobalBPLibrary::GetPlayerController<ADWPlayerController>()->LoadSaveData(&DWArchiveSaveData.PlayerData, bForceMode);
+	AVoxelModule::Get()->LoadSaveData(&DWArchiveSaveData.WorldData, InPhase);
+	UGlobalBPLibrary::GetPlayerController<ADWPlayerController>()->LoadSaveData(&DWArchiveSaveData.PlayerData, InPhase);
 }
 
-void UDWArchiveSaveGame::OnUnload_Implementation(bool bForceMode)
+void UDWArchiveSaveGame::OnUnload_Implementation(EPhase InPhase)
 {
-	Super::OnUnload_Implementation(bForceMode);
+	Super::OnUnload_Implementation(InPhase);
 
 	WHDebug(FString::Printf(TEXT("Unloading archive : %d"), DWArchiveSaveData.ID));
 
-	ADWVoxelModule::Get()->UnloadSaveData(bForceMode);
-	UGlobalBPLibrary::GetPlayerController<ADWPlayerController>()->UnloadSaveData(bForceMode);
+	ADWVoxelModule::Get()->UnloadSaveData(InPhase);
+	UGlobalBPLibrary::GetPlayerController<ADWPlayerController>()->UnloadSaveData(InPhase);
 }
 
 void UDWArchiveSaveGame::OnRefresh_Implementation()
@@ -77,7 +74,7 @@ void UDWArchiveSaveGame::OnActiveChange_Implementation(bool bActive)
 
 	if(!bActive)
 	{
-		ADWVoxelModule::Get()->UnloadSaveData(true);
-		UGlobalBPLibrary::GetPlayerController<ADWPlayerController>()->UnloadSaveData(true);
+		ADWVoxelModule::Get()->UnloadSaveData(EPhase::Primary);
+		UGlobalBPLibrary::GetPlayerController<ADWPlayerController>()->UnloadSaveData(EPhase::Primary);
 	}
 }

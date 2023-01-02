@@ -34,7 +34,7 @@ protected:
 		
 	virtual void OnDespawn_Implementation() override;
 
-	virtual void LoadData(FSaveData* InSaveData, bool bForceMode) override;
+	virtual void LoadData(FSaveData* InSaveData, EPhase InPhase) override;
 
 	virtual FSaveData* ToData() override;
 
@@ -65,7 +65,7 @@ protected:
 public:
 	virtual void Initialize(AVoxelModule* InModule, FIndex InIndex, int32 InBatch) override;
 
-	virtual void Generate(bool bBuildMesh, bool bForceMode) override;
+	virtual void Generate(EPhase InPhase = EPhase::Primary) override;
 
 	virtual void BuildMap(int32 InStage) override;
 

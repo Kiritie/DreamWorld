@@ -15,9 +15,9 @@ UDWCharacterInventory::UDWCharacterInventory()
 	SkillSlotClass = UDWInventorySkillSlot::StaticClass();
 }
 
-void UDWCharacterInventory::LoadData(FSaveData* InSaveData, bool bForceMode)
+void UDWCharacterInventory::LoadData(FSaveData* InSaveData, EPhase InPhase)
 {
-	Super::LoadData(InSaveData, bForceMode);
+	Super::LoadData(InSaveData, InPhase);
 }
 
 FSaveData* UDWCharacterInventory::ToData()
@@ -25,9 +25,9 @@ FSaveData* UDWCharacterInventory::ToData()
 	return Super::ToData();
 }
 
-void UDWCharacterInventory::UnloadData(bool bForceMode)
+void UDWCharacterInventory::UnloadData(EPhase InPhase)
 {
-	Super::UnloadData(bForceMode);
+	Super::UnloadData(InPhase);
 }
 
 FQueryItemInfo UDWCharacterInventory::QueryItemByRange(EQueryItemType InActionType, FAbilityItem InItem, int32 InStartIndex, int32 InEndIndex)

@@ -10,9 +10,9 @@ UDWVitalityInventory::UDWVitalityInventory()
 	SkillSlotClass = UDWInventorySkillSlot::StaticClass();
 }
 
-void UDWVitalityInventory::LoadData(FSaveData* InSaveData, bool bForceMode)
+void UDWVitalityInventory::LoadData(FSaveData* InSaveData, EPhase InPhase)
 {
-	Super::LoadData(InSaveData, bForceMode);
+	Super::LoadData(InSaveData, InPhase);
 }
 
 FSaveData* UDWVitalityInventory::ToData()
@@ -20,9 +20,9 @@ FSaveData* UDWVitalityInventory::ToData()
 	return Super::ToData();
 }
 
-void UDWVitalityInventory::UnloadData(bool bForceMode)
+void UDWVitalityInventory::UnloadData(EPhase InPhase)
 {
-	Super::UnloadData(bForceMode);
+	Super::UnloadData(InPhase);
 }
 
 void UDWVitalityInventory::DiscardAllItem()

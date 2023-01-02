@@ -56,9 +56,9 @@ void ADWSaveGameModule::OnUnPause_Implementation()
 	Super::OnUnPause_Implementation();
 }
 
-void ADWSaveGameModule::LoadData(FSaveData* InSaveData, bool bForceMode)
+void ADWSaveGameModule::LoadData(FSaveData* InSaveData, EPhase InPhase)
 {
-	Super::LoadData(InSaveData, bForceMode);
+	Super::LoadData(InSaveData, InPhase);
 }
 
 FSaveData* ADWSaveGameModule::ToData()

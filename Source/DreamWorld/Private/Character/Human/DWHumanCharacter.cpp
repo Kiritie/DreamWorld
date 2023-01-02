@@ -82,6 +82,7 @@ void ADWHumanCharacter::OnSelectItem(const FAbilityItem& InItem)
 			GenerateVoxelEntity = UObjectPoolModuleBPLibrary::SpawnObject<AVoxelEntity>();
 			GenerateVoxelEntity->Execute_SetActorVisible(GenerateVoxelEntity, Execute_IsVisible(this) && ControlMode == EDWCharacterControlMode::Creating);
 			GenerateVoxelEntity->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("GenerateVoxelMesh"));
+			GenerateVoxelEntity->SetActorScale3D(FVector(0.3f));
 			GenerateVoxelEntity->GetMeshComponent()->SetCastShadow(false);
 			GenerateVoxelEntity->GetMeshComponent()->OffsetScale = FVector(0.f, 0.f, 1.f);
 			GenerateVoxelEntity->GetMeshComponent()->CenterOffset = FVector(0.f, 0.f, 0.5f);
@@ -106,6 +107,7 @@ void ADWHumanCharacter::OnAuxiliaryItem(const FAbilityItem& InItem)
 		{
 			AuxiliaryVoxelEntity = UObjectPoolModuleBPLibrary::SpawnObject<AVoxelEntity>();
 			AuxiliaryVoxelEntity->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("AuxiliaryVoxelMesh"));
+			AuxiliaryVoxelEntity->SetActorScale3D(FVector(0.3f));
 			AuxiliaryVoxelEntity->GetMeshComponent()->SetCastShadow(false);
 		}
 		AuxiliaryVoxelEntity->Initialize(InItem.ID);

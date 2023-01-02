@@ -18,14 +18,14 @@ void UDWGeneralSaveGame::OnCreate_Implementation(int32 InSaveIndex)
 	Super::OnCreate_Implementation(InSaveIndex);
 }
 
-void UDWGeneralSaveGame::OnLoad_Implementation(bool bForceMode)
+void UDWGeneralSaveGame::OnLoad_Implementation(EPhase InPhase)
 {
-	Super::OnLoad_Implementation(bForceMode);
+	Super::OnLoad_Implementation(InPhase);
 }
 
-void UDWGeneralSaveGame::OnUnload_Implementation(bool bForceMode)
+void UDWGeneralSaveGame::OnUnload_Implementation(EPhase InPhase)
 {
-	Super::OnUnload_Implementation(bForceMode);
+	Super::OnUnload_Implementation(InPhase);
 }
 
 void UDWGeneralSaveGame::OnRefresh_Implementation()

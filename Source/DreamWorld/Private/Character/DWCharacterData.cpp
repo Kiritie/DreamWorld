@@ -17,7 +17,6 @@ UDWCharacterData::UDWCharacterData()
 	ActionAbilityTable = nullptr;
 	BehaviorTreeAsset = nullptr;
 	FallingAttackAbility = FDWCharacterAttackAbilityData();
-	InventoryData = FInventorySaveData();
 
 	// tags
 	DeadTag = FGameplayTag::RequestGameplayTag("State.Vitality.Dead");

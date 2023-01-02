@@ -157,7 +157,7 @@ void ADWCharacter::OnDespawn_Implementation()
 {
 	Super::OnDespawn_Implementation();
 
-	Inventory->UnloadSaveData(true);
+	Inventory->UnloadSaveData(EPhase::Primary);
 	
 	for(auto& Iter : Equips)
 	{
@@ -166,101 +166,111 @@ void ADWCharacter::OnDespawn_Implementation()
 	Equips.Empty();
 }
 
-void ADWCharacter::LoadData(FSaveData* InSaveData, bool bForceMode)
+void ADWCharacter::LoadData(FSaveData* InSaveData, EPhase InPhase)
 {
 	auto& SaveData = InSaveData->CastRef<FDWCharacterSaveData>();
-	
-	if(bForceMode)
+
+	switch(InPhase)
 	{
-		SetControlMode(SaveData.ControlMode);
-		SetTeamID(SaveData.TeamID);
-
-		if(SaveData.IsSaved())
+		case EPhase::Primary:
 		{
-			BirthLocation = SaveData.BirthLocation;
-			FallingAttackAbility = SaveData.FallingAttackAbility;
-			AttackAbilities = SaveData.AttackAbilities;
-			SkillAbilities = SaveData.SkillAbilities;
-			ActionAbilities = SaveData.ActionAbilities;
+			SetControlMode(SaveData.ControlMode);
+			SetTeamID(SaveData.TeamID);
 
-			for(auto& Iter : AttackAbilities)
+			if(SaveData.IsSaved())
 			{
-				for(auto& Iter1 : Iter.Value.Array)
+				BirthLocation = SaveData.BirthLocation;
+				FallingAttackAbility = SaveData.FallingAttackAbility;
+				AttackAbilities = SaveData.AttackAbilities;
+				SkillAbilities = SaveData.SkillAbilities;
+				ActionAbilities = SaveData.ActionAbilities;
+
+				for(auto& Iter : AttackAbilities)
 				{
-					Iter1.AbilityHandle = AbilitySystem->K2_GiveAbility(Iter1.AbilityClass, Iter1.AbilityLevel);
-				}
-			}
-			
-			for(auto& Iter : SkillAbilities)
-			{
-				Iter.Value.AbilityHandle = AbilitySystem->K2_GiveAbility(Iter.Value.AbilityClass, Iter.Value.AbilityLevel);
-			}
-
-			for(auto& Iter : ActionAbilities)
-			{
-				Iter.Value.AbilityHandle = AbilitySystem->K2_GiveAbility(Iter.Value.AbilityClass, Iter.Value.AbilityLevel);
-			}
-
-			if (FallingAttackAbility.AbilityClass)
-			{
-				FallingAttackAbility.AbilityHandle = AbilitySystem->K2_GiveAbility(FallingAttackAbility.AbilityClass, FallingAttackAbility.AbilityLevel);
-			}
-		}
-		else
-		{
-			BirthLocation = SaveData.SpawnLocation;
-
-			const UDWCharacterData& CharacterData = GetCharacterData<UDWCharacterData>();
-			if(CharacterData.IsValid())
-			{
-				TArray<FDWCharacterAttackAbilityData> attackAbilities;
-				UAssetModuleBPLibrary::ReadDataTable(CharacterData.AttackAbilityTable, attackAbilities);
-				for(auto Iter : attackAbilities)
-				{
-					Iter.AbilityHandle = AbilitySystem->K2_GiveAbility(Iter.AbilityClass, Iter.AbilityLevel);
-					if(!AttackAbilities.Contains(Iter.WeaponType)) AttackAbilities.Add(Iter.WeaponType);
-					AttackAbilities[Iter.WeaponType].Array.Add(Iter);
-				}
-
-				TArray<FDWCharacterSkillAbilityData> skillAbilities;
-				UAssetModuleBPLibrary::ReadDataTable(CharacterData.SkillAbilityTable, skillAbilities);
-				for(auto Iter : skillAbilities)
-				{
-					Iter.AbilityHandle = AbilitySystem->K2_GiveAbility(Iter.AbilityClass, Iter.AbilityLevel);
-					SkillAbilities.Add(Iter.AbilityID, Iter);
-				}
-
-				TArray<FDWCharacterActionAbilityData> actionAbilities;
-				UAssetModuleBPLibrary::ReadDataTable(CharacterData.ActionAbilityTable, actionAbilities);
-				for(auto Iter : actionAbilities)
-				{
-					Iter.AbilityHandle = AbilitySystem->K2_GiveAbility(Iter.AbilityClass, Iter.AbilityLevel);
-					ActionAbilities.Add(Iter.ActionType, Iter);
-				}
-
-				if (CharacterData.FallingAttackAbility.AbilityClass)
-				{
-					FallingAttackAbility = CharacterData.FallingAttackAbility;
-					FallingAttackAbility.AbilityHandle = AbilitySystem->K2_GiveAbility(FallingAttackAbility.AbilityClass, FallingAttackAbility.AbilityLevel);
-				}
-				
-				SaveData.InventoryData = CharacterData.InventoryData;
-
-				if(!IsPlayer())
-				{
-					auto EquipDatas = UAssetModuleBPLibrary::LoadPrimaryAssets<UAbilityEquipDataBase>(UAbilityModuleBPLibrary::ItemTypeToAssetType(EAbilityItemType::Equip));
-					const int32 EquipNum = FMath::Clamp(FMath::Rand() < 0.2f ? FMath::RandRange(1, 3) : 0, 0, EquipDatas.Num());
-					for (int32 i = 0; i < EquipNum; i++)
+					for(auto& Iter1 : Iter.Value.Array)
 					{
-						FAbilityItem tmpItem = FAbilityItem(EquipDatas[FMath::RandRange(0, EquipDatas.Num() - 1)]->GetPrimaryAssetId(), 1);
-						SaveData.InventoryData.AddItem(tmpItem);
+						Iter1.AbilityHandle = AbilitySystem->K2_GiveAbility(Iter1.AbilityClass, Iter1.AbilityLevel);
 					}
 				}
-			}
-		}
-	}
+			
+				for(auto& Iter : SkillAbilities)
+				{
+					Iter.Value.AbilityHandle = AbilitySystem->K2_GiveAbility(Iter.Value.AbilityClass, Iter.Value.AbilityLevel);
+				}
 
-	Super::LoadData(InSaveData, bForceMode);
+				for(auto& Iter : ActionAbilities)
+				{
+					Iter.Value.AbilityHandle = AbilitySystem->K2_GiveAbility(Iter.Value.AbilityClass, Iter.Value.AbilityLevel);
+				}
+
+				if (FallingAttackAbility.AbilityClass)
+				{
+					FallingAttackAbility.AbilityHandle = AbilitySystem->K2_GiveAbility(FallingAttackAbility.AbilityClass, FallingAttackAbility.AbilityLevel);
+				}
+			}
+			else
+			{
+				BirthLocation = SaveData.SpawnLocation;
+
+				const UDWCharacterData& CharacterData = GetCharacterData<UDWCharacterData>();
+				if(CharacterData.IsValid())
+				{
+					TArray<FDWCharacterAttackAbilityData> attackAbilities;
+					UAssetModuleBPLibrary::ReadDataTable(CharacterData.AttackAbilityTable, attackAbilities);
+					for(auto Iter : attackAbilities)
+					{
+						Iter.AbilityHandle = AbilitySystem->K2_GiveAbility(Iter.AbilityClass, Iter.AbilityLevel);
+						if(!AttackAbilities.Contains(Iter.WeaponType)) AttackAbilities.Add(Iter.WeaponType);
+						AttackAbilities[Iter.WeaponType].Array.Add(Iter);
+					}
+
+					TArray<FDWCharacterSkillAbilityData> skillAbilities;
+					UAssetModuleBPLibrary::ReadDataTable(CharacterData.SkillAbilityTable, skillAbilities);
+					for(auto Iter : skillAbilities)
+					{
+						Iter.AbilityHandle = AbilitySystem->K2_GiveAbility(Iter.AbilityClass, Iter.AbilityLevel);
+						SkillAbilities.Add(Iter.AbilityID, Iter);
+					}
+
+					TArray<FDWCharacterActionAbilityData> actionAbilities;
+					UAssetModuleBPLibrary::ReadDataTable(CharacterData.ActionAbilityTable, actionAbilities);
+					for(auto Iter : actionAbilities)
+					{
+						Iter.AbilityHandle = AbilitySystem->K2_GiveAbility(Iter.AbilityClass, Iter.AbilityLevel);
+						ActionAbilities.Add(Iter.ActionType, Iter);
+					}
+
+					if (CharacterData.FallingAttackAbility.AbilityClass)
+					{
+						FallingAttackAbility = CharacterData.FallingAttackAbility;
+						FallingAttackAbility.AbilityHandle = AbilitySystem->K2_GiveAbility(FallingAttackAbility.AbilityClass, FallingAttackAbility.AbilityLevel);
+					}
+				
+				}
+			}
+			break;
+		}
+		case EPhase::Second:
+		{
+			break;
+		}
+		case EPhase::Final:
+		{
+			if(!SaveData.IsSaved() && !IsPlayer())
+			{
+				auto EquipDatas = UAssetModuleBPLibrary::LoadPrimaryAssets<UAbilityEquipDataBase>(UAbilityModuleBPLibrary::ItemTypeToAssetType(EAbilityItemType::Equip));
+				const int32 EquipNum = FMath::Clamp(FMath::Rand() < 0.2f ? FMath::RandRange(1, 3) : 0, 0, EquipDatas.Num());
+				for (int32 i = 0; i < EquipNum; i++)
+				{
+					FAbilityItem tmpItem = FAbilityItem(EquipDatas[FMath::RandRange(0, EquipDatas.Num() - 1)]->GetPrimaryAssetId(), 1);
+					SaveData.InventoryData.AddItem(tmpItem);
+				}
+			}
+			break;
+		}
+	}	
+
+	Super::LoadData(InSaveData, InPhase);
 }
 
 FSaveData* ADWCharacter::ToData()

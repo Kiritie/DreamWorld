@@ -53,7 +53,7 @@ void UProcedure_Loading::OnEnter(UProcedureBase* InLastProcedure)
 	
 	UWidgetModuleBPLibrary::CreateUserWidget<UWidgetGameHUD>();
 
-	USaveGameModuleBPLibrary::LoadSaveGame<UDWArchiveSaveGame>(-1, false);
+	USaveGameModuleBPLibrary::LoadSaveGame<UDWArchiveSaveGame>(-1, EPhase::Final);
 }
 
 void UProcedure_Loading::OnRefresh()

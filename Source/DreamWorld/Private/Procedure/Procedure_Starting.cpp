@@ -59,11 +59,10 @@ void UProcedure_Starting::OnEnter(UProcedureBase* InLastProcedure)
 	{
 		USaveGameModuleBPLibrary::LoadOrCreateSaveGame<UDWArchiveSaveGame>();
 	}
-	else if(InLastProcedure->IsA<UProcedure_Pausing>())
+	else
 	{
-		AVoxelModule::Get()->UnloadSaveData(false);
-		UGlobalBPLibrary::GetPlayerController<ADWPlayerController>()->UnloadSaveData(false);
-		UWidgetModuleBPLibrary::GetUserWidget<UWidgetContextBox>()->ClearContext();
+		AVoxelModule::Get()->UnloadSaveData(EPhase::Final);
+		UGlobalBPLibrary::GetPlayerController<ADWPlayerController>()->UnloadSaveData(EPhase::Final);
 	}
 	AMainModule::PauseModuleByClass<ASceneModule>();
 

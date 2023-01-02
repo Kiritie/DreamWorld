@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Procedure/Base/ProcedureBase.h"
+#include "DWTypes.h"
 #include "Procedure_ArchiveCreating.generated.h"
 
 class UFiniteStateBase;
@@ -40,6 +41,12 @@ public:
 	virtual void OnLeave(UProcedureBase* InNextProcedure) override;
 
 public:
+	UFUNCTION(BlueprintCallable)
+	void CreatePlayer(UPARAM(ref) FDWPlayerSaveData& InPlayerSaveData, EPhase InPhase = EPhase::Primary);
+
+	UFUNCTION(BlueprintCallable)
+	void CreateWorld(UPARAM(ref) FDWVoxelWorldSaveData& InWorldSaveData, EPhase InPhase = EPhase::Primary);
+
 	UFUNCTION(BlueprintCallable)
 	void CreateArchive(UPARAM(ref) FDWArchiveSaveData& InArchiveSaveData);
 };

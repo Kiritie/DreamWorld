@@ -66,7 +66,7 @@ void ADWVitality::OnDespawn_Implementation()
 {
 	Super::OnDespawn_Implementation();
 
-	Inventory->UnloadSaveData(true);
+	Inventory->UnloadSaveData(EPhase::Primary);
 }
 
 void ADWVitality::Tick(float DeltaTime)
@@ -81,30 +81,34 @@ void ADWVitality::Serialize(FArchive& Ar)
 	Super::Serialize(Ar);
 }
 
-void ADWVitality::LoadData(FSaveData* InSaveData, bool bForceMode)
+void ADWVitality::LoadData(FSaveData* InSaveData, EPhase InPhase)
 {
 	auto& SaveData = InSaveData->CastRef<FDWVitalitySaveData>();
 
-	if(bForceMode)
+	switch(InPhase)
 	{
-		if(!SaveData.IsSaved())
+		case EPhase::Primary:
+		case EPhase::Second:
 		{
-			const UDWVitalityData& vitalityData = GetVitalityData<UDWVitalityData>();
-			if(vitalityData.IsValid())
+			break;
+		}
+		case EPhase::Final:
+		{
+			if(!SaveData.IsSaved())
 			{
-				SaveData.InventoryData = vitalityData.InventoryData;
+				auto PropDatas = UAssetModuleBPLibrary::LoadPrimaryAssets<UAbilityPropDataBase>(UAbilityModuleBPLibrary::ItemTypeToAssetType(EAbilityItemType::Prop));
+				const int32 PropNum = FMath::Clamp(FMath::Rand() < 0.2f ? FMath::RandRange(1, 3) : 0, 0, PropDatas.Num());
+				for (int32 i = 0; i < PropNum; i++)
+				{
+					FAbilityItem tmpItem = FAbilityItem(PropDatas[FMath::RandRange(0, PropDatas.Num() - 1)]->GetPrimaryAssetId(), 1);
+					SaveData.InventoryData.AddItem(tmpItem);
+				}
 			}
-			auto PropDatas = UAssetModuleBPLibrary::LoadPrimaryAssets<UAbilityPropDataBase>(UAbilityModuleBPLibrary::ItemTypeToAssetType(EAbilityItemType::Equip));
-			const int32 PropNum = FMath::Clamp(FMath::Rand() < 0.2f ? FMath::RandRange(1, 3) : 0, 0, PropDatas.Num());
-			for (int32 i = 0; i < PropNum; i++)
-			{
-				FAbilityItem tmpItem = FAbilityItem(PropDatas[FMath::RandRange(0, PropDatas.Num() - 1)]->GetPrimaryAssetId(), 1);
-				SaveData.InventoryData.AddItem(tmpItem);
-			}
+			break;
 		}
 	}
 
-	Super::LoadData(InSaveData, bForceMode);
+	Super::LoadData(InSaveData, InPhase);
 }
 
 FSaveData* ADWVitality::ToData()

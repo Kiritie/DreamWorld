@@ -46,9 +46,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FDWCharacterAttackAbilityData FallingAttackAbility;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FInventorySaveData InventoryData;
-
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tags")
 	FGameplayTag DodgingTag;

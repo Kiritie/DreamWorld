@@ -45,6 +45,7 @@
 #include "Camera/CameraModule.h"
 #include "Widget/WidgetGeneratePanel.h"
 #include "Widget/WidgetShopPanel.h"
+#include "Procedure/Procedure_Starting.h"
 
 ADWPlayerController::ADWPlayerController()
 {
@@ -64,24 +65,34 @@ void ADWPlayerController::OnPreparatory_Implementation()
 	Super::OnPreparatory_Implementation();
 }
 
-void ADWPlayerController::LoadData(FSaveData* InSaveData, bool bForceMode)
+void ADWPlayerController::LoadData(FSaveData* InSaveData, EPhase InPhase)
 {
 	auto& SaveData = InSaveData->CastRef<FDWPlayerSaveData>();
 
-	ADWPlayerCharacter* PlayerCharacter;
-	if(bForceMode)
+	ADWPlayerCharacter* PlayerCharacter = nullptr;
+	switch(InPhase)
 	{
-		PlayerCharacter = UObjectPoolModuleBPLibrary::SpawnObject<ADWPlayerCharacter>({ FParameter::MakePointer(&SaveData.ID) }, SaveData.GetCharacterData().Class);
-		PlayerCharacter->Execute_SetActorVisible(PlayerCharacter, false);
-		SetPlayerPawn(PlayerCharacter);
-	}
-	else
-	{
-		PlayerCharacter = GetPlayerPawn<ADWPlayerCharacter>();
+		case EPhase::Primary:
+		{
+			UnloadData(InPhase);
+			PlayerCharacter = UObjectPoolModuleBPLibrary::SpawnObject<ADWPlayerCharacter>({ FParameter::MakePointer(&SaveData.ID) }, SaveData.GetCharacterData().Class);
+			if(UProcedureModuleBPLibrary::IsCurrentProcedureClass<UProcedure_Starting>())
+			{
+				PlayerCharacter->Execute_SetActorVisible(PlayerCharacter, false);
+			}
+			SetPlayerPawn(PlayerCharacter);
+			break;
+		}
+		case EPhase::Second:
+		case EPhase::Final:
+		{
+			PlayerCharacter = GetPlayerPawn<ADWPlayerCharacter>();
+			break;
+		}
 	}
 	if(PlayerCharacter)
 	{
-		PlayerCharacter->LoadSaveData(InSaveData, bForceMode, true);
+		PlayerCharacter->LoadSaveData(InSaveData, InPhase, true);
 	}
 }
 
@@ -90,21 +101,26 @@ FSaveData* ADWPlayerController::ToData()
 	return nullptr;
 }
 
-void ADWPlayerController::UnloadData(bool bForceMode)
+void ADWPlayerController::UnloadData(EPhase InPhase)
 {
 	ADWPlayerCharacter* PlayerCharacter = GetPlayerPawn<ADWPlayerCharacter>();
-	
 	if(PlayerCharacter)
 	{
-		if(bForceMode)
+		switch(InPhase)
 		{
-			UObjectPoolModuleBPLibrary::DespawnObject(PlayerCharacter);
-			SetPlayerPawn(nullptr);
-		}
-		else
-		{
-			UnPossess();
-			PlayerCharacter->Execute_SetActorVisible(PlayerCharacter, false);
+			case EPhase::Primary:
+			{
+				UObjectPoolModuleBPLibrary::DespawnObject(PlayerCharacter);
+				SetPlayerPawn(nullptr);
+				break;
+			}
+			case EPhase::Second:
+			case EPhase::Final:
+			{
+				UnPossess();
+				PlayerCharacter->Execute_SetActorVisible(PlayerCharacter, false);
+				break;
+			}
 		}
 	}
 }

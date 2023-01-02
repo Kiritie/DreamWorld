@@ -11,8 +11,4 @@ class DREAMWORLD_API UDWVitalityData : public UAbilityVitalityDataBase
 
 public:
 	UDWVitalityData();
-
-public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FInventorySaveData InventoryData;
 };

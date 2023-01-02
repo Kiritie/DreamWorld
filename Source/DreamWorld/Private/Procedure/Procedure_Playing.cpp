@@ -20,6 +20,8 @@
 #include "Widget/WidgetModuleBPLibrary.h"
 #include "Widget/Inventory/WidgetInventoryBar.h"
 #include "Widget/Inventory/WidgetInventoryPanel.h"
+#include "Procedure/Procedure_Starting.h"
+#include "Widget/WidgetContextBox.h"
 
 UProcedure_Playing::UProcedure_Playing()
 {
@@ -84,4 +86,8 @@ void UProcedure_Playing::OnGuide()
 void UProcedure_Playing::OnLeave(UProcedureBase* InNextProcedure)
 {
 	Super::OnLeave(InNextProcedure);
+	if(InNextProcedure->IsA<UProcedure_Starting>())
+	{
+		UWidgetModuleBPLibrary::GetUserWidget<UWidgetContextBox>()->ClearContext();
+	}
 }

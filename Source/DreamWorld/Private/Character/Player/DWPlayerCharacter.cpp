@@ -159,71 +159,82 @@ void ADWPlayerCharacter::OnDespawn_Implementation()
 	Super::OnDespawn_Implementation();
 }
 
-void ADWPlayerCharacter::LoadData(FSaveData* InSaveData, bool bForceMode)
+void ADWPlayerCharacter::LoadData(FSaveData* InSaveData, EPhase InPhase)
 {
 	auto& SaveData = InSaveData->CastRef<FDWPlayerSaveData>();
 	
-	SetBodyColor(SaveData.BodyColorIndex);
-	SetCapeColor(SaveData.CapeColorIndex);
-
-	if(!bForceMode && !SaveData.IsSaved())
+	switch(InPhase)
 	{
-		switch (SaveData.InventoryInitType)
+		case EPhase::Primary:
+		case EPhase::Second:
+		case EPhase::Final:
 		{
-			case EDWPlayerInventoryInitType::None:
+			SetBodyColor(SaveData.BodyColorIndex);
+			SetCapeColor(SaveData.CapeColorIndex);
+
+			if(!SaveData.IsSaved())
 			{
-				SaveData.InventoryData.ClearAllItem();
-				break;
-			}
-			case EDWPlayerInventoryInitType::Basic:
-			{
-				break;
-			}
-			case EDWPlayerInventoryInitType::All:
-			{
-				auto VoxelDatas = UAssetModuleBPLibrary::LoadPrimaryAssets<UVoxelData>(UAbilityModuleBPLibrary::ItemTypeToAssetType(EAbilityItemType::Voxel));
-				for (int32 i = 0; i < VoxelDatas.Num(); i++)
+				switch (SaveData.InventoryInitType)
 				{
-					if(VoxelDatas[i]->VoxelType != EVoxelType::Empty && VoxelDatas[i]->VoxelType != EVoxelType::Unknown && VoxelDatas[i]->PartType == EVoxelPartType::Main)
+					case EDWPlayerInventoryInitType::Default:
 					{
-						FAbilityItem tmpItem = FAbilityItem(VoxelDatas[i]->GetPrimaryAssetId(), VoxelDatas[i]->MaxCount);
-						SaveData.InventoryData.AddItem(tmpItem);
+						break;
+					}
+					case EDWPlayerInventoryInitType::Empty:
+					{
+						SaveData.InventoryData.ClearAllItem();
+						break;
+					}
+					case EDWPlayerInventoryInitType::All:
+					{
+						SaveData.InventoryData.ClearAllItem();
+
+						auto VoxelDatas = UAssetModuleBPLibrary::LoadPrimaryAssets<UVoxelData>(UAbilityModuleBPLibrary::ItemTypeToAssetType(EAbilityItemType::Voxel));
+						for (int32 i = 0; i < VoxelDatas.Num(); i++)
+						{
+							if(VoxelDatas[i]->VoxelType != EVoxelType::Empty && VoxelDatas[i]->VoxelType != EVoxelType::Unknown && VoxelDatas[i]->PartType == EVoxelPartType::Main)
+							{
+								FAbilityItem tmpItem = FAbilityItem(VoxelDatas[i]->GetPrimaryAssetId(), VoxelDatas[i]->MaxCount);
+								SaveData.InventoryData.AddItem(tmpItem);
+							}
+						}
+		
+						auto RawDatas = UAssetModuleBPLibrary::LoadPrimaryAssets<UAbilityRawDataBase>(UAbilityModuleBPLibrary::ItemTypeToAssetType(EAbilityItemType::Raw));
+						for (int32 i = 0; i < RawDatas.Num(); i++)
+						{
+							FAbilityItem tmpItem = FAbilityItem(RawDatas[i]->GetPrimaryAssetId(), RawDatas[i]->MaxCount);
+							SaveData.InventoryData.AddItem(tmpItem);
+						}
+		
+						auto EquipDatas = UAssetModuleBPLibrary::LoadPrimaryAssets<UAbilityEquipDataBase>(UAbilityModuleBPLibrary::ItemTypeToAssetType(EAbilityItemType::Equip));
+						for (int32 i = 0; i < EquipDatas.Num(); i++)
+						{
+							FAbilityItem tmpItem = FAbilityItem(EquipDatas[i]->GetPrimaryAssetId(), EquipDatas[i]->MaxCount);
+							SaveData.InventoryData.AddItem(tmpItem);
+						}
+			
+						auto PropDatas = UAssetModuleBPLibrary::LoadPrimaryAssets<UAbilityPropDataBase>(UAbilityModuleBPLibrary::ItemTypeToAssetType(EAbilityItemType::Prop));
+						for (int32 i = 0; i < PropDatas.Num(); i++)
+						{
+							FAbilityItem tmpItem = FAbilityItem(PropDatas[i]->GetPrimaryAssetId(), PropDatas[i]->MaxCount);
+							SaveData.InventoryData.AddItem(tmpItem);
+						}
+
+						auto SkillDatas = UAssetModuleBPLibrary::LoadPrimaryAssets<UAbilitySkillDataBase>(UAbilityModuleBPLibrary::ItemTypeToAssetType(EAbilityItemType::Skill));
+						for (int32 i = 0; i < SkillDatas.Num(); i++)
+						{
+							FAbilityItem tmpItem = FAbilityItem(SkillDatas[i]->GetPrimaryAssetId(), SkillDatas[i]->MaxCount);
+							SaveData.InventoryData.AddItem(tmpItem);
+						}
+						break;
 					}
 				}
-		
-				auto RawDatas = UAssetModuleBPLibrary::LoadPrimaryAssets<UAbilityRawDataBase>(UAbilityModuleBPLibrary::ItemTypeToAssetType(EAbilityItemType::Raw));
-				for (int32 i = 0; i < RawDatas.Num(); i++)
-				{
-					FAbilityItem tmpItem = FAbilityItem(RawDatas[i]->GetPrimaryAssetId(), RawDatas[i]->MaxCount);
-					SaveData.InventoryData.AddItem(tmpItem);
-				}
-		
-				auto EquipDatas = UAssetModuleBPLibrary::LoadPrimaryAssets<UAbilityEquipDataBase>(UAbilityModuleBPLibrary::ItemTypeToAssetType(EAbilityItemType::Equip));
-				for (int32 i = 0; i < EquipDatas.Num(); i++)
-				{
-					FAbilityItem tmpItem = FAbilityItem(EquipDatas[i]->GetPrimaryAssetId(), EquipDatas[i]->MaxCount);
-					SaveData.InventoryData.AddItem(tmpItem);
-				}
-			
-				auto PropDatas = UAssetModuleBPLibrary::LoadPrimaryAssets<UAbilityPropDataBase>(UAbilityModuleBPLibrary::ItemTypeToAssetType(EAbilityItemType::Prop));
-				for (int32 i = 0; i < PropDatas.Num(); i++)
-				{
-					FAbilityItem tmpItem = FAbilityItem(PropDatas[i]->GetPrimaryAssetId(), PropDatas[i]->MaxCount);
-					SaveData.InventoryData.AddItem(tmpItem);
-				}
-
-				auto SkillDatas = UAssetModuleBPLibrary::LoadPrimaryAssets<UAbilitySkillDataBase>(UAbilityModuleBPLibrary::ItemTypeToAssetType(EAbilityItemType::Skill));
-				for (int32 i = 0; i < SkillDatas.Num(); i++)
-				{
-					FAbilityItem tmpItem = FAbilityItem(SkillDatas[i]->GetPrimaryAssetId(), SkillDatas[i]->MaxCount);
-					SaveData.InventoryData.AddItem(tmpItem);
-				}
-				break;
 			}
+			break;
 		}
 	}
 
-	Super::LoadData(InSaveData, bForceMode);
+	Super::LoadData(InSaveData, InPhase);
 }
 
 FSaveData* ADWPlayerCharacter::ToData()

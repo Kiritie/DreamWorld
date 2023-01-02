@@ -40,8 +40,9 @@ public:
 	//////////////////////////////////////////////////////////////////////////
 	/// Player
 protected:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Player")
+	UPROPERTY(EditAnywhere, Category = "Player")
 	FDWPlayerBasicSaveData PlayerBasicData;
 public:
-	FDWPlayerBasicSaveData GetPlayerBasicData() const { return PlayerBasicData; }
+	UFUNCTION(BlueprintPure)
+	FDWPlayerBasicSaveData& GetPlayerBasicData();
 };

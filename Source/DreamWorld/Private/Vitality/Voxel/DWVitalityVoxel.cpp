@@ -32,9 +32,9 @@ void ADWVitalityVoxel::OnDespawn_Implementation()
 	VoxelID = FPrimaryAssetId();
 }
 
-void ADWVitalityVoxel::LoadData(FSaveData* InSaveData, bool bForceMode)
+void ADWVitalityVoxel::LoadData(FSaveData* InSaveData, EPhase InPhase)
 {
-	Super::LoadData(InSaveData, bForceMode);
+	Super::LoadData(InSaveData, InPhase);
 
 	auto& SaveData = InSaveData->CastRef<FDWVitalitySaveData>();
 
