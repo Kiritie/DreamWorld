@@ -69,30 +69,44 @@ void ADWPlayerController::LoadData(FSaveData* InSaveData, EPhase InPhase)
 {
 	auto& SaveData = InSaveData->CastRef<FDWPlayerSaveData>();
 
-	ADWPlayerCharacter* PlayerCharacter = nullptr;
+	ADWPlayerCharacter* PlayerCharacter = GetPlayerPawn<ADWPlayerCharacter>();
 	switch(InPhase)
 	{
 		case EPhase::Primary:
 		{
-			UnloadData(InPhase);
-			PlayerCharacter = UObjectPoolModuleBPLibrary::SpawnObject<ADWPlayerCharacter>({ FParameter::MakePointer(&SaveData.ID) }, SaveData.GetCharacterData().Class);
-			if(UProcedureModuleBPLibrary::IsCurrentProcedureClass<UProcedure_Starting>())
+			bool bNeedSpawn = true;
+			if(PlayerCharacter)
 			{
-				PlayerCharacter->Execute_SetActorVisible(PlayerCharacter, false);
+				if(PlayerCharacter->GetAssetID() == SaveData.ID)
+				{
+					bNeedSpawn = false;
+				}
+				SaveData.SpawnLocation = PlayerCharacter->GetActorLocation();
 			}
-			SetPlayerPawn(PlayerCharacter);
+			if(bNeedSpawn)
+			{
+				UnloadData(InPhase);
+				PlayerCharacter = UObjectPoolModuleBPLibrary::SpawnObject<ADWPlayerCharacter>({ FParameter::MakePointer(&SaveData.ID) }, SaveData.GetCharacterData().Class);
+				if(PlayerCharacter)
+				{
+					if(UProcedureModuleBPLibrary::IsCurrentProcedureClass<UProcedure_Starting>())
+					{
+						PlayerCharacter->Execute_SetActorVisible(PlayerCharacter, false);
+					}
+					SetPlayerPawn(PlayerCharacter);
+				}
+			}
 			break;
 		}
-		case EPhase::Second:
+		case EPhase::Lesser:
 		case EPhase::Final:
 		{
-			PlayerCharacter = GetPlayerPawn<ADWPlayerCharacter>();
 			break;
 		}
 	}
 	if(PlayerCharacter)
 	{
-		PlayerCharacter->LoadSaveData(InSaveData, InPhase, true);
+		PlayerCharacter->LoadSaveData(&SaveData, InPhase, true);
 	}
 }
 
@@ -114,7 +128,7 @@ void ADWPlayerController::UnloadData(EPhase InPhase)
 				SetPlayerPawn(nullptr);
 				break;
 			}
-			case EPhase::Second:
+			case EPhase::Lesser:
 			case EPhase::Final:
 			{
 				UnPossess();

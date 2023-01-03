@@ -56,6 +56,7 @@
 #include "Ability/Inventory/CharacterInventory.h"
 #include "Widget/WidgetContextBox.h"
 #include "Ability/Item/Raw/AbilityRawDataBase.h"
+#include "Character/Player/DWPlayerCharacterData.h"
 #include "Gameplay/WHGameInstance.h"
 #include "Vitality/DWVitality.h"
 
@@ -166,7 +167,7 @@ void ADWPlayerCharacter::LoadData(FSaveData* InSaveData, EPhase InPhase)
 	switch(InPhase)
 	{
 		case EPhase::Primary:
-		case EPhase::Second:
+		case EPhase::Lesser:
 		case EPhase::Final:
 		{
 			SetBodyColor(SaveData.BodyColorIndex);
@@ -178,16 +179,18 @@ void ADWPlayerCharacter::LoadData(FSaveData* InSaveData, EPhase InPhase)
 				{
 					case EDWPlayerInventoryInitType::Default:
 					{
+						SaveData.InventoryData = GetCharacterData<UDWPlayerCharacterData>().InventoryData;
 						break;
 					}
 					case EDWPlayerInventoryInitType::Empty:
 					{
+						SaveData.InventoryData = GetCharacterData<UDWPlayerCharacterData>().InventoryData;
 						SaveData.InventoryData.ClearAllItem();
 						break;
 					}
 					case EDWPlayerInventoryInitType::All:
 					{
-						SaveData.InventoryData.ClearAllItem();
+						SaveData.InventoryData = GetCharacterData<UDWPlayerCharacterData>().InventoryData;
 
 						auto VoxelDatas = UAssetModuleBPLibrary::LoadPrimaryAssets<UVoxelData>(UAbilityModuleBPLibrary::ItemTypeToAssetType(EAbilityItemType::Voxel));
 						for (int32 i = 0; i < VoxelDatas.Num(); i++)

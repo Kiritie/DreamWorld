@@ -250,7 +250,7 @@ void ADWCharacter::LoadData(FSaveData* InSaveData, EPhase InPhase)
 			}
 			break;
 		}
-		case EPhase::Second:
+		case EPhase::Lesser:
 		{
 			break;
 		}

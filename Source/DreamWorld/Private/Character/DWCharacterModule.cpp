@@ -4,6 +4,7 @@
 #include "Character/DWCharacterModule.h"
 #include "Asset/AssetModuleBPLibrary.h"
 #include "Ability/AbilityModuleTypes.h"
+#include "Character/Player/DWPlayerCharacterData.h"
 
 MODULE_INSTANCE_IMPLEMENTATION(ADWCharacterModule)
 
@@ -60,5 +61,6 @@ FDWPlayerBasicSaveData& ADWCharacterModule::GetPlayerBasicData()
 		PlayerBasicData.ID = PlayerRaceData.Items[0].ID;
 		PlayerBasicData.Level = PlayerRaceData.Items[0].Level;
 	}
+	PlayerBasicData.InventoryData = UAssetModuleBPLibrary::LoadPrimaryAssetRef<UDWPlayerCharacterData>(PlayerBasicData.ID).InventoryData;
 	return PlayerBasicData;
 }

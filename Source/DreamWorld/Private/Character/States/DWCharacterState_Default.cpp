@@ -55,44 +55,6 @@ void UDWCharacterState_Default::OnEnter(UFiniteStateBase* InLastFiniteState)
 void UDWCharacterState_Default::OnRefresh()
 {
 	Super::OnRefresh();
-
-	ADWCharacter* Character = GetAgent<ADWCharacter>();
-
-	if(Character->IsPlayer())
-	{
-		if(Character->GetActorLocation().IsNearlyZero())
-		{
-			if(UVoxelModuleBPLibrary::IsBasicGenerated())
-			{
-				const auto& characterData = Character->GetCharacterData<UAbilityCharacterDataBase>();
-				const auto& worldData = AVoxelModule::Get()->GetWorldData();
-				const float& chunkRadius = worldData.GetChunkLength() * 0.5f;
-				DON(i, 10,
-					const FVector rayStart = FVector(i == 0 ? 0.f : worldData.RandomStream.FRandRange(-chunkRadius, chunkRadius), i == 0 ? 0.f : worldData.RandomStream.FRandRange(-chunkRadius, chunkRadius), worldData.GetWorldHeight(true));
-					const FVector rayEnd = FVector(rayStart.X, rayStart.Y, 0.f);
-					FHitResult hitResult;
-					if(UVoxelModuleBPLibrary::ChunkTraceSingle(rayStart, rayEnd, characterData.Radius, characterData.HalfHeight, {}, hitResult))
-					{
-						FVoxelItem& voxelItem = UVoxelModuleBPLibrary::FindVoxelByLocation(hitResult.Location);
-						if(!voxelItem.IsValid())
-						{
-							Character->SetActorLocationAndRotation(hitResult.Location, FRotator::ZeroRotator);
-							FSM->SwitchStateByClass<UDWCharacterState_Walk>();
-							break;
-						}
-					}
-				)
-			}
-		}
-		else
-		{
-			FSM->SwitchStateByClass<UDWCharacterState_Walk>();
-		}
-	}
-	else
-	{
-		FSM->SwitchStateByClass<UDWCharacterState_Walk>();
-	}
 }
 
 void UDWCharacterState_Default::OnLeave(UFiniteStateBase* InNextFiniteState)
@@ -109,4 +71,35 @@ void UDWCharacterState_Default::OnLeave(UFiniteStateBase* InNextFiniteState)
 void UDWCharacterState_Default::OnTermination()
 {
 	Super::OnTermination();
+}
+
+void UDWCharacterState_Default::TrySwitchToWalk()
+{
+	ADWCharacter* Character = GetAgent<ADWCharacter>();
+
+	if(!Character->IsPlayer())
+	{
+		FSM->SwitchStateByClass<UDWCharacterState_Walk>();
+	}
+	else if(UVoxelModuleBPLibrary::IsBasicGenerated())
+	{
+		const auto& characterData = Character->GetCharacterData<UAbilityCharacterDataBase>();
+		const auto& worldData = AVoxelModule::Get()->GetWorldData();
+		const float& chunkRadius = worldData.GetChunkLength() * 0.5f;
+		DON(i, 10,
+			const FVector rayStart = FVector(i == 0 ? Character->GetActorLocation().X : worldData.RandomStream.FRandRange(-chunkRadius, chunkRadius), i == 0 ? Character->GetActorLocation().Y : worldData.RandomStream.FRandRange(-chunkRadius, chunkRadius), worldData.GetWorldHeight(true));
+			const FVector rayEnd = FVector(rayStart.X, rayStart.Y, 0.f);
+			FHitResult hitResult;
+			if(UVoxelModuleBPLibrary::ChunkTraceSingle(rayStart, rayEnd, characterData.Radius, characterData.HalfHeight, {}, hitResult))
+			{
+				FVoxelItem& voxelItem = UVoxelModuleBPLibrary::FindVoxelByLocation(hitResult.Location);
+				if(!voxelItem.IsValid())
+				{
+					Character->SetActorLocationAndRotation(hitResult.Location, FRotator::ZeroRotator);
+					FSM->SwitchStateByClass<UDWCharacterState_Walk>();
+					break;
+				}
+			}
+		)
+	}
 }

@@ -88,7 +88,7 @@ void ADWVitality::LoadData(FSaveData* InSaveData, EPhase InPhase)
 	switch(InPhase)
 	{
 		case EPhase::Primary:
-		case EPhase::Second:
+		case EPhase::Lesser:
 		{
 			break;
 		}

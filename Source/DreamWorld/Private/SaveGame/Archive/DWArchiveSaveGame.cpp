@@ -39,20 +39,40 @@ void UDWArchiveSaveGame::OnLoad_Implementation(EPhase InPhase)
 {
 	Super::OnLoad_Implementation(InPhase);
 
-	WHDebug(FString::Printf(TEXT("Loading archive : %d"), DWArchiveSaveData.ID));
-
-	AVoxelModule::Get()->LoadSaveData(&DWArchiveSaveData.WorldData, InPhase);
-	UGlobalBPLibrary::GetPlayerController<ADWPlayerController>()->LoadSaveData(&DWArchiveSaveData.PlayerData, InPhase);
+	switch (InPhase)
+	{
+		case EPhase::Primary:
+		{
+			WHDebug(FString::Printf(TEXT("Loading archive : %d"), DWArchiveSaveData.ID));
+		}
+		case EPhase::Final:
+		{
+			AVoxelModule::Get()->LoadSaveData(&DWArchiveSaveData.WorldData, InPhase);
+			UGlobalBPLibrary::GetPlayerController<ADWPlayerController>()->LoadSaveData(&DWArchiveSaveData.PlayerData, InPhase);
+			break;
+		}
+		default: break;
+	}
 }
 
 void UDWArchiveSaveGame::OnUnload_Implementation(EPhase InPhase)
 {
 	Super::OnUnload_Implementation(InPhase);
 
-	WHDebug(FString::Printf(TEXT("Unloading archive : %d"), DWArchiveSaveData.ID));
-
-	ADWVoxelModule::Get()->UnloadSaveData(InPhase);
-	UGlobalBPLibrary::GetPlayerController<ADWPlayerController>()->UnloadSaveData(InPhase);
+	switch (InPhase)
+	{
+		case EPhase::Primary:
+		{
+			WHDebug(FString::Printf(TEXT("Unloading archive : %d"), DWArchiveSaveData.ID));
+		}
+		case EPhase::Final:
+		{
+			ADWVoxelModule::Get()->UnloadSaveData(InPhase);
+			UGlobalBPLibrary::GetPlayerController<ADWPlayerController>()->UnloadSaveData(InPhase);
+			break;
+		}
+		default: break;
+	}
 }
 
 void UDWArchiveSaveGame::OnRefresh_Implementation()

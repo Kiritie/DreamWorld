@@ -115,7 +115,7 @@ void ADWVoxelModule::LoadData(FSaveData* InSaveData, EPhase InPhase)
 			}
 			break;
 		}
-		case EPhase::Second:
+		case EPhase::Lesser:
 		case EPhase::Final:
 		{
 			break;
