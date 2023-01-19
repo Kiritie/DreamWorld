@@ -18,5 +18,5 @@ public:
 	ADWMainModule();
 
 public:
-	virtual void InitializeModules_Implementation() override;
+	virtual void OnInitialize_Implementation() override;
 };

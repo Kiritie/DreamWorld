@@ -45,11 +45,6 @@ void UProcedure_ArchiveChoosing::OnInitialize()
 void UProcedure_ArchiveChoosing::OnEnter(UProcedureBase* InLastProcedure)
 {
 	Super::OnEnter(InLastProcedure);
-	
-	if(ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>())
-	{
-		PlayerCharacter->Execute_SetActorVisible(PlayerCharacter, false);
-	}
 
 	UWidgetModuleBPLibrary::OpenUserWidget<UWidgetArchiveChoosingPanel>();
 

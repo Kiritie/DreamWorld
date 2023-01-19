@@ -40,4 +40,7 @@ public:
 protected:
 	UPROPERTY(EditAnywhere, Category = "BGM")
 	USoundBase* BGMSound;
+
+	UPROPERTY(EditAnywhere, Category = "Camera")
+	float CameraSpeed;
 };

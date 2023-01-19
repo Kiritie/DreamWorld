@@ -9,7 +9,7 @@
 #include "Voxel/Chunks/VoxelChunk.h"
 #include "Voxel/Datas/VoxelData.h"
 		
-MODULE_INSTANCE_IMPLEMENTATION(ADWTeamModule)
+MODULE_INSTANCE_IMPLEMENTATION(ADWTeamModule, false)
 
 // Sets default values
 ADWTeamModule::ADWTeamModule()
@@ -36,9 +36,9 @@ void ADWTeamModule::OnInitialize_Implementation()
 	Super::OnInitialize_Implementation();
 }
 
-void ADWTeamModule::OnPreparatory_Implementation()
+void ADWTeamModule::OnPreparatory_Implementation(EPhase InPhase)
 {
-	Super::OnPreparatory_Implementation();
+	Super::OnPreparatory_Implementation(InPhase);
 }
 
 void ADWTeamModule::OnRefresh_Implementation(float DeltaSeconds)

@@ -8,7 +8,7 @@
 #include "SaveGame/SaveGameModuleBPLibrary.h"
 #include "SaveGame/General/DWGeneralSaveGame.h"
 	
-MODULE_INSTANCE_IMPLEMENTATION(ADWCameraModule)
+MODULE_INSTANCE_IMPLEMENTATION(ADWCameraModule, false)
 
 // ParamSets default values
 ADWCameraModule::ADWCameraModule()
@@ -38,9 +38,9 @@ void ADWCameraModule::OnInitialize_Implementation()
 	Super::OnInitialize_Implementation();
 }
 
-void ADWCameraModule::OnPreparatory_Implementation()
+void ADWCameraModule::OnPreparatory_Implementation(EPhase InPhase)
 {
-	Super::OnPreparatory_Implementation();
+	Super::OnPreparatory_Implementation(InPhase);
 }
 
 void ADWCameraModule::OnRefresh_Implementation(float DeltaSeconds)

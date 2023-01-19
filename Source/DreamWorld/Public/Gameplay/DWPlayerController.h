@@ -22,10 +22,16 @@ class DREAMWORLD_API ADWPlayerController : public AWHPlayerController, public IS
 public:
 	ADWPlayerController();
 
+	//////////////////////////////////////////////////////////////////////////
+	/// WHActor
 public:
 	virtual void OnInitialize_Implementation() override;
 
-	virtual void OnPreparatory_Implementation() override;
+	virtual void OnPreparatory_Implementation(EPhase InPhase) override;
+
+	virtual void OnRefresh_Implementation(float DeltaSeconds) override;
+
+	virtual void OnTermination_Implementation() override;
 
 protected:
 	virtual void LoadData(FSaveData* InSaveData, EPhase InPhase) override;
@@ -50,9 +56,6 @@ protected:
 	virtual void OnPossess(APawn* InPawn) override;
 
 	virtual void OnUnPossess() override;
-
-public:
-	virtual void Tick(float DeltaTime) override;
 	
 protected:
 	virtual void OnJumpPressed(FKey Key);

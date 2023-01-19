@@ -6,7 +6,7 @@
 #include "Ability/AbilityModuleTypes.h"
 #include "Character/Player/DWPlayerCharacterData.h"
 
-MODULE_INSTANCE_IMPLEMENTATION(ADWCharacterModule)
+MODULE_INSTANCE_IMPLEMENTATION(ADWCharacterModule, false)
 
 // ParamSets default values
 ADWCharacterModule::ADWCharacterModule()
@@ -31,9 +31,9 @@ void ADWCharacterModule::OnInitialize_Implementation()
 	Super::OnInitialize_Implementation();
 }
 
-void ADWCharacterModule::OnPreparatory_Implementation()
+void ADWCharacterModule::OnPreparatory_Implementation(EPhase InPhase)
 {
-	Super::OnPreparatory_Implementation();
+	Super::OnPreparatory_Implementation(InPhase);
 }
 
 void ADWCharacterModule::OnRefresh_Implementation(float DeltaSeconds)

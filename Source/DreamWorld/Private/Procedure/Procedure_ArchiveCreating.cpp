@@ -23,6 +23,7 @@
 #include "Widget/Archive/WidgetArchiveCreatingPanel.h"
 #include "Voxel/VoxelModule.h"
 #include "DWTypes.h"
+#include "Procedure/Procedure_ArchiveChoosing.h"
 
 UProcedure_ArchiveCreating::UProcedure_ArchiveCreating()
 {
@@ -45,15 +46,19 @@ void UProcedure_ArchiveCreating::OnUnGenerate()
 void UProcedure_ArchiveCreating::OnInitialize()
 {
 	Super::OnInitialize();
+
+	UGlobalBPLibrary::GetPlayerController<ADWPlayerController>()->GetOnPlayerPawnChanged().AddDynamic(this, &UProcedure_ArchiveCreating::OnPlayerChanged);
 }
 
 void UProcedure_ArchiveCreating::OnEnter(UProcedureBase* InLastProcedure)
 {
 	Super::OnEnter(InLastProcedure);
 
-	if(ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>())
+	OperationTarget = UGlobalBPLibrary::GetPlayerPawn();
+
+	if(OperationTarget)
 	{
-		PlayerCharacter->Execute_SetActorVisible(PlayerCharacter, true);
+		ISceneActorInterface::Execute_SetActorVisible(OperationTarget, true);
 	}
 
 	UWidgetModuleBPLibrary::OpenUserWidget<UWidgetArchiveCreatingPanel>();
@@ -64,9 +69,9 @@ void UProcedure_ArchiveCreating::OnRefresh()
 {
 	Super::OnRefresh();
 
-	if(ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>())
+	if(OperationTarget)
 	{
-		UCameraModuleBPLibrary::SetCameraLocation(PlayerCharacter->GetActorLocation() + CameraViewOffset);
+		UCameraModuleBPLibrary::SetCameraLocation(OperationTarget->GetActorLocation() + CameraViewOffset);
 	}
 }
 
@@ -78,6 +83,20 @@ void UProcedure_ArchiveCreating::OnGuide()
 void UProcedure_ArchiveCreating::OnLeave(UProcedureBase* InNextProcedure)
 {
 	Super::OnLeave(InNextProcedure);
+
+	if(InNextProcedure->IsA<UProcedure_ArchiveChoosing>())
+	{
+		if(OperationTarget)
+		{
+			ISceneActorInterface::Execute_SetActorVisible(OperationTarget, false);
+		}
+	}
+	OperationTarget = nullptr;
+}
+
+void UProcedure_ArchiveCreating::OnPlayerChanged(APawn* InPlayerPawn)
+{
+	OperationTarget = InPlayerPawn;
 }
 
 void UProcedure_ArchiveCreating::CreatePlayer(FDWPlayerSaveData& InPlayerSaveData, EPhase InPhase)

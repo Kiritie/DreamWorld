@@ -29,6 +29,7 @@ UProcedure_Starting::UProcedure_Starting()
 	ProcedureDisplayName = FText::FromString(TEXT("Starting"));
 	
 	BGMSound = nullptr;
+	CameraSpeed = 10.f;
 }
 
 #if WITH_EDITOR
@@ -68,7 +69,7 @@ void UProcedure_Starting::OnEnter(UProcedureBase* InLastProcedure)
 
 	if(const ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>())
 	{
-		CameraViewOffset = FVector(PlayerCharacter->GetActorLocation().X, PlayerCharacter->GetActorLocation().Y, CameraViewOffset.Z);
+		CameraViewOffset = FVector(PlayerCharacter->GetActorLocation().X, PlayerCharacter->GetActorLocation().Y, PlayerCharacter->GetActorLocation().Z + CameraViewOffset.Z);
 	}
 
 	Super::OnEnter(InLastProcedure);
@@ -77,6 +78,9 @@ void UProcedure_Starting::OnEnter(UProcedureBase* InLastProcedure)
 void UProcedure_Starting::OnRefresh()
 {
 	Super::OnRefresh();
+
+	// CameraViewYaw += UGameplayStatics::GetWorldDeltaSeconds(this) * CameraSpeed;
+	// UCameraModuleBPLibrary::SetCameraRotation(CameraViewYaw, CameraViewPitch);
 }
 
 void UProcedure_Starting::OnGuide()

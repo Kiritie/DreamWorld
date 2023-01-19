@@ -11,7 +11,7 @@
 #include "SaveGame/General/DWGeneralSaveGame.h"
 #include "SaveGame/SaveGameModuleBPLibrary.h"
 	
-MODULE_INSTANCE_IMPLEMENTATION(ADWSaveGameModule)
+MODULE_INSTANCE_IMPLEMENTATION(ADWSaveGameModule, false)
 
 // ParamSets default values
 ADWSaveGameModule::ADWSaveGameModule()
@@ -36,9 +36,9 @@ void ADWSaveGameModule::OnInitialize_Implementation()
 	Super::OnInitialize_Implementation();
 }
 
-void ADWSaveGameModule::OnPreparatory_Implementation()
+void ADWSaveGameModule::OnPreparatory_Implementation(EPhase InPhase)
 {
-	Super::OnPreparatory_Implementation();
+	Super::OnPreparatory_Implementation(InPhase);
 }
 
 void ADWSaveGameModule::OnRefresh_Implementation(float DeltaSeconds)

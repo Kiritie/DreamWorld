@@ -28,7 +28,7 @@
 #include "SaveGame/SaveGameModuleBPLibrary.h"
 #include "UObject/ConstructorHelpers.h"
 	
-MODULE_INSTANCE_IMPLEMENTATION(ADWVoxelModule)
+MODULE_INSTANCE_IMPLEMENTATION(ADWVoxelModule, false)
 
 // Sets default values
 ADWVoxelModule::ADWVoxelModule()
@@ -78,9 +78,9 @@ void ADWVoxelModule::OnInitialize_Implementation()
 	Super::OnInitialize_Implementation();
 }
 
-void ADWVoxelModule::OnPreparatory_Implementation()
+void ADWVoxelModule::OnPreparatory_Implementation(EPhase InPhase)
 {
-	Super::OnPreparatory_Implementation();
+	Super::OnPreparatory_Implementation(InPhase);
 }
 
 void ADWVoxelModule::OnRefresh_Implementation(float DeltaSeconds)

@@ -3,7 +3,7 @@
 
 #include "Ability/DWAbilityModule.h"
 	
-MODULE_INSTANCE_IMPLEMENTATION(ADWAbilityModule)
+MODULE_INSTANCE_IMPLEMENTATION(ADWAbilityModule, false)
 
 // ParamSets default values
 ADWAbilityModule::ADWAbilityModule()
@@ -28,9 +28,9 @@ void ADWAbilityModule::OnInitialize_Implementation()
 	Super::OnInitialize_Implementation();
 }
 
-void ADWAbilityModule::OnPreparatory_Implementation()
+void ADWAbilityModule::OnPreparatory_Implementation(EPhase InPhase)
 {
-	Super::OnPreparatory_Implementation();
+	Super::OnPreparatory_Implementation(InPhase);
 }
 
 void ADWAbilityModule::OnRefresh_Implementation(float DeltaSeconds)

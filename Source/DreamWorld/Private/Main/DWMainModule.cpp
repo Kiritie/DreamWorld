@@ -62,11 +62,12 @@ ADWMainModule::ADWMainModule()
 	ModuleClasses.Add(ADWTeamModule::StaticClass());
 }
 
-void ADWMainModule::InitializeModules_Implementation()
+void ADWMainModule::OnInitialize_Implementation()
 {
-	Super::InitializeModules_Implementation();
+	Super::OnInitialize_Implementation();
 
 	UAbilityModuleBPLibrary::AddCustomInteractAction((int32)EDWInteractAction::Feed, TEXT("EDWInteractAction"));
 	UAbilityModuleBPLibrary::AddCustomInteractAction((int32)EDWInteractAction::Ride, TEXT("EDWInteractAction"));
 	UAbilityModuleBPLibrary::AddCustomInteractAction((int32)EDWInteractAction::UnRide, TEXT("EDWInteractAction"));
 }
+

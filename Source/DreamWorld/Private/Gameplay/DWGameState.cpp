@@ -29,7 +29,17 @@ void ADWGameState::OnInitialize_Implementation()
 	Super::OnInitialize_Implementation();
 }
 
-void ADWGameState::OnPreparatory_Implementation()
+void ADWGameState::OnPreparatory_Implementation(EPhase InPhase)
 {
-	Super::OnPreparatory_Implementation();
+	Super::OnPreparatory_Implementation(InPhase);
+}
+
+void ADWGameState::OnRefresh_Implementation(float DeltaSeconds)
+{
+	Super::OnRefresh_Implementation(DeltaSeconds);
+}
+
+void ADWGameState::OnTermination_Implementation()
+{
+	Super::OnTermination_Implementation();
 }

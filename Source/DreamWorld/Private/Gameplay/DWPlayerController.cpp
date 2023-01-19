@@ -60,9 +60,69 @@ void ADWPlayerController::OnInitialize_Implementation()
 	Super::OnInitialize_Implementation();
 }
 
-void ADWPlayerController::OnPreparatory_Implementation()
+void ADWPlayerController::OnPreparatory_Implementation(EPhase InPhase)
 {
-	Super::OnPreparatory_Implementation();
+	Super::OnPreparatory_Implementation(InPhase);
+}
+
+void ADWPlayerController::OnRefresh_Implementation(float DeltaSeconds)
+{
+	Super::OnRefresh_Implementation(DeltaSeconds);
+
+
+	ADWCharacter* PossessedCharacter = GetPawn<ADWCharacter>();
+
+	if(!PossessedCharacter) return;
+
+	if(PossessedCharacter->IsActive(true))
+	{
+		switch (PossessedCharacter->ControlMode)
+		{
+			case EDWCharacterControlMode::Fighting:
+			{
+				if(bPressedAttackDestroy || PossessedCharacter->AttackAbilityQueue > 0)
+				{
+					PossessedCharacter->Attack();
+				}
+				else if(!PossessedCharacter->IsAttacking(true))
+				{
+					PossessedCharacter->UnAttack();
+				}
+
+				if(bPressedDefendGenerate)
+				{
+					PossessedCharacter->Defend();
+				}
+				else
+				{
+					PossessedCharacter->UnDefend();
+				}
+			}
+			case EDWCharacterControlMode::Creating:
+			{
+				// FVoxelHitResult voxelHitResult;
+				// if(RaycastVoxel(voxelHitResult))
+				// {
+				// 	voxelHitResult.GetVoxel().OnMouseHover(voxelHitResult);
+				// }
+				break;
+			}
+		}
+
+		if(bPressedSprint)
+		{
+			PossessedCharacter->Sprint();
+		}
+		else
+		{
+			PossessedCharacter->UnSprint();
+		}
+	}
+}
+
+void ADWPlayerController::OnTermination_Implementation()
+{
+	Super::OnTermination_Implementation();
 }
 
 void ADWPlayerController::LoadData(FSaveData* InSaveData, EPhase InPhase)
@@ -224,60 +284,6 @@ void ADWPlayerController::OnUnPossess()
 	bPressedAttackDestroy = false;
 	bPressedDefendGenerate = false;
 	bPressedSprint = false;
-}
-
-void ADWPlayerController::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-	ADWCharacter* PossessedCharacter = GetPawn<ADWCharacter>();
-
-	if(!PossessedCharacter) return;
-
-	if(PossessedCharacter->IsActive(true))
-	{
-		switch (PossessedCharacter->ControlMode)
-		{
-			case EDWCharacterControlMode::Fighting:
-			{
-				if(bPressedAttackDestroy || PossessedCharacter->AttackAbilityQueue > 0)
-				{
-					PossessedCharacter->Attack();
-				}
-				else if(!PossessedCharacter->IsAttacking(true))
-				{
-					PossessedCharacter->UnAttack();
-				}
-
-				if(bPressedDefendGenerate)
-				{
-					PossessedCharacter->Defend();
-				}
-				else
-				{
-					PossessedCharacter->UnDefend();
-				}
-			}
-			case EDWCharacterControlMode::Creating:
-			{
-				// FVoxelHitResult voxelHitResult;
-				// if(RaycastVoxel(voxelHitResult))
-				// {
-				// 	voxelHitResult.GetVoxel().OnMouseHover(voxelHitResult);
-				// }
-				break;
-			}
-		}
-
-		if(bPressedSprint)
-		{
-			PossessedCharacter->Sprint();
-		}
-		else
-		{
-			PossessedCharacter->UnSprint();
-		}
-	}
 }
 
 void ADWPlayerController::OnJumpPressed(FKey Key)
