@@ -31,6 +31,8 @@
 #include "WebRequest/WebRequestModule.h"
 #include "Widget/WidgetModule.h"
 
+MODULE_INSTANCE_IMPLEMENTATION(ADWMainModule, false)
+
 ADWMainModule::ADWMainModule()
 {
 	// set default pawn class to our Blueprinted character

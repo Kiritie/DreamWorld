@@ -13,6 +13,8 @@ UCLASS()
 class DREAMWORLD_API ADWMainModule : public AMainModule
 {
 	GENERATED_BODY()
+		
+	MODULE_INSTANCE_DECLARE(ADWMainModule)
 
 public:
 	ADWMainModule();

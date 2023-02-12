@@ -240,7 +240,7 @@ void UWidgetInventorySlot::OnCooldown()
 	{
 		ImgMask->SetVisibility(ESlateVisibility::Visible);
 		TxtCooldown->SetVisibility(ESlateVisibility::Visible);
-		TxtCooldown->SetText(UKismetTextLibrary::Conv_FloatToText(CooldownInfo.CooldownRemaining, ERoundingMode::HalfToEven, false, true, 1, 324, 0, 1));
+		TxtCooldown->SetText(UKismetTextLibrary::AsCurrency_Float(CooldownInfo.CooldownRemaining, ERoundingMode::HalfToEven, false, true, 1, 324, 0, 1));
 		MaskMatInst->SetScalarParameterValue(FName("Progress"), 1.f - CooldownInfo.CooldownRemaining / CooldownInfo.CooldownDuration);
 	}
 	else
