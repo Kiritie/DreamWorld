@@ -12,7 +12,7 @@ class DREAMWORLD_API ADWAbilityModule : public AAbilityModule
 {
 	GENERATED_BODY()
 		
-	MODULE_INSTANCE_DECLARE(ADWAbilityModule)
+	GENERATED_MODULE(ADWAbilityModule)
 
 public:	
 	// ParamSets default values for this actor's properties

@@ -14,7 +14,7 @@ class DREAMWORLD_API ADWMainModule : public AMainModule
 {
 	GENERATED_BODY()
 		
-	MODULE_INSTANCE_DECLARE(ADWMainModule)
+	GENERATED_MAIN_MODULE(ADWMainModule)
 
 public:
 	ADWMainModule();

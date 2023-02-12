@@ -81,7 +81,7 @@ void UWidgetInventoryPanel::OnInitialize_Implementation(AActor* InOwner)
 				if(UWidgetInventoryEquipSlot* EquipSlot = Cast<UWidgetInventoryEquipSlot>(UWidgetBlueprintLibrary::Create(this, EquipSlotClass, nullptr)))
 				{
 					EquipSlot->OnInitialize(EquipSlots[i]);
-					EquipSlot->SetEquipPartType(UGlobalBPLibrary::GetEnumValueDisplayName(TEXT("EEquipPartType"), i));
+					EquipSlot->SetEquipPartType(UGlobalBPLibrary::GetEnumValueDisplayName(TEXT("/Script/WHFramework.EEquipPartType"), i));
 					if(UGridSlot* GridSlot = i % 2 == 0 ? LeftEquipContent->AddChildToGrid(EquipSlot) : RightEquipContent->AddChildToGrid(EquipSlot))
 					{
 						GridSlot->SetPadding(FMargin(2.5f, 2.5f, 2.5f, 2.5f));

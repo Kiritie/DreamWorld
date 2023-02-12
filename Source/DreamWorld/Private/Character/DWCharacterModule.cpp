@@ -6,7 +6,7 @@
 #include "Ability/AbilityModuleTypes.h"
 #include "Character/Player/DWPlayerCharacterData.h"
 
-MODULE_INSTANCE_IMPLEMENTATION(ADWCharacterModule, false)
+IMPLEMENTATION_MODULE(ADWCharacterModule)
 
 // ParamSets default values
 ADWCharacterModule::ADWCharacterModule()

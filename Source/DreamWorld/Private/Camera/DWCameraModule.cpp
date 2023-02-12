@@ -8,7 +8,7 @@
 #include "SaveGame/SaveGameModuleBPLibrary.h"
 #include "SaveGame/General/DWGeneralSaveGame.h"
 	
-MODULE_INSTANCE_IMPLEMENTATION(ADWCameraModule, false)
+IMPLEMENTATION_MODULE(ADWCameraModule)
 
 // ParamSets default values
 ADWCameraModule::ADWCameraModule()

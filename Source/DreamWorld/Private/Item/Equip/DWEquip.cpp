@@ -27,7 +27,7 @@ void ADWEquip::OnAssemble_Implementation()
 {
 	Super::OnAssemble_Implementation();
 
-	AttachToComponent(OwnerCharacter->GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, *UGlobalBPLibrary::GetEnumValueAuthoredName(TEXT("EDWEquipPartType"), (int32)GetItemData<UDWEquipData>().PartType));
+	AttachToComponent(OwnerCharacter->GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, *UGlobalBPLibrary::GetEnumValueAuthoredName(TEXT("/Script/DreamWorld.EDWEquipPartType"), (int32)GetItemData<UDWEquipData>().PartType));
 }
 
 void ADWEquip::OnDischarge_Implementation()

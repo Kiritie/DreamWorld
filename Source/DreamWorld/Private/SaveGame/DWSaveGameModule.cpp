@@ -11,7 +11,7 @@
 #include "SaveGame/General/DWGeneralSaveGame.h"
 #include "SaveGame/SaveGameModuleBPLibrary.h"
 	
-MODULE_INSTANCE_IMPLEMENTATION(ADWSaveGameModule, false)
+IMPLEMENTATION_MODULE(ADWSaveGameModule)
 
 // ParamSets default values
 ADWSaveGameModule::ADWSaveGameModule()

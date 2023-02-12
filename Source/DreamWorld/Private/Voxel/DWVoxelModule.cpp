@@ -28,7 +28,7 @@
 #include "SaveGame/SaveGameModuleBPLibrary.h"
 #include "UObject/ConstructorHelpers.h"
 	
-MODULE_INSTANCE_IMPLEMENTATION(ADWVoxelModule, false)
+IMPLEMENTATION_MODULE(ADWVoxelModule)
 
 // Sets default values
 ADWVoxelModule::ADWVoxelModule()

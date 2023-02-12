@@ -16,7 +16,7 @@ class DREAMWORLD_API ADWTeamModule : public AModuleBase
 {
 	GENERATED_BODY()
 		
-	MODULE_INSTANCE_DECLARE(ADWTeamModule)
+	GENERATED_MODULE(ADWTeamModule)
 
 public:
 	// Sets default values for this actor's properties

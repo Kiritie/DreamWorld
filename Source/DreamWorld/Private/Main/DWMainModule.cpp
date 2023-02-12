@@ -31,7 +31,7 @@
 #include "WebRequest/WebRequestModule.h"
 #include "Widget/WidgetModule.h"
 
-MODULE_INSTANCE_IMPLEMENTATION(ADWMainModule, false)
+IMPLEMENTATION_MAIN_MODULE(ADWMainModule)
 
 ADWMainModule::ADWMainModule()
 {

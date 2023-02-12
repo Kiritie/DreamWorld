@@ -3,7 +3,7 @@
 
 #include "Ability/DWAbilityModule.h"
 	
-MODULE_INSTANCE_IMPLEMENTATION(ADWAbilityModule, false)
+IMPLEMENTATION_MODULE(ADWAbilityModule)
 
 // ParamSets default values
 ADWAbilityModule::ADWAbilityModule()
