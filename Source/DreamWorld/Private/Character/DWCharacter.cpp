@@ -153,9 +153,9 @@ void ADWCharacter::OnSpawn_Implementation(const TArray<FParameter>& InParams)
 	Super::OnSpawn_Implementation(InParams);
 }
 
-void ADWCharacter::OnDespawn_Implementation()
+void ADWCharacter::OnDespawn_Implementation(bool bRecovery)
 {
-	Super::OnDespawn_Implementation();
+	Super::OnDespawn_Implementation(bRecovery);
 
 	Inventory->UnloadSaveData(EPhase::Primary);
 	

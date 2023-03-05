@@ -25,9 +25,9 @@ void ADWVitalityVoxel::BeginPlay()
 	Super::BeginPlay();
 }
 
-void ADWVitalityVoxel::OnDespawn_Implementation()
+void ADWVitalityVoxel::OnDespawn_Implementation(bool bRecovery)
 {
-	Super::OnDespawn_Implementation();
+	Super::OnDespawn_Implementation(bRecovery);
 
 	VoxelID = FPrimaryAssetId();
 }

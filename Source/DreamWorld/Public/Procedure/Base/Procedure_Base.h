@@ -4,27 +4,27 @@
 
 #include "CoreMinimal.h"
 #include "Procedure/Base/ProcedureBase.h"
-#include "Procedure_ArchiveChoosing.generated.h"
+#include "Procedure_Base.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class DREAMWORLD_API UProcedure_ArchiveChoosing : public UProcedureBase
+class DREAMWORLD_API UProcedure_Base : public UProcedureBase
 {
 	GENERATED_BODY()
 	
 public:
-	UProcedure_ArchiveChoosing();
+	UProcedure_Base();
 
 	//////////////////////////////////////////////////////////////////////////
 	/// Procedure
-public:
-#if WITH_EDITOR
+	public:
+	#if WITH_EDITOR
 	virtual void OnGenerate() override;
 
 	virtual void OnUnGenerate() override;
-#endif
+	#endif
 
 public:
 	virtual void OnInitialize() override;
@@ -37,13 +37,10 @@ public:
 	
 	virtual void OnLeave(UProcedureBase* InNextProcedure) override;
 
-public:
-	UFUNCTION(BlueprintCallable)
-	void CreateArchive();
-	
-	UFUNCTION(BlueprintCallable)
-	void RemoveArchive(int32 InArchiveID);
-	
-	UFUNCTION(BlueprintCallable)
-	void ChooseArchive(int32 InArchiveID);
+protected:
+	UPROPERTY(EditAnywhere, Category = "BGM")
+	USoundBase* BGMSound;
+
+	UPROPERTY(EditAnywhere, Category = "Camera")
+	float CameraRotationSpeed;
 };

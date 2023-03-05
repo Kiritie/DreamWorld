@@ -155,9 +155,9 @@ void ADWPlayerCharacter::OnSpawn_Implementation(const TArray<FParameter>& InPara
 	Super::OnSpawn_Implementation(InParams);
 }
 
-void ADWPlayerCharacter::OnDespawn_Implementation()
+void ADWPlayerCharacter::OnDespawn_Implementation(bool bRecovery)
 {
-	Super::OnDespawn_Implementation();
+	Super::OnDespawn_Implementation(bRecovery);
 }
 
 void ADWPlayerCharacter::LoadData(FSaveData* InSaveData, EPhase InPhase)

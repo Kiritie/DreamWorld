@@ -47,9 +47,9 @@ void ADWVoxelChunk::OnSpawn_Implementation(const TArray<FParameter>& InParams)
 	Super::OnSpawn_Implementation(InParams);
 }
 
-void ADWVoxelChunk::OnDespawn_Implementation()
+void ADWVoxelChunk::OnDespawn_Implementation(bool bRecovery)
 {
-	Super::OnDespawn_Implementation();
+	Super::OnDespawn_Implementation(bRecovery);
 	
 	bRaceGenerated = false;
 }
@@ -157,9 +157,9 @@ void ADWVoxelChunk::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
-void ADWVoxelChunk::Initialize(AVoxelModule* InModule, FIndex InIndex, int32 InBatch)
+void ADWVoxelChunk::Initialize(FIndex InIndex, int32 InBatch)
 {
-	Super::Initialize(InModule, InIndex, InBatch);
+	Super::Initialize(InIndex, InBatch);
 }
 
 void ADWVoxelChunk::Generate(EPhase InPhase)
@@ -293,12 +293,14 @@ void ADWVoxelChunk::DestroyActors()
 	while(Characters.Num() > 0)
 	{
 		UObjectPoolModuleBPLibrary::DespawnObject(Characters[0]);
+		Characters.RemoveAt(0);
 	}
 	Characters.Empty();
 
 	while(Vitalitys.Num() > 0)
 	{
 		UObjectPoolModuleBPLibrary::DespawnObject(Vitalitys[0]);
+		Vitalitys.RemoveAt(0);
 	}
 	Vitalitys.Empty();
 }
@@ -307,16 +309,19 @@ void ADWVoxelChunk::AddSceneActor(AActor* InActor)
 {
 	if(!InActor || !InActor->Implements<USceneActorInterface>() || ISceneActorInterface::Execute_GetContainer(InActor) == this) return;
 
-	if(ADWCharacter* Character = Cast<ADWCharacter>(InActor))
+	if(State != EVoxelChunkState::None)
 	{
-		if(!Character->IsPlayer())
+		if(ADWCharacter* Character = Cast<ADWCharacter>(InActor))
 		{
-			Characters.Add(Character);
+			if(!Character->IsPlayer())
+			{
+				Characters.Add(Character);
+			}
 		}
-	}
-	else if(ADWVitality* Vitality = Cast<ADWVitality>(InActor))
-	{
-		Vitalitys.Add(Vitality);
+		else if(ADWVitality* Vitality = Cast<ADWVitality>(InActor))
+		{
+			Vitalitys.Add(Vitality);
+		}
 	}
 
 	Super::AddSceneActor(InActor);

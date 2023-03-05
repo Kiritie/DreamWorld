@@ -27,9 +27,9 @@ UProcedure_Starting::UProcedure_Starting()
 {
 	ProcedureName = FName("Starting");
 	ProcedureDisplayName = FText::FromString(TEXT("Starting"));
-	
-	BGMSound = nullptr;
-	CameraSpeed = 10.f;
+
+	bTrackTarget = true;
+	TrackTargetMode = ETrackTargetMode::LocationOnly;
 }
 
 #if WITH_EDITOR
@@ -51,8 +51,6 @@ void UProcedure_Starting::OnInitialize()
 
 void UProcedure_Starting::OnEnter(UProcedureBase* InLastProcedure)
 {
-	UAudioModuleBPLibrary::PlaySingleSound2D(BGMSound, FName("BGM"));
-
 	UWidgetModuleBPLibrary::OpenUserWidget<UWidgetMainMenu>();
 	UWidgetModuleBPLibrary::CreateUserWidget<UWidgetArchiveChoosingPanel>();
 
@@ -67,20 +65,14 @@ void UProcedure_Starting::OnEnter(UProcedureBase* InLastProcedure)
 	}
 	AMainModule::PauseModuleByClass<ASceneModule>();
 
-	if(const ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>())
-	{
-		CameraViewOffset = FVector(PlayerCharacter->GetActorLocation().X, PlayerCharacter->GetActorLocation().Y, PlayerCharacter->GetActorLocation().Z + CameraViewOffset.Z);
-	}
-
+	SetOperationTarget(UGlobalBPLibrary::GetPlayerPawn());
+	
 	Super::OnEnter(InLastProcedure);
 }
 
 void UProcedure_Starting::OnRefresh()
 {
 	Super::OnRefresh();
-
-	// CameraViewYaw += UGameplayStatics::GetWorldDeltaSeconds(this) * CameraSpeed;
-	// UCameraModuleBPLibrary::SetCameraRotation(CameraViewYaw, CameraViewPitch);
 }
 
 void UProcedure_Starting::OnGuide()
@@ -91,4 +83,6 @@ void UProcedure_Starting::OnGuide()
 void UProcedure_Starting::OnLeave(UProcedureBase* InNextProcedure)
 {
 	Super::OnLeave(InNextProcedure);
+
+	SetOperationTarget(nullptr);
 }

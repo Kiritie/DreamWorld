@@ -3,14 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Procedure/Base/ProcedureBase.h"
+#include "Procedure/Base/Procedure_Base.h"
 #include "Procedure_Overed.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class DREAMWORLD_API UProcedure_Overed : public UProcedureBase
+class DREAMWORLD_API UProcedure_Overed : public UProcedure_Base
 {
 	GENERATED_BODY()
 	

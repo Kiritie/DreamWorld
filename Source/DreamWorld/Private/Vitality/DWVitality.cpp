@@ -62,9 +62,9 @@ void ADWVitality::OnSpawn_Implementation(const TArray<FParameter>& InParams)
 	Super::OnSpawn_Implementation(InParams);
 }
 
-void ADWVitality::OnDespawn_Implementation()
+void ADWVitality::OnDespawn_Implementation(bool bRecovery)
 {
-	Super::OnDespawn_Implementation();
+	Super::OnDespawn_Implementation(bRecovery);
 
 	Inventory->UnloadSaveData(EPhase::Primary);
 }

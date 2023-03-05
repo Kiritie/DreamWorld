@@ -17,6 +17,8 @@ class DREAMWORLD_API ADWCharacterModule : public ACharacterModule
 public:	
 	// ParamSets default values for this actor's properties
 	ADWCharacterModule();
+
+	~ADWCharacterModule();
 	
 	//////////////////////////////////////////////////////////////////////////
 	/// Module
@@ -36,6 +38,8 @@ public:
 	virtual void OnPause_Implementation() override;
 
 	virtual void OnUnPause_Implementation() override;
+
+	virtual void OnTermination_Implementation() override;
 
 	//////////////////////////////////////////////////////////////////////////
 	/// Player

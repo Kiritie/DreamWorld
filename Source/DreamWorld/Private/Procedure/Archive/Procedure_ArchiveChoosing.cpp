@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Procedure/Procedure_ArchiveChoosing.h"
+#include "Procedure/Archive/Procedure_ArchiveChoosing.h"
 
 #include "Character/CharacterModuleBPLibrary.h"
 #include "Character/Player/DWPlayerCharacter.h"
@@ -9,7 +9,7 @@
 #include "Gameplay/DWPlayerController.h"
 #include "Global/GlobalBPLibrary.h"
 #include "Procedure/ProcedureModuleBPLibrary.h"
-#include "Procedure/Procedure_ArchiveCreating.h"
+#include "Procedure/Archive/Procedure_ArchiveCreating.h"
 #include "Procedure/Procedure_Loading.h"
 #include "SaveGame/Archive/DWArchiveSaveGame.h"
 #include "SaveGame/General/DWGeneralSaveGame.h"
@@ -23,6 +23,9 @@ UProcedure_ArchiveChoosing::UProcedure_ArchiveChoosing()
 {
 	ProcedureName = FName("ArchiveChoosing");
 	ProcedureDisplayName = FText::FromString(TEXT("ArchiveChoosing"));
+
+	bTrackTarget = true;
+	TrackTargetMode = ETrackTargetMode::LocationOnly;
 }
 
 #if WITH_EDITOR
@@ -44,6 +47,8 @@ void UProcedure_ArchiveChoosing::OnInitialize()
 
 void UProcedure_ArchiveChoosing::OnEnter(UProcedureBase* InLastProcedure)
 {
+	SetOperationTarget(UGlobalBPLibrary::GetPlayerPawn());
+
 	Super::OnEnter(InLastProcedure);
 
 	UWidgetModuleBPLibrary::OpenUserWidget<UWidgetArchiveChoosingPanel>();
@@ -64,6 +69,8 @@ void UProcedure_ArchiveChoosing::OnGuide()
 void UProcedure_ArchiveChoosing::OnLeave(UProcedureBase* InNextProcedure)
 {
 	Super::OnLeave(InNextProcedure);
+
+	SetOperationTarget(nullptr);
 }
 
 void UProcedure_ArchiveChoosing::CreateArchive()

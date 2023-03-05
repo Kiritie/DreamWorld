@@ -21,6 +21,8 @@ public:
 	// Sets default values for this actor's properties
 	ADWVoxelModule();
 
+	~ADWVoxelModule();
+
 	//////////////////////////////////////////////////////////////////////////
 	/// Module
 public:

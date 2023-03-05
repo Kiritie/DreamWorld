@@ -19,6 +19,11 @@ ADWSaveGameModule::ADWSaveGameModule()
 	GeneralSaveGame = UDWGeneralSaveGame::StaticClass();
 }
 
+ADWSaveGameModule::~ADWSaveGameModule()
+{
+	TERMINATION_MODULE(ADWSaveGameModule)
+}
+
 #if WITH_EDITOR
 void ADWSaveGameModule::OnGenerate_Implementation()
 {
@@ -54,6 +59,11 @@ void ADWSaveGameModule::OnPause_Implementation()
 void ADWSaveGameModule::OnUnPause_Implementation()
 {
 	Super::OnUnPause_Implementation();
+}
+
+void ADWSaveGameModule::OnTermination_Implementation()
+{
+	Super::OnTermination_Implementation();
 }
 
 void ADWSaveGameModule::LoadData(FSaveData* InSaveData, EPhase InPhase)

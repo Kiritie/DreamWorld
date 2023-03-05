@@ -54,9 +54,9 @@ void ADWHumanCharacter::OnSpawn_Implementation(const TArray<FParameter>& InParam
 	Super::OnSpawn_Implementation(InParams);
 }
 
-void ADWHumanCharacter::OnDespawn_Implementation()
+void ADWHumanCharacter::OnDespawn_Implementation(bool bRecovery)
 {
-	Super::OnDespawn_Implementation();
+	Super::OnDespawn_Implementation(bRecovery);
 
 	UObjectPoolModuleBPLibrary::DespawnObject(GenerateVoxelEntity);
 	UObjectPoolModuleBPLibrary::DespawnObject(AuxiliaryVoxelEntity);

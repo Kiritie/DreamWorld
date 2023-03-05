@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Procedure/Base/ProcedureBase.h"
+#include "Procedure/Base/Procedure_Base.h"
 #include "DWTypes.h"
 #include "Procedure_ArchiveCreating.generated.h"
 
@@ -13,7 +13,7 @@ class UEventHandle_ChangeVoxelWorldState;
  * 
  */
 UCLASS()
-class DREAMWORLD_API UProcedure_ArchiveCreating : public UProcedureBase
+class DREAMWORLD_API UProcedure_ArchiveCreating : public UProcedure_Base
 {
 	GENERATED_BODY()
 	

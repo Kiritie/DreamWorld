@@ -17,6 +17,8 @@ class DREAMWORLD_API ADWSaveGameModule : public ASaveGameModule
 public:	
 	// ParamSets default values for this actor's properties
 	ADWSaveGameModule();
+
+	~ADWSaveGameModule();
 	
 	//////////////////////////////////////////////////////////////////////////
 	/// Module
@@ -36,6 +38,8 @@ public:
 	virtual void OnPause_Implementation() override;
 
 	virtual void OnUnPause_Implementation() override;
+
+	virtual void OnTermination_Implementation() override;
 
 protected:
 	virtual void LoadData(FSaveData* InSaveData, EPhase InPhase) override;

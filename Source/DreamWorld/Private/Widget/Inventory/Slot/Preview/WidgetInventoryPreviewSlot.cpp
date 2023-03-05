@@ -19,7 +19,7 @@ void UWidgetInventoryPreviewSlot::OnSpawn_Implementation(const TArray<FParameter
 
 }
 
-void UWidgetInventoryPreviewSlot::OnDespawn_Implementation()
+void UWidgetInventoryPreviewSlot::OnDespawn_Implementation(bool bRecovery)
 {
 	Owner = nullptr;
 	Item = FAbilityItem::Empty;

@@ -4,12 +4,13 @@
 #include "Voxel/DWVoxelModule.h"
 
 #include "Character/Player/DWPlayerCharacter.h"
+#include "Components/StaticMeshComponent.h"
 #include "Gameplay/DWGameState.h"
 #include "Gameplay/DWPlayerController.h"
 #include "Global/GlobalBPLibrary.h"
 #include "Procedure/ProcedureModuleBPLibrary.h"
-#include "Procedure/Procedure_ArchiveChoosing.h"
-#include "Procedure/Procedure_ArchiveCreating.h"
+#include "Procedure/Archive/Procedure_ArchiveChoosing.h"
+#include "Procedure/Archive/Procedure_ArchiveCreating.h"
 #include "Procedure/Procedure_Initializing.h"
 #include "Procedure/Procedure_Loading.h"
 #include "Procedure/Procedure_Overed.h"
@@ -59,6 +60,11 @@ ADWVoxelModule::ADWVoxelModule()
 	{
 		WorldBasicData.ChunkMaterials.Add(FVoxelChunkMaterial(TransparentMatFinder.Object, UnlitTransparentMatFinder.Object, FVector2D(0.0625f, 0.5f)));
 	}
+}
+
+ADWVoxelModule::~ADWVoxelModule()
+{
+	TERMINATION_MODULE(ADWVoxelModule)
 }
 
 #if WITH_EDITOR

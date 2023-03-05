@@ -12,6 +12,7 @@
 #include "Character/DWCharacterData.h"
 #include "Character/DWCharacter.h"
 #include "Ability/Vitality/AbilityVitalityInterface.h"
+#include "Debug/DebugModuleTypes.h"
 
 void UDWDamageHandle::HandleDamage(AActor* SourceActor, AActor* TargetActor, float DamageValue, EDamageType DamageType, const FHitResult& HitResult, const FGameplayTagContainer& SourceTags)
 {
@@ -40,11 +41,12 @@ void UDWDamageHandle::HandleDamage(AActor* SourceActor, AActor* TargetActor, flo
 	{
 		SourceDefendRate = TargetCharacter->GetDefendRate();
 		SourceDefendScope = TargetCharacter->GetDefendScope();
+		WHDebug(FString::Printf(TEXT("%f"), SourceDefendScope));
 		SourcePhysicsDefRate = TargetCharacter->GetPhysicsDefRate();
 		SourceMagicDefRate = TargetCharacter->GetMagicDefRate();
 
-		FVector DamageDirection = SourceActor->GetActorLocation() - TargetActor->GetActorLocation();
-		if (FVector::DotProduct(DamageDirection, TargetActor->GetActorForwardVector()) / 90 > (1 - SourceDefendScope))
+		const FVector DamageDirection = SourceActor->GetActorLocation() - TargetActor->GetActorLocation();
+		if (FVector::DotProduct(DamageDirection.GetSafeNormal(), TargetActor->GetActorForwardVector()) / 90 > (1 - SourceDefendScope))
 		{
 			DefendRateDone = SourceDefendRate * (TargetCharacter->IsDefending() ? 1 : 0);
 			if(DefendRateDone > 0.f && !TargetCharacter->DoAction(EDWCharacterActionType::DefendBlock))

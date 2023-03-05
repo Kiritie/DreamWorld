@@ -41,7 +41,7 @@ protected:
 
 	virtual void OnSpawn_Implementation(const TArray<FParameter>& InParams) override;
 
-	virtual void OnDespawn_Implementation() override;
+	virtual void OnDespawn_Implementation(bool bRecovery) override;
 
 public:
 	virtual void Tick(float DeltaTime) override;

@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Procedure/Procedure_ArchiveCreating.h"
+#include "Procedure/Archive/Procedure_ArchiveCreating.h"
 
 #include "Camera/CameraModuleBPLibrary.h"
 #include "Character/CharacterModuleBPLibrary.h"
@@ -23,12 +23,15 @@
 #include "Widget/Archive/WidgetArchiveCreatingPanel.h"
 #include "Voxel/VoxelModule.h"
 #include "DWTypes.h"
-#include "Procedure/Procedure_ArchiveChoosing.h"
+#include "Procedure/Archive/Procedure_ArchiveChoosing.h"
 
 UProcedure_ArchiveCreating::UProcedure_ArchiveCreating()
 {
 	ProcedureName = FName("ArchiveCreating");
 	ProcedureDisplayName = FText::FromString(TEXT("ArchiveCreating"));
+
+	bTrackTarget = true;
+	TrackTargetMode = ETrackTargetMode::LocationOnly;
 }
 
 #if WITH_EDITOR
@@ -52,9 +55,9 @@ void UProcedure_ArchiveCreating::OnInitialize()
 
 void UProcedure_ArchiveCreating::OnEnter(UProcedureBase* InLastProcedure)
 {
-	Super::OnEnter(InLastProcedure);
+	SetOperationTarget(UGlobalBPLibrary::GetPlayerPawn());
 
-	OperationTarget = UGlobalBPLibrary::GetPlayerPawn();
+	Super::OnEnter(InLastProcedure);
 
 	if(OperationTarget)
 	{
@@ -68,11 +71,6 @@ void UProcedure_ArchiveCreating::OnEnter(UProcedureBase* InLastProcedure)
 void UProcedure_ArchiveCreating::OnRefresh()
 {
 	Super::OnRefresh();
-
-	if(OperationTarget)
-	{
-		UCameraModuleBPLibrary::SetCameraLocation(OperationTarget->GetActorLocation() + CameraViewOffset);
-	}
 }
 
 void UProcedure_ArchiveCreating::OnGuide()
@@ -91,12 +89,12 @@ void UProcedure_ArchiveCreating::OnLeave(UProcedureBase* InNextProcedure)
 			ISceneActorInterface::Execute_SetActorVisible(OperationTarget, false);
 		}
 	}
-	OperationTarget = nullptr;
+	SetOperationTarget(nullptr);
 }
 
 void UProcedure_ArchiveCreating::OnPlayerChanged(APawn* InPlayerPawn)
 {
-	OperationTarget = InPlayerPawn;
+	SetOperationTarget(InPlayerPawn);
 }
 
 void UProcedure_ArchiveCreating::CreatePlayer(FDWPlayerSaveData& InPlayerSaveData, EPhase InPhase)

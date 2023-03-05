@@ -33,7 +33,7 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	virtual void OnDespawn_Implementation() override;
+	virtual void OnDespawn_Implementation(bool bRecovery) override;
 
 	virtual void LoadData(FSaveData* InSaveData, EPhase InPhase) override;
 

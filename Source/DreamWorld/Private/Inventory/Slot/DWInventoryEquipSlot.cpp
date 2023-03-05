@@ -28,9 +28,9 @@ void UDWInventoryEquipSlot::OnSpawn_Implementation(const TArray<FParameter>& InP
 	Super::OnSpawn_Implementation(InParams);
 }
 
-void UDWInventoryEquipSlot::OnDespawn_Implementation()
+void UDWInventoryEquipSlot::OnDespawn_Implementation(bool bRecovery)
 {
-	Super::OnDespawn_Implementation();
+	Super::OnDespawn_Implementation(bRecovery);
 
 	PartType = EDWEquipPartType::Head;
 }

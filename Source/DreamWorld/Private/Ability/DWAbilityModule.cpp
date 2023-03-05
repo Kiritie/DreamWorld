@@ -2,13 +2,20 @@
 
 
 #include "Ability/DWAbilityModule.h"
-	
+
+#include "Ability/AbilityModuleBPLibrary.h"
+
 IMPLEMENTATION_MODULE(ADWAbilityModule)
 
 // ParamSets default values
 ADWAbilityModule::ADWAbilityModule()
 {
 	
+}
+
+ADWAbilityModule::~ADWAbilityModule()
+{
+	TERMINATION_MODULE(ADWAbilityModule)
 }
 
 #if WITH_EDITOR
@@ -26,6 +33,10 @@ void ADWAbilityModule::OnDestroy_Implementation()
 void ADWAbilityModule::OnInitialize_Implementation()
 {
 	Super::OnInitialize_Implementation();
+	
+	UAbilityModuleBPLibrary::AddCustomInteractAction((int32)EDWInteractAction::Feed, TEXT("EDWInteractAction"));
+	UAbilityModuleBPLibrary::AddCustomInteractAction((int32)EDWInteractAction::Ride, TEXT("EDWInteractAction"));
+	UAbilityModuleBPLibrary::AddCustomInteractAction((int32)EDWInteractAction::UnRide, TEXT("EDWInteractAction"));
 }
 
 void ADWAbilityModule::OnPreparatory_Implementation(EPhase InPhase)

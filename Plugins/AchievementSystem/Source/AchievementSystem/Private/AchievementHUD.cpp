@@ -91,7 +91,7 @@ void UAchievementHUD::Spawn(FAchievementData Achievement, FAchievementStates Sta
 	Active.Add(Temp);
 	UCanvasPanelSlot *CSlot = Canvas->AddChildToCanvas(Temp);
 	
-	Size = FVector2D(Temp->Root->WidthOverride, Temp->Root->HeightOverride);
+	Size = FVector2D(Temp->Root->GetWidthOverride(), Temp->Root->GetHeightOverride());
 	SpawnLocation = FVector2D(
 		Settings->IsRightOfScreen() ? -Size.X : 0,
 		Settings->IsBottomOfScreen() ? 0 : -Size.Y

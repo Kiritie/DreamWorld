@@ -3,14 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Procedure/Base/ProcedureBase.h"
+#include "Procedure/Base/Procedure_Base.h"
 #include "Procedure_Pausing.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class DREAMWORLD_API UProcedure_Pausing : public UProcedureBase
+class DREAMWORLD_API UProcedure_Pausing : public UProcedure_Base
 {
 	GENERATED_BODY()
 	

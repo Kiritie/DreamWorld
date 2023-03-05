@@ -8,9 +8,9 @@ UWidgetInventoryGenerateSlot::UWidgetInventoryGenerateSlot(const FObjectInitiali
 	
 }
 
-void UWidgetInventoryGenerateSlot::OnDespawn_Implementation()
+void UWidgetInventoryGenerateSlot::OnDespawn_Implementation(bool bRecovery)
 {
-	Super::OnDespawn_Implementation();
+	Super::OnDespawn_Implementation(bRecovery);
 
 	OnSlotSelected.Clear();
 }

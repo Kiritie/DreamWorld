@@ -3,14 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Procedure/Base/ProcedureBase.h"
+#include "Base/Procedure_Base.h"
 #include "Procedure_Starting.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class DREAMWORLD_API UProcedure_Starting : public UProcedureBase
+class DREAMWORLD_API UProcedure_Starting : public UProcedure_Base
 {
 	GENERATED_BODY()
 	
@@ -36,11 +36,4 @@ public:
 	virtual void OnGuide() override;
 	
 	virtual void OnLeave(UProcedureBase* InNextProcedure) override;
-
-protected:
-	UPROPERTY(EditAnywhere, Category = "BGM")
-	USoundBase* BGMSound;
-
-	UPROPERTY(EditAnywhere, Category = "Camera")
-	float CameraSpeed;
 };

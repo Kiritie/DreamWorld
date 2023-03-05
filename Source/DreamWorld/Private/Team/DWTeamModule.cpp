@@ -19,6 +19,11 @@ ADWTeamModule::ADWTeamModule()
 	TeamMap = TMap<FName, FDWTeamData>();
 }
 
+ADWTeamModule::~ADWTeamModule()
+{
+	TERMINATION_MODULE(ADWTeamModule)
+}
+
 #if WITH_EDITOR
 void ADWTeamModule::OnGenerate_Implementation()
 {

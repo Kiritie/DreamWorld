@@ -32,7 +32,7 @@ protected:
 
 	virtual void OnSpawn_Implementation(const TArray<FParameter>& InParams) override;
 		
-	virtual void OnDespawn_Implementation() override;
+	virtual void OnDespawn_Implementation(bool bRecovery) override;
 
 	virtual void LoadData(FSaveData* InSaveData, EPhase InPhase) override;
 
@@ -63,7 +63,7 @@ protected:
 	//////////////////////////////////////////////////////////////////////////
 	// Chunk
 public:
-	virtual void Initialize(AVoxelModule* InModule, FIndex InIndex, int32 InBatch) override;
+	virtual void Initialize(FIndex InIndex, int32 InBatch) override;
 
 	virtual void Generate(EPhase InPhase = EPhase::Primary) override;
 

@@ -27,8 +27,6 @@ UProcedure_Playing::UProcedure_Playing()
 {
 	ProcedureName = FName("Playing");
 	ProcedureDisplayName = FText::FromString(TEXT("Playing"));
-	
-	BGMSound = nullptr;
 }
 
 #if WITH_EDITOR
@@ -54,8 +52,6 @@ void UProcedure_Playing::OnEnter(UProcedureBase* InLastProcedure)
 
 	if(InLastProcedure->IsA<UProcedure_Loading>())
 	{
-		UAudioModuleBPLibrary::PlaySingleSound2D(BGMSound, FName("BGM"));
-
 		UWidgetModuleBPLibrary::OpenUserWidget<UWidgetGameHUD>();
 
 		if(ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>())

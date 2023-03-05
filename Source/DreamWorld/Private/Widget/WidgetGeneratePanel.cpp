@@ -144,20 +144,12 @@ void UWidgetGeneratePanel::OnDestroy_Implementation(bool bRecovery)
 	
 	for(auto Iter : GenerateSlots)
 	{
-		if(Iter->IsRooted())
-		{
-			Iter->RemoveFromRoot();
-		}
-		Iter->ConditionalBeginDestroy();
+		UObjectPoolModuleBPLibrary::DespawnObject(Iter);
 	}
 
 	for(auto Iter : PreviewSlots)
 	{
-		if(Iter->IsRooted())
-		{
-			Iter->RemoveFromRoot();
-		}
-		Iter->ConditionalBeginDestroy();
+		UObjectPoolModuleBPLibrary::DespawnObject(Iter);
 	}
 }
 

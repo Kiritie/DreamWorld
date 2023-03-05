@@ -32,9 +32,9 @@ void ADWEquipWeapon::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AA
 	}
 }
 
-void ADWEquipWeapon::OnDespawn_Implementation()
+void ADWEquipWeapon::OnDespawn_Implementation(bool bRecovery)
 {
-	Super::OnDespawn_Implementation();
+	Super::OnDespawn_Implementation(bRecovery);
 
 	Execute_SetHitAble(this, false);
 	Execute_ClearHitTargets(this);

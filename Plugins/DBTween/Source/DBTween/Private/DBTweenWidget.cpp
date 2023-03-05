@@ -12,7 +12,7 @@ UDBTweenWidget* UDBTweenWidget::DOLocalMove(FString TweenName,float DurTime, UWi
 	UDBTweenWidget* result = NewObject<UDBTweenWidget>();
 	result->AllocaKey(TweenName);
 	result->Init(DurTime);
-	result->StartTranslationValue = UI->RenderTransform.Translation;
+	result->StartTranslationValue = UI->GetRenderTransform().Translation;
 	result->EndTranslationValue = End;
 	result->SetLooping(IsLoop);
 	result->Widget = UI;
@@ -27,7 +27,7 @@ UDBTweenWidget* UDBTweenWidget::DOLocalMoveByCurve(FString TweenName, float DurT
 	UDBTweenWidget* result = NewObject<UDBTweenWidget>();
 	result->AllocaKey(TweenName);
 	result->Init(DurTime);
-	result->StartTranslationValue = UI->RenderTransform.Translation;
+	result->StartTranslationValue = UI->GetRenderTransform().Translation;
 	result->EndTranslationValue = End;
 	result->SetLooping(IsLoop);
 	result->Widget = UI;
@@ -86,7 +86,7 @@ UDBTweenWidget* UDBTweenWidget::DOLocalScale(FString TweenName,float DurTime, UW
 	UDBTweenWidget* result = NewObject<UDBTweenWidget>();
 	result->AllocaKey(TweenName);
 	result->Init(DurTime);
-	result->StartScaleValue = UI->RenderTransform.Scale;
+	result->StartScaleValue = UI->GetRenderTransform().Scale;
 	result->EndScaleValue = End;
 	result->SetLooping(IsLoop);
 	result->Widget = UI;
@@ -101,7 +101,7 @@ UDBTweenWidget* UDBTweenWidget::DOLocalScaleByCurve(FString TweenName, float Dur
 	UDBTweenWidget* result = NewObject<UDBTweenWidget>();
 	result->AllocaKey(TweenName);
 	result->Init(DurTime);
-	result->StartScaleValue = UI->RenderTransform.Scale;
+	result->StartScaleValue = UI->GetRenderTransform().Scale;
 	result->EndScaleValue = End;
 	result->SetLooping(IsLoop);
 	result->Widget = UI;

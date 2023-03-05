@@ -3,14 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Procedure/Base/ProcedureBase.h"
+#include "Procedure/Base/Procedure_Base.h"
 #include "Procedure_Initializing.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class DREAMWORLD_API UProcedure_Initializing : public UProcedureBase
+class DREAMWORLD_API UProcedure_Initializing : public UProcedure_Base
 {
 	GENERATED_BODY()
 	

@@ -3,7 +3,6 @@
 #include "Main/DWMainModule.h"
 
 #include "Ability/AbilityModule.h"
-#include "Ability/AbilityModuleBPLibrary.h"
 #include "AI/AIModule.h"
 #include "Asset/AssetModule.h"
 #include "Audio/AudioModule.h"
@@ -23,7 +22,6 @@
 #include "Procedure/ProcedureModule.h"
 #include "SaveGame/DWSaveGameModule.h"
 #include "Scene/SceneModule.h"
-#include "ReferencePool/ReferencePoolModuleBPLibrary.h"
 #include "Step/StepModule.h"
 #include "Team/DWTeamModule.h"
 #include "Voxel/DWVoxelModule.h"
@@ -64,12 +62,8 @@ ADWMainModule::ADWMainModule()
 	ModuleClasses.Add(ADWTeamModule::StaticClass());
 }
 
-void ADWMainModule::OnInitialize_Implementation()
+ADWMainModule::~ADWMainModule()
 {
-	Super::OnInitialize_Implementation();
-
-	UAbilityModuleBPLibrary::AddCustomInteractAction((int32)EDWInteractAction::Feed, TEXT("EDWInteractAction"));
-	UAbilityModuleBPLibrary::AddCustomInteractAction((int32)EDWInteractAction::Ride, TEXT("EDWInteractAction"));
-	UAbilityModuleBPLibrary::AddCustomInteractAction((int32)EDWInteractAction::UnRide, TEXT("EDWInteractAction"));
+	TERMINATION_MAIN_MODULE(ADWMainModule)
 }
 

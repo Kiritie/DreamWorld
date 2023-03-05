@@ -2,6 +2,8 @@
 
 
 #include "UIAchievement.h"
+
+#include "Animation/WidgetAnimation.h"
 #include "Kismet/KismetStringLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Kismet/KismetTextLibrary.h"
@@ -34,7 +36,7 @@ void UUIAchievement::SetValue(FAchievementData Achievement, FAchievementStates S
 		FString Goal;
 		if(!Achievement.IntProgress)
 		{
-			Progress = UKismetTextLibrary::Conv_FloatToText(DisplayProgress, ERoundingMode::HalfFromZero, false, false, 1, 324, 0, Settings->MaxDecimalPlaces).ToString();
+			Progress = UKismetTextLibrary::AsCurrency_Float(DisplayProgress, ERoundingMode::HalfFromZero, false, false, 1, 324, 0, Settings->MaxDecimalPlaces).ToString();
 			Goal = FString::SanitizeFloat(Achievement.ProgressGoal);
 		}
 		else

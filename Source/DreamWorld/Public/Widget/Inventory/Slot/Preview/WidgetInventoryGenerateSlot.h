@@ -24,7 +24,7 @@ public:
 	FOnGenerateSlotSelected OnSlotSelected;
 
 public:
-	virtual void OnDespawn_Implementation() override;
+	virtual void OnDespawn_Implementation(bool bRecovery) override;
 
 	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
 

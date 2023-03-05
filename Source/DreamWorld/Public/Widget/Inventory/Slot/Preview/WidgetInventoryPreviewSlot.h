@@ -30,7 +30,7 @@ public:
 
 	virtual void OnSpawn_Implementation(const TArray<FParameter>& InParams) override;
 
-	virtual void OnDespawn_Implementation() override;
+	virtual void OnDespawn_Implementation(bool bRecovery) override;
 		
 	virtual void NativeOnMouseEnter(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
 

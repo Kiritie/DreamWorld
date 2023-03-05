@@ -19,6 +19,5 @@ class DREAMWORLD_API ADWMainModule : public AMainModule
 public:
 	ADWMainModule();
 
-public:
-	virtual void OnInitialize_Implementation() override;
+	~ADWMainModule();
 };

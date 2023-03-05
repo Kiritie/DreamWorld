@@ -22,6 +22,8 @@ public:
 	// Sets default values for this actor's properties
 	ADWTeamModule();
 
+	~ADWTeamModule();
+
 	//////////////////////////////////////////////////////////////////////////
 	/// Module
 public:

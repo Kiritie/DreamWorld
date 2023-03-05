@@ -14,6 +14,11 @@ ADWCharacterModule::ADWCharacterModule()
 	PlayerBasicData = FDWPlayerBasicSaveData();
 }
 
+ADWCharacterModule::~ADWCharacterModule()
+{
+	TERMINATION_MODULE(ADWCharacterModule)
+}
+
 #if WITH_EDITOR
 void ADWCharacterModule::OnGenerate_Implementation()
 {
@@ -49,6 +54,11 @@ void ADWCharacterModule::OnPause_Implementation()
 void ADWCharacterModule::OnUnPause_Implementation()
 {
 	Super::OnUnPause_Implementation();
+}
+
+void ADWCharacterModule::OnTermination_Implementation()
+{
+	Super::OnTermination_Implementation();
 }
 
 FDWPlayerBasicSaveData& ADWCharacterModule::GetPlayerBasicData()
