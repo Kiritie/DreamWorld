@@ -290,18 +290,10 @@ void ADWVoxelChunk::DestroyActors()
 {
 	Super::DestroyActors();
 
-	while(Characters.Num() > 0)
-	{
-		UObjectPoolModuleBPLibrary::DespawnObject(Characters[0]);
-		Characters.RemoveAt(0);
-	}
+	UObjectPoolModuleBPLibrary::DespawnObjects(Characters);
 	Characters.Empty();
 
-	while(Vitalitys.Num() > 0)
-	{
-		UObjectPoolModuleBPLibrary::DespawnObject(Vitalitys[0]);
-		Vitalitys.RemoveAt(0);
-	}
+	UObjectPoolModuleBPLibrary::DespawnObjects(Vitalitys);
 	Vitalitys.Empty();
 }
 

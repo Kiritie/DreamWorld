@@ -3,6 +3,7 @@
 #include "Main/DWMainModule.h"
 
 #include "Ability/AbilityModule.h"
+#include "Ability/DWAbilityModule.h"
 #include "AI/AIModule.h"
 #include "Asset/AssetModule.h"
 #include "Audio/AudioModule.h"
@@ -36,7 +37,7 @@ ADWMainModule::ADWMainModule()
 	// set default pawn class to our Blueprinted character
 
 	ModuleClasses = TArray<TSubclassOf<AModuleBase>>();
-	ModuleClasses.Add(AAbilityModule::StaticClass());
+	ModuleClasses.Add(ADWAbilityModule::StaticClass());
 	ModuleClasses.Add(AAIModule::StaticClass());
 	ModuleClasses.Add(AAssetModule::StaticClass());
 	ModuleClasses.Add(AAudioModule::StaticClass());
