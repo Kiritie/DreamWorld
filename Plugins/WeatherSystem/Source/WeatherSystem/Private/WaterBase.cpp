@@ -26,14 +26,14 @@ void AWaterBase::SetWaterBloackAll()
 {
     WaterComp->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	WaterComp->SetCollisionResponseToAllChannels(ECR_Block);
-	//WH_LOG(LogTemp, Error, TEXT("WeatherSystem_SetWaterBloackAll"));
+	//UE_LOG(LogTemp, Error, TEXT("WeatherSystem_SetWaterBloackAll"));
 }
 
 void AWaterBase::SetWaterNoCollision()
 {
     WaterComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	WaterComp->SetCollisionResponseToAllChannels(ECR_Ignore);
-	//WH_LOG(LogTemp, Error, TEXT("WeatherSystem_SetWaterNoCollision"));
+	//UE_LOG(LogTemp, Error, TEXT("WeatherSystem_SetWaterNoCollision"));
 }
 
 // Called when the game starts or when spawned

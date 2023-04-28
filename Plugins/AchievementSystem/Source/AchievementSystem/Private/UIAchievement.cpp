@@ -36,7 +36,7 @@ void UUIAchievement::SetValue(FAchievementData Achievement, FAchievementStates S
 		FString Goal;
 		if(!Achievement.IntProgress)
 		{
-			Progress = UKismetTextLibrary::AsCurrency_Float(DisplayProgress, ERoundingMode::HalfFromZero, false, false, 1, 324, 0, Settings->MaxDecimalPlaces).ToString();
+			Progress = UKismetTextLibrary::Conv_DoubleToText(DisplayProgress, ERoundingMode::HalfFromZero, false, false, 1, 324, 0, Settings->MaxDecimalPlaces).ToString();
 			Goal = FString::SanitizeFloat(Achievement.ProgressGoal);
 		}
 		else

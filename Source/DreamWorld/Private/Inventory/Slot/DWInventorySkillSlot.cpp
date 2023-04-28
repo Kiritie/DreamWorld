@@ -7,7 +7,7 @@
 #include "Character/Player/DWPlayerCharacter.h"
 #include "Widget/WidgetModuleBPLibrary.h"
 #include "Widget/WidgetGameHUD.h"
-#include "Widget/WidgetItemInfoBox.h"
+#include "Widget/Item/WidgetItemInfoBox.h"
 #include "Ability/Character/DWCharacterSkillAbility.h"
 #include "Ability/Item/Skill/AbilitySkillDataBase.h"
 #include "Ability/Abilities/ItemAbilityBase.h"

@@ -64,7 +64,26 @@ void UProcedure_ArchiveCreating::OnEnter(UProcedureBase* InLastProcedure)
 		ISceneActorInterface::Execute_SetActorVisible(OperationTarget, true);
 	}
 
-	UWidgetModuleBPLibrary::OpenUserWidget<UWidgetArchiveCreatingPanel>();
+	if(!InLastProcedure)
+	{
+		if(USaveGameModuleBPLibrary::GetActiveSaveIndex<UDWArchiveSaveGame>() == -1)
+		{
+			USaveGameModuleBPLibrary::LoadOrCreateSaveGame<UDWArchiveSaveGame>(-1);
+			CreatePlayer(PlayerSaveData, EPhase::Lesser);
+			CreateWorld(WorldSaveData, EPhase::Lesser);
+			CreateArchive(USaveGameModuleBPLibrary::GetSaveGame<UDWArchiveSaveGame>()->GetSaveDataRef<FDWArchiveSaveData>());
+		}
+		else
+		{
+			USaveGameModuleBPLibrary::LoadOrCreateSaveGame<UDWArchiveSaveGame>(-1);
+			UProcedureModuleBPLibrary::SwitchProcedureByClass<UProcedure_Loading>();
+		}
+	}
+	else
+	{
+		UWidgetModuleBPLibrary::OpenUserWidget<UWidgetArchiveCreatingPanel>();
+	}
+
 	UWidgetModuleBPLibrary::CreateUserWidget<UWidgetLoadingPanel>();
 }
 
@@ -112,6 +131,5 @@ void UProcedure_ArchiveCreating::CreateWorld(FDWVoxelWorldSaveData& InWorldSaveD
 void UProcedure_ArchiveCreating::CreateArchive(FDWArchiveSaveData& InArchiveSaveData)
 {
 	USaveGameModuleBPLibrary::GetSaveGame<UDWArchiveSaveGame>()->SetSaveData(&InArchiveSaveData);
-
 	UProcedureModuleBPLibrary::SwitchProcedureByClass<UProcedure_Loading>();
 }

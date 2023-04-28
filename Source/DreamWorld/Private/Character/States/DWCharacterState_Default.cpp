@@ -83,23 +83,30 @@ void UDWCharacterState_Default::TrySwitchToWalk()
 	}
 	else if(UVoxelModuleBPLibrary::IsBasicGenerated())
 	{
-		const auto& characterData = Character->GetCharacterData<UAbilityCharacterDataBase>();
-		const auto& worldData = AVoxelModule::Get()->GetWorldData();
-		const float& chunkRadius = worldData.GetChunkLength() * 0.5f;
-		DON(i, 10,
-			const FVector rayStart = FVector(i == 0 ? Character->GetActorLocation().X : worldData.RandomStream.FRandRange(-chunkRadius, chunkRadius), i == 0 ? Character->GetActorLocation().Y : worldData.RandomStream.FRandRange(-chunkRadius, chunkRadius), worldData.GetWorldHeight(true));
-			const FVector rayEnd = FVector(rayStart.X, rayStart.Y, 0.f);
-			FHitResult hitResult;
-			if(UVoxelModuleBPLibrary::ChunkTraceSingle(rayStart, rayEnd, characterData.Radius, characterData.HalfHeight, {}, hitResult))
-			{
-				FVoxelItem& voxelItem = UVoxelModuleBPLibrary::FindVoxelByLocation(hitResult.Location);
-				if(!voxelItem.IsValid())
+		if(!Character->GetActorLocation().IsNearlyZero())
+		{
+			FSM->SwitchStateByClass<UDWCharacterState_Walk>();
+		}
+		else
+		{
+			const auto& characterData = Character->GetCharacterData<UAbilityCharacterDataBase>();
+			const auto& worldData = AVoxelModule::Get()->GetWorldData();
+			const float& chunkRadius = worldData.GetChunkLength() * 0.5f;
+			DON(i, 10,
+				const FVector rayStart = FVector(i == 0 ? Character->GetActorLocation().X : worldData.RandomStream.FRandRange(-chunkRadius, chunkRadius), i == 0 ? Character->GetActorLocation().Y : worldData.RandomStream.FRandRange(-chunkRadius, chunkRadius), worldData.GetWorldHeight(true));
+				const FVector rayEnd = FVector(rayStart.X, rayStart.Y, 0.f);
+				FHitResult hitResult;
+				if(UVoxelModuleBPLibrary::ChunkTraceSingle(rayStart, rayEnd, characterData.Radius, characterData.HalfHeight, {}, hitResult))
 				{
-					Character->SetActorLocationAndRotation(hitResult.Location, FRotator::ZeroRotator);
-					FSM->SwitchStateByClass<UDWCharacterState_Walk>();
-					break;
+					FVoxelItem& voxelItem = UVoxelModuleBPLibrary::FindVoxelByLocation(hitResult.Location);
+					if(!voxelItem.IsValid())
+					{
+						Character->SetActorLocationAndRotation(hitResult.Location, FRotator::ZeroRotator);
+						FSM->SwitchStateByClass<UDWCharacterState_Walk>();
+						break;
+					}
 				}
-			}
-		)
+			)
+		}
 	}
 }

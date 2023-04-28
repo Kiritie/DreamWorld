@@ -13,13 +13,15 @@
 #include "Character/DWCharacter.h"
 #include "Ability/Vitality/AbilityVitalityInterface.h"
 #include "Debug/DebugModuleTypes.h"
+#include "Scene/SceneModuleBPLibrary.h"
 
 void UDWDamageHandle::HandleDamage(AActor* SourceActor, AActor* TargetActor, float DamageValue, EDamageType DamageType, const FHitResult& HitResult, const FGameplayTagContainer& SourceTags)
 {
 	ADWCharacter* SourceCharacter = Cast<ADWCharacter>(SourceActor);
 
-	IAbilityVitalityInterface* TargetVitality = Cast<IAbilityVitalityInterface>(TargetActor);
 	ADWCharacter* TargetCharacter = Cast<ADWCharacter>(TargetActor);
+
+	IAbilityVitalityInterface* TargetVitality = Cast<IAbilityVitalityInterface>(TargetActor);
 	
 	float SourceAttackForce = 0.f;
 	float SourceAttackCritRate = 0.f;
@@ -41,14 +43,14 @@ void UDWDamageHandle::HandleDamage(AActor* SourceActor, AActor* TargetActor, flo
 	{
 		SourceDefendRate = TargetCharacter->GetDefendRate();
 		SourceDefendScope = TargetCharacter->GetDefendScope();
-		WHDebug(FString::Printf(TEXT("%f"), SourceDefendScope));
 		SourcePhysicsDefRate = TargetCharacter->GetPhysicsDefRate();
 		SourceMagicDefRate = TargetCharacter->GetMagicDefRate();
 
-		const FVector DamageDirection = SourceActor->GetActorLocation() - TargetActor->GetActorLocation();
-		if (FVector::DotProduct(DamageDirection.GetSafeNormal(), TargetActor->GetActorForwardVector()) / 90 > (1 - SourceDefendScope))
+		FVector DamageDirection = SourceActor->GetActorLocation() - TargetActor->GetActorLocation();
+		DamageDirection.Normalize();
+		if (FVector::DotProduct(DamageDirection, TargetActor->GetActorForwardVector())/* / 90.f*/ > (1.f - SourceDefendScope))
 		{
-			DefendRateDone = SourceDefendRate * (TargetCharacter->IsDefending() ? 1 : 0);
+			DefendRateDone = SourceDefendRate * (TargetCharacter->IsDefending() ? 1.f : 0.f);
 			if(DefendRateDone > 0.f && !TargetCharacter->DoAction(EDWCharacterActionType::DefendBlock))
 			{
 				DefendRateDone = 0.f;
@@ -61,14 +63,23 @@ void UDWDamageHandle::HandleDamage(AActor* SourceActor, AActor* TargetActor, flo
 		case EDamageType::Physics:
 		{
 			bAttackCrited = FMath::FRand() <= SourceAttackCritRate;
-			LocalDamageDone = SourceAttackForce * DamageValue * (1 - SourcePhysicsDefRate) * (1 - DefendRateDone) * (bAttackCrited ? 2 : 1);
+			LocalDamageDone = SourceAttackForce * DamageValue * (1.f - SourcePhysicsDefRate) * (bAttackCrited ? 2.f : 1.f);
 			break;
 		}
 		case EDamageType::Magic:
 		{
-			LocalDamageDone = DamageValue * (1 - SourceMagicDefRate) * (1 - DefendRateDone);
+			LocalDamageDone = DamageValue * (1.f - SourceMagicDefRate);
 			break;
 		}
+	}
+
+	if (DefendRateDone > 0.f)
+	{
+		if (TargetCharacter)
+		{
+			USceneModuleBPLibrary::SpawnWorldText(FString::FromInt(LocalDamageDone * DefendRateDone), FColor::Cyan, EWorldTextStyle::Normal, TargetCharacter->GetActorLocation(), FVector(20.f), TargetCharacter);
+		}
+		LocalDamageDone *= (1.f - DefendRateDone);
 	}
 
 	if (LocalDamageDone > 0.f)

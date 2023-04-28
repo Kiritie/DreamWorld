@@ -443,13 +443,13 @@ public:
 	UPROPERTY(BlueprintReadOnly)
 	int32 ArchiveID;
 	
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 BodyColorIndex;
 		
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 CapeColorIndex;
 
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	EDWPlayerInventoryInitType InventoryInitType;
 };
 

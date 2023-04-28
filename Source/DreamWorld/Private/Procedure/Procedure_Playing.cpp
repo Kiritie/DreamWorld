@@ -57,11 +57,10 @@ void UProcedure_Playing::OnEnter(UProcedureBase* InLastProcedure)
 		if(ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>())
 		{
 			PlayerCharacter->Execute_SetActorVisible(PlayerCharacter, true);
-			PlayerCharacter->RefreshAttributes();
-			UCharacterModuleBPLibrary::SwitchCharacter(PlayerCharacter);
+			//PlayerCharacter->RefreshAttributes();
 			const FRotator CameraRotation = USaveGameModuleBPLibrary::GetSaveGame<UDWArchiveSaveGame>()->GetSaveDataRef<FDWArchiveSaveData>().PlayerData.CameraRotation;
 			const float CameraDistance = USaveGameModuleBPLibrary::GetSaveGame<UDWGeneralSaveGame>()->GetSaveDataRef<FDWGeneralSaveData>().CameraDistance;
-			UCameraModuleBPLibrary::SetCameraRotationAndDistance(CameraRotation.Yaw, CameraRotation.Pitch, CameraDistance);
+			UCameraModuleBPLibrary::SetCameraRotationAndDistance(CameraRotation.Yaw, CameraRotation.Pitch, CameraDistance, true);
 		}
 	}
 	AMainModule::UnPauseModuleByClass<ASceneModule>();

@@ -111,6 +111,8 @@ void ADWVoxelModule::OnTermination_Implementation()
 
 void ADWVoxelModule::LoadData(FSaveData* InSaveData, EPhase InPhase)
 {
+	auto& SaveData = InSaveData->CastRef<FDWVoxelWorldSaveData>();
+
 	switch(InPhase)
 	{
 		case EPhase::Primary:
@@ -118,6 +120,7 @@ void ADWVoxelModule::LoadData(FSaveData* InSaveData, EPhase InPhase)
 			if(!WorldData)
 			{
 				WorldData = new FDWVoxelWorldSaveData();
+				WorldData->CastRef<FDWVoxelWorldSaveData>().ChunkDatas = SaveData.ChunkDatas;
 			}
 			break;
 		}

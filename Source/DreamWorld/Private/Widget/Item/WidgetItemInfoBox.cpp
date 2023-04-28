@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Widget/WidgetItemInfoBox.h"
+#include "Widget/Item/WidgetItemInfoBox.h"
 
 #include "Character/DWCharacter.h"
 #include "Main/MainModule.h"

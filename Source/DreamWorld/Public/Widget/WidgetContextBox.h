@@ -7,7 +7,7 @@
 #include "WidgetContextBox.generated.h"
 
 /**
- * 主界面
+ * 上下文框
  */
 UCLASS()
 class DREAMWORLD_API UWidgetContextBox : public UUserWidgetBase

@@ -7,7 +7,7 @@
 #include "WidgetMainMenu.generated.h"
 
 /**
- * ���˵�
+ * 主菜单
  */
 UCLASS()
 class DREAMWORLD_API UWidgetMainMenu : public UUserWidgetBase

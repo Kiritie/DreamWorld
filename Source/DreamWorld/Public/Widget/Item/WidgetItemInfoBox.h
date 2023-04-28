@@ -9,7 +9,7 @@
 class ADWPlayerCharacter;
 
 /**
- * 主界面
+ * 物品信息框
  */
 UCLASS()
 class DREAMWORLD_API UWidgetItemInfoBox : public UUserWidgetBase

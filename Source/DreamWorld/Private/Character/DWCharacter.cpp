@@ -74,7 +74,7 @@
 #include "Voxel/Datas/VoxelData.h"
 #include "Voxel/DWVoxelChunk.h"
 #include "Voxel/VoxelModuleBPLibrary.h"
-#include "Widget/WidgetItemInfoBox.h"
+#include "Widget/Item/WidgetItemInfoBox.h"
 #include "Widget/WidgetModuleBPLibrary.h"
 #include "Widget/Inventory/WidgetInventoryBar.h"
 #include "Widget/World/WorldWidgetComponent.h"

@@ -15,7 +15,7 @@ void UAchievementProgressDetails::UpdateDetails()
 	int32 Total = Settings->Achievements.Num();
 	float Progress = (float)TotalAchieved / (float)Total;
 
-	FString ProgressString = UKismetTextLibrary::AsCurrency_Float(Progress * 100, ERoundingMode::HalfFromZero, false, false, 1, 324, 0, TotalProgressMaxDecimalPlaces).ToString();
+	FString ProgressString = UKismetTextLibrary::Conv_DoubleToText(Progress * 100, ERoundingMode::HalfFromZero, false, false, 1, 324, 0, TotalProgressMaxDecimalPlaces).ToString();
 
 	AchievementProgressBar->SetPercent(Progress);
 	FString TotalText =

@@ -19,12 +19,12 @@ public:
 
 	//////////////////////////////////////////////////////////////////////////
 	/// Procedure
-	public:
-	#if WITH_EDITOR
+public:
+#if WITH_EDITOR
 	virtual void OnGenerate() override;
 
 	virtual void OnUnGenerate() override;
-	#endif
+#endif
 
 public:
 	virtual void OnInitialize() override;

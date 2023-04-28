@@ -236,11 +236,11 @@ void UWidgetInventorySlot::OnCooldown()
 	if(!OwnerSlot) return;
 
 	const FAbilityInfo CooldownInfo = OwnerSlot->GetAbilityInfo();
-	if(CooldownInfo.CooldownRemaining > 0.f)
+	if(CooldownInfo.IsCooldownning())
 	{
 		ImgMask->SetVisibility(ESlateVisibility::Visible);
 		TxtCooldown->SetVisibility(ESlateVisibility::Visible);
-		TxtCooldown->SetText(UKismetTextLibrary::AsCurrency_Float(CooldownInfo.CooldownRemaining, ERoundingMode::HalfToEven, false, true, 1, 324, 0, 1));
+		TxtCooldown->SetText(UKismetTextLibrary::Conv_DoubleToText(CooldownInfo.CooldownRemaining, ERoundingMode::HalfToEven, false, true, 1, 324, 0, 1));
 		MaskMatInst->SetScalarParameterValue(FName("Progress"), 1.f - CooldownInfo.CooldownRemaining / CooldownInfo.CooldownDuration);
 	}
 	else

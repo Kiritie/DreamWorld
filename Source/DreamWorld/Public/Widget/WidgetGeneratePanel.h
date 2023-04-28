@@ -13,7 +13,7 @@ class UWidgetInventoryPreviewSlot;
 class UButton;
 
 /**
- * ��ɫ���
+ * 制作面板
  */
 UCLASS()
 class DREAMWORLD_API UWidgetGeneratePanel : public UUserWidgetBase

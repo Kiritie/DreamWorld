@@ -7,7 +7,7 @@
 #include "WidgetShopPanel.generated.h"
 
 /**
- * ��ɫ���
+ * 商店面板
  */
 UCLASS()
 class DREAMWORLD_API UWidgetShopPanel : public UUserWidgetBase

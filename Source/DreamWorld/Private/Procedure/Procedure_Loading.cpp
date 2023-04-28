@@ -53,6 +53,10 @@ void UProcedure_Loading::OnEnter(UProcedureBase* InLastProcedure)
 	
 	UWidgetModuleBPLibrary::CreateUserWidget<UWidgetGameHUD>();
 
+	if(ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>())
+	{
+		UCharacterModuleBPLibrary::SwitchCharacter(PlayerCharacter);
+	}
 	USaveGameModuleBPLibrary::LoadSaveGame<UDWArchiveSaveGame>(-1, EPhase::Final);
 }
 
@@ -61,9 +65,12 @@ void UProcedure_Loading::OnRefresh()
 	Super::OnRefresh();
 
 	const ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>();
-	if(UVoxelModuleBPLibrary::IsBasicGenerated() && PlayerCharacter && PlayerCharacter->GetFSMComponent()->IsCurrentStateClass<UDWCharacterState_Walk>())
+	if(PlayerCharacter && PlayerCharacter->GetFSMComponent()->IsCurrentStateClass<UDWCharacterState_Walk>())
 	{
-		UProcedureModuleBPLibrary::SwitchProcedureByClass<UProcedure_Playing>();
+		if(UVoxelModuleBPLibrary::IsBasicGenerated())
+		{
+			UProcedureModuleBPLibrary::SwitchProcedureByClass<UProcedure_Playing>();
+		}
 	}
 }
 

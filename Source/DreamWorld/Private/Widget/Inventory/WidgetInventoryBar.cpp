@@ -20,7 +20,7 @@
 #include "Procedure/Procedure_Playing.h"
 #include "Widget/WidgetModuleBPLibrary.h"
 #include "Widget/WidgetGameHUD.h"
-#include "Widget/WidgetItemInfoBox.h"
+#include "Widget/Item/WidgetItemInfoBox.h"
 #include "Widget/Inventory/Slot/WidgetInventoryAuxiliarySlot.h"
 #include "Widget/Inventory/Slot/WidgetInventoryShortcutSlot.h"
 #include "Widget/Inventory/Slot/WidgetInventorySkillSlot.h"

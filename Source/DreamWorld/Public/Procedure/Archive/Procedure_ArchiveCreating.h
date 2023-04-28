@@ -53,4 +53,11 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void CreateArchive(UPARAM(ref) FDWArchiveSaveData& InArchiveSaveData);
+	
+protected:
+	UPROPERTY(EditAnywhere, Category = "SaveData")
+	FDWPlayerSaveData PlayerSaveData;
+
+	UPROPERTY(EditAnywhere, Category = "SaveData")
+	FDWVoxelWorldSaveData WorldSaveData;
 };

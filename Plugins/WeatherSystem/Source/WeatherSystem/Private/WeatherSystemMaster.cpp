@@ -16,7 +16,7 @@ AWeatherSystemMaster::AWeatherSystemMaster()
 	SetupDefaults();//����Ĭ������
 }
 
-//WH_LOG(LogTemp, Error, TEXT("ReverseTEST")); 
+//UE_LOG(LogTemp, Error, TEXT("ReverseTEST")); 
 // Called every frame
 void AWeatherSystemMaster::Tick(float DeltaTime)
 {
@@ -119,7 +119,7 @@ void AWeatherSystemMaster::WeatherRandomFunc()
 		DirectionalLight->SetEnableLightShaftBloom(false);
 		DirectionalLight->SetEnableLightShaftOcclusion(false);
 		UKismetMaterialLibrary::SetScalarParameterValue(this, MPC_Tree, FName(TEXT("Wind_Speed")), WindSpeedOfSnowOrRain);
-		//WH_LOG(LogTemp, Error, TEXT("WeatherSystem_RainAndSnowFalling"));
+		//UE_LOG(LogTemp, Error, TEXT("WeatherSystem_RainAndSnowFalling"));
 	}
 	else {
 		if (WeatherSet <= 2)
@@ -134,7 +134,7 @@ void AWeatherSystemMaster::WeatherRandomFunc()
 			DirectionalLight->SetEnableLightShaftBloom(false);
 			DirectionalLight->SetEnableLightShaftOcclusion(false);
 			UKismetMaterialLibrary::SetScalarParameterValue(this, MPC_Tree, FName(TEXT("Wind_Speed")), WindSpeedOfSnowOrRain);
-			//WH_LOG(LogTemp, Error, TEXT("WeatherSystem_SnowFalling"));
+			//UE_LOG(LogTemp, Error, TEXT("WeatherSystem_SnowFalling"));
 			
 		}
 		else {
@@ -150,7 +150,7 @@ void AWeatherSystemMaster::WeatherRandomFunc()
 				DirectionalLight->SetEnableLightShaftBloom(false);
 				DirectionalLight->SetEnableLightShaftOcclusion(false);
 				UKismetMaterialLibrary::SetScalarParameterValue(this, MPC_Tree, FName(TEXT("Wind_Speed")), WindSpeedOfSnowOrRain);
-				//WH_LOG(LogTemp, Error, TEXT("WeatherSystem_RainFalling"));
+				//UE_LOG(LogTemp, Error, TEXT("WeatherSystem_RainFalling"));
 			
 			}
 			else
@@ -165,7 +165,7 @@ void AWeatherSystemMaster::WeatherRandomFunc()
 				DirectionalLight->SetEnableLightShaftBloom(true);
 				DirectionalLight->SetEnableLightShaftOcclusion(true);
 				UKismetMaterialLibrary::SetScalarParameterValue(this, MPC_Tree, FName(TEXT("Wind_Speed")), WindSpeedOfSunny);
-				//WH_LOG(LogTemp, Error, TEXT("WeatherSystem_Sunny"));
+				//UE_LOG(LogTemp, Error, TEXT("WeatherSystem_Sunny"));
 			}
 		}
 	}

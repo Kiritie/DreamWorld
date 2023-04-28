@@ -10,7 +10,7 @@
 class ADWPlayerCharacter;
 
 /**
- * 主界面
+ * 游戏主界面
  */
 UCLASS()
 class DREAMWORLD_API UWidgetGameHUD : public UUserWidgetBase

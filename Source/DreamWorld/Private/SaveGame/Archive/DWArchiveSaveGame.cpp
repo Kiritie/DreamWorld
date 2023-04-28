@@ -43,7 +43,7 @@ void UDWArchiveSaveGame::OnLoad_Implementation(EPhase InPhase)
 	{
 		case EPhase::Primary:
 		{
-			WHDebug(FString::Printf(TEXT("Loading archive : %d"), DWArchiveSaveData.ID));
+			WHDebug(FString::Printf(TEXT("Loading archive : %d"), DWArchiveSaveData.ID), EDebugMode::All, EDebugCategory::SaveGame);
 		}
 		case EPhase::Final:
 		{
@@ -63,7 +63,7 @@ void UDWArchiveSaveGame::OnUnload_Implementation(EPhase InPhase)
 	{
 		case EPhase::Primary:
 		{
-			WHDebug(FString::Printf(TEXT("Unloading archive : %d"), DWArchiveSaveData.ID));
+			WHDebug(FString::Printf(TEXT("Unloading archive : %d"), DWArchiveSaveData.ID), EDebugMode::All, EDebugCategory::SaveGame);
 		}
 		case EPhase::Final:
 		{

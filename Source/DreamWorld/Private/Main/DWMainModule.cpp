@@ -24,6 +24,7 @@
 #include "SaveGame/DWSaveGameModule.h"
 #include "Scene/SceneModule.h"
 #include "Step/StepModule.h"
+#include "Task/TaskModule.h"
 #include "Team/DWTeamModule.h"
 #include "Voxel/DWVoxelModule.h"
 #include "Voxel/Voxels/Voxel.h"
@@ -57,6 +58,7 @@ ADWMainModule::ADWMainModule()
 	ModuleClasses.Add(ADWSaveGameModule::StaticClass());
 	ModuleClasses.Add(ASceneModule::StaticClass());
 	ModuleClasses.Add(AStepModule::StaticClass());
+	ModuleClasses.Add(ATaskModule::StaticClass());
 	ModuleClasses.Add(ADWVoxelModule::StaticClass());
 	ModuleClasses.Add(AWebRequestModule::StaticClass());
 	ModuleClasses.Add(AWidgetModule::StaticClass());

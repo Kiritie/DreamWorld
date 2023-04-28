@@ -8,7 +8,7 @@
 #include "WidgetPausingMenu.generated.h"
 
 /**
- * ��ͣ�˵�
+ * 暂停菜单
  */
 UCLASS()
 class DREAMWORLD_API UWidgetPausingMenu : public UUserWidgetBase
