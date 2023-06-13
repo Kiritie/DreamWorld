@@ -22,7 +22,7 @@
 #include "Widget/Archive/WidgetArchiveChoosingPanel.h"
 #include "Widget/Archive/WidgetArchiveCreatingPanel.h"
 #include "Voxel/VoxelModule.h"
-#include "DWTypes.h"
+#include "Global/DWGlobalTypes.h"
 #include "Procedure/Archive/Procedure_ArchiveChoosing.h"
 
 UProcedure_ArchiveCreating::UProcedure_ArchiveCreating()

@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include "DreamWorld/DreamWorld.h"
 #include "Widget/Screen/UMG/UserWidgetBase.h"
 
 #include "WidgetPausingMenu.generated.h"

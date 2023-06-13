@@ -10,7 +10,7 @@
 #include "Voxel/VoxelModuleTypes.h"
 #include "Asset/AssetModuleTypes.h"
 
-#include "DWTypes.generated.h"
+#include "DWGlobalTypes.generated.h"
 
 class UBehaviorTree;
 class AVoxelModule;

@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Ability/Abilities/EquipAbilityBase.h"
-#include "DreamWorld/DreamWorld.h"
 #include "DWEquipAbility.generated.h"
 
 /**

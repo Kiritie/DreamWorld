@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "DreamWorld/DreamWorld.h"
+#include "Ability/AbilityModuleTypes.h"
 #include "Blueprint/UserWidget.h"
 #include "ObjectPool/ObjectPoolInterface.h"
 #include "WidgetInventoryPreviewSlot.generated.h"

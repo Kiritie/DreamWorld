@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include "DreamWorld/DreamWorld.h"
 #include "Ability/Inventory/VitalityInventory.h"
 #include "DWVitalityInventory.generated.h"
 

@@ -2,12 +2,11 @@
 
 #pragma once
 
-#include "DreamWorld/DreamWorld.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
-#include "DWHelper.generated.h"
+#include "DWGlobalBPLibrary.generated.h"
 
 UCLASS()
-class DREAMWORLD_API UDWHelper : public UBlueprintFunctionLibrary
+class DREAMWORLD_API UDWGlobalBPLibrary : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
 };

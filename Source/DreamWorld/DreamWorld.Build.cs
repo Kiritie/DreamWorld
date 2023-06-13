@@ -9,8 +9,6 @@ public class DreamWorld : ModuleRules
 {
 	public DreamWorld(ReadOnlyTargetRules Target) : base(Target)
 	{
-		PrivatePCHHeaderFile = "DreamWorld.h";
-
 		bLegacyPublicIncludePaths = false;
 
 		ShadowVariableWarningLevel = WarningLevel.Error;

@@ -9,8 +9,6 @@
 			"Type": "Runtime",
 			"LoadingPhase": "Default",
 			"AdditionalDependencies": [
-				"Engine",
-				"GameplayAbilities",
 				"WHFramework"
 			]
 		}
@@ -29,23 +27,6 @@
 			"Name": "TargetSystem",
 			"Enabled": true,
 			"MarketplaceURL": "com.epicgames.launcher://ue/marketplace/content/6bd21ce58d6e4cb295f71bd370233f53"
-		},
-		{
-			"Name": "GameplayAbilities",
-			"Enabled": true
-		},
-		{
-			"Name": "ProceduralMeshComponent",
-			"Enabled": true
-		},
-		{
-			"Name": "Bridge",
-			"Enabled": true,
-			"SupportedTargetPlatforms": [
-				"Win64",
-				"Mac",
-				"Linux"
-			]
 		},
 		{
 			"Name": "DBTween",

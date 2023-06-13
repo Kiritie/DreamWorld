@@ -2,11 +2,13 @@
 
 #pragma once
 
-#include "DreamWorld/DreamWorld.h"
+#include "Global/DWGlobalTypes.h"
 #include "Components/BoxComponent.h"
+#include "Voxel/VoxelModuleTypes.h"
 
 #include "DWCharacterPart.generated.h"
 
+class UVoxel;
 /**
  * 角色部位组件
  */

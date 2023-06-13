@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Procedure/Base/Procedure_Base.h"
-#include "DWTypes.h"
+#include "Global/DWGlobalTypes.h"
 #include "Procedure_ArchiveCreating.generated.h"
 
 class UFiniteStateBase;

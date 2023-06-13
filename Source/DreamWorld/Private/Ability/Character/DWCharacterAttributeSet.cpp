@@ -2,7 +2,7 @@
 
 #include "GameplayEffectExtension.h"
 #include "Character/DWCharacter.h"
-#include "DWTypes.h"
+#include "Global/DWGlobalTypes.h"
 
 UDWCharacterAttributeSet::UDWCharacterAttributeSet()
 :	Mana(100.f),

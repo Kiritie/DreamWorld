@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include "DreamWorld/DreamWorld.h"
 #include "Ability/Inventory/Slot/InventorySkillSlot.h"
 #include "DWInventorySkillSlot.generated.h"
 

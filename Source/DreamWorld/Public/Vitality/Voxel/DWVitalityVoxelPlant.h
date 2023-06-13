@@ -3,7 +3,6 @@
 #pragma once
 
 #include "DWVitalityVoxel.h"
-#include "DreamWorld/DreamWorld.h"
 #include "DWVitalityVoxelPlant.generated.h"
 
 class UVoxelMeshComponent;

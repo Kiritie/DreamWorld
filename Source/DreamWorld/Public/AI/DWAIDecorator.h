@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include "DreamWorld/DreamWorld.h"
 #include "AI/Base/AIDecoratorBase.h"
 #include "DWAIDecorator.generated.h"
 

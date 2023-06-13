@@ -2,12 +2,11 @@
 
 #pragma once
 
-#include "DreamWorld/DreamWorld.h"
 #include "AI/Base/AIControllerBase.h"
 #include "Perception/AIPerceptionTypes.h"
 #include "DWAIController.generated.h"
 
-DECLARE_DELEGATE_TwoParams(FDWAIPerceptionUpdated, ADWCharacter*, bool)
+DECLARE_DELEGATE_TwoParams(FDWAIPerceptionUpdated, class ADWCharacter*, bool)
 
 /**
  * AI����������

@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include "DreamWorld/DreamWorld.h"
 #include "GameFramework/Character.h"
 #include "AbilitySystemInterface.h"
 #include "TargetSystemComponent.h"
@@ -10,6 +9,7 @@
 #include "Ability/Character/AbilityCharacterBase.h"
 #include "Ability/Character/DWCharacterAttributeSet.h"
 #include "Ability/Inventory/InventoryAgentInterface.h"
+#include "Global/DWGlobalTypes.h"
 #include "Team/DWTeamModuleTypes.h"
 #include "Voxel/Agent/VoxelAgentInterface.h"
 

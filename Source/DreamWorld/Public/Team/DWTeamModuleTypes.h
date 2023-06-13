@@ -6,6 +6,8 @@
 
 #include "DWTeamModuleTypes.generated.h"
 
+class ADWCharacter;
+
 USTRUCT(BlueprintType)
 struct DREAMWORLD_API FDWTeamData
 {
@@ -46,17 +48,17 @@ public:
 
 	TArray<ADWCharacter*> GetMembers(ADWCharacter* InMember = nullptr);
 
-	FORCEINLINE int GetNumMember()
+	FORCEINLINE int32 GetNumMember() const
 	{
 		return Members.Num();
 	}
 
-	FORCEINLINE bool IsCaptain(ADWCharacter* InMember)
+	FORCEINLINE bool IsCaptain(ADWCharacter* InMember) const
 	{
 		return Captain == nullptr || Captain == InMember;
 	}
 
-	FORCEINLINE bool IsValid()
+	FORCEINLINE bool IsValid() const
 	{
 		return !ID.IsNone();
 	}

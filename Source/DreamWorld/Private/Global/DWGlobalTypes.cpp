@@ -1,4 +1,4 @@
-#include "DWTypes.h"
+#include "Global/DWGlobalTypes.h"
 
 #include "Asset/AssetModuleBPLibrary.h"
 #include "Character/Player/DWPlayerCharacter.h"

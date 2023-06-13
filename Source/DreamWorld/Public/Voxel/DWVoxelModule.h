@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include "DreamWorld/DreamWorld.h"
 #include "GameFramework/Actor.h"
 #include "Voxel/VoxelModule.h"
 #include "DWVoxelModule.generated.h"

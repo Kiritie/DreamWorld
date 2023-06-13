@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include "DreamWorld/DreamWorld.h"
 #include "AI/DWAITask.h"
 #include "DWAITask_AIAttack.generated.h"
 

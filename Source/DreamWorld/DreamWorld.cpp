@@ -1,10 +1,19 @@
 // Copyright 1998-2019 Epic Games, Inc. All Rights Reserved.
 
-#include "DreamWorld/DreamWorld.h"
-#include "Modules/ModuleManager.h"
+#include "DreamWorld.h"
 
-/**
- * ʵ����Ҫ����Ϸģ��
- */
+#define LOCTEXT_NAMESPACE "FDreamWorldModule"
+
+void FDreamWorldModule::StartupModule()
+{
+	IModuleInterface::StartupModule();
+}
+
+void FDreamWorldModule::ShutdownModule()
+{
+	IModuleInterface::ShutdownModule();
+}
+
+#undef LOCTEXT_NAMESPACE
+
 IMPLEMENT_PRIMARY_GAME_MODULE( FDefaultGameModuleImpl, DreamWorld, "DreamWorld" );
- 

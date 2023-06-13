@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include "DreamWorld/DreamWorld.h"
 #include "Ability/Inventory/CharacterInventory.h"
+#include "Global/DWGlobalTypes.h"
 #include "DWCharacterInventory.generated.h"
 
 class UInventoryEquipSlot;

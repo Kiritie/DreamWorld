@@ -2,7 +2,7 @@
 
 #include "GameplayEffectExtension.h"
 #include "Character/DWCharacter.h"
-#include "DWTypes.h"
+#include "Global/DWGlobalTypes.h"
 
 UDWVitalityAttributeSet::UDWVitalityAttributeSet()
 {

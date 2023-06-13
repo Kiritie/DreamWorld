@@ -3,7 +3,6 @@
 #pragma once
 
 #include "DWTeamModuleTypes.h"
-#include "DreamWorld/DreamWorld.h"
 #include "GameFramework/Actor.h"
 #include "Voxel/VoxelModule.h"
 #include "DWTeamModule.generated.h"

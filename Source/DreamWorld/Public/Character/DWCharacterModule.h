@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Character/CharacterModule.h"
+#include "Global/DWGlobalTypes.h"
 
 #include "DWCharacterModule.generated.h"
 

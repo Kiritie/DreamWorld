@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include "DreamWorld/DreamWorld.h"
 #include "Gameplay/WHGameState.h"
 #include "DWGameState.generated.h"
 

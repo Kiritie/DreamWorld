@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include "DreamWorld/DreamWorld.h"
 #include "Item/Equip/DWEquip.h"
 #include "Ability/Interfaces/AbilityAttackerInterface.h"
 #include "DWEquipWeapon.generated.h"

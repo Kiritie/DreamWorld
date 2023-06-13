@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include "DreamWorld/DreamWorld.h"
 #include "SaveGame/Base/SaveGameBase.h"
+#include "Global/DWGlobalTypes.h"
 
 #include "DWArchiveSaveGame.generated.h"
 

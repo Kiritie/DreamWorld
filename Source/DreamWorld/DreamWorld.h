@@ -2,11 +2,14 @@
  
 #pragma once
 
-/**
- * 预编译头文件
- */
-  
 #include "CoreMinimal.h"
-#include "Engine/Engine.h"
-#include "DWTypes.h"
-#include "DWHelper.h"
+#include "Modules/ModuleManager.h"
+
+class FDreamWorldModule : public IModuleInterface
+{
+public:
+
+	/** IModuleInterface implementation */
+	virtual void StartupModule() override;
+	virtual void ShutdownModule() override;
+};

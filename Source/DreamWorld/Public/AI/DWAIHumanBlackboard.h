@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include "DreamWorld/DreamWorld.h"
 #include "AI/DWAIBlackboard.h"
 #include "DWAIHumanBlackboard.generated.h"
 

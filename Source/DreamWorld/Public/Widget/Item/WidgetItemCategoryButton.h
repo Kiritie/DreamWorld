@@ -3,7 +3,6 @@
 #pragma once
 
 #include "Blueprint/UserWidget.h"
-#include "DreamWorld/DreamWorld.h"
 #include "WidgetItemCategoryButton.generated.h"
 
 /**

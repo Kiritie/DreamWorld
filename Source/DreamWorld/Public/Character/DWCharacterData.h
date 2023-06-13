@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Global/DWGlobalTypes.h"
 #include "Ability/Character/AbilityCharacterDataBase.h"
 
 #include "DWCharacterData.generated.h"

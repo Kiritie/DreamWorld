@@ -1,6 +1,5 @@
 #pragma once
 
-#include "DreamWorld/DreamWorld.h"
 #include "Ability/Attributes/VitalityAttributeSetBase.h"
 #include "DWVitalityAttributeSet.generated.h"
 

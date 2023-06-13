@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "DreamWorld/DreamWorld.h"
+#include "Global/DWGlobalTypes.h"
 #include "SaveGame/General/GeneralSaveGame.h"
 
 #include "DWGeneralSaveGame.generated.h"

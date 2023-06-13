@@ -1,7 +1,7 @@
 #pragma once
 
+#include "Global/DWGlobalTypes.h"
 #include "DWCharacterAbility.h"
-#include "DreamWorld/DreamWorld.h"
 #include "DWCharacterActionAbility.generated.h"
 
 /**

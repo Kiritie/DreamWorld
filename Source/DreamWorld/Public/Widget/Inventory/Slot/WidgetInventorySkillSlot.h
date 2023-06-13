@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include "DreamWorld/DreamWorld.h"
 #include "Blueprint/UserWidget.h"
 #include "WidgetInventorySlot.h"
 #include "WidgetInventorySkillSlot.generated.h"

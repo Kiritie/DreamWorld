@@ -2,10 +2,10 @@
 
 #pragma once
 
-#include "DreamWorld/DreamWorld.h"
 #include "AI/DWAITask.h"
 #include "DWAITask_AIDefend.generated.h"
 
+class ADWCharacter;
 /**
  * AI任务_防御
  */

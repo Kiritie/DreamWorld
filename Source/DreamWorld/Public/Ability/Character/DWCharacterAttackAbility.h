@@ -1,7 +1,6 @@
 #pragma once
 
 #include "DWCharacterAbility.h"
-#include "DreamWorld/DreamWorld.h"
 #include "DWCharacterAttackAbility.generated.h"
 
 /**
