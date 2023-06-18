@@ -25,14 +25,14 @@ ADWTeamModule::~ADWTeamModule()
 }
 
 #if WITH_EDITOR
-void ADWTeamModule::OnGenerate_Implementation()
+void ADWTeamModule::OnGenerate()
 {
-	Super::OnGenerate_Implementation();
+	Super::OnGenerate();
 }
 
-void ADWTeamModule::OnDestroy_Implementation()
+void ADWTeamModule::OnDestroy()
 {
-	Super::OnDestroy_Implementation();
+	Super::OnDestroy();
 }
 #endif
 

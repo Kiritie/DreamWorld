@@ -25,14 +25,14 @@ ADWSaveGameModule::~ADWSaveGameModule()
 }
 
 #if WITH_EDITOR
-void ADWSaveGameModule::OnGenerate_Implementation()
+void ADWSaveGameModule::OnGenerate()
 {
-	Super::OnGenerate_Implementation();
+	Super::OnGenerate();
 }
 
-void ADWSaveGameModule::OnDestroy_Implementation()
+void ADWSaveGameModule::OnDestroy()
 {
-	Super::OnDestroy_Implementation();
+	Super::OnDestroy();
 }
 #endif
 

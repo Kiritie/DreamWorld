@@ -68,14 +68,14 @@ ADWVoxelModule::~ADWVoxelModule()
 }
 
 #if WITH_EDITOR
-void ADWVoxelModule::OnGenerate_Implementation()
+void ADWVoxelModule::OnGenerate()
 {
-	Super::OnGenerate_Implementation();
+	Super::OnGenerate();
 }
 
-void ADWVoxelModule::OnDestroy_Implementation()
+void ADWVoxelModule::OnDestroy()
 {
-	Super::OnDestroy_Implementation();
+	Super::OnDestroy();
 }
 #endif
 
@@ -111,17 +111,15 @@ void ADWVoxelModule::OnTermination_Implementation()
 
 void ADWVoxelModule::LoadData(FSaveData* InSaveData, EPhase InPhase)
 {
+	Super::LoadData(InSaveData, InPhase);
+
 	auto& SaveData = InSaveData->CastRef<FDWVoxelWorldSaveData>();
 
 	switch(InPhase)
 	{
 		case EPhase::Primary:
 		{
-			if(!WorldData)
-			{
-				WorldData = new FDWVoxelWorldSaveData();
-				WorldData->CastRef<FDWVoxelWorldSaveData>().ChunkDatas = SaveData.ChunkDatas;
-			}
+			WorldData->CastRef<FDWVoxelWorldSaveData>().ChunkDatas = SaveData.ChunkDatas;
 			break;
 		}
 		case EPhase::Lesser:
@@ -130,8 +128,6 @@ void ADWVoxelModule::LoadData(FSaveData* InSaveData, EPhase InPhase)
 			break;
 		}
 	}
-
-	Super::LoadData(InSaveData, InPhase);
 }
 
 FSaveData* ADWVoxelModule::ToData()
@@ -142,6 +138,13 @@ FSaveData* ADWVoxelModule::ToData()
 void ADWVoxelModule::UnloadData(EPhase InPhase)
 {
 	Super::UnloadData(InPhase);
+}
+
+FVoxelWorldSaveData* ADWVoxelModule::NewData(bool bInheritBasicData) const
+{
+	static FVoxelWorldSaveData* NewWorldData;
+	NewWorldData = !bInheritBasicData ? new FDWVoxelWorldSaveData() : new FDWVoxelWorldSaveData(WorldBasicData);
+	return NewWorldData;
 }
 
 void ADWVoxelModule::OnWorldStateChanged()

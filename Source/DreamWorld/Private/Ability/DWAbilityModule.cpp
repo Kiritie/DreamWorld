@@ -4,6 +4,7 @@
 #include "Ability/DWAbilityModule.h"
 
 #include "Ability/AbilityModuleBPLibrary.h"
+#include "Global/DWGlobalTypes.h"
 
 IMPLEMENTATION_MODULE(ADWAbilityModule)
 
@@ -19,14 +20,14 @@ ADWAbilityModule::~ADWAbilityModule()
 }
 
 #if WITH_EDITOR
-void ADWAbilityModule::OnGenerate_Implementation()
+void ADWAbilityModule::OnGenerate()
 {
-	Super::OnGenerate_Implementation();
+	Super::OnGenerate();
 }
 
-void ADWAbilityModule::OnDestroy_Implementation()
+void ADWAbilityModule::OnDestroy()
 {
-	Super::OnDestroy_Implementation();
+	Super::OnDestroy();
 }
 #endif
 

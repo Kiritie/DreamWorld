@@ -55,6 +55,8 @@ protected:
 	virtual void OnPossess(APawn* InPawn) override;
 
 	virtual void OnUnPossess() override;
+
+	virtual void SetPlayerPawn(APawn* InPlayerPawn) override;
 	
 protected:
 	virtual void OnJumpPressed(FKey Key);

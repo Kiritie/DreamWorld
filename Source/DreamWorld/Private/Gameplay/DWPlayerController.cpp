@@ -286,6 +286,14 @@ void ADWPlayerController::OnUnPossess()
 	bPressedSprint = false;
 }
 
+void ADWPlayerController::SetPlayerPawn(APawn* InPlayerPawn)
+{
+	if(InPlayerPawn->IsA<ADWCharacter>())
+	{
+		Super::SetPlayerPawn(InPlayerPawn);
+	}
+}
+
 void ADWPlayerController::OnJumpPressed(FKey Key)
 {
 	ADWCharacter* PossessedCharacter = GetPawn<ADWCharacter>();

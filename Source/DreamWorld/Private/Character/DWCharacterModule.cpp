@@ -20,14 +20,14 @@ ADWCharacterModule::~ADWCharacterModule()
 }
 
 #if WITH_EDITOR
-void ADWCharacterModule::OnGenerate_Implementation()
+void ADWCharacterModule::OnGenerate()
 {
-	Super::OnGenerate_Implementation();
+	Super::OnGenerate();
 }
 
-void ADWCharacterModule::OnDestroy_Implementation()
+void ADWCharacterModule::OnDestroy()
 {
-	Super::OnDestroy_Implementation();
+	Super::OnDestroy();
 }
 #endif
 

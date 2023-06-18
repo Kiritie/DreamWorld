@@ -22,14 +22,14 @@ ADWCameraModule::ADWCameraModule()
 }
 
 #if WITH_EDITOR
-void ADWCameraModule::OnGenerate_Implementation()
+void ADWCameraModule::OnGenerate()
 {
-	Super::OnGenerate_Implementation();
+	Super::OnGenerate();
 }
 
-void ADWCameraModule::OnDestroy_Implementation()
+void ADWCameraModule::OnDestroy()
 {
-	Super::OnDestroy_Implementation();
+	Super::OnDestroy();
 }
 #endif
 
