@@ -70,7 +70,7 @@ EBTNodeResult::Type UDWAITask_AIPatrol::ExecuteTask(UBehaviorTreeComponent& Owne
 		rayStart.Z = UVoxelModuleBPLibrary::GetWorldData().GetWorldHeight(true);
 		const FVector rayEnd = FVector(rayStart.X, rayStart.Y, 0.f);
 		FHitResult hitResult;
-		if(UVoxelModuleBPLibrary::ChunkTraceSingle(rayStart, rayEnd, GetOwnerCharacter<ADWCharacter>()->GetRadius(), GetOwnerCharacter<ADWCharacter>()->GetHalfHeight(), {}, hitResult))
+		if(UVoxelModuleBPLibrary::VoxelAgentTraceSingle(rayStart, rayEnd, GetOwnerCharacter<ADWCharacter>()->GetRadius(), GetOwnerCharacter<ADWCharacter>()->GetHalfHeight(), {}, hitResult))
 		{
 			PatrolLocation = hitResult.Location;
 			break;

@@ -211,26 +211,19 @@ void ADWVoxelChunk::GenerateActors()
 				const auto& vitalityData = vitalityItem.GetData<UAbilityVitalityDataBase>();
 				const int32 tmpNum = vitalityItem.Count != 0 ? vitalityItem.Count : worldData.RandomStream.RandRange(vitalityItem.MinCount, vitalityItem.MaxCount);
 				DON(i, tmpNum,
-					DON(j, 10,
-						FHitResult hitResult;
-						if(UVoxelModuleBPLibrary::ChunkTraceSingle(Index, vitalityData.Radius, vitalityData.HalfHeight, {}, hitResult))
-						{
-							FVoxelItem& voxelItem = UVoxelModuleBPLibrary::FindVoxelByLocation(hitResult.Location);
-							if(!voxelItem.IsValid())
-							{
-								auto saveData = FDWVitalitySaveData();
-								saveData.ID = vitalityData.GetPrimaryAssetId();
-								saveData.Name = *vitalityData.Name.ToString();
-								saveData.RaceID = raceData.ID;
-								saveData.Level = vitalityItem.Level;
-								saveData.SpawnLocation = hitResult.Location;
-								saveData.SpawnRotation = FRotator(0.f, FMath::RandRange(0.f, 360.f), 0.f);
-								saveData.InventoryData = vitalityData.InventoryData;
-								UAbilityModuleBPLibrary::SpawnVitality(&saveData, this);
-								break;
-							}
-						}
-					)
+					FHitResult hitResult;
+					if(UVoxelModuleBPLibrary::VoxelAgentTraceSingle(Index, vitalityData.Radius, vitalityData.HalfHeight, {}, hitResult, true, 10, false))
+					{
+						auto saveData = FDWVitalitySaveData();
+						saveData.ID = vitalityData.GetPrimaryAssetId();
+						saveData.Name = *vitalityData.Name.ToString();
+						saveData.RaceID = raceData.ID;
+						saveData.Level = vitalityItem.Level;
+						saveData.SpawnLocation = hitResult.Location;
+						saveData.SpawnRotation = FRotator(0.f, FMath::RandRange(0.f, 360.f), 0.f);
+						saveData.InventoryData = vitalityData.InventoryData;
+						UAbilityModuleBPLibrary::SpawnVitality(&saveData, this);
+					}
 				)
 			}
 		}
@@ -246,37 +239,30 @@ void ADWVoxelChunk::GenerateActors()
 				const auto& characterData = characterItem.GetData<UAbilityCharacterDataBase>();
 				const int32 tmpNum = characterItem.Count != 0 ? characterItem.Count : worldData.RandomStream.RandRange(characterItem.MinCount, characterItem.MaxCount);
 				DON(i, tmpNum,
-					DON(j, 10,
-						FHitResult hitResult;
-						if(UVoxelModuleBPLibrary::ChunkTraceSingle(Index, characterData.Radius, characterData.HalfHeight, {}, hitResult))
+					FHitResult hitResult;
+					if(UVoxelModuleBPLibrary::VoxelAgentTraceSingle(Index, characterData.Radius, characterData.HalfHeight, {}, hitResult, true, 10, false))
+					{
+						auto saveData = FDWCharacterSaveData();
+						saveData.ID = characterData.GetPrimaryAssetId();
+						saveData.Name = *characterData.Name.ToString();
+						saveData.RaceID = raceData.ID;
+						saveData.Level = characterItem.Level;
+						saveData.SpawnLocation = hitResult.Location;
+						saveData.SpawnRotation = FRotator(0.f, FMath::RandRange(0.f, 360.f), 0.f);
+						saveData.InventoryData = characterData.InventoryData;
+						if(ADWCharacter* character = Cast<ADWCharacter>(UAbilityModuleBPLibrary::SpawnCharacter(&saveData, this)))
 						{
-							FVoxelItem& voxelItem = UVoxelModuleBPLibrary::FindVoxelByLocation(hitResult.Location);
-							if(!voxelItem.IsValid())
+							if(!captain)
 							{
-								auto saveData = FDWCharacterSaveData();
-								saveData.ID = characterData.GetPrimaryAssetId();
-								saveData.Name = *characterData.Name.ToString();
-								saveData.RaceID = raceData.ID;
-								saveData.Level = characterItem.Level;
-								saveData.SpawnLocation = hitResult.Location;
-								saveData.SpawnRotation = FRotator(0.f, FMath::RandRange(0.f, 360.f), 0.f);
-								saveData.InventoryData = characterData.InventoryData;
-								if(ADWCharacter* character = Cast<ADWCharacter>(UAbilityModuleBPLibrary::SpawnCharacter(&saveData, this)))
-								{
-									if(!captain)
-									{
-										captain = character;
-										ADWTeamModule::Get()->CreateTeam(captain);
-									}
-									else
-									{
-										captain->AddTeamMate(character);
-									}
-								}
+								captain = character;
+								ADWTeamModule::Get()->CreateTeam(captain);
 							}
-							break;
+							else
+							{
+								captain->AddTeamMate(character);
+							}
 						}
-					)
+					}
 				)
 			}
 		}
