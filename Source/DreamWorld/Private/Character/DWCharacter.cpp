@@ -142,10 +142,64 @@ ADWCharacter::ADWCharacter()
 	AIControllerClass = ADWAIController::StaticClass();
 }
 
-// Called when the game starts or when spawned
-void ADWCharacter::BeginPlay()
+void ADWCharacter::OnRefresh_Implementation(float DeltaSeconds)
 {
-	Super::BeginPlay();
+	Super::OnRefresh_Implementation(DeltaSeconds);
+
+	if (IsDead()) return;
+
+	if (IsActive())
+	{
+		if (LockedTarget)
+		{
+			if (CanLookAtTarget(LockedTarget))
+			{
+				LookAtTarget(LockedTarget);
+			}
+			else
+			{
+				SetLockedTarget(nullptr);
+			}
+		}
+
+		if (AIMoveLocation != Vector_Empty)
+		{
+			if (DoAIMove(AIMoveLocation, AIMoveStopDistance))
+			{
+				StopAIMove();
+			}
+		}
+
+		if(AVoxelChunk* Chunk = UVoxelModuleBPLibrary::FindChunkByLocation(GetActorLocation()))
+		{
+			Chunk->AddSceneActor(this);
+		}
+		else if(Container)
+		{
+			Container->RemoveSceneActor(this);
+		}
+
+		if(IsSprinting())
+		{
+			if(GetMoveDirection().Size() > 0.2f)
+			{
+				ModifyStamina(ATTRIBUTE_DELTAVALUE_CLAMP(Stamina, -GetStaminaExpendSpeed() * DeltaSeconds));
+			}
+			else
+			{
+				UnSprint();
+			}
+		}
+		else if(IsFreeToAnim())
+		{
+			ModifyStamina(ATTRIBUTE_DELTAVALUE_CLAMP(Stamina, GetStaminaRegenSpeed() * DeltaSeconds));
+		}
+
+		if (GetActorLocation().Z < 0)
+		{
+			Death();
+		}
+	}
 }
 
 void ADWCharacter::OnSpawn_Implementation(const TArray<FParameter>& InParams)
@@ -325,67 +379,6 @@ void ADWCharacter::RefreshState()
 		default:
 		{
 			Super::RefreshState();
-		}
-	}
-}
-
-// Called every frame
-void ADWCharacter::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-	if (IsDead()) return;
-
-	if (IsActive())
-	{
-		if (LockedTarget)
-		{
-			if (CanLookAtTarget(LockedTarget))
-			{
-				LookAtTarget(LockedTarget);
-			}
-			else
-			{
-				SetLockedTarget(nullptr);
-			}
-		}
-
-		if (AIMoveLocation != Vector_Empty)
-		{
-			if (DoAIMove(AIMoveLocation, AIMoveStopDistance))
-			{
-				StopAIMove();
-			}
-		}
-
-		if(AVoxelChunk* Chunk = UVoxelModuleBPLibrary::FindChunkByLocation(GetActorLocation()))
-		{
-			Chunk->AddSceneActor(this);
-		}
-		else if(Container)
-		{
-			Container->RemoveSceneActor(this);
-		}
-
-		if(IsSprinting())
-		{
-			if(GetMoveDirection().Size() > 0.2f)
-			{
-				ModifyStamina(ATTRIBUTE_DELTAVALUE_CLAMP(Stamina, -GetStaminaExpendSpeed() * DeltaTime));
-			}
-			else
-			{
-				UnSprint();
-			}
-		}
-		else if(IsFreeToAnim())
-		{
-			ModifyStamina(ATTRIBUTE_DELTAVALUE_CLAMP(Stamina, GetStaminaRegenSpeed() * DeltaTime));
-		}
-
-		if (GetActorLocation().Z < 0)
-		{
-			Death();
 		}
 	}
 }

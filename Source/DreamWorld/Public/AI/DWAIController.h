@@ -19,13 +19,13 @@ class DREAMWORLD_API ADWAIController : public AAIControllerBase
 public:
     ADWAIController();
 
+public:
+	virtual void OnRefresh_Implementation(float DeltaSeconds) override;
+
 protected:
 	virtual void OnPossess(APawn* InPawn) override;
 
 	virtual void OnUnPossess() override;
 
 	virtual void OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus) override;
-
-public:
-	virtual void Tick(float DeltaTime) override;
 };

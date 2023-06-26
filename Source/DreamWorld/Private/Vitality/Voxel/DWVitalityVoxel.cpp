@@ -20,12 +20,6 @@ ADWVitalityVoxel::ADWVitalityVoxel()
 	VoxelMesh->Initialize(EVoxelMeshNature::Vitality);
 }
 
-// Called when the game starts or when spawned
-void ADWVitalityVoxel::BeginPlay()
-{
-	Super::BeginPlay();
-}
-
 void ADWVitalityVoxel::OnDespawn_Implementation(bool bRecovery)
 {
 	Super::OnDespawn_Implementation(bRecovery);
@@ -51,13 +45,6 @@ void ADWVitalityVoxel::LoadData(FSaveData* InSaveData, EPhase InPhase)
 FSaveData* ADWVitalityVoxel::ToData()
 {
 	return Super::ToData();
-}
-
-// Called every frame
-void ADWVitalityVoxel::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
 }
 
 UVoxelData& ADWVitalityVoxel::GetVoxelData() const

@@ -29,18 +29,11 @@ protected:
 	FPrimaryAssetId VoxelID;
 
 protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-
 	virtual void OnDespawn_Implementation(bool bRecovery) override;
 
 	virtual void LoadData(FSaveData* InSaveData, EPhase InPhase) override;
 
 	virtual FSaveData* ToData() override;
-
-public:
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
 
 public:
 	template<class T>

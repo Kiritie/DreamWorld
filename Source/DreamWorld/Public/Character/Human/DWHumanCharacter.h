@@ -35,15 +35,9 @@ protected:
 	AVoxelEntity* AuxiliaryVoxelEntity;
 
 protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-
 	virtual void OnSpawn_Implementation(const TArray<FParameter>& InParams) override;
 
 	virtual void OnDespawn_Implementation(bool bRecovery) override;
-
-public:
-	virtual void Tick(float DeltaTime) override;
 
 public:
 	virtual void OnSelectItem(const FAbilityItem& InItem) override;

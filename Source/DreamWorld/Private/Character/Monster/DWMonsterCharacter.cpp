@@ -25,20 +25,6 @@ ADWMonsterCharacter::ADWMonsterCharacter()
 	Interaction->AddInteractionAction((EInteractAction)EDWInteractAction::Feed);
 }
 
-// Called when the game starts or when spawned
-void ADWMonsterCharacter::BeginPlay()
-{
-	Super::BeginPlay();
-
-}
-
-// Called every frame
-void ADWMonsterCharacter::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-}
-
 bool ADWMonsterCharacter::CanInteract(IInteractionAgentInterface* InInteractionAgent, EInteractAction InInteractAction)
 {
 	if(!Super::CanInteract(InInteractionAgent, InInteractAction)) return false;

@@ -51,12 +51,6 @@ ADWVitality::ADWVitality()
 	FSM->States.Add(UDWVitalityState_Death::StaticClass());
 }
 
-// Called when the game starts or when spawned
-void ADWVitality::BeginPlay()
-{
-	Super::BeginPlay();
-}
-
 void ADWVitality::OnSpawn_Implementation(const TArray<FParameter>& InParams)
 {
 	Super::OnSpawn_Implementation(InParams);
@@ -67,13 +61,6 @@ void ADWVitality::OnDespawn_Implementation(bool bRecovery)
 	Super::OnDespawn_Implementation(bRecovery);
 
 	Inventory->UnloadSaveData(EPhase::Primary);
-}
-
-void ADWVitality::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-	if(IsDead()) return;
 }
 
 void ADWVitality::Serialize(FArchive& Ar)

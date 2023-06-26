@@ -19,6 +19,23 @@ ADWAIController::ADWAIController()
 	
 }
 
+void ADWAIController::OnRefresh_Implementation(float DeltaSeconds)
+{
+	Super::OnRefresh_Implementation(DeltaSeconds);
+
+	ADWCharacter* OwnerCharacter = GetPawn<ADWCharacter>();
+
+	if(!OwnerCharacter) return;
+
+	if(IsRunningBehaviorTree())
+	{
+		if(OwnerCharacter->IsDead())
+		{
+			StopBehaviorTree();
+		}
+	}
+}
+
 void ADWAIController::OnPossess(APawn* InPawn)
 {
 	Super::OnPossess(InPawn);
@@ -32,21 +49,4 @@ void ADWAIController::OnUnPossess()
 void ADWAIController::OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus)
 {
 	Super::OnTargetPerceptionUpdated(Actor, Stimulus);
-}
-
-void ADWAIController::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-	ADWCharacter* OwnerCharacter = GetPawn<ADWCharacter>();
-
-	if(!OwnerCharacter) return;
-
-	if(IsRunningBehaviorTree())
-	{
-		if(OwnerCharacter->IsDead())
-		{
-			StopBehaviorTree();
-		}
-	}
 }

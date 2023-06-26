@@ -18,12 +18,4 @@ class DREAMWORLD_API ADWVitalityVoxelPlant : public ADWVitalityVoxel
 public:
 	// Sets default values for this actor's properties
 	ADWVitalityVoxelPlant();
-
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-
-public:
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
 };

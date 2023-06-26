@@ -27,6 +27,7 @@ class ADWPlayerCharacter : public ADWHumanCharacter, public IWHPlayerInterface
 	GENERATED_BODY()
 	
 	friend class ADWPlayerController;
+	friend class ADWInputModule;
 
 	friend class UDWPlayerCharacterState_Attack;
 	friend class UDWPlayerCharacterState_Death;
@@ -36,6 +37,9 @@ class ADWPlayerCharacter : public ADWHumanCharacter, public IWHPlayerInterface
 
 public:
 	ADWPlayerCharacter();
+
+public:
+	virtual void OnInitialize_Implementation() override;
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
@@ -54,9 +58,6 @@ protected:
 	USceneCaptureComponent2D* MiniMapCapture;
 
 protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-
 	virtual void OnSpawn_Implementation(const TArray<FParameter>& InParams) override;
 
 	virtual void OnDespawn_Implementation(bool bRecovery) override;
@@ -64,11 +65,6 @@ protected:
 	virtual void LoadData(FSaveData* InSaveData, EPhase InPhase) override;
 
 	virtual FSaveData* ToData() override;
-
-	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
-
-public:
-	virtual void Tick(float DeltaTime) override;
 
 public:
 	virtual void Death(IAbilityVitalityInterface* InKiller /* = nullptr */) override;

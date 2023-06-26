@@ -65,9 +65,6 @@
 
 ADWPlayerCharacter::ADWPlayerCharacter()
 {
-	// Set this actor to call Tick() every frame.  You can turn this off to improve performance ifyou don't need it.
-	PrimaryActorTick.bCanEverTick = true;
-
 	GetCapsuleComponent()->SetCapsuleHalfHeight(69.f);
 	GetCapsuleComponent()->SetCapsuleRadius(24.f);
 
@@ -134,18 +131,9 @@ ADWPlayerCharacter::ADWPlayerCharacter()
 	AutoPossessAI = EAutoPossessAI::Disabled;
 }
 
-void ADWPlayerCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
+void ADWPlayerCharacter::OnInitialize_Implementation()
 {
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
-	// Set up gameplay key bindings
-	check(PlayerInputComponent);
-}
-
-// Called when the game starts or when spawned
-void ADWPlayerCharacter::BeginPlay()
-{
-	Super::BeginPlay();
+	Super::OnInitialize_Implementation();
 
 	PreviewCapture->ShowOnlyActors.Add(this);
 }
@@ -248,14 +236,6 @@ FSaveData* ADWPlayerCharacter::ToData()
 	SaveData.BodyColorIndex = GetBodyColor();
 	SaveData.CapeColorIndex = GetCapeColor();
 	return &SaveData;
-}
-
-// Called every frame
-void ADWPlayerCharacter::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-	if(IsDead()) return;
 }
 
 void ADWPlayerCharacter::Death(IAbilityVitalityInterface* InKiller /* = nullptr */)

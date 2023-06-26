@@ -33,12 +33,6 @@ ADWVoxelChunk::ADWVoxelChunk()
 	bRaceGenerated = false;
 }
 
-// Called when the game starts or when spawned
-void ADWVoxelChunk::BeginPlay()
-{
-	Super::BeginPlay();
-}
-
 void ADWVoxelChunk::OnSpawn_Implementation(const TArray<FParameter>& InParams)
 {
 	Super::OnSpawn_Implementation(InParams);
@@ -146,12 +140,6 @@ void ADWVoxelChunk::OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 	// 		}
 	// 	}
 	// }
-}
-
-// Called every frame
-void ADWVoxelChunk::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
 }
 
 void ADWVoxelChunk::Initialize(FIndex InIndex, int32 InBatch)

@@ -66,6 +66,9 @@ class DREAMWORLD_API ADWCharacter : public AAbilityCharacterBase, public ITarget
 
 public:
 	ADWCharacter();
+
+public:
+	virtual void OnRefresh_Implementation(float DeltaSeconds) override;
 	
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
@@ -119,8 +122,6 @@ protected:
 	TMap<EDWCharacterActionType, FDWCharacterActionAbilityData> ActionAbilities;
 
 protected:
-	virtual void BeginPlay() override;
-
 	virtual int32 GetLimit_Implementation() const override { return 0; }
 
 	virtual void OnSpawn_Implementation(const TArray<FParameter>& InParams) override;
@@ -138,8 +139,6 @@ protected:
 	virtual void RefreshState() override;
 	
 public:
-	virtual void Tick(float DeltaTime) override;
-
 	virtual void Serialize(FArchive& Ar) override;
 
 public:

@@ -59,7 +59,7 @@ void UProcedure_ArchiveCreating::OnEnter(UProcedureBase* InLastProcedure)
 
 	Super::OnEnter(InLastProcedure);
 
-	if(OperationTarget)
+	if(OperationTarget && OperationTarget->Implements<USceneActorInterface>())
 	{
 		ISceneActorInterface::Execute_SetActorVisible(OperationTarget, true);
 	}
@@ -103,7 +103,7 @@ void UProcedure_ArchiveCreating::OnLeave(UProcedureBase* InNextProcedure)
 
 	if(InNextProcedure->IsA<UProcedure_ArchiveChoosing>())
 	{
-		if(OperationTarget)
+		if(OperationTarget && OperationTarget->Implements<USceneActorInterface>())
 		{
 			ISceneActorInterface::Execute_SetActorVisible(OperationTarget, false);
 		}

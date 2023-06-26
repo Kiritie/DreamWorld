@@ -42,13 +42,6 @@ ADWHumanCharacter::ADWHumanCharacter()
 	AuxiliaryVoxelEntity = nullptr;
 }
 
-// Called when the game starts or when spawned
-void ADWHumanCharacter::BeginPlay()
-{
-	Super::BeginPlay();
-
-}
-
 void ADWHumanCharacter::OnSpawn_Implementation(const TArray<FParameter>& InParams)
 {
 	Super::OnSpawn_Implementation(InParams);
@@ -62,13 +55,6 @@ void ADWHumanCharacter::OnDespawn_Implementation(bool bRecovery)
 	UObjectPoolModuleBPLibrary::DespawnObject(AuxiliaryVoxelEntity);
 	GenerateVoxelEntity = nullptr;
 	AuxiliaryVoxelEntity = nullptr;
-}
-
-// Called every frame
-void ADWHumanCharacter::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
 }
 
 void ADWHumanCharacter::OnSelectItem(const FAbilityItem& InItem)
