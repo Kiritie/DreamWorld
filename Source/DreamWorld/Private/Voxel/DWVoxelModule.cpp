@@ -159,14 +159,12 @@ void ADWVoxelModule::GenerateVoxels()
 
 void ADWVoxelModule::GenerateWorld()
 {
-	if(UProcedureModuleBPLibrary::IsCurrentProcedureClass<UProcedure_Pausing>() || UProcedureModuleBPLibrary::IsCurrentProcedureClass<UProcedure_Overed>()) return;
-
 	Super::GenerateWorld();
 
 	if(BoundsMesh && LastGenerateIndex != Index_Empty)
 	{
 		BoundsMesh->SetRelativeLocation(AVoxelModule::ChunkIndexToLocation(FIndex(LastGenerateIndex.X, LastGenerateIndex.Y, 0)));
-		BoundsMesh->SetRelativeScale3D(FVector(GetWorldLength() * WorldData->BlockSize * 0.01f, GetWorldLength() * WorldData->BlockSize * 0.01f, 15.f));
+		BoundsMesh->SetRelativeScale3D(FVector(WorldData->GetWorldRealSize().X * WorldData->BlockSize * 0.01f, WorldData->GetWorldRealSize().Y * WorldData->BlockSize * 0.01f, 15.f));
 	}
 }
 

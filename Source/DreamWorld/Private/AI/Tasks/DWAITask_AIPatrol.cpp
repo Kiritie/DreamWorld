@@ -65,9 +65,9 @@ EBTNodeResult::Type UDWAITask_AIPatrol::ExecuteTask(UBehaviorTreeComponent& Owne
 	PatrolDistance = OwnerComp.GetBlackboardComponent()->GetValueAsFloat(PatrolDistanceKey.SelectedKeyName);
 
 	PatrolLocation = GetOwnerCharacter<ADWCharacter>()->GetActorLocation();
-	DON(i, 10,
+	DON(10,
 		FVector rayStart = GetOwnerCharacter<ADWCharacter>()->GetBirthLocation() + FRotator(0.f, FMath::RandRange(0.f, 360.f), 0.f).Vector() * FMath::FRandRange(0.f, PatrolDistance);
-		rayStart.Z = UVoxelModuleBPLibrary::GetWorldData().GetWorldHeight(true);
+		rayStart.Z = UVoxelModuleBPLibrary::GetWorldData().GetWorldRealSize().Z;
 		const FVector rayEnd = FVector(rayStart.X, rayStart.Y, 0.f);
 		FHitResult hitResult;
 		if(UVoxelModuleBPLibrary::VoxelAgentTraceSingle(rayStart, rayEnd, GetOwnerCharacter<ADWCharacter>()->GetRadius(), GetOwnerCharacter<ADWCharacter>()->GetHalfHeight(), {}, hitResult))

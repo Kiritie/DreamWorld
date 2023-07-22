@@ -187,7 +187,7 @@ void ADWVoxelChunk::GenerateActors()
 	Super::GenerateActors();
 
 	const auto& worldData = AVoxelModule::Get()->GetWorldData();
-	const FVector2D worldLocation = FVector2D(GetChunkLocation().X, GetChunkLocation().Y) + worldData.GetChunkLength() * 0.5f;
+	const FVector2D worldLocation = FVector2D(GetChunkLocation().X + worldData.GetChunkRealSize().X * 0.5f, GetChunkLocation().Y + worldData.GetChunkRealSize().Y * 0.5f);
 	
 	TArray<FVitalityRaceData> vitalityRaceDatas;
 	if(UAbilityModuleBPLibrary::GetNoiseRaceDatas(worldLocation, worldData.WorldSeed, vitalityRaceDatas))
@@ -198,7 +198,7 @@ void ADWVoxelChunk::GenerateActors()
 			{
 				const auto& vitalityData = vitalityItem.GetData<UAbilityVitalityDataBase>();
 				const int32 tmpNum = vitalityItem.Count != 0 ? vitalityItem.Count : worldData.RandomStream.RandRange(vitalityItem.MinCount, vitalityItem.MaxCount);
-				DON(i, tmpNum,
+				DON(tmpNum,
 					FHitResult hitResult;
 					if(UVoxelModuleBPLibrary::VoxelAgentTraceSingle(Index, vitalityData.Radius, vitalityData.HalfHeight, {}, hitResult, true, 10, false))
 					{
@@ -226,7 +226,7 @@ void ADWVoxelChunk::GenerateActors()
 			{
 				const auto& characterData = characterItem.GetData<UAbilityCharacterDataBase>();
 				const int32 tmpNum = characterItem.Count != 0 ? characterItem.Count : worldData.RandomStream.RandRange(characterItem.MinCount, characterItem.MaxCount);
-				DON(i, tmpNum,
+				DON(tmpNum,
 					FHitResult hitResult;
 					if(UVoxelModuleBPLibrary::VoxelAgentTraceSingle(Index, characterData.Radius, characterData.HalfHeight, {}, hitResult, true, 10, false))
 					{

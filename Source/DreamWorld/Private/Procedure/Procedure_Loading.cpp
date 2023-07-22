@@ -67,10 +67,7 @@ void UProcedure_Loading::OnRefresh()
 	const ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>();
 	if(PlayerCharacter && PlayerCharacter->GetFSMComponent()->IsCurrentStateClass<UDWCharacterState_Walk>())
 	{
-		if(UVoxelModuleBPLibrary::IsBasicGenerated())
-		{
-			UProcedureModuleBPLibrary::SwitchProcedureByClass<UProcedure_Playing>();
-		}
+		UProcedureModuleBPLibrary::SwitchProcedureByClass<UProcedure_Playing>();
 	}
 }
 

@@ -5,6 +5,7 @@
 #include "Ability/AbilityModule.h"
 #include "Ability/DWAbilityModule.h"
 #include "AI/AIModule.h"
+#include "Animation/AnimationModule.h"
 #include "Asset/AssetModule.h"
 #include "Audio/AudioModule.h"
 #include "Camera/CameraModule.h"
@@ -16,7 +17,6 @@
 #include "FSM/FSMModule.h"
 #include "Input/DWInputModule.h"
 #include "Input/InputModule.h"
-#include "LatentAction/LatentActionModule.h"
 #include "Media/MediaModule.h"
 #include "Network/NetworkModule.h"
 #include "ObjectPool/ObjectPoolModule.h"
@@ -41,6 +41,7 @@ ADWMainModule::ADWMainModule()
 	ModuleClasses = TArray<TSubclassOf<AModuleBase>>();
 	ModuleClasses.Add(ADWAbilityModule::StaticClass());
 	ModuleClasses.Add(AAIModule::StaticClass());
+	ModuleClasses.Add(AAnimationModule::StaticClass());
 	ModuleClasses.Add(AAssetModule::StaticClass());
 	ModuleClasses.Add(AAudioModule::StaticClass());
 	ModuleClasses.Add(ADWCameraModule::StaticClass());
@@ -49,7 +50,6 @@ ADWMainModule::ADWMainModule()
 	ModuleClasses.Add(AEventModule::StaticClass());
 	ModuleClasses.Add(AFSMModule::StaticClass());
 	ModuleClasses.Add(ADWInputModule::StaticClass());
-	ModuleClasses.Add(ALatentActionModule::StaticClass());
 	ModuleClasses.Add(AMediaModule::StaticClass());
 	ModuleClasses.Add(ANetworkModule::StaticClass());
 	ModuleClasses.Add(AObjectPoolModule::StaticClass());

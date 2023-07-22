@@ -22,7 +22,7 @@ class UTargetSystemComponent;
  * ��ҽ�ɫ
  */
 UCLASS()
-class ADWPlayerCharacter : public ADWHumanCharacter, public IWHPlayerInterface
+class DREAMWORLD_API ADWPlayerCharacter : public ADWHumanCharacter, public IWHPlayerInterface
 {
 	GENERATED_BODY()
 	

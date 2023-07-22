@@ -81,21 +81,14 @@ void UDWCharacterState_Default::TrySwitchToWalk()
 	{
 		FSM->SwitchStateByClass<UDWCharacterState_Walk>();
 	}
-	else if(UVoxelModuleBPLibrary::IsBasicGenerated())
+	else if(Character->GetActorLocation().IsNearlyZero())
 	{
-		if(!Character->GetActorLocation().IsNearlyZero())
+		const auto& characterData = Character->GetCharacterData<UAbilityCharacterDataBase>();
+		FHitResult hitResult;
+		if(UVoxelModuleBPLibrary::VoxelAgentTraceSingle(Character->GetActorLocation(), characterData.Radius, characterData.HalfHeight, {}, hitResult, true, 10, true))
 		{
+			Character->SetActorLocationAndRotation(hitResult.Location, FRotator::ZeroRotator);
 			FSM->SwitchStateByClass<UDWCharacterState_Walk>();
-		}
-		else
-		{
-			const auto& characterData = Character->GetCharacterData<UAbilityCharacterDataBase>();
-			FHitResult hitResult;
-			if(UVoxelModuleBPLibrary::VoxelAgentTraceSingle(Character->GetActorLocation(), characterData.Radius, characterData.HalfHeight, {}, hitResult, true, 10, true))
-			{
-				Character->SetActorLocationAndRotation(hitResult.Location, FRotator::ZeroRotator);
-				FSM->SwitchStateByClass<UDWCharacterState_Walk>();
-			}
 		}
 	}
 }

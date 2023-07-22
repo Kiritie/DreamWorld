@@ -61,7 +61,7 @@ void UDWCharacterAnim::NativeHandleNotify(const FString& AnimNotifyName)
 }
 
 void UDWCharacterAnim::NativeUpdateAnimation(float DeltaSeconds)
-{
+{ 
 	ADWCharacter* Character = Cast<ADWCharacter>(TryGetPawnOwner());
 
 	if(!Character || !Character->GetAssetID().IsValid() || !UGlobalBPLibrary::IsPlaying()) return;
