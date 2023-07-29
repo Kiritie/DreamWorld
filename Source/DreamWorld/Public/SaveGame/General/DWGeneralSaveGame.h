@@ -43,16 +43,4 @@ public:
 
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "SetSaveData"))
 	void K2_SetSaveData(const FDWGeneralSaveData& InSaveData) { this->DWGeneralSaveData = InSaveData; }
-
-	UFUNCTION(BlueprintPure)
-	bool IsAutoJump() const { return DWGeneralSaveData.bAutoJump; }
-	
-	UFUNCTION(BlueprintCallable)
-	void SetAutoJump(bool bInAutoJump) { DWGeneralSaveData.bAutoJump = bInAutoJump; }
-
-	UFUNCTION(BlueprintPure)
-	float GetCameraDistance() const { return DWGeneralSaveData.CameraDistance; }
-	
-	UFUNCTION(BlueprintCallable)
-	void SetCameraDistance(float InCameraDistance) { DWGeneralSaveData.CameraDistance = InCameraDistance; }
 };
