@@ -36,7 +36,7 @@ void UProcedure_Base::OnEnter(UProcedureBase* InLastProcedure)
 {
 	if(BGMSound)
 	{
-		UAudioModuleBPLibrary::PlaySingleSound2D(BGMSound, FName("BGM"));
+		UAudioModuleBPLibrary::PlaySingleSound2D(BGMSound);
 	}
 	Super::OnEnter(InLastProcedure);
 }

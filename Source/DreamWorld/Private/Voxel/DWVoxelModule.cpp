@@ -152,11 +152,6 @@ void ADWVoxelModule::OnWorldStateChanged()
 	Super::OnWorldStateChanged();
 }
 
-void ADWVoxelModule::GenerateVoxels()
-{
-	Super::GenerateVoxels();
-}
-
 void ADWVoxelModule::GenerateWorld()
 {
 	Super::GenerateWorld();

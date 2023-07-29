@@ -16,7 +16,6 @@ ADWCameraModule::ADWCameraModule()
 	bCameraControlAble = true;
 	bCameraMoveAble = true;
 	bCameraMoveControlAble = false;
-	CameraZoomKey = FKey("Left Ctrl");
 	MaxCameraDistance = 300.f;
 	InitCameraDistance = 200.f;
 }

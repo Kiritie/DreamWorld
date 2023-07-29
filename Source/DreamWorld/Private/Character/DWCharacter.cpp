@@ -443,7 +443,7 @@ void ADWCharacter::OnActiveItem(const FAbilityItem& InItem, bool bPassive, bool 
 		}
 		else if(IsPlayer())
 		{
-			UWidgetModuleBPLibrary::OpenUserWidget<UWidgetItemInfoBox>({ FParameter::MakeString(FString::Printf(TEXT("该%s还未准备好！"), *UGlobalBPLibrary::GetEnumValueDisplayName(TEXT("/Script/WHFramework.EAbilityItemType"), (int32)InItem.GetType()).ToString())) });
+			UWidgetModuleBPLibrary::OpenUserWidget<UWidgetItemInfoBox>({ FString::Printf(TEXT("该%s还未准备好！"), *UGlobalBPLibrary::GetEnumValueDisplayName(TEXT("/Script/WHFramework.EAbilityItemType"), (int32)InItem.GetType()).ToString()) });
 		}
 	}
 }

@@ -93,7 +93,7 @@ void ADWPlayerController::LoadData(FSaveData* InSaveData, EPhase InPhase)
 			if(bNeedSpawn)
 			{
 				UnloadData(InPhase);
-				PlayerCharacter = UObjectPoolModuleBPLibrary::SpawnObject<ADWPlayerCharacter>({ FParameter::MakePointer(&SaveData.ID) }, SaveData.GetCharacterData().Class);
+				PlayerCharacter = UObjectPoolModuleBPLibrary::SpawnObject<ADWPlayerCharacter>({ &SaveData.ID }, SaveData.GetCharacterData().Class);
 				if(PlayerCharacter)
 				{
 					if(UProcedureModuleBPLibrary::IsCurrentProcedureClass<UProcedure_Starting>())
@@ -163,7 +163,7 @@ void ADWPlayerController::OnUnPossess()
 {
 	Super::OnUnPossess();
 
-	UInputModuleBPLibrary::ResetInputStates();
+	AMainModule::ResetModuleByClass<AInputModule>();
 }
 
 void ADWPlayerController::SetPlayerPawn(APawn* InPlayerPawn)

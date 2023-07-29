@@ -212,7 +212,7 @@ void UWidgetInventoryBar::SelectInventorySlot(int32 InSlotIndex, bool bRefreshIn
 		}
 		if(!SelectedSlot->IsEmpty() && UProcedureModuleBPLibrary::IsCurrentProcedureClass<UProcedure_Playing>())
 		{
-			UWidgetModuleBPLibrary::OpenUserWidget<UWidgetItemInfoBox>({ FParameter::MakeString(SelectedSlot->GetItem().GetData().Name.ToString()) });
+			UWidgetModuleBPLibrary::OpenUserWidget<UWidgetItemInfoBox>({ SelectedSlot->GetItem().GetData().Name });
 		}
 	}
 	if(SelectBox)

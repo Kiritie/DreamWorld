@@ -33,6 +33,8 @@ public:
 
 	virtual void OnRefresh_Implementation(float DeltaSeconds) override;
 
+	virtual void OnReset_Implementation() override;
+
 	virtual void OnPause_Implementation() override;
 
 	virtual void OnUnPause_Implementation() override;
@@ -46,9 +48,6 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, Category = "InputStates|Player")
 	bool bPressedSprint;
-
-public:
-	virtual void ResetInputStates_Implementation() override;
 
 protected:
 	UFUNCTION()

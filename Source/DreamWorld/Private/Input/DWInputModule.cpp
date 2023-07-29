@@ -171,23 +171,23 @@ void ADWInputModule::OnRefresh_Implementation(float DeltaSeconds)
 	}
 }
 
+void ADWInputModule::OnReset_Implementation()
+{
+	Super::OnReset_Implementation();
+}
+
 void ADWInputModule::OnPause_Implementation()
 {
 	Super::OnPause_Implementation();
+
+	bPressedAttackDestroy = false;
+	bPressedDefendGenerate = false;
+	bPressedSprint = false;
 }
 
 void ADWInputModule::OnUnPause_Implementation()
 {
 	Super::OnUnPause_Implementation();
-}
-
-void ADWInputModule::ResetInputStates_Implementation()
-{
-	Super::ResetInputStates_Implementation();
-
-	bPressedAttackDestroy = false;
-	bPressedDefendGenerate = false;
-	bPressedSprint = false;
 }
 
 void ADWInputModule::OnJumpPressed(FKey Key)
@@ -313,7 +313,7 @@ void ADWInputModule::OnAttackDestroyPressed()
 		case EDWCharacterControlMode::Creating:
 		{
 			FVoxelHitResult voxelHitResult;
-			if(UVoxelModuleBPLibrary::VoxelRaycastSinge(PossessedCharacter->GetInteractDistance(), {}, voxelHitResult))
+			if(UVoxelModuleBPLibrary::VoxelRaycastSinge(EVoxelRaycastType::FromAimPoint, PossessedCharacter->GetInteractDistance(), {}, voxelHitResult))
 			{
 				voxelHitResult.GetVoxel().OnActionTrigger(PossessedCharacter, EVoxelActionType::Action1, voxelHitResult);
 			}
@@ -358,7 +358,7 @@ void ADWInputModule::OnDefendGeneratePressed()
 		case EDWCharacterControlMode::Creating:
 		{
 			FVoxelHitResult voxelHitResult;
-			if(UVoxelModuleBPLibrary::VoxelRaycastSinge(PossessedCharacter->GetInteractDistance(), {}, voxelHitResult))
+			if(UVoxelModuleBPLibrary::VoxelRaycastSinge(EVoxelRaycastType::FromAimPoint, PossessedCharacter->GetInteractDistance(), {}, voxelHitResult))
 			{
 				voxelHitResult.GetVoxel().OnActionTrigger(PossessedCharacter, EVoxelActionType::Action2, voxelHitResult);
 			}
@@ -586,7 +586,7 @@ void ADWInputModule::PrevInventorySlot()
 {
 	ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>();
 	
-	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput() || GetPlayerController()->IsInputKeyDown(ACameraModule::Get()->GetCameraZoomKey())) return;
+	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput() || GetPlayerController()->IsInputKeyDown(UInputModuleBPLibrary::GetKeyShortcutByName(FName("CameraZoom")).Key)) return;
 	
 	if(UProcedureModuleBPLibrary::IsCurrentProcedureClass<UProcedure_Playing>())
 	{
@@ -598,7 +598,7 @@ void ADWInputModule::NextInventorySlot()
 {
 	ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>();
 	
-	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput() || GetPlayerController()->IsInputKeyDown(ACameraModule::Get()->GetCameraZoomKey())) return;
+	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput() || GetPlayerController()->IsInputKeyDown(UInputModuleBPLibrary::GetKeyShortcutByName(FName("CameraZoom")).Key)) return;
 	
 	if(UProcedureModuleBPLibrary::IsCurrentProcedureClass<UProcedure_Playing>())
 	{

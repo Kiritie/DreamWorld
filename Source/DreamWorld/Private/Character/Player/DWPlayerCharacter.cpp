@@ -78,19 +78,6 @@ ADWPlayerCharacter::ADWPlayerCharacter()
 	TargetSystem->OnTargetLockedOn.AddDynamic(this, &ADWPlayerCharacter::OnTargetLockedOn);
 	TargetSystem->OnTargetLockedOff.AddDynamic(this, &ADWPlayerCharacter::OnTargetLockedOff);
 	TargetSystem->OnTargetSetRotation.AddDynamic(this, &ADWPlayerCharacter::OnTargetSetRotation);
-	
-	// Create a camera boom (pulls in towards the player ifthere is a collision)
-	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(FName("CameraBoom"));
-	CameraBoom->SetupAttachment(RootComponent);
-	CameraBoom->TargetArmLength = 200; // The camera follows at this distance behind the character	
-	CameraBoom->SocketOffset = FVector(0, 30, 40);
-	CameraBoom->bUsePawnControlRotation = true; // Rotate the arm based on the controller
-
-	// Create a follow camera
-	FollowCamera = CreateDefaultSubobject<UCameraComponent>(FName("FollowCamera"));
-	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
-	FollowCamera->SetRelativeLocationAndRotation(FVector(0, 0, 0), FRotator(0, 0, 0));
-	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
 	GetMesh()->SetRelativeLocation(FVector(0, 0, -70));
 
@@ -232,7 +219,7 @@ FSaveData* ADWPlayerCharacter::ToData()
 {
 	static FDWPlayerSaveData SaveData;
 	SaveData = Super::ToData()->CastRef<FDWCharacterSaveData>();
-	SaveData.CameraRotation = UCameraModuleBPLibrary::GetCurrentCameraRotation();
+	SaveData.CameraRotation = UCameraModuleBPLibrary::GetCameraRotation();
 	SaveData.BodyColorIndex = GetBodyColor();
 	SaveData.CapeColorIndex = GetCapeColor();
 	return &SaveData;

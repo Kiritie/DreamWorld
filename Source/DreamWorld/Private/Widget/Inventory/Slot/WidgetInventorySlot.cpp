@@ -88,7 +88,7 @@ void UWidgetInventorySlot::NativeOnMouseEnter(const FGeometry& InGeometry, const
 	if(!IsEmpty())
 	{
 		const auto& ItemData = GetItem().GetData();
-		UWidgetModuleBPLibrary::OpenUserWidget<UWidgetInventoryItemInfoBox>({ FParameter::MakeText(ItemData.Name), FParameter::MakeText(ItemData.Detail) });
+		UWidgetModuleBPLibrary::OpenUserWidget<UWidgetInventoryItemInfoBox>({ ItemData.Name, ItemData.Detail });
 	}
 }
 
@@ -191,7 +191,7 @@ void UWidgetInventorySlot::OnRefresh()
 		}
 		if(IsHovered())
 		{
-			UWidgetModuleBPLibrary::OpenUserWidget<UWidgetInventoryItemInfoBox>({ FParameter::MakeText(ItemData.Name), FParameter::MakeText(ItemData.Detail) });
+			UWidgetModuleBPLibrary::OpenUserWidget<UWidgetInventoryItemInfoBox>({ ItemData.Name, ItemData.Detail });
 		}
 	}
 	else

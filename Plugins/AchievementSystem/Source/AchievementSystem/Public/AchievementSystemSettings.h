@@ -97,10 +97,10 @@ public:
 		float EntranceAnimationLength = 0.2;
 	
 	/**The sound that plays when an achievement is unlocked is displayed to a user. Only plays if ShowAchievementUnlocks is true.*/
-	UPROPERTY(config, EditAnywhere, Category = "Sound", meta = (AllowedClasses = "SoundBase"))
+	UPROPERTY(config, EditAnywhere, Category = "Sound", meta = (AllowedClasses = "/Script/Engine.SoundBase"))
 		FSoftObjectPath UnlockSound;
 	/**The sound that plays when a progress update is displayed to a user. Only plays if ShowAchievementProgress is true.*/
-	UPROPERTY(config, EditAnywhere, Category = "Sound", meta = (AllowedClasses = "SoundBase"))
+	UPROPERTY(config, EditAnywhere, Category = "Sound", meta = (AllowedClasses = "/Script/Engine.SoundBase"))
 		FSoftObjectPath ProgressMadeSound;
 
 	/**Use this achievement ui to display progress and unlock updates to the players screen*/

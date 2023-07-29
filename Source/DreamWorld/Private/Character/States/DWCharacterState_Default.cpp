@@ -85,7 +85,7 @@ void UDWCharacterState_Default::TrySwitchToWalk()
 	{
 		const auto& characterData = Character->GetCharacterData<UAbilityCharacterDataBase>();
 		FHitResult hitResult;
-		if(UVoxelModuleBPLibrary::VoxelAgentTraceSingle(Character->GetActorLocation(), characterData.Radius, characterData.HalfHeight, {}, hitResult, true, 10, true))
+		if(UVoxelModuleBPLibrary::VoxelAgentTraceSingle(Character->GetActorLocation(), FVector2D(1000.f), characterData.Radius, characterData.HalfHeight, {}, hitResult, true, 10, true))
 		{
 			Character->SetActorLocationAndRotation(hitResult.Location, FRotator::ZeroRotator);
 			FSM->SwitchStateByClass<UDWCharacterState_Walk>();

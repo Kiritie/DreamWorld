@@ -22,7 +22,7 @@ class UTargetSystemComponent;
  * ��ҽ�ɫ
  */
 UCLASS()
-class DREAMWORLD_API ADWPlayerCharacter : public ADWHumanCharacter, public IWHPlayerInterface
+class DREAMWORLD_API ADWPlayerCharacter : public ADWHumanCharacter
 {
 	GENERATED_BODY()
 	
@@ -44,12 +44,6 @@ public:
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	UTargetSystemComponent* TargetSystem;
-	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-	USpringArmComponent* CameraBoom;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-	UCameraComponent* FollowCamera;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	USceneCaptureComponent2D* PreviewCapture;
