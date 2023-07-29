@@ -63,6 +63,6 @@ void ADWCameraModule::SetCameraDistance(float InDistance, bool bInstant)
 
 	if(UProcedureModuleBPLibrary::IsCurrentProcedureClass<UProcedure_Playing>())
 	{
-		USaveGameModuleBPLibrary::GetSaveGame<UDWGeneralSaveGame>()->SetCameraDistance(InDistance);
+		USaveGameModuleBPLibrary::GetSaveGame<UDWGeneralSaveGame>()->GetSaveDataRef<FDWGeneralSaveData>().CameraDistance = InDistance;
 	}
 }

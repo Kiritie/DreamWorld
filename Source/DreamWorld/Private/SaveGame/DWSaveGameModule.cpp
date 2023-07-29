@@ -73,7 +73,5 @@ void ADWSaveGameModule::LoadData(FSaveData* InSaveData, EPhase InPhase)
 
 FSaveData* ADWSaveGameModule::ToData()
 {
-	static FDWGeneralSaveData SaveData;
-	SaveData = Super::ToData()->CastRef<FGeneralSaveData>();
-	return &SaveData;
+	return Super::ToData();
 }
