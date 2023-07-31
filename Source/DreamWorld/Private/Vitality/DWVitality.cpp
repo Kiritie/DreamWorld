@@ -98,10 +98,10 @@ void ADWVitality::LoadData(FSaveData* InSaveData, EPhase InPhase)
 	Super::LoadData(InSaveData, InPhase);
 }
 
-FSaveData* ADWVitality::ToData()
+FSaveData* ADWVitality::ToData(bool bRefresh)
 {
 	static FDWVitalitySaveData SaveData;
-	SaveData = Super::ToData()->CastRef<FVitalitySaveData>();
+	SaveData = Super::ToData(bRefresh)->CastRef<FVitalitySaveData>();
 
 	return &SaveData;
 }

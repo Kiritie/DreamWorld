@@ -113,11 +113,11 @@ void ADWPlayerController::LoadData(FSaveData* InSaveData, EPhase InPhase)
 	}
 	if(PlayerCharacter)
 	{
-		PlayerCharacter->LoadSaveData(&SaveData, InPhase, true);
+		PlayerCharacter->LoadSaveData(&SaveData, InPhase);
 	}
 }
 
-FSaveData* ADWPlayerController::ToData()
+FSaveData* ADWPlayerController::ToData(bool bRefresh)
 {
 	return nullptr;
 }

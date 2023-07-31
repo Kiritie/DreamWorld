@@ -215,10 +215,11 @@ void ADWPlayerCharacter::LoadData(FSaveData* InSaveData, EPhase InPhase)
 	Super::LoadData(InSaveData, InPhase);
 }
 
-FSaveData* ADWPlayerCharacter::ToData()
+FSaveData* ADWPlayerCharacter::ToData(bool bRefresh)
 {
 	static FDWPlayerSaveData SaveData;
-	SaveData = Super::ToData()->CastRef<FDWCharacterSaveData>();
+	SaveData = Super::ToData(bRefresh)->CastRef<FDWCharacterSaveData>();
+	
 	SaveData.CameraRotation = UCameraModuleBPLibrary::GetCameraRotation();
 	SaveData.BodyColorIndex = GetBodyColor();
 	SaveData.CapeColorIndex = GetCapeColor();

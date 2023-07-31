@@ -130,9 +130,9 @@ void ADWVoxelModule::LoadData(FSaveData* InSaveData, EPhase InPhase)
 	}
 }
 
-FSaveData* ADWVoxelModule::ToData()
+FSaveData* ADWVoxelModule::ToData(bool bRefresh)
 {
-	return Super::ToData();
+	return Super::ToData(bRefresh);
 }
 
 void ADWVoxelModule::UnloadData(EPhase InPhase)
@@ -142,7 +142,7 @@ void ADWVoxelModule::UnloadData(EPhase InPhase)
 
 FVoxelWorldSaveData* ADWVoxelModule::NewData(bool bInheritBasicData) const
 {
-	static FVoxelWorldSaveData* NewWorldData;
+	static FDWVoxelWorldSaveData* NewWorldData;
 	NewWorldData = !bInheritBasicData ? new FDWVoxelWorldSaveData() : new FDWVoxelWorldSaveData(WorldBasicData);
 	return NewWorldData;
 }

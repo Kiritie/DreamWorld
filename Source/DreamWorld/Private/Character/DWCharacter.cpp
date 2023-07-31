@@ -327,10 +327,10 @@ void ADWCharacter::LoadData(FSaveData* InSaveData, EPhase InPhase)
 	Super::LoadData(InSaveData, InPhase);
 }
 
-FSaveData* ADWCharacter::ToData()
+FSaveData* ADWCharacter::ToData(bool bRefresh)
 {
 	static FDWCharacterSaveData SaveData;
-	SaveData = Super::ToData()->CastRef<FCharacterSaveData>();
+	SaveData = Super::ToData(bRefresh)->CastRef<FCharacterSaveData>();
 
 	SaveData.TeamID = TeamID;
 	SaveData.BirthLocation = BirthLocation;

@@ -15,9 +15,9 @@ void UDWVitalityInventory::LoadData(FSaveData* InSaveData, EPhase InPhase)
 	Super::LoadData(InSaveData, InPhase);
 }
 
-FSaveData* UDWVitalityInventory::ToData()
+FSaveData* UDWVitalityInventory::ToData(bool bRefresh)
 {
-	return Super::ToData();
+	return Super::ToData(bRefresh);
 }
 
 void UDWVitalityInventory::UnloadData(EPhase InPhase)

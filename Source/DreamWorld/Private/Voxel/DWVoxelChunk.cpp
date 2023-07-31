@@ -50,19 +50,19 @@ void ADWVoxelChunk::LoadData(FSaveData* InSaveData, EPhase InPhase)
 	Super::LoadData(InSaveData, InPhase);
 }
  
-FSaveData* ADWVoxelChunk::ToData()
+FSaveData* ADWVoxelChunk::ToData(bool bRefresh)
 {
 	static FDWVoxelChunkSaveData SaveData;
-	SaveData = Super::ToData()->CastRef<FVoxelChunkSaveData>();
+	SaveData = Super::ToData(bRefresh)->CastRef<FVoxelChunkSaveData>();
 
 	for(auto& Iter : Characters)
 	{
-		SaveData.CharacterDatas.Add(Iter->ToSaveDataRef<FDWCharacterSaveData>(true));
+		SaveData.CharacterDatas.Add(Iter->GetSaveDataRef<FDWCharacterSaveData>(true));
 	}
 
 	for(auto& Iter : Vitalitys)
 	{
-		SaveData.VitalityDatas.Add(Iter->ToSaveDataRef<FDWVitalitySaveData>(true));
+		SaveData.VitalityDatas.Add(Iter->GetSaveDataRef<FDWVitalitySaveData>(true));
 	}
 
 	return &SaveData;

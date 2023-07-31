@@ -71,7 +71,7 @@ void ADWSaveGameModule::LoadData(FSaveData* InSaveData, EPhase InPhase)
 	Super::LoadData(InSaveData, InPhase);
 }
 
-FSaveData* ADWSaveGameModule::ToData()
+FSaveData* ADWSaveGameModule::ToData(bool bRefresh)
 {
-	return Super::ToData();
+	return Super::ToData(bRefresh);
 }
