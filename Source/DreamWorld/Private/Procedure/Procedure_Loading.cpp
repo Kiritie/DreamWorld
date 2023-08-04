@@ -25,7 +25,7 @@
 UProcedure_Loading::UProcedure_Loading()
 {
 	ProcedureName = FName("Loading");
-	ProcedureDisplayName = FText::FromString(TEXT("Loading"));
+	ProcedureDisplayName = FText::FromString(TEXT("加载"));
 }
 
 #if WITH_EDITOR
@@ -53,7 +53,7 @@ void UProcedure_Loading::OnEnter(UProcedureBase* InLastProcedure)
 	
 	UWidgetModuleBPLibrary::CreateUserWidget<UWidgetGameHUD>();
 
-	if(ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>())
+	if(ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerPawn<ADWPlayerCharacter>())
 	{
 		UCharacterModuleBPLibrary::SwitchCharacter(PlayerCharacter);
 	}
@@ -64,7 +64,7 @@ void UProcedure_Loading::OnRefresh()
 {
 	Super::OnRefresh();
 
-	const ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>();
+	const ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerPawn<ADWPlayerCharacter>();
 	if(PlayerCharacter && PlayerCharacter->GetFSMComponent()->IsCurrentStateClass<UDWCharacterState_Walk>())
 	{
 		UProcedureModuleBPLibrary::SwitchProcedureByClass<UProcedure_Playing>();

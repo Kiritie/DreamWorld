@@ -12,7 +12,7 @@
 UProcedure_Initializing::UProcedure_Initializing()
 {
 	ProcedureName = FName("Initializing");
-	ProcedureDisplayName = FText::FromString(TEXT("Initializing"));
+	ProcedureDisplayName = FText::FromString(TEXT("初始化"));
 }
 
 #if WITH_EDITOR

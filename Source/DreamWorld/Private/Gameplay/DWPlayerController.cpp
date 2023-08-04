@@ -67,9 +67,9 @@ void ADWPlayerController::OnRefresh_Implementation(float DeltaSeconds)
 	Super::OnRefresh_Implementation(DeltaSeconds);
 }
 
-void ADWPlayerController::OnTermination_Implementation()
+void ADWPlayerController::OnTermination_Implementation(EPhase InPhase)
 {
-	Super::OnTermination_Implementation();
+	Super::OnTermination_Implementation(InPhase);
 }
 
 void ADWPlayerController::LoadData(FSaveData* InSaveData, EPhase InPhase)

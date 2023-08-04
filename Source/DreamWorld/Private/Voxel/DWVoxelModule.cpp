@@ -104,9 +104,9 @@ void ADWVoxelModule::OnUnPause_Implementation()
 	Super::OnUnPause_Implementation();
 }
 
-void ADWVoxelModule::OnTermination_Implementation()
+void ADWVoxelModule::OnTermination_Implementation(EPhase InPhase)
 {
-	Super::OnTermination_Implementation();
+	Super::OnTermination_Implementation(InPhase);
 }
 
 void ADWVoxelModule::LoadData(FSaveData* InSaveData, EPhase InPhase)
@@ -140,10 +140,11 @@ void ADWVoxelModule::UnloadData(EPhase InPhase)
 	Super::UnloadData(InPhase);
 }
 
-FVoxelWorldSaveData* ADWVoxelModule::NewData(bool bInheritBasicData) const
+FVoxelWorldSaveData* ADWVoxelModule::NewWorldData(FSaveData* InWorldData) const
 {
 	static FDWVoxelWorldSaveData* NewWorldData;
-	NewWorldData = !bInheritBasicData ? new FDWVoxelWorldSaveData() : new FDWVoxelWorldSaveData(WorldBasicData);
+	NewWorldData = new FDWVoxelWorldSaveData();
+	*NewWorldData = !InWorldData ? FDWVoxelWorldSaveData(WorldBasicData) : InWorldData->CastRef<FDWVoxelWorldSaveData>();
 	return NewWorldData;
 }
 

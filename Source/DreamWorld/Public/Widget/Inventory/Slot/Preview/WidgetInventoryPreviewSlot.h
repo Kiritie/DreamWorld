@@ -18,13 +18,6 @@ class DREAMWORLD_API UWidgetInventoryPreviewSlot : public UUserWidget, public IO
 public:
 	UWidgetInventoryPreviewSlot(const FObjectInitializer& ObjectInitializer);
 
-protected:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	UUserWidgetBase* Owner;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	FAbilityItem Item;
-
 public:
 	virtual int32 GetLimit_Implementation() const override { return 1000; }
 
@@ -46,6 +39,13 @@ public:
 
 	UFUNCTION(BlueprintNativeEvent)
 	void OnRefresh();
+
+protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UUserWidgetBase* Owner;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	FAbilityItem Item;
 
 public:
 	FAbilityItem GetItem() const { return Item; }

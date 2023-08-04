@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Base/Task_Base.h"
+#include "Task/Base/Task_Base.h"
 #include "Task_GenerateVoxel.generated.h"
 
 class UEventHandle_GenerateVoxel;
@@ -43,6 +43,13 @@ public:
 	virtual void OnComplete(ETaskExecuteResult InTaskExecuteResult) override;
 	
 	virtual void OnLeave() override;
+
+protected:
+	virtual void Serialize(FArchive& Ar) override;
+
+	virtual void LoadData(FSaveData* InSaveData, EPhase InPhase) override;
+
+	virtual FSaveData* ToData(bool bRefresh) override;
 
 public:
 	virtual float CheckTaskProgress_Implementation(FString& OutInfo) const override;

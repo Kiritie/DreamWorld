@@ -61,9 +61,9 @@ void ADWTeamModule::OnUnPause_Implementation()
 	Super::OnUnPause_Implementation();
 }
 
-void ADWTeamModule::OnTermination_Implementation()
+void ADWTeamModule::OnTermination_Implementation(EPhase InPhase)
 {
-	Super::OnTermination_Implementation();
+	Super::OnTermination_Implementation(InPhase);
 }
 
 bool ADWTeamModule::IsExistTeam(const FName& InTeamID) const

@@ -28,7 +28,7 @@
 UProcedure_ArchiveCreating::UProcedure_ArchiveCreating()
 {
 	ProcedureName = FName("ArchiveCreating");
-	ProcedureDisplayName = FText::FromString(TEXT("ArchiveCreating"));
+	ProcedureDisplayName = FText::FromString(TEXT("创建存档"));
 
 	bTrackTarget = true;
 	TrackTargetMode = ETrackTargetMode::LocationOnly;
@@ -55,7 +55,7 @@ void UProcedure_ArchiveCreating::OnInitialize()
 
 void UProcedure_ArchiveCreating::OnEnter(UProcedureBase* InLastProcedure)
 {
-	SetOperationTarget(UGlobalBPLibrary::GetPlayerPawn());
+	SetOperationTarget(UGlobalBPLibrary::GetPossessedPawn());
 
 	Super::OnEnter(InLastProcedure);
 

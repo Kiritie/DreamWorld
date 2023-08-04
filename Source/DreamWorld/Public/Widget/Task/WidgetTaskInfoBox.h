@@ -5,6 +5,8 @@
 #include "Widget/Screen/UMG/UserWidgetBase.h"
 #include "WidgetTaskInfoBox.generated.h"
 
+class UTaskBase;
+
 /**
  * 任务信息框
  */
@@ -24,4 +26,16 @@ public:
 	virtual void OnOpen_Implementation(const TArray<FParameter>& InParams, bool bInstant) override;
 
 	virtual void OnClose_Implementation(bool bInstant) override;
+
+	virtual void OnRefresh_Implementation() override;
+
+protected:
+	void CreateTaskInfoItem(UTaskBase* InTask);
+
+protected:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components", meta = (BindWidget, OptionalWidget = false))
+	class UVerticalBox* ContentBox;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TSubclassOf<class UWidgetTaskInfoItem> TaskInfoItemClass;
 };

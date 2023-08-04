@@ -5,6 +5,8 @@
 #include "Blueprint/UserWidget.h"
 #include "WidgetTaskInfoItem.generated.h"
 
+class UTaskBase;
+
 /**
  * 任务信息框
  */
@@ -15,4 +17,12 @@ class DREAMWORLD_API UWidgetTaskInfoItem : public UUserWidget
 
 public:
 	UWidgetTaskInfoItem(const FObjectInitializer& ObjectInitializer);
+
+public:
+	UFUNCTION(BlueprintNativeEvent)
+	void Init(UTaskBase* InTask);
+
+protected:
+	UPROPERTY(BlueprintReadOnly, Category = "Default")
+	UTaskBase* Task;
 };

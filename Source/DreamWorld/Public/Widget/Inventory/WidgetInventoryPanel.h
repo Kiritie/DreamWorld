@@ -18,6 +18,15 @@ class DREAMWORLD_API UWidgetInventoryPanel : public UWidgetInventory
 public:
 	UWidgetInventoryPanel(const FObjectInitializer& ObjectInitializer);
 
+public:
+	virtual void OnInitialize_Implementation(AActor* InOwner) override;
+
+	virtual void OnOpen_Implementation(const TArray<FParameter>& InParams, bool bInstant) override;
+
+	virtual void OnClose_Implementation(bool bInstant) override;
+
+	virtual void OnRefresh_Implementation() override;
+	
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components", meta = (BindWidget, OptionalWidget = false))
 	class UWrapBox* DefaultContent;
@@ -34,15 +43,6 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TSubclassOf<class UWidgetInventoryEquipSlot> EquipSlotClass;
 
-public:
-	virtual void OnInitialize_Implementation(AActor* InOwner) override;
-
-	virtual void OnOpen_Implementation(const TArray<FParameter>& InParams, bool bInstant) override;
-
-	virtual void OnClose_Implementation(bool bInstant) override;
-
-	virtual void OnRefresh_Implementation() override;
-	
 public:
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
 	void SetHeadInfo(const FString& InHeadInfo);

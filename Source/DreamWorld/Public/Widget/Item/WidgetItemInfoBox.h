@@ -5,8 +5,6 @@
 #include "Widget/Screen/UMG/UserWidgetBase.h"
 #include "WidgetItemInfoBox.generated.h"
 
-class ADWPlayerCharacter;
-
 /**
  * 物品信息框
  */

@@ -170,15 +170,6 @@ void ADWCharacter::OnRefresh_Implementation(float DeltaSeconds)
 			}
 		}
 
-		if(AVoxelChunk* Chunk = UVoxelModuleBPLibrary::FindChunkByLocation(GetActorLocation()))
-		{
-			Chunk->AddSceneActor(this);
-		}
-		else if(Container)
-		{
-			Container->RemoveSceneActor(this);
-		}
-
 		if(IsSprinting())
 		{
 			if(GetMoveDirection().Size() > 0.2f)
@@ -1435,7 +1426,7 @@ TArray<ADWCharacter*> ADWCharacter::GetTeamMates()
 
 bool ADWCharacter::IsPlayer(bool bCheckNature) const
 {
-	return !bCheckNature ? UGlobalBPLibrary::GetPlayerCharacter() == this : GetNature() == EDWCharacterNature::Player;
+	return !bCheckNature ? UGlobalBPLibrary::GetPlayerPawn() == this : GetNature() == EDWCharacterNature::Player;
 }
 
 bool ADWCharacter::IsEnemy(ADWCharacter* InTargetCharacter) const

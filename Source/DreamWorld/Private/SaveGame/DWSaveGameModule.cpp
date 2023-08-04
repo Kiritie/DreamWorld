@@ -16,7 +16,7 @@ IMPLEMENTATION_MODULE(ADWSaveGameModule)
 // ParamSets default values
 ADWSaveGameModule::ADWSaveGameModule()
 {
-	GeneralSaveGame = UDWGeneralSaveGame::StaticClass();
+	ModuleSaveGame = UDWGeneralSaveGame::StaticClass();
 }
 
 ADWSaveGameModule::~ADWSaveGameModule()
@@ -61,9 +61,9 @@ void ADWSaveGameModule::OnUnPause_Implementation()
 	Super::OnUnPause_Implementation();
 }
 
-void ADWSaveGameModule::OnTermination_Implementation()
+void ADWSaveGameModule::OnTermination_Implementation(EPhase InPhase)
 {
-	Super::OnTermination_Implementation();
+	Super::OnTermination_Implementation(InPhase);
 }
 
 void ADWSaveGameModule::LoadData(FSaveData* InSaveData, EPhase InPhase)

@@ -22,7 +22,7 @@
 UProcedure_ArchiveChoosing::UProcedure_ArchiveChoosing()
 {
 	ProcedureName = FName("ArchiveChoosing");
-	ProcedureDisplayName = FText::FromString(TEXT("ArchiveChoosing"));
+	ProcedureDisplayName = FText::FromString(TEXT("选择存档"));
 
 	bTrackTarget = true;
 	TrackTargetMode = ETrackTargetMode::LocationOnly;
@@ -47,7 +47,7 @@ void UProcedure_ArchiveChoosing::OnInitialize()
 
 void UProcedure_ArchiveChoosing::OnEnter(UProcedureBase* InLastProcedure)
 {
-	SetOperationTarget(UGlobalBPLibrary::GetPlayerPawn());
+	SetOperationTarget(UGlobalBPLibrary::GetPossessedPawn());
 
 	Super::OnEnter(InLastProcedure);
 

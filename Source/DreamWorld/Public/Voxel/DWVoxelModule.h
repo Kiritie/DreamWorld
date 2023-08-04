@@ -41,7 +41,7 @@ public:
 
 	virtual void OnUnPause_Implementation() override;
 
-	virtual void OnTermination_Implementation() override;
+	virtual void OnTermination_Implementation(EPhase InPhase) override;
 	
 protected:
 	virtual void LoadData(FSaveData* InSaveData, EPhase InPhase) override;
@@ -50,7 +50,8 @@ protected:
 
 	virtual void UnloadData(EPhase InPhase) override;
 
-	virtual FVoxelWorldSaveData* NewData(bool bInheritBasicData) const override;
+	virtual FVoxelWorldSaveData* NewWorldData(FSaveData* InWorldData) const override;
+
 
 	//////////////////////////////////////////////////////////////////////////
 	// Components

@@ -3,7 +3,6 @@
 
 #include "Character/DWCharacterModule.h"
 #include "Asset/AssetModuleBPLibrary.h"
-#include "Ability/AbilityModuleTypes.h"
 #include "Character/Player/DWPlayerCharacterData.h"
 
 IMPLEMENTATION_MODULE(ADWCharacterModule)
@@ -56,9 +55,9 @@ void ADWCharacterModule::OnUnPause_Implementation()
 	Super::OnUnPause_Implementation();
 }
 
-void ADWCharacterModule::OnTermination_Implementation()
+void ADWCharacterModule::OnTermination_Implementation(EPhase InPhase)
 {
-	Super::OnTermination_Implementation();
+	Super::OnTermination_Implementation(InPhase);
 }
 
 FDWPlayerBasicSaveData& ADWCharacterModule::GetPlayerBasicData()

@@ -8,9 +8,7 @@
 
 UProcedure_Base::UProcedure_Base()
 {
-	ProcedureName = FName("Base");
-	ProcedureDisplayName = FText::FromString(TEXT("Base"));
-
+	ProcedureDisplayName = FText::FromString(TEXT("根流程"));
 	BGMSound = nullptr;
 	CameraRotationSpeed = 0.f;
 }

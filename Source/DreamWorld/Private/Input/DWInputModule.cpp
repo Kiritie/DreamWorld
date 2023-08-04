@@ -121,7 +121,7 @@ void ADWInputModule::OnRefresh_Implementation(float DeltaSeconds)
 {
 	Super::OnRefresh_Implementation(DeltaSeconds);
 
-	ADWCharacter* PossessedCharacter = UGlobalBPLibrary::GetPlayerPawn<ADWCharacter>();
+	ADWCharacter* PossessedCharacter = UGlobalBPLibrary::GetPossessedPawn<ADWCharacter>();
 
 	if(!PossessedCharacter || PossessedCharacter->IsBreakAllInput()) return;
 
@@ -190,9 +190,9 @@ void ADWInputModule::OnUnPause_Implementation()
 	Super::OnUnPause_Implementation();
 }
 
-void ADWInputModule::OnJumpPressed(FKey Key)
+void ADWInputModule::OnJumpPressed()
 {
-	ADWCharacter* PossessedCharacter = UGlobalBPLibrary::GetPlayerPawn<ADWCharacter>();
+	ADWCharacter* PossessedCharacter = UGlobalBPLibrary::GetPossessedPawn<ADWCharacter>();
 
 	if(!PossessedCharacter || PossessedCharacter->IsBreakAllInput()) return;
 
@@ -201,7 +201,7 @@ void ADWInputModule::OnJumpPressed(FKey Key)
 
 void ADWInputModule::OnJumpReleased()
 {
-	ADWCharacter* PossessedCharacter = UGlobalBPLibrary::GetPlayerPawn<ADWCharacter>();
+	ADWCharacter* PossessedCharacter = UGlobalBPLibrary::GetPossessedPawn<ADWCharacter>();
 
 	if(!PossessedCharacter || PossessedCharacter->IsBreakAllInput()) return;
 
@@ -210,7 +210,7 @@ void ADWInputModule::OnJumpReleased()
 
 void ADWInputModule::OnSprintPressed()
 {
-	ADWCharacter* PossessedCharacter = UGlobalBPLibrary::GetPlayerPawn<ADWCharacter>();
+	ADWCharacter* PossessedCharacter = UGlobalBPLibrary::GetPossessedPawn<ADWCharacter>();
 
 	if(!PossessedCharacter || PossessedCharacter->IsBreakAllInput()) return;
 
@@ -224,7 +224,7 @@ void ADWInputModule::OnSprintReleased()
 
 void ADWInputModule::ToggleControlMode()
 {
-	ADWPlayerCharacter* PossessedCharacter = UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>();
+	ADWPlayerCharacter* PossessedCharacter = UGlobalBPLibrary::GetPlayerPawn<ADWPlayerCharacter>();
 
 	if(!PossessedCharacter || PossessedCharacter->IsBreakAllInput()) return;
 
@@ -240,7 +240,7 @@ void ADWInputModule::ToggleControlMode()
 
 void ADWInputModule::ToggleCrouch()
 {
-	ADWCharacter* PossessedCharacter = UGlobalBPLibrary::GetPlayerPawn<ADWCharacter>();
+	ADWCharacter* PossessedCharacter = UGlobalBPLibrary::GetPossessedPawn<ADWCharacter>();
 
 	if(!PossessedCharacter || PossessedCharacter->IsBreakAllInput()) return;
 
@@ -256,7 +256,7 @@ void ADWInputModule::ToggleCrouch()
 
 void ADWInputModule::ToggleLockTarget()
 {
-	ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>();
+	ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerPawn<ADWPlayerCharacter>();
 
 	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput()) return;
 
@@ -265,7 +265,7 @@ void ADWInputModule::ToggleLockTarget()
 
 void ADWInputModule::ChangeHand()
 {
-	ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>();
+	ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerPawn<ADWPlayerCharacter>();
 
 	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput()) return;
 
@@ -274,7 +274,7 @@ void ADWInputModule::ChangeHand()
 
 void ADWInputModule::OnDodgePressed()
 {
-	ADWCharacter* PossessedCharacter = UGlobalBPLibrary::GetPlayerPawn<ADWCharacter>();
+	ADWCharacter* PossessedCharacter = UGlobalBPLibrary::GetPossessedPawn<ADWCharacter>();
 
 	if(!PossessedCharacter || PossessedCharacter->IsBreakAllInput()) return;
 
@@ -283,7 +283,7 @@ void ADWInputModule::OnDodgePressed()
 
 void ADWInputModule::OnDodgeReleased()
 {
-	ADWCharacter* PossessedCharacter = UGlobalBPLibrary::GetPlayerPawn<ADWCharacter>();
+	ADWCharacter* PossessedCharacter = UGlobalBPLibrary::GetPossessedPawn<ADWCharacter>();
 
 	if(!PossessedCharacter || PossessedCharacter->IsBreakAllInput()) return;
 
@@ -292,7 +292,7 @@ void ADWInputModule::OnDodgeReleased()
 
 void ADWInputModule::OnAttackDestroyPressed()
 {
-	ADWPlayerCharacter* PossessedCharacter = UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>();
+	ADWPlayerCharacter* PossessedCharacter = UGlobalBPLibrary::GetPlayerPawn<ADWPlayerCharacter>();
 
 	if(!PossessedCharacter || PossessedCharacter->IsBreakAllInput()) return;
 
@@ -324,7 +324,7 @@ void ADWInputModule::OnAttackDestroyPressed()
 
 void ADWInputModule::OnAttackDestroyReleased()
 {
-	ADWPlayerCharacter* PossessedCharacter = UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>();
+	ADWPlayerCharacter* PossessedCharacter = UGlobalBPLibrary::GetPlayerPawn<ADWPlayerCharacter>();
 
 	if(!PossessedCharacter || PossessedCharacter->IsBreakAllInput()) return;
 
@@ -344,7 +344,7 @@ void ADWInputModule::OnAttackDestroyReleased()
 
 void ADWInputModule::OnDefendGeneratePressed()
 {
-	ADWPlayerCharacter* PossessedCharacter = UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>();
+	ADWPlayerCharacter* PossessedCharacter = UGlobalBPLibrary::GetPlayerPawn<ADWPlayerCharacter>();
 
 	if(!PossessedCharacter || PossessedCharacter->IsBreakAllInput()) return;
 
@@ -369,7 +369,7 @@ void ADWInputModule::OnDefendGeneratePressed()
 
 void ADWInputModule::OnDefendGenerateReleased()
 {
-	ADWPlayerCharacter* PossessedCharacter = UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>();
+	ADWPlayerCharacter* PossessedCharacter = UGlobalBPLibrary::GetPlayerPawn<ADWPlayerCharacter>();
 
 	if(!PossessedCharacter || PossessedCharacter->IsBreakAllInput()) return;
 
@@ -389,7 +389,7 @@ void ADWInputModule::OnDefendGenerateReleased()
 
 void ADWInputModule::ReleaseSkillAbility1()
 {
-	ADWPlayerCharacter* PossessedCharacter = UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>();
+	ADWPlayerCharacter* PossessedCharacter = UGlobalBPLibrary::GetPlayerPawn<ADWPlayerCharacter>();
 	
 	if(!PossessedCharacter || PossessedCharacter->IsBreakAllInput()) return;
 
@@ -401,7 +401,7 @@ void ADWInputModule::ReleaseSkillAbility1()
 
 void ADWInputModule::ReleaseSkillAbility2()
 {
-	ADWPlayerCharacter* PossessedCharacter = UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>();
+	ADWPlayerCharacter* PossessedCharacter = UGlobalBPLibrary::GetPlayerPawn<ADWPlayerCharacter>();
 	
 	if(!PossessedCharacter || PossessedCharacter->IsBreakAllInput()) return;
 
@@ -413,7 +413,7 @@ void ADWInputModule::ReleaseSkillAbility2()
 
 void ADWInputModule::ReleaseSkillAbility3()
 {
-	ADWPlayerCharacter* PossessedCharacter = UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>();
+	ADWPlayerCharacter* PossessedCharacter = UGlobalBPLibrary::GetPlayerPawn<ADWPlayerCharacter>();
 	
 	if(!PossessedCharacter || PossessedCharacter->IsBreakAllInput()) return;
 
@@ -425,7 +425,7 @@ void ADWInputModule::ReleaseSkillAbility3()
 
 void ADWInputModule::ReleaseSkillAbility4()
 {
-	ADWPlayerCharacter* PossessedCharacter = UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>();
+	ADWPlayerCharacter* PossessedCharacter = UGlobalBPLibrary::GetPlayerPawn<ADWPlayerCharacter>();
 	
 	if(!PossessedCharacter || PossessedCharacter->IsBreakAllInput()) return;
 
@@ -437,82 +437,82 @@ void ADWInputModule::ReleaseSkillAbility4()
 
 void ADWInputModule::DoInteractAction1()
 {
-	ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>();
+	ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerPawn<ADWPlayerCharacter>();
 	
 	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput() || !PlayerCharacter->Interaction->GetInteractingAgent()) return;
 	
 	if(UInteractionComponent* Interaction = PlayerCharacter->Interaction->GetInteractingComponent())
 	{
-		if(Interaction->GetValidInteractActions(UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>()).IsValidIndex(0))
+		if(Interaction->GetValidInteractActions(UGlobalBPLibrary::GetPlayerPawn<ADWPlayerCharacter>()).IsValidIndex(0))
 		{
-			Interaction->DoInteract(PlayerCharacter, Interaction->GetValidInteractActions(UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>())[0]);
+			Interaction->DoInteract(PlayerCharacter, Interaction->GetValidInteractActions(UGlobalBPLibrary::GetPlayerPawn<ADWPlayerCharacter>())[0]);
 		}
 	}
 }
 
 void ADWInputModule::DoInteractAction2()
 {
-	ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>();
+	ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerPawn<ADWPlayerCharacter>();
 	
 	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput() || !PlayerCharacter->Interaction->GetInteractingAgent()) return;
 	
 	if(UInteractionComponent* Interaction = PlayerCharacter->Interaction->GetInteractingComponent())
 	{
-		if(Interaction->GetValidInteractActions(UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>()).IsValidIndex(1))
+		if(Interaction->GetValidInteractActions(UGlobalBPLibrary::GetPlayerPawn<ADWPlayerCharacter>()).IsValidIndex(1))
 		{
-			Interaction->DoInteract(PlayerCharacter, Interaction->GetValidInteractActions(UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>())[1]);
+			Interaction->DoInteract(PlayerCharacter, Interaction->GetValidInteractActions(UGlobalBPLibrary::GetPlayerPawn<ADWPlayerCharacter>())[1]);
 		}
 	}
 }
 
 void ADWInputModule::DoInteractAction3()
 {
-	ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>();
+	ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerPawn<ADWPlayerCharacter>();
 	
 	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput() || !PlayerCharacter->Interaction->GetInteractingAgent()) return;
 	
 	if(UInteractionComponent* Interaction = PlayerCharacter->Interaction->GetInteractingComponent())
 	{
-		if(Interaction->GetValidInteractActions(UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>()).IsValidIndex(2))
+		if(Interaction->GetValidInteractActions(UGlobalBPLibrary::GetPlayerPawn<ADWPlayerCharacter>()).IsValidIndex(2))
 		{
-			Interaction->DoInteract(PlayerCharacter, Interaction->GetValidInteractActions(UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>())[2]);
+			Interaction->DoInteract(PlayerCharacter, Interaction->GetValidInteractActions(UGlobalBPLibrary::GetPlayerPawn<ADWPlayerCharacter>())[2]);
 		}
 	}
 }
 
 void ADWInputModule::DoInteractAction4()
 {
-	ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>();
+	ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerPawn<ADWPlayerCharacter>();
 	
 	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput() || !PlayerCharacter->Interaction->GetInteractingAgent()) return;
 	
 	if(UInteractionComponent* Interaction = PlayerCharacter->Interaction->GetInteractingComponent())
 	{
-		if(Interaction->GetValidInteractActions(UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>()).IsValidIndex(3))
+		if(Interaction->GetValidInteractActions(UGlobalBPLibrary::GetPlayerPawn<ADWPlayerCharacter>()).IsValidIndex(3))
 		{
-			Interaction->DoInteract(PlayerCharacter, Interaction->GetValidInteractActions(UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>())[3]);
+			Interaction->DoInteract(PlayerCharacter, Interaction->GetValidInteractActions(UGlobalBPLibrary::GetPlayerPawn<ADWPlayerCharacter>())[3]);
 		}
 	}
 }
 
 void ADWInputModule::DoInteractAction5()
 {
-	ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>();
+	ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerPawn<ADWPlayerCharacter>();
 	
 	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput() || !PlayerCharacter->Interaction->GetInteractingAgent()) return;
 	
 	if(UInteractionComponent* Interaction = PlayerCharacter->Interaction->GetInteractingComponent())
 	{
-		if(Interaction->GetValidInteractActions(UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>()).IsValidIndex(4))
+		if(Interaction->GetValidInteractActions(UGlobalBPLibrary::GetPlayerPawn<ADWPlayerCharacter>()).IsValidIndex(4))
 		{
-			Interaction->DoInteract(PlayerCharacter, Interaction->GetValidInteractActions(UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>())[4]);
+			Interaction->DoInteract(PlayerCharacter, Interaction->GetValidInteractActions(UGlobalBPLibrary::GetPlayerPawn<ADWPlayerCharacter>())[4]);
 		}
 	}
 }
 
 void ADWInputModule::OpenInventoryPanel()
 {
-	ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>();
+	ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerPawn<ADWPlayerCharacter>();
 	
 	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput()) return;
 	
@@ -524,7 +524,7 @@ void ADWInputModule::OpenInventoryPanel()
 
 void ADWInputModule::OpenGeneratePanel()
 {
-	ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>();
+	ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerPawn<ADWPlayerCharacter>();
 	
 	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput()) return;
 	
@@ -536,7 +536,7 @@ void ADWInputModule::OpenGeneratePanel()
 
 void ADWInputModule::UseInventoryItem()
 {
-	ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>();
+	ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerPawn<ADWPlayerCharacter>();
 	
 	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput()) return;
 	
@@ -548,7 +548,7 @@ void ADWInputModule::UseInventoryItem()
 
 void ADWInputModule::UseAllInventoryItem()
 {
-	ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>();
+	ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerPawn<ADWPlayerCharacter>();
 	
 	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput()) return;
 	
@@ -560,7 +560,7 @@ void ADWInputModule::UseAllInventoryItem()
 
 void ADWInputModule::DiscardInventoryItem()
 {
-	ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>();
+	ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerPawn<ADWPlayerCharacter>();
 	
 	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput()) return;
 	
@@ -572,7 +572,7 @@ void ADWInputModule::DiscardInventoryItem()
 
 void ADWInputModule::DiscardAllInventoryItem()
 {
-	ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>();
+	ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerPawn<ADWPlayerCharacter>();
 	
 	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput()) return;
 	
@@ -584,7 +584,7 @@ void ADWInputModule::DiscardAllInventoryItem()
 
 void ADWInputModule::PrevInventorySlot()
 {
-	ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>();
+	ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerPawn<ADWPlayerCharacter>();
 	
 	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput() || GetPlayerController()->IsInputKeyDown(UInputModuleBPLibrary::GetKeyShortcutByName(FName("CameraZoom")).Key)) return;
 	
@@ -596,7 +596,7 @@ void ADWInputModule::PrevInventorySlot()
 
 void ADWInputModule::NextInventorySlot()
 {
-	ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>();
+	ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerPawn<ADWPlayerCharacter>();
 	
 	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput() || GetPlayerController()->IsInputKeyDown(UInputModuleBPLibrary::GetKeyShortcutByName(FName("CameraZoom")).Key)) return;
 	
@@ -608,7 +608,7 @@ void ADWInputModule::NextInventorySlot()
 
 void ADWInputModule::SelectInventorySlot1()
 {
-	ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>();
+	ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerPawn<ADWPlayerCharacter>();
 	
 	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput()) return;
 	
@@ -620,7 +620,7 @@ void ADWInputModule::SelectInventorySlot1()
 
 void ADWInputModule::SelectInventorySlot2()
 {
-	ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>();
+	ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerPawn<ADWPlayerCharacter>();
 	
 	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput()) return;
 	
@@ -632,7 +632,7 @@ void ADWInputModule::SelectInventorySlot2()
 
 void ADWInputModule::SelectInventorySlot3()
 {
-	ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>();
+	ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerPawn<ADWPlayerCharacter>();
 	
 	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput()) return;
 	
@@ -644,7 +644,7 @@ void ADWInputModule::SelectInventorySlot3()
 
 void ADWInputModule::SelectInventorySlot4()
 {
-	ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>();
+	ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerPawn<ADWPlayerCharacter>();
 	
 	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput()) return;
 	
@@ -656,7 +656,7 @@ void ADWInputModule::SelectInventorySlot4()
 
 void ADWInputModule::SelectInventorySlot5()
 {
-	ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>();
+	ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerPawn<ADWPlayerCharacter>();
 	
 	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput()) return;
 	
@@ -668,7 +668,7 @@ void ADWInputModule::SelectInventorySlot5()
 
 void ADWInputModule::SelectInventorySlot6()
 {
-	ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>();
+	ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerPawn<ADWPlayerCharacter>();
 	
 	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput()) return;
 	
@@ -680,7 +680,7 @@ void ADWInputModule::SelectInventorySlot6()
 
 void ADWInputModule::SelectInventorySlot7()
 {
-	ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>();
+	ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerPawn<ADWPlayerCharacter>();
 	
 	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput()) return;
 	
@@ -692,7 +692,7 @@ void ADWInputModule::SelectInventorySlot7()
 
 void ADWInputModule::SelectInventorySlot8()
 {
-	ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>();
+	ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerPawn<ADWPlayerCharacter>();
 	
 	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput()) return;
 	
@@ -704,7 +704,7 @@ void ADWInputModule::SelectInventorySlot8()
 
 void ADWInputModule::SelectInventorySlot9()
 {
-	ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>();
+	ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerPawn<ADWPlayerCharacter>();
 	
 	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput()) return;
 	
@@ -716,7 +716,7 @@ void ADWInputModule::SelectInventorySlot9()
 
 void ADWInputModule::SelectInventorySlot10()
 {
-	ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>();
+	ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerPawn<ADWPlayerCharacter>();
 	
 	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput()) return;
 	

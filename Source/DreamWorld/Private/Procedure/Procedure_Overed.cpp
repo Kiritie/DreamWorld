@@ -9,7 +9,7 @@
 UProcedure_Overed::UProcedure_Overed()
 {
 	ProcedureName = FName("Overed");
-	ProcedureDisplayName = FText::FromString(TEXT("Overed"));
+	ProcedureDisplayName = FText::FromString(TEXT("结束"));
 }
 
 #if WITH_EDITOR

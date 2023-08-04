@@ -79,7 +79,7 @@ void UDWArchiveSaveGame::OnRefresh_Implementation()
 {
 	Super::OnRefresh_Implementation();
 
-	DWArchiveSaveData.PlayerData = UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>()->GetSaveDataRef<FDWPlayerSaveData>(true);
+	DWArchiveSaveData.PlayerData = UGlobalBPLibrary::GetPlayerPawn<ADWPlayerCharacter>()->GetSaveDataRef<FDWPlayerSaveData>(true);
 	DWArchiveSaveData.WorldData = ADWVoxelModule::Get()->GetSaveDataRef<FDWVoxelWorldSaveData>(true);
 }
 

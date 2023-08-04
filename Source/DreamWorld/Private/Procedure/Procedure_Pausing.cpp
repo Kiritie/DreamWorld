@@ -15,7 +15,7 @@
 UProcedure_Pausing::UProcedure_Pausing()
 {
 	ProcedureName = FName("Pausing");
-	ProcedureDisplayName = FText::FromString(TEXT("Pausing"));
+	ProcedureDisplayName = FText::FromString(TEXT("暂停"));
 }
 
 #if WITH_EDITOR

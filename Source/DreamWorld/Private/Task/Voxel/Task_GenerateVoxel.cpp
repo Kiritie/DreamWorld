@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Task/Task_GenerateVoxel.h"
+#include "Task/Voxel/Task_GenerateVoxel.h"
 
 #include "TimerManager.h"
 #include "Event/EventModuleBPLibrary.h"
@@ -13,7 +13,8 @@
 
 UTask_GenerateVoxel::UTask_GenerateVoxel()
 {
-	TaskDisplayName = FText::FromString(TEXT("GenerateVoxel"));
+	TaskDisplayName = FText::FromString(TEXT("建造"));
+	TaskDescription = FText::FromString(TEXT("建造5个方块"));
 
 	MaxCount = 5;
 	CurrentCount = 0;
@@ -75,6 +76,33 @@ void UTask_GenerateVoxel::OnComplete(ETaskExecuteResult InTaskExecuteResult)
 void UTask_GenerateVoxel::OnLeave()
 {
 	Super::OnLeave();
+}
+
+void UTask_GenerateVoxel::Serialize(FArchive& Ar)
+{
+	Super::Serialize(Ar);
+
+	if(Ar.ArIsSaveGame)
+	{
+		if(Ar.IsLoading())
+		{
+			Ar << CurrentCount;
+		}
+		else if(Ar.IsSaving())
+		{
+			Ar << CurrentCount;
+		}
+	}
+}
+
+void UTask_GenerateVoxel::LoadData(FSaveData* InSaveData, EPhase InPhase)
+{
+	Super::LoadData(InSaveData, InPhase);
+}
+
+FSaveData* UTask_GenerateVoxel::ToData(bool bRefresh)
+{
+	return Super::ToData(bRefresh);
 }
 
 float UTask_GenerateVoxel::CheckTaskProgress_Implementation(FString& OutInfo) const

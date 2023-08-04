@@ -14,11 +14,15 @@
 UWidgetGameHUD::UWidgetGameHUD(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	WidgetName = FName("GameHUD");
-	ChildNames.Add(FName("InventoryBar"));
-	ChildNames.Add(FName("InventoryPanel"));
-	ChildNames.Add(FName("GeneratePanel"));
-	ChildNames.Add(FName("ContextBox"));
-	ChildNames.Add(FName("ItemInfoBox"));
+	ChildNames =
+	{
+		FName("InventoryBar"),
+	    FName("InventoryPanel"),
+	    FName("GeneratePanel"),
+	    FName("ContextBox"),
+	    FName("ItemInfoBox"),
+	    FName("TaskInfoBox")
+	};
 	WidgetType = EWidgetType::Permanent;
 	InputMode = EInputMode::GameOnly;
 

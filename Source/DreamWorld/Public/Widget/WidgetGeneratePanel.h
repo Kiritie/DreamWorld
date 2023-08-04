@@ -22,27 +22,6 @@ class DREAMWORLD_API UWidgetGeneratePanel : public UUserWidgetBase
 public:
 	UWidgetGeneratePanel(const FObjectInitializer& ObjectInitializer);
 
-protected:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components", meta = (BindWidget, OptionalWidget = false))
-	UScrollBox* GenerateContent;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components", meta = (BindWidget, OptionalWidget = false))
-	UWrapBox* PreviewContent;
-	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components", meta = (BindWidget, OptionalWidget = false))
-	UButton* BtnGenerate;
-
-protected:
-	TSubclassOf<UWidgetInventoryGenerateSlot> GenerateSlotClass;
-
-	TSubclassOf<UWidgetInventoryPreviewSlot> PreviewSlotClass;
-
-	TArray<UWidgetInventoryGenerateSlot*> GenerateSlots;
-	
-	TArray<UWidgetInventoryPreviewSlot*> PreviewSlots;
-
-	UWidgetInventoryGenerateSlot* SelectedGenerateSlot;
-
 public:
 	virtual void OnCreate_Implementation(AActor* InOwner) override;
 
@@ -66,4 +45,26 @@ protected:
 public:
 	UFUNCTION(BlueprintPure)
 	bool GetSelectedGenerateItemData(FDWGenerateItemData& OutItemData);
+
+protected:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components", meta = (BindWidget, OptionalWidget = false))
+	UScrollBox* GenerateContent;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components", meta = (BindWidget, OptionalWidget = false))
+	UWrapBox* PreviewContent;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components", meta = (BindWidget, OptionalWidget = false))
+	UButton* BtnGenerate;
+
+protected:
+	TSubclassOf<UWidgetInventoryGenerateSlot> GenerateSlotClass;
+
+	TSubclassOf<UWidgetInventoryPreviewSlot> PreviewSlotClass;
+
+	TArray<UWidgetInventoryGenerateSlot*> GenerateSlots;
+	
+	TArray<UWidgetInventoryPreviewSlot*> PreviewSlots;
+
+	UPROPERTY()
+	UWidgetInventoryGenerateSlot* SelectedGenerateSlot;
 };

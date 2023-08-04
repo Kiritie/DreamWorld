@@ -26,7 +26,7 @@
 UProcedure_Starting::UProcedure_Starting()
 {
 	ProcedureName = FName("Starting");
-	ProcedureDisplayName = FText::FromString(TEXT("Starting"));
+	ProcedureDisplayName = FText::FromString(TEXT("开始"));
 
 	bTrackTarget = true;
 	TrackTargetMode = ETrackTargetMode::LocationOnly;
@@ -65,7 +65,7 @@ void UProcedure_Starting::OnEnter(UProcedureBase* InLastProcedure)
 	}
 	AMainModule::PauseModuleByClass<ASceneModule>();
 
-	SetOperationTarget(UGlobalBPLibrary::GetPlayerPawn());
+	SetOperationTarget(UGlobalBPLibrary::GetPossessedPawn());
 	
 	Super::OnEnter(InLastProcedure);
 }

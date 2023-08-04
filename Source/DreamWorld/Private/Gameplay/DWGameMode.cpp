@@ -40,7 +40,7 @@ void ADWGameMode::OnRefresh_Implementation(float DeltaSeconds)
 	Super::OnRefresh_Implementation(DeltaSeconds);
 }
 
-void ADWGameMode::OnTermination_Implementation()
+void ADWGameMode::OnTermination_Implementation(EPhase InPhase)
 {
-	Super::OnTermination_Implementation();
+	Super::OnTermination_Implementation(InPhase);
 }

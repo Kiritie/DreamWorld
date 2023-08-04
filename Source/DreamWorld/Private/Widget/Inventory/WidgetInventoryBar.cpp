@@ -66,7 +66,7 @@ void UWidgetInventoryBar::OnInitialize_Implementation(AActor* InOwner)
 			UISlotDatas[ESplitSlotType::Shortcut].Slots.Empty();
 			for(int32 i = 0; i < ShortcutSlots.Num(); i++)
 			{
-				if(UWidgetInventoryShortcutSlot* ShortcutSlot = Cast<UWidgetInventoryShortcutSlot>(UWidgetBlueprintLibrary::Create(this, ShortcutSlotClass, nullptr)))
+				if(UWidgetInventoryShortcutSlot* ShortcutSlot = CreateWidget<UWidgetInventoryShortcutSlot>(this, ShortcutSlotClass))
 				{
 					ShortcutSlot->OnInitialize(ShortcutSlots[i]);
 					//ShortcutSlot->SetKeyCode(UDWHelper::GetInputActionKeyCodeByName(FString::Printf(TEXT("SelectInventorySlot%d"), i + 1)));
@@ -95,7 +95,7 @@ void UWidgetInventoryBar::OnInitialize_Implementation(AActor* InOwner)
 		{
 			for(int32 i = 0; i < AuxiliarySlots.Num(); i++)
 			{
-				if(UWidgetInventoryAuxiliarySlot* AuxiliarySlot = Cast<UWidgetInventoryAuxiliarySlot>(UWidgetBlueprintLibrary::Create(this, AuxiliarySlotClass, nullptr)))
+				if(UWidgetInventoryAuxiliarySlot* AuxiliarySlot = CreateWidget<UWidgetInventoryAuxiliarySlot>(this, AuxiliarySlotClass))
 				{
 					AuxiliarySlot->OnInitialize(AuxiliarySlots[i]);
 					//AuxiliarySlot->SetKeyCode(UGlobalBPLibrary::GetInputActionKeyCodeByName(FString::Printf(TEXT("ReleaseAuxiliaryAbility%d"), i + 1)));
@@ -124,7 +124,7 @@ void UWidgetInventoryBar::OnInitialize_Implementation(AActor* InOwner)
 		{
 			for(int32 i = 0; i < SkillSlots.Num(); i++)
 			{
-				if(UWidgetInventorySkillSlot* SkillSlot = Cast<UWidgetInventorySkillSlot>(UWidgetBlueprintLibrary::Create(this, SkillSlotClass, nullptr)))
+				if(UWidgetInventorySkillSlot* SkillSlot = CreateWidget<UWidgetInventorySkillSlot>(this, SkillSlotClass))
 				{
 					SkillSlot->OnInitialize(SkillSlots[i]);
 					SkillSlot->SetKeyCode(UGlobalBPLibrary::GetInputActionKeyCodeByName(FString::Printf(TEXT("ReleaseSkillAbility%d"), i + 1)));

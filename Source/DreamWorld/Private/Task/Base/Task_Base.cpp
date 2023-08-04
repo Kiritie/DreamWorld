@@ -8,8 +8,7 @@
 
 UTask_Base::UTask_Base()
 {
-	TaskDisplayName = FText::FromString(TEXT("Task Base"));
-
+	TaskDisplayName = FText::FromString(TEXT("根任务"));
 	NeedLevel = 1;
 }
 
@@ -67,16 +66,13 @@ void UTask_Base::OnLeave()
 
 bool UTask_Base::CheckTaskCondition_Implementation(FString& OutInfo) const
 {
-	if(const ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>())
+	if(const ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerPawn<ADWPlayerCharacter>())
 	{
-		if(PlayerCharacter->GetLevelV() >= NeedLevel)
-		{
-			return true;
-		}
-		else
+		if(PlayerCharacter->GetLevelV() < NeedLevel)
 		{
 			OutInfo = FString::Printf(TEXT("角色等级未达到[%d]级"), NeedLevel);
+			return false;
 		}
 	}
-	return false;
+	return true;
 }

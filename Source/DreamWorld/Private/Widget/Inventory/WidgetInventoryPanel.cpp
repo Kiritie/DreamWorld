@@ -52,7 +52,7 @@ void UWidgetInventoryPanel::OnInitialize_Implementation(AActor* InOwner)
 			UISlotDatas[ESplitSlotType::Default].Slots.Empty();
 			for(int32 i = 0; i < DefaultSlots.Num(); i++)
 			{
-				if(UWidgetInventorySlot* DefaultSlot = Cast<UWidgetInventorySlot>(UWidgetBlueprintLibrary::Create(this, DefaultSlotClass, nullptr)))
+				if(UWidgetInventorySlot* DefaultSlot = CreateWidget<UWidgetInventorySlot>(this, DefaultSlotClass))
 				{
 					DefaultSlot->OnInitialize(DefaultSlots[i]);
 					if(UWrapBoxSlot* WrapBoxSlot = DefaultContent->AddChildToWrapBox(DefaultSlot))
@@ -78,7 +78,7 @@ void UWidgetInventoryPanel::OnInitialize_Implementation(AActor* InOwner)
 		{
 			for(int32 i = 0; i < EquipSlots.Num(); i++)
 			{
-				if(UWidgetInventoryEquipSlot* EquipSlot = Cast<UWidgetInventoryEquipSlot>(UWidgetBlueprintLibrary::Create(this, EquipSlotClass, nullptr)))
+				if(UWidgetInventoryEquipSlot* EquipSlot = CreateWidget<UWidgetInventoryEquipSlot>(this, EquipSlotClass))
 				{
 					EquipSlot->OnInitialize(EquipSlots[i]);
 					EquipSlot->SetEquipPartType(UGlobalBPLibrary::GetEnumValueDisplayName(TEXT("/Script/WHFramework.EEquipPartType"), i));

@@ -26,7 +26,7 @@
 UProcedure_Playing::UProcedure_Playing()
 {
 	ProcedureName = FName("Playing");
-	ProcedureDisplayName = FText::FromString(TEXT("Playing"));
+	ProcedureDisplayName = FText::FromString(TEXT("游玩"));
 }
 
 #if WITH_EDITOR
@@ -54,7 +54,7 @@ void UProcedure_Playing::OnEnter(UProcedureBase* InLastProcedure)
 	{
 		UWidgetModuleBPLibrary::OpenUserWidget<UWidgetGameHUD>();
 
-		if(ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerCharacter<ADWPlayerCharacter>())
+		if(ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerPawn<ADWPlayerCharacter>())
 		{
 			PlayerCharacter->Execute_SetActorVisible(PlayerCharacter, true);
 			//PlayerCharacter->RefreshAttributes();

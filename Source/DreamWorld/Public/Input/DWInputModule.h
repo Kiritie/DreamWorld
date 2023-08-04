@@ -51,7 +51,7 @@ protected:
 
 protected:
 	UFUNCTION()
-	virtual void OnJumpPressed(FKey Key);
+	virtual void OnJumpPressed();
 
 	UFUNCTION()
 	virtual void OnJumpReleased();
