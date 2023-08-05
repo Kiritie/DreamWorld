@@ -37,6 +37,10 @@ public:
 	
 	virtual void OnLeave(UProcedureBase* InNextProcedure) override;
 
+protected:
+	UFUNCTION()
+	void OnPlayerChanged(APawn* InPlayerPawn);
+
 public:
 	UFUNCTION(BlueprintCallable)
 	void CreateArchive();

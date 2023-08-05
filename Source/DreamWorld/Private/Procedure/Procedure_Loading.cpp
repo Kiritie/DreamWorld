@@ -3,6 +3,7 @@
 
 #include "Procedure/Procedure_Loading.h"
 
+#include "Camera/CameraModule.h"
 #include "Character/CharacterModuleBPLibrary.h"
 #include "Character/Player/DWPlayerCharacter.h"
 #include "Character/States/DWCharacterState_Walk.h"
@@ -55,7 +56,8 @@ void UProcedure_Loading::OnEnter(UProcedureBase* InLastProcedure)
 
 	if(ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerPawn<ADWPlayerCharacter>())
 	{
-		UCharacterModuleBPLibrary::SwitchCharacter(PlayerCharacter);
+		UCharacterModuleBPLibrary::SwitchCharacter(PlayerCharacter, true, true);
+		AMainModule::PauseModuleByClass<ACameraModule>();
 	}
 	USaveGameModuleBPLibrary::LoadSaveGame<UDWArchiveSaveGame>(-1, EPhase::Final);
 }

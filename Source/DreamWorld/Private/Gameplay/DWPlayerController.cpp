@@ -46,6 +46,7 @@
 #include "Widget/WidgetGeneratePanel.h"
 #include "Widget/WidgetShopPanel.h"
 #include "Procedure/Procedure_Starting.h"
+#include "Procedure/Archive/Procedure_ArchiveCreating.h"
 
 ADWPlayerController::ADWPlayerController()
 {
@@ -77,43 +78,38 @@ void ADWPlayerController::LoadData(FSaveData* InSaveData, EPhase InPhase)
 	auto& SaveData = InSaveData->CastRef<FDWPlayerSaveData>();
 
 	ADWPlayerCharacter* PlayerCharacter = GetPlayerPawn<ADWPlayerCharacter>();
-	switch(InPhase)
+	
+	if(PHASEC(InPhase, EPhase::Primary))
 	{
-		case EPhase::Primary:
+		bool bNeedSpawn = true;
+		if(PlayerCharacter)
 		{
-			bool bNeedSpawn = true;
+			if(PlayerCharacter->GetAssetID() == SaveData.ID)
+			{
+				bNeedSpawn = false;
+			}
+			SaveData.SpawnLocation = PlayerCharacter->GetActorLocation();
+		}
+		if(bNeedSpawn)
+		{
+			UnloadData(InPhase);
+			PlayerCharacter = UObjectPoolModuleBPLibrary::SpawnObject<ADWPlayerCharacter>({ &SaveData.ID }, SaveData.GetCharacterData().Class);
 			if(PlayerCharacter)
 			{
-				if(PlayerCharacter->GetAssetID() == SaveData.ID)
+				if(!UProcedureModuleBPLibrary::IsCurrentProcedureClass<UProcedure_ArchiveCreating>())
 				{
-					bNeedSpawn = false;
+					PlayerCharacter->Execute_SetActorVisible(PlayerCharacter, false);
 				}
-				SaveData.SpawnLocation = PlayerCharacter->GetActorLocation();
+				SetPlayerPawn(PlayerCharacter);
 			}
-			if(bNeedSpawn)
-			{
-				UnloadData(InPhase);
-				PlayerCharacter = UObjectPoolModuleBPLibrary::SpawnObject<ADWPlayerCharacter>({ &SaveData.ID }, SaveData.GetCharacterData().Class);
-				if(PlayerCharacter)
-				{
-					if(UProcedureModuleBPLibrary::IsCurrentProcedureClass<UProcedure_Starting>())
-					{
-						PlayerCharacter->Execute_SetActorVisible(PlayerCharacter, false);
-					}
-					SetPlayerPawn(PlayerCharacter);
-				}
-			}
-			break;
-		}
-		case EPhase::Lesser:
-		case EPhase::Final:
-		{
-			break;
 		}
 	}
-	if(PlayerCharacter)
+	if(PHASEC(InPhase, EPhase::All))
 	{
-		PlayerCharacter->LoadSaveData(&SaveData, InPhase);
+		if(PlayerCharacter)
+		{
+			PlayerCharacter->LoadSaveData(&SaveData, InPhase);
+		}
 	}
 }
 
@@ -125,23 +121,17 @@ FSaveData* ADWPlayerController::ToData(bool bRefresh)
 void ADWPlayerController::UnloadData(EPhase InPhase)
 {
 	ADWPlayerCharacter* PlayerCharacter = GetPlayerPawn<ADWPlayerCharacter>();
+	
 	if(PlayerCharacter)
 	{
-		switch(InPhase)
+		if(PHASEC(InPhase, EPhase::Primary))
 		{
-			case EPhase::Primary:
-			{
-				UObjectPoolModuleBPLibrary::DespawnObject(PlayerCharacter);
-				SetPlayerPawn(nullptr);
-				break;
-			}
-			case EPhase::Lesser:
-			case EPhase::Final:
-			{
-				UnPossess();
-				PlayerCharacter->Execute_SetActorVisible(PlayerCharacter, false);
-				break;
-			}
+			UObjectPoolModuleBPLibrary::DespawnObject(PlayerCharacter);
+			SetPlayerPawn(nullptr);
+		}
+		if(PHASEC(InPhase, EPhase::Lesser) || PHASEC(InPhase, EPhase::Final))
+		{
+			PlayerCharacter->Execute_SetActorVisible(PlayerCharacter, false);
 		}
 	}
 }
@@ -168,8 +158,7 @@ void ADWPlayerController::OnUnPossess()
 
 void ADWPlayerController::SetPlayerPawn(APawn* InPlayerPawn)
 {
-	if(InPlayerPawn->IsA<ADWPlayerCharacter>())
-	{
-		Super::SetPlayerPawn(InPlayerPawn);
-	}
+	if(InPlayerPawn && !InPlayerPawn->IsA<ADWPlayerCharacter>()) return;
+
+	Super::SetPlayerPawn(InPlayerPawn);
 }

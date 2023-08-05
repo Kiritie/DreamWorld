@@ -5,6 +5,7 @@
 
 #include "AchievementSubSystem.h"
 #include "Audio/AudioModuleBPLibrary.h"
+#include "Camera/CameraModule.h"
 #include "Camera/CameraModuleBPLibrary.h"
 #include "Character/CharacterModuleBPLibrary.h"
 #include "Character/Player/DWPlayerCharacter.h"
@@ -57,10 +58,9 @@ void UProcedure_Playing::OnEnter(UProcedureBase* InLastProcedure)
 		if(ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerPawn<ADWPlayerCharacter>())
 		{
 			PlayerCharacter->Execute_SetActorVisible(PlayerCharacter, true);
-			//PlayerCharacter->RefreshAttributes();
-			const FRotator CameraRotation = USaveGameModuleBPLibrary::GetSaveGame<UDWArchiveSaveGame>()->GetSaveDataRef<FDWArchiveSaveData>().PlayerData.CameraRotation;
-			const float CameraDistance = USaveGameModuleBPLibrary::GetSaveGame<UDWGeneralSaveGame>()->GetSaveDataRef<FDWGeneralSaveData>().CameraDistance;
-			UCameraModuleBPLibrary::SetCameraRotationAndDistance(CameraRotation.Yaw, CameraRotation.Pitch, CameraDistance, true);
+			const auto& PlayerData = USaveGameModuleBPLibrary::GetSaveGame<UDWArchiveSaveGame>()->GetSaveDataRef<FDWArchiveSaveData>().PlayerData;
+			UCameraModuleBPLibrary::SetCameraRotationAndDistance(PlayerData.CameraRotation.Yaw, PlayerData.CameraRotation.Pitch, PlayerData.CameraDistance, true);
+			AMainModule::UnPauseModuleByClass<ACameraModule>();
 		}
 	}
 	AMainModule::UnPauseModuleByClass<ASceneModule>();

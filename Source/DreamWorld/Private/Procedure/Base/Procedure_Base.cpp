@@ -34,7 +34,7 @@ void UProcedure_Base::OnEnter(UProcedureBase* InLastProcedure)
 {
 	if(BGMSound)
 	{
-		UAudioModuleBPLibrary::PlaySingleSound2D(BGMSound);
+		BGMHandle = UAudioModuleBPLibrary::PlaySingleSound2D(BGMSound);
 	}
 	Super::OnEnter(InLastProcedure);
 }
@@ -57,4 +57,9 @@ void UProcedure_Base::OnGuide()
 void UProcedure_Base::OnLeave(UProcedureBase* InNextProcedure)
 {
 	Super::OnLeave(InNextProcedure);
+
+	if(BGMHandle.IsValid())
+	{
+		UAudioModuleBPLibrary::StopSingleSound(BGMHandle);
+	}
 }

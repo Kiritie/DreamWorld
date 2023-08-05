@@ -112,22 +112,6 @@ void ADWVoxelModule::OnTermination_Implementation(EPhase InPhase)
 void ADWVoxelModule::LoadData(FSaveData* InSaveData, EPhase InPhase)
 {
 	Super::LoadData(InSaveData, InPhase);
-
-	auto& SaveData = InSaveData->CastRef<FDWVoxelWorldSaveData>();
-
-	switch(InPhase)
-	{
-		case EPhase::Primary:
-		{
-			WorldData->CastRef<FDWVoxelWorldSaveData>().ChunkDatas = SaveData.ChunkDatas;
-			break;
-		}
-		case EPhase::Lesser:
-		case EPhase::Final:
-		{
-			break;
-		}
-	}
 }
 
 FSaveData* ADWVoxelModule::ToData(bool bRefresh)

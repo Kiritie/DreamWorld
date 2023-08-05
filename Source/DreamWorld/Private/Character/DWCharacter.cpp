@@ -215,105 +215,96 @@ void ADWCharacter::LoadData(FSaveData* InSaveData, EPhase InPhase)
 {
 	auto& SaveData = InSaveData->CastRef<FDWCharacterSaveData>();
 
-	switch(InPhase)
+	if(PHASEC(InPhase, EPhase::Primary))
 	{
-		case EPhase::Primary:
+		SetControlMode(SaveData.ControlMode);
+		SetTeamID(SaveData.TeamID);
+
+		if(SaveData.IsSaved())
 		{
-			SetControlMode(SaveData.ControlMode);
-			SetTeamID(SaveData.TeamID);
+			BirthLocation = SaveData.BirthLocation;
+			FallingAttackAbility = SaveData.FallingAttackAbility;
+			AttackAbilities = SaveData.AttackAbilities;
+			SkillAbilities = SaveData.SkillAbilities;
+			ActionAbilities = SaveData.ActionAbilities;
 
-			if(SaveData.IsSaved())
+			for(auto& Iter : AttackAbilities)
 			{
-				BirthLocation = SaveData.BirthLocation;
-				FallingAttackAbility = SaveData.FallingAttackAbility;
-				AttackAbilities = SaveData.AttackAbilities;
-				SkillAbilities = SaveData.SkillAbilities;
-				ActionAbilities = SaveData.ActionAbilities;
-
-				for(auto& Iter : AttackAbilities)
+				for(auto& Iter1 : Iter.Value.Array)
 				{
-					for(auto& Iter1 : Iter.Value.Array)
-					{
-						Iter1.AbilityHandle = AbilitySystem->K2_GiveAbility(Iter1.AbilityClass, Iter1.AbilityLevel);
-					}
+					Iter1.AbilityHandle = AbilitySystem->K2_GiveAbility(Iter1.AbilityClass, Iter1.AbilityLevel);
 				}
-			
-				for(auto& Iter : SkillAbilities)
+			}
+		
+			for(auto& Iter : SkillAbilities)
+			{
+				Iter.Value.AbilityHandle = AbilitySystem->K2_GiveAbility(Iter.Value.AbilityClass, Iter.Value.AbilityLevel);
+			}
+
+			for(auto& Iter : ActionAbilities)
+			{
+				Iter.Value.AbilityHandle = AbilitySystem->K2_GiveAbility(Iter.Value.AbilityClass, Iter.Value.AbilityLevel);
+			}
+
+			if (FallingAttackAbility.AbilityClass)
+			{
+				FallingAttackAbility.AbilityHandle = AbilitySystem->K2_GiveAbility(FallingAttackAbility.AbilityClass, FallingAttackAbility.AbilityLevel);
+			}
+		}
+		else
+		{
+			BirthLocation = SaveData.SpawnLocation;
+
+			const UDWCharacterData& CharacterData = GetCharacterData<UDWCharacterData>();
+			if(CharacterData.IsValid())
+			{
+				TArray<FDWCharacterAttackAbilityData> attackAbilities;
+				UAssetModuleBPLibrary::ReadDataTable(CharacterData.AttackAbilityTable, attackAbilities);
+				for(auto Iter : attackAbilities)
 				{
-					Iter.Value.AbilityHandle = AbilitySystem->K2_GiveAbility(Iter.Value.AbilityClass, Iter.Value.AbilityLevel);
+					Iter.AbilityHandle = AbilitySystem->K2_GiveAbility(Iter.AbilityClass, Iter.AbilityLevel);
+					if(!AttackAbilities.Contains(Iter.WeaponType)) AttackAbilities.Add(Iter.WeaponType);
+					AttackAbilities[Iter.WeaponType].Array.Add(Iter);
 				}
 
-				for(auto& Iter : ActionAbilities)
+				TArray<FDWCharacterSkillAbilityData> skillAbilities;
+				UAssetModuleBPLibrary::ReadDataTable(CharacterData.SkillAbilityTable, skillAbilities);
+				for(auto Iter : skillAbilities)
 				{
-					Iter.Value.AbilityHandle = AbilitySystem->K2_GiveAbility(Iter.Value.AbilityClass, Iter.Value.AbilityLevel);
+					Iter.AbilityHandle = AbilitySystem->K2_GiveAbility(Iter.AbilityClass, Iter.AbilityLevel);
+					SkillAbilities.Add(Iter.AbilityID, Iter);
 				}
 
-				if (FallingAttackAbility.AbilityClass)
+				TArray<FDWCharacterActionAbilityData> actionAbilities;
+				UAssetModuleBPLibrary::ReadDataTable(CharacterData.ActionAbilityTable, actionAbilities);
+				for(auto Iter : actionAbilities)
 				{
+					Iter.AbilityHandle = AbilitySystem->K2_GiveAbility(Iter.AbilityClass, Iter.AbilityLevel);
+					ActionAbilities.Add(Iter.ActionType, Iter);
+				}
+
+				if (CharacterData.FallingAttackAbility.AbilityClass)
+				{
+					FallingAttackAbility = CharacterData.FallingAttackAbility;
 					FallingAttackAbility.AbilityHandle = AbilitySystem->K2_GiveAbility(FallingAttackAbility.AbilityClass, FallingAttackAbility.AbilityLevel);
 				}
+			
 			}
-			else
-			{
-				BirthLocation = SaveData.SpawnLocation;
-
-				const UDWCharacterData& CharacterData = GetCharacterData<UDWCharacterData>();
-				if(CharacterData.IsValid())
-				{
-					TArray<FDWCharacterAttackAbilityData> attackAbilities;
-					UAssetModuleBPLibrary::ReadDataTable(CharacterData.AttackAbilityTable, attackAbilities);
-					for(auto Iter : attackAbilities)
-					{
-						Iter.AbilityHandle = AbilitySystem->K2_GiveAbility(Iter.AbilityClass, Iter.AbilityLevel);
-						if(!AttackAbilities.Contains(Iter.WeaponType)) AttackAbilities.Add(Iter.WeaponType);
-						AttackAbilities[Iter.WeaponType].Array.Add(Iter);
-					}
-
-					TArray<FDWCharacterSkillAbilityData> skillAbilities;
-					UAssetModuleBPLibrary::ReadDataTable(CharacterData.SkillAbilityTable, skillAbilities);
-					for(auto Iter : skillAbilities)
-					{
-						Iter.AbilityHandle = AbilitySystem->K2_GiveAbility(Iter.AbilityClass, Iter.AbilityLevel);
-						SkillAbilities.Add(Iter.AbilityID, Iter);
-					}
-
-					TArray<FDWCharacterActionAbilityData> actionAbilities;
-					UAssetModuleBPLibrary::ReadDataTable(CharacterData.ActionAbilityTable, actionAbilities);
-					for(auto Iter : actionAbilities)
-					{
-						Iter.AbilityHandle = AbilitySystem->K2_GiveAbility(Iter.AbilityClass, Iter.AbilityLevel);
-						ActionAbilities.Add(Iter.ActionType, Iter);
-					}
-
-					if (CharacterData.FallingAttackAbility.AbilityClass)
-					{
-						FallingAttackAbility = CharacterData.FallingAttackAbility;
-						FallingAttackAbility.AbilityHandle = AbilitySystem->K2_GiveAbility(FallingAttackAbility.AbilityClass, FallingAttackAbility.AbilityLevel);
-					}
-				
-				}
-			}
-			break;
 		}
-		case EPhase::Lesser:
+	}
+	if(PHASEC(InPhase, EPhase::Final))
+	{
+		if(!SaveData.IsSaved() && !IsPlayer())
 		{
-			break;
-		}
-		case EPhase::Final:
-		{
-			if(!SaveData.IsSaved() && !IsPlayer())
+			auto EquipDatas = UAssetModuleBPLibrary::LoadPrimaryAssets<UAbilityEquipDataBase>(UAbilityModuleBPLibrary::ItemTypeToAssetType(EAbilityItemType::Equip));
+			const int32 EquipNum = FMath::Clamp(FMath::Rand() < 0.2f ? FMath::RandRange(1, 3) : 0, 0, EquipDatas.Num());
+			for (int32 i = 0; i < EquipNum; i++)
 			{
-				auto EquipDatas = UAssetModuleBPLibrary::LoadPrimaryAssets<UAbilityEquipDataBase>(UAbilityModuleBPLibrary::ItemTypeToAssetType(EAbilityItemType::Equip));
-				const int32 EquipNum = FMath::Clamp(FMath::Rand() < 0.2f ? FMath::RandRange(1, 3) : 0, 0, EquipDatas.Num());
-				for (int32 i = 0; i < EquipNum; i++)
-				{
-					FAbilityItem tmpItem = FAbilityItem(EquipDatas[FMath::RandRange(0, EquipDatas.Num() - 1)]->GetPrimaryAssetId(), 1);
-					SaveData.InventoryData.AddItem(tmpItem);
-				}
+				FAbilityItem tmpItem = FAbilityItem(EquipDatas[FMath::RandRange(0, EquipDatas.Num() - 1)]->GetPrimaryAssetId(), 1);
+				SaveData.InventoryData.AddItem(tmpItem);
 			}
-			break;
 		}
-	}	
+	}
 
 	Super::LoadData(InSaveData, InPhase);
 }
@@ -347,10 +338,7 @@ void ADWCharacter::SetActorVisible_Implementation(bool bNewVisible)
 {
 	Super::SetActorVisible_Implementation(bNewVisible);
 
-	if(bNewVisible)
-	{
-		SetControlMode(ControlMode);
-	}
+	SetControlMode(ControlMode);
 }
 
 void ADWCharacter::RefreshState()
@@ -1045,29 +1033,6 @@ bool ADWCharacter::IsBreakAllInput() const
 	return AbilitySystem->HasMatchingGameplayTag(GetCharacterData<UDWCharacterData>().BreakAllInputTag);
 }
 
-void ADWCharacter::SetControlMode(EDWCharacterControlMode InControlMode)
-{
-	ControlMode = InControlMode;
-
-	if(!Execute_IsVisible(this)) return;
-
-	switch (ControlMode)
-	{
-		case EDWCharacterControlMode::Fighting:
-		{
-			if(GetWeapon()) GetWeapon()->Execute_SetActorVisible(GetWeapon(), true);
-			if(GetShield()) GetShield()->Execute_SetActorVisible(GetShield(), true);
-			break;
-		}
-		case EDWCharacterControlMode::Creating:
-		{
-			if(GetWeapon()) GetWeapon()->Execute_SetActorVisible(GetWeapon(), false);
-			if(GetShield()) GetShield()->Execute_SetActorVisible(GetShield(), false);
-			break;
-		}
-	}
-}
-
 UWidgetCharacterHP* ADWCharacter::GetCharacterHPWidget() const
 {
 	if (CharacterHP->GetWorldWidget())
@@ -1120,6 +1085,27 @@ bool ADWCharacter::SetLevelV(int32 InLevel)
 		GetCharacterHPWidget()->SetHeadInfo(GetHeadInfo());
 	}
 	return true;
+}
+
+void ADWCharacter::SetControlMode_Implementation(EDWCharacterControlMode InControlMode)
+{
+	ControlMode = InControlMode;
+
+	switch (ControlMode)
+	{
+		case EDWCharacterControlMode::Fighting:
+		{
+			if(GetWeapon()) GetWeapon()->Execute_SetActorVisible(GetWeapon(), Execute_IsVisible(this));
+			if(GetShield()) GetShield()->Execute_SetActorVisible(GetShield(), Execute_IsVisible(this));
+			break;
+		}
+		case EDWCharacterControlMode::Creating:
+		{
+			if(GetWeapon()) GetWeapon()->Execute_SetActorVisible(GetWeapon(), false);
+			if(GetShield()) GetShield()->Execute_SetActorVisible(GetShield(), false);
+			break;
+		}
+	}
 }
 
 void ADWCharacter::SetTeamID(FName InTeamID)

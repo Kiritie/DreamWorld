@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Audio/AudioModuleTypes.h"
 #include "Procedure/Base/ProcedureBase.h"
 #include "Procedure_Base.generated.h"
 
@@ -43,4 +44,6 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "Camera")
 	float CameraRotationSpeed;
+
+	FSingleSoundHandle BGMHandle;
 };

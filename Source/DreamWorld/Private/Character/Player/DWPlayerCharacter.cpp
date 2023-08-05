@@ -139,76 +139,70 @@ void ADWPlayerCharacter::LoadData(FSaveData* InSaveData, EPhase InPhase)
 {
 	auto& SaveData = InSaveData->CastRef<FDWPlayerSaveData>();
 	
-	switch(InPhase)
+	if(PHASEC(InPhase, EPhase::All))
 	{
-		case EPhase::Primary:
-		case EPhase::Lesser:
-		case EPhase::Final:
+		SetBodyColor(SaveData.BodyColorIndex);
+		SetCapeColor(SaveData.CapeColorIndex);
+
+		if(!SaveData.IsSaved())
 		{
-			SetBodyColor(SaveData.BodyColorIndex);
-			SetCapeColor(SaveData.CapeColorIndex);
-
-			if(!SaveData.IsSaved())
+			switch (SaveData.InventoryInitType)
 			{
-				switch (SaveData.InventoryInitType)
+				case EDWPlayerInventoryInitType::Default:
 				{
-					case EDWPlayerInventoryInitType::Default:
-					{
-						SaveData.InventoryData = GetCharacterData<UDWPlayerCharacterData>().InventoryData;
-						break;
-					}
-					case EDWPlayerInventoryInitType::Empty:
-					{
-						SaveData.InventoryData = GetCharacterData<UDWPlayerCharacterData>().InventoryData;
-						SaveData.InventoryData.ClearAllItem();
-						break;
-					}
-					case EDWPlayerInventoryInitType::All:
-					{
-						SaveData.InventoryData = GetCharacterData<UDWPlayerCharacterData>().InventoryData;
+					SaveData.InventoryData = GetCharacterData<UDWPlayerCharacterData>().InventoryData;
+					break;
+				}
+				case EDWPlayerInventoryInitType::Empty:
+				{
+					SaveData.InventoryData = GetCharacterData<UDWPlayerCharacterData>().InventoryData;
+					SaveData.InventoryData.ClearAllItem();
+					break;
+				}
+				case EDWPlayerInventoryInitType::All:
+				{
+					SaveData.InventoryData = GetCharacterData<UDWPlayerCharacterData>().InventoryData;
 
-						auto VoxelDatas = UAssetModuleBPLibrary::LoadPrimaryAssets<UVoxelData>(UAbilityModuleBPLibrary::ItemTypeToAssetType(EAbilityItemType::Voxel));
-						for (int32 i = 0; i < VoxelDatas.Num(); i++)
+					auto VoxelDatas = UAssetModuleBPLibrary::LoadPrimaryAssets<UVoxelData>(UAbilityModuleBPLibrary::ItemTypeToAssetType(EAbilityItemType::Voxel));
+					for (int32 i = 0; i < VoxelDatas.Num(); i++)
+					{
+						if(VoxelDatas[i]->VoxelType != EVoxelType::Empty && VoxelDatas[i]->VoxelType != EVoxelType::Unknown && VoxelDatas[i]->PartType == EVoxelPartType::Main)
 						{
-							if(VoxelDatas[i]->VoxelType != EVoxelType::Empty && VoxelDatas[i]->VoxelType != EVoxelType::Unknown && VoxelDatas[i]->PartType == EVoxelPartType::Main)
-							{
-								FAbilityItem tmpItem = FAbilityItem(VoxelDatas[i]->GetPrimaryAssetId(), VoxelDatas[i]->MaxCount);
-								SaveData.InventoryData.AddItem(tmpItem);
-							}
-						}
-		
-						auto RawDatas = UAssetModuleBPLibrary::LoadPrimaryAssets<UAbilityRawDataBase>(UAbilityModuleBPLibrary::ItemTypeToAssetType(EAbilityItemType::Raw));
-						for (int32 i = 0; i < RawDatas.Num(); i++)
-						{
-							FAbilityItem tmpItem = FAbilityItem(RawDatas[i]->GetPrimaryAssetId(), RawDatas[i]->MaxCount);
+							FAbilityItem tmpItem = FAbilityItem(VoxelDatas[i]->GetPrimaryAssetId(), VoxelDatas[i]->MaxCount);
 							SaveData.InventoryData.AddItem(tmpItem);
 						}
-		
-						auto EquipDatas = UAssetModuleBPLibrary::LoadPrimaryAssets<UAbilityEquipDataBase>(UAbilityModuleBPLibrary::ItemTypeToAssetType(EAbilityItemType::Equip));
-						for (int32 i = 0; i < EquipDatas.Num(); i++)
-						{
-							FAbilityItem tmpItem = FAbilityItem(EquipDatas[i]->GetPrimaryAssetId(), EquipDatas[i]->MaxCount);
-							SaveData.InventoryData.AddItem(tmpItem);
-						}
-			
-						auto PropDatas = UAssetModuleBPLibrary::LoadPrimaryAssets<UAbilityPropDataBase>(UAbilityModuleBPLibrary::ItemTypeToAssetType(EAbilityItemType::Prop));
-						for (int32 i = 0; i < PropDatas.Num(); i++)
-						{
-							FAbilityItem tmpItem = FAbilityItem(PropDatas[i]->GetPrimaryAssetId(), PropDatas[i]->MaxCount);
-							SaveData.InventoryData.AddItem(tmpItem);
-						}
-
-						auto SkillDatas = UAssetModuleBPLibrary::LoadPrimaryAssets<UAbilitySkillDataBase>(UAbilityModuleBPLibrary::ItemTypeToAssetType(EAbilityItemType::Skill));
-						for (int32 i = 0; i < SkillDatas.Num(); i++)
-						{
-							FAbilityItem tmpItem = FAbilityItem(SkillDatas[i]->GetPrimaryAssetId(), SkillDatas[i]->MaxCount);
-							SaveData.InventoryData.AddItem(tmpItem);
-						}
-						break;
 					}
+	
+					auto RawDatas = UAssetModuleBPLibrary::LoadPrimaryAssets<UAbilityRawDataBase>(UAbilityModuleBPLibrary::ItemTypeToAssetType(EAbilityItemType::Raw));
+					for (int32 i = 0; i < RawDatas.Num(); i++)
+					{
+						FAbilityItem tmpItem = FAbilityItem(RawDatas[i]->GetPrimaryAssetId(), RawDatas[i]->MaxCount);
+						SaveData.InventoryData.AddItem(tmpItem);
+					}
+	
+					auto EquipDatas = UAssetModuleBPLibrary::LoadPrimaryAssets<UAbilityEquipDataBase>(UAbilityModuleBPLibrary::ItemTypeToAssetType(EAbilityItemType::Equip));
+					for (int32 i = 0; i < EquipDatas.Num(); i++)
+					{
+						FAbilityItem tmpItem = FAbilityItem(EquipDatas[i]->GetPrimaryAssetId(), EquipDatas[i]->MaxCount);
+						SaveData.InventoryData.AddItem(tmpItem);
+					}
+		
+					auto PropDatas = UAssetModuleBPLibrary::LoadPrimaryAssets<UAbilityPropDataBase>(UAbilityModuleBPLibrary::ItemTypeToAssetType(EAbilityItemType::Prop));
+					for (int32 i = 0; i < PropDatas.Num(); i++)
+					{
+						FAbilityItem tmpItem = FAbilityItem(PropDatas[i]->GetPrimaryAssetId(), PropDatas[i]->MaxCount);
+						SaveData.InventoryData.AddItem(tmpItem);
+					}
+
+					auto SkillDatas = UAssetModuleBPLibrary::LoadPrimaryAssets<UAbilitySkillDataBase>(UAbilityModuleBPLibrary::ItemTypeToAssetType(EAbilityItemType::Skill));
+					for (int32 i = 0; i < SkillDatas.Num(); i++)
+					{
+						FAbilityItem tmpItem = FAbilityItem(SkillDatas[i]->GetPrimaryAssetId(), SkillDatas[i]->MaxCount);
+						SaveData.InventoryData.AddItem(tmpItem);
+					}
+					break;
 				}
 			}
-			break;
 		}
 	}
 
@@ -221,6 +215,7 @@ FSaveData* ADWPlayerCharacter::ToData(bool bRefresh)
 	SaveData = Super::ToData(bRefresh)->CastRef<FDWCharacterSaveData>();
 	
 	SaveData.CameraRotation = UCameraModuleBPLibrary::GetCameraRotation();
+	SaveData.CameraDistance = UCameraModuleBPLibrary::GetCameraDistance();
 	SaveData.BodyColorIndex = GetBodyColor();
 	SaveData.CapeColorIndex = GetCapeColor();
 	return &SaveData;
@@ -271,17 +266,11 @@ FString ADWPlayerCharacter::GetHeadInfo() const
 void ADWPlayerCharacter::SetActorVisible_Implementation(bool bNewVisible)
 {
 	Super::SetActorVisible_Implementation(bNewVisible);
-
-	if(bNewVisible && ControlMode == EDWCharacterControlMode::Fighting)
-	{
-		if(GenerateVoxelEntity) GenerateVoxelEntity->Execute_SetActorVisible(GenerateVoxelEntity, false);
-		HammerMesh->SetVisibility(false);
-	}
 }
 
-void ADWPlayerCharacter::SetControlMode(EDWCharacterControlMode InControlMode)
+void ADWPlayerCharacter::SetControlMode_Implementation(EDWCharacterControlMode InControlMode)
 {
-	Super::SetControlMode(InControlMode);
+	Super::SetControlMode_Implementation(InControlMode);
 
 	switch (ControlMode)
 	{

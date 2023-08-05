@@ -387,16 +387,21 @@ struct DREAMWORLD_API FDWPlayerBasicSaveData : public FDWCharacterSaveData
 public:
 	FORCEINLINE FDWPlayerBasicSaveData()
 	{
-		CameraRotation = FRotator::ZeroRotator;
+		CameraRotation = FRotator(-1.f);
+		CameraDistance = -1.f;
 	}
 
 	FORCEINLINE FDWPlayerBasicSaveData(const FDWCharacterSaveData& InCharacterSaveData) : FDWCharacterSaveData(InCharacterSaveData)
 	{
-		CameraRotation = FRotator::ZeroRotator;
+		CameraRotation = FRotator(-1.f);
+		CameraDistance = -1.f;
 	}
 
 	UPROPERTY()
 	FRotator CameraRotation;
+
+	UPROPERTY()
+	float CameraDistance;
 };
 
 UENUM(BlueprintType)
@@ -598,21 +603,16 @@ public:
 	FORCEINLINE FDWGeneralSaveData()
 	{
 		bAutoJump = true;
-		CameraDistance = 200.f;
 	}
 
 	FORCEINLINE FDWGeneralSaveData(const FGeneralSaveData& InGeneralSaveData) : FGeneralSaveData(InGeneralSaveData)
 	{
 		bAutoJump = true;
-		CameraDistance = 200.f;
 	}
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bAutoJump;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float CameraDistance;
 };
 
 USTRUCT(BlueprintType)

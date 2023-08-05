@@ -31,13 +31,6 @@ ADWHumanCharacter::ADWHumanCharacter()
 
 	GetMesh()->SetRelativeLocation(FVector(0, 0, -70));
 
-	HammerMesh = CreateDefaultSubobject<USkeletalMeshComponent>(FName("HammerMesh"));
-	HammerMesh->SetupAttachment(GetMesh(), FName("HammerMesh"));
-	HammerMesh->SetRelativeLocationAndRotation(FVector(0, 0, 0), FRotator(0, 0, 0));
-	HammerMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	HammerMesh->SetCastShadow(false);
-	HammerMesh->SetVisibility(false);
-
 	GenerateVoxelEntity = nullptr;
 	AuxiliaryVoxelEntity = nullptr;
 }
@@ -134,24 +127,20 @@ void ADWHumanCharacter::RefreshEquip(EDWEquipPartType InPartType, const FAbility
 	}
 }
 
-void ADWHumanCharacter::SetControlMode(EDWCharacterControlMode InControlMode)
+void ADWHumanCharacter::SetControlMode_Implementation(EDWCharacterControlMode InControlMode)
 {
-	Super::SetControlMode(InControlMode);
+	Super::SetControlMode_Implementation(InControlMode);
 
-	if(!Execute_IsVisible(this)) return;
-	
 	switch (ControlMode)
 	{
 		case EDWCharacterControlMode::Fighting:
 		{
 			if(GenerateVoxelEntity) GenerateVoxelEntity->Execute_SetActorVisible(GenerateVoxelEntity, false);
-			HammerMesh->SetVisibility(false);
 			break;
 		}
 		case EDWCharacterControlMode::Creating:
 		{
-			if(GenerateVoxelEntity) GenerateVoxelEntity->Execute_SetActorVisible(GenerateVoxelEntity, true);
-			HammerMesh->SetVisibility(true);
+			if(GenerateVoxelEntity) GenerateVoxelEntity->Execute_SetActorVisible(GenerateVoxelEntity, Execute_IsVisible(this));
 			break;
 		}
 	}

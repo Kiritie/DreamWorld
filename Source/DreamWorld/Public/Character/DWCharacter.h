@@ -398,8 +398,8 @@ public:
 
 	virtual bool SetLevelV(int32 InLevel) override;
 
-	UFUNCTION(BlueprintCallable)
-	virtual void SetControlMode(EDWCharacterControlMode InControlMode);
+	UFUNCTION(BlueprintNativeEvent)
+	void SetControlMode(EDWCharacterControlMode InControlMode);
 
 	UFUNCTION(BlueprintPure)
 	EDWCharacterControlMode GetControlMode() const { return ControlMode; }

@@ -47,6 +47,8 @@ void UProcedure_Starting::OnUnGenerate()
 void UProcedure_Starting::OnInitialize()
 {
 	Super::OnInitialize();
+	
+	UGlobalBPLibrary::GetPlayerController<ADWPlayerController>()->OnPlayerPawnChanged.AddDynamic(this, &UProcedure_Starting::OnPlayerChanged);
 }
 
 void UProcedure_Starting::OnEnter(UProcedureBase* InLastProcedure)
@@ -65,8 +67,6 @@ void UProcedure_Starting::OnEnter(UProcedureBase* InLastProcedure)
 	}
 	AMainModule::PauseModuleByClass<ASceneModule>();
 
-	SetOperationTarget(UGlobalBPLibrary::GetPossessedPawn());
-	
 	Super::OnEnter(InLastProcedure);
 }
 
@@ -83,6 +83,9 @@ void UProcedure_Starting::OnGuide()
 void UProcedure_Starting::OnLeave(UProcedureBase* InNextProcedure)
 {
 	Super::OnLeave(InNextProcedure);
+}
 
-	SetOperationTarget(nullptr);
+void UProcedure_Starting::OnPlayerChanged(APawn* InPlayerPawn)
+{
+	SetOperationTarget(InPlayerPawn);
 }

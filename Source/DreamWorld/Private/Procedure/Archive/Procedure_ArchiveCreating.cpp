@@ -50,13 +50,11 @@ void UProcedure_ArchiveCreating::OnInitialize()
 {
 	Super::OnInitialize();
 
-	UGlobalBPLibrary::GetPlayerController<ADWPlayerController>()->GetOnPlayerPawnChanged().AddDynamic(this, &UProcedure_ArchiveCreating::OnPlayerChanged);
+	UGlobalBPLibrary::GetPlayerController<ADWPlayerController>()->OnPlayerPawnChanged.AddDynamic(this, &UProcedure_ArchiveCreating::OnPlayerChanged);
 }
 
 void UProcedure_ArchiveCreating::OnEnter(UProcedureBase* InLastProcedure)
 {
-	SetOperationTarget(UGlobalBPLibrary::GetPossessedPawn());
-
 	Super::OnEnter(InLastProcedure);
 
 	if(OperationTarget && OperationTarget->Implements<USceneActorInterface>())
@@ -108,7 +106,6 @@ void UProcedure_ArchiveCreating::OnLeave(UProcedureBase* InNextProcedure)
 			ISceneActorInterface::Execute_SetActorVisible(OperationTarget, false);
 		}
 	}
-	SetOperationTarget(nullptr);
 }
 
 void UProcedure_ArchiveCreating::OnPlayerChanged(APawn* InPlayerPawn)

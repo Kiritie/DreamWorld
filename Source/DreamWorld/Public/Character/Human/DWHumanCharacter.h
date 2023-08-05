@@ -25,9 +25,6 @@ public:
 	ADWHumanCharacter();
 
 protected:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-	USkeletalMeshComponent* HammerMesh;
-
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	AVoxelEntity* GenerateVoxelEntity;
 	
@@ -51,5 +48,5 @@ public:
 
 	virtual void ClearAttackHitTargets() override;
 
-	virtual void SetControlMode(EDWCharacterControlMode InControlMode) override;
+	virtual void SetControlMode_Implementation(EDWCharacterControlMode InControlMode) override;
 };
