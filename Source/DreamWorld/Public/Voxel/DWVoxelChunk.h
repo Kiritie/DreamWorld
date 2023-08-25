@@ -58,7 +58,7 @@ protected:
 public:
 	virtual void Initialize(FIndex InIndex, int32 InBatch) override;
 
-	virtual void Generate(EPhase InPhase = EPhase::Primary) override;
+	virtual void Generate(EPhase InPhase) override;
 
 	virtual void BuildMap(int32 InStage) override;
 
@@ -68,7 +68,7 @@ public:
 
 	virtual void LoadActors(FSaveData* InSaveData) override;
 
-	virtual void GenerateActors() override;
+	virtual void CreateActors() override;
 
 	virtual void DestroyActors() override;
 

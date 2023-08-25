@@ -21,11 +21,11 @@ UDWArchiveSaveGame::UDWArchiveSaveGame()
 	DWArchiveSaveData = FDWArchiveSaveData();
 }
 
-void UDWArchiveSaveGame::OnCreate_Implementation(int32 InSaveIndex)
+void UDWArchiveSaveGame::OnCreate_Implementation(int32 InIndex)
 {
-	Super::OnCreate_Implementation(InSaveIndex);
+	Super::OnCreate_Implementation(InIndex);
 
-	DWArchiveSaveData.ID = InSaveIndex;
+	DWArchiveSaveData.ID = InIndex;
 	DWArchiveSaveData.WorldData = ADWVoxelModule::Get()->GetWorldBasicData();
 	DWArchiveSaveData.PlayerData = ADWCharacterModule::Get()->GetPlayerBasicData();
 }
@@ -39,40 +39,24 @@ void UDWArchiveSaveGame::OnLoad_Implementation(EPhase InPhase)
 {
 	Super::OnLoad_Implementation(InPhase);
 
-	switch (InPhase)
+	if(PHASEC(InPhase, EPhase::Primary))
 	{
-		case EPhase::Primary:
-		{
-			WHDebug(FString::Printf(TEXT("Loading archive : %d"), DWArchiveSaveData.ID), EDebugMode::All, EDebugCategory::SaveGame);
-		}
-		case EPhase::Final:
-		{
-			AVoxelModule::Get()->LoadSaveData(&DWArchiveSaveData.WorldData, InPhase);
-			UGlobalBPLibrary::GetPlayerController<ADWPlayerController>()->LoadSaveData(&DWArchiveSaveData.PlayerData, InPhase);
-			break;
-		}
-		default: break;
+		WHDebug(FString::Printf(TEXT("Loading archive : %d"), DWArchiveSaveData.ID), EDebugMode::All, EDebugCategory::SaveGame);
 	}
+	AVoxelModule::Get()->LoadSaveData(&DWArchiveSaveData.WorldData, InPhase);
+	UGlobalBPLibrary::GetPlayerController<ADWPlayerController>()->LoadSaveData(&DWArchiveSaveData.PlayerData, InPhase);
 }
 
 void UDWArchiveSaveGame::OnUnload_Implementation(EPhase InPhase)
 {
 	Super::OnUnload_Implementation(InPhase);
 
-	switch (InPhase)
+	if(PHASEC(InPhase, EPhase::Primary))
 	{
-		case EPhase::Primary:
-		{
-			WHDebug(FString::Printf(TEXT("Unloading archive : %d"), DWArchiveSaveData.ID), EDebugMode::All, EDebugCategory::SaveGame);
-		}
-		case EPhase::Final:
-		{
-			ADWVoxelModule::Get()->UnloadSaveData(InPhase);
-			UGlobalBPLibrary::GetPlayerController<ADWPlayerController>()->UnloadSaveData(InPhase);
-			break;
-		}
-		default: break;
+		WHDebug(FString::Printf(TEXT("Unloading archive : %d"), DWArchiveSaveData.ID), EDebugMode::All, EDebugCategory::SaveGame);
 	}
+	ADWVoxelModule::Get()->UnloadSaveData(InPhase);
+	UGlobalBPLibrary::GetPlayerController<ADWPlayerController>()->UnloadSaveData(InPhase);
 }
 
 void UDWArchiveSaveGame::OnRefresh_Implementation()
@@ -86,15 +70,4 @@ void UDWArchiveSaveGame::OnRefresh_Implementation()
 void UDWArchiveSaveGame::OnDestroy_Implementation()
 {
 	Super::OnDestroy_Implementation();
-}
-
-void UDWArchiveSaveGame::OnActiveChange_Implementation(bool bActive)
-{
-	Super::OnActiveChange_Implementation(bActive);
-
-	if(!bActive)
-	{
-		ADWVoxelModule::Get()->UnloadSaveData(EPhase::Primary);
-		UGlobalBPLibrary::GetPlayerController<ADWPlayerController>()->UnloadSaveData(EPhase::Primary);
-	}
 }

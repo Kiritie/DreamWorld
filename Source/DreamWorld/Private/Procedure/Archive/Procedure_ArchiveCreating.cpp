@@ -64,16 +64,16 @@ void UProcedure_ArchiveCreating::OnEnter(UProcedureBase* InLastProcedure)
 
 	if(!InLastProcedure)
 	{
-		if(USaveGameModuleBPLibrary::GetActiveSaveIndex<UDWArchiveSaveGame>() == -1)
+		if(USaveGameModuleBPLibrary::GetSaveGameInfo<UDWArchiveSaveGame>().ActiveIndex == -1)
 		{
-			USaveGameModuleBPLibrary::LoadOrCreateSaveGame<UDWArchiveSaveGame>(-1);
+			USaveGameModuleBPLibrary::LoadOrCreateSaveGame<UDWArchiveSaveGame>(-1, EPhase::Primary);
 			CreatePlayer(PlayerSaveData, EPhase::Lesser);
 			CreateWorld(WorldSaveData, EPhase::Lesser);
 			CreateArchive(USaveGameModuleBPLibrary::GetSaveGame<UDWArchiveSaveGame>()->GetSaveDataRef<FDWArchiveSaveData>());
 		}
 		else
 		{
-			USaveGameModuleBPLibrary::LoadOrCreateSaveGame<UDWArchiveSaveGame>(-1);
+			USaveGameModuleBPLibrary::LoadOrCreateSaveGame<UDWArchiveSaveGame>(-1, EPhase::Primary);
 			UProcedureModuleBPLibrary::SwitchProcedureByClass<UProcedure_Loading>();
 		}
 	}

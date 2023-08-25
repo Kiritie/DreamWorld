@@ -47,6 +47,7 @@
 #include "Widget/WidgetShopPanel.h"
 #include "Procedure/Procedure_Starting.h"
 #include "Procedure/Archive/Procedure_ArchiveCreating.h"
+#include "Character/CharacterModuleBPLibrary.h"
 
 ADWPlayerController::ADWPlayerController()
 {
@@ -96,11 +97,8 @@ void ADWPlayerController::LoadData(FSaveData* InSaveData, EPhase InPhase)
 			PlayerCharacter = UObjectPoolModuleBPLibrary::SpawnObject<ADWPlayerCharacter>({ &SaveData.ID }, SaveData.GetCharacterData().Class);
 			if(PlayerCharacter)
 			{
-				if(!UProcedureModuleBPLibrary::IsCurrentProcedureClass<UProcedure_ArchiveCreating>())
-				{
-					PlayerCharacter->Execute_SetActorVisible(PlayerCharacter, false);
-				}
 				SetPlayerPawn(PlayerCharacter);
+				PlayerCharacter->Execute_SetActorVisible(PlayerCharacter, UProcedureModuleBPLibrary::IsCurrentProcedureClass<UProcedure_ArchiveCreating>());
 			}
 		}
 	}
@@ -110,6 +108,11 @@ void ADWPlayerController::LoadData(FSaveData* InSaveData, EPhase InPhase)
 		{
 			PlayerCharacter->LoadSaveData(&SaveData, InPhase);
 		}
+	}
+	if(PHASEC(InPhase, EPhase::Final))
+	{
+		UCharacterModuleBPLibrary::SwitchCharacter(PlayerCharacter, true, true);
+		UCameraModuleBPLibrary::SetCameraRotationAndDistance(SaveData.CameraRotation.Yaw, SaveData.CameraRotation.Pitch, SaveData.CameraDistance, true);
 	}
 }
 
@@ -129,7 +132,7 @@ void ADWPlayerController::UnloadData(EPhase InPhase)
 			UObjectPoolModuleBPLibrary::DespawnObject(PlayerCharacter);
 			SetPlayerPawn(nullptr);
 		}
-		if(PHASEC(InPhase, EPhase::Lesser) || PHASEC(InPhase, EPhase::Final))
+		if(PHASEC(InPhase, EPhase::LesserAndFinal))
 		{
 			PlayerCharacter->Execute_SetActorVisible(PlayerCharacter, false);
 		}

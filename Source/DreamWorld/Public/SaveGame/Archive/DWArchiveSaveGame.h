@@ -19,7 +19,7 @@ public:
 	UDWArchiveSaveGame();
 
 public:
-	virtual void OnCreate_Implementation(int32 InSaveIndex) override;
+	virtual void OnCreate_Implementation(int32 InIndex) override;
 
 	virtual void OnSave_Implementation() override;
 
@@ -30,8 +30,6 @@ public:
 	virtual void OnRefresh_Implementation() override;
 
 	virtual void OnDestroy_Implementation() override;
-
-	virtual void OnActiveChange_Implementation(bool bActive) override;
 	
 protected:
 	UPROPERTY()

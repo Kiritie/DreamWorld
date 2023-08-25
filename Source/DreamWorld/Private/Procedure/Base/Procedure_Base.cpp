@@ -6,6 +6,8 @@
 #include "Audio/AudioModuleBPLibrary.h"
 #include "Camera/CameraModuleBPLibrary.h"
 
+FSingleSoundHandle UProcedure_Base::BGMHandle = FSingleSoundHandle();
+
 UProcedure_Base::UProcedure_Base()
 {
 	ProcedureDisplayName = FText::FromString(TEXT("根流程"));
@@ -32,11 +34,17 @@ void UProcedure_Base::OnInitialize()
 
 void UProcedure_Base::OnEnter(UProcedureBase* InLastProcedure)
 {
-	if(BGMSound)
+	Super::OnEnter(InLastProcedure);
+
+	if(BGMHandle.IsValid() && UAudioModuleBPLibrary::GetSingleSoundInfo(BGMHandle).Sound != BGMSound)
+	{
+		UAudioModuleBPLibrary::StopSingleSound(BGMHandle);
+		BGMHandle = -1;
+	}
+	if(!BGMHandle.IsValid() && BGMSound)
 	{
 		BGMHandle = UAudioModuleBPLibrary::PlaySingleSound2D(BGMSound);
 	}
-	Super::OnEnter(InLastProcedure);
 }
 
 void UProcedure_Base::OnRefresh()
@@ -57,9 +65,4 @@ void UProcedure_Base::OnGuide()
 void UProcedure_Base::OnLeave(UProcedureBase* InNextProcedure)
 {
 	Super::OnLeave(InNextProcedure);
-
-	if(BGMHandle.IsValid())
-	{
-		UAudioModuleBPLibrary::StopSingleSound(BGMHandle);
-	}
 }

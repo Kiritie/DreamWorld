@@ -59,8 +59,6 @@ void ADWVitality::OnSpawn_Implementation(const TArray<FParameter>& InParams)
 void ADWVitality::OnDespawn_Implementation(bool bRecovery)
 {
 	Super::OnDespawn_Implementation(bRecovery);
-
-	Inventory->UnloadSaveData(EPhase::Primary);
 }
 
 void ADWVitality::Serialize(FArchive& Ar)

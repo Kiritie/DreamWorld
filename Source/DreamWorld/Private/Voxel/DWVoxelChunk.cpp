@@ -57,12 +57,12 @@ FSaveData* ADWVoxelChunk::ToData(bool bRefresh)
 
 	for(auto& Iter : Characters)
 	{
-		SaveData.CharacterDatas.Add(Iter->GetSaveDataRef<FDWCharacterSaveData>(true));
+		SaveData.CharacterDatas.Add(Iter->GetSaveDataRef<FDWCharacterSaveData>(bRefresh));
 	}
 
 	for(auto& Iter : Vitalitys)
 	{
-		SaveData.VitalityDatas.Add(Iter->GetSaveDataRef<FDWVitalitySaveData>(true));
+		SaveData.VitalityDatas.Add(Iter->GetSaveDataRef<FDWVitalitySaveData>(bRefresh));
 	}
 
 	return &SaveData;
@@ -172,82 +172,82 @@ void ADWVoxelChunk::LoadActors(FSaveData* InSaveData)
 	Super::LoadActors(InSaveData);
 
 	auto& SaveData = InSaveData->CastRef<FDWVoxelChunkSaveData>();
-	for(int32 i = 0; i < SaveData.VitalityDatas.Num(); i++)
+	for(auto& Iter : SaveData.VitalityDatas)
 	{
-		UAbilityModuleBPLibrary::SpawnVitality(&SaveData.VitalityDatas[i], this);
+		UAbilityModuleBPLibrary::SpawnVitality(&Iter, this);
 	}
-	for(int32 i = 0; i < SaveData.CharacterDatas.Num(); i++)
+	for(auto& Iter : SaveData.CharacterDatas)
 	{
-		UAbilityModuleBPLibrary::SpawnCharacter(&SaveData.CharacterDatas[i], this);
+		UAbilityModuleBPLibrary::SpawnCharacter(&Iter, this);
 	}
 }
 
-void ADWVoxelChunk::GenerateActors()
+void ADWVoxelChunk::CreateActors()
 {
-	Super::GenerateActors();
+	Super::CreateActors();
 
-	const auto& worldData = AVoxelModule::Get()->GetWorldData();
-	const FVector2D worldLocation = FVector2D(GetChunkLocation().X + worldData.GetChunkRealSize().X * 0.5f, GetChunkLocation().Y + worldData.GetChunkRealSize().Y * 0.5f);
+	const auto& WorldData = AVoxelModule::Get()->GetWorldData();
+	const FVector2D WorldLocation = FVector2D(GetChunkLocation().X + WorldData.GetChunkRealSize().X * 0.5f, GetChunkLocation().Y + WorldData.GetChunkRealSize().Y * 0.5f);
 	
-	TArray<FVitalityRaceData> vitalityRaceDatas;
-	if(UAbilityModuleBPLibrary::GetNoiseRaceDatas(worldLocation, worldData.WorldSeed, vitalityRaceDatas))
+	TArray<FVitalityRaceData> VitalityRaceDatas;
+	if(UAbilityModuleBPLibrary::GetNoiseRaceDatas(WorldLocation, WorldData.WorldSeed, VitalityRaceDatas))
 	{
-		for(auto& raceData : vitalityRaceDatas)
+		for(auto& RaceData : VitalityRaceDatas)
 		{
-			for(auto& vitalityItem : raceData.Items)
+			for(auto& VitalityItem : RaceData.Items)
 			{
-				const auto& vitalityData = vitalityItem.GetData<UAbilityVitalityDataBase>();
-				const int32 tmpNum = vitalityItem.Count != 0 ? vitalityItem.Count : worldData.RandomStream.RandRange(vitalityItem.MinCount, vitalityItem.MaxCount);
+				const auto& VitalityData = VitalityItem.GetData<UAbilityVitalityDataBase>();
+				const int32 tmpNum = VitalityItem.Count != 0 ? VitalityItem.Count : WorldData.RandomStream.RandRange(VitalityItem.MinCount, VitalityItem.MaxCount);
 				DON(tmpNum,
-					FHitResult hitResult;
-					if(UVoxelModuleBPLibrary::VoxelAgentTraceSingle(Index, vitalityData.Radius, vitalityData.HalfHeight, {}, hitResult, true, 10, false))
+					FHitResult HitResult;
+					if(UVoxelModuleBPLibrary::VoxelAgentTraceSingle(Index, VitalityData.Radius, VitalityData.HalfHeight, {}, HitResult, true, 10, false))
 					{
-						auto saveData = FDWVitalitySaveData();
-						saveData.ID = vitalityData.GetPrimaryAssetId();
-						saveData.Name = *vitalityData.Name.ToString();
-						saveData.RaceID = raceData.ID;
-						saveData.Level = vitalityItem.Level;
-						saveData.SpawnLocation = hitResult.Location;
-						saveData.SpawnRotation = FRotator(0.f, FMath::RandRange(0.f, 360.f), 0.f);
-						saveData.InventoryData = vitalityData.InventoryData;
-						UAbilityModuleBPLibrary::SpawnVitality(&saveData, this);
+						auto SaveData = FDWVitalitySaveData();
+						SaveData.ID = VitalityData.GetPrimaryAssetId();
+						SaveData.Name = *VitalityData.Name.ToString();
+						SaveData.RaceID = RaceData.ID;
+						SaveData.Level = VitalityItem.Level;
+						SaveData.SpawnLocation = HitResult.Location;
+						SaveData.SpawnRotation = FRotator(0.f, FMath::RandRange(0.f, 360.f), 0.f);
+						SaveData.InventoryData = VitalityData.InventoryData;
+						UAbilityModuleBPLibrary::SpawnVitality(&SaveData, this);
 					}
 				)
 			}
 		}
 	}
-	TArray<FCharacterRaceData> characterRaceDatas;
-	if(UAbilityModuleBPLibrary::GetNoiseRaceDatas(worldLocation, worldData.WorldSeed, characterRaceDatas))
+	TArray<FCharacterRaceData> CharacterRaceDatas;
+	if(UAbilityModuleBPLibrary::GetNoiseRaceDatas(WorldLocation, WorldData.WorldSeed, CharacterRaceDatas))
 	{
-		for(auto& raceData : characterRaceDatas)
+		for(auto& RaceData : CharacterRaceDatas)
 		{
-			ADWCharacter* captain = nullptr;
-			for(auto& characterItem : raceData.Items)
+			ADWCharacter* Captain = nullptr;
+			for(auto& CharacterItem : RaceData.Items)
 			{
-				const auto& characterData = characterItem.GetData<UAbilityCharacterDataBase>();
-				const int32 tmpNum = characterItem.Count != 0 ? characterItem.Count : worldData.RandomStream.RandRange(characterItem.MinCount, characterItem.MaxCount);
+				const auto& CharacterData = CharacterItem.GetData<UAbilityCharacterDataBase>();
+				const int32 tmpNum = CharacterItem.Count != 0 ? CharacterItem.Count : WorldData.RandomStream.RandRange(CharacterItem.MinCount, CharacterItem.MaxCount);
 				DON(tmpNum,
-					FHitResult hitResult;
-					if(UVoxelModuleBPLibrary::VoxelAgentTraceSingle(Index, characterData.Radius, characterData.HalfHeight, {}, hitResult, true, 10, false))
+					FHitResult HitResult;
+					if(UVoxelModuleBPLibrary::VoxelAgentTraceSingle(Index, CharacterData.Radius, CharacterData.HalfHeight, {}, HitResult, true, 10, false))
 					{
-						auto saveData = FDWCharacterSaveData();
-						saveData.ID = characterData.GetPrimaryAssetId();
-						saveData.Name = *characterData.Name.ToString();
-						saveData.RaceID = raceData.ID;
-						saveData.Level = characterItem.Level;
-						saveData.SpawnLocation = hitResult.Location;
-						saveData.SpawnRotation = FRotator(0.f, FMath::RandRange(0.f, 360.f), 0.f);
-						saveData.InventoryData = characterData.InventoryData;
-						if(ADWCharacter* character = Cast<ADWCharacter>(UAbilityModuleBPLibrary::SpawnCharacter(&saveData, this)))
+						auto SaveData = FDWCharacterSaveData();
+						SaveData.ID = CharacterData.GetPrimaryAssetId();
+						SaveData.Name = *CharacterData.Name.ToString();
+						SaveData.RaceID = RaceData.ID;
+						SaveData.Level = CharacterItem.Level;
+						SaveData.SpawnLocation = HitResult.Location;
+						SaveData.SpawnRotation = FRotator(0.f, FMath::RandRange(0.f, 360.f), 0.f);
+						SaveData.InventoryData = CharacterData.InventoryData;
+						if(ADWCharacter* Character = Cast<ADWCharacter>(UAbilityModuleBPLibrary::SpawnCharacter(&SaveData, this)))
 						{
-							if(!captain)
+							if(!Captain)
 							{
-								captain = character;
-								ADWTeamModule::Get()->CreateTeam(captain);
+								Captain = Character;
+								ADWTeamModule::Get()->CreateTeam(Captain);
 							}
 							else
 							{
-								captain->AddTeamMate(character);
+								Captain->AddTeamMate(Character);
 							}
 						}
 					}
@@ -272,19 +272,16 @@ void ADWVoxelChunk::AddSceneActor(AActor* InActor)
 {
 	if(!InActor || !InActor->Implements<USceneActorInterface>() || ISceneActorInterface::Execute_GetContainer(InActor) == this) return;
 
-	if(State != EVoxelChunkState::None)
+	if(ADWCharacter* Character = Cast<ADWCharacter>(InActor))
 	{
-		if(ADWCharacter* Character = Cast<ADWCharacter>(InActor))
+		if(!Character->IsPlayer())
 		{
-			if(!Character->IsPlayer())
-			{
-				Characters.Add(Character);
-			}
+			Characters.Add(Character);
 		}
-		else if(ADWVitality* Vitality = Cast<ADWVitality>(InActor))
-		{
-			Vitalitys.Add(Vitality);
-		}
+	}
+	else if(ADWVitality* Vitality = Cast<ADWVitality>(InActor))
+	{
+		Vitalitys.Add(Vitality);
 	}
 
 	Super::AddSceneActor(InActor);

@@ -45,5 +45,5 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Camera")
 	float CameraRotationSpeed;
 
-	FSingleSoundHandle BGMHandle;
+	static FSingleSoundHandle BGMHandle;
 };

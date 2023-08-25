@@ -109,6 +109,13 @@ void ADWVoxelModule::OnTermination_Implementation(EPhase InPhase)
 	Super::OnTermination_Implementation(InPhase);
 }
 
+FVoxelWorldSaveData* ADWVoxelModule::NewWorldData(FSaveData* InBasicData) const
+{
+	static FDWVoxelWorldSaveData SaveData;
+	SaveData = !InBasicData ? FDWVoxelWorldSaveData(WorldBasicData) : InBasicData->CastRef<FDWVoxelWorldSaveData>();
+	return &SaveData;
+}
+
 void ADWVoxelModule::LoadData(FSaveData* InSaveData, EPhase InPhase)
 {
 	Super::LoadData(InSaveData, InPhase);
@@ -124,14 +131,6 @@ void ADWVoxelModule::UnloadData(EPhase InPhase)
 	Super::UnloadData(InPhase);
 }
 
-FVoxelWorldSaveData* ADWVoxelModule::NewWorldData(FSaveData* InWorldData) const
-{
-	static FDWVoxelWorldSaveData* NewWorldData;
-	NewWorldData = new FDWVoxelWorldSaveData();
-	*NewWorldData = !InWorldData ? FDWVoxelWorldSaveData(WorldBasicData) : InWorldData->CastRef<FDWVoxelWorldSaveData>();
-	return NewWorldData;
-}
-
 void ADWVoxelModule::OnWorldStateChanged()
 {
 	Super::OnWorldStateChanged();
@@ -141,9 +140,9 @@ void ADWVoxelModule::GenerateWorld()
 {
 	Super::GenerateWorld();
 
-	if(BoundsMesh && LastGenerateIndex != Index_Empty)
+	if(BoundsMesh && ChunkGenerateIndex != Index_Empty)
 	{
-		BoundsMesh->SetRelativeLocation(AVoxelModule::ChunkIndexToLocation(FIndex(LastGenerateIndex.X, LastGenerateIndex.Y, 0)));
+		BoundsMesh->SetRelativeLocation(AVoxelModule::ChunkIndexToLocation(FIndex(ChunkGenerateIndex.X, ChunkGenerateIndex.Y, 0)));
 		BoundsMesh->SetRelativeScale3D(FVector(WorldData->GetWorldRealSize().X * WorldData->BlockSize * 0.01f, WorldData->GetWorldRealSize().Y * WorldData->BlockSize * 0.01f, 15.f));
 	}
 }

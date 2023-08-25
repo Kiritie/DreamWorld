@@ -13,6 +13,7 @@
 #include "Procedure/ProcedureModuleBPLibrary.h"
 #include "Procedure/Procedure_Initializing.h"
 #include "Procedure/Procedure_Pausing.h"
+#include "Procedure/Archive/Procedure_ArchiveChoosing.h"
 #include "SaveGame/Archive/DWArchiveSaveGame.h"
 #include "SaveGame/General/DWGeneralSaveGame.h"
 #include "SaveGame/SaveGameModuleBPLibrary.h"
@@ -53,21 +54,25 @@ void UProcedure_Starting::OnInitialize()
 
 void UProcedure_Starting::OnEnter(UProcedureBase* InLastProcedure)
 {
-	UWidgetModuleBPLibrary::OpenUserWidget<UWidgetMainMenu>();
-	UWidgetModuleBPLibrary::CreateUserWidget<UWidgetArchiveChoosingPanel>();
-
 	if(!InLastProcedure || InLastProcedure->IsA<UProcedure_Initializing>())
 	{
-		USaveGameModuleBPLibrary::LoadOrCreateSaveGame<UDWArchiveSaveGame>(-1);
+		USaveGameModuleBPLibrary::LoadOrCreateSaveGame<UDWArchiveSaveGame>(-1, EPhase::Primary);
 	}
 	else
 	{
-		AVoxelModule::Get()->UnloadSaveData(EPhase::Final);
-		UGlobalBPLibrary::GetPlayerController<ADWPlayerController>()->UnloadSaveData(EPhase::Final);
+		USaveGameModuleBPLibrary::UnloadSaveGame<UDWArchiveSaveGame>(-1, EPhase::Lesser);
 	}
-	AMainModule::PauseModuleByClass<ASceneModule>();
+	if(InLastProcedure && InLastProcedure->IsA<UProcedure_ArchiveChoosing>())
+	{
+		CameraViewYaw = UCameraModuleBPLibrary::GetCameraRotation().Yaw;
+	}
 
 	Super::OnEnter(InLastProcedure);
+
+	UWidgetModuleBPLibrary::OpenUserWidget<UWidgetMainMenu>();
+	UWidgetModuleBPLibrary::CreateUserWidget<UWidgetArchiveChoosingPanel>();
+
+	AMainModule::PauseModuleByClass<ASceneModule>();
 }
 
 void UProcedure_Starting::OnRefresh()

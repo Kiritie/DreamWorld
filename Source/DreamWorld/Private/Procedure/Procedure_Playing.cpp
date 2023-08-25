@@ -53,17 +53,13 @@ void UProcedure_Playing::OnEnter(UProcedureBase* InLastProcedure)
 
 	if(InLastProcedure->IsA<UProcedure_Loading>())
 	{
+		AMainModule::UnPauseModuleByClass<ASceneModule>();
+		AMainModule::UnPauseModuleByClass<ACameraModule>();
+		
 		UWidgetModuleBPLibrary::OpenUserWidget<UWidgetGameHUD>();
 
-		if(ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerPawn<ADWPlayerCharacter>())
-		{
-			PlayerCharacter->Execute_SetActorVisible(PlayerCharacter, true);
-			const auto& PlayerData = USaveGameModuleBPLibrary::GetSaveGame<UDWArchiveSaveGame>()->GetSaveDataRef<FDWArchiveSaveData>().PlayerData;
-			UCameraModuleBPLibrary::SetCameraRotationAndDistance(PlayerData.CameraRotation.Yaw, PlayerData.CameraRotation.Pitch, PlayerData.CameraDistance, true);
-			AMainModule::UnPauseModuleByClass<ACameraModule>();
-		}
+		ISceneActorInterface::Execute_SetActorVisible(UGlobalBPLibrary::GetPlayerPawn<ADWPlayerCharacter>(), true);
 	}
-	AMainModule::UnPauseModuleByClass<ASceneModule>();
 
 	UGlobalBPLibrary::GetGameInstance()->GetSubsystem<UAchievementSubSystem>()->Unlock(FName("FirstPlay"));
 }

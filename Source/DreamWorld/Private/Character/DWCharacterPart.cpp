@@ -74,7 +74,7 @@ void UDWCharacterPart::OnEnterVoxel(UVoxel& InVoxel, const FVoxelHitResult& InHi
 {
 	InVoxel.OnAgentEnter(GetOwnerCharacter(), InHitResult);
 
-	UVoxelData& VoxelData = InVoxel.GetData();
+	const UVoxelData& VoxelData = InVoxel.GetData();
 	switch (VoxelData.VoxelType)
 	{
 		case EVoxelType::Water:
@@ -113,7 +113,7 @@ void UDWCharacterPart::OnExitVoxel(UVoxel& InVoxel, const FVoxelHitResult& InHit
 			{
 				case EDWCharacterPartType::Chest:
 				{
-					if(!InHitResult.IsValid() || InHitResult.VoxelItem.GetVoxelData().VoxelType != EVoxelType::Water)
+					if(!InHitResult.IsValid() || InHitResult.VoxelItem.GetVoxelType() != EVoxelType::Water)
 					{
 						GetOwnerCharacter()->UnFloat();
 					}
@@ -121,7 +121,7 @@ void UDWCharacterPart::OnExitVoxel(UVoxel& InVoxel, const FVoxelHitResult& InHit
 				}
 				case EDWCharacterPartType::Neck:
 				{
-					if(!InHitResult.IsValid() || InHitResult.VoxelItem.GetVoxelData().VoxelType != EVoxelType::Water)
+					if(!InHitResult.IsValid() || InHitResult.VoxelItem.GetVoxelType() != EVoxelType::Water)
 					{
 						GetOwnerCharacter()->Float(InVoxel.GetOwner()->IndexToLocation(InVoxel.GetIndex()).Z + AVoxelModule::Get()->GetWorldData().BlockSize);
 					}

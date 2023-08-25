@@ -12,6 +12,7 @@
 #include "Procedure/ProcedureModuleBPLibrary.h"
 #include "Procedure/Archive/Procedure_ArchiveCreating.h"
 #include "Procedure/Procedure_Loading.h"
+#include "Procedure/Procedure_Starting.h"
 #include "SaveGame/Archive/DWArchiveSaveGame.h"
 #include "SaveGame/General/DWGeneralSaveGame.h"
 #include "SaveGame/SaveGameModuleBPLibrary.h"
@@ -50,6 +51,11 @@ void UProcedure_ArchiveChoosing::OnInitialize()
 
 void UProcedure_ArchiveChoosing::OnEnter(UProcedureBase* InLastProcedure)
 {
+	if(InLastProcedure && InLastProcedure->IsA<UProcedure_Starting>())
+	{
+		CameraViewYaw = UCameraModuleBPLibrary::GetCameraRotation().Yaw;
+	}
+	
 	Super::OnEnter(InLastProcedure);
 
 	UWidgetModuleBPLibrary::OpenUserWidget<UWidgetArchiveChoosingPanel>();
@@ -81,22 +87,22 @@ void UProcedure_ArchiveChoosing::CreateArchive()
 {
 	if(USaveGameModuleBPLibrary::GetSaveGame<UDWArchiveSaveGame>()->IsSaved())
 	{
-		USaveGameModuleBPLibrary::CreateSaveGame<UDWArchiveSaveGame>(-1, true);
+		USaveGameModuleBPLibrary::CreateSaveGame<UDWArchiveSaveGame>(-1, EPhase::Primary);
 	}
 	UProcedureModuleBPLibrary::SwitchProcedureByClass<UProcedure_ArchiveCreating>();
 }
 
 void UProcedure_ArchiveChoosing::RemoveArchive(int32 InArchiveID)
 {
-	const bool bNeedCreateArchive = USaveGameModuleBPLibrary::GetActiveSaveIndex<UDWArchiveSaveGame>() == InArchiveID;
+	const bool bNeedCreateArchive = USaveGameModuleBPLibrary::GetSaveGameInfo<UDWArchiveSaveGame>().ActiveIndex == InArchiveID;
 	USaveGameModuleBPLibrary::DestroySaveGame<UDWArchiveSaveGame>(InArchiveID);
-	if(bNeedCreateArchive) USaveGameModuleBPLibrary::CreateSaveGame<UDWArchiveSaveGame>(-1, true);
+	if(bNeedCreateArchive) USaveGameModuleBPLibrary::CreateSaveGame<UDWArchiveSaveGame>(-1, EPhase::Primary);
 	UWidgetModuleBPLibrary::GetUserWidget<UWidgetArchiveChoosingPanel>()->Refresh();
 }
 
 void UProcedure_ArchiveChoosing::ChooseArchive(int32 InArchiveID)
 {
-	if(USaveGameModuleBPLibrary::GetActiveSaveIndex<UDWArchiveSaveGame>() != InArchiveID)
+	if(USaveGameModuleBPLibrary::GetSaveGameInfo<UDWArchiveSaveGame>().ActiveIndex != InArchiveID)
 	{
 		USaveGameModuleBPLibrary::LoadSaveGame<UDWArchiveSaveGame>(InArchiveID, EPhase::Primary);
 	}

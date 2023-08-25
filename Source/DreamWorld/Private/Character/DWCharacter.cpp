@@ -202,8 +202,6 @@ void ADWCharacter::OnDespawn_Implementation(bool bRecovery)
 {
 	Super::OnDespawn_Implementation(bRecovery);
 
-	Inventory->UnloadSaveData(EPhase::Primary);
-	
 	for(auto& Iter : Equips)
 	{
 		UObjectPoolModuleBPLibrary::DespawnObject(Iter.Value);

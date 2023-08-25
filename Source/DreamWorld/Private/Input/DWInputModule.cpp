@@ -315,7 +315,7 @@ void ADWInputModule::OnAttackDestroyPressed()
 			FVoxelHitResult voxelHitResult;
 			if(UVoxelModuleBPLibrary::VoxelRaycastSinge(EVoxelRaycastType::FromAimPoint, PossessedCharacter->GetInteractDistance(), {}, voxelHitResult))
 			{
-				voxelHitResult.GetVoxel().OnActionTrigger(PossessedCharacter, EVoxelActionType::Action1, voxelHitResult);
+				voxelHitResult.GetVoxel().OnAgentAction(PossessedCharacter, EVoxelActionType::Action1, voxelHitResult);
 			}
 			break;
 		}
@@ -360,7 +360,7 @@ void ADWInputModule::OnDefendGeneratePressed()
 			FVoxelHitResult voxelHitResult;
 			if(UVoxelModuleBPLibrary::VoxelRaycastSinge(EVoxelRaycastType::FromAimPoint, PossessedCharacter->GetInteractDistance(), {}, voxelHitResult))
 			{
-				voxelHitResult.GetVoxel().OnActionTrigger(PossessedCharacter, EVoxelActionType::Action2, voxelHitResult);
+				voxelHitResult.GetVoxel().OnAgentAction(PossessedCharacter, EVoxelActionType::Action2, voxelHitResult);
 			}
 			break;
 		}

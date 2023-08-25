@@ -46,10 +46,10 @@ protected:
 
 public:
 	UFUNCTION(BlueprintCallable)
-	void CreatePlayer(UPARAM(ref) FDWPlayerSaveData& InPlayerSaveData, EPhase InPhase = EPhase::Primary);
+	void CreatePlayer(UPARAM(ref) FDWPlayerSaveData& InPlayerSaveData, EPhase InPhase);
 
 	UFUNCTION(BlueprintCallable)
-	void CreateWorld(UPARAM(ref) FDWVoxelWorldSaveData& InWorldSaveData, EPhase InPhase = EPhase::Primary);
+	void CreateWorld(UPARAM(ref) FDWVoxelWorldSaveData& InWorldSaveData, EPhase InPhase);
 
 	UFUNCTION(BlueprintCallable)
 	void CreateArchive(UPARAM(ref) FDWArchiveSaveData& InArchiveSaveData);
