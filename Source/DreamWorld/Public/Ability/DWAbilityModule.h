@@ -38,4 +38,7 @@ public:
 	virtual void OnPause_Implementation() override;
 
 	virtual void OnUnPause_Implementation() override;
+
+public:
+	virtual ECollisionChannel GetPickUpTraceChannel() const override;
 };

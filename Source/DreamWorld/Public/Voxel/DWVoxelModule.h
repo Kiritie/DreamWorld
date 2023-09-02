@@ -80,7 +80,7 @@ public:
 public:
 	virtual AVoxelChunk* SpawnChunk(FIndex InIndex, bool bAddToQueue = true) override;
 
-	virtual ECollisionChannel GetChunkTraceType() const override;
+	virtual ECollisionChannel GetChunkTraceChannel() const override;
 
-	virtual ECollisionChannel GetVoxelTraceType() const override;
+	virtual ECollisionChannel GetVoxelTraceChannel() const override;
 };

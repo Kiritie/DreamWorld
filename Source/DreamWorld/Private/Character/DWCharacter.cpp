@@ -1266,7 +1266,7 @@ bool ADWCharacter::RaycastStep(FHitResult& OutHitResult)
 {
 	const FVector rayStart = GetActorLocation() + FVector::DownVector * (GetHalfHeight() - GetCharacterMovement()->MaxStepHeight);
 	const FVector rayEnd = rayStart + GetMoveDirection() * (GetRadius() + AVoxelModule::Get()->GetWorldData().BlockSize * FMath::Clamp(GetMoveDirection().Size() * 0.005f, 0.5f, 1.3f));
-	return UKismetSystemLibrary::LineTraceSingle(this, rayStart, rayEnd, UGlobalBPLibrary::GetGameTraceChannel((ECollisionChannel)EDWGameTraceType::Step), false, {}, EDrawDebugTrace::None, OutHitResult, true);
+	return UKismetSystemLibrary::LineTraceSingle(this, rayStart, rayEnd, UGlobalBPLibrary::GetGameTraceType((ECollisionChannel)EDWGameTraceChannel::Step), false, {}, EDrawDebugTrace::None, OutHitResult, true);
 }
 
 bool ADWCharacter::HasTeam() const

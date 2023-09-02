@@ -172,12 +172,12 @@ AVoxelChunk* ADWVoxelModule::SpawnChunk(FIndex InIndex, bool bAddToQueue)
 	return Super::SpawnChunk(InIndex, bAddToQueue);
 }
 
-ECollisionChannel ADWVoxelModule::GetChunkTraceType() const
+ECollisionChannel ADWVoxelModule::GetChunkTraceChannel() const
 {
-	return (ECollisionChannel)EDWGameTraceType::Chunk;
+	return (ECollisionChannel)EDWGameTraceChannel::Chunk;
 }
 
-ECollisionChannel ADWVoxelModule::GetVoxelTraceType() const
+ECollisionChannel ADWVoxelModule::GetVoxelTraceChannel() const
 {
-	return (ECollisionChannel)EDWGameTraceType::Voxel;
+	return (ECollisionChannel)EDWGameTraceChannel::Voxel;
 }

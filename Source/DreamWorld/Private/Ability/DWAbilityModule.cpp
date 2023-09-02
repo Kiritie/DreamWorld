@@ -59,3 +59,8 @@ void ADWAbilityModule::OnUnPause_Implementation()
 {
 	Super::OnUnPause_Implementation();
 }
+
+ECollisionChannel ADWAbilityModule::GetPickUpTraceChannel() const
+{
+	return (ECollisionChannel)EDWGameTraceChannel::Chunk;
+}

@@ -639,7 +639,7 @@ public:
  * ???????????
  */
 UENUM(BlueprintType)
-enum class EDWGameTraceType : uint8
+enum class EDWGameTraceChannel : uint8
 {
 	// ??
 	None = 0,
