@@ -16,12 +16,12 @@ UWidgetItemInfoBox::UWidgetItemInfoBox(const FObjectInitializer& ObjectInitializ
 	InputMode = EInputMode::None;
 }
 
-void UWidgetItemInfoBox::OnCreate_Implementation(AActor* InOwner)
+void UWidgetItemInfoBox::OnCreate_Implementation(UObject* InOwner)
 {
 	Super::OnCreate_Implementation(InOwner);
 }
 
-void UWidgetItemInfoBox::OnInitialize_Implementation(AActor* InOwner)
+void UWidgetItemInfoBox::OnInitialize_Implementation(UObject* InOwner)
 {
 	Super::OnInitialize_Implementation(InOwner);
 }

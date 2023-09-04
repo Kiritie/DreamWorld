@@ -46,8 +46,10 @@ UWidgetInventoryBar::UWidgetInventoryBar(const FObjectInitializer& ObjectInitial
 	UISlotDatas.Add(ESplitSlotType::Skill);
 }
 
-void UWidgetInventoryBar::OnInitialize_Implementation(AActor* InOwner)
+void UWidgetInventoryBar::OnInitialize_Implementation(UObject* InOwner)
 {
+	if(OwnerObject == InOwner) return;
+	
 	if(GetInventory())
 	{
 		GetInventory()->OnSlotSelected.RemoveDynamic(this, &UWidgetInventoryBar::OnInventorySlotSelected);
@@ -66,9 +68,8 @@ void UWidgetInventoryBar::OnInitialize_Implementation(AActor* InOwner)
 			UISlotDatas[ESplitSlotType::Shortcut].Slots.Empty();
 			for(int32 i = 0; i < ShortcutSlots.Num(); i++)
 			{
-				if(UWidgetInventoryShortcutSlot* ShortcutSlot = CreateWidget<UWidgetInventoryShortcutSlot>(this, ShortcutSlotClass))
+				if(UWidgetInventoryShortcutSlot* ShortcutSlot = CreateSubWidget<UWidgetInventoryShortcutSlot>({ ShortcutSlots[i] }, ShortcutSlotClass))
 				{
-					ShortcutSlot->OnInitialize(ShortcutSlots[i]);
 					//ShortcutSlot->SetKeyCode(UDWHelper::GetInputActionKeyCodeByName(FString::Printf(TEXT("SelectInventorySlot%d"), i + 1)));
 					ShortcutSlot->SetKeyCode(FText::FromString(FString::FromInt(i < 9 ? i + 1 : 0)));
 					if(UGridSlot* GridSlot = ShortcutContent->AddChildToGrid(ShortcutSlot))
@@ -84,7 +85,7 @@ void UWidgetInventoryBar::OnInitialize_Implementation(AActor* InOwner)
 		{
 			for(int32 i = 0; i < UISlotDatas[ESplitSlotType::Shortcut].Slots.Num(); i++)
 			{
-				UISlotDatas[ESplitSlotType::Shortcut].Slots[i]->OnInitialize(ShortcutSlots[i]);
+				UISlotDatas[ESplitSlotType::Shortcut].Slots[i]->OnInitialize({ ShortcutSlots[i] });
 			}
 		}
 	}
@@ -95,9 +96,8 @@ void UWidgetInventoryBar::OnInitialize_Implementation(AActor* InOwner)
 		{
 			for(int32 i = 0; i < AuxiliarySlots.Num(); i++)
 			{
-				if(UWidgetInventoryAuxiliarySlot* AuxiliarySlot = CreateWidget<UWidgetInventoryAuxiliarySlot>(this, AuxiliarySlotClass))
+				if(UWidgetInventoryAuxiliarySlot* AuxiliarySlot = CreateSubWidget<UWidgetInventoryAuxiliarySlot>({ AuxiliarySlots[i] }, AuxiliarySlotClass))
 				{
-					AuxiliarySlot->OnInitialize(AuxiliarySlots[i]);
 					//AuxiliarySlot->SetKeyCode(UGlobalBPLibrary::GetInputActionKeyCodeByName(FString::Printf(TEXT("ReleaseAuxiliaryAbility%d"), i + 1)));
 					AuxiliarySlot->SetKeyCode(FText::FromString(TEXT("X")));
 					if(UGridSlot* GridSlot = AuxiliaryContent->AddChildToGrid(AuxiliarySlot))
@@ -113,7 +113,7 @@ void UWidgetInventoryBar::OnInitialize_Implementation(AActor* InOwner)
 		{
 			for(int32 i = 0; i < UISlotDatas[ESplitSlotType::Auxiliary].Slots.Num(); i++)
 			{
-				UISlotDatas[ESplitSlotType::Auxiliary].Slots[i]->OnInitialize(AuxiliarySlots[i]);
+				UISlotDatas[ESplitSlotType::Auxiliary].Slots[i]->OnInitialize({ AuxiliarySlots[i] });
 			}
 		}
 	}
@@ -124,9 +124,8 @@ void UWidgetInventoryBar::OnInitialize_Implementation(AActor* InOwner)
 		{
 			for(int32 i = 0; i < SkillSlots.Num(); i++)
 			{
-				if(UWidgetInventorySkillSlot* SkillSlot = CreateWidget<UWidgetInventorySkillSlot>(this, SkillSlotClass))
+				if(UWidgetInventorySkillSlot* SkillSlot = CreateSubWidget<UWidgetInventorySkillSlot>({ SkillSlots[i] }, SkillSlotClass))
 				{
-					SkillSlot->OnInitialize(SkillSlots[i]);
 					SkillSlot->SetKeyCode(UGlobalBPLibrary::GetInputActionKeyCodeByName(FString::Printf(TEXT("ReleaseSkillAbility%d"), i + 1)));
 					if(UGridSlot* GridSlot = i < SkillSlots.Num() / 2 ? LeftSkillContent->AddChildToGrid(SkillSlot) : RightSkillContent->AddChildToGrid(SkillSlot))
 					{
@@ -141,7 +140,7 @@ void UWidgetInventoryBar::OnInitialize_Implementation(AActor* InOwner)
 		{
 			for(int32 i = 0; i < UISlotDatas[ESplitSlotType::Skill].Slots.Num(); i++)
 			{
-				UISlotDatas[ESplitSlotType::Skill].Slots[i]->OnInitialize(SkillSlots[i]);
+				UISlotDatas[ESplitSlotType::Skill].Slots[i]->OnInitialize({ SkillSlots[i] });
 			}
 		}
 	}

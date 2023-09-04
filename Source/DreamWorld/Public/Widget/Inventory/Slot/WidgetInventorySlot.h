@@ -27,6 +27,8 @@ protected:
 	
 	virtual void NativeOnDragLeave(const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
 
+	virtual void NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation) override;
+
 	virtual void NativeOnMouseEnter(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
 
 	virtual void NativeOnMouseLeave(const FPointerEvent& InMouseEvent) override;
@@ -36,21 +38,22 @@ protected:
 	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
 
 public:
-	virtual void OnInitialize(UInventorySlot* InOwnerSlot) override;
+	virtual void OnCreate_Implementation(UUserWidgetBase* InOwner, const TArray<FParameter>& InParams) override;
 
-protected:
-	virtual void OnRefresh() override;
+	virtual void OnInitialize_Implementation(const TArray<FParameter>& InParams) override;
 
-	virtual void OnActivated() override;
+	virtual void OnRefresh_Implementation() override;
+
+	virtual void OnActivated_Implementation() override;
 	
-	virtual void OnCanceled() override;
+	virtual void OnCanceled_Implementation() override;
 		
 protected:
-	virtual void StartCooldown() override;
+	virtual void StartCooldown_Implementation() override;
 			
-	virtual void StopCooldown() override;
+	virtual void StopCooldown_Implementation() override;
 
-	virtual void OnCooldown() override;
+	virtual void OnCooldown_Implementation() override;
 
 public:
 	UFUNCTION(BlueprintCallable)
@@ -83,6 +86,9 @@ protected:
 
 	UPROPERTY()
 	UMaterialInstanceDynamic* MaskMatInst;
+
+	UPROPERTY()
+	TSubclassOf<class UWidgetInventoryItemBase> DragVisualClass;
 
 public:
 	FText GetKeyCode() const { return KeyCode; }

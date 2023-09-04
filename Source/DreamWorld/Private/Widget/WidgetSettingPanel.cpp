@@ -10,7 +10,7 @@ UWidgetSettingPanel::UWidgetSettingPanel(const FObjectInitializer& ObjectInitial
 	InputMode = EInputMode::UIOnly;
 }
 
-void UWidgetSettingPanel::OnInitialize_Implementation(AActor* InOwner)
+void UWidgetSettingPanel::OnInitialize_Implementation(UObject* InOwner)
 {
 	Super::OnInitialize_Implementation(InOwner);
 }

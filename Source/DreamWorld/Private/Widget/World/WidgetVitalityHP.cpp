@@ -25,7 +25,7 @@ void UWidgetVitalityHP::RefreshVisibility_Implementation()
 
 	if(GetVisibility() == ESlateVisibility::SelfHitTestInvisible)
 	{
-		if(GetOwnerActor<ADWVitality>() && GetOwnerActor<ADWVitality>()->IsDead())
+		if(GetOwnerObject<ADWVitality>() && GetOwnerObject<ADWVitality>()->IsDead())
 		{
 			SetVisibility(ESlateVisibility::Hidden);
 		}

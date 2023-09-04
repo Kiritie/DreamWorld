@@ -17,12 +17,12 @@ UWidgetContextBox::UWidgetContextBox(const FObjectInitializer& ObjectInitializer
 	WidgetCreateType = EWidgetCreateType::AutoCreateAndOpen;
 }
 
-void UWidgetContextBox::OnCreate_Implementation(AActor* InOwner)
+void UWidgetContextBox::OnCreate_Implementation(UObject* InOwner)
 {
 	Super::OnCreate_Implementation(InOwner);
 }
 
-void UWidgetContextBox::OnInitialize_Implementation(AActor* InOwner)
+void UWidgetContextBox::OnInitialize_Implementation(UObject* InOwner)
 {
 	Super::OnInitialize_Implementation(InOwner);
 }

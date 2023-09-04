@@ -7,8 +7,8 @@
 
 class UScrollBox;
 class UWrapBox;
-class UWidgetInventoryGenerateSlot;
-class UWidgetInventoryPreviewSlot;
+class UWidgetInventoryGenerateItem;
+class UWidgetInventoryPreviewItem;
 class UButton;
 
 /**
@@ -23,9 +23,9 @@ public:
 	UWidgetGeneratePanel(const FObjectInitializer& ObjectInitializer);
 
 public:
-	virtual void OnCreate_Implementation(AActor* InOwner) override;
+	virtual void OnCreate_Implementation(UObject* InOwner) override;
 
-	virtual void OnInitialize_Implementation(AActor* InOwner) override;
+	virtual void OnInitialize_Implementation(UObject* InOwner) override;
 
 	virtual void OnOpen_Implementation(const TArray<FParameter>& InParams, bool bInstant) override;
 
@@ -35,9 +35,9 @@ public:
 
 	virtual void OnDestroy_Implementation(bool bRecovery = false) override;
 
-protected:
+public:
 	UFUNCTION()
-	virtual void OnGenerateSlotSelected(UWidgetInventoryGenerateSlot* InSlot);
+	virtual void OnGenerateSlotSelected(UWidgetInventoryGenerateItem* InSlot);
 
 	UFUNCTION()
 	virtual void OnGenerateButtonClicked();
@@ -57,14 +57,14 @@ protected:
 	UButton* BtnGenerate;
 
 protected:
-	TSubclassOf<UWidgetInventoryGenerateSlot> GenerateSlotClass;
+	TSubclassOf<UWidgetInventoryGenerateItem> GenerateSlotClass;
 
-	TSubclassOf<UWidgetInventoryPreviewSlot> PreviewSlotClass;
+	TSubclassOf<UWidgetInventoryPreviewItem> PreviewSlotClass;
 
-	TArray<UWidgetInventoryGenerateSlot*> GenerateSlots;
+	TArray<UWidgetInventoryGenerateItem*> GenerateItems;
 	
-	TArray<UWidgetInventoryPreviewSlot*> PreviewSlots;
+	TArray<UWidgetInventoryPreviewItem*> PreviewItems;
 
 	UPROPERTY()
-	UWidgetInventoryGenerateSlot* SelectedGenerateSlot;
+	UWidgetInventoryGenerateItem* SelectedGenerateSlot;
 };

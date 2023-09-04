@@ -141,14 +141,6 @@ void ADWPlayerController::UnloadData(EPhase InPhase)
 
 void ADWPlayerController::OnPossess(APawn* InPawn)
 {
-	if(InPawn->IsA<ADWPlayerCharacter>() && (InPawn != GetPlayerPawn() || !GetPawn()))
-	{
-		UWidgetModuleBPLibrary::InitializeUserWidget<UWidgetGameHUD>(InPawn);
-		UWidgetModuleBPLibrary::InitializeUserWidget<UWidgetInventoryBar>(InPawn);
-		UWidgetModuleBPLibrary::InitializeUserWidget<UWidgetInventoryPanel>(InPawn);
-		UWidgetModuleBPLibrary::InitializeUserWidget<UWidgetGeneratePanel>(InPawn);
-		UWidgetModuleBPLibrary::InitializeUserWidget<UWidgetShopPanel>(InPawn);
-	}
 	Super::OnPossess(InPawn);
 }
 

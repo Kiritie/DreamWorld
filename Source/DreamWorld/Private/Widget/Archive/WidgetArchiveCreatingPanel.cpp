@@ -10,7 +10,7 @@ UWidgetArchiveCreatingPanel::UWidgetArchiveCreatingPanel(const FObjectInitialize
 	InputMode = EInputMode::UIOnly;
 }
 
-void UWidgetArchiveCreatingPanel::OnInitialize_Implementation(AActor* InOwner)
+void UWidgetArchiveCreatingPanel::OnInitialize_Implementation(UObject* InOwner)
 {
 	Super::OnInitialize_Implementation(InOwner);
 }

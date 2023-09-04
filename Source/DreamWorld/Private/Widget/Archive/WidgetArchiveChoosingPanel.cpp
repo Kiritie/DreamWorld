@@ -10,7 +10,7 @@ UWidgetArchiveChoosingPanel::UWidgetArchiveChoosingPanel(const FObjectInitialize
 	InputMode = EInputMode::UIOnly;
 }
 
-void UWidgetArchiveChoosingPanel::OnInitialize_Implementation(AActor* InOwner)
+void UWidgetArchiveChoosingPanel::OnInitialize_Implementation(UObject* InOwner)
 {
 	Super::OnInitialize_Implementation(InOwner);
 }

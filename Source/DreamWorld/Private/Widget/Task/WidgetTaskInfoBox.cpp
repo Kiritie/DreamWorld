@@ -27,12 +27,12 @@ UWidgetTaskInfoBox::UWidgetTaskInfoBox(const FObjectInitializer& ObjectInitializ
 	TaskInfoItemClass = LoadClass<UWidgetTaskInfoItem>(nullptr, TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/Blueprints/Widget/Task/WB_TaskInfoItem.WB_TaskInfoItem_C'"));
 }
 
-void UWidgetTaskInfoBox::OnCreate_Implementation(AActor* InOwner)
+void UWidgetTaskInfoBox::OnCreate_Implementation(UObject* InOwner)
 {
 	Super::OnCreate_Implementation(InOwner);
 }
 
-void UWidgetTaskInfoBox::OnInitialize_Implementation(AActor* InOwner)
+void UWidgetTaskInfoBox::OnInitialize_Implementation(UObject* InOwner)
 {
 	Super::OnInitialize_Implementation(InOwner);
 }
@@ -64,7 +64,7 @@ void UWidgetTaskInfoBox::OnRefresh_Implementation()
 
 void UWidgetTaskInfoBox::CreateTaskInfoItem(UTaskBase* InTask)
 {
-	if(UWidgetTaskInfoItem* TaskInfoItem = CreateWidget<UWidgetTaskInfoItem>(this, TaskInfoItemClass))
+	if(UWidgetTaskInfoItem* TaskInfoItem = UObjectPoolModuleBPLibrary::SpawnObject<UWidgetTaskInfoItem>(nullptr, TaskInfoItemClass))
 	{
 		if(auto TempSlot = ContentBox->AddChildToVerticalBox(TaskInfoItem))
 		{

@@ -16,12 +16,12 @@ UWidgetInventorySkillSlot::UWidgetInventorySkillSlot(const FObjectInitializer& O
 	
 }
 
-void UWidgetInventorySkillSlot::OnInitialize(UInventorySlot* InOwnerSlot)
+void UWidgetInventorySkillSlot::OnInitialize_Implementation(const TArray<FParameter>& InParams)
 {
-	Super::OnInitialize(InOwnerSlot);
+	Super::OnInitialize_Implementation(InParams);
 }
 
-void UWidgetInventorySkillSlot::UseItem(int InCount)
+void UWidgetInventorySkillSlot::UseItem_Implementation(int InCount)
 {
 	if(OwnerSlot)
 	{
@@ -29,9 +29,9 @@ void UWidgetInventorySkillSlot::UseItem(int InCount)
 	}
 }
 
-void UWidgetInventorySkillSlot::OnRefresh()
+void UWidgetInventorySkillSlot::OnRefresh_Implementation()
 {
-	Super::OnRefresh();
+	Super::OnRefresh_Implementation();
 
 	if(!IsEmpty())
 	{

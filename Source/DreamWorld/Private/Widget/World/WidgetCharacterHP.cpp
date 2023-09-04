@@ -26,7 +26,7 @@ void UWidgetCharacterHP::RefreshVisibility_Implementation()
 
 	if(GetVisibility() == ESlateVisibility::SelfHitTestInvisible)
 	{
-		if(GetOwnerActor<ADWCharacter>() && GetOwnerActor<ADWCharacter>()->IsDead())
+		if(GetOwnerObject<ADWCharacter>() && GetOwnerObject<ADWCharacter>()->IsDead())
 		{
 			SetVisibility(ESlateVisibility::Hidden);
 		}

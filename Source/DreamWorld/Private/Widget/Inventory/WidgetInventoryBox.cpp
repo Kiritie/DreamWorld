@@ -18,8 +18,10 @@ UWidgetInventoryBox::UWidgetInventoryBox(const FObjectInitializer& ObjectInitial
 	bIsFocusable = true;
 }
 
-void UWidgetInventoryBox::OnInitialize_Implementation(AActor* InOwner)
+void UWidgetInventoryBox::OnInitialize_Implementation(UObject* InOwner)
 {
+	if(OwnerObject == InOwner) return;
+	
 	Super::OnInitialize_Implementation(InOwner);
 }
 

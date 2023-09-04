@@ -14,6 +14,7 @@
 #include "Global/GlobalBPLibrary.h"
 #include "Ability/Inventory/CharacterInventory.h"
 #include "Ability/Inventory/Slot/InventorySlot.h"
+#include "ObjectPool/ObjectPoolModuleBPLibrary.h"
 #include "Widget/Inventory/Slot/WidgetInventoryEquipSlot.h"
 
 UWidgetInventoryPanel::UWidgetInventoryPanel(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
@@ -37,8 +38,10 @@ UWidgetInventoryPanel::UWidgetInventoryPanel(const FObjectInitializer& ObjectIni
 	UISlotDatas.Add(ESplitSlotType::Equip);
 }
 
-void UWidgetInventoryPanel::OnInitialize_Implementation(AActor* InOwner)
+void UWidgetInventoryPanel::OnInitialize_Implementation(UObject* InOwner)
 {
+	if(OwnerObject == InOwner) return;
+	
 	Super::OnInitialize_Implementation(InOwner);
 	
 	if(!GetInventory()) return;
@@ -52,9 +55,8 @@ void UWidgetInventoryPanel::OnInitialize_Implementation(AActor* InOwner)
 			UISlotDatas[ESplitSlotType::Default].Slots.Empty();
 			for(int32 i = 0; i < DefaultSlots.Num(); i++)
 			{
-				if(UWidgetInventorySlot* DefaultSlot = CreateWidget<UWidgetInventorySlot>(this, DefaultSlotClass))
+				if(UWidgetInventorySlot* DefaultSlot = CreateSubWidget<UWidgetInventorySlot>({ DefaultSlots[i] }, DefaultSlotClass))
 				{
-					DefaultSlot->OnInitialize(DefaultSlots[i]);
 					if(UWrapBoxSlot* WrapBoxSlot = DefaultContent->AddChildToWrapBox(DefaultSlot))
 					{
 						WrapBoxSlot->SetPadding(FMargin(2.5f, 2.5f, 2.5f, 2.5f));
@@ -67,7 +69,7 @@ void UWidgetInventoryPanel::OnInitialize_Implementation(AActor* InOwner)
 		{
 			for(int32 i = 0; i < UISlotDatas[ESplitSlotType::Default].Slots.Num(); i++)
 			{
-				UISlotDatas[ESplitSlotType::Default].Slots[i]->OnInitialize(DefaultSlots[i]);
+				UISlotDatas[ESplitSlotType::Default].Slots[i]->OnInitialize({ DefaultSlots[i] });
 			}
 		}
 	}
@@ -78,9 +80,8 @@ void UWidgetInventoryPanel::OnInitialize_Implementation(AActor* InOwner)
 		{
 			for(int32 i = 0; i < EquipSlots.Num(); i++)
 			{
-				if(UWidgetInventoryEquipSlot* EquipSlot = CreateWidget<UWidgetInventoryEquipSlot>(this, EquipSlotClass))
+				if(UWidgetInventoryEquipSlot* EquipSlot = CreateSubWidget<UWidgetInventoryEquipSlot>({ EquipSlots[i] }, EquipSlotClass))
 				{
-					EquipSlot->OnInitialize(EquipSlots[i]);
 					EquipSlot->SetEquipPartType(UGlobalBPLibrary::GetEnumValueDisplayName(TEXT("/Script/WHFramework.EEquipPartType"), i));
 					if(UGridSlot* GridSlot = i % 2 == 0 ? LeftEquipContent->AddChildToGrid(EquipSlot) : RightEquipContent->AddChildToGrid(EquipSlot))
 					{
@@ -95,7 +96,7 @@ void UWidgetInventoryPanel::OnInitialize_Implementation(AActor* InOwner)
 		{
 			for(int32 i = 0; i < UISlotDatas[ESplitSlotType::Equip].Slots.Num(); i++)
 			{
-				UISlotDatas[ESplitSlotType::Equip].Slots[i]->OnInitialize(EquipSlots[i]);
+				UISlotDatas[ESplitSlotType::Equip].Slots[i]->OnInitialize({ EquipSlots[i] });
 			}
 		}
 	}

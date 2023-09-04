@@ -12,7 +12,7 @@ UWidgetMainMenu::UWidgetMainMenu(const FObjectInitializer& ObjectInitializer) : 
 	InputMode = EInputMode::UIOnly;
 }
 
-void UWidgetMainMenu::OnInitialize_Implementation(AActor* InOwner)
+void UWidgetMainMenu::OnInitialize_Implementation(UObject* InOwner)
 {
 	Super::OnInitialize_Implementation(InOwner);
 }

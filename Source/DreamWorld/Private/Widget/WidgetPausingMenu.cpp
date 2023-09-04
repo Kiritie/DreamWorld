@@ -15,7 +15,7 @@ UWidgetPausingMenu::UWidgetPausingMenu(const FObjectInitializer& ObjectInitializ
 	bIsFocusable = true;
 }
 
-void UWidgetPausingMenu::OnInitialize_Implementation(AActor* InOwner)
+void UWidgetPausingMenu::OnInitialize_Implementation(UObject* InOwner)
 {
 	Super::OnInitialize_Implementation(InOwner);
 }

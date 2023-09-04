@@ -31,14 +31,14 @@ UWidgetGameHUD::UWidgetGameHUD(const FObjectInitializer& ObjectInitializer) : Su
 	bIsFocusable = true;
 }
 
-void UWidgetGameHUD::OnCreate_Implementation(AActor* InOwner)
+void UWidgetGameHUD::OnCreate_Implementation(UObject* InOwner)
 {
 	Super::OnCreate_Implementation(InOwner);
 
 	UEventModuleBPLibrary::SubscribeEvent(UEventHandle_ChangeInputMode::StaticClass(), this, FName("OnChangeInputMode"));
 }
 
-void UWidgetGameHUD::OnInitialize_Implementation(AActor* InOwner)
+void UWidgetGameHUD::OnInitialize_Implementation(UObject* InOwner)
 {
 	Super::OnInitialize_Implementation(InOwner);
 }
@@ -61,7 +61,7 @@ void UWidgetGameHUD::OnRefresh_Implementation()
 {
 	Super::OnRefresh_Implementation();
 
-	if(ADWCharacter* OwnerCharacter = Cast<ADWCharacter>(OwnerActor))
+	if(ADWCharacter* OwnerCharacter = Cast<ADWCharacter>(OwnerObject))
 	{
 		if(auto Interaction = OwnerCharacter->GetInteractionComponent()->GetInteractingComponent())
 		{
@@ -89,7 +89,7 @@ FReply UWidgetGameHUD::NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEv
 
 void UWidgetGameHUD::OnChangeInputMode(UObject* InSender, UEventHandle_ChangeInputMode* InEventHandle)
 {
-	if(ADWCharacter* OwnerCharacter = Cast<ADWCharacter>(OwnerActor))
+	if(ADWCharacter* OwnerCharacter = Cast<ADWCharacter>(OwnerObject))
 	{
 		if(!OwnerCharacter->IsDead() && InEventHandle->InputMode == EInputMode::GameOnly)
 		{

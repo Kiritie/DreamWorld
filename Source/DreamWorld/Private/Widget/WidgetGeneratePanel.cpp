@@ -13,8 +13,8 @@
 #include "Ability/Inventory/CharacterInventory.h"
 #include "Ability/Inventory/Slot/InventorySlot.h"
 #include "Asset/AssetModuleBPLibrary.h"
-#include "Widget/Inventory/Slot/Preview/WidgetInventoryGenerateSlot.h"
-#include "Widget/Inventory/Slot/Preview/WidgetInventoryPreviewSlot.h"
+#include "Widget/Inventory/Item/WidgetInventoryGenerateItem.h"
+#include "Widget/Inventory/Item/WidgetInventoryPreviewItem.h"
 #include "Components/ScrollBoxSlot.h"
 #include "Components/ScrollBox.h"
 #include "ObjectPool/ObjectPoolModuleBPLibrary.h"
@@ -37,11 +37,11 @@ UWidgetGeneratePanel::UWidgetGeneratePanel(const FObjectInitializer& ObjectIniti
 
 	bIsFocusable = true;
 
-	GenerateSlotClass = LoadClass<UWidgetInventoryGenerateSlot>(nullptr, TEXT("WidgetBlueprint'/Game/Blueprints/Widget/Inventory/Slot/Preview/WB_InventoryGenerateSlot.WB_InventoryGenerateSlot_C'"));
-	PreviewSlotClass = LoadClass<UWidgetInventoryPreviewSlot>(nullptr, TEXT("WidgetBlueprint'/Game/Blueprints/Widget/Inventory/Slot/Preview/WB_InventoryPreviewSlot.WB_InventoryPreviewSlot_C'"));
+	GenerateSlotClass = LoadClass<UWidgetInventoryGenerateItem>(nullptr, TEXT("WidgetBlueprint'/Game/Blueprints/Widget/Inventory/Item/WB_InventoryGenerateItem.WB_InventoryGenerateItem_C'"));
+	PreviewSlotClass = LoadClass<UWidgetInventoryPreviewItem>(nullptr, TEXT("WidgetBlueprint'/Game/Blueprints/Widget/Inventory/Item/WB_InventoryPreviewItem.WB_InventoryPreviewItem_C'"));
 }
 
-void UWidgetGeneratePanel::OnCreate_Implementation(AActor* InOwner)
+void UWidgetGeneratePanel::OnCreate_Implementation(UObject* InOwner)
 {
 	Super::OnCreate_Implementation(InOwner);
 
@@ -51,11 +51,13 @@ void UWidgetGeneratePanel::OnCreate_Implementation(AActor* InOwner)
 	}
 }
 
-void UWidgetGeneratePanel::OnInitialize_Implementation(AActor* InOwner)
+void UWidgetGeneratePanel::OnInitialize_Implementation(UObject* InOwner)
 {
-	if(OwnerActor)
+	if(OwnerObject == InOwner) return;
+	
+	if(OwnerObject)
 	{
-		UInventory* Inventory = Cast<ADWCharacter>(OwnerActor)->GetInventory();
+		UInventory* Inventory = Cast<ADWCharacter>(OwnerObject)->GetInventory();
 		Inventory->OnRefresh.RemoveDynamic(this, &UWidgetGeneratePanel::Refresh);
 	}
 
@@ -75,22 +77,20 @@ void UWidgetGeneratePanel::OnOpen_Implementation(const TArray<FParameter>& InPar
 	TArray<FDWGenerateItemData> GenerateItemDatas;
 	if(GenerateContent && UAssetModuleBPLibrary::ReadDataTable(GenerateItemDatas))
 	{
-		for(auto Iter : GenerateSlots)
+		for(auto Iter : GenerateItems)
 		{
-			UObjectPoolModuleBPLibrary::DespawnObject(Iter);
+			DestroySubWidget(Iter, true);
 		}
-		GenerateSlots.Empty();
+		GenerateItems.Empty();
 		for(int32 i = 0; i < GenerateItemDatas.Num(); i++)
 		{
-			if(UWidgetInventoryGenerateSlot* GenerateSlot = UObjectPoolModuleBPLibrary::SpawnObject<UWidgetInventoryGenerateSlot>(nullptr, GenerateSlotClass))
+			if(UWidgetInventoryGenerateItem* GenerateItem = CreateSubWidget<UWidgetInventoryGenerateItem>({ &GenerateItemDatas[i].Item }, GenerateSlotClass))
 			{
-				GenerateSlot->OnInitialize(this, GenerateItemDatas[i].Item);
-				GenerateSlot->OnSlotSelected.AddDynamic(this, &UWidgetGeneratePanel::OnGenerateSlotSelected);
-				if(UScrollBoxSlot* ScrollBoxSlot = Cast<UScrollBoxSlot>(GenerateContent->AddChild(GenerateSlot)))
+				if(UScrollBoxSlot* ScrollBoxSlot = Cast<UScrollBoxSlot>(GenerateContent->AddChild(GenerateItem)))
 				{
 					ScrollBoxSlot->SetPadding(FMargin(0.f, 0.f, 0.f, 5.f));
 				}
-				GenerateSlots.Add(GenerateSlot);
+				GenerateItems.Add(GenerateItem);
 			}
 		}
 		OnGenerateSlotSelected(nullptr);
@@ -108,7 +108,7 @@ void UWidgetGeneratePanel::OnRefresh_Implementation()
 {
 	Super::OnRefresh_Implementation();
 
-	for(auto Iter : PreviewSlots)
+	for(auto Iter : PreviewItems)
 	{
 		Iter->OnRefresh();
 	}
@@ -119,7 +119,7 @@ void UWidgetGeneratePanel::OnRefresh_Implementation()
 		FDWGenerateItemData GenerateItemData;
 		if(GetSelectedGenerateItemData(GenerateItemData))
 		{
-			UInventory* Inventory = Cast<ADWCharacter>(OwnerActor)->GetInventory();
+			UInventory* Inventory = Cast<ADWCharacter>(OwnerObject)->GetInventory();
 			for(auto Iter : GenerateItemData.Raws)
 			{
 				const FQueryItemInfo QueryItemInfo = Inventory->QueryItemByRange(EQueryItemType::Get, Iter);
@@ -142,52 +142,49 @@ void UWidgetGeneratePanel::OnDestroy_Implementation(bool bRecovery)
 {
 	Super::OnDestroy_Implementation(bRecovery);
 	
-	for(auto Iter : GenerateSlots)
+	for(auto Iter : GenerateItems)
 	{
-		UObjectPoolModuleBPLibrary::DespawnObject(Iter);
+		DestroySubWidget(Iter, true);
 	}
 
-	for(auto Iter : PreviewSlots)
+	for(auto Iter : PreviewItems)
 	{
-		UObjectPoolModuleBPLibrary::DespawnObject(Iter);
+		DestroySubWidget(Iter, true);
 	}
 }
 
-void UWidgetGeneratePanel::OnGenerateSlotSelected(UWidgetInventoryGenerateSlot* InSlot)
+void UWidgetGeneratePanel::OnGenerateSlotSelected(UWidgetInventoryGenerateItem* InSlot)
 {
 	if(InSlot == SelectedGenerateSlot) return;
 
 	if(SelectedGenerateSlot)
 	{
-		SelectedGenerateSlot->SetSelectState(false);
+		SelectedGenerateSlot->OnUnSelected();
 	}
 
 	SelectedGenerateSlot = InSlot;
 
 	if(SelectedGenerateSlot)
 	{
-		SelectedGenerateSlot->SetSelectState(true);
-
 		if(PreviewContent)
 		{
 			FDWGenerateItemData GenerateItemData;
 			if(GetSelectedGenerateItemData(GenerateItemData))
 			{
-				for(auto Iter : PreviewSlots)
+				for(auto Iter : PreviewItems)
 				{
-					UObjectPoolModuleBPLibrary::DespawnObject(Iter);
+					DestroySubWidget(Iter, true);
 				}
-				PreviewSlots.Empty();
+				PreviewItems.Empty();
 				for(int32 i = 0; i < GenerateItemData.Raws.Num(); i++)
 				{
-					if(UWidgetInventoryPreviewSlot* PreviewSlot = UObjectPoolModuleBPLibrary::SpawnObject<UWidgetInventoryPreviewSlot>(nullptr, PreviewSlotClass))
+					if(UWidgetInventoryPreviewItem* PreviewItem = CreateSubWidget<UWidgetInventoryPreviewItem>({ &GenerateItemData.Raws[i] }, PreviewSlotClass))
 					{
-						PreviewSlot->OnInitialize(this, GenerateItemData.Raws[i]);
-						if(UWrapBoxSlot* WrapBoxSlot = PreviewContent->AddChildToWrapBox(PreviewSlot))
+						if(UWrapBoxSlot* WrapBoxSlot = PreviewContent->AddChildToWrapBox(PreviewItem))
 						{
 							WrapBoxSlot->SetPadding(FMargin(5.f, 5.f, 5.f, 5.f));
 						}
-						PreviewSlots.Add(PreviewSlot);
+						PreviewItems.Add(PreviewItem);
 					}
 				}
 			}
@@ -195,11 +192,11 @@ void UWidgetGeneratePanel::OnGenerateSlotSelected(UWidgetInventoryGenerateSlot* 
 	}
 	else
 	{
-		for(auto Iter : PreviewSlots)
+		for(auto Iter : PreviewItems)
 		{
-			UObjectPoolModuleBPLibrary::DespawnObject(Iter);
+			DestroySubWidget(Iter, true);
 		}
-		PreviewSlots.Empty();
+		PreviewItems.Empty();
 	}
 
 	Refresh();
@@ -210,7 +207,7 @@ void UWidgetGeneratePanel::OnGenerateButtonClicked()
 	FDWGenerateItemData GenerateItemData;
 	if(GetSelectedGenerateItemData(GenerateItemData))
 	{
-		UInventory* Inventory = Cast<ADWCharacter>(OwnerActor)->GetInventory();
+		UInventory* Inventory = Cast<ADWCharacter>(OwnerObject)->GetInventory();
 		for(auto& Iter : GenerateItemData.Raws)
 		{
 			Inventory->RemoveItemByRange(Iter);
@@ -226,7 +223,7 @@ bool UWidgetGeneratePanel::GetSelectedGenerateItemData(FDWGenerateItemData& OutI
 	TArray<FDWGenerateItemData> GenerateItemDatas;
 	if(SelectedGenerateSlot && UAssetModuleBPLibrary::ReadDataTable(GenerateItemDatas))
 	{
-		const int32 tmpIndex = GenerateSlots.Find(SelectedGenerateSlot);
+		const int32 tmpIndex = GenerateItems.Find(SelectedGenerateSlot);
 		if(GenerateItemDatas.IsValidIndex(tmpIndex))
 		{
 			OutItemData = GenerateItemDatas[tmpIndex];

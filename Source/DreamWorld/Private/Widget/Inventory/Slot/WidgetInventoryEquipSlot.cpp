@@ -7,8 +7,3 @@ UWidgetInventoryEquipSlot::UWidgetInventoryEquipSlot(const FObjectInitializer& O
 {
 	
 }
-
-void UWidgetInventoryEquipSlot::OnInitialize(UInventorySlot* InOwnerSlot)
-{
-	Super::OnInitialize(InOwnerSlot);
-}

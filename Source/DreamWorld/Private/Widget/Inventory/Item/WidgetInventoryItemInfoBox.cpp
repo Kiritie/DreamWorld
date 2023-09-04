@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Widget/Inventory/WidgetInventoryItemInfoBox.h"
+#include "Widget/Inventory/Item/WidgetInventoryItemInfoBox.h"
 #include "Components/TextBlock.h"
 
 UWidgetInventoryItemInfoBox::UWidgetInventoryItemInfoBox(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
@@ -13,12 +13,12 @@ UWidgetInventoryItemInfoBox::UWidgetInventoryItemInfoBox(const FObjectInitialize
 	WidgetType = EWidgetType::Permanent;
 }
 
-void UWidgetInventoryItemInfoBox::OnCreate_Implementation(AActor* InOwner)
+void UWidgetInventoryItemInfoBox::OnCreate_Implementation(UObject* InOwner)
 {
 	Super::OnCreate_Implementation(InOwner);
 }
 
-void UWidgetInventoryItemInfoBox::OnInitialize_Implementation(AActor* InOwner)
+void UWidgetInventoryItemInfoBox::OnInitialize_Implementation(UObject* InOwner)
 {
 	Super::OnInitialize_Implementation(InOwner);
 }

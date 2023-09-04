@@ -12,16 +12,23 @@
 #include "Ability/Inventory/Inventory.h"
 #include "Widget/Inventory/WidgetInventory.h"
 #include "Ability/Inventory/Slot/InventorySlot.h"
+#include "Blueprint/WidgetBlueprintLibrary.h"
 #include "Kismet/KismetTextLibrary.h"
 #include "Materials/MaterialInstanceDynamic.h"
 #include "Blueprint/WidgetLayoutLibrary.h"
 #include "Components/CanvasPanelSlot.h"
-#include "Widget/Inventory/WidgetInventoryItemInfoBox.h"
+#include "Widget/Inventory/Item/WidgetInventoryItemInfoBox.h"
 #include "Widget/WidgetModuleBPLibrary.h"
 #include "Global/GlobalBPLibrary.h"
+#include "Widget/Inventory/Item/WidgetInventoryItem.h"
 
 UWidgetInventorySlot::UWidgetInventorySlot(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
+	static ConstructorHelpers::FClassFinder<UWidgetInventoryItemBase> ItemDragVisualClassFinder(TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/Blueprints/Widget/Inventory/Item/WB_InventoryItemDragVisual.WB_InventoryItemDragVisual_C'"));
+	if(ItemDragVisualClassFinder.Succeeded())
+	{
+		DragVisualClass = ItemDragVisualClassFinder.Class;
+	}
 }
 
 void UWidgetInventorySlot::NativePreConstruct()
@@ -45,20 +52,20 @@ bool UWidgetInventorySlot::NativeOnDrop(const FGeometry& InGeometry, const FDrag
 {
 	Super::NativeOnDrop(InGeometry, InDragDropEvent, InOperation);
 
-	auto payloadSlot = Cast<UWidgetInventorySlot>(InOperation->Payload);
-	if (payloadSlot && payloadSlot != this && !payloadSlot->IsEmpty())
+	const auto PayloadSlot = Cast<UWidgetInventorySlot>(InOperation->Payload);
+	if (PayloadSlot && PayloadSlot != this && !PayloadSlot->IsEmpty())
 	{
-		FAbilityItem& tmpItem = payloadSlot->GetItem();
+		FAbilityItem& tmpItem = PayloadSlot->GetItem();
 		if(OwnerSlot->CheckSlot(tmpItem))
 		{
 			if (OwnerSlot->Contains(tmpItem))
 			{
 				OwnerSlot->AddItem(tmpItem);
-				payloadSlot->OwnerSlot->Refresh();
+				PayloadSlot->OwnerSlot->Refresh();
 			}
 			else
 			{
-				OwnerSlot->Replace(payloadSlot->OwnerSlot);
+				OwnerSlot->Replace(PayloadSlot->OwnerSlot);
 			}
 		}
 	}
@@ -77,6 +84,18 @@ void UWidgetInventorySlot::NativeOnDragLeave(const FDragDropEvent& InDragDropEve
 	Super::NativeOnDragLeave(InDragDropEvent, InOperation);
 
 	SetBorderColor(FLinearColor(0.0f, 1.0f, 1.0f, 0.7f));
+}
+
+void UWidgetInventorySlot::NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation)
+{
+	Super::NativeOnDragDetected(InGeometry, InMouseEvent, OutOperation);
+
+	if(!IsEmpty())
+	{
+		OutOperation = UWidgetBlueprintLibrary::CreateDragDropOperation(UDragDropOperation::StaticClass());
+		OutOperation->Payload = this;
+		OutOperation->DefaultDragVisual = Owner->CreateSubWidget<UWidgetInventoryItemBase>({ &GetItem() }, DragVisualClass);
+	}
 }
 
 void UWidgetInventorySlot::NativeOnMouseEnter(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
@@ -108,14 +127,11 @@ FReply UWidgetInventorySlot::NativeOnMouseMove(const FGeometry& InGeometry, cons
 {
 	if(!IsEmpty())
 	{
-		if(auto InventoryItemInfoBox = UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryItemInfoBox>())
+		if(const auto ItemInfoBoxSlot = Cast<UCanvasPanelSlot>(UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryItemInfoBox>()->Slot))
 		{
-			if(auto InventoryItemInfoBoxSlot = Cast<UCanvasPanelSlot>(InventoryItemInfoBox->Slot))
-			{
-				float PosX, PosY;
-				UWidgetLayoutLibrary::GetMousePositionScaledByDPI(UGlobalBPLibrary::GetPlayerController(), PosX, PosY);
-				InventoryItemInfoBoxSlot->SetPosition(FVector2D(PosX, PosY));
-			}
+			float PosX, PosY;
+			UWidgetLayoutLibrary::GetMousePositionScaledByDPI(UGlobalBPLibrary::GetPlayerController(), PosX, PosY);
+			ItemInfoBoxSlot->SetPosition(FVector2D(PosX, PosY));
 		}
 	}
 
@@ -138,6 +154,7 @@ FReply UWidgetInventorySlot::NativeOnMouseButtonDown(const FGeometry& InGeometry
 		{
 			UseItem(1);
 		}
+		return FReply::Handled();
 	}
 	else if(InMouseEvent.GetEffectingButton() == FKey("MiddleMouseButton"))
 	{
@@ -149,34 +166,32 @@ FReply UWidgetInventorySlot::NativeOnMouseButtonDown(const FGeometry& InGeometry
 		{
 			DiscardItem(1);
 		}
+		return FReply::Handled();
 	}
-
-	return Super::NativeOnMouseButtonDown(InGeometry, InMouseEvent);
+	return UWidgetBlueprintLibrary::DetectDragIfPressed(InMouseEvent, this, FKey("LeftMouseButton")).NativeReply;
 }
 
-void UWidgetInventorySlot::OnInitialize(UInventorySlot* InOwnerSlot)
+void UWidgetInventorySlot::OnCreate_Implementation(UUserWidgetBase* InOwner, const TArray<FParameter>& InParams)
 {
-	Super::OnInitialize(InOwnerSlot);
+	Super::OnCreate_Implementation(InOwner, InParams);
 }
 
-void UWidgetInventorySlot::OnRefresh()
+void UWidgetInventorySlot::OnInitialize_Implementation(const TArray<FParameter>& InParams)
 {
-	Super::OnRefresh();
+	Super::OnInitialize_Implementation(InParams);
+}
+
+void UWidgetInventorySlot::OnRefresh_Implementation()
+{
+	Super::OnRefresh_Implementation();
 
 	if(!OwnerSlot) return;
 
 	if(!IsEmpty())
 	{
-		ImgIcon->SetVisibility(ESlateVisibility::Visible);
 		const auto& ItemData = GetItem().GetData();
-		if(ItemData.IconMat)
-		{
-			ImgIcon->SetBrushFromMaterial(ItemData.IconMat);
-		}
-		else
-		{
-			ImgIcon->SetBrushFromTexture(ItemData.Icon);
-		}
+		ImgIcon->SetVisibility(ESlateVisibility::Visible);
+		ImgIcon->SetBrushResourceObject(ItemData.Icon);
 		if(TxtCount)
 		{
 			if(GetItem().Count > 1)
@@ -208,30 +223,30 @@ void UWidgetInventorySlot::OnRefresh()
 	}
 }
 
-void UWidgetInventorySlot::OnActivated()
+void UWidgetInventorySlot::OnActivated_Implementation()
 {
-	Super::OnActivated();
+	Super::OnActivated_Implementation();
 }
 
-void UWidgetInventorySlot::OnCanceled()
+void UWidgetInventorySlot::OnCanceled_Implementation()
 {
-	Super::OnCanceled();
+	Super::OnCanceled_Implementation();
 }
 
-void UWidgetInventorySlot::StartCooldown()
+void UWidgetInventorySlot::StartCooldown_Implementation()
 {
-	Super::StartCooldown();
+	Super::StartCooldown_Implementation();
 }
 
-void UWidgetInventorySlot::StopCooldown()
+void UWidgetInventorySlot::StopCooldown_Implementation()
 {
-	Super::StopCooldown();
+	Super::StopCooldown_Implementation();
 
 	ImgMask->SetVisibility(ESlateVisibility::Hidden);
 	TxtCooldown->SetVisibility(ESlateVisibility::Hidden);
 }
 
-void UWidgetInventorySlot::OnCooldown()
+void UWidgetInventorySlot::OnCooldown_Implementation()
 {
 	if(!OwnerSlot) return;
 

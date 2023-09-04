@@ -5,7 +5,7 @@ UWidgetInventory::UWidgetInventory(const FObjectInitializer& ObjectInitializer) 
 
 }
 
-void UWidgetInventory::OnInitialize_Implementation(AActor* InOwner)
+void UWidgetInventory::OnInitialize_Implementation(UObject* InOwner)
 {
 	Super::OnInitialize_Implementation(InOwner);
 }

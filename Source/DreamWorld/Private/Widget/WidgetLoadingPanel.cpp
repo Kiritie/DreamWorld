@@ -10,7 +10,7 @@ UWidgetLoadingPanel::UWidgetLoadingPanel(const FObjectInitializer& ObjectInitial
 	InputMode = EInputMode::None;
 }
 
-void UWidgetLoadingPanel::OnInitialize_Implementation(AActor* InOwner)
+void UWidgetLoadingPanel::OnInitialize_Implementation(UObject* InOwner)
 {
 	Super::OnInitialize_Implementation(InOwner);
 }
