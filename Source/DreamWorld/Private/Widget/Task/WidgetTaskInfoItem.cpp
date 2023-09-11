@@ -2,6 +2,8 @@
 
 
 #include "Widget/Task/WidgetTaskInfoItem.h"
+
+#include "Components/VerticalBoxSlot.h"
 #include "Task/Base/TaskBase.h"
 
 
@@ -9,7 +11,16 @@ UWidgetTaskInfoItem::UWidgetTaskInfoItem(const FObjectInitializer& ObjectInitial
 {
 }
 
-void UWidgetTaskInfoItem::Init_Implementation(UTaskBase* InTask)
+void UWidgetTaskInfoItem::OnInitialize_Implementation(const TArray<FParameter>& InParams)
 {
-	Task = InTask;
+	if(InParams.IsValidIndex(0))
+	{
+		Task = InParams[0].GetObjectValue<UTaskBase>();
+	}
+	Super::OnInitialize_Implementation(InParams);
+}
+
+void UWidgetTaskInfoItem::OnRefresh_Implementation()
+{
+	Super::OnRefresh_Implementation();
 }

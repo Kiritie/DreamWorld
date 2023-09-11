@@ -2,17 +2,14 @@
 
 #pragma once
 
-#include "Animation/AnimInstance.h"
-#include "Character/Base/CharacterAnim.h"
+#include "Ability/Character/AbilityCharacterAnimBase.h"
 #include "DWCharacterAnim.generated.h"
-
-class ADWCharacter;
 
 /**
  * 角色动画控制器
  */
 UCLASS()
-class DREAMWORLD_API UDWCharacterAnim : public UCharacterAnim
+class DREAMWORLD_API UDWCharacterAnim : public UAbilityCharacterAnimBase
 {
 	GENERATED_BODY()
 
@@ -36,8 +33,6 @@ public:
 	bool bClimbing;
 
 protected:
-	virtual void NativeInitializeAnimation() override;
-
 	virtual void NativeHandleNotify(const FString& AnimNotifyName) override;
 
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;

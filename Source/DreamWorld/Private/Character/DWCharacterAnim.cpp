@@ -25,11 +25,6 @@ UDWCharacterAnim::UDWCharacterAnim()
 	VerticalSpeed = 0;
 }
 
-void UDWCharacterAnim::NativeInitializeAnimation()
-{
-	
-}
-
 void UDWCharacterAnim::NativeHandleNotify(const FString& AnimNotifyName)
 {
 	Super::NativeHandleNotify(AnimNotifyName);
@@ -61,12 +56,12 @@ void UDWCharacterAnim::NativeHandleNotify(const FString& AnimNotifyName)
 }
 
 void UDWCharacterAnim::NativeUpdateAnimation(float DeltaSeconds)
-{ 
+{
+	Super::NativeUpdateAnimation(DeltaSeconds);
+	
 	ADWCharacter* Character = Cast<ADWCharacter>(TryGetPawnOwner());
 
 	if(!Character || !Character->GetAssetID().IsValid() || !UGlobalBPLibrary::IsPlaying()) return;
-
-	bFalling = Character->IsFalling();
 
 	bSprinting = Character->IsSprinting();
 	bAttacking = Character->IsAttacking();
@@ -76,9 +71,4 @@ void UDWCharacterAnim::NativeUpdateAnimation(float DeltaSeconds)
 	bClimbing = Character->IsClimbing();
 	bCrouching = Character->IsCrouching();
 	bSwimming = Character->IsSwimming() || Character->IsFloating();
-
-	VerticalSpeed = Character->GetMoveVelocity(false).Z;
-	HorizontalSpeed = Character->GetMoveVelocity().Size();
-
-	MoveDirection = FMath::FindDeltaAngleDegrees(Character->GetMoveDirection().ToOrientationRotator().Yaw, Character->GetActorRotation().Yaw);
 }

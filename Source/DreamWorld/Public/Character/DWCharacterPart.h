@@ -2,18 +2,16 @@
 
 #pragma once
 
+#include "Ability/Character/AbilityCharacterPartBase.h"
 #include "Global/DWGlobalTypes.h"
-#include "Components/BoxComponent.h"
-#include "Voxel/VoxelModuleTypes.h"
 
 #include "DWCharacterPart.generated.h"
 
-class UVoxel;
 /**
  * 角色部位组件
  */
 UCLASS()
-class DREAMWORLD_API UDWCharacterPart : public UBoxComponent
+class DREAMWORLD_API UDWCharacterPart : public UAbilityCharacterPartBase
 {
 	GENERATED_BODY()
 	
@@ -25,23 +23,17 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+	virtual void OnHitVoxel(UVoxel& InVoxel, const FVoxelHitResult& InHitResult) override;
 
-public:
-	virtual void OnHitVoxel(UVoxel& InVoxel, const FVoxelHitResult& InHitResult);
+	virtual void OnEnterVoxel(UVoxel& InVoxel, const FVoxelHitResult& InHitResult) override;
 
-	virtual void OnEnterVoxel(UVoxel& InVoxel, const FVoxelHitResult& InHitResult);
+	virtual void OnStayVoxel(UVoxel& InVoxel, const FVoxelHitResult& InHitResult) override;
 
-	virtual void OnStayVoxel(UVoxel& InVoxel, const FVoxelHitResult& InHitResult);
-
-	virtual void OnExitVoxel(UVoxel& InVoxel, const FVoxelHitResult& InHitResult);
+	virtual void OnExitVoxel(UVoxel& InVoxel, const FVoxelHitResult& InHitResult) override;
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	EDWCharacterPartType CharacterPartType;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	FVoxelItem LastOverlapVoxel;
 
 public:
 	UFUNCTION(BlueprintPure)
@@ -49,10 +41,4 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void SetCharacterPartType(EDWCharacterPartType InCharacterPartType) { this->CharacterPartType = InCharacterPartType; }
-
-	UFUNCTION(BlueprintPure)
-	FVoxelItem& GetLastOverlapVoxel() { return LastOverlapVoxel; }
-
-	UFUNCTION(BlueprintPure)
-	ADWCharacter* GetOwnerCharacter() const;
 };

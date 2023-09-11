@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "Blueprint/UserWidget.h"
+#include "Widget/Screen/UMG/SubWidgetBase.h"
 #include "WidgetTaskInfoItem.generated.h"
 
 class UTaskBase;
@@ -11,7 +11,7 @@ class UTaskBase;
  * 任务信息框
  */
 UCLASS()
-class DREAMWORLD_API UWidgetTaskInfoItem : public UUserWidget
+class DREAMWORLD_API UWidgetTaskInfoItem : public USubWidgetBase
 {
 	GENERATED_BODY()
 
@@ -19,8 +19,9 @@ public:
 	UWidgetTaskInfoItem(const FObjectInitializer& ObjectInitializer);
 
 public:
-	UFUNCTION(BlueprintNativeEvent)
-	void Init(UTaskBase* InTask);
+	virtual void OnInitialize_Implementation(const TArray<FParameter>& InParams) override;
+
+	virtual void OnRefresh_Implementation() override;
 
 protected:
 	UPROPERTY(BlueprintReadOnly, Category = "Default")

@@ -64,13 +64,13 @@ void UWidgetTaskInfoBox::OnRefresh_Implementation()
 
 void UWidgetTaskInfoBox::CreateTaskInfoItem(UTaskBase* InTask)
 {
-	if(UWidgetTaskInfoItem* TaskInfoItem = UObjectPoolModuleBPLibrary::SpawnObject<UWidgetTaskInfoItem>(nullptr, TaskInfoItemClass))
+	if(UWidgetTaskInfoItem* TaskInfoItem = CreateSubWidget<UWidgetTaskInfoItem>({ InTask }, TaskInfoItemClass))
 	{
-		if(auto TempSlot = ContentBox->AddChildToVerticalBox(TaskInfoItem))
+		if(const auto TempSlot = ContentBox->AddChildToVerticalBox(TaskInfoItem))
 		{
 			TempSlot->SetHorizontalAlignment(EHorizontalAlignment::HAlign_Left);
+			TempSlot->SetPadding(FMargin(InTask->TaskHierarchy * 50.f, 0.f, 0.f, 0.f));
 		}
-		TaskInfoItem->Init(InTask);
 	}
 	for(auto Iter : InTask->SubTasks)
 	{

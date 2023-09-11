@@ -50,26 +50,7 @@ void UWidgetInventorySlot::NativeConstruct()
 
 bool UWidgetInventorySlot::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
 {
-	Super::NativeOnDrop(InGeometry, InDragDropEvent, InOperation);
-
-	const auto PayloadSlot = Cast<UWidgetInventorySlot>(InOperation->Payload);
-	if (PayloadSlot && PayloadSlot != this && !PayloadSlot->IsEmpty())
-	{
-		FAbilityItem& tmpItem = PayloadSlot->GetItem();
-		if(OwnerSlot->CheckSlot(tmpItem))
-		{
-			if (OwnerSlot->Contains(tmpItem))
-			{
-				OwnerSlot->AddItem(tmpItem);
-				PayloadSlot->OwnerSlot->Refresh();
-			}
-			else
-			{
-				OwnerSlot->Replace(PayloadSlot->OwnerSlot);
-			}
-		}
-	}
-	return true;
+	return Super::NativeOnDrop(InGeometry, InDragDropEvent, InOperation);
 }
 
 void UWidgetInventorySlot::NativeOnDragEnter(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
@@ -89,13 +70,6 @@ void UWidgetInventorySlot::NativeOnDragLeave(const FDragDropEvent& InDragDropEve
 void UWidgetInventorySlot::NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation)
 {
 	Super::NativeOnDragDetected(InGeometry, InMouseEvent, OutOperation);
-
-	if(!IsEmpty())
-	{
-		OutOperation = UWidgetBlueprintLibrary::CreateDragDropOperation(UDragDropOperation::StaticClass());
-		OutOperation->Payload = this;
-		OutOperation->DefaultDragVisual = Owner->CreateSubWidget<UWidgetInventoryItemBase>({ &GetItem() }, DragVisualClass);
-	}
 }
 
 void UWidgetInventorySlot::NativeOnMouseEnter(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
@@ -134,40 +108,11 @@ FReply UWidgetInventorySlot::NativeOnMouseMove(const FGeometry& InGeometry, cons
 			ItemInfoBoxSlot->SetPosition(FVector2D(PosX, PosY));
 		}
 	}
-
 	return Super::NativeOnMouseMove(InGeometry, InMouseEvent);
 }
 
 FReply UWidgetInventorySlot::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
 {
-	if(InMouseEvent.GetEffectingButton() == FKey("RightMouseButton"))
-	{
-		if(InMouseEvent.IsLeftControlDown())
-		{
-			MoveItem(-1);
-		}
-		else if(InMouseEvent.IsLeftShiftDown())
-		{
-			UseItem(-1);
-		}
-		else
-		{
-			UseItem(1);
-		}
-		return FReply::Handled();
-	}
-	else if(InMouseEvent.GetEffectingButton() == FKey("MiddleMouseButton"))
-	{
-		if(InMouseEvent.IsLeftShiftDown())
-		{
-			DiscardItem(-1);
-		}
-		else
-		{
-			DiscardItem(1);
-		}
-		return FReply::Handled();
-	}
 	return UWidgetBlueprintLibrary::DetectDragIfPressed(InMouseEvent, this, FKey("LeftMouseButton")).NativeReply;
 }
 
