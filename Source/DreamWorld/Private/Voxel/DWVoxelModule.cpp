@@ -40,26 +40,6 @@ ADWVoxelModule::ADWVoxelModule()
 	BoundsMesh->SetRelativeScale3D(FVector::ZeroVector);
 	BoundsMesh->SetRelativeRotation(FRotator(0, 0, 0));
 	BoundsMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	
-	WorldBasicData.ChunkMaterials.Empty();
-	static ConstructorHelpers::FObjectFinder<UMaterialInterface> SolidMatFinder(TEXT("MaterialInstanceConstant'/Game/Materials/Voxel/M_DW_Voxels_Solid.M_DW_Voxels_Solid'"));
-	static ConstructorHelpers::FObjectFinder<UMaterialInterface> UnlitSolidMatFinder(TEXT("MaterialInstanceConstant'/Game/Materials/Voxel/M_DW_Voxels_Solid_Unlit.M_DW_Voxels_Solid_Unlit'"));
-	if(SolidMatFinder.Succeeded() && UnlitSolidMatFinder.Succeeded())
-	{
-		WorldBasicData.ChunkMaterials.Add(FVoxelChunkMaterial(SolidMatFinder.Object, UnlitSolidMatFinder.Object, FVector2D(0.0625f, 0.5f)));
-	}
-	static ConstructorHelpers::FObjectFinder<UMaterialInterface> SemiTransparentMatFinder(TEXT("MaterialInstanceConstant'/Game/Materials/Voxel/M_DW_Voxels_SemiTransparent.M_DW_Voxels_SemiTransparent'"));
-	static ConstructorHelpers::FObjectFinder<UMaterialInterface> UnlitSemiTransparentMatFinder(TEXT("MaterialInstanceConstant'/Game/Materials/Voxel/M_DW_Voxels_SemiTransparent_Unlit.M_DW_Voxels_SemiTransparent_Unlit'"));
-	if(SemiTransparentMatFinder.Succeeded() && UnlitSemiTransparentMatFinder.Succeeded())
-	{
-		WorldBasicData.ChunkMaterials.Add(FVoxelChunkMaterial(SemiTransparentMatFinder.Object, UnlitSemiTransparentMatFinder.Object, FVector2D(0.0625f, 0.5f)));
-	}
-	static ConstructorHelpers::FObjectFinder<UMaterialInterface> TransparentMatFinder(TEXT("MaterialInstanceConstant'/Game/Materials/Voxel/M_DW_Voxels_Transparent.M_DW_Voxels_Transparent'"));
-	static ConstructorHelpers::FObjectFinder<UMaterialInterface> UnlitTransparentMatFinder(TEXT("MaterialInstanceConstant'/Game/Materials/Voxel/M_DW_Voxels_Transparent_Unlit.M_DW_Voxels_Transparent_Unlit'"));
-	if(TransparentMatFinder.Succeeded() && UnlitTransparentMatFinder.Succeeded())
-	{
-		WorldBasicData.ChunkMaterials.Add(FVoxelChunkMaterial(TransparentMatFinder.Object, UnlitTransparentMatFinder.Object, FVector2D(0.0625f, 0.5f)));
-	}
 }
 
 ADWVoxelModule::~ADWVoxelModule()
