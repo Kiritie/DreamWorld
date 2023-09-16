@@ -7,7 +7,7 @@ UWidgetShopPanel::UWidgetShopPanel(const FObjectInitializer& ObjectInitializer) 
 {
 	WidgetName = FName("ShopPanel");
 	ParentName = FName("GameHUD");
-	InputMode = EInputMode::UIOnly;
+	WidgetInputMode = EInputMode::UIOnly;
 
 	WidgetType = EWidgetType::Temporary;
 	WidgetCreateType = EWidgetCreateType::AutoCreate;
@@ -15,5 +15,5 @@ UWidgetShopPanel::UWidgetShopPanel(const FObjectInitializer& ObjectInitializer) 
 	WidgetOpenFinishType = EWidgetOpenFinishType::Procedure;
 	WidgetCloseFinishType = EWidgetCloseFinishType::Procedure;
 
-	bIsFocusable = true;
+	SetIsFocusable(true);
 }

@@ -49,7 +49,7 @@ public:
 	void CreatePlayer(UPARAM(ref) FDWPlayerSaveData& InPlayerSaveData, EPhase InPhase);
 
 	UFUNCTION(BlueprintCallable)
-	void CreateWorld(UPARAM(ref) FDWVoxelWorldSaveData& InWorldSaveData, EPhase InPhase);
+	void CreateWorld(UPARAM(ref) FDWWorldSaveData& InWorldSaveData, EPhase InPhase);
 
 	UFUNCTION(BlueprintCallable)
 	void CreateArchive(UPARAM(ref) FDWArchiveSaveData& InArchiveSaveData);
@@ -59,5 +59,5 @@ protected:
 	FDWPlayerSaveData PlayerSaveData;
 
 	UPROPERTY(EditAnywhere, Category = "SaveData")
-	FDWVoxelWorldSaveData WorldSaveData;
+	FDWWorldSaveData WorldSaveData;
 };

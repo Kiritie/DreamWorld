@@ -127,12 +127,12 @@ void ADWPlayerController::UnloadData(EPhase InPhase)
 	
 	if(PlayerCharacter)
 	{
-		if(PHASEC(InPhase, EPhase::Primary))
+		if(PHASEC(InPhase, EPhase::PrimaryAndFinal))
 		{
 			UObjectPoolModuleBPLibrary::DespawnObject(PlayerCharacter);
 			SetPlayerPawn(nullptr);
 		}
-		if(PHASEC(InPhase, EPhase::LesserAndFinal))
+		if(PHASEC(InPhase, EPhase::Lesser))
 		{
 			PlayerCharacter->Execute_SetActorVisible(PlayerCharacter, false);
 		}

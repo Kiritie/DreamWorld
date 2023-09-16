@@ -29,7 +29,7 @@ UWidgetInventoryBar::UWidgetInventoryBar(const FObjectInitializer& ObjectInitial
 {
 	WidgetName = FName("InventoryBar");
 	ParentName = FName("GameHUD");
-	InputMode = EInputMode::GameOnly;
+	WidgetInputMode = EInputMode::GameOnly;
 	
 	WidgetCreateType = EWidgetCreateType::AutoCreateAndOpen;
 
@@ -160,15 +160,11 @@ void UWidgetInventoryBar::OnInitialize_Implementation(UObject* InOwner)
 void UWidgetInventoryBar::OnOpen_Implementation(const TArray<FParameter>& InParams, bool bInstant)
 {
 	Super::OnOpen_Implementation(InParams, bInstant);
-
-	FinishOpen(bInstant);
 }
 
 void UWidgetInventoryBar::OnClose_Implementation(bool bInstant)
 {
 	Super::OnClose_Implementation(bInstant);
-
-	FinishClose(bInstant);
 }
 
 void UWidgetInventoryBar::OnRefresh_Implementation()

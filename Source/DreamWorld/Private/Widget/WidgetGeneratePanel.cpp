@@ -27,7 +27,7 @@ UWidgetGeneratePanel::UWidgetGeneratePanel(const FObjectInitializer& ObjectIniti
 {
 	WidgetName = FName("GeneratePanel");
 	ParentName = FName("GameHUD");
-	InputMode = EInputMode::UIOnly;
+	WidgetInputMode = EInputMode::UIOnly;
 
 	WidgetType = EWidgetType::Temporary;
 	WidgetCreateType = EWidgetCreateType::AutoCreate;
@@ -35,7 +35,7 @@ UWidgetGeneratePanel::UWidgetGeneratePanel(const FObjectInitializer& ObjectIniti
 	WidgetOpenFinishType = EWidgetOpenFinishType::Procedure;
 	WidgetCloseFinishType = EWidgetCloseFinishType::Procedure;
 
-	bIsFocusable = true;
+	SetIsFocusable(true);
 
 	GenerateSlotClass = LoadClass<UWidgetInventoryGenerateItem>(nullptr, TEXT("WidgetBlueprint'/Game/Blueprints/Widget/Inventory/Item/WB_InventoryGenerateItem.WB_InventoryGenerateItem_C'"));
 	PreviewSlotClass = LoadClass<UWidgetInventoryPreviewItem>(nullptr, TEXT("WidgetBlueprint'/Game/Blueprints/Widget/Inventory/Item/WB_InventoryPreviewItem.WB_InventoryPreviewItem_C'"));

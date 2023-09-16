@@ -8,7 +8,7 @@ UWidgetInventoryItemInfoBox::UWidgetInventoryItemInfoBox(const FObjectInitialize
 {
 	WidgetName = FName("InventoryItemInfoBox");
 	ParentName = FName("GameHUD");
-	InputMode = EInputMode::None;
+	WidgetInputMode = EInputMode::None;
 
 	WidgetType = EWidgetType::Permanent;
 }

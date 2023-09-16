@@ -10,9 +10,9 @@ UWidgetPausingMenu::UWidgetPausingMenu(const FObjectInitializer& ObjectInitializ
 {
 	WidgetName = FName("PausingMenu");
 	WidgetType = EWidgetType::Temporary;
-	InputMode = EInputMode::UIOnly;
+	WidgetInputMode = EInputMode::UIOnly;
 
-	bIsFocusable = true;
+	SetIsFocusable(true);
 }
 
 void UWidgetPausingMenu::OnInitialize_Implementation(UObject* InOwner)
@@ -23,15 +23,11 @@ void UWidgetPausingMenu::OnInitialize_Implementation(UObject* InOwner)
 void UWidgetPausingMenu::OnOpen_Implementation(const TArray<FParameter>& InParams, bool bInstant)
 {
 	Super::OnOpen_Implementation(InParams, bInstant);
-
-	FinishOpen(bInstant);
 }
 
 void UWidgetPausingMenu::OnClose_Implementation(bool bInstant)
 {
 	Super::OnClose_Implementation(bInstant);
-
-	FinishClose(bInstant);
 }
 
 FReply UWidgetPausingMenu::NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent)

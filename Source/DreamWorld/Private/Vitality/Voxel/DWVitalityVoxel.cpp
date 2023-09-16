@@ -31,15 +31,17 @@ void ADWVitalityVoxel::LoadData(FSaveData* InSaveData, EPhase InPhase)
 {
 	Super::LoadData(InSaveData, InPhase);
 
-	auto& SaveData = InSaveData->CastRef<FDWVitalitySaveData>();
-
-	VoxelID = GetVitalityData<UDWVitalityVoxelData>().VoxelID;
-	if(VoxelID.IsValid())
+	if(PHASEC(InPhase, EPhase::Final))
 	{
-		VoxelMesh->CreateVoxel(VoxelID);
-		const FVector range = GetVoxelData().GetRange();
-        BoxComponent->SetBoxExtent(range * AVoxelModule::Get()->GetWorldData().BlockSize * 0.5f);
+		VoxelID = GetVitalityData<UDWVitalityVoxelData>().VoxelID;
+		if(VoxelID.IsValid())
+		{
+			VoxelMesh->CreateVoxel(VoxelID);
+			const FVector Range = GetVoxelData().GetRange();
+			BoxComponent->SetBoxExtent(Range * AVoxelModule::Get()->GetWorldData().BlockSize * 0.5f);
+		}
 	}
+
 }
 
 FSaveData* ADWVitalityVoxel::ToData(bool bRefresh)

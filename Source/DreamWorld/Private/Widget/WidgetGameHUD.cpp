@@ -24,11 +24,11 @@ UWidgetGameHUD::UWidgetGameHUD(const FObjectInitializer& ObjectInitializer) : Su
 	    FName("TaskInfoBox")
 	};
 	WidgetType = EWidgetType::Permanent;
-	InputMode = EInputMode::GameOnly;
+	WidgetInputMode = EInputMode::GameOnly;
 
 	WidgetRefreshType = EWidgetRefreshType::Tick;
 
-	bIsFocusable = true;
+	SetIsFocusable(true);
 }
 
 void UWidgetGameHUD::OnCreate_Implementation(UObject* InOwner)
@@ -46,15 +46,11 @@ void UWidgetGameHUD::OnInitialize_Implementation(UObject* InOwner)
 void UWidgetGameHUD::OnOpen_Implementation(const TArray<FParameter>& InParams, bool bInstant)
 {
 	Super::OnOpen_Implementation(InParams, bInstant);
-
-	FinishOpen(bInstant);
 }
 
 void UWidgetGameHUD::OnClose_Implementation(bool bInstant)
 {
 	Super::OnClose_Implementation(bInstant);
-
-	FinishClose(bInstant);
 }
 
 void UWidgetGameHUD::OnRefresh_Implementation()

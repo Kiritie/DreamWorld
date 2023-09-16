@@ -37,6 +37,8 @@ void UProcedure_Initializing::OnEnter(UProcedureBase* InLastProcedure)
 	Super::OnEnter(InLastProcedure);
 
 	UWidgetModuleBPLibrary::CreateUserWidget<UWidgetMainMenu>();
+
+	SwitchNext();
 }
 
 void UProcedure_Initializing::OnRefresh()

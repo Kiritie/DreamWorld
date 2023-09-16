@@ -21,7 +21,7 @@ UWidgetInventoryPanel::UWidgetInventoryPanel(const FObjectInitializer& ObjectIni
 {
 	WidgetName = FName("InventoryPanel");
 	ParentName = FName("GameHUD");
-	InputMode = EInputMode::UIOnly;
+	WidgetInputMode = EInputMode::UIOnly;
 
 	WidgetType = EWidgetType::Temporary;
 	WidgetCreateType = EWidgetCreateType::AutoCreate;
@@ -29,7 +29,7 @@ UWidgetInventoryPanel::UWidgetInventoryPanel(const FObjectInitializer& ObjectIni
 	WidgetOpenFinishType = EWidgetOpenFinishType::Procedure;
 	WidgetCloseFinishType = EWidgetCloseFinishType::Procedure;
 
-	bIsFocusable = true;
+	SetIsFocusable(true);
 
 	DefaultSlotClass = LoadClass<UWidgetInventorySlot>(nullptr, TEXT("WidgetBlueprint'/Game/Blueprints/Widget/Inventory/Slot/WB_InventorySlot.WB_InventorySlot_C'"));
 	EquipSlotClass = LoadClass<UWidgetInventoryEquipSlot>(nullptr, TEXT("WidgetBlueprint'/Game/Blueprints/Widget/Inventory/Slot/WB_InventoryEquipSlot.WB_InventoryEquipSlot_C'"));

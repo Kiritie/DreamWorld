@@ -9,6 +9,7 @@
 #include "SaveGame/SaveGameModuleTypes.h"
 #include "Voxel/VoxelModuleTypes.h"
 #include "Asset/AssetModuleTypes.h"
+#include "Task/TaskModuleTypes.h"
 
 #include "DWGlobalTypes.generated.h"
 
@@ -498,17 +499,17 @@ public:
 };
 
 USTRUCT(BlueprintType)
-struct DREAMWORLD_API FDWVoxelWorldSaveData : public FVoxelWorldSaveData
+struct DREAMWORLD_API FDWWorldSaveData : public FVoxelWorldSaveData
 {
 	GENERATED_BODY()
 
 public:
-	FORCEINLINE FDWVoxelWorldSaveData()
+	FORCEINLINE FDWWorldSaveData()
 	{
 		ChunkDatas = TMap<FVector, FDWVoxelChunkSaveData>();
 	}
 	
-	FORCEINLINE FDWVoxelWorldSaveData(const FVoxelWorldBasicSaveData& InBasicSaveData) : FVoxelWorldSaveData(InBasicSaveData)
+	FORCEINLINE FDWWorldSaveData(const FVoxelWorldBasicSaveData& InBasicSaveData) : FVoxelWorldSaveData(InBasicSaveData)
 	{
 		ChunkDatas = TMap<FVector, FDWVoxelChunkSaveData>();
 	}
@@ -544,6 +545,17 @@ public:
 };
 
 USTRUCT(BlueprintType)
+struct DREAMWORLD_API FDWTaskSaveData : public FTaskModuleSaveData
+{
+	GENERATED_BODY()
+
+public:
+	FORCEINLINE FDWTaskSaveData()
+	{
+	}
+};
+
+USTRUCT(BlueprintType)
 struct DREAMWORLD_API FDWArchiveBasicSaveData : public FSaveData
 {
 	GENERATED_BODY()
@@ -573,16 +585,20 @@ struct DREAMWORLD_API FDWArchiveSaveData : public FDWArchiveBasicSaveData
 public:
 	FORCEINLINE FDWArchiveSaveData()
 	{
+		WorldData = FDWWorldSaveData();
 		PlayerData = FDWPlayerSaveData();
-		WorldData = FDWVoxelWorldSaveData();
+		TaskData = FDWTaskSaveData();
 	}
 
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	FDWPlayerSaveData PlayerData;
+	FDWWorldSaveData WorldData;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	FDWVoxelWorldSaveData WorldData;
+	FDWPlayerSaveData PlayerData;
+
+	UPROPERTY()
+	FDWTaskSaveData TaskData;
 
 public:
 	virtual void MakeSaved() override
@@ -591,6 +607,7 @@ public:
 		
 		PlayerData.MakeSaved();
 		WorldData.MakeSaved();
+		TaskData.MakeSaved();
 	}
 };
 

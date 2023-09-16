@@ -13,7 +13,7 @@ UWidgetContextBox::UWidgetContextBox(const FObjectInitializer& ObjectInitializer
 	WidgetName = FName("ContextBox");
 	ParentName = FName("GameHUD");
 	WidgetType = EWidgetType::Permanent;
-	InputMode = EInputMode::None;
+	WidgetInputMode = EInputMode::None;
 	WidgetCreateType = EWidgetCreateType::AutoCreateAndOpen;
 }
 

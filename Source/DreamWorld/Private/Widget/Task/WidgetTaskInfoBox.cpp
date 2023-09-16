@@ -21,7 +21,7 @@ UWidgetTaskInfoBox::UWidgetTaskInfoBox(const FObjectInitializer& ObjectInitializ
 	WidgetName = FName("TaskInfoBox");
 	ParentName = FName("GameHUD");
 	WidgetType = EWidgetType::Permanent;
-	InputMode = EInputMode::None;
+	WidgetInputMode = EInputMode::None;
 	WidgetCreateType = EWidgetCreateType::AutoCreateAndOpen;
 
 	TaskInfoItemClass = LoadClass<UWidgetTaskInfoItem>(nullptr, TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/Blueprints/Widget/Task/WB_TaskInfoItem.WB_TaskInfoItem_C'"));

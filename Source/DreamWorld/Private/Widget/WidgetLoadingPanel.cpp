@@ -7,7 +7,7 @@ UWidgetLoadingPanel::UWidgetLoadingPanel(const FObjectInitializer& ObjectInitial
 {
 	WidgetName = FName("LoadingPanel");
 	WidgetType = EWidgetType::Temporary;
-	InputMode = EInputMode::None;
+	WidgetZOrder = 5;
 }
 
 void UWidgetLoadingPanel::OnInitialize_Implementation(UObject* InOwner)
@@ -18,13 +18,9 @@ void UWidgetLoadingPanel::OnInitialize_Implementation(UObject* InOwner)
 void UWidgetLoadingPanel::OnOpen_Implementation(const TArray<FParameter>& InParams, bool bInstant)
 {
 	Super::OnOpen_Implementation(InParams, bInstant);
-
-	FinishOpen(bInstant);
 }
 
 void UWidgetLoadingPanel::OnClose_Implementation(bool bInstant)
 {
 	Super::OnClose_Implementation(bInstant);
-
-	FinishClose(bInstant);
 }

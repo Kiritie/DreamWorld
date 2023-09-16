@@ -9,7 +9,7 @@ UWidgetMainMenu::UWidgetMainMenu(const FObjectInitializer& ObjectInitializer) : 
 {
 	WidgetName = FName("MainMenu");
 	WidgetType = EWidgetType::Temporary;
-	InputMode = EInputMode::UIOnly;
+	WidgetInputMode = EInputMode::UIOnly;
 }
 
 void UWidgetMainMenu::OnInitialize_Implementation(UObject* InOwner)
@@ -20,13 +20,9 @@ void UWidgetMainMenu::OnInitialize_Implementation(UObject* InOwner)
 void UWidgetMainMenu::OnOpen_Implementation(const TArray<FParameter>& InParams, bool bInstant)
 {
 	Super::OnOpen_Implementation(InParams, bInstant);
-
-	FinishOpen(bInstant);
 }
 
 void UWidgetMainMenu::OnClose_Implementation(bool bInstant)
 {
 	Super::OnClose_Implementation(bInstant);
-
-	FinishClose(bInstant);
 }

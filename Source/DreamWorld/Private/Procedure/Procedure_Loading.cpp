@@ -52,7 +52,7 @@ void UProcedure_Loading::OnEnter(UProcedureBase* InLastProcedure)
 
 	AMainModule::PauseModuleByClass<ACameraModule>();
 
-	UWidgetModuleBPLibrary::OpenUserWidget<UWidgetLoadingPanel>();
+	UWidgetModuleBPLibrary::OpenUserWidget<UWidgetLoadingPanel>({ FString(TEXT("生成世界中...")) });
 	
 	UWidgetModuleBPLibrary::CreateUserWidget<UWidgetGameHUD>();
 

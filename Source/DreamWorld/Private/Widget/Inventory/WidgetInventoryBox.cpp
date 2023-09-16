@@ -7,7 +7,7 @@ UWidgetInventoryBox::UWidgetInventoryBox(const FObjectInitializer& ObjectInitial
 {
 	WidgetName = FName("InventoryBox");
 	ParentName = FName("GameHUD");
-	InputMode = EInputMode::UIOnly;
+	WidgetInputMode = EInputMode::UIOnly;
 
 	WidgetType = EWidgetType::Temporary;
 	WidgetCreateType = EWidgetCreateType::AutoCreate;
@@ -15,7 +15,7 @@ UWidgetInventoryBox::UWidgetInventoryBox(const FObjectInitializer& ObjectInitial
 	WidgetOpenFinishType = EWidgetOpenFinishType::Procedure;
 	WidgetCloseFinishType = EWidgetCloseFinishType::Procedure;
 
-	bIsFocusable = true;
+	SetIsFocusable(true);
 }
 
 void UWidgetInventoryBox::OnInitialize_Implementation(UObject* InOwner)

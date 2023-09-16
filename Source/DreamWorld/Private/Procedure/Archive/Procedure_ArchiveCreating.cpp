@@ -119,7 +119,7 @@ void UProcedure_ArchiveCreating::CreatePlayer(FDWPlayerSaveData& InPlayerSaveDat
 	USaveGameModuleBPLibrary::GetSaveGame<UDWArchiveSaveGame>()->GetSaveDataRef<FDWArchiveSaveData>().PlayerData = InPlayerSaveData;
 }
 
-void UProcedure_ArchiveCreating::CreateWorld(FDWVoxelWorldSaveData& InWorldSaveData, EPhase InPhase)
+void UProcedure_ArchiveCreating::CreateWorld(FDWWorldSaveData& InWorldSaveData, EPhase InPhase)
 {
 	AVoxelModule::Get()->LoadSaveData(&InWorldSaveData, InPhase);
 	USaveGameModuleBPLibrary::GetSaveGame<UDWArchiveSaveGame>()->GetSaveDataRef<FDWArchiveSaveData>().WorldData = InWorldSaveData;

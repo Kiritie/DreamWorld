@@ -66,7 +66,7 @@ void ADWHumanCharacter::OnSelectItem(const FAbilityItem& InItem)
 			GenerateVoxelEntity->GetMeshComponent()->OffsetScale = FVector(0.f, 0.f, 1.f);
 			GenerateVoxelEntity->GetMeshComponent()->CenterOffset = FVector(0.f, 0.f, 0.5f);
 		}
-		GenerateVoxelEntity->Initialize(InItem.ID);
+		GenerateVoxelEntity->LoadSaveData(new FVoxelItem(InItem));
 	}
 	else if(GenerateVoxelEntity)
 	{
@@ -89,7 +89,7 @@ void ADWHumanCharacter::OnAuxiliaryItem(const FAbilityItem& InItem)
 			AuxiliaryVoxelEntity->SetActorScale3D(FVector(0.3f));
 			AuxiliaryVoxelEntity->GetMeshComponent()->SetCastShadow(false);
 		}
-		AuxiliaryVoxelEntity->Initialize(InItem.ID);
+		AuxiliaryVoxelEntity->LoadSaveData(new FVoxelItem(InItem));
 	}
 	else if(AuxiliaryVoxelEntity)
 	{
