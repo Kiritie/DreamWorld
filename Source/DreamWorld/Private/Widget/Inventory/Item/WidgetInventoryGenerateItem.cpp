@@ -9,6 +9,22 @@ UWidgetInventoryGenerateItem::UWidgetInventoryGenerateItem(const FObjectInitiali
 {
 }
 
+void UWidgetInventoryGenerateItem::OnDespawn_Implementation(bool bRecovery)
+{
+	Super::OnDespawn_Implementation(bRecovery);
+
+	GenerateItemData = FDWGenerateItemData();
+}
+
+void UWidgetInventoryGenerateItem::OnInitialize_Implementation(const TArray<FParameter>& InParams)
+{
+	if(InParams.IsValidIndex(1))
+	{
+		GenerateItemData = InParams[1].GetPointerValueRef<FDWGenerateItemData>();
+	}
+	Super::OnInitialize_Implementation(InParams);
+}
+
 void UWidgetInventoryGenerateItem::OnSelected_Implementation()
 {
 	Super::OnSelected_Implementation();

@@ -633,6 +633,22 @@ public:
 };
 
 USTRUCT(BlueprintType)
+struct DREAMWORLD_API FDWGenerateRawData
+{
+	GENERATED_BODY()
+
+public:
+	FORCEINLINE FDWGenerateRawData()
+	{
+		Raws = TArray<FAbilityItem>();
+	}
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<FAbilityItem> Raws;
+};
+
+USTRUCT(BlueprintType)
 struct DREAMWORLD_API FDWGenerateItemData : public FDataTableRowBase
 {
 	GENERATED_BODY()
@@ -640,16 +656,20 @@ struct DREAMWORLD_API FDWGenerateItemData : public FDataTableRowBase
 public:
 	FORCEINLINE FDWGenerateItemData()
 	{
+		ToolID = FPrimaryAssetId();
 		Item = FAbilityItem();
-		Raws = TArray<FAbilityItem>();
+		RawDatas = TArray<FDWGenerateRawData>();
 	}
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FPrimaryAssetId ToolID;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FAbilityItem Item;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TArray<FAbilityItem> Raws;
+	TArray<FDWGenerateRawData> RawDatas;
 };
 
 /**

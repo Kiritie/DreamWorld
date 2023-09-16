@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include "Global/DWGlobalTypes.h"
 #include "Widget/Screen/UMG/UserWidgetBase.h"
 #include "WidgetGeneratePanel.generated.h"
 
@@ -36,15 +37,18 @@ public:
 	virtual void OnDestroy_Implementation(bool bRecovery = false) override;
 
 public:
-	UFUNCTION()
-	virtual void OnGenerateSlotSelected(UWidgetInventoryGenerateItem* InSlot);
+	UFUNCTION(BlueprintNativeEvent)
+	void OnGenerateSlotSelected(UWidgetInventoryGenerateItem* InSlot);
 
 	UFUNCTION()
-	virtual void OnGenerateButtonClicked();
+	void OnPreviewContentRefresh();
+
+	UFUNCTION()
+	void OnGenerateButtonClicked();
 
 public:
 	UFUNCTION(BlueprintPure)
-	bool GetSelectedGenerateItemData(FDWGenerateItemData& OutItemData);
+	bool GetSelectedGenerateItemData(FDWGenerateItemData& OutItemData) const;
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components", meta = (BindWidget, OptionalWidget = false))
@@ -67,4 +71,19 @@ protected:
 
 	UPROPERTY()
 	UWidgetInventoryGenerateItem* SelectedGenerateSlot;
+
+	UPROPERTY()
+	FDWGenerateRawData SelectedGenerateRawData;
+
+	UPROPERTY()
+	int32 PreviewGenerateRawDataIndex;
+
+	UPROPERTY()
+	FPrimaryAssetId GenerateToolID;
+	
+	UPROPERTY()
+	FTimerHandle PreviewContentRefreshTH;
+
+	UPROPERTY(BlueprintReadOnly)
+	UObject* TargetObject;
 };

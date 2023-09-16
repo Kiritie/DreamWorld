@@ -58,16 +58,8 @@ void UProcedure_Playing::OnEnter(UProcedureBase* InLastProcedure)
 		AMainModule::UnPauseModuleByClass<ASceneModule>();
 		AMainModule::UnPauseModuleByClass<ACameraModule>();
 
-		if(ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerPawn<ADWPlayerCharacter>())
-		{
-			PlayerCharacter->Execute_SetActorVisible(PlayerCharacter, true);
-			
-			UWidgetModuleBPLibrary::InitializeUserWidget<UWidgetGameHUD>(PlayerCharacter);
-			UWidgetModuleBPLibrary::InitializeUserWidget<UWidgetInventoryBar>(PlayerCharacter);
-			UWidgetModuleBPLibrary::InitializeUserWidget<UWidgetInventoryPanel>(PlayerCharacter);
-			UWidgetModuleBPLibrary::InitializeUserWidget<UWidgetGeneratePanel>(PlayerCharacter);
-			UWidgetModuleBPLibrary::InitializeUserWidget<UWidgetShopPanel>(PlayerCharacter);
-		}
+		ISceneActorInterface::Execute_SetActorVisible(UGlobalBPLibrary::GetPlayerPawn<ADWPlayerCharacter>(), true);
+		
 		UWidgetModuleBPLibrary::OpenUserWidget<UWidgetGameHUD>();
 	}
 

@@ -79,6 +79,8 @@ public:
 
 	virtual void ChangeHand();
 
+	virtual bool InteractVoxel(const FVoxelHitResult& InVoxelHitResult, EVoxelInteractType InInteractType) override;
+
 protected:
 	virtual void Turn_Implementation(float InValue) override;
 

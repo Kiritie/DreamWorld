@@ -26,4 +26,20 @@ public:
 	virtual void OnClose_Implementation(bool bInstant) override;
 
 	virtual void OnRefresh_Implementation() override;
+	
+protected:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components", meta = (BindWidget, OptionalWidget = false))
+	class UWrapBox* DefaultContent;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components", meta = (BindWidget, OptionalWidget = false))
+	class UWrapBox* TargetContent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	TMap<ESplitSlotType, FWidgetSplitSlotData> TargetUISlotDatas;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TSubclassOf<class UWidgetInventorySlot> DefaultSlotClass;
+
+	UPROPERTY(BlueprintReadOnly)
+	UObject* TargetObject;
 };

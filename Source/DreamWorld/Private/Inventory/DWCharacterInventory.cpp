@@ -37,12 +37,23 @@ FQueryItemInfo UDWCharacterInventory::QueryItemByRange(EQueryItemType InActionTy
 
 void UDWCharacterInventory::AddItemBySlots(FAbilityItem& InItem, const TArray<UInventorySlot*>& InSlots)
 {
-	if(GetOwnerAgent<ADWCharacter>()->IsPlayer())
-	{
-		UWidgetModuleBPLibrary::GetUserWidget<UWidgetContextBox>()->AddMessage(FString::Printf(TEXT("获得: %s × %d"), *InItem.GetData().Name.ToString(), InItem.Count));
-	}
+	FAbilityItem tmpItem = InItem;
 
 	Super::AddItemBySlots(InItem, InSlots);
+
+	tmpItem -= InItem;
+
+	if(GetOwnerAgent<ADWCharacter>()->IsPlayer())
+	{
+		if(tmpItem.Count > 0)
+		{
+			UWidgetModuleBPLibrary::GetUserWidget<UWidgetContextBox>()->AddMessage(FString::Printf(TEXT("获得: %s × %d"), *InItem.GetData().Name.ToString(), tmpItem.Count));
+		}
+		else
+		{
+			UWidgetModuleBPLibrary::GetUserWidget<UWidgetContextBox>()->AddMessage(FString::Printf(TEXT("无法再获得: %s"), *InItem.GetData().Name.ToString()));
+		}
+	}
 }
 
 void UDWCharacterInventory::RemoveItemBySlots(FAbilityItem& InItem, const TArray<UInventorySlot*>& InSlots)

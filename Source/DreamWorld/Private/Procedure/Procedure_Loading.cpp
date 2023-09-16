@@ -18,6 +18,7 @@
 #include "Voxel/DWVoxelModule.h"
 #include "Voxel/VoxelModuleBPLibrary.h"
 #include "Widget/WidgetGameHUD.h"
+#include "Widget/WidgetGeneratePanel.h"
 #include "Widget/WidgetLoadingPanel.h"
 #include "Widget/WidgetModuleBPLibrary.h"
 #include "Widget/Inventory/WidgetInventoryBar.h"
@@ -53,10 +54,10 @@ void UProcedure_Loading::OnEnter(UProcedureBase* InLastProcedure)
 	AMainModule::PauseModuleByClass<ACameraModule>();
 
 	UWidgetModuleBPLibrary::OpenUserWidget<UWidgetLoadingPanel>({ FString(TEXT("生成世界中...")) });
-	
-	UWidgetModuleBPLibrary::CreateUserWidget<UWidgetGameHUD>();
 
 	USaveGameModuleBPLibrary::LoadSaveGame<UDWArchiveSaveGame>(-1, EPhase::Final);
+
+	UWidgetModuleBPLibrary::CreateUserWidget<UWidgetGameHUD>(UGlobalBPLibrary::GetPlayerPawn<ADWPlayerCharacter>());
 }
 
 void UProcedure_Loading::OnRefresh()

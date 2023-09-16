@@ -22,6 +22,7 @@
 #include "Ability/Inventory/Inventory.h"
 #include "Character/DWCharacter.h"
 #include "Gameplay/WHGameInstance.h"
+#include "Voxel/Voxels/Auxiliary/VoxelInteractAuxiliary.h"
 
 UWidgetGeneratePanel::UWidgetGeneratePanel(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -74,6 +75,23 @@ void UWidgetGeneratePanel::OnOpen_Implementation(const TArray<FParameter>& InPar
 {
 	Super::OnOpen_Implementation(InParams, bInstant);
 
+	if(InParams.IsValidIndex(0))
+	{
+		TargetObject = InParams[0].GetObjectValue();
+	}
+
+	PreviewGenerateRawDataIndex = 0;
+
+	SelectedGenerateRawData = FDWGenerateRawData();
+
+	GenerateToolID = FPrimaryAssetId();
+
+	if(Cast<AVoxelInteractAuxiliary>(TargetObject))
+	{
+		Cast<AVoxelInteractAuxiliary>(TargetObject)->Open();
+		GenerateToolID = Cast<AVoxelInteractAuxiliary>(TargetObject)->GetVoxelItem().ID;
+	}
+
 	TArray<FDWGenerateItemData> GenerateItemDatas;
 	if(GenerateContent && UAssetModuleBPLibrary::ReadDataTable(GenerateItemDatas))
 	{
@@ -82,9 +100,11 @@ void UWidgetGeneratePanel::OnOpen_Implementation(const TArray<FParameter>& InPar
 			DestroySubWidget(Iter, true);
 		}
 		GenerateItems.Empty();
-		for(int32 i = 0; i < GenerateItemDatas.Num(); i++)
+		for(auto Iter : GenerateItemDatas)
 		{
-			if(UWidgetInventoryGenerateItem* GenerateItem = CreateSubWidget<UWidgetInventoryGenerateItem>({ &GenerateItemDatas[i].Item }, GenerateSlotClass))
+			if(Iter.ToolID.IsValid() && Iter.ToolID != GenerateToolID) continue;
+			
+			if(UWidgetInventoryGenerateItem* GenerateItem = CreateSubWidget<UWidgetInventoryGenerateItem>({ &Iter.Item, &Iter}, GenerateSlotClass))
 			{
 				if(UScrollBoxSlot* ScrollBoxSlot = Cast<UScrollBoxSlot>(GenerateContent->AddChild(GenerateItem)))
 				{
@@ -102,6 +122,11 @@ void UWidgetGeneratePanel::OnOpen_Implementation(const TArray<FParameter>& InPar
 void UWidgetGeneratePanel::OnClose_Implementation(bool bInstant)
 {
 	Super::OnClose_Implementation(bInstant);
+
+	if(Cast<AVoxelInteractAuxiliary>(TargetObject))
+	{
+		Cast<AVoxelInteractAuxiliary>(TargetObject)->Close();
+	}
 }
 
 void UWidgetGeneratePanel::OnRefresh_Implementation()
@@ -120,12 +145,20 @@ void UWidgetGeneratePanel::OnRefresh_Implementation()
 		if(GetSelectedGenerateItemData(GenerateItemData))
 		{
 			UInventory* Inventory = Cast<ADWCharacter>(OwnerObject)->GetInventory();
-			for(auto Iter : GenerateItemData.Raws)
+			for(auto& Iter1 : GenerateItemData.RawDatas)
 			{
-				const FQueryItemInfo QueryItemInfo = Inventory->QueryItemByRange(EQueryItemType::Get, Iter);
-				if(QueryItemInfo.Item.Count < Iter.Count)
+				for(auto& Iter2 : Iter1.Raws)
 				{
-					bCanGenerate = false;
+					const FQueryItemInfo QueryItemInfo = Inventory->QueryItemByRange(EQueryItemType::Get, Iter2);
+					if(QueryItemInfo.Item.Count < Iter2.Count)
+					{
+						bCanGenerate = false;
+						break;
+					}
+				}
+				if(bCanGenerate)
+				{
+					SelectedGenerateRawData = Iter1;
 					break;
 				}
 			}
@@ -153,7 +186,7 @@ void UWidgetGeneratePanel::OnDestroy_Implementation(bool bRecovery)
 	}
 }
 
-void UWidgetGeneratePanel::OnGenerateSlotSelected(UWidgetInventoryGenerateItem* InSlot)
+void UWidgetGeneratePanel::OnGenerateSlotSelected_Implementation(UWidgetInventoryGenerateItem* InSlot)
 {
 	if(InSlot == SelectedGenerateSlot) return;
 
@@ -166,32 +199,12 @@ void UWidgetGeneratePanel::OnGenerateSlotSelected(UWidgetInventoryGenerateItem* 
 
 	if(SelectedGenerateSlot)
 	{
-		if(PreviewContent)
-		{
-			FDWGenerateItemData GenerateItemData;
-			if(GetSelectedGenerateItemData(GenerateItemData))
-			{
-				for(auto Iter : PreviewItems)
-				{
-					DestroySubWidget(Iter, true);
-				}
-				PreviewItems.Empty();
-				for(int32 i = 0; i < GenerateItemData.Raws.Num(); i++)
-				{
-					if(UWidgetInventoryPreviewItem* PreviewItem = CreateSubWidget<UWidgetInventoryPreviewItem>({ &GenerateItemData.Raws[i] }, PreviewSlotClass))
-					{
-						if(UWrapBoxSlot* WrapBoxSlot = PreviewContent->AddChildToWrapBox(PreviewItem))
-						{
-							WrapBoxSlot->SetPadding(FMargin(5.f, 5.f, 5.f, 5.f));
-						}
-						PreviewItems.Add(PreviewItem);
-					}
-				}
-			}
-		}
+		PreviewGenerateRawDataIndex = 0;
+		GetWorld()->GetTimerManager().SetTimer(PreviewContentRefreshTH, FTimerDelegate::CreateUObject(this, &UWidgetGeneratePanel::OnPreviewContentRefresh), 1.5f, true, 0.f);
 	}
 	else
 	{
+		GetWorld()->GetTimerManager().ClearTimer(PreviewContentRefreshTH);
 		for(auto Iter : PreviewItems)
 		{
 			DestroySubWidget(Iter, true);
@@ -202,13 +215,48 @@ void UWidgetGeneratePanel::OnGenerateSlotSelected(UWidgetInventoryGenerateItem* 
 	Refresh();
 }
 
+void UWidgetGeneratePanel::OnPreviewContentRefresh()
+{
+	if(PreviewContent)
+	{
+		FDWGenerateItemData GenerateItemData;
+		if(GetSelectedGenerateItemData(GenerateItemData))
+		{
+			for(auto Iter : PreviewItems)
+			{
+				DestroySubWidget(Iter, true);
+			}
+			PreviewItems.Empty();
+			for(auto& Iter : GenerateItemData.RawDatas[PreviewGenerateRawDataIndex].Raws)
+			{
+				if(UWidgetInventoryPreviewItem* PreviewItem = CreateSubWidget<UWidgetInventoryPreviewItem>({ &Iter }, PreviewSlotClass))
+				{
+					if(UWrapBoxSlot* WrapBoxSlot = PreviewContent->AddChildToWrapBox(PreviewItem))
+					{
+						WrapBoxSlot->SetPadding(FMargin(5.f, 5.f, 5.f, 5.f));
+					}
+					PreviewItems.Add(PreviewItem);
+				}
+			}
+			if(GenerateItemData.RawDatas.Num() == 1)
+			{
+				GetWorld()->GetTimerManager().ClearTimer(PreviewContentRefreshTH);
+			}
+			else if(++PreviewGenerateRawDataIndex >= GenerateItemData.RawDatas.Num())
+			{
+				PreviewGenerateRawDataIndex = 0;
+			}
+		}
+	}
+}
+
 void UWidgetGeneratePanel::OnGenerateButtonClicked()
 {
 	FDWGenerateItemData GenerateItemData;
 	if(GetSelectedGenerateItemData(GenerateItemData))
 	{
 		UInventory* Inventory = Cast<ADWCharacter>(OwnerObject)->GetInventory();
-		for(auto& Iter : GenerateItemData.Raws)
+		for(auto& Iter : SelectedGenerateRawData.Raws)
 		{
 			Inventory->RemoveItemByRange(Iter);
 		}
@@ -218,17 +266,12 @@ void UWidgetGeneratePanel::OnGenerateButtonClicked()
 	}
 }
 
-bool UWidgetGeneratePanel::GetSelectedGenerateItemData(FDWGenerateItemData& OutItemData)
+bool UWidgetGeneratePanel::GetSelectedGenerateItemData(FDWGenerateItemData& OutItemData) const
 {
-	TArray<FDWGenerateItemData> GenerateItemDatas;
-	if(SelectedGenerateSlot && UAssetModuleBPLibrary::ReadDataTable(GenerateItemDatas))
+	if(SelectedGenerateSlot)
 	{
-		const int32 tmpIndex = GenerateItems.Find(SelectedGenerateSlot);
-		if(GenerateItemDatas.IsValidIndex(tmpIndex))
-		{
-			OutItemData = GenerateItemDatas[tmpIndex];
-			return true;
-		}
+		OutItemData = SelectedGenerateSlot->GenerateItemData;
+		return true;
 	}
 	return false;
 }

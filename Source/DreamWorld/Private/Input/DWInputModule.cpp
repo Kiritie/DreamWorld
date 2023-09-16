@@ -530,7 +530,7 @@ void ADWInputModule::OpenGeneratePanel()
 	
 	if(UProcedureModuleBPLibrary::IsCurrentProcedureClass<UProcedure_Playing>())
 	{
-		UWidgetModuleBPLibrary::OpenUserWidget<UWidgetGeneratePanel>(false);
+		UWidgetModuleBPLibrary::OpenUserWidget<UWidgetGeneratePanel>();
 	}
 }
 

@@ -56,8 +56,6 @@ void UWidgetInventoryBar::OnInitialize_Implementation(UObject* InOwner)
 	}
 
 	Super::OnInitialize_Implementation(InOwner);
-
-	if(!GetInventory()) return;
 	
 	if(ShortcutContent && UISlotDatas.Contains(ESplitSlotType::Shortcut))
 	{

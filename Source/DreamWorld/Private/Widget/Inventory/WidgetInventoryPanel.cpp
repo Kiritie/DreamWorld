@@ -43,8 +43,6 @@ void UWidgetInventoryPanel::OnInitialize_Implementation(UObject* InOwner)
 	if(OwnerObject == InOwner) return;
 	
 	Super::OnInitialize_Implementation(InOwner);
-	
-	if(!GetInventory()) return;
 
 	if(DefaultContent && UISlotDatas.Contains(ESplitSlotType::Default))
 	{

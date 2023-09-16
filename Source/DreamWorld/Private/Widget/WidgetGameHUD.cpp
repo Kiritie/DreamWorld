@@ -17,8 +17,10 @@ UWidgetGameHUD::UWidgetGameHUD(const FObjectInitializer& ObjectInitializer) : Su
 	ChildNames =
 	{
 		FName("InventoryBar"),
+	    FName("InventoryBox"),
 	    FName("InventoryPanel"),
 	    FName("GeneratePanel"),
+	    FName("ShopPanel"),
 	    FName("ContextBox"),
 	    FName("ItemInfoBox"),
 	    FName("TaskInfoBox")

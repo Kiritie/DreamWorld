@@ -59,6 +59,10 @@
 #include "Character/Player/DWPlayerCharacterData.h"
 #include "Gameplay/WHGameInstance.h"
 #include "Vitality/DWVitality.h"
+#include "Voxel/Voxels/VoxelInteract.h"
+#include "Voxel/Voxels/Auxiliary/VoxelAuxiliary.h"
+#include "Widget/WidgetGeneratePanel.h"
+#include "Widget/Inventory/WidgetInventoryBox.h"
 
 //////////////////////////////////////////////////////////////////////////
 // ADWPlayerCharacter
@@ -355,6 +359,32 @@ void ADWPlayerCharacter::ChangeHand()
 	{
 		AuxilarySlots[0]->Replace(Inventory->GetSelectedSlot());
 	}
+}
+
+bool ADWPlayerCharacter::InteractVoxel(const FVoxelHitResult& InVoxelHitResult, EVoxelInteractType InInteractType)
+{
+	switch(InVoxelHitResult.VoxelItem.GetVoxelType())
+	{
+		case EVoxelType::Chest:
+		{
+			if(InInteractType == EVoxelInteractType::Action2)
+			{
+				return UWidgetModuleBPLibrary::OpenUserWidget<UWidgetInventoryBox>({ InVoxelHitResult.VoxelItem.Auxiliary });
+			}
+			break;
+		}
+		case EVoxelType::Furnace:
+		case EVoxelType::Crafting_Table:
+		{
+			if(InInteractType == EVoxelInteractType::Action2)
+			{
+				return UWidgetModuleBPLibrary::OpenUserWidget<UWidgetGeneratePanel>({ InVoxelHitResult.VoxelItem.Auxiliary });
+			}
+			break;
+		}
+		default: break;
+	}
+	return Super::InteractVoxel(InVoxelHitResult, InInteractType);
 }
 
 void ADWPlayerCharacter::Turn_Implementation(float InValue)
