@@ -20,4 +20,9 @@ public:
 	ADWMainModule();
 
 	~ADWMainModule();
+
+public:
+	virtual void OnInitialize_Implementation() override;
+	
+	virtual void OnPreparatory_Implementation(EPhase InPhase) override;
 };

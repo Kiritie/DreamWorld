@@ -30,7 +30,9 @@
 #include "Voxel/DWVoxelModule.h"
 #include "Voxel/Voxels/Voxel.h"
 #include "WebRequest/WebRequestModule.h"
+#include "Widget/WidgetLoadingPanel.h"
 #include "Widget/WidgetModule.h"
+#include "Widget/WidgetModuleBPLibrary.h"
 
 IMPLEMENTATION_MAIN_MODULE(ADWMainModule)
 
@@ -69,5 +71,17 @@ ADWMainModule::ADWMainModule()
 ADWMainModule::~ADWMainModule()
 {
 	TERMINATION_MAIN_MODULE(ADWMainModule)
+}
+
+void ADWMainModule::OnInitialize_Implementation()
+{
+	Super::OnInitialize_Implementation();
+
+	UWidgetModuleBPLibrary::OpenUserWidget<UWidgetLoadingPanel>({ FString(TEXT("初始化中...")) });
+}
+
+void ADWMainModule::OnPreparatory_Implementation(EPhase InPhase)
+{
+	Super::OnPreparatory_Implementation(InPhase);
 }
 

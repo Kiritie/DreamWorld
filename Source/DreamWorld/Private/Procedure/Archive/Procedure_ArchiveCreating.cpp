@@ -81,8 +81,6 @@ void UProcedure_ArchiveCreating::OnEnter(UProcedureBase* InLastProcedure)
 	{
 		UWidgetModuleBPLibrary::OpenUserWidget<UWidgetArchiveCreatingPanel>();
 	}
-
-	UWidgetModuleBPLibrary::CreateUserWidget<UWidgetLoadingPanel>();
 }
 
 void UProcedure_ArchiveCreating::OnRefresh()

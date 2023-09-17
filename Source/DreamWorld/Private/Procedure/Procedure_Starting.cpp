@@ -23,6 +23,7 @@
 #include "Widget/WidgetModuleBPLibrary.h"
 #include "Widget/Archive/WidgetArchiveChoosingPanel.h"
 #include "Widget/WidgetContextBox.h"
+#include "Widget/WidgetLoadingPanel.h"
 
 UProcedure_Starting::UProcedure_Starting()
 {
@@ -56,6 +57,8 @@ void UProcedure_Starting::OnEnter(UProcedureBase* InLastProcedure)
 {
 	if(!InLastProcedure || InLastProcedure->IsA<UProcedure_Initializing>())
 	{
+		UWidgetModuleBPLibrary::CloseUserWidget<UWidgetLoadingPanel>();
+
 		USaveGameModuleBPLibrary::LoadOrCreateSaveGame<UDWArchiveSaveGame>(-1, EPhase::Primary);
 	}
 	else
@@ -71,8 +74,6 @@ void UProcedure_Starting::OnEnter(UProcedureBase* InLastProcedure)
 
 	UWidgetModuleBPLibrary::OpenUserWidget<UWidgetMainMenu>();
 	UWidgetModuleBPLibrary::CreateUserWidget<UWidgetArchiveChoosingPanel>();
-
-	AMainModule::PauseModuleByClass<ASceneModule>();
 }
 
 void UProcedure_Starting::OnRefresh()
