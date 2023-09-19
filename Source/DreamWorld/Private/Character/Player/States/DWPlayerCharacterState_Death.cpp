@@ -32,7 +32,9 @@ void UDWPlayerCharacterState_Death::OnEnter(UFiniteStateBase* InLastFiniteState)
 
 	PlayerCharacter->GetTargetSystem()->TargetLockOff();
 
-	PlayerCharacter->GetInteractionComponent()->SetInteractingAgent(PlayerCharacter);
+	PlayerCharacter->GetInteractionComponent()->SetInteractable(false);
+	
+	PlayerCharacter->SetInteractingAgent(PlayerCharacter);
 
 	UGlobalBPLibrary::GetGameInstance()->GetSubsystem<UAchievementSubSystem>()->Unlock(FName("FirstDeath"));
 }
@@ -48,7 +50,7 @@ void UDWPlayerCharacterState_Death::OnLeave(UFiniteStateBase* InNextFiniteState)
 
 	ADWPlayerCharacter* PlayerCharacter = GetAgent<ADWPlayerCharacter>();
 
-	PlayerCharacter->GetInteractionComponent()->SetInteractingAgent(nullptr);
+	PlayerCharacter->SetInteractingAgent(nullptr);
 }
 
 void UDWPlayerCharacterState_Death::OnTermination()

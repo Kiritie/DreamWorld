@@ -33,8 +33,6 @@ UWidgetInventoryBox::UWidgetInventoryBox(const FObjectInitializer& ObjectInitial
 
 void UWidgetInventoryBox::OnInitialize_Implementation(UObject* InOwner)
 {
-	if(OwnerObject == InOwner) return;
-	
 	Super::OnInitialize_Implementation(InOwner);
 	
 	if(DefaultContent && UISlotDatas.Contains(ESplitSlotType::Default))
@@ -70,17 +68,11 @@ void UWidgetInventoryBox::OnOpen_Implementation(const TArray<FParameter>& InPara
 {
 	Super::OnOpen_Implementation(InParams, bInstant);
 
+	UInventory* TargetInventory = nullptr;
 	if(InParams.IsValidIndex(0))
 	{
-		TargetObject = InParams[0].GetObjectValue();
+		TargetInventory = InParams[0].GetObjectValue<IInventoryAgentInterface>()->GetInventory();
 	}
-
-	if(Cast<AVoxelInteractAuxiliary>(TargetObject))
-	{
-		Cast<AVoxelInteractAuxiliary>(TargetObject)->Open();
-	}
-
-	UInventory* TargetInventory = Cast<IInventoryAgentInterface>(TargetObject)->GetInventory();
 
 	if(!TargetInventory) return;
 	
@@ -120,10 +112,13 @@ void UWidgetInventoryBox::OnClose_Implementation(bool bInstant)
 	Super::OnClose_Implementation(bInstant);
 
 	GetInventory()->SetConnectInventory(nullptr);
-	
-	if(Cast<AVoxelInteractAuxiliary>(TargetObject))
+
+	if(WidgetParams.IsValidIndex(0))
 	{
-		Cast<AVoxelInteractAuxiliary>(TargetObject)->Close();
+		if(AVoxelInteractAuxiliary* InteractionAgent = WidgetParams[0].GetObjectValue<AVoxelInteractAuxiliary>())
+		{
+			GetOwnerObject<IInteractionAgentInterface>()->DoInteract((EInteractAction)EVoxelInteractAction::Close, InteractionAgent);
+		}
 	}
 }
 

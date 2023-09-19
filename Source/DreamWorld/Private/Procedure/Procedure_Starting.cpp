@@ -57,8 +57,6 @@ void UProcedure_Starting::OnEnter(UProcedureBase* InLastProcedure)
 {
 	if(!InLastProcedure || InLastProcedure->IsA<UProcedure_Initializing>())
 	{
-		UWidgetModuleBPLibrary::CloseUserWidget<UWidgetLoadingPanel>();
-
 		USaveGameModuleBPLibrary::LoadOrCreateSaveGame<UDWArchiveSaveGame>(-1, EPhase::Primary);
 	}
 	else

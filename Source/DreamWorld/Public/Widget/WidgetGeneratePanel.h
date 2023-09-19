@@ -77,13 +77,7 @@ protected:
 
 	UPROPERTY()
 	int32 PreviewGenerateRawDataIndex;
-
-	UPROPERTY()
-	FPrimaryAssetId GenerateToolID;
 	
 	UPROPERTY()
 	FTimerHandle PreviewContentRefreshTH;
-
-	UPROPERTY(BlueprintReadOnly)
-	UObject* TargetObject;
 };

@@ -54,8 +54,6 @@ void UWidgetGeneratePanel::OnCreate_Implementation(UObject* InOwner)
 
 void UWidgetGeneratePanel::OnInitialize_Implementation(UObject* InOwner)
 {
-	if(OwnerObject == InOwner) return;
-	
 	if(OwnerObject)
 	{
 		UInventory* Inventory = Cast<ADWCharacter>(OwnerObject)->GetInventory();
@@ -75,21 +73,14 @@ void UWidgetGeneratePanel::OnOpen_Implementation(const TArray<FParameter>& InPar
 {
 	Super::OnOpen_Implementation(InParams, bInstant);
 
+	FPrimaryAssetId GenerateToolID = FPrimaryAssetId();
+
 	if(InParams.IsValidIndex(0))
 	{
-		TargetObject = InParams[0].GetObjectValue();
-	}
-
-	PreviewGenerateRawDataIndex = 0;
-
-	SelectedGenerateRawData = FDWGenerateRawData();
-
-	GenerateToolID = FPrimaryAssetId();
-
-	if(Cast<AVoxelInteractAuxiliary>(TargetObject))
-	{
-		Cast<AVoxelInteractAuxiliary>(TargetObject)->Open();
-		GenerateToolID = Cast<AVoxelInteractAuxiliary>(TargetObject)->GetVoxelItem().ID;
+		if(AVoxelInteractAuxiliary* InteractionAgent = InParams[0].GetObjectValue<AVoxelInteractAuxiliary>())
+		{
+			GenerateToolID = InteractionAgent->GetVoxelItem().ID;
+		}
 	}
 
 	TArray<FDWGenerateItemData> GenerateItemDatas;
@@ -123,10 +114,15 @@ void UWidgetGeneratePanel::OnClose_Implementation(bool bInstant)
 {
 	Super::OnClose_Implementation(bInstant);
 
-	if(Cast<AVoxelInteractAuxiliary>(TargetObject))
+	if(WidgetParams.IsValidIndex(0))
 	{
-		Cast<AVoxelInteractAuxiliary>(TargetObject)->Close();
+		if(AVoxelInteractAuxiliary* InteractionAgent = WidgetParams[0].GetObjectValue<AVoxelInteractAuxiliary>())
+		{
+			GetOwnerObject<IInteractionAgentInterface>()->DoInteract((EInteractAction)EVoxelInteractAction::Close, InteractionAgent);
+		}
 	}
+	PreviewGenerateRawDataIndex = 0;
+	SelectedGenerateRawData = FDWGenerateRawData();
 }
 
 void UWidgetGeneratePanel::OnRefresh_Implementation()

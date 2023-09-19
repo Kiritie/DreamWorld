@@ -224,17 +224,17 @@ void ADWInputModule::OnSprintReleased()
 
 void ADWInputModule::ToggleControlMode()
 {
-	ADWPlayerCharacter* PossessedCharacter = UGlobalBPLibrary::GetPlayerPawn<ADWPlayerCharacter>();
+	ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerPawn<ADWPlayerCharacter>();
 
-	if(!PossessedCharacter || PossessedCharacter->IsBreakAllInput()) return;
+	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput()) return;
 
-	if(PossessedCharacter->ControlMode == EDWCharacterControlMode::Fighting)
+	if(PlayerCharacter->ControlMode == EDWCharacterControlMode::Fighting)
 	{
-		PossessedCharacter->SetControlMode(EDWCharacterControlMode::Creating);
+		PlayerCharacter->SetControlMode(EDWCharacterControlMode::Creating);
 	}
 	else
 	{
-		PossessedCharacter->SetControlMode(EDWCharacterControlMode::Fighting);
+		PlayerCharacter->SetControlMode(EDWCharacterControlMode::Fighting);
 	}
 }
 
@@ -292,20 +292,20 @@ void ADWInputModule::OnDodgeReleased()
 
 void ADWInputModule::OnAttackDestroyPressed()
 {
-	ADWPlayerCharacter* PossessedCharacter = UGlobalBPLibrary::GetPlayerPawn<ADWPlayerCharacter>();
+	ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerPawn<ADWPlayerCharacter>();
 
-	if(!PossessedCharacter || PossessedCharacter->IsBreakAllInput()) return;
+	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput()) return;
 
 	bPressedAttackDestroy = true;
-	switch (PossessedCharacter->ControlMode)
+	switch (PlayerCharacter->ControlMode)
 	{
 		case EDWCharacterControlMode::Fighting:
 		{
-			if(PossessedCharacter->IsFreeToAnim() || PossessedCharacter->IsAttacking())
+			if(PlayerCharacter->IsFreeToAnim() || PlayerCharacter->IsAttacking())
 			{
-				if(PossessedCharacter->AttackAbilityQueue < PossessedCharacter->GetAttackAbilities().Num())
+				if(PlayerCharacter->AttackAbilityQueue < PlayerCharacter->GetAttackAbilities().Num())
 				{
-					PossessedCharacter->AttackAbilityQueue++; 
+					PlayerCharacter->AttackAbilityQueue++; 
 				}
 			}
 			break;
@@ -313,9 +313,9 @@ void ADWInputModule::OnAttackDestroyPressed()
 		case EDWCharacterControlMode::Creating:
 		{
 			FVoxelHitResult voxelHitResult;
-			if(UVoxelModuleBPLibrary::VoxelRaycastSinge(EVoxelRaycastType::FromAimPoint, PossessedCharacter->GetInteractDistance(), {}, voxelHitResult))
+			if(UVoxelModuleBPLibrary::VoxelRaycastSinge(EVoxelRaycastType::FromAimPoint, PlayerCharacter->GetInteractDistance(), {}, voxelHitResult))
 			{
-				PossessedCharacter->InteractVoxel(voxelHitResult, EVoxelInteractType::Action1);
+				PlayerCharacter->OnInteractVoxel(voxelHitResult, EInputInteractAction::Action1);
 			}
 			break;
 		}
@@ -324,12 +324,12 @@ void ADWInputModule::OnAttackDestroyPressed()
 
 void ADWInputModule::OnAttackDestroyReleased()
 {
-	ADWPlayerCharacter* PossessedCharacter = UGlobalBPLibrary::GetPlayerPawn<ADWPlayerCharacter>();
+	ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerPawn<ADWPlayerCharacter>();
 
-	if(!PossessedCharacter || PossessedCharacter->IsBreakAllInput()) return;
+	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput()) return;
 
 	bPressedAttackDestroy = false;
-	switch (PossessedCharacter->ControlMode)
+	switch (PlayerCharacter->ControlMode)
 	{
 		case EDWCharacterControlMode::Fighting:
 		{
@@ -344,12 +344,12 @@ void ADWInputModule::OnAttackDestroyReleased()
 
 void ADWInputModule::OnDefendGeneratePressed()
 {
-	ADWPlayerCharacter* PossessedCharacter = UGlobalBPLibrary::GetPlayerPawn<ADWPlayerCharacter>();
+	ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerPawn<ADWPlayerCharacter>();
 
-	if(!PossessedCharacter || PossessedCharacter->IsBreakAllInput()) return;
+	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput()) return;
 
 	bPressedDefendGenerate = true;
-	switch (PossessedCharacter->ControlMode)
+	switch (PlayerCharacter->ControlMode)
 	{
 		case EDWCharacterControlMode::Fighting:
 		{
@@ -358,9 +358,9 @@ void ADWInputModule::OnDefendGeneratePressed()
 		case EDWCharacterControlMode::Creating:
 		{
 			FVoxelHitResult voxelHitResult;
-			if(UVoxelModuleBPLibrary::VoxelRaycastSinge(EVoxelRaycastType::FromAimPoint, PossessedCharacter->GetInteractDistance(), {}, voxelHitResult))
+			if(UVoxelModuleBPLibrary::VoxelRaycastSinge(EVoxelRaycastType::FromAimPoint, PlayerCharacter->GetInteractDistance(), {}, voxelHitResult))
 			{
-				PossessedCharacter->InteractVoxel(voxelHitResult, EVoxelInteractType::Action2);
+				PlayerCharacter->OnInteractVoxel(voxelHitResult, EInputInteractAction::Action2);
 			}
 			break;
 		}
@@ -369,12 +369,12 @@ void ADWInputModule::OnDefendGeneratePressed()
 
 void ADWInputModule::OnDefendGenerateReleased()
 {
-	ADWPlayerCharacter* PossessedCharacter = UGlobalBPLibrary::GetPlayerPawn<ADWPlayerCharacter>();
+	ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerPawn<ADWPlayerCharacter>();
 
-	if(!PossessedCharacter || PossessedCharacter->IsBreakAllInput()) return;
+	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput()) return;
 
 	bPressedDefendGenerate = false;
-	switch (PossessedCharacter->ControlMode)
+	switch (PlayerCharacter->ControlMode)
 	{
 		case EDWCharacterControlMode::Fighting:
 		{
@@ -389,49 +389,49 @@ void ADWInputModule::OnDefendGenerateReleased()
 
 void ADWInputModule::ReleaseSkillAbility1()
 {
-	ADWPlayerCharacter* PossessedCharacter = UGlobalBPLibrary::GetPlayerPawn<ADWPlayerCharacter>();
+	ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerPawn<ADWPlayerCharacter>();
 	
-	if(!PossessedCharacter || PossessedCharacter->IsBreakAllInput()) return;
+	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput()) return;
 
-	if(PossessedCharacter->Inventory->GetSplitSlots(ESplitSlotType::Skill).IsValidIndex(0))
+	if(PlayerCharacter->Inventory->GetSplitSlots(ESplitSlotType::Skill).IsValidIndex(0))
 	{
-		PossessedCharacter->Inventory->GetSplitSlots(ESplitSlotType::Skill)[0]->ActiveItem();
+		PlayerCharacter->Inventory->GetSplitSlots(ESplitSlotType::Skill)[0]->ActiveItem();
 	}
 }
 
 void ADWInputModule::ReleaseSkillAbility2()
 {
-	ADWPlayerCharacter* PossessedCharacter = UGlobalBPLibrary::GetPlayerPawn<ADWPlayerCharacter>();
+	ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerPawn<ADWPlayerCharacter>();
 	
-	if(!PossessedCharacter || PossessedCharacter->IsBreakAllInput()) return;
+	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput()) return;
 
-	if(PossessedCharacter->Inventory->GetSplitSlots(ESplitSlotType::Skill).IsValidIndex(1))
+	if(PlayerCharacter->Inventory->GetSplitSlots(ESplitSlotType::Skill).IsValidIndex(1))
 	{
-		PossessedCharacter->Inventory->GetSplitSlots(ESplitSlotType::Skill)[1]->ActiveItem();
+		PlayerCharacter->Inventory->GetSplitSlots(ESplitSlotType::Skill)[1]->ActiveItem();
 	}
 }
 
 void ADWInputModule::ReleaseSkillAbility3()
 {
-	ADWPlayerCharacter* PossessedCharacter = UGlobalBPLibrary::GetPlayerPawn<ADWPlayerCharacter>();
+	ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerPawn<ADWPlayerCharacter>();
 	
-	if(!PossessedCharacter || PossessedCharacter->IsBreakAllInput()) return;
+	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput()) return;
 
-	if(PossessedCharacter->Inventory->GetSplitSlots(ESplitSlotType::Skill).IsValidIndex(2))
+	if(PlayerCharacter->Inventory->GetSplitSlots(ESplitSlotType::Skill).IsValidIndex(2))
 	{
-		PossessedCharacter->Inventory->GetSplitSlots(ESplitSlotType::Skill)[2]->ActiveItem();
+		PlayerCharacter->Inventory->GetSplitSlots(ESplitSlotType::Skill)[2]->ActiveItem();
 	}
 }
 
 void ADWInputModule::ReleaseSkillAbility4()
 {
-	ADWPlayerCharacter* PossessedCharacter = UGlobalBPLibrary::GetPlayerPawn<ADWPlayerCharacter>();
+	ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerPawn<ADWPlayerCharacter>();
 	
-	if(!PossessedCharacter || PossessedCharacter->IsBreakAllInput()) return;
+	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput()) return;
 
-	if(PossessedCharacter->Inventory->GetSplitSlots(ESplitSlotType::Skill).IsValidIndex(3))
+	if(PlayerCharacter->Inventory->GetSplitSlots(ESplitSlotType::Skill).IsValidIndex(3))
 	{
-		PossessedCharacter->Inventory->GetSplitSlots(ESplitSlotType::Skill)[3]->ActiveItem();
+		PlayerCharacter->Inventory->GetSplitSlots(ESplitSlotType::Skill)[3]->ActiveItem();
 	}
 }
 
@@ -439,14 +439,11 @@ void ADWInputModule::DoInteractAction1()
 {
 	ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerPawn<ADWPlayerCharacter>();
 	
-	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput() || !PlayerCharacter->Interaction->GetInteractingAgent()) return;
+	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput() || !PlayerCharacter->GetInteractingAgent()) return;
 	
-	if(UInteractionComponent* Interaction = PlayerCharacter->Interaction->GetInteractingComponent())
+	if(PlayerCharacter->GetInteractableActions().IsValidIndex(0))
 	{
-		if(Interaction->GetValidInteractActions(UGlobalBPLibrary::GetPlayerPawn<ADWPlayerCharacter>()).IsValidIndex(0))
-		{
-			Interaction->DoInteract(PlayerCharacter, Interaction->GetValidInteractActions(UGlobalBPLibrary::GetPlayerPawn<ADWPlayerCharacter>())[0]);
-		}
+		PlayerCharacter->DoInteract(PlayerCharacter->GetInteractableActions()[0]);
 	}
 }
 
@@ -454,14 +451,11 @@ void ADWInputModule::DoInteractAction2()
 {
 	ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerPawn<ADWPlayerCharacter>();
 	
-	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput() || !PlayerCharacter->Interaction->GetInteractingAgent()) return;
+	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput() || !PlayerCharacter->GetInteractingAgent()) return;
 	
-	if(UInteractionComponent* Interaction = PlayerCharacter->Interaction->GetInteractingComponent())
+	if(PlayerCharacter->GetInteractableActions().IsValidIndex(1))
 	{
-		if(Interaction->GetValidInteractActions(UGlobalBPLibrary::GetPlayerPawn<ADWPlayerCharacter>()).IsValidIndex(1))
-		{
-			Interaction->DoInteract(PlayerCharacter, Interaction->GetValidInteractActions(UGlobalBPLibrary::GetPlayerPawn<ADWPlayerCharacter>())[1]);
-		}
+		PlayerCharacter->DoInteract(PlayerCharacter->GetInteractableActions()[1]);
 	}
 }
 
@@ -469,14 +463,11 @@ void ADWInputModule::DoInteractAction3()
 {
 	ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerPawn<ADWPlayerCharacter>();
 	
-	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput() || !PlayerCharacter->Interaction->GetInteractingAgent()) return;
+	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput() || !PlayerCharacter->GetInteractingAgent()) return;
 	
-	if(UInteractionComponent* Interaction = PlayerCharacter->Interaction->GetInteractingComponent())
+	if(PlayerCharacter->GetInteractableActions().IsValidIndex(2))
 	{
-		if(Interaction->GetValidInteractActions(UGlobalBPLibrary::GetPlayerPawn<ADWPlayerCharacter>()).IsValidIndex(2))
-		{
-			Interaction->DoInteract(PlayerCharacter, Interaction->GetValidInteractActions(UGlobalBPLibrary::GetPlayerPawn<ADWPlayerCharacter>())[2]);
-		}
+		PlayerCharacter->DoInteract(PlayerCharacter->GetInteractableActions()[2]);
 	}
 }
 
@@ -484,14 +475,11 @@ void ADWInputModule::DoInteractAction4()
 {
 	ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerPawn<ADWPlayerCharacter>();
 	
-	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput() || !PlayerCharacter->Interaction->GetInteractingAgent()) return;
+	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput() || !PlayerCharacter->GetInteractingAgent()) return;
 	
-	if(UInteractionComponent* Interaction = PlayerCharacter->Interaction->GetInteractingComponent())
+	if(PlayerCharacter->GetInteractableActions().IsValidIndex(3))
 	{
-		if(Interaction->GetValidInteractActions(UGlobalBPLibrary::GetPlayerPawn<ADWPlayerCharacter>()).IsValidIndex(3))
-		{
-			Interaction->DoInteract(PlayerCharacter, Interaction->GetValidInteractActions(UGlobalBPLibrary::GetPlayerPawn<ADWPlayerCharacter>())[3]);
-		}
+		PlayerCharacter->DoInteract(PlayerCharacter->GetInteractableActions()[3]);
 	}
 }
 
@@ -499,14 +487,11 @@ void ADWInputModule::DoInteractAction5()
 {
 	ADWPlayerCharacter* PlayerCharacter = UGlobalBPLibrary::GetPlayerPawn<ADWPlayerCharacter>();
 	
-	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput() || !PlayerCharacter->Interaction->GetInteractingAgent()) return;
+	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput() || !PlayerCharacter->GetInteractingAgent()) return;
 	
-	if(UInteractionComponent* Interaction = PlayerCharacter->Interaction->GetInteractingComponent())
+	if(PlayerCharacter->GetInteractableActions().IsValidIndex(4))
 	{
-		if(Interaction->GetValidInteractActions(UGlobalBPLibrary::GetPlayerPawn<ADWPlayerCharacter>()).IsValidIndex(4))
-		{
-			Interaction->DoInteract(PlayerCharacter, Interaction->GetValidInteractActions(UGlobalBPLibrary::GetPlayerPawn<ADWPlayerCharacter>())[4]);
-		}
+		PlayerCharacter->DoInteract(PlayerCharacter->GetInteractableActions()[4]);
 	}
 }
 

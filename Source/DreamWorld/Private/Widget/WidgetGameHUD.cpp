@@ -58,18 +58,6 @@ void UWidgetGameHUD::OnClose_Implementation(bool bInstant)
 void UWidgetGameHUD::OnRefresh_Implementation()
 {
 	Super::OnRefresh_Implementation();
-
-	if(ADWCharacter* OwnerCharacter = Cast<ADWCharacter>(OwnerObject))
-	{
-		if(auto Interaction = OwnerCharacter->GetInteractionComponent()->GetInteractingComponent())
-		{
-			ShowActions(Interaction->GetValidInteractActions(OwnerCharacter));
-		}
-		else
-		{
-			HideActions();
-		}
-	}
 }
 
 FReply UWidgetGameHUD::NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent)

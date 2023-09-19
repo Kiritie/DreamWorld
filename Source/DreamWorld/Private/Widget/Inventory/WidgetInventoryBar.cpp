@@ -48,8 +48,6 @@ UWidgetInventoryBar::UWidgetInventoryBar(const FObjectInitializer& ObjectInitial
 
 void UWidgetInventoryBar::OnInitialize_Implementation(UObject* InOwner)
 {
-	if(OwnerObject == InOwner) return;
-	
 	if(GetInventory())
 	{
 		GetInventory()->OnSlotSelected.RemoveDynamic(this, &UWidgetInventoryBar::OnInventorySlotSelected);

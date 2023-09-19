@@ -105,26 +105,25 @@ void ADWVitality::Revive(IAbilityVitalityInterface* InRescuer)
 	Super::Revive(InRescuer);
 }
 
-bool ADWVitality::CanInteract(IInteractionAgentInterface* InInteractionAgent, EInteractAction InInteractAction)
+bool ADWVitality::CanInteract(EInteractAction InInteractAction, IInteractionAgentInterface* InInteractionAgent)
 {
 	switch (InInteractAction)
 	{
 		case EInteractAction::Revive:
 		{
-			if(!IsDead(true))
-			{
-				return true;
-			}
-			break;
+			return !IsDead(true);
 		}
-		default: return true;
+		default: break;
 	}
-	return Super::CanInteract(InInteractionAgent, InInteractAction);
+	return Super::CanInteract(InInteractAction, InInteractionAgent);
 }
 
-void ADWVitality::OnInteract(IInteractionAgentInterface* InInteractionAgent, EInteractAction InInteractAction)
+void ADWVitality::OnInteract(EInteractAction InInteractAction, IInteractionAgentInterface* InInteractionAgent, bool bPassivity)
 {
-	Super::OnInteract(InInteractionAgent, InInteractAction);
+	Super::OnInteract(InInteractAction, InInteractionAgent, bPassivity);
+
+	if(!bPassivity) return;
+	
 	switch (InInteractAction)
 	{
 		case EInteractAction::Revive:
@@ -171,14 +170,14 @@ void ADWVitality::OnAuxiliaryItem(const FAbilityItem& InItem)
 	Super::OnAuxiliaryItem(InItem);
 }
 
-bool ADWVitality::GenerateVoxel(const FVoxelHitResult& InVoxelHitResult)
+bool ADWVitality::OnGenerateVoxel(const FVoxelHitResult& InVoxelHitResult)
 {
 	if(!GenerateVoxelID.IsValid()) return false;
 	
 	FQueryItemInfo QueryItemInfo = Inventory->QueryItemByRange(EQueryItemType::Remove, FAbilityItem(GenerateVoxelID, 1), -1);
 	if(QueryItemInfo.IsSuccess())
 	{
-		if(Super::GenerateVoxel(InVoxelHitResult))
+		if(Super::OnGenerateVoxel(InVoxelHitResult))
 		{
 			Inventory->RemoveItemByQueryInfo(QueryItemInfo);
 			return true;
@@ -187,9 +186,9 @@ bool ADWVitality::GenerateVoxel(const FVoxelHitResult& InVoxelHitResult)
 	return false;
 }
 
-bool ADWVitality::DestroyVoxel(const FVoxelHitResult& InVoxelHitResult)
+bool ADWVitality::OnDestroyVoxel(const FVoxelHitResult& InVoxelHitResult)
 {
-	return Super::DestroyVoxel(InVoxelHitResult);
+	return Super::OnDestroyVoxel(InVoxelHitResult);
 }
 
 void ADWVitality::SetNameV(FName InName)

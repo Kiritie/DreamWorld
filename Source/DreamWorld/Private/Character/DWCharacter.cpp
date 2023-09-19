@@ -375,26 +375,22 @@ void ADWCharacter::Revive(IAbilityVitalityInterface* InRescuer)
 	Super::Revive(InRescuer);
 }
 
-bool ADWCharacter::CanInteract(IInteractionAgentInterface* InInteractionAgent, EInteractAction InInteractAction)
+bool ADWCharacter::CanInteract(EInteractAction InInteractAction, IInteractionAgentInterface* InInteractionAgent)
 {
 	switch (InInteractAction)
 	{
 		case EInteractAction::Revive:
 		{
-			if(IsDead(false))
-			{
-				return true;
-			}
-			break;
+			return IsDead(false);
 		}
-		default: return true;
+		default: break;
 	}
-	return false;
+	return Super::CanInteract(InInteractAction, InInteractionAgent);
 }
 
-void ADWCharacter::OnInteract(IInteractionAgentInterface* InInteractionAgent, EInteractAction InInteractAction)
+void ADWCharacter::OnInteract(EInteractAction InInteractAction, IInteractionAgentInterface* InInteractionAgent, bool bPassivity)
 {
-	Super::OnInteract(InInteractionAgent, InInteractAction);
+	Super::OnInteract(InInteractAction, InInteractionAgent, bPassivity);
 	switch (InInteractAction)
 	{
 		case EInteractAction::Revive:
@@ -734,14 +730,14 @@ void ADWCharacter::PickUp(AAbilityPickUpBase* InPickUp)
 	Super::PickUp(InPickUp);
 }
 
-bool ADWCharacter::GenerateVoxel(const FVoxelHitResult& InVoxelHitResult)
+bool ADWCharacter::OnGenerateVoxel(const FVoxelHitResult& InVoxelHitResult)
 {
 	if(!GenerateVoxelID.IsValid()) return false;
 	
 	FQueryItemInfo QueryItemInfo = Inventory->QueryItemByRange(EQueryItemType::Remove, FAbilityItem(GenerateVoxelID, 1), -1);
 	if(QueryItemInfo.IsSuccess() && DoAction(EDWCharacterActionType::Generate))
 	{
-		if(Super::GenerateVoxel(InVoxelHitResult))
+		if(Super::OnGenerateVoxel(InVoxelHitResult))
 		{
 			Inventory->RemoveItemByQueryInfo(QueryItemInfo);
 			UGlobalBPLibrary::GetGameInstance()->GetSubsystem<UAchievementSubSystem>()->Unlock(FName("FirstGenerateVoxel"));
@@ -751,11 +747,11 @@ bool ADWCharacter::GenerateVoxel(const FVoxelHitResult& InVoxelHitResult)
 	return false;
 }
 
-bool ADWCharacter::DestroyVoxel(const FVoxelHitResult& InVoxelHitResult)
+bool ADWCharacter::OnDestroyVoxel(const FVoxelHitResult& InVoxelHitResult)
 {
 	if(DoAction(EDWCharacterActionType::Destroy))
 	{
-		if(Super::DestroyVoxel(InVoxelHitResult))
+		if(Super::OnDestroyVoxel(InVoxelHitResult))
 		{
 			UGlobalBPLibrary::GetGameInstance()->GetSubsystem<UAchievementSubSystem>()->Unlock(FName("FirstDestroyVoxel"));
 			return true;

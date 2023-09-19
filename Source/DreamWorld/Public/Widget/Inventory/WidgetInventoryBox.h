@@ -39,7 +39,4 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TSubclassOf<class UWidgetInventorySlot> DefaultSlotClass;
-
-	UPROPERTY(BlueprintReadOnly)
-	UObject* TargetObject;
 };

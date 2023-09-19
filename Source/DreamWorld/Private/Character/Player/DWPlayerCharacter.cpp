@@ -61,6 +61,7 @@
 #include "Vitality/DWVitality.h"
 #include "Voxel/Voxels/VoxelInteract.h"
 #include "Voxel/Voxels/Auxiliary/VoxelAuxiliary.h"
+#include "Voxel/Voxels/Auxiliary/VoxelInteractAuxiliary.h"
 #include "Widget/WidgetGeneratePanel.h"
 #include "Widget/Inventory/WidgetInventoryBox.h"
 
@@ -340,51 +341,94 @@ void ADWPlayerCharacter::RefreshEquip(EDWEquipPartType InPartType, const FAbilit
 void ADWPlayerCharacter::OnEnterInteract(IInteractionAgentInterface* InInteractionAgent)
 {
 	Super::OnEnterInteract(InInteractionAgent);
+
+	UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>()->ShowInteractActions(GetInteractableActions(InInteractionAgent));
 }
 
 void ADWPlayerCharacter::OnLeaveInteract(IInteractionAgentInterface* InInteractionAgent)
 {
 	Super::OnLeaveInteract(InInteractionAgent);
-}
 
-void ADWPlayerCharacter::OnInteract(IInteractionAgentInterface* InInteractionAgent, EInteractAction InInteractAction)
-{
-	Super::OnInteract(InInteractionAgent, InInteractAction);
-}
-
-void ADWPlayerCharacter::ChangeHand()
-{
-	TArray<UInventorySlot*> AuxilarySlots = Inventory->GetSplitSlots(ESplitSlotType::Auxiliary);
-	if(AuxilarySlots.Num() > 0 && Inventory->GetSelectedSlot())
+	if(GetInteractingAgent() == InInteractionAgent)
 	{
-		AuxilarySlots[0]->Replace(Inventory->GetSelectedSlot());
+		UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>()->HideInteractActions();
 	}
 }
 
-bool ADWPlayerCharacter::InteractVoxel(const FVoxelHitResult& InVoxelHitResult, EVoxelInteractType InInteractType)
+void ADWPlayerCharacter::OnInteract(EInteractAction InInteractAction, IInteractionAgentInterface* InInteractionAgent, bool bPassivity)
 {
-	switch(InVoxelHitResult.VoxelItem.GetVoxelType())
+	Super::OnInteract(InInteractAction, InInteractionAgent, bPassivity);
+
+	if(bPassivity) return;
+
+	switch(InInteractAction)
 	{
-		case EVoxelType::Chest:
+		case EVoxelInteractAction::Open:
 		{
-			if(InInteractType == EVoxelInteractType::Action2)
+			if(AVoxelInteractAuxiliary* InteractionAgent = Cast<AVoxelInteractAuxiliary>(InInteractionAgent))
 			{
-				return UWidgetModuleBPLibrary::OpenUserWidget<UWidgetInventoryBox>({ InVoxelHitResult.VoxelItem.Auxiliary });
-			}
-			break;
-		}
-		case EVoxelType::Furnace:
-		case EVoxelType::Crafting_Table:
-		{
-			if(InInteractType == EVoxelInteractType::Action2)
-			{
-				return UWidgetModuleBPLibrary::OpenUserWidget<UWidgetGeneratePanel>({ InVoxelHitResult.VoxelItem.Auxiliary });
+				switch(InteractionAgent->GetVoxelItem().GetVoxelType())
+				{
+					case EVoxelType::Chest:
+					{
+						UWidgetModuleBPLibrary::OpenUserWidget<UWidgetInventoryBox>({ InteractionAgent });
+						break;
+					}
+					case EVoxelType::Furnace:
+					case EVoxelType::Crafting_Table:
+					{
+						UWidgetModuleBPLibrary::OpenUserWidget<UWidgetGeneratePanel>({ InteractionAgent });
+						break;
+					}
+					default: break;
+				}
 			}
 			break;
 		}
 		default: break;
 	}
-	return Super::InteractVoxel(InVoxelHitResult, InInteractType);
+	UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>()->ShowInteractActions(GetInteractableActions(InInteractionAgent));
+}
+
+void ADWPlayerCharacter::ChangeHand()
+{
+	TArray<UInventorySlot*> AuxiliarySlots = Inventory->GetSplitSlots(ESplitSlotType::Auxiliary);
+	if(AuxiliarySlots.Num() > 0 && Inventory->GetSelectedSlot())
+	{
+		AuxiliarySlots[0]->Replace(Inventory->GetSelectedSlot());
+	}
+}
+
+bool ADWPlayerCharacter::OnInteractVoxel(const FVoxelHitResult& InVoxelHitResult, EInputInteractAction InInteractAction)
+{
+	switch(InInteractAction)
+	{
+		case EInputInteractAction::Action2:
+		{
+			if(AVoxelInteractAuxiliary* InteractionAgent = Cast<AVoxelInteractAuxiliary>(InVoxelHitResult.VoxelItem.Auxiliary))
+			{
+				switch(InteractionAgent->GetVoxelItem().GetVoxelType())
+				{
+					case EVoxelType::Chest:
+					{
+						UWidgetModuleBPLibrary::OpenUserWidget<UWidgetInventoryBox>({ InteractionAgent });
+						break;
+					}
+					case EVoxelType::Furnace:
+					case EVoxelType::Crafting_Table:
+					{
+						UWidgetModuleBPLibrary::OpenUserWidget<UWidgetGeneratePanel>({ InteractionAgent });
+						break;
+					}
+					default: break;
+				}
+				UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>()->ShowInteractActions(GetInteractableActions(InteractionAgent));
+			}
+			break;
+		}
+		default: break;
+	}
+	return Super::OnInteractVoxel(InVoxelHitResult, InInteractAction);
 }
 
 void ADWPlayerCharacter::Turn_Implementation(float InValue)

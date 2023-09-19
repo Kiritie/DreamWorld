@@ -146,9 +146,9 @@ public:
 			
 	virtual void Revive(IAbilityVitalityInterface* InRescuer = nullptr) override;
 
-	virtual bool CanInteract(IInteractionAgentInterface* InInteractionAgent, EInteractAction InInteractAction) override;
+	virtual bool CanInteract(EInteractAction InInteractAction, IInteractionAgentInterface* InInteractionAgent) override;
 
-	virtual void OnInteract(IInteractionAgentInterface* InInteractionAgent, EInteractAction InInteractAction) override;
+	virtual void OnInteract(EInteractAction InInteractAction, IInteractionAgentInterface* InInteractionAgent, bool bPassivity) override;
 
 	virtual void OnActiveItem(const FAbilityItem& InItem, bool bPassive, bool bSuccess) override;
 		
@@ -248,9 +248,9 @@ public:
 
 	virtual void PickUp(AAbilityPickUpBase* InPickUp) override;
 
-	virtual bool GenerateVoxel(const FVoxelHitResult& InVoxelHitResult) override;
+	virtual bool OnGenerateVoxel(const FVoxelHitResult& InVoxelHitResult) override;
 
-	virtual bool DestroyVoxel(const FVoxelHitResult& InVoxelHitResult) override;
+	virtual bool OnDestroyVoxel(const FVoxelHitResult& InVoxelHitResult) override;
 
 	UFUNCTION(BlueprintCallable)
 	virtual void RefreshEquip(EDWEquipPartType InPartType, const FAbilityItem& InItem);

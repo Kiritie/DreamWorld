@@ -21,14 +21,12 @@ ADWMonsterCharacter::ADWMonsterCharacter()
 	AttackPoint = CreateDefaultSubobject<UDWCharacterAttackPointComponent>(TEXT("AttackPoint"));
 	AttackPoint->SetupAttachment(GetMesh(), TEXT("AttackPoint"));
 
-	Interaction->AddInteractionAction((EInteractAction)EDWInteractAction::Ride);
-	Interaction->AddInteractionAction((EInteractAction)EDWInteractAction::Feed);
+	Interaction->AddInteractAction((EInteractAction)EDWInteractAction::Ride);
+	Interaction->AddInteractAction((EInteractAction)EDWInteractAction::Feed);
 }
 
-bool ADWMonsterCharacter::CanInteract(IInteractionAgentInterface* InInteractionAgent, EInteractAction InInteractAction)
+bool ADWMonsterCharacter::CanInteract(EInteractAction InInteractAction, IInteractionAgentInterface* InInteractionAgent)
 {
-	if(!Super::CanInteract(InInteractionAgent, InInteractAction)) return false;
-	
 	switch (InInteractAction)
 	{
 		case EDWInteractAction::Feed:
@@ -36,10 +34,7 @@ bool ADWMonsterCharacter::CanInteract(IInteractionAgentInterface* InInteractionA
 			if(ADWCharacter* InInteractionCharacter = Cast<ADWCharacter>(InInteractionAgent))
 			{
 				const FAbilityItem SelectedItem = InInteractionCharacter->GetInventory()->GetSelectedItem();
-				if(!IsEnemy(InInteractionCharacter) && SelectedItem.IsValid() && SelectedItem.GetType() == EAbilityItemType::Prop && SelectedItem.GetData<UDWPropData>().PropType == EDWPropType::Food)
-				{
-					return true;
-				}
+				return !IsEnemy(InInteractionCharacter) && SelectedItem.IsValid() && SelectedItem.GetType() == EAbilityItemType::Prop && SelectedItem.GetData<UDWPropData>().PropType == EDWPropType::Food;
 			}
 			break;
 		}
@@ -47,10 +42,7 @@ bool ADWMonsterCharacter::CanInteract(IInteractionAgentInterface* InInteractionA
 		{
 			if(ADWCharacter* InInteractionCharacter = Cast<ADWCharacter>(InInteractionAgent))
 			{
-				if(!IsEnemy(InInteractionCharacter) && InInteractionCharacter->GetRidingTarget() != this)
-				{
-					return true;
-				}
+				return !IsEnemy(InInteractionCharacter) && InInteractionCharacter->GetRidingTarget() != this;
 			}
 			break;
 		}
@@ -58,22 +50,21 @@ bool ADWMonsterCharacter::CanInteract(IInteractionAgentInterface* InInteractionA
 		{
 			if(ADWCharacter* InInteractionCharacter = Cast<ADWCharacter>(InInteractionAgent))
 			{
-				if(!IsEnemy(InInteractionCharacter) && InInteractionCharacter->GetRidingTarget() == this)
-				{
-					return true;
-				}
+				return !IsEnemy(InInteractionCharacter) && InInteractionCharacter->GetRidingTarget() == this;
 			}
 			break;
 		}
-		default: return true;
+		default: break;
 	}
-	return false;
+	return Super::CanInteract(InInteractAction, InInteractionAgent);
 }
 
-void ADWMonsterCharacter::OnInteract(IInteractionAgentInterface* InInteractionAgent, EInteractAction InInteractAction)
+void ADWMonsterCharacter::OnInteract(EInteractAction InInteractAction, IInteractionAgentInterface* InInteractionAgent, bool bPassivity)
 {
-	Super::OnInteract(InInteractionAgent, InInteractAction);
+	Super::OnInteract(InInteractAction, InInteractionAgent, bPassivity);
 
+	if(!bPassivity) return;
+	
 	switch (InInteractAction)
 	{
 		case EDWInteractAction::Feed:
