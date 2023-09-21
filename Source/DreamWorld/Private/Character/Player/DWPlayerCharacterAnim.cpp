@@ -2,9 +2,6 @@
 
 
 #include "Character/Player/DWPlayerCharacterAnim.h"
-#include "Character/Player/DWPlayerCharacter.h"
-#include "GameFramework/CharacterMovementComponent.h"
-#include "Math.h"
 
 UDWPlayerCharacterAnim::UDWPlayerCharacterAnim()
 {

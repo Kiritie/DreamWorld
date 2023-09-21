@@ -3,8 +3,7 @@
 
 #include "Procedure/Procedure_Pausing.h"
 
-#include "Gameplay/DWGameState.h"
-#include "Global/GlobalBPLibrary.h"
+#include "Common/CommonBPLibrary.h"
 #include "Main/MainModuleBPLibrary.h"
 #include "Procedure/Procedure_Starting.h"
 #include "Widget/WidgetGameHUD.h"

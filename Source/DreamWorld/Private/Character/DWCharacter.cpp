@@ -5,48 +5,31 @@
 #include "AchievementSubSystem.h"
 #include "TimerManager.h"
 #include "Ability/AbilityModuleBPLibrary.h"
-#include "Ability/Abilities/ItemAbilityBase.h"
 #include "Ability/Components/DWAbilitySystemComponent.h"
-#include "Character/DWCharacterAnim.h"
-#include "Components/CapsuleComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Ability/Item/Equip/AbilityEquipBase.h"
 #include "AI/DWAIController.h"
 #include "Character/DWCharacterPart.h"
-#include "Global/GlobalBPLibrary.h"
-#include "Ability/Inventory/CharacterInventory.h"
-#include "Perception/AIPerceptionStimuliSourceComponent.h"
-#include "Perception/AISense_Damage.h"
-#include "Perception/AISense_Sight.h"
-#include "Scene/SceneModuleBPLibrary.h"
+#include "Common/CommonBPLibrary.h"
 #include "Scene/Actor/PhysicsVolume/PhysicsVolumeBase.h"
 #include "Voxel/DWVoxelChunk.h"
-#include "Voxel/DWVoxelModule.h"
 #include "Voxel/VoxelModule.h"
-#include "Voxel/Chunks/VoxelChunk.h"
 #include "Widget/World/WidgetCharacterHP.h"
-#include "Ability/Character/DWCharacterAbility.h"
 #include "Ability/Character/DWCharacterActionAbility.h"
 #include "Ability/Character/DWCharacterAttackAbility.h"
 #include "Ability/Character/DWCharacterAttributeSet.h"
 #include "Ability/Character/DWCharacterSkillAbility.h"
 #include "Ability/Item/Equip/AbilityEquipDataBase.h"
-#include "Item/Equip/Armor/DWEquipArmor.h"
 #include "Item/Equip/Shield/DWEquipShield.h"
 #include "Item/Equip/Shield/DWEquipShieldData.h"
 #include "Item/Equip/Weapon/DWEquipWeapon.h"
 #include "Item/Equip/Weapon/DWEquipWeaponData.h"
-#include "Item/Prop/DWPropData.h"
-#include "Ability/Item/Prop/AbilityPropDataBase.h"
 #include "Ability/Item/Skill/AbilitySkillBase.h"
 #include "Ability/Item/Skill/AbilitySkillDataBase.h"
 #include "Ability/PickUp/AbilityPickUpBase.h"
 #include "AI/DWAIBlackboard.h"
 #include "Asset/AssetModuleBPLibrary.h"
-#include "BehaviorTree/BehaviorTree.h"
-#include "BehaviorTree/BlackboardData.h"
-#include "Character/CharacterModuleBPLibrary.h"
 #include "Character/DWCharacterData.h"
 #include "Character/States/DWCharacterState_Attack.h"
 #include "Character/States/DWCharacterState_Climb.h"
@@ -65,18 +48,12 @@
 #include "Character/States/DWCharacterState_Swim.h"
 #include "Character/States/DWCharacterState_Walk.h"
 #include "FSM/Components/FSMComponent.h"
-#include "Ability/Inventory/Slot/InventoryEquipSlot.h"
-#include "Ability/Inventory/Slot/InventorySkillSlot.h"
+#include "Ability/Inventory/Slot/AbilityInventorySkillSlot.h"
 #include "Gameplay/WHGameInstance.h"
-#include "Item/Prop/DWPropData.h"
-#include "Main/MainModuleBPLibrary.h"
 #include "Team/DWTeamModule.h"
-#include "Voxel/Datas/VoxelData.h"
-#include "Voxel/DWVoxelChunk.h"
 #include "Voxel/VoxelModuleBPLibrary.h"
 #include "Widget/Item/WidgetItemInfoBox.h"
 #include "Widget/WidgetModuleBPLibrary.h"
-#include "Widget/Inventory/WidgetInventoryBar.h"
 #include "Widget/World/WorldWidgetComponent.h"
 #include "Inventory/DWCharacterInventory.h"
 
@@ -154,7 +131,7 @@ void ADWCharacter::OnRefresh_Implementation(float DeltaSeconds)
 		{
 			if (CanLookAtTarget(LockedTarget))
 			{
-				LookAtTarget(LockedTarget);
+				DoLookAtTarget(LockedTarget);
 			}
 			else
 			{
@@ -377,14 +354,6 @@ void ADWCharacter::Revive(IAbilityVitalityInterface* InRescuer)
 
 bool ADWCharacter::CanInteract(EInteractAction InInteractAction, IInteractionAgentInterface* InInteractionAgent)
 {
-	switch (InInteractAction)
-	{
-		case EInteractAction::Revive:
-		{
-			return IsDead(false);
-		}
-		default: break;
-	}
 	return Super::CanInteract(InInteractAction, InInteractionAgent);
 }
 
@@ -416,7 +385,7 @@ void ADWCharacter::OnActiveItem(const FAbilityItem& InItem, bool bPassive, bool 
 		}
 		else if(IsPlayer())
 		{
-			UWidgetModuleBPLibrary::OpenUserWidget<UWidgetItemInfoBox>({ FString::Printf(TEXT("该%s还未准备好！"), *UGlobalBPLibrary::GetEnumValueDisplayName(TEXT("/Script/WHFramework.EAbilityItemType"), (int32)InItem.GetType()).ToString()) });
+			UWidgetModuleBPLibrary::OpenUserWidget<UWidgetItemInfoBox>({ FString::Printf(TEXT("该%s还未准备好！"), *UCommonBPLibrary::GetEnumValueDisplayName(TEXT("/Script/WHFramework.EAbilityItemType"), (int32)InItem.GetType()).ToString()) });
 		}
 	}
 }
@@ -725,9 +694,13 @@ void ADWCharacter::UnDefend()
 	}
 }
 
-void ADWCharacter::PickUp(AAbilityPickUpBase* InPickUp)
+void ADWCharacter::RefreshEquip(EDWEquipPartType InPartType, const FAbilityItem& InItem)
 {
-	Super::PickUp(InPickUp);
+}
+
+bool ADWCharacter::OnPickUp_Implementation(AAbilityPickUpBase* InPickUp)
+{
+	return Super::OnPickUp_Implementation(InPickUp);
 }
 
 bool ADWCharacter::OnGenerateVoxel(const FVoxelHitResult& InVoxelHitResult)
@@ -740,7 +713,7 @@ bool ADWCharacter::OnGenerateVoxel(const FVoxelHitResult& InVoxelHitResult)
 		if(Super::OnGenerateVoxel(InVoxelHitResult))
 		{
 			Inventory->RemoveItemByQueryInfo(QueryItemInfo);
-			UGlobalBPLibrary::GetGameInstance()->GetSubsystem<UAchievementSubSystem>()->Unlock(FName("FirstGenerateVoxel"));
+			UCommonBPLibrary::GetGameInstance()->GetSubsystem<UAchievementSubSystem>()->Unlock(FName("FirstGenerateVoxel"));
 			return true;
 		}
 	}
@@ -753,15 +726,11 @@ bool ADWCharacter::OnDestroyVoxel(const FVoxelHitResult& InVoxelHitResult)
 	{
 		if(Super::OnDestroyVoxel(InVoxelHitResult))
 		{
-			UGlobalBPLibrary::GetGameInstance()->GetSubsystem<UAchievementSubSystem>()->Unlock(FName("FirstDestroyVoxel"));
+			UCommonBPLibrary::GetGameInstance()->GetSubsystem<UAchievementSubSystem>()->Unlock(FName("FirstDestroyVoxel"));
 			return true;
 		}
 	}
 	return false;
-}
-
-void ADWCharacter::RefreshEquip(EDWEquipPartType InPartType, const FAbilityItem& InItem)
-{
 }
 
 bool ADWCharacter::DoAction(EDWCharacterActionType InActionType)
@@ -861,17 +830,12 @@ void ADWCharacter::EndAction(EDWCharacterActionType InActionType, bool bWasCance
 	}
 }
 
-void ADWCharacter::SetLockedTarget(ADWCharacter* InTargetCharacter)
-{
-	LockedTarget = InTargetCharacter;
-}
-
 bool ADWCharacter::CanLookAtTarget(ADWCharacter* InTargetCharacter)
 {
-	return !LockedTarget->IsDead() && FVector::Distance(GetActorLocation(), LockedTarget->GetActorLocation()) <= 1000.f;
+	return !InTargetCharacter->IsDead() && FVector::Distance(GetActorLocation(), InTargetCharacter->GetActorLocation()) <= 1000.f;
 }
 
-void ADWCharacter::LookAtTarget(ADWCharacter* InTargetCharacter)
+void ADWCharacter::DoLookAtTarget(ADWCharacter* InTargetCharacter)
 {
 	if(!IsDodging())
 	{
@@ -1047,7 +1011,7 @@ FDWTeamData* ADWCharacter::GetTeamData() const
 
 bool ADWCharacter::IsTargetable_Implementation() const
 {
-	return !IsDead();
+	return Super::IsTargetable_Implementation();
 }
 
 void ADWCharacter::SetNameV(FName InName)
@@ -1140,6 +1104,11 @@ float ADWCharacter::GetPatrolDistance() const
 float ADWCharacter::GetPatrolDuration() const
 {
 	return GetCharacterData<UDWCharacterData>().PatrolDuration;
+}
+
+void ADWCharacter::SetLockedTarget(ADWCharacter* InTargetCharacter)
+{
+	LockedTarget = InTargetCharacter;
 }
 
 AAbilityEquipBase* ADWCharacter::GetEquip(EDWEquipPartType InPartType) const
@@ -1262,7 +1231,7 @@ bool ADWCharacter::RaycastStep(FHitResult& OutHitResult)
 {
 	const FVector rayStart = GetActorLocation() + FVector::DownVector * (GetHalfHeight() - GetCharacterMovement()->MaxStepHeight);
 	const FVector rayEnd = rayStart + GetMoveDirection() * (GetRadius() + AVoxelModule::Get()->GetWorldData().BlockSize * FMath::Clamp(GetMoveDirection().Size() * 0.005f, 0.5f, 1.3f));
-	return UKismetSystemLibrary::LineTraceSingle(this, rayStart, rayEnd, UGlobalBPLibrary::GetGameTraceType((ECollisionChannel)EDWGameTraceChannel::Step), false, {}, EDrawDebugTrace::None, OutHitResult, true);
+	return UKismetSystemLibrary::LineTraceSingle(this, rayStart, rayEnd, UCommonBPLibrary::GetGameTraceType((ECollisionChannel)EDWGameTraceChannel::Step), false, {}, EDrawDebugTrace::None, OutHitResult, true);
 }
 
 bool ADWCharacter::HasTeam() const
@@ -1289,7 +1258,7 @@ bool ADWCharacter::HasSkillAbility(const FPrimaryAssetId& InSkillID, bool bNeedA
 	if(SkillAbilities.Contains(InSkillID))
 	{
 		if(!bNeedAssembled) return true;
-		auto SkillSlots = Inventory->GetSplitSlots<UInventorySkillSlot>(ESplitSlotType::Skill);
+		auto SkillSlots = Inventory->GetSplitSlots<UAbilityInventorySkillSlot>(ESplitSlotType::Skill);
 		for (int32 i = 0; i < SkillSlots.Num(); i++)
 		{
 			if(SkillSlots[i]->GetItem().ID == InSkillID)
@@ -1314,7 +1283,7 @@ bool ADWCharacter::HasSkillAbility(ESkillType InSkillType, int32 InAbilityIndex,
 	if(Abilities.IsValidIndex(InAbilityIndex))
 	{
 		if(!bNeedAssembled) return true;
-		auto SkillSlots = Inventory->GetSplitSlots<UInventorySkillSlot>(ESplitSlotType::Skill);
+		auto SkillSlots = Inventory->GetSplitSlots<UAbilityInventorySkillSlot>(ESplitSlotType::Skill);
 		for (int32 i = 0; i < SkillSlots.Num(); i++)
 		{
 			if(SkillSlots[i]->GetItem().ID == Abilities[InAbilityIndex].AbilityID)
@@ -1406,7 +1375,7 @@ TArray<ADWCharacter*> ADWCharacter::GetTeamMates()
 
 bool ADWCharacter::IsPlayer(bool bCheckNature) const
 {
-	return !bCheckNature ? UGlobalBPLibrary::GetPlayerPawn() == this : GetNature() == EDWCharacterNature::Player;
+	return !bCheckNature ? UCommonBPLibrary::GetPlayerPawn() == this : GetNature() == EDWCharacterNature::Player;
 }
 
 bool ADWCharacter::IsEnemy(ADWCharacter* InTargetCharacter) const

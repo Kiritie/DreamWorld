@@ -4,11 +4,8 @@
 #include "Procedure/Archive/Procedure_ArchiveChoosing.h"
 
 #include "Camera/CameraModuleBPLibrary.h"
-#include "Character/CharacterModuleBPLibrary.h"
-#include "Character/Player/DWPlayerCharacter.h"
-#include "Gameplay/DWGameState.h"
 #include "Gameplay/DWPlayerController.h"
-#include "Global/GlobalBPLibrary.h"
+#include "Common/CommonBPLibrary.h"
 #include "Procedure/ProcedureModuleBPLibrary.h"
 #include "Procedure/Archive/Procedure_ArchiveCreating.h"
 #include "Procedure/Procedure_Loading.h"
@@ -16,7 +13,6 @@
 #include "SaveGame/Archive/DWArchiveSaveGame.h"
 #include "SaveGame/General/DWGeneralSaveGame.h"
 #include "SaveGame/SaveGameModuleBPLibrary.h"
-#include "Voxel/VoxelModule.h"
 #include "Widget/WidgetModuleBPLibrary.h"
 #include "Widget/Archive/WidgetArchiveChoosingPanel.h"
 #include "Widget/Archive/WidgetArchiveCreatingPanel.h"
@@ -46,7 +42,7 @@ void UProcedure_ArchiveChoosing::OnInitialize()
 {
 	Super::OnInitialize();
 
-	UGlobalBPLibrary::GetPlayerController<ADWPlayerController>()->OnPlayerPawnChanged.AddDynamic(this, &UProcedure_ArchiveChoosing::OnPlayerChanged);
+	UCommonBPLibrary::GetPlayerController<ADWPlayerController>()->OnPlayerPawnChanged.AddDynamic(this, &UProcedure_ArchiveChoosing::OnPlayerChanged);
 }
 
 void UProcedure_ArchiveChoosing::OnEnter(UProcedureBase* InLastProcedure)

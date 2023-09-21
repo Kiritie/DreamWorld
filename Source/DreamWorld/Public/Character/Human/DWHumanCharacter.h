@@ -11,7 +11,7 @@ class UStaticMeshComponent;
 class ADWEquipWeapon;
 class ADWEquipShield;
 class ADWEquipArmor;
-class UInventoryEquipSlot;
+class UAbilityInventoryEquipSlot;
 
 /**
  * 类人角色

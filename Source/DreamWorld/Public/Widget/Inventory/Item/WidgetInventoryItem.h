@@ -2,14 +2,11 @@
 
 #pragma once
 
-#include "Ability/AbilityModuleTypes.h"
-#include "Ability/Inventory/Widget/WidgetInventoryItemBase.h"
-#include "Blueprint/UserWidget.h"
-#include "ObjectPool/ObjectPoolInterface.h"
+#include "Ability/Inventory/Widget/WidgetAbilityInventoryItemBase.h"
 #include "WidgetInventoryItem.generated.h"
 
 UCLASS(BlueprintType)
-class DREAMWORLD_API UWidgetInventoryItem : public UWidgetInventoryItemBase
+class DREAMWORLD_API UWidgetInventoryItem : public UWidgetAbilityInventoryItemBase
 {
 	GENERATED_BODY()
 	

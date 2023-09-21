@@ -4,10 +4,10 @@
 
 #include "AchievementSubSystem.h"
 #include "Character/Player/DWPlayerCharacter.h"
-#include "Widget/WidgetModuleBPLibrary.h"
-#include "Ability/Components/InteractionComponent.h"
 #include "Gameplay/WHGameInstance.h"
-#include "Global/GlobalBPLibrary.h"
+#include "Common/CommonBPLibrary.h"
+#include "Common/Interaction/InteractionComponent.h"
+#include "Common/Targeting/TargetingComponent.h"
 
 UDWPlayerCharacterState_Death::UDWPlayerCharacterState_Death()
 {
@@ -30,13 +30,11 @@ void UDWPlayerCharacterState_Death::OnEnter(UFiniteStateBase* InLastFiniteState)
 
 	ADWPlayerCharacter* PlayerCharacter = GetAgent<ADWPlayerCharacter>();
 
-	PlayerCharacter->GetTargetSystem()->TargetLockOff();
+	PlayerCharacter->GetTargeting()->TargetLockOff();
 
 	PlayerCharacter->GetInteractionComponent()->SetInteractable(false);
 	
-	PlayerCharacter->SetInteractingAgent(PlayerCharacter);
-
-	UGlobalBPLibrary::GetGameInstance()->GetSubsystem<UAchievementSubSystem>()->Unlock(FName("FirstDeath"));
+	UCommonBPLibrary::GetGameInstance()->GetSubsystem<UAchievementSubSystem>()->Unlock(FName("FirstDeath"));
 }
 
 void UDWPlayerCharacterState_Death::OnRefresh()
@@ -51,6 +49,8 @@ void UDWPlayerCharacterState_Death::OnLeave(UFiniteStateBase* InNextFiniteState)
 	ADWPlayerCharacter* PlayerCharacter = GetAgent<ADWPlayerCharacter>();
 
 	PlayerCharacter->SetInteractingAgent(nullptr);
+	
+	PlayerCharacter->GetInteractionComponent()->SetInteractable(true);
 }
 
 void UDWPlayerCharacterState_Death::OnTermination()
@@ -67,5 +67,7 @@ void UDWPlayerCharacterState_Death::DeathEnd()
 {
 	Super::DeathEnd();
 
-	
+	ADWPlayerCharacter* PlayerCharacter = GetAgent<ADWPlayerCharacter>();
+
+	PlayerCharacter->SetInteractingAgent(PlayerCharacter);
 }

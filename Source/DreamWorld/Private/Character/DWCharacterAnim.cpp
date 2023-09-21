@@ -4,10 +4,8 @@
 #include "Character/DWCharacterAnim.h"
 #include "Character/DWCharacter.h"
 #include "Character/States/DWCharacterState_Attack.h"
-#include "Character/States/DWCharacterState_Death.h"
-#include "GameFramework/CharacterMovementComponent.h"
 #include "FSM/Components/FSMComponent.h"
-#include "Global/GlobalBPLibrary.h"
+#include "Common/CommonBPLibrary.h"
 
 UDWCharacterAnim::UDWCharacterAnim()
 {
@@ -61,7 +59,7 @@ void UDWCharacterAnim::NativeUpdateAnimation(float DeltaSeconds)
 	
 	ADWCharacter* Character = Cast<ADWCharacter>(TryGetPawnOwner());
 
-	if(!Character || !Character->GetAssetID().IsValid() || !UGlobalBPLibrary::IsPlaying()) return;
+	if(!Character || !Character->GetAssetID().IsValid() || !UCommonBPLibrary::IsPlaying()) return;
 
 	bSprinting = Character->IsSprinting();
 	bAttacking = Character->IsAttacking();

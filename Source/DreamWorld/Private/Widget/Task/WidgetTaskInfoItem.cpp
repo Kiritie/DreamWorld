@@ -3,7 +3,6 @@
 
 #include "Widget/Task/WidgetTaskInfoItem.h"
 
-#include "Components/VerticalBoxSlot.h"
 #include "Task/Base/TaskBase.h"
 
 

@@ -4,13 +4,8 @@
 #include "Procedure/Procedure_Initializing.h"
 
 #include "TimerManager.h"
-#include "Gameplay/DWGameState.h"
-#include "Global/GlobalBPLibrary.h"
 #include "Procedure/ProcedureModuleBPLibrary.h"
 #include "Procedure/Procedure_Starting.h"
-#include "Scene/SceneModule.h"
-#include "Voxel/VoxelModule.h"
-#include "Widget/WidgetLoadingPanel.h"
 #include "Widget/WidgetMainMenu.h"
 #include "Widget/WidgetModuleBPLibrary.h"
 

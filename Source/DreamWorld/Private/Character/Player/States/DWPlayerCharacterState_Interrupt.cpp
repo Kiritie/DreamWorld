@@ -1,9 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Character/Player/States/DWPlayerCharacterState_Interrupt.h"
-#include "AbilitySystemComponent.h"
-#include "Character/Player/DWPlayerCharacter.h"
-#include "Components/CapsuleComponent.h"
 
 UDWPlayerCharacterState_Interrupt::UDWPlayerCharacterState_Interrupt()
 {

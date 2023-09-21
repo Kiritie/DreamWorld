@@ -5,18 +5,18 @@
 #include "GameFramework/Actor.h"
 #include "AbilitySystemInterface.h"
 #include "Ability/Vitality/AbilityVitalityBase.h"
-#include "Ability/Inventory/InventoryAgentInterface.h"
+#include "Ability/Inventory/AbilityInventoryAgentInterface.h"
 
 #include "DWVitality.generated.h"
 
 class UWorldWidgetComponent;
-class UVitalityInventory;
+class UAbilityVitalityInventoryBase;
 class ADWVoxelChunk;
-class UVitalityInteractionComponent;
+class UInteractionComponent;
 class AVoxelChunk;
 class ADWVitality;
 class UBoxComponent;
-class UInventory;
+class UAbilityInventoryBase;
 class UAttributeSetBase;
 
 /**

@@ -3,7 +3,7 @@
 #pragma once
 
 #include "Ability/Character/AbilityCharacterPartBase.h"
-#include "Global/DWGlobalTypes.h"
+#include "Common/DWCommonTypes.h"
 
 #include "DWCharacterPart.generated.h"
 

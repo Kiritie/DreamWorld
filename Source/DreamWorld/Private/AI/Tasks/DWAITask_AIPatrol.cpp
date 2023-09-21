@@ -4,9 +4,8 @@
 #include "AI/Tasks/DWAITask_AIPatrol.h"
 #include "BehaviorTree/BehaviorTreeTypes.h"
 #include "Character/DWCharacter.h"
-#include "AI/DWAIController.h"
 #include "AIModule/Classes/BehaviorTree/BlackboardComponent.h"
-#include "Global/GlobalTypes.h"
+#include "Common/CommonTypes.h"
 #include "Voxel/VoxelModuleBPLibrary.h"
 
 UDWAITask_AIPatrol::UDWAITask_AIPatrol(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)

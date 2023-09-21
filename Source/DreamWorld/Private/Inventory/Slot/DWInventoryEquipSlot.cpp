@@ -4,19 +4,19 @@
 #include "Inventory/Slot/DWInventoryEquipSlot.h"
 
 #include "Item/Equip/DWEquipData.h"
-#include "Ability/Inventory/Inventory.h"
+#include "Ability/Inventory/AbilityInventoryBase.h"
 #include "Character/DWCharacter.h"
 
 UDWInventoryEquipSlot::UDWInventoryEquipSlot()
 {
 }
 
-void UDWInventoryEquipSlot::OnInitialize(UInventory* InInventory, FAbilityItem InItem, EAbilityItemType InLimitType /* = EAbilityItemType::None */, ESplitSlotType InSplitType /*= ESplitSlotType::Default*/)
+void UDWInventoryEquipSlot::OnInitialize(UAbilityInventoryBase* InInventory, FAbilityItem InItem, EAbilityItemType InLimitType /* = EAbilityItemType::None */, ESplitSlotType InSplitType /*= ESplitSlotType::Default*/)
 {
 	Super::OnInitialize(InInventory, InItem, InLimitType, InSplitType);
 }
 
-void UDWInventoryEquipSlot::OnInitialize(UInventory* InInventory, FAbilityItem InItem, EAbilityItemType InLimitType, ESplitSlotType InSplitType, int32 InPartType)
+void UDWInventoryEquipSlot::OnInitialize(UAbilityInventoryBase* InInventory, FAbilityItem InItem, EAbilityItemType InLimitType, ESplitSlotType InSplitType, int32 InPartType)
 {
 	Super::OnInitialize(InInventory, InItem, InLimitType, InSplitType, InPartType);
 

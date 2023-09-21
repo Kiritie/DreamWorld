@@ -4,27 +4,19 @@
 
 #include "AchievementSubSystem.h"
 #include "Ability/Character/DWCharacterAttributeSet.h"
-#include "Ability/Components/InteractionComponent.h"
 #include "Item/Equip/Weapon/DWEquipWeapon.h"
 #include "Asset/AssetModuleBPLibrary.h"
 #include "Ability/Item/AbilityItemDataBase.h"
-#include "Gameplay/DWPlayerController.h"
-#include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/InputComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "GameFramework/SpringArmComponent.h"
 #include "Components/SceneCaptureComponent2D.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Voxel/Components/VoxelMeshComponent.h"
 #include "Widget/Inventory/WidgetInventoryBar.h"
-#include "Widget/Inventory/Slot/WidgetInventorySlot.h"
 #include "Widget/Inventory/WidgetInventoryPanel.h"
-#include "Ability/Inventory/Slot/InventorySlot.h"
-#include "Gameplay/DWGameState.h"
+#include "Ability/Inventory/Slot/AbilityInventorySlot.h"
 #include "Widget/WidgetGameHUD.h"
-#include "Voxel/DWVoxelModule.h"
-#include "Voxel/Chunks/VoxelChunk.h"
 #include "Widget/WidgetModuleBPLibrary.h"
 #include "Voxel/Datas/VoxelData.h"
 #include "Ability/Item/Equip/AbilityEquipDataBase.h"
@@ -32,6 +24,7 @@
 #include "Ability/Item/Skill/AbilitySkillDataBase.h"
 #include "Ability/AbilityModuleBPLibrary.h"
 #include "Ability/AbilityModuleTypes.h"
+#include "Ability/Character/AbilityCharacterInventoryBase.h"
 #include "Camera/CameraModuleBPLibrary.h"
 #include "Character/Player/States/DWPlayerCharacterState_Attack.h"
 #include "Character/Player/States/DWPlayerCharacterState_Death.h"
@@ -50,13 +43,12 @@
 #include "Character/States/DWCharacterState_Swim.h"
 #include "Character/States/DWCharacterState_Walk.h"
 #include "FSM/Components/FSMComponent.h"
-#include "Global/GlobalBPLibrary.h"
-#include "Voxel/Voxels/Entity/VoxelEntity.h"
+#include "Common/CommonBPLibrary.h"
 #include "Widget/World/WorldWidgetComponent.h"
-#include "Ability/Inventory/CharacterInventory.h"
 #include "Widget/WidgetContextBox.h"
 #include "Ability/Item/Raw/AbilityRawDataBase.h"
 #include "Character/Player/DWPlayerCharacterData.h"
+#include "Common/Targeting/TargetingComponent.h"
 #include "Gameplay/WHGameInstance.h"
 #include "Vitality/DWVitality.h"
 #include "Voxel/Voxels/VoxelInteract.h"
@@ -75,14 +67,14 @@ ADWPlayerCharacter::ADWPlayerCharacter()
 
 	CharacterHP->SetAutoCreate(false);
 
-	TargetSystem = CreateDefaultSubobject<UTargetSystemComponent>(FName("TargetSystem"));
-	TargetSystem->bShouldControlRotation = false;
-	TargetSystem->TargetableActors = ADWCharacter::StaticClass();
-	TargetSystem->TargetableCollisionChannel = ECC_GameTraceChannel1;
-	TargetSystem->LockedOnWidgetParentSocket = FName("LockPoint");
-	TargetSystem->OnTargetLockedOn.AddDynamic(this, &ADWPlayerCharacter::OnTargetLockedOn);
-	TargetSystem->OnTargetLockedOff.AddDynamic(this, &ADWPlayerCharacter::OnTargetLockedOff);
-	TargetSystem->OnTargetSetRotation.AddDynamic(this, &ADWPlayerCharacter::OnTargetSetRotation);
+	Targeting = CreateDefaultSubobject<UTargetingComponent>(FName("Targeting"));
+	Targeting->bShouldControlRotation = false;
+	Targeting->TargetableActors = ADWCharacter::StaticClass();
+	Targeting->TargetableCollisionChannel = ECC_GameTraceChannel1;
+	Targeting->LockedOnWidgetParentSocket = FName("LockPoint");
+	Targeting->OnTargetLockedOn.AddDynamic(this, &ADWPlayerCharacter::OnTargetLockedOn);
+	Targeting->OnTargetLockedOff.AddDynamic(this, &ADWPlayerCharacter::OnTargetLockedOff);
+	Targeting->OnTargetSetRotation.AddDynamic(this, &ADWPlayerCharacter::OnTargetSetRotation);
 
 	GetMesh()->SetRelativeLocation(FVector(0, 0, -70));
 
@@ -241,11 +233,11 @@ void ADWPlayerCharacter::Kill(IAbilityVitalityInterface* InTarget)
 
 	if(Cast<ADWCharacter>(InTarget))
 	{
-		UGlobalBPLibrary::GetGameInstance()->GetSubsystem<UAchievementSubSystem>()->Unlock(FName("FirstKillMonster"));
+		UCommonBPLibrary::GetGameInstance()->GetSubsystem<UAchievementSubSystem>()->Unlock(FName("FirstKillMonster"));
 	}
 	else if(Cast<ADWVitality>(InTarget))
 	{
-		UGlobalBPLibrary::GetGameInstance()->GetSubsystem<UAchievementSubSystem>()->Unlock(FName("FirstKillVitality"));
+		UCommonBPLibrary::GetGameInstance()->GetSubsystem<UAchievementSubSystem>()->Unlock(FName("FirstKillVitality"));
 	}
 }
 
@@ -254,7 +246,7 @@ bool ADWPlayerCharacter::CanLookAtTarget(ADWCharacter* InTargetCharacter)
 	return true;
 }
 
-void ADWPlayerCharacter::LookAtTarget(ADWCharacter* InTargetCharacter)
+void ADWPlayerCharacter::DoLookAtTarget(ADWCharacter* InTargetCharacter)
 {
 	if(IsAttacking() || IsDefending())
 	{
@@ -338,18 +330,37 @@ void ADWPlayerCharacter::RefreshEquip(EDWEquipPartType InPartType, const FAbilit
 	}
 }
 
+bool ADWPlayerCharacter::CanInteract(EInteractAction InInteractAction, IInteractionAgentInterface* InInteractionAgent)
+{
+	switch (InInteractAction)
+	{
+		case EInteractAction::Revive:
+		{
+			if(InInteractionAgent == this)
+			{
+				return IsDead(false);
+			}
+		}
+		default: break;
+	}
+	return Super::CanInteract(InInteractAction, InInteractionAgent);
+}
+
 void ADWPlayerCharacter::OnEnterInteract(IInteractionAgentInterface* InInteractionAgent)
 {
 	Super::OnEnterInteract(InInteractionAgent);
 
-	UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>()->ShowInteractActions(GetInteractableActions(InInteractionAgent));
+	if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>())
+	{
+		UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>()->ShowInteractActions(GetInteractableActions(InInteractionAgent));
+	}
 }
 
 void ADWPlayerCharacter::OnLeaveInteract(IInteractionAgentInterface* InInteractionAgent)
 {
 	Super::OnLeaveInteract(InInteractionAgent);
 
-	if(GetInteractingAgent() == InInteractionAgent)
+	if(GetInteractingAgent() == InInteractionAgent && UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>())
 	{
 		UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>()->HideInteractActions();
 	}
@@ -387,12 +398,15 @@ void ADWPlayerCharacter::OnInteract(EInteractAction InInteractAction, IInteracti
 		}
 		default: break;
 	}
-	UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>()->ShowInteractActions(GetInteractableActions(InInteractionAgent));
+	if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>())
+	{
+		UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>()->ShowInteractActions(GetInteractableActions(InInteractionAgent));
+	}
 }
 
 void ADWPlayerCharacter::ChangeHand()
 {
-	TArray<UInventorySlot*> AuxiliarySlots = Inventory->GetSplitSlots(ESplitSlotType::Auxiliary);
+	TArray<UAbilityInventorySlot*> AuxiliarySlots = Inventory->GetSplitSlots(ESplitSlotType::Auxiliary);
 	if(AuxiliarySlots.Num() > 0 && Inventory->GetSelectedSlot())
 	{
 		AuxiliarySlots[0]->Replace(Inventory->GetSelectedSlot());
@@ -422,7 +436,10 @@ bool ADWPlayerCharacter::OnInteractVoxel(const FVoxelHitResult& InVoxelHitResult
 					}
 					default: break;
 				}
-				UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>()->ShowInteractActions(GetInteractableActions(InteractionAgent));
+				if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>())
+				{
+					UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>()->ShowInteractActions(GetInteractableActions(InteractionAgent));
+				}
 			}
 			break;
 		}
@@ -435,7 +452,7 @@ void ADWPlayerCharacter::Turn_Implementation(float InValue)
 {
 	if(IsBreakAllInput()) return;
 
-	TargetSystem->TargetActorWithAxisInput(InValue);
+	Targeting->TargetActorWithAxisInput(InValue);
 }
 
 void ADWPlayerCharacter::MoveForward_Implementation(float InValue)

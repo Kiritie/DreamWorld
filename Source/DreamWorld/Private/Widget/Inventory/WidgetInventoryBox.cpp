@@ -3,9 +3,9 @@
 
 #include "Widget/Inventory/WidgetInventoryBox.h"
 
-#include "Ability/Inventory/Inventory.h"
-#include "Ability/Inventory/InventoryAgentInterface.h"
-#include "Ability/Inventory/Slot/InventorySlot.h"
+#include "Ability/Inventory/AbilityInventoryBase.h"
+#include "Ability/Inventory/AbilityInventoryAgentInterface.h"
+#include "Ability/Inventory/Slot/AbilityInventorySlot.h"
 #include "Components/WrapBox.h"
 #include "Components/WrapBoxSlot.h"
 #include "Voxel/Voxels/Auxiliary/VoxelInteractAuxiliary.h"
@@ -37,7 +37,7 @@ void UWidgetInventoryBox::OnInitialize_Implementation(UObject* InOwner)
 	
 	if(DefaultContent && UISlotDatas.Contains(ESplitSlotType::Default))
 	{
-		const auto DefaultSlots = GetInventory()->GetSplitSlots<UInventorySlot>(ESplitSlotType::Default);
+		const auto DefaultSlots = GetInventory()->GetSplitSlots<UAbilityInventorySlot>(ESplitSlotType::Default);
 		if(UISlotDatas[ESplitSlotType::Default].Slots.Num() != DefaultSlots.Num())
 		{
 			DefaultContent->ClearChildren();
@@ -68,10 +68,10 @@ void UWidgetInventoryBox::OnOpen_Implementation(const TArray<FParameter>& InPara
 {
 	Super::OnOpen_Implementation(InParams, bInstant);
 
-	UInventory* TargetInventory = nullptr;
+	UAbilityInventoryBase* TargetInventory = nullptr;
 	if(InParams.IsValidIndex(0))
 	{
-		TargetInventory = InParams[0].GetObjectValue<IInventoryAgentInterface>()->GetInventory();
+		TargetInventory = InParams[0].GetObjectValue<IAbilityInventoryAgentInterface>()->GetInventory();
 	}
 
 	if(!TargetInventory) return;
@@ -80,7 +80,7 @@ void UWidgetInventoryBox::OnOpen_Implementation(const TArray<FParameter>& InPara
 
 	if(TargetContent && TargetUISlotDatas.Contains(ESplitSlotType::Default))
 	{
-		const auto DefaultSlots = TargetInventory->GetSplitSlots<UInventorySlot>(ESplitSlotType::Default);
+		const auto DefaultSlots = TargetInventory->GetSplitSlots<UAbilityInventorySlot>(ESplitSlotType::Default);
 		if(TargetUISlotDatas[ESplitSlotType::Default].Slots.Num() != DefaultSlots.Num())
 		{
 			TargetContent->ClearChildren();

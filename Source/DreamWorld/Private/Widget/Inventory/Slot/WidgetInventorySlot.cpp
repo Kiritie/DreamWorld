@@ -4,14 +4,11 @@
 #include "Widget/Inventory/Slot/WidgetInventorySlot.h"
 
 #include "Ability/Item/AbilityItemDataBase.h"
-#include "Ability/Vitality/AbilityVitalityInterface.h"
 #include "Blueprint/DragDropOperation.h"
 #include "Components/Border.h"
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
-#include "Ability/Inventory/Inventory.h"
-#include "Widget/Inventory/WidgetInventory.h"
-#include "Ability/Inventory/Slot/InventorySlot.h"
+#include "Ability/Inventory/Slot/AbilityInventorySlot.h"
 #include "Blueprint/WidgetBlueprintLibrary.h"
 #include "Kismet/KismetTextLibrary.h"
 #include "Materials/MaterialInstanceDynamic.h"
@@ -19,12 +16,12 @@
 #include "Components/CanvasPanelSlot.h"
 #include "Widget/Inventory/Item/WidgetInventoryItemInfoBox.h"
 #include "Widget/WidgetModuleBPLibrary.h"
-#include "Global/GlobalBPLibrary.h"
+#include "Common/CommonBPLibrary.h"
 #include "Widget/Inventory/Item/WidgetInventoryItem.h"
 
 UWidgetInventorySlot::UWidgetInventorySlot(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
-	static ConstructorHelpers::FClassFinder<UWidgetInventoryItemBase> ItemDragVisualClassFinder(TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/Blueprints/Widget/Inventory/Item/WB_InventoryItemDragVisual.WB_InventoryItemDragVisual_C'"));
+	static ConstructorHelpers::FClassFinder<UWidgetAbilityInventoryItemBase> ItemDragVisualClassFinder(TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/Blueprints/Widget/Inventory/Item/WB_InventoryItemDragVisual.WB_InventoryItemDragVisual_C'"));
 	if(ItemDragVisualClassFinder.Succeeded())
 	{
 		DragVisualClass = ItemDragVisualClassFinder.Class;
@@ -104,7 +101,7 @@ FReply UWidgetInventorySlot::NativeOnMouseMove(const FGeometry& InGeometry, cons
 		if(const auto ItemInfoBoxSlot = Cast<UCanvasPanelSlot>(UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryItemInfoBox>()->Slot))
 		{
 			float PosX, PosY;
-			UWidgetLayoutLibrary::GetMousePositionScaledByDPI(UGlobalBPLibrary::GetPlayerController(), PosX, PosY);
+			UWidgetLayoutLibrary::GetMousePositionScaledByDPI(UCommonBPLibrary::GetPlayerController(), PosX, PosY);
 			ItemInfoBoxSlot->SetPosition(FVector2D(PosX, PosY));
 		}
 	}

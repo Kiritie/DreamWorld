@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "Ability/Inventory/Widget/WidgetInventoryBase.h"
+#include "Ability/Inventory/Widget/WidgetAbilityInventoryBase.h"
 
 #include "WidgetInventory.generated.h"
 
@@ -10,7 +10,7 @@
  * ��Ʒ������
  */
 UCLASS()
-class DREAMWORLD_API UWidgetInventory : public UWidgetInventoryBase
+class DREAMWORLD_API UWidgetInventory : public UWidgetAbilityInventoryBase
 {
 	GENERATED_BODY()
 

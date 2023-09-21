@@ -3,7 +3,6 @@
 #include "Character/Player/States/DWPlayerCharacterState_Dodge.h"
 
 #include "Character/Player/DWPlayerCharacter.h"
-#include "Components/CapsuleComponent.h"
 
 UDWPlayerCharacterState_Dodge::UDWPlayerCharacterState_Dodge()
 {
@@ -26,7 +25,7 @@ void UDWPlayerCharacterState_Dodge::OnEnter(UFiniteStateBase* InLastFiniteState)
 
 	ADWPlayerCharacter* PlayerCharacter = GetAgent<ADWPlayerCharacter>();
 
-	// PlayerCharacter->GetTargetSystem()->SetShouldControlRotation(false);
+	// PlayerCharacter->GetTargeting()->SetShouldControlRotation(false);
 }
 
 void UDWPlayerCharacterState_Dodge::OnRefresh()
@@ -40,7 +39,7 @@ void UDWPlayerCharacterState_Dodge::OnLeave(UFiniteStateBase* InNextFiniteState)
 
 	ADWPlayerCharacter* PlayerCharacter = GetAgent<ADWPlayerCharacter>();
 
-	// PlayerCharacter->GetTargetSystem()->SetShouldControlRotation(true);
+	// PlayerCharacter->GetTargeting()->SetShouldControlRotation(true);
 }
 
 void UDWPlayerCharacterState_Dodge::OnTermination()

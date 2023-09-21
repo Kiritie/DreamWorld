@@ -6,6 +6,7 @@
 #include "AI/DWAITask.h"
 #include "DWAITask_AIMoveTo.generated.h"
 
+class ADWCharacter;
 /**
  * 
  */

@@ -4,25 +4,17 @@
 #include "Procedure/Archive/Procedure_ArchiveCreating.h"
 
 #include "Camera/CameraModuleBPLibrary.h"
-#include "Character/CharacterModuleBPLibrary.h"
 #include "Character/Player/DWPlayerCharacter.h"
-#include "Character/States/DWCharacterState_Walk.h"
-#include "Event/EventModuleBPLibrary.h"
-#include "FSM/Components/FSMComponent.h"
-#include "Gameplay/DWGameState.h"
 #include "Gameplay/DWPlayerController.h"
-#include "Global/GlobalBPLibrary.h"
+#include "Common/CommonBPLibrary.h"
 #include "Procedure/ProcedureModuleBPLibrary.h"
 #include "Procedure/Procedure_Loading.h"
 #include "SaveGame/Archive/DWArchiveSaveGame.h"
 #include "SaveGame/SaveGameModuleBPLibrary.h"
-#include "Voxel/DWVoxelModule.h"
-#include "Widget/WidgetLoadingPanel.h"
 #include "Widget/WidgetModuleBPLibrary.h"
-#include "Widget/Archive/WidgetArchiveChoosingPanel.h"
 #include "Widget/Archive/WidgetArchiveCreatingPanel.h"
 #include "Voxel/VoxelModule.h"
-#include "Global/DWGlobalTypes.h"
+#include "Common/DWCommonTypes.h"
 #include "Procedure/Archive/Procedure_ArchiveChoosing.h"
 
 UProcedure_ArchiveCreating::UProcedure_ArchiveCreating()
@@ -50,7 +42,7 @@ void UProcedure_ArchiveCreating::OnInitialize()
 {
 	Super::OnInitialize();
 
-	UGlobalBPLibrary::GetPlayerController<ADWPlayerController>()->OnPlayerPawnChanged.AddDynamic(this, &UProcedure_ArchiveCreating::OnPlayerChanged);
+	UCommonBPLibrary::GetPlayerController<ADWPlayerController>()->OnPlayerPawnChanged.AddDynamic(this, &UProcedure_ArchiveCreating::OnPlayerChanged);
 }
 
 void UProcedure_ArchiveCreating::OnEnter(UProcedureBase* InLastProcedure)
@@ -113,7 +105,7 @@ void UProcedure_ArchiveCreating::OnPlayerChanged(APawn* InPlayerPawn)
 
 void UProcedure_ArchiveCreating::CreatePlayer(FDWPlayerSaveData& InPlayerSaveData, EPhase InPhase)
 {
-	UGlobalBPLibrary::GetPlayerController<ADWPlayerController>()->LoadSaveData(&InPlayerSaveData, InPhase);
+	UCommonBPLibrary::GetPlayerController<ADWPlayerController>()->LoadSaveData(&InPlayerSaveData, InPhase);
 	USaveGameModuleBPLibrary::GetSaveGame<UDWArchiveSaveGame>()->GetSaveDataRef<FDWArchiveSaveData>().PlayerData = InPlayerSaveData;
 }
 

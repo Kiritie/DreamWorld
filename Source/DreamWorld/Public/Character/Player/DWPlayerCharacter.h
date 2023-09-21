@@ -16,7 +16,7 @@ class USceneCaptureComponent2D;
 class ADWPlayerController;
 class UPawnSensingComponent;
 class ADWPlayerCharacterCameraManager;
-class UTargetSystemComponent;
+class UTargetingComponent;
 
 /**
  * ��ҽ�ɫ
@@ -43,7 +43,7 @@ public:
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-	UTargetSystemComponent* TargetSystem;
+	UTargetingComponent* Targeting;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	USceneCaptureComponent2D* PreviewCapture;
@@ -67,9 +67,11 @@ public:
 
 	virtual bool CanLookAtTarget(ADWCharacter* InTargetCharacter) override;
 
-	virtual void LookAtTarget(ADWCharacter* InTargetCharacter) override;
+	virtual void DoLookAtTarget(ADWCharacter* InTargetCharacter) override;
 
 	virtual void RefreshEquip(EDWEquipPartType InPartType, const FAbilityItem& InItem) override;
+
+	virtual bool CanInteract(EInteractAction InInteractAction, IInteractionAgentInterface* InInteractionAgent) override;
 
 	virtual void OnEnterInteract(IInteractionAgentInterface* InInteractionAgent) override;
 
@@ -136,7 +138,7 @@ protected:
 
 public:
 	UFUNCTION(BlueprintPure)
-	virtual UTargetSystemComponent* GetTargetSystem() const { return TargetSystem; }
+	virtual UTargetingComponent* GetTargeting() const { return Targeting; }
 
 	virtual UCameraComponent* GetCameraComp_Implementation() override { return FollowCamera; }
 

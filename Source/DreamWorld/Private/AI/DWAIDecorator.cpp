@@ -3,8 +3,6 @@
 
 #include "AI/DWAIDecorator.h"
 #include "AIModule/Classes/BehaviorTree/BehaviorTreeComponent.h"
-#include "AI/DWAIController.h"
-#include "Character/DWCharacter.h"
 
 UDWAIDecorator::UDWAIDecorator(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {

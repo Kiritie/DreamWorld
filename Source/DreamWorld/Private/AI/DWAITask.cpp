@@ -2,8 +2,6 @@
 
 
 #include "AI/DWAITask.h"
-#include "AI/DWAIController.h"
-#include "Character/DWCharacter.h"
 
 UDWAITask::UDWAITask(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {

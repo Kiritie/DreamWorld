@@ -2,14 +2,8 @@
 
 #include "Character/States/DWCharacterState_Static.h"
 
-#include "AbilitySystemComponent.h"
 #include "Character/DWCharacter.h"
-#include "Character/DWCharacterData.h"
-#include "Components/CapsuleComponent.h"
 #include "FSM/Components/FSMComponent.h"
-#include "GameFramework/CharacterMovementComponent.h"
-#include "Voxel/VoxelModule.h"
-#include "Voxel/VoxelModuleBPLibrary.h"
 
 UDWCharacterState_Static::UDWCharacterState_Static()
 {

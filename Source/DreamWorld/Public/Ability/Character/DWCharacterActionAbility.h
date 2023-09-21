@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Global/DWGlobalTypes.h"
+#include "Common/DWCommonTypes.h"
 #include "DWCharacterAbility.h"
 #include "DWCharacterActionAbility.generated.h"
 

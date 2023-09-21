@@ -2,7 +2,7 @@
 
 #pragma once
 #include "WidgetInventoryItem.h"
-#include "Global/DWGlobalTypes.h"
+#include "Common/DWCommonTypes.h"
 
 #include "WidgetInventoryGenerateItem.generated.h"
 

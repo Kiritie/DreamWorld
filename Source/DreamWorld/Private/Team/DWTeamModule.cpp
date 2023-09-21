@@ -4,11 +4,7 @@
 #include "Team/DWTeamModule.h"
 
 #include "Character/Player/DWPlayerCharacter.h"
-#include "Gameplay/DWGameState.h"
-#include "ReferencePool/ReferencePoolModuleBPLibrary.h"
-#include "Voxel/Chunks/VoxelChunk.h"
-#include "Voxel/Datas/VoxelData.h"
-		
+
 IMPLEMENTATION_MODULE(ADWTeamModule)
 
 // Sets default values

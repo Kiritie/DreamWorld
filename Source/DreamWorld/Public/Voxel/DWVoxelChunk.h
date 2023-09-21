@@ -2,8 +2,7 @@
 
 #pragma once
 
-#include "Global/DWGlobalTypes.h"
-#include "ReferencePool/ReferencePoolInterface.h"
+#include "Common/DWCommonTypes.h"
 #include "GameFramework/Actor.h"
 #include "Voxel/VoxelModuleTypes.h"
 #include "Voxel/Chunks/VoxelChunk.h"

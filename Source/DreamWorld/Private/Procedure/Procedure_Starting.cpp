@@ -3,27 +3,17 @@
 
 #include "Procedure/Procedure_Starting.h"
 
-#include "Audio/AudioModuleBPLibrary.h"
 #include "Camera/CameraModuleBPLibrary.h"
-#include "Camera/Roam/RoamCameraPawn.h"
-#include "Character/Player/DWPlayerCharacter.h"
-#include "Gameplay/DWGameState.h"
 #include "Gameplay/DWPlayerController.h"
-#include "Global/GlobalBPLibrary.h"
+#include "Common/CommonBPLibrary.h"
 #include "Procedure/ProcedureModuleBPLibrary.h"
 #include "Procedure/Procedure_Initializing.h"
-#include "Procedure/Procedure_Pausing.h"
 #include "Procedure/Archive/Procedure_ArchiveChoosing.h"
 #include "SaveGame/Archive/DWArchiveSaveGame.h"
-#include "SaveGame/General/DWGeneralSaveGame.h"
 #include "SaveGame/SaveGameModuleBPLibrary.h"
-#include "Scene/SceneModule.h"
-#include "Voxel/DWVoxelModule.h"
 #include "Widget/WidgetMainMenu.h"
 #include "Widget/WidgetModuleBPLibrary.h"
 #include "Widget/Archive/WidgetArchiveChoosingPanel.h"
-#include "Widget/WidgetContextBox.h"
-#include "Widget/WidgetLoadingPanel.h"
 
 UProcedure_Starting::UProcedure_Starting()
 {
@@ -50,7 +40,7 @@ void UProcedure_Starting::OnInitialize()
 {
 	Super::OnInitialize();
 	
-	UGlobalBPLibrary::GetPlayerController<ADWPlayerController>()->OnPlayerPawnChanged.AddDynamic(this, &UProcedure_Starting::OnPlayerChanged);
+	UCommonBPLibrary::GetPlayerController<ADWPlayerController>()->OnPlayerPawnChanged.AddDynamic(this, &UProcedure_Starting::OnPlayerChanged);
 }
 
 void UProcedure_Starting::OnEnter(UProcedureBase* InLastProcedure)

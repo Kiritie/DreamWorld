@@ -2,11 +2,7 @@
 
 #include "SaveGame/General/DWGeneralSaveGame.h"
 
-#include "Camera/CameraModuleBPLibrary.h"
-#include "Gameplay/DWPlayerController.h"
-#include "Global/GlobalBPLibrary.h"
-#include "Kismet/GameplayStatics.h"
-#include "SaveGame/SaveGameModule.h"
+#include "Common/CommonBPLibrary.h"
 
 UDWGeneralSaveGame::UDWGeneralSaveGame()
 {

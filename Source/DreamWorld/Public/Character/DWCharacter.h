@@ -2,46 +2,40 @@
 
 #pragma once
 
-#include "GameFramework/Character.h"
-#include "AbilitySystemInterface.h"
-#include "TargetSystemComponent.h"
-#include "TargetSystemTargetableInterface.h"
 #include "Ability/Character/AbilityCharacterBase.h"
 #include "Ability/Character/DWCharacterAttributeSet.h"
-#include "Ability/Inventory/InventoryAgentInterface.h"
-#include "Global/DWGlobalTypes.h"
+#include "Common/DWCommonTypes.h"
 #include "Team/DWTeamModuleTypes.h"
-#include "Voxel/Agent/VoxelAgentInterface.h"
 
 #include "DWCharacter.generated.h"
 
 class UWorldWidgetComponent;
 class UDWCharacterData;
 class ADWVoxelChunk;
-class UCharacterInteractionComponent;
+class UInteractionComponent;
 class UInteractionComponent;
 class UDWCharacterPart;
 class ADWEquipArmor;
 class ADWEquipShield;
 class ADWEquipWeapon;
-class UInventoryEquipSlot;
+class UAbilityInventoryEquipSlot;
 class AVoxelChunk;
 class UVoxel;
 class AController;
 class UDWCharacterAnim;
 class UAbilityBase;
 class UAbilitySystemComponentBase;
-class UCharacterInventory;
+class UAbilityCharacterInventoryBase;
 class UBehaviorTree;
 class UDWAIBlackboard;
-class UInventorySlot;
+class UAbilityInventorySlot;
 class AAbilitySkillBase;
 
 /**
  * 角色
  */
 UCLASS()
-class DREAMWORLD_API ADWCharacter : public AAbilityCharacterBase, public ITargetSystemTargetableInterface
+class DREAMWORLD_API ADWCharacter : public AAbilityCharacterBase
 {
 	GENERATED_BODY()
 
@@ -246,14 +240,14 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual void UnDefend();
 
-	virtual void PickUp(AAbilityPickUpBase* InPickUp) override;
+	UFUNCTION(BlueprintCallable)
+	virtual void RefreshEquip(EDWEquipPartType InPartType, const FAbilityItem& InItem);
+
+	virtual bool OnPickUp_Implementation(AAbilityPickUpBase* InPickUp) override;
 
 	virtual bool OnGenerateVoxel(const FVoxelHitResult& InVoxelHitResult) override;
 
 	virtual bool OnDestroyVoxel(const FVoxelHitResult& InVoxelHitResult) override;
-
-	UFUNCTION(BlueprintCallable)
-	virtual void RefreshEquip(EDWEquipPartType InPartType, const FAbilityItem& InItem);
 
 public:
 	UFUNCTION(BlueprintCallable)
@@ -264,15 +258,12 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	virtual void EndAction(EDWCharacterActionType InActionType, bool bWasCancelled);
-
-	UFUNCTION(BlueprintCallable)
-	virtual void SetLockedTarget(ADWCharacter* InTargetCharacter);
 				
 	UFUNCTION(BlueprintPure)
 	virtual bool CanLookAtTarget(ADWCharacter* InTargetCharacter);
 
 	UFUNCTION(BlueprintCallable)
-	virtual void LookAtTarget(ADWCharacter* InTargetCharacter);
+	virtual void DoLookAtTarget(ADWCharacter* InTargetCharacter);
 
 	UFUNCTION(BlueprintCallable)
 	virtual void AIMoveTo(FVector InTargetLocation, float InMoveStopDistance = 10.f, bool bMulticast = false) override;
@@ -444,6 +435,9 @@ public:
 
 	UFUNCTION(BlueprintPure)
 	ADWCharacter* GetLockedTarget() const { return LockedTarget; }
+
+	UFUNCTION(BlueprintCallable)
+	void SetLockedTarget(ADWCharacter* InTargetCharacter);
 
 	UFUNCTION(BlueprintPure)
 	FVector GetBirthLocation() const { return BirthLocation; }

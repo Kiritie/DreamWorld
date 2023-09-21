@@ -2,14 +2,14 @@
 
 #pragma once
 
-#include "Ability/Inventory/Slot/InventorySkillSlot.h"
+#include "Ability/Inventory/Slot/AbilityInventorySkillSlot.h"
 #include "DWInventorySkillSlot.generated.h"
 
 /**
  * ���ܲ�
  */
 UCLASS(BlueprintType)
-class DREAMWORLD_API UDWInventorySkillSlot : public UInventorySkillSlot
+class DREAMWORLD_API UDWInventorySkillSlot : public UAbilityInventorySkillSlot
 {
 	GENERATED_BODY()
 
@@ -17,7 +17,7 @@ public:
 	UDWInventorySkillSlot();
 
 public:
-	virtual void OnInitialize(UInventory* InInventory, FAbilityItem InItem, EAbilityItemType InLimitType /* = EAbilityItemType::None */, ESplitSlotType InSplitType /*= ESplitSlotType::Default*/) override;
+	virtual void OnInitialize(UAbilityInventoryBase* InInventory, FAbilityItem InItem, EAbilityItemType InLimitType /* = EAbilityItemType::None */, ESplitSlotType InSplitType /*= ESplitSlotType::Default*/) override;
 
 	virtual void OnItemPreChange(FAbilityItem& InNewItem) override;
 

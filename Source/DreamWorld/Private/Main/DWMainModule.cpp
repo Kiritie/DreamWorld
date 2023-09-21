@@ -8,15 +8,13 @@
 #include "Animation/AnimationModule.h"
 #include "Asset/AssetModule.h"
 #include "Audio/AudioModule.h"
-#include "Camera/CameraModule.h"
 #include "Camera/DWCameraModule.h"
-#include "Character/CharacterModule.h"
 #include "Character/DWCharacterModule.h"
+#include "Common/CommonBPLibrary.h"
 #include "Debug/DebugModule.h"
 #include "Event/EventModule.h"
 #include "FSM/FSMModule.h"
 #include "Input/DWInputModule.h"
-#include "Input/InputModule.h"
 #include "Media/MediaModule.h"
 #include "Network/NetworkModule.h"
 #include "ObjectPool/ObjectPoolModule.h"
@@ -35,8 +33,8 @@ IMPLEMENTATION_MAIN_MODULE(ADWMainModule)
 
 ADWMainModule::ADWMainModule()
 {
-	// set default pawn class to our Blueprinted character
-
+	// set default pawn class to our Blueprinted characterUCommonBPLibrary
+	
 	ModuleClasses = TArray<TSubclassOf<AModuleBase>>();
 	ModuleClasses.Add(ADWAbilityModule::StaticClass());
 	ModuleClasses.Add(AAIModule::StaticClass());

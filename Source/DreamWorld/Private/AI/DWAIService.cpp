@@ -2,8 +2,6 @@
 
 
 #include "AI/DWAIService.h"
-#include "AI/DWAIController.h"
-#include "Character/DWCharacter.h"
 
 UDWAIService::UDWAIService(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {

@@ -2,17 +2,7 @@
 
 
 #include "AI/DWAIController.h"
-#include "Perception/AIPerceptionComponent.h"
 #include "Character/DWCharacter.h"
-#include "GameFramework/CharacterMovementComponent.h"
-#include "Perception/AISenseConfig_Sight.h"
-#include "Perception/AISenseConfig_Damage.h"
-#include "BehaviorTree/BehaviorTreeComponent.h"
-#include "BehaviorTree/BehaviorTree.h"
-#include "AI/DWAIBlackboard.h"
-#include "AIModule/Classes/BehaviorTree/BlackboardComponent.h"
-#include "Character/States/DWCharacterState_Death.h"
-#include "FSM/Components/FSMComponent.h"
 
 ADWAIController::ADWAIController()
 {

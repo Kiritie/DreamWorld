@@ -2,9 +2,6 @@
 
 
 #include "Character/Monster/DWMonsterCharacterAnim.h"
-#include "Character/DWCharacter.h"
-#include "GameFramework/CharacterMovementComponent.h"
-#include "Math.h"
 
 UDWMonsterCharacterAnim::UDWMonsterCharacterAnim()
 {

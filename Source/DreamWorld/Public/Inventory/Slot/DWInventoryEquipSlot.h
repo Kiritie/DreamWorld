@@ -2,15 +2,15 @@
 
 #pragma once
 
-#include "Global/DWGlobalTypes.h"
-#include "Ability/Inventory/Slot/InventoryEquipSlot.h"
+#include "Common/DWCommonTypes.h"
+#include "Ability/Inventory/Slot/AbilityInventoryEquipSlot.h"
 #include "DWInventoryEquipSlot.generated.h"
 
 /**
  * װ����
  */
 UCLASS()
-class DREAMWORLD_API UDWInventoryEquipSlot : public UInventoryEquipSlot
+class DREAMWORLD_API UDWInventoryEquipSlot : public UAbilityInventoryEquipSlot
 {
 	GENERATED_BODY()
 
@@ -22,9 +22,9 @@ protected:
 	EDWEquipPartType PartType;
 
 public:
-	virtual void OnInitialize(UInventory* InInventory, FAbilityItem InItem, EAbilityItemType InLimitType, ESplitSlotType InSplitType) override;
+	virtual void OnInitialize(UAbilityInventoryBase* InInventory, FAbilityItem InItem, EAbilityItemType InLimitType, ESplitSlotType InSplitType) override;
 
-	virtual void OnInitialize(UInventory* InInventory, FAbilityItem InItem, EAbilityItemType InLimitType, ESplitSlotType InSplitType, int32 InPartType) override;
+	virtual void OnInitialize(UAbilityInventoryBase* InInventory, FAbilityItem InItem, EAbilityItemType InLimitType, ESplitSlotType InSplitType, int32 InPartType) override;
 
 	virtual void OnSpawn_Implementation(const TArray<FParameter>& InParams) override;
 

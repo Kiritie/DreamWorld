@@ -3,8 +3,6 @@
 
 #include "Widget/Item/WidgetItemInfoBox.h"
 
-#include "Character/DWCharacter.h"
-#include "Main/MainModule.h"
 #include "Widget/WidgetModule.h"
 
 

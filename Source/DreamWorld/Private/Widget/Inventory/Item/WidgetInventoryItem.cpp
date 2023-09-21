@@ -7,7 +7,7 @@
 #include "Blueprint/WidgetLayoutLibrary.h"
 #include "Components/CanvasPanelSlot.h"
 #include "Ability/Item/AbilityItemDataBase.h"
-#include "Global/GlobalBPLibrary.h"
+#include "Common/CommonBPLibrary.h"
 
 UWidgetInventoryItem::UWidgetInventoryItem(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -34,7 +34,7 @@ FReply UWidgetInventoryItem::NativeOnMouseMove(const FGeometry& InGeometry, cons
 	if(const auto ItemInfoBoxSlot = Cast<UCanvasPanelSlot>(UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryItemInfoBox>()->Slot))
 	{
 		float PosX, PosY;
-		UWidgetLayoutLibrary::GetMousePositionScaledByDPI(UGlobalBPLibrary::GetPlayerController(), PosX, PosY);
+		UWidgetLayoutLibrary::GetMousePositionScaledByDPI(UCommonBPLibrary::GetPlayerController(), PosX, PosY);
 		ItemInfoBoxSlot->SetPosition(FVector2D(PosX, PosY));
 	}
 

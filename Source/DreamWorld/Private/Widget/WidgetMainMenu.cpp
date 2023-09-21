@@ -3,8 +3,6 @@
 
 #include "Widget/WidgetMainMenu.h"
 
-#include "Main/MainModule.h"
-
 UWidgetMainMenu::UWidgetMainMenu(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	WidgetName = FName("MainMenu");

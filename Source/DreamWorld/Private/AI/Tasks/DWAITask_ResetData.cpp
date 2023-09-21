@@ -3,7 +3,6 @@
 #include "AI/Tasks/DWAITask_ResetData.h"
 #include "BehaviorTree/BehaviorTreeTypes.h"
 #include "Character/DWCharacter.h"
-#include "AI/DWAIController.h"
 #include "BehaviorTree/BlackboardComponent.h"
 
 UDWAITask_ResetData::UDWAITask_ResetData(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)

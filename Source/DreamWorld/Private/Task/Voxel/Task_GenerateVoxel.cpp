@@ -6,10 +6,7 @@
 #include "TimerManager.h"
 #include "Event/EventModuleBPLibrary.h"
 #include "Event/Handle/Voxel/EventHandle_GenerateVoxel.h"
-#include "Gameplay/DWGameState.h"
-#include "Global/GlobalBPLibrary.h"
-#include "Widget/WidgetMainMenu.h"
-#include "Widget/WidgetModuleBPLibrary.h"
+#include "Common/CommonBPLibrary.h"
 
 UTask_GenerateVoxel::UTask_GenerateVoxel()
 {

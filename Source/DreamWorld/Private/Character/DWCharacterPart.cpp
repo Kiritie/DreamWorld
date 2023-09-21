@@ -5,7 +5,6 @@
 
 #include "Character/DWCharacter.h"
 #include "Voxel/VoxelModule.h"
-#include "Voxel/VoxelModuleBPLibrary.h"
 #include "Voxel/Chunks/VoxelChunk.h"
 #include "Voxel/Voxels/Voxel.h"
 #include "Voxel/Datas/VoxelData.h"

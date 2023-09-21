@@ -4,27 +4,17 @@
 #include "Procedure/Procedure_Playing.h"
 
 #include "AchievementSubSystem.h"
-#include "Audio/AudioModuleBPLibrary.h"
 #include "Camera/CameraModule.h"
-#include "Camera/CameraModuleBPLibrary.h"
-#include "Character/CharacterModuleBPLibrary.h"
 #include "Character/Player/DWPlayerCharacter.h"
-#include "Gameplay/DWGameState.h"
+#include "Common/CommonBPLibrary.h"
 #include "Gameplay/WHGameInstance.h"
-#include "Global/GlobalBPLibrary.h"
+#include "Main/MainModule.h"
 #include "Procedure/Procedure_Loading.h"
-#include "SaveGame/SaveGameModuleBPLibrary.h"
-#include "SaveGame/Archive/DWArchiveSaveGame.h"
-#include "SaveGame/General/DWGeneralSaveGame.h"
+#include "Procedure/Procedure_Starting.h"
 #include "Scene/SceneModule.h"
+#include "Widget/WidgetContextBox.h"
 #include "Widget/WidgetGameHUD.h"
 #include "Widget/WidgetModuleBPLibrary.h"
-#include "Widget/Inventory/WidgetInventoryBar.h"
-#include "Widget/Inventory/WidgetInventoryPanel.h"
-#include "Procedure/Procedure_Starting.h"
-#include "Widget/WidgetContextBox.h"
-#include "Widget/WidgetGeneratePanel.h"
-#include "Widget/WidgetShopPanel.h"
 
 UProcedure_Playing::UProcedure_Playing()
 {
@@ -58,12 +48,12 @@ void UProcedure_Playing::OnEnter(UProcedureBase* InLastProcedure)
 		AMainModule::UnPauseModuleByClass<ASceneModule>();
 		AMainModule::UnPauseModuleByClass<ACameraModule>();
 
-		ISceneActorInterface::Execute_SetActorVisible(UGlobalBPLibrary::GetPlayerPawn<ADWPlayerCharacter>(), true);
+		ISceneActorInterface::Execute_SetActorVisible(UCommonBPLibrary::GetPlayerPawn<ADWPlayerCharacter>(), true);
 		
 		UWidgetModuleBPLibrary::OpenUserWidget<UWidgetGameHUD>();
 	}
 
-	UGlobalBPLibrary::GetGameInstance()->GetSubsystem<UAchievementSubSystem>()->Unlock(FName("FirstPlay"));
+	UCommonBPLibrary::GetGameInstance()->GetSubsystem<UAchievementSubSystem>()->Unlock(FName("FirstPlay"));
 }
 
 void UProcedure_Playing::OnRefresh()

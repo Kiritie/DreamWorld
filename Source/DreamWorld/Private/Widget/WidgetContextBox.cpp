@@ -3,8 +3,6 @@
 
 #include "Widget/WidgetContextBox.h"
 
-#include "Character/DWCharacter.h"
-#include "Main/MainModule.h"
 #include "Widget/WidgetModule.h"
 
 

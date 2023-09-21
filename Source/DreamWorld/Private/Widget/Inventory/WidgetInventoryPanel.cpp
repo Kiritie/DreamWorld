@@ -3,7 +3,7 @@
 
 #include "Widget/Inventory/WidgetInventoryPanel.h"
 
-#include "Blueprint/WidgetBlueprintLibrary.h"
+#include "Ability/Inventory/AbilityInventoryBase.h"
 #include "Widget/Inventory/WidgetInventoryBar.h"
 #include "Widget/Inventory/Slot/WidgetInventorySlot.h"
 #include "Character/Player/DWPlayerCharacter.h"
@@ -11,9 +11,8 @@
 #include "Components/GridSlot.h"
 #include "Components/WrapBox.h"
 #include "Components/WrapBoxSlot.h"
-#include "Global/GlobalBPLibrary.h"
-#include "Ability/Inventory/CharacterInventory.h"
-#include "Ability/Inventory/Slot/InventorySlot.h"
+#include "Common/CommonBPLibrary.h"
+#include "Ability/Inventory/Slot/AbilityInventorySlot.h"
 #include "ObjectPool/ObjectPoolModuleBPLibrary.h"
 #include "Widget/Inventory/Slot/WidgetInventoryEquipSlot.h"
 
@@ -44,7 +43,7 @@ void UWidgetInventoryPanel::OnInitialize_Implementation(UObject* InOwner)
 
 	if(DefaultContent && UISlotDatas.Contains(ESplitSlotType::Default))
 	{
-		const auto DefaultSlots = GetInventory()->GetSplitSlots<UInventorySlot>(ESplitSlotType::Default);
+		const auto DefaultSlots = GetInventory()->GetSplitSlots<UAbilityInventorySlot>(ESplitSlotType::Default);
 		if(UISlotDatas[ESplitSlotType::Default].Slots.Num() != DefaultSlots.Num())
 		{
 			DefaultContent->ClearChildren();
@@ -71,14 +70,14 @@ void UWidgetInventoryPanel::OnInitialize_Implementation(UObject* InOwner)
 	}
 	if(LeftEquipContent && RightEquipContent && UISlotDatas.Contains(ESplitSlotType::Equip))
 	{
-		const auto EquipSlots = GetInventory()->GetSplitSlots<UInventorySlot>(ESplitSlotType::Equip);
+		const auto EquipSlots = GetInventory()->GetSplitSlots<UAbilityInventorySlot>(ESplitSlotType::Equip);
 		if(UISlotDatas[ESplitSlotType::Equip].Slots.Num() == 0)
 		{
 			for(int32 i = 0; i < EquipSlots.Num(); i++)
 			{
 				if(UWidgetInventoryEquipSlot* EquipSlot = CreateSubWidget<UWidgetInventoryEquipSlot>({ EquipSlots[i] }, EquipSlotClass))
 				{
-					EquipSlot->SetEquipPartType(UGlobalBPLibrary::GetEnumValueDisplayName(TEXT("/Script/WHFramework.EEquipPartType"), i));
+					EquipSlot->SetEquipPartType(UCommonBPLibrary::GetEnumValueDisplayName(TEXT("/Script/WHFramework.EEquipPartType"), i));
 					if(UGridSlot* GridSlot = i % 2 == 0 ? LeftEquipContent->AddChildToGrid(EquipSlot) : RightEquipContent->AddChildToGrid(EquipSlot))
 					{
 						GridSlot->SetPadding(FMargin(2.5f, 2.5f, 2.5f, 2.5f));

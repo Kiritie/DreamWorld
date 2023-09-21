@@ -6,7 +6,6 @@
 #include "Character/DWCharacter.h"
 #include "AIModule/Classes/BehaviorTree/BehaviorTreeComponent.h"
 #include "AIModule/Classes/BehaviorTree/BlackboardComponent.h"
-#include "AI/DWAIController.h"
 
 UDWAIDecorator_CheckAttacking::UDWAIDecorator_CheckAttacking(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {

@@ -5,11 +5,9 @@
 
 #include "Ability/Item/AbilityItemDataBase.h"
 #include "Character/DWCharacter.h"
-#include "Ability/Inventory/Slot/InventorySlot.h"
-#include "Ability/Inventory/Slot/InventorySkillSlot.h"
+#include "Ability/Inventory/Slot/AbilityInventorySlot.h"
 #include "Components/TextBlock.h"
-#include "Ability/Inventory/Inventory.h"
-#include "Kismet/KismetTextLibrary.h"
+#include "Ability/Inventory/AbilityInventoryBase.h"
 
 UWidgetInventorySkillSlot::UWidgetInventorySkillSlot(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {

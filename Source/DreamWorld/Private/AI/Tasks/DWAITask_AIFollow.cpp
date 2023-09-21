@@ -4,7 +4,6 @@
 #include "AI/Tasks/DWAITask_AIFollow.h"
 #include "BehaviorTree/BehaviorTreeTypes.h"
 #include "Character/DWCharacter.h"
-#include "AI/DWAIController.h"
 #include "AIModule/Classes/BehaviorTree/BehaviorTreeComponent.h"
 #include "AIModule/Classes/BehaviorTree/BlackboardComponent.h"
 

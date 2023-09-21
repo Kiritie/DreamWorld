@@ -5,10 +5,9 @@
 
 #include "Asset/AssetModuleBPLibrary.h"
 #include "Components/BoxComponent.h"
-#include "Global/DWGlobalTypes.h"
+#include "Common/DWCommonTypes.h"
 #include "Vitality/Voxel/DWVitalityVoxelData.h"
 #include "Voxel/VoxelModule.h"
-#include "Voxel/VoxelModuleBPLibrary.h"
 #include "Voxel/Components/VoxelMeshComponent.h"
 #include "Voxel/Datas/VoxelData.h"
 

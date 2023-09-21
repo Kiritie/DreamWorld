@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Global/DWGlobalTypes.h"
+#include "Common/DWCommonTypes.h"
 #include "Ability/Item/Equip/AbilityEquipDataBase.h"
 
 #include "DWEquipData.generated.h"

@@ -6,16 +6,14 @@
 #include "Ability/Item/AbilityItemDataBase.h"
 #include "Blueprint/WidgetBlueprintLibrary.h"
 #include "Widget/Inventory/Slot/WidgetInventorySlot.h"
-#include "Character/Player/DWPlayerCharacter.h"
 #include "Components/CanvasPanelSlot.h"
 #include "Components/GridPanel.h"
 #include "Components/GridSlot.h"
 #include "Components/SizeBox.h"
-#include "GameFramework/InputSettings.h"
-#include "Global/GlobalBPLibrary.h"
-#include "Ability/Inventory/Inventory.h"
+#include "Common/CommonBPLibrary.h"
+#include "Ability/Inventory/AbilityInventoryBase.h"
 #include "Widget/Inventory/WidgetInventoryPanel.h"
-#include "Ability/Inventory/Slot/InventorySlot.h"
+#include "Ability/Inventory/Slot/AbilityInventorySlot.h"
 #include "Procedure/ProcedureModuleBPLibrary.h"
 #include "Procedure/Procedure_Playing.h"
 #include "Widget/WidgetModuleBPLibrary.h"
@@ -57,7 +55,7 @@ void UWidgetInventoryBar::OnInitialize_Implementation(UObject* InOwner)
 	
 	if(ShortcutContent && UISlotDatas.Contains(ESplitSlotType::Shortcut))
 	{
-		const auto ShortcutSlots = GetInventory()->GetSplitSlots<UInventorySlot>(ESplitSlotType::Shortcut);
+		const auto ShortcutSlots = GetInventory()->GetSplitSlots<UAbilityInventorySlot>(ESplitSlotType::Shortcut);
 		if(UISlotDatas[ESplitSlotType::Shortcut].Slots.Num() != ShortcutSlots.Num())
 		{
 			ShortcutContent->ClearChildren();
@@ -87,14 +85,14 @@ void UWidgetInventoryBar::OnInitialize_Implementation(UObject* InOwner)
 	}
 	if(AuxiliaryContent && UISlotDatas.Contains(ESplitSlotType::Auxiliary))
 	{
-		const auto AuxiliarySlots = GetInventory()->GetSplitSlots<UInventorySlot>(ESplitSlotType::Auxiliary);
+		const auto AuxiliarySlots = GetInventory()->GetSplitSlots<UAbilityInventorySlot>(ESplitSlotType::Auxiliary);
 		if(UISlotDatas[ESplitSlotType::Auxiliary].Slots.Num() == 0)
 		{
 			for(int32 i = 0; i < AuxiliarySlots.Num(); i++)
 			{
 				if(UWidgetInventoryAuxiliarySlot* AuxiliarySlot = CreateSubWidget<UWidgetInventoryAuxiliarySlot>({ AuxiliarySlots[i] }, AuxiliarySlotClass))
 				{
-					//AuxiliarySlot->SetKeyCode(UGlobalBPLibrary::GetInputActionKeyCodeByName(FString::Printf(TEXT("ReleaseAuxiliaryAbility%d"), i + 1)));
+					//AuxiliarySlot->SetKeyCode(UCommonBPLibrary::GetInputActionKeyCodeByName(FString::Printf(TEXT("ReleaseAuxiliaryAbility%d"), i + 1)));
 					AuxiliarySlot->SetKeyCode(FText::FromString(TEXT("X")));
 					if(UGridSlot* GridSlot = AuxiliaryContent->AddChildToGrid(AuxiliarySlot))
 					{
@@ -115,14 +113,14 @@ void UWidgetInventoryBar::OnInitialize_Implementation(UObject* InOwner)
 	}
 	if(LeftSkillContent && RightSkillContent && UISlotDatas.Contains(ESplitSlotType::Skill))
 	{
-		const auto SkillSlots = GetInventory()->GetSplitSlots<UInventorySlot>(ESplitSlotType::Skill);
+		const auto SkillSlots = GetInventory()->GetSplitSlots<UAbilityInventorySlot>(ESplitSlotType::Skill);
 		if(UISlotDatas[ESplitSlotType::Skill].Slots.Num() == 0)
 		{
 			for(int32 i = 0; i < SkillSlots.Num(); i++)
 			{
 				if(UWidgetInventorySkillSlot* SkillSlot = CreateSubWidget<UWidgetInventorySkillSlot>({ SkillSlots[i] }, SkillSlotClass))
 				{
-					SkillSlot->SetKeyCode(UGlobalBPLibrary::GetInputActionKeyCodeByName(FString::Printf(TEXT("ReleaseSkillAbility%d"), i + 1)));
+					SkillSlot->SetKeyCode(UCommonBPLibrary::GetInputActionKeyCodeByName(FString::Printf(TEXT("ReleaseSkillAbility%d"), i + 1)));
 					if(UGridSlot* GridSlot = i < SkillSlots.Num() / 2 ? LeftSkillContent->AddChildToGrid(SkillSlot) : RightSkillContent->AddChildToGrid(SkillSlot))
 					{
 						GridSlot->SetPadding(FMargin(0.f, 0.f, 5.f, 0.f));
@@ -168,7 +166,7 @@ void UWidgetInventoryBar::OnRefresh_Implementation()
 	Super::OnRefresh_Implementation();
 }
 
-void UWidgetInventoryBar::OnInventorySlotSelected(UInventorySlot* InInventorySlot)
+void UWidgetInventoryBar::OnInventorySlotSelected(UAbilityInventorySlot* InInventorySlot)
 {
 	if(InInventorySlot)
 	{
@@ -195,7 +193,7 @@ void UWidgetInventoryBar::NextInventorySlot()
 void UWidgetInventoryBar::SelectInventorySlot(int32 InSlotIndex, bool bRefreshInventory)
 {
 	SelectedSlotIndex = InSlotIndex;
-	if(UInventorySlot* SelectedSlot = GetSelectedSlot())
+	if(UAbilityInventorySlot* SelectedSlot = GetSelectedSlot())
 	{
 		if(bRefreshInventory)
 		{
@@ -227,7 +225,7 @@ void UWidgetInventoryBar::SetSkillBoxVisible(bool bValue)
 	}
 }
 
-UInventorySlot* UWidgetInventoryBar::GetSelectedSlot() const
+UAbilityInventorySlot* UWidgetInventoryBar::GetSelectedSlot() const
 {
 	auto SplitUISlots = GetSplitUISlots(ESplitSlotType::Shortcut);
 	if(SplitUISlots.IsValidIndex(SelectedSlotIndex))

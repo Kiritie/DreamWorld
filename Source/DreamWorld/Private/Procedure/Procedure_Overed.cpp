@@ -3,9 +3,6 @@
 
 #include "Procedure/Procedure_Overed.h"
 
-#include "Gameplay/DWGameState.h"
-#include "Global/GlobalBPLibrary.h"
-
 UProcedure_Overed::UProcedure_Overed()
 {
 	ProcedureName = FName("Overed");

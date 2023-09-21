@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include "Blueprint/UserWidget.h"
 #include "WidgetInventorySlot.h"
 #include "WidgetInventoryShortcutSlot.generated.h"
 

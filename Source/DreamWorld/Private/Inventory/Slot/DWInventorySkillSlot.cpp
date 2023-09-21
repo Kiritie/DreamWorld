@@ -2,21 +2,15 @@
 
 #include "Inventory/Slot/DWInventorySkillSlot.h"
 
-#include "Ability/Inventory/Inventory.h"
-#include "Ability/Inventory/Slot/InventorySlot.h"
+#include "Ability/Inventory/AbilityInventoryBase.h"
+#include "Ability/Inventory/Slot/AbilityInventorySlot.h"
 #include "Character/Player/DWPlayerCharacter.h"
-#include "Widget/WidgetModuleBPLibrary.h"
-#include "Widget/WidgetGameHUD.h"
-#include "Widget/Item/WidgetItemInfoBox.h"
-#include "Ability/Character/DWCharacterSkillAbility.h"
-#include "Ability/Item/Skill/AbilitySkillDataBase.h"
-#include "Ability/Abilities/ItemAbilityBase.h"
 
 UDWInventorySkillSlot::UDWInventorySkillSlot()
 {
 }
 
-void UDWInventorySkillSlot::OnInitialize(UInventory* InInventory, FAbilityItem InItem, EAbilityItemType InLimitType /* = EAbilityItemType::None */, ESplitSlotType InSplitType /*= ESplitSlotType::Default*/)
+void UDWInventorySkillSlot::OnInitialize(UAbilityInventoryBase* InInventory, FAbilityItem InItem, EAbilityItemType InLimitType /* = EAbilityItemType::None */, ESplitSlotType InSplitType /*= ESplitSlotType::Default*/)
 {
 	Super::OnInitialize(InInventory, InItem, InLimitType, InSplitType);
 }

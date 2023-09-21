@@ -2,14 +2,14 @@
 
 #pragma once
 
-#include "Ability/Inventory/VitalityInventory.h"
+#include "Ability/Vitality/AbilityVitalityInventoryBase.h"
 #include "DWVitalityInventory.generated.h"
 
 /**
  * �����Ʒ��
  */
 UCLASS()
-class DREAMWORLD_API UDWVitalityInventory : public UVitalityInventory
+class DREAMWORLD_API UDWVitalityInventory : public UAbilityVitalityInventoryBase
 {
 	GENERATED_BODY()
 

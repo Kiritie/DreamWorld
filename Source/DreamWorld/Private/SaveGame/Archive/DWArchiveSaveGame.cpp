@@ -6,10 +6,7 @@
 #include "Character/Player/DWPlayerCharacter.h"
 #include "Debug/DebugModuleTypes.h"
 #include "Gameplay/DWPlayerController.h"
-#include "Global/GlobalBPLibrary.h"
-#include "Kismet/GameplayStatics.h"
-#include "Main/MainModule.h"
-#include "SaveGame/DWSaveGameModule.h"
+#include "Common/CommonBPLibrary.h"
 #include "SaveGame/SaveGameModuleBPLibrary.h"
 #include "Task/DWTaskModule.h"
 #include "Voxel/VoxelModule.h"
@@ -42,10 +39,10 @@ void UDWArchiveSaveGame::OnLoad_Implementation(EPhase InPhase)
 
 	if(PHASEC(InPhase, EPhase::Primary))
 	{
-		WHDebug(FString::Printf(TEXT("Loading archive : %d"), DWArchiveSaveData.ID), EDebugMode::All, EDebugCategory::SaveGame);
+		WHDebug(FString::Printf(TEXT("Loading archive : %d"), DWArchiveSaveData.ID), EDebugMode::All, EDC_SaveGame);
 	}
 	AVoxelModule::Get()->LoadSaveData(&DWArchiveSaveData.WorldData, InPhase);
-	UGlobalBPLibrary::GetPlayerController<ADWPlayerController>()->LoadSaveData(&DWArchiveSaveData.PlayerData, InPhase);
+	UCommonBPLibrary::GetPlayerController<ADWPlayerController>()->LoadSaveData(&DWArchiveSaveData.PlayerData, InPhase);
 	ADWTaskModule::Get()->LoadSaveData(&DWArchiveSaveData.TaskData, InPhase);
 }
 
@@ -55,10 +52,10 @@ void UDWArchiveSaveGame::OnUnload_Implementation(EPhase InPhase)
 
 	if(PHASEC(InPhase, EPhase::Primary))
 	{
-		WHDebug(FString::Printf(TEXT("Unloading archive : %d"), DWArchiveSaveData.ID), EDebugMode::All, EDebugCategory::SaveGame);
+		WHDebug(FString::Printf(TEXT("Unloading archive : %d"), DWArchiveSaveData.ID), EDebugMode::All, EDC_SaveGame);
 	}
 	ADWVoxelModule::Get()->UnloadSaveData(InPhase);
-	UGlobalBPLibrary::GetPlayerController<ADWPlayerController>()->UnloadSaveData(InPhase);
+	UCommonBPLibrary::GetPlayerController<ADWPlayerController>()->UnloadSaveData(InPhase);
 	ADWTaskModule::Get()->UnloadSaveData(InPhase);
 }
 
@@ -67,7 +64,7 @@ void UDWArchiveSaveGame::OnRefresh_Implementation()
 	Super::OnRefresh_Implementation();
 
 	DWArchiveSaveData.WorldData = ADWVoxelModule::Get()->GetSaveDataRef<FDWWorldSaveData>(true);
-	DWArchiveSaveData.PlayerData = UGlobalBPLibrary::GetPlayerPawn<ADWPlayerCharacter>()->GetSaveDataRef<FDWPlayerSaveData>(true);
+	DWArchiveSaveData.PlayerData = UCommonBPLibrary::GetPlayerPawn<ADWPlayerCharacter>()->GetSaveDataRef<FDWPlayerSaveData>(true);
 	DWArchiveSaveData.TaskData = ADWTaskModule::Get()->GetSaveDataRef<FDWTaskSaveData>(true);
 }
 

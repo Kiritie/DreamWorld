@@ -4,22 +4,18 @@
 #include "Widget/WidgetGeneratePanel.h"
 
 #include "AchievementSubSystem.h"
-#include "Blueprint/WidgetBlueprintLibrary.h"
 #include "Widget/Inventory/WidgetInventoryBar.h"
-#include "Widget/Inventory/Slot/WidgetInventorySlot.h"
 #include "Components/WrapBox.h"
 #include "Components/WrapBoxSlot.h"
-#include "Global/GlobalBPLibrary.h"
-#include "Ability/Inventory/CharacterInventory.h"
-#include "Ability/Inventory/Slot/InventorySlot.h"
+#include "Common/CommonBPLibrary.h"
+#include "Ability/Inventory/Slot/AbilityInventorySlot.h"
 #include "Asset/AssetModuleBPLibrary.h"
 #include "Widget/Inventory/Item/WidgetInventoryGenerateItem.h"
 #include "Widget/Inventory/Item/WidgetInventoryPreviewItem.h"
 #include "Components/ScrollBoxSlot.h"
 #include "Components/ScrollBox.h"
-#include "ObjectPool/ObjectPoolModuleBPLibrary.h"
 #include "Components/Button.h"
-#include "Ability/Inventory/Inventory.h"
+#include "Ability/Inventory/AbilityInventoryBase.h"
 #include "Character/DWCharacter.h"
 #include "Gameplay/WHGameInstance.h"
 #include "Voxel/Voxels/Auxiliary/VoxelInteractAuxiliary.h"
@@ -56,7 +52,7 @@ void UWidgetGeneratePanel::OnInitialize_Implementation(UObject* InOwner)
 {
 	if(OwnerObject)
 	{
-		UInventory* Inventory = Cast<ADWCharacter>(OwnerObject)->GetInventory();
+		UAbilityInventoryBase* Inventory = Cast<ADWCharacter>(OwnerObject)->GetInventory();
 		Inventory->OnRefresh.RemoveDynamic(this, &UWidgetGeneratePanel::Refresh);
 	}
 
@@ -64,7 +60,7 @@ void UWidgetGeneratePanel::OnInitialize_Implementation(UObject* InOwner)
 
 	if(InOwner)
 	{
-		UInventory* Inventory = Cast<ADWCharacter>(InOwner)->GetInventory();
+		UAbilityInventoryBase* Inventory = Cast<ADWCharacter>(InOwner)->GetInventory();
 		Inventory->OnRefresh.AddDynamic(this, &UWidgetGeneratePanel::Refresh);
 	}
 }
@@ -140,7 +136,7 @@ void UWidgetGeneratePanel::OnRefresh_Implementation()
 		FDWGenerateItemData GenerateItemData;
 		if(GetSelectedGenerateItemData(GenerateItemData))
 		{
-			UInventory* Inventory = Cast<ADWCharacter>(OwnerObject)->GetInventory();
+			UAbilityInventoryBase* Inventory = Cast<ADWCharacter>(OwnerObject)->GetInventory();
 			for(auto& Iter1 : GenerateItemData.RawDatas)
 			{
 				for(auto& Iter2 : Iter1.Raws)
@@ -251,14 +247,17 @@ void UWidgetGeneratePanel::OnGenerateButtonClicked()
 	FDWGenerateItemData GenerateItemData;
 	if(GetSelectedGenerateItemData(GenerateItemData))
 	{
-		UInventory* Inventory = Cast<ADWCharacter>(OwnerObject)->GetInventory();
+		UAbilityInventoryBase* Inventory = Cast<ADWCharacter>(OwnerObject)->GetInventory();
 		for(auto& Iter : SelectedGenerateRawData.Raws)
 		{
 			Inventory->RemoveItemByRange(Iter);
 		}
 		Inventory->AddItemByRange(GenerateItemData.Item, -1);
-
-		UGlobalBPLibrary::GetGameInstance()->GetSubsystem<UAchievementSubSystem>()->Unlock(FName("FirstGenerateItem"));
+		if(GenerateItemData.Item.Count > 0)
+		{
+			Cast<ADWCharacter>(OwnerObject)->OnDiscardItem(GenerateItemData.Item, false);
+		}
+		UCommonBPLibrary::GetGameInstance()->GetSubsystem<UAchievementSubSystem>()->Unlock(FName("FirstGenerateItem"));
 	}
 }
 

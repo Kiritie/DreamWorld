@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "Global/DWGlobalTypes.h"
+#include "Common/DWCommonTypes.h"
 #include "Widget/Screen/UMG/UserWidgetBase.h"
 #include "WidgetGeneratePanel.generated.h"
 

@@ -4,7 +4,6 @@
 #include "Widget/World/WidgetCharacterHP.h"
 
 #include "Character/DWCharacter.h"
-#include "Vitality/DWVitality.h"
 
 UWidgetCharacterHP::UWidgetCharacterHP(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {

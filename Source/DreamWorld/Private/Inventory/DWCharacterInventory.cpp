@@ -3,7 +3,7 @@
 #include "Inventory/DWCharacterInventory.h"
 #include "Inventory/Slot/DWInventoryEquipSlot.h"
 #include "Inventory/Slot/DWInventorySkillSlot.h"
-#include "Ability/Inventory/Slot/InventoryEquipSlot.h"
+#include "Ability/Inventory/Slot/AbilityInventoryEquipSlot.h"
 #include "Item/Equip/DWEquipData.h"
 #include "Character/DWCharacter.h"
 #include "Widget/WidgetContextBox.h"
@@ -35,7 +35,7 @@ FQueryItemInfo UDWCharacterInventory::QueryItemByRange(EQueryItemType InActionTy
 	return Super::QueryItemByRange(InActionType, InItem, InStartIndex, InEndIndex);
 }
 
-void UDWCharacterInventory::AddItemBySlots(FAbilityItem& InItem, const TArray<UInventorySlot*>& InSlots)
+void UDWCharacterInventory::AddItemBySlots(FAbilityItem& InItem, const TArray<UAbilityInventorySlot*>& InSlots)
 {
 	FAbilityItem tmpItem = InItem;
 
@@ -56,7 +56,7 @@ void UDWCharacterInventory::AddItemBySlots(FAbilityItem& InItem, const TArray<UI
 	}
 }
 
-void UDWCharacterInventory::RemoveItemBySlots(FAbilityItem& InItem, const TArray<UInventorySlot*>& InSlots)
+void UDWCharacterInventory::RemoveItemBySlots(FAbilityItem& InItem, const TArray<UAbilityInventorySlot*>& InSlots)
 {
 	if(GetOwnerAgent<ADWCharacter>()->IsPlayer())
 	{
@@ -76,9 +76,9 @@ void UDWCharacterInventory::ClearAllItem()
 	Super::ClearAllItem();
 }
 
-UInventoryEquipSlot* UDWCharacterInventory::GetEquipSlotByPartType(EDWEquipPartType InPartType)
+UAbilityInventoryEquipSlot* UDWCharacterInventory::GetEquipSlotByPartType(EDWEquipPartType InPartType)
 {
-	auto EquipSlots = GetSplitSlots<UInventoryEquipSlot>(ESplitSlotType::Equip);
+	auto EquipSlots = GetSplitSlots<UAbilityInventoryEquipSlot>(ESplitSlotType::Equip);
 	for (int32 i = 0; i < EquipSlots.Num(); i++)
 	{
 		if(EquipSlots[i]->GetItem().GetData<UDWEquipData>().PartType == InPartType)

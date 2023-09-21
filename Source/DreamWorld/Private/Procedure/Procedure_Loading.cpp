@@ -4,25 +4,17 @@
 #include "Procedure/Procedure_Loading.h"
 
 #include "Camera/CameraModule.h"
-#include "Character/CharacterModuleBPLibrary.h"
 #include "Character/Player/DWPlayerCharacter.h"
-#include "Character/States/DWCharacterState_Walk.h"
-#include "FSM/Components/FSMComponent.h"
-#include "Gameplay/DWGameState.h"
-#include "Global/GlobalBPLibrary.h"
+#include "Common/CommonBPLibrary.h"
+#include "Main/MainModule.h"
 #include "Procedure/ProcedureModuleBPLibrary.h"
 #include "Procedure/Procedure_Playing.h"
-#include "SaveGame/General/DWGeneralSaveGame.h"
 #include "SaveGame/Archive/DWArchiveSaveGame.h"
 #include "SaveGame/SaveGameModuleBPLibrary.h"
 #include "Voxel/DWVoxelModule.h"
-#include "Voxel/VoxelModuleBPLibrary.h"
 #include "Widget/WidgetGameHUD.h"
-#include "Widget/WidgetGeneratePanel.h"
 #include "Widget/WidgetLoadingPanel.h"
 #include "Widget/WidgetModuleBPLibrary.h"
-#include "Widget/Inventory/WidgetInventoryBar.h"
-#include "Widget/Inventory/WidgetInventoryPanel.h"
 
 UProcedure_Loading::UProcedure_Loading()
 {
@@ -53,11 +45,11 @@ void UProcedure_Loading::OnEnter(UProcedureBase* InLastProcedure)
 
 	AMainModule::PauseModuleByClass<ACameraModule>();
 
+	UWidgetModuleBPLibrary::CreateUserWidget<UWidgetGameHUD>(UCommonBPLibrary::GetPlayerPawn<ADWPlayerCharacter>());
+
 	UWidgetModuleBPLibrary::OpenUserWidget<UWidgetLoadingPanel>({ FString(TEXT("生成世界中...")) });
 
 	USaveGameModuleBPLibrary::LoadSaveGame<UDWArchiveSaveGame>(-1, EPhase::Final);
-
-	UWidgetModuleBPLibrary::CreateUserWidget<UWidgetGameHUD>(UGlobalBPLibrary::GetPlayerPawn<ADWPlayerCharacter>());
 }
 
 void UProcedure_Loading::OnRefresh()

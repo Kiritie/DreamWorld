@@ -3,22 +3,17 @@
 
 #include "Character/Monster/DWMonsterCharacter.h"
 
-#include "Ability/Components/CharacterInteractionComponent.h"
-#include "Ability/Item/Prop/AbilityPropDataBase.h"
-#include "BehaviorTree/BehaviorTree.h"
+#include "Ability/Character/DWCharacterAttackPoint.h"
+#include "Common/Interaction/InteractionComponent.h"
 #include "Components/SkeletalMeshComponent.h"
-#include "AI/DWAIBlackboard.h"
 #include "Character/Human/DWHumanCharacter.h"
-#include "Ability/Inventory/Inventory.h"
-#include "Ability/Inventory/Slot/InventorySlot.h"
+#include "Ability/Inventory/AbilityInventoryBase.h"
+#include "Ability/Inventory/Slot/AbilityInventorySlot.h"
 #include "Item/Prop/DWPropData.h"
-#include "Voxel/Datas/VoxelData.h"
-#include "Ability/Vitality/AbilityVitalityInterface.h"
-#include "Ability/Components/DWCharacterAttackPointComponent.h"
 
 ADWMonsterCharacter::ADWMonsterCharacter()
 {
-	AttackPoint = CreateDefaultSubobject<UDWCharacterAttackPointComponent>(TEXT("AttackPoint"));
+	AttackPoint = CreateDefaultSubobject<UDWCharacterAttackPoint>(TEXT("AttackPoint"));
 	AttackPoint->SetupAttachment(GetMesh(), TEXT("AttackPoint"));
 
 	Interaction->AddInteractAction((EInteractAction)EDWInteractAction::Ride);
@@ -117,9 +112,9 @@ void ADWMonsterCharacter::ClearAttackHitTargets()
 	}
 }
 
-TArray<UDWCharacterAttackPointComponent*> ADWMonsterCharacter::GetAttackPoints()
+TArray<UDWCharacterAttackPoint*> ADWMonsterCharacter::GetAttackPoints()
 {
-	TArray<UDWCharacterAttackPointComponent*> AttackPoints;
+	TArray<UDWCharacterAttackPoint*> AttackPoints;
 	GetComponents(AttackPoints);
 	return AttackPoints;
 }

@@ -3,13 +3,10 @@
 
 #include "Widget/Task/WidgetTaskInfoBox.h"
 
-#include "Blueprint/WidgetBlueprintLibrary.h"
-#include "Character/DWCharacter.h"
 #include "Components/VerticalBox.h"
 #include "Components/VerticalBoxSlot.h"
 #include "Event/EventModuleBPLibrary.h"
 #include "Event/Handle/Task/EventHandle_EnterTask.h"
-#include "Main/MainModule.h"
 #include "Task/TaskModuleBPLibrary.h"
 #include "Task/Base/TaskBase.h"
 #include "Widget/WidgetModule.h"

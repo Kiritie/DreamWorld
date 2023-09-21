@@ -4,7 +4,7 @@
 #include "Ability/DWAbilityModule.h"
 
 #include "Ability/AbilityModuleBPLibrary.h"
-#include "Global/DWGlobalTypes.h"
+#include "Common/DWCommonTypes.h"
 
 IMPLEMENTATION_MODULE(ADWAbilityModule)
 

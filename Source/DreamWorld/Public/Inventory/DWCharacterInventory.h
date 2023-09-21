@@ -2,17 +2,17 @@
 
 #pragma once
 
-#include "Ability/Inventory/CharacterInventory.h"
-#include "Global/DWGlobalTypes.h"
+#include "Ability/Character/AbilityCharacterInventoryBase.h"
+#include "Common/DWCommonTypes.h"
 #include "DWCharacterInventory.generated.h"
 
-class UInventoryEquipSlot;
+class UAbilityInventoryEquipSlot;
 
 /**
  * ��ɫ��Ʒ��
  */
 UCLASS()
-class DREAMWORLD_API UDWCharacterInventory : public UCharacterInventory
+class DREAMWORLD_API UDWCharacterInventory : public UAbilityCharacterInventoryBase
 {
 	GENERATED_BODY()
 
@@ -29,13 +29,13 @@ protected:
 public:
 	virtual FQueryItemInfo QueryItemByRange(EQueryItemType InActionType, FAbilityItem InItem, int32 InStartIndex = 0, int32 InEndIndex = -1) override;
 
-	virtual void AddItemBySlots(FAbilityItem& InItem, const TArray<UInventorySlot *>& InSlots) override;
+	virtual void AddItemBySlots(FAbilityItem& InItem, const TArray<UAbilityInventorySlot *>& InSlots) override;
 
-	virtual void RemoveItemBySlots(FAbilityItem& InItem, const TArray<UInventorySlot *>& InSlots) override;
+	virtual void RemoveItemBySlots(FAbilityItem& InItem, const TArray<UAbilityInventorySlot *>& InSlots) override;
 
 	virtual void DiscardAllItem() override;
 
 	virtual void ClearAllItem() override;
 
-	virtual UInventoryEquipSlot* GetEquipSlotByPartType(EDWEquipPartType InPartType);
+	virtual UAbilityInventoryEquipSlot* GetEquipSlotByPartType(EDWEquipPartType InPartType);
 };

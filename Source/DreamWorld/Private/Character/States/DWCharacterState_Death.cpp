@@ -2,17 +2,12 @@
 
 #include "Character/States/DWCharacterState_Death.h"
 
-#include "Ability/AbilityModuleBPLibrary.h"
-#include "Ability/Item/Equip/AbilityEquipBase.h"
-#include "AI/DWAIController.h"
 #include "Character/DWCharacter.h"
-#include "Components/CapsuleComponent.h"
-#include "GameFramework/CharacterMovementComponent.h"
 #include "Voxel/Chunks/VoxelChunk.h"
 #include "Ability/Character/AbilityCharacterBase.h"
 #include "ObjectPool/ObjectPoolModuleBPLibrary.h"
 #include "Ability/Character/AbilityCharacterDataBase.h"
-#include "Ability/Inventory/CharacterInventory.h"
+#include "Ability/Character/AbilityCharacterInventoryBase.h"
 
 UDWCharacterState_Death::UDWCharacterState_Death()
 {

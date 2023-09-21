@@ -2,6 +2,8 @@
 
 #include "Ability/Item/Prop/AbilityPropDataBase.h"
 
+#include "Common/DWCommonTypes.h"
+
 #include "DWPropData.generated.h"
 
 UCLASS(BlueprintType)

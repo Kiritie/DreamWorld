@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "Global/DWGlobalTypes.h"
+#include "Common/DWCommonTypes.h"
 #include "SaveGame/General/GeneralSaveGame.h"
 
 #include "DWGeneralSaveGame.generated.h"

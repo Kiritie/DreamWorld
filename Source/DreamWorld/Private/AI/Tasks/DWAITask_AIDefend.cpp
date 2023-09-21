@@ -4,7 +4,6 @@
 #include "AI/Tasks/DWAITask_AIDefend.h"
 #include "BehaviorTree/BehaviorTreeTypes.h"
 #include "Character/DWCharacter.h"
-#include "AI/DWAIController.h"
 #include "AIModule/Classes/BehaviorTree/BlackboardComponent.h"
 
 UDWAITask_AIDefend::UDWAITask_AIDefend(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)

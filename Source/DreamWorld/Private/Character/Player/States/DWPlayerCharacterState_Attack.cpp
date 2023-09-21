@@ -3,9 +3,6 @@
 #include "Character/Player/States/DWPlayerCharacterState_Attack.h"
 
 #include "TimerManager.h"
-#include "Ability/Item/Skill/AbilitySkillBase.h"
-#include "Ability/Item/Skill/AbilitySkillDataBase.h"
-#include "Character/Player/DWPlayerCharacter.h"
 
 UDWPlayerCharacterState_Attack::UDWPlayerCharacterState_Attack()
 {
