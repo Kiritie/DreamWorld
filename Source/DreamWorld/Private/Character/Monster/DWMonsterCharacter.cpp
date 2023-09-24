@@ -16,6 +16,7 @@ ADWMonsterCharacter::ADWMonsterCharacter()
 	AttackPoint = CreateDefaultSubobject<UDWCharacterAttackPoint>(TEXT("AttackPoint"));
 	AttackPoint->SetupAttachment(GetMesh(), TEXT("AttackPoint"));
 
+	Interaction->SetRelativeLocation(FVector(0.f, 0.f, 0.f));
 	Interaction->AddInteractAction((EInteractAction)EDWInteractAction::Ride);
 	Interaction->AddInteractAction((EInteractAction)EDWInteractAction::Feed);
 }

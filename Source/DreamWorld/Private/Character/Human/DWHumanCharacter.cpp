@@ -13,19 +13,22 @@
 #include "Voxel/Voxels/Entity/VoxelEntity.h"
 #include "Ability/Item/Equip/AbilityEquipBase.h"
 #include "Ability/Item/Equip/AbilityEquipDataBase.h"
+#include "Common/Interaction/InteractionComponent.h"
 #include "Voxel/Datas/VoxelData.h"
 
 ADWHumanCharacter::ADWHumanCharacter()
 {
+	Interaction->SetRelativeLocation(FVector(0.f, 0.f, -19.f));
+
 	// Set size for collision capsule
-	GetCapsuleComponent()->SetCapsuleHalfHeight(69);
-	GetCapsuleComponent()->SetCapsuleRadius(24);
+	GetCapsuleComponent()->SetCapsuleHalfHeight(69.f);
+	GetCapsuleComponent()->SetCapsuleRadius(24.f);
 
 	// Configure character movement
 	GetCharacterMovement()->bOrientRotationToMovement = true; // Character moves in the direction of input...	
 	GetCharacterMovement()->AirControl = 0.3f;
 
-	GetMesh()->SetRelativeLocation(FVector(0, 0, -70));
+	GetMesh()->SetRelativeLocation(FVector(0.f, 0.f, -70.f));
 
 	GenerateVoxelEntity = nullptr;
 	AuxiliaryVoxelEntity = nullptr;

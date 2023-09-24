@@ -7,7 +7,7 @@ UWidgetArchiveCreatingPanel::UWidgetArchiveCreatingPanel(const FObjectInitialize
 {
 	WidgetName = FName("ArchiveCreatingPanel");
 	WidgetType = EWidgetType::Temporary;
-	WidgetInputMode = EInputMode::UIOnly;
+	WidgetInputMode = EInputMode::GameAndUI_NotHideCursor;
 }
 
 void UWidgetArchiveCreatingPanel::OnInitialize_Implementation(UObject* InOwner)

@@ -36,10 +36,10 @@ ADWInputModule::ADWInputModule()
 	ActionMappings.Add(FInputActionMapping("Sprint", IE_Released, this, "OnSprintReleased"));
 	
 	ActionMappings.Add(FInputActionMapping("Interact1", IE_Pressed, this, "DoInteractAction1"));
-	ActionMappings.Add(FInputActionMapping("Interact2", IE_Pressed, this, "DoInteractAction1"));
-	ActionMappings.Add(FInputActionMapping("Interact3", IE_Pressed, this, "DoInteractAction1"));
-	ActionMappings.Add(FInputActionMapping("Interact4", IE_Pressed, this, "DoInteractAction1"));
-	ActionMappings.Add(FInputActionMapping("Interact5", IE_Pressed, this, "DoInteractAction1"));
+	ActionMappings.Add(FInputActionMapping("Interact2", IE_Pressed, this, "DoInteractAction2"));
+	ActionMappings.Add(FInputActionMapping("Interact3", IE_Pressed, this, "DoInteractAction3"));
+	ActionMappings.Add(FInputActionMapping("Interact4", IE_Pressed, this, "DoInteractAction4"));
+	ActionMappings.Add(FInputActionMapping("Interact5", IE_Pressed, this, "DoInteractAction5"));
 
 	ActionMappings.Add(FInputActionMapping("Dodge", IE_Pressed, this, "OnDodgePressed"));
 	ActionMappings.Add(FInputActionMapping("Dodge", IE_Released, this, "OnDodgeReleased"));

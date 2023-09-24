@@ -67,7 +67,7 @@ void UDWDamageHandle::HandleDamage(AActor* SourceActor, AActor* TargetActor, flo
 	{
 		if (TargetCharacter)
 		{
-			USceneModuleBPLibrary::SpawnWorldText(FString::FromInt(LocalDamageDone * DefendRateDone), FColor::Cyan, EWorldTextStyle::Normal, TargetCharacter->GetActorLocation(), FVector(20.f), TargetCharacter);
+			USceneModuleBPLibrary::SpawnWorldText(FString::FromInt(LocalDamageDone * DefendRateDone), FColor::Cyan, EWorldTextStyle::Normal, TargetCharacter->GetActorLocation(), FVector(20.f));
 		}
 		LocalDamageDone *= (1.f - DefendRateDone);
 	}
