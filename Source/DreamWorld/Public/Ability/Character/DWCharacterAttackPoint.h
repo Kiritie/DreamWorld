@@ -22,7 +22,7 @@ public:
 
 	virtual void OnHitTarget_Implementation(AActor* InTarget, const FHitResult& InHitResult) override;
 	
-	virtual void ClearHitTargets_Implementation();
+	virtual void ClearHitTargets_Implementation() override;
 
-	virtual void SetHitAble_Implementation(bool bValue);
+	virtual void SetHitAble_Implementation(bool bValue) override;
 };

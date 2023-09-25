@@ -57,7 +57,11 @@
 #include "Widget/World/WorldWidgetComponent.h"
 #include "Inventory/DWCharacterInventory.h"
 
-ADWCharacter::ADWCharacter()
+// Sets default values
+ADWCharacter::ADWCharacter(const FObjectInitializer& ObjectInitializer) :
+	Super(ObjectInitializer.SetDefaultSubobjectClass<UDWAbilitySystemComponent>("AbilitySystem").
+		SetDefaultSubobjectClass<UDWCharacterAttributeSet>("AttributeSet").
+		SetDefaultSubobjectClass<UDWCharacterInventory>("Inventory"))
 {
 	CharacterHP = CreateDefaultSubobject<UWorldWidgetComponent>(FName("CharacterHP"));
 	CharacterHP->SetupAttachment(RootComponent);
@@ -68,12 +72,6 @@ ADWCharacter::ADWCharacter()
 	{
 		CharacterHP->SetWorldWidgetClass(CharacterHPClassFinder.Class);
 	}
-
-	AbilitySystem = CreateDefaultSubobject<UDWAbilitySystemComponent>(FName("AbilitySystem"));
-
-	AttributeSet = CreateDefaultSubobject<UDWCharacterAttributeSet>(FName("AttributeSet"));
-
-	Inventory = CreateDefaultSubobject<UDWCharacterInventory>(FName("Inventory"));
 
 	FSM->DefaultState = UDWCharacterState_Default::StaticClass();
 	FSM->States.Empty();
@@ -1523,9 +1521,9 @@ void ADWCharacter::HandleDamage(EDamageType DamageType, const float LocalDamageD
 			{
 				SourceCharacter->ModifyHealth(LocalDamageDone * SourceCharacter->GetAttackStealRate());
 			}
-			if(!IsPlayer() && !GetController<ADWAIController>()->GetBlackboard()->GetTargetCharacter())
+			if(!IsPlayer() && !GetController<ADWAIController>()->GetBlackboard()->GetTargetAgent())
 			{
-				GetController<ADWAIController>()->GetBlackboard()->SetTargetCharacter(SourceCharacter);
+				GetController<ADWAIController>()->GetBlackboard()->SetTargetAgent(SourceCharacter);
 			}
 			if(!bHasDefend)
 			{

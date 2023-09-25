@@ -33,7 +33,7 @@ void UDWAITask_AIPatrol::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* Node
 
 	if (!InitTask(OwnerComp)) return;
 
-	if (GetOwnerCharacter<ADWCharacter>()->DoAIMove(PatrolLocation))
+	if (GetAgent<ADWCharacter>()->DoAIMove(PatrolLocation))
 	{
 		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
 	}
@@ -45,7 +45,7 @@ EBTNodeResult::Type UDWAITask_AIPatrol::AbortTask(UBehaviorTreeComponent& OwnerC
 
 	if (!InitTask(OwnerComp)) return EBTNodeResult::Failed;
 
-	//GetOwnerCharacter<ADWCharacter>()->SetMotionRate(1.f, 1.f);
+	//GetAgent<ADWCharacter>()->SetMotionRate(1.f, 1.f);
 
 	return EBTNodeResult::Aborted;
 }
@@ -59,17 +59,17 @@ EBTNodeResult::Type UDWAITask_AIPatrol::ExecuteTask(UBehaviorTreeComponent& Owne
 
 	if (!InitTask(OwnerComp)) return EBTNodeResult::Failed;
 
-	GetOwnerCharacter<ADWCharacter>()->SetMotionRate(0.3f, 0.5f);
+	GetAgent<ADWCharacter>()->SetMotionRate(0.3f, 0.5f);
 
 	PatrolDistance = OwnerComp.GetBlackboardComponent()->GetValueAsFloat(PatrolDistanceKey.SelectedKeyName);
 
-	PatrolLocation = GetOwnerCharacter<ADWCharacter>()->GetActorLocation();
+	PatrolLocation = GetAgent<ADWCharacter>()->GetActorLocation();
 	DON(10,
-		FVector rayStart = GetOwnerCharacter<ADWCharacter>()->GetBirthLocation() + FRotator(0.f, FMath::RandRange(0.f, 360.f), 0.f).Vector() * FMath::FRandRange(0.f, PatrolDistance);
+		FVector rayStart = GetAgent<ADWCharacter>()->GetBirthLocation() + FRotator(0.f, FMath::RandRange(0.f, 360.f), 0.f).Vector() * FMath::FRandRange(0.f, PatrolDistance);
 		rayStart.Z = UVoxelModuleBPLibrary::GetWorldData().GetWorldRealSize().Z;
 		const FVector rayEnd = FVector(rayStart.X, rayStart.Y, 0.f);
 		FHitResult hitResult;
-		if(UVoxelModuleBPLibrary::VoxelAgentTraceSingle(rayStart, rayEnd, GetOwnerCharacter<ADWCharacter>()->GetRadius(), GetOwnerCharacter<ADWCharacter>()->GetHalfHeight(), {}, hitResult))
+		if(UVoxelModuleBPLibrary::VoxelAgentTraceSingle(rayStart, rayEnd, GetAgent<ADWCharacter>()->GetRadius(), GetAgent<ADWCharacter>()->GetHalfHeight(), {}, hitResult))
 		{
 			PatrolLocation = hitResult.Location;
 			break;
@@ -86,5 +86,5 @@ void UDWAITask_AIPatrol::OnTaskFinished(UBehaviorTreeComponent& OwnerComp, uint8
 
 	if (!InitTask(OwnerComp)) return;
 
-	GetOwnerCharacter<ADWCharacter>()->SetMotionRate(1.f, 1.f);
+	GetAgent<ADWCharacter>()->SetMotionRate(1.f, 1.f);
 }

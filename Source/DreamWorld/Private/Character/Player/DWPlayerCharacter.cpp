@@ -211,8 +211,6 @@ FSaveData* ADWPlayerCharacter::ToData(bool bRefresh)
 	static FDWPlayerSaveData SaveData;
 	SaveData = Super::ToData(bRefresh)->CastRef<FDWCharacterSaveData>();
 	
-	SaveData.CameraRotation = UCameraModuleBPLibrary::GetCameraRotation();
-	SaveData.CameraDistance = UCameraModuleBPLibrary::GetCameraDistance();
 	SaveData.BodyColorIndex = GetBodyColor();
 	SaveData.CapeColorIndex = GetCapeColor();
 	return &SaveData;

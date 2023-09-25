@@ -35,9 +35,7 @@ void ADWAbilityModule::OnInitialize_Implementation()
 {
 	Super::OnInitialize_Implementation();
 	
-	UAbilityModuleBPLibrary::AddCustomInteractAction((int32)EDWInteractAction::Feed, TEXT("/Script/DreamWorld.EDWInteractAction"));
-	UAbilityModuleBPLibrary::AddCustomInteractAction((int32)EDWInteractAction::Ride, TEXT("/Script/DreamWorld.EDWInteractAction"));
-	UAbilityModuleBPLibrary::AddCustomInteractAction((int32)EDWInteractAction::UnRide, TEXT("/Script/DreamWorld.EDWInteractAction"));
+	UAssetModuleBPLibrary::AddEnumMapping(TEXT("/Script/WHFramework.EInteractAction"), TEXT("/Script/WHFramework.EDWInteractAction"));
 }
 
 void ADWAbilityModule::OnPreparatory_Implementation(EPhase InPhase)

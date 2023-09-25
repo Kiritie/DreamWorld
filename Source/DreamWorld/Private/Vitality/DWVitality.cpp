@@ -19,7 +19,11 @@
 #include "Inventory/DWVitalityInventory.h"
 
 // Sets default values
-ADWVitality::ADWVitality()
+
+ADWVitality::ADWVitality(const FObjectInitializer& ObjectInitializer) :
+	Super(ObjectInitializer.SetDefaultSubobjectClass<UDWAbilitySystemComponent>("AbilitySystem").
+		SetDefaultSubobjectClass<UDWVitalityAttributeSet>("AttributeSet").
+		SetDefaultSubobjectClass<UDWVitalityInventory>("Inventory"))
 {
 	VitalityHP = CreateDefaultSubobject<UWorldWidgetComponent>(FName("VitalityHP"));
 	VitalityHP->SetupAttachment(RootComponent);
@@ -30,12 +34,6 @@ ADWVitality::ADWVitality()
 	{
 		VitalityHP->SetWorldWidgetClass(VitalityHPClassFinder.Class);
 	}
-
-	AbilitySystem = CreateDefaultSubobject<UDWAbilitySystemComponent>(FName("AbilitySystem"));
-
-	AttributeSet = CreateDefaultSubobject<UDWVitalityAttributeSet>(FName("AttributeSet"));
-	
-	Inventory = CreateDefaultSubobject<UDWVitalityInventory>(FName("Inventory"));
 
 	FSM->DefaultState = UDWVitalityState_Default::StaticClass();
 	FSM->States.Empty();

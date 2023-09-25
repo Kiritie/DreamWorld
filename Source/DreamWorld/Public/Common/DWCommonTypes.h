@@ -384,21 +384,11 @@ struct DREAMWORLD_API FDWPlayerBasicSaveData : public FDWCharacterSaveData
 public:
 	FORCEINLINE FDWPlayerBasicSaveData()
 	{
-		CameraRotation = FRotator(-1.f);
-		CameraDistance = -1.f;
 	}
 
 	FORCEINLINE FDWPlayerBasicSaveData(const FDWCharacterSaveData& InCharacterSaveData) : FDWCharacterSaveData(InCharacterSaveData)
 	{
-		CameraRotation = FRotator(-1.f);
-		CameraDistance = -1.f;
 	}
-
-	UPROPERTY()
-	FRotator CameraRotation;
-
-	UPROPERTY()
-	float CameraDistance;
 };
 
 UENUM(BlueprintType)

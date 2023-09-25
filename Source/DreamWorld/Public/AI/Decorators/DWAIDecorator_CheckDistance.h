@@ -22,5 +22,5 @@ protected:
 	FBlackboardKeySelector TargetDistanceKey;
 
 protected:
-	bool CalculateRawConditionValue(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) const override;
+	virtual bool CalculateRawConditionValue(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) const override;
 };

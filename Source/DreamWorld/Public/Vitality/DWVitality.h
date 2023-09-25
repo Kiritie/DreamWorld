@@ -25,18 +25,10 @@ class UAttributeSetBase;
 UCLASS()
 class DREAMWORLD_API ADWVitality : public AAbilityVitalityBase
 {
-	GENERATED_BODY()
+	GENERATED_UCLASS_BODY()
 
 	friend class UDWVitalityState_Death;
 	friend class UDWVitalityState_Default;
-
-public:
-	// Sets default values for this actor's properties
-	ADWVitality();
-
-protected:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-	UWorldWidgetComponent* VitalityHP;
 
 public:
 	virtual int32 GetLimit_Implementation() const override { return 1000; }
@@ -76,6 +68,10 @@ public:
 	virtual bool OnGenerateVoxel(const FVoxelHitResult& InVoxelHitResult) override;
 
 	virtual bool OnDestroyVoxel(const FVoxelHitResult& InVoxelHitResult) override;
+
+protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	UWorldWidgetComponent* VitalityHP;
 
 public:
 	virtual void SetNameV(FName InName) override;

@@ -25,13 +25,6 @@ public:
 	ADWHumanCharacter();
 
 protected:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	AVoxelEntity* GenerateVoxelEntity;
-	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	AVoxelEntity* AuxiliaryVoxelEntity;
-
-protected:
 	virtual void OnSpawn_Implementation(const TArray<FParameter>& InParams) override;
 
 	virtual void OnDespawn_Implementation(bool bRecovery) override;
@@ -42,6 +35,13 @@ public:
 	virtual void OnAuxiliaryItem(const FAbilityItem& InItem) override;
 
 	virtual void RefreshEquip(EDWEquipPartType InPartType, const FAbilityItem& InItem) override;
+
+protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	AVoxelEntity* GenerateVoxelEntity;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	AVoxelEntity* AuxiliaryVoxelEntity;
 
 public:
 	virtual void SetAttackHitAble(bool bValue) override;

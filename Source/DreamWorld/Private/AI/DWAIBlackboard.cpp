@@ -16,28 +16,28 @@ void UDWAIBlackboard::PostLoad()
 	// BLACKBOARD_VALUE_GENERATE_FLOAT(PatrolDuration);
 }
 
-void UDWAIBlackboard::Initialize(UBlackboardComponent* InComponent, ACharacterBase* InCharacter)
+void UDWAIBlackboard::Initialize(UBlackboardComponent* InComponent, IAIAgentInterface* InAgent)
 {
-	Super::Initialize(InComponent, InCharacter);
+	Super::Initialize(InComponent, InAgent);
 
-	if(!GetCharacter<ADWCharacter>()) return;
+	if(!GetAgent<ADWCharacter>()) return;
 
-	SetCharacterNature((uint8)GetCharacter<ADWCharacter>()->GetNature());
-	SetAttackDistance(GetCharacter<ADWCharacter>()->GetAttackDistance());
-	SetFollowDistance(GetCharacter<ADWCharacter>()->GetFollowDistance());
-	SetPatrolDistance(GetCharacter<ADWCharacter>()->GetPatrolDistance());
-	SetPatrolDuration(GetCharacter<ADWCharacter>()->GetPatrolDuration());
+	SetCharacterNature((uint8)GetAgent<ADWCharacter>()->GetNature());
+	SetAttackDistance(GetAgent<ADWCharacter>()->GetAttackDistance());
+	SetFollowDistance(GetAgent<ADWCharacter>()->GetFollowDistance());
+	SetPatrolDistance(GetAgent<ADWCharacter>()->GetPatrolDistance());
+	SetPatrolDuration(GetAgent<ADWCharacter>()->GetPatrolDuration());
 }
 
 void UDWAIBlackboard::OnRefresh()
 {
 	Super::OnRefresh();
 
-	if(!GetCharacter<ADWCharacter>()) return;
+	if(!GetAgent<ADWCharacter>()) return;
 
-	if(GetTargetCharacter<ADWCharacter>() && GetTargetCharacter<ADWCharacter>()->IsDead())
+	if(GetTargetAgent<ADWCharacter>() && GetTargetAgent<ADWCharacter>()->IsDead())
 	{
-		SetTargetCharacter(nullptr);
+		SetTargetAgent(nullptr);
 	}
 }
 

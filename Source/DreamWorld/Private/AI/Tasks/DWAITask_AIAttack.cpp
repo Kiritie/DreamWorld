@@ -31,11 +31,11 @@ void UDWAITask_AIAttack::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* Node
 
 	if (!InitTask(OwnerComp)) return;
 
-	if(GetOwnerCharacter<ADWCharacter>()->GetDistance(AttackTarget, false, false) <= AttackDistance)
+	if(GetAgent<ADWCharacter>()->GetDistance(AttackTarget, false, false) <= AttackDistance)
 	{
 		if(!AttackTarget->IsDead())
 		{
-			GetOwnerCharacter<ADWCharacter>()->Attack();
+			GetAgent<ADWCharacter>()->Attack();
 		}
 		else
 		{
@@ -54,8 +54,8 @@ EBTNodeResult::Type UDWAITask_AIAttack::AbortTask(UBehaviorTreeComponent& OwnerC
 
 	if (!InitTask(OwnerComp)) return EBTNodeResult::Failed;
 
-	//GetOwnerCharacter<ADWCharacter>()->UnAttack();
-	//GetOwnerCharacter<ADWCharacter>()->SetLockedTarget(nullptr);
+	//GetAgent<ADWCharacter>()->UnAttack();
+	//GetAgent<ADWCharacter>()->SetLockedTarget(nullptr);
 
 	return EBTNodeResult::Aborted;
 }
@@ -66,7 +66,7 @@ EBTNodeResult::Type UDWAITask_AIAttack::ExecuteTask(UBehaviorTreeComponent& Owne
 
 	if (!InitTask(OwnerComp)) return EBTNodeResult::Failed;
 
-	GetOwnerCharacter<ADWCharacter>()->SetLockedTarget(AttackTarget);
+	GetAgent<ADWCharacter>()->SetLockedTarget(AttackTarget);
 
 	return EBTNodeResult::InProgress;
 }
@@ -77,6 +77,6 @@ void UDWAITask_AIAttack::OnTaskFinished(UBehaviorTreeComponent& OwnerComp, uint8
 
 	if (!InitTask(OwnerComp)) return;
 
-	GetOwnerCharacter<ADWCharacter>()->UnAttack();
-	GetOwnerCharacter<ADWCharacter>()->SetLockedTarget(nullptr);
+	GetAgent<ADWCharacter>()->UnAttack();
+	GetAgent<ADWCharacter>()->SetLockedTarget(nullptr);
 }

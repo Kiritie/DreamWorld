@@ -56,13 +56,3 @@ void ADWCameraModule::OnUnPause_Implementation()
 {
 	Super::OnUnPause_Implementation();
 }
-
-void ADWCameraModule::SetCameraDistance(float InDistance, bool bInstant)
-{
-	Super::SetCameraDistance(InDistance, bInstant);
-
-	if(UProcedureModuleBPLibrary::IsCurrentProcedureClass<UProcedure_Playing>())
-	{
-		InitCameraDistance = InDistance;
-	}
-}

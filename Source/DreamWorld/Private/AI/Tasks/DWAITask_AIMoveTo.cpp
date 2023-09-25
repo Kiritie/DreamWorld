@@ -54,14 +54,14 @@ void UDWAITask_AIMoveTo::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* Node
 
 	if (TargetKey.SelectedKeyType == UBlackboardKeyType_Vector::StaticClass())
 	{
-		if(GetOwnerCharacter<ADWCharacter>()->DoAIMove(TargetLocation, TargetDistance))
+		if(GetAgent<ADWCharacter>()->DoAIMove(TargetLocation, TargetDistance))
 		{
 			FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
 		}
 	}
 	else
 	{
-		if(GetOwnerCharacter<ADWCharacter>()->DoAIMove(TargetCharacter, TargetDistance))
+		if(GetAgent<ADWCharacter>()->DoAIMove(TargetCharacter, TargetDistance))
 		{
 			FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
 		}
@@ -74,7 +74,7 @@ EBTNodeResult::Type UDWAITask_AIMoveTo::AbortTask(UBehaviorTreeComponent& OwnerC
 
 	if (!InitTask(OwnerComp)) return EBTNodeResult::Failed;
 
-	//GetOwnerCharacter<ADWCharacter>()->SetMotionRate(1.f, 1.f);
+	//GetAgent<ADWCharacter>()->SetMotionRate(1.f, 1.f);
 
 	return EBTNodeResult::Aborted;
 }
@@ -85,7 +85,7 @@ EBTNodeResult::Type UDWAITask_AIMoveTo::ExecuteTask(UBehaviorTreeComponent& Owne
 
 	if (!InitTask(OwnerComp)) return EBTNodeResult::Failed;
 
-	GetOwnerCharacter<ADWCharacter>()->SetMotionRate(0.7f, 0.7f);
+	GetAgent<ADWCharacter>()->SetMotionRate(0.7f, 0.7f);
 	
 	return EBTNodeResult::InProgress;
 }
@@ -96,5 +96,5 @@ void UDWAITask_AIMoveTo::OnTaskFinished(UBehaviorTreeComponent& OwnerComp, uint8
 
 	if (!InitTask(OwnerComp)) return;
 
-	GetOwnerCharacter<ADWCharacter>()->SetMotionRate(1.f, 1.f);
+	GetAgent<ADWCharacter>()->SetMotionRate(1.f, 1.f);
 }

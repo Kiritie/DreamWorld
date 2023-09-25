@@ -3,7 +3,6 @@
 #pragma once
 
 #include "Character/Human/DWHumanCharacter.h"
-#include "Gameplay/WHPlayerInterface.h"
 #include "DWPlayerCharacter.generated.h"
 
 class UVoxel;

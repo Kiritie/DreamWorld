@@ -31,7 +31,7 @@ void UDWAITask_AIFollow::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* Node
 
 	if (!InitTask(OwnerComp)) return;
 
-	GetOwnerCharacter<ADWCharacter>()->DoAIMove(TargetCharacter, TargetDistance, true);
+	GetAgent<ADWCharacter>()->DoAIMove(TargetCharacter, TargetDistance, true);
 }
 
 EBTNodeResult::Type UDWAITask_AIFollow::AbortTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)

@@ -37,7 +37,7 @@ class AAbilitySkillBase;
 UCLASS()
 class DREAMWORLD_API ADWCharacter : public AAbilityCharacterBase
 {
-	GENERATED_BODY()
+	GENERATED_UCLASS_BODY()
 
 	friend class ADWPlayerController;
 	
@@ -59,61 +59,7 @@ class DREAMWORLD_API ADWCharacter : public AAbilityCharacterBase
 	friend class UDWCharacterState_Walk;
 
 public:
-	ADWCharacter();
-
-public:
 	virtual void OnRefresh_Implementation(float DeltaSeconds) override;
-	
-protected:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-	UWorldWidgetComponent* CharacterHP;
-
-protected:
-	// stats
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "CharacterStates")
-	EDWCharacterControlMode ControlMode;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CharacterStats")
-	FName TeamID;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "CharacterStats")
-	ADWCharacter* OwnerRider;
-	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "CharacterStats")
-	ADWCharacter* RidingTarget;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "CharacterStats")
-	ADWCharacter* LockedTarget;
-
-protected:
-	FVector BirthLocation;
-
-	bool bAttackHitAble;
-	
-	float AIMoveStopDistance;
-
-	FVector AIMoveLocation;
-
-	int32 AttackAbilityIndex;
-		
-	int32 AttackAbilityQueue;
-
-	FPrimaryAssetId SkillAbilityID;
-
-	FTimerHandle AttackHurtTimer;
-
-	EDWCharacterAttackType AttackType;
-
-	UPROPERTY()
-	TMap<EDWEquipPartType, AAbilityEquipBase*> Equips;
-	
-	FDWCharacterAttackAbilityData FallingAttackAbility;
-
-	TMap<EDWWeaponType, FDWCharacterAttackAbilityDatas> AttackAbilities;
-
-	TMap<FPrimaryAssetId, FDWCharacterSkillAbilityData> SkillAbilities;
-
-	TMap<EDWCharacterActionType, FDWCharacterActionAbilityData> ActionAbilities;
 
 protected:
 	virtual int32 GetLimit_Implementation() const override { return 0; }
@@ -381,6 +327,57 @@ public:
 	virtual bool IsBreakAllInput() const;
 	
 	virtual bool IsTargetable_Implementation() const override;
+	
+protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	UWorldWidgetComponent* CharacterHP;
+
+protected:
+	// stats
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "CharacterStates")
+	EDWCharacterControlMode ControlMode;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CharacterStats")
+	FName TeamID;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "CharacterStats")
+	ADWCharacter* OwnerRider;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "CharacterStats")
+	ADWCharacter* RidingTarget;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "CharacterStats")
+	ADWCharacter* LockedTarget;
+
+protected:
+	FVector BirthLocation;
+
+	bool bAttackHitAble;
+	
+	float AIMoveStopDistance;
+
+	FVector AIMoveLocation;
+
+	int32 AttackAbilityIndex;
+		
+	int32 AttackAbilityQueue;
+
+	FPrimaryAssetId SkillAbilityID;
+
+	FTimerHandle AttackHurtTimer;
+
+	EDWCharacterAttackType AttackType;
+
+	UPROPERTY()
+	TMap<EDWEquipPartType, AAbilityEquipBase*> Equips;
+	
+	FDWCharacterAttackAbilityData FallingAttackAbility;
+
+	TMap<EDWWeaponType, FDWCharacterAttackAbilityDatas> AttackAbilities;
+
+	TMap<FPrimaryAssetId, FDWCharacterSkillAbilityData> SkillAbilities;
+
+	TMap<EDWCharacterActionType, FDWCharacterActionAbilityData> ActionAbilities;
 
 public:
 	virtual void SetNameV(FName InName) override;

@@ -18,10 +18,6 @@ class DREAMWORLD_API ADWMonsterCharacter : public ADWCharacter
 public:
 	ADWMonsterCharacter();
 
-protected:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-	UDWCharacterAttackPoint* AttackPoint;
-
 public:
 	virtual bool CanInteract(EInteractAction InInteractAction, IInteractionAgentInterface* InInteractionAgent) override;
 	
@@ -30,6 +26,10 @@ public:
 	virtual void SetAttackHitAble(bool bValue) override;
 
 	virtual void ClearAttackHitTargets() override;
+
+protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	UDWCharacterAttackPoint* AttackPoint;
 
 public:
 	UFUNCTION(BlueprintPure)
