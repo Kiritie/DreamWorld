@@ -164,12 +164,12 @@ bool ADWVitality::OnGenerateVoxel(const FVoxelHitResult& InVoxelHitResult)
 {
 	if(!GenerateVoxelID.IsValid()) return false;
 	
-	FQueryItemInfo QueryItemInfo = Inventory->QueryItemByRange(EQueryItemType::Remove, FAbilityItem(GenerateVoxelID, 1), -1);
-	if(QueryItemInfo.IsSuccess())
+	FItemQueryInfo ItemQueryInfo = Inventory->QueryItemByRange(EItemQueryType::Remove, FAbilityItem(GenerateVoxelID, 1), -1);
+	if(ItemQueryInfo.IsValid())
 	{
 		if(Super::OnGenerateVoxel(InVoxelHitResult))
 		{
-			Inventory->RemoveItemByQueryInfo(QueryItemInfo);
+			Inventory->RemoveItemByQueryInfo(ItemQueryInfo);
 			return true;
 		}
 	}

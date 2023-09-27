@@ -404,7 +404,7 @@ void ADWPlayerCharacter::OnInteract(EInteractAction InInteractAction, IInteracti
 
 void ADWPlayerCharacter::ChangeHand()
 {
-	TArray<UAbilityInventorySlot*> AuxiliarySlots = Inventory->GetSplitSlots(ESplitSlotType::Auxiliary);
+	TArray<UAbilityInventorySlot*> AuxiliarySlots = Inventory->GetSlotsBySplitType(ESlotSplitType::Auxiliary);
 	if(AuxiliarySlots.Num() > 0 && Inventory->GetSelectedSlot())
 	{
 		AuxiliarySlots[0]->Replace(Inventory->GetSelectedSlot());

@@ -27,21 +27,21 @@ UWidgetInventoryBox::UWidgetInventoryBox(const FObjectInitializer& ObjectInitial
 
 	DefaultSlotClass = LoadClass<UWidgetInventorySlot>(nullptr, TEXT("WidgetBlueprint'/Game/Blueprints/Widget/Inventory/Slot/WB_InventorySlot.WB_InventorySlot_C'"));
 
-	UISlotDatas.Add(ESplitSlotType::Default);
-	TargetUISlotDatas.Add(ESplitSlotType::Default);
+	UISlotDatas.Add(ESlotSplitType::Default);
+	TargetUISlotDatas.Add(ESlotSplitType::Default);
 }
 
 void UWidgetInventoryBox::OnInitialize_Implementation(UObject* InOwner)
 {
 	Super::OnInitialize_Implementation(InOwner);
 	
-	if(DefaultContent && UISlotDatas.Contains(ESplitSlotType::Default))
+	if(DefaultContent && UISlotDatas.Contains(ESlotSplitType::Default))
 	{
-		const auto DefaultSlots = GetInventory()->GetSplitSlots<UAbilityInventorySlot>(ESplitSlotType::Default);
-		if(UISlotDatas[ESplitSlotType::Default].Slots.Num() != DefaultSlots.Num())
+		const auto DefaultSlots = GetInventory()->GetSlotsBySplitType(ESlotSplitType::Default);
+		if(UISlotDatas[ESlotSplitType::Default].Slots.Num() != DefaultSlots.Num())
 		{
 			DefaultContent->ClearChildren();
-			UISlotDatas[ESplitSlotType::Default].Slots.Empty();
+			UISlotDatas[ESlotSplitType::Default].Slots.Empty();
 			for(int32 i = 0; i < DefaultSlots.Num(); i++)
 			{
 				if(UWidgetInventorySlot* DefaultSlot = CreateSubWidget<UWidgetInventorySlot>({ DefaultSlots[i] }, DefaultSlotClass))
@@ -50,15 +50,15 @@ void UWidgetInventoryBox::OnInitialize_Implementation(UObject* InOwner)
 					{
 						WrapBoxSlot->SetPadding(FMargin(2.5f, 2.5f, 2.5f, 2.5f));
 					}
-					UISlotDatas[ESplitSlotType::Default].Slots.Add(DefaultSlot);
+					UISlotDatas[ESlotSplitType::Default].Slots.Add(DefaultSlot);
 				}
 			}
 		}
 		else
 		{
-			for(int32 i = 0; i < UISlotDatas[ESplitSlotType::Default].Slots.Num(); i++)
+			for(int32 i = 0; i < UISlotDatas[ESlotSplitType::Default].Slots.Num(); i++)
 			{
-				UISlotDatas[ESplitSlotType::Default].Slots[i]->OnInitialize({ DefaultSlots[i] });
+				UISlotDatas[ESlotSplitType::Default].Slots[i]->OnInitialize({ DefaultSlots[i] });
 			}
 		}
 	}
@@ -78,13 +78,13 @@ void UWidgetInventoryBox::OnOpen_Implementation(const TArray<FParameter>& InPara
 	
 	GetInventory()->SetConnectInventory(TargetInventory);
 
-	if(TargetContent && TargetUISlotDatas.Contains(ESplitSlotType::Default))
+	if(TargetContent && TargetUISlotDatas.Contains(ESlotSplitType::Default))
 	{
-		const auto DefaultSlots = TargetInventory->GetSplitSlots<UAbilityInventorySlot>(ESplitSlotType::Default);
-		if(TargetUISlotDatas[ESplitSlotType::Default].Slots.Num() != DefaultSlots.Num())
+		const auto DefaultSlots = TargetInventory->GetSlotsBySplitType(ESlotSplitType::Default);
+		if(TargetUISlotDatas[ESlotSplitType::Default].Slots.Num() != DefaultSlots.Num())
 		{
 			TargetContent->ClearChildren();
-			TargetUISlotDatas[ESplitSlotType::Default].Slots.Empty();
+			TargetUISlotDatas[ESlotSplitType::Default].Slots.Empty();
 			for(int32 i = 0; i < DefaultSlots.Num(); i++)
 			{
 				if(UWidgetInventorySlot* DefaultSlot = CreateSubWidget<UWidgetInventorySlot>({ DefaultSlots[i] }, DefaultSlotClass))
@@ -93,15 +93,15 @@ void UWidgetInventoryBox::OnOpen_Implementation(const TArray<FParameter>& InPara
 					{
 						WrapBoxSlot->SetPadding(FMargin(2.5f, 2.5f, 2.5f, 2.5f));
 					}
-					TargetUISlotDatas[ESplitSlotType::Default].Slots.Add(DefaultSlot);
+					TargetUISlotDatas[ESlotSplitType::Default].Slots.Add(DefaultSlot);
 				}
 			}
 		}
 		else
 		{
-			for(int32 i = 0; i < TargetUISlotDatas[ESplitSlotType::Default].Slots.Num(); i++)
+			for(int32 i = 0; i < TargetUISlotDatas[ESlotSplitType::Default].Slots.Num(); i++)
 			{
-				TargetUISlotDatas[ESplitSlotType::Default].Slots[i]->OnInitialize({ DefaultSlots[i] });
+				TargetUISlotDatas[ESlotSplitType::Default].Slots[i]->OnInitialize({ DefaultSlots[i] });
 			}
 		}
 	}

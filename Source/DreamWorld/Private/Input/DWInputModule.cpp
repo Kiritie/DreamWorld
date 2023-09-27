@@ -382,9 +382,9 @@ void ADWInputModule::ReleaseSkillAbility1()
 	
 	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput()) return;
 
-	if(PlayerCharacter->Inventory->GetSplitSlots(ESplitSlotType::Skill).IsValidIndex(0))
+	if(PlayerCharacter->Inventory->GetSlotsBySplitType(ESlotSplitType::Skill).IsValidIndex(0))
 	{
-		PlayerCharacter->Inventory->GetSplitSlots(ESplitSlotType::Skill)[0]->ActiveItem();
+		PlayerCharacter->Inventory->GetSlotsBySplitType(ESlotSplitType::Skill)[0]->ActiveItem();
 	}
 }
 
@@ -394,9 +394,9 @@ void ADWInputModule::ReleaseSkillAbility2()
 	
 	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput()) return;
 
-	if(PlayerCharacter->Inventory->GetSplitSlots(ESplitSlotType::Skill).IsValidIndex(1))
+	if(PlayerCharacter->Inventory->GetSlotsBySplitType(ESlotSplitType::Skill).IsValidIndex(1))
 	{
-		PlayerCharacter->Inventory->GetSplitSlots(ESplitSlotType::Skill)[1]->ActiveItem();
+		PlayerCharacter->Inventory->GetSlotsBySplitType(ESlotSplitType::Skill)[1]->ActiveItem();
 	}
 }
 
@@ -406,9 +406,9 @@ void ADWInputModule::ReleaseSkillAbility3()
 	
 	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput()) return;
 
-	if(PlayerCharacter->Inventory->GetSplitSlots(ESplitSlotType::Skill).IsValidIndex(2))
+	if(PlayerCharacter->Inventory->GetSlotsBySplitType(ESlotSplitType::Skill).IsValidIndex(2))
 	{
-		PlayerCharacter->Inventory->GetSplitSlots(ESplitSlotType::Skill)[2]->ActiveItem();
+		PlayerCharacter->Inventory->GetSlotsBySplitType(ESlotSplitType::Skill)[2]->ActiveItem();
 	}
 }
 
@@ -418,9 +418,9 @@ void ADWInputModule::ReleaseSkillAbility4()
 	
 	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput()) return;
 
-	if(PlayerCharacter->Inventory->GetSplitSlots(ESplitSlotType::Skill).IsValidIndex(3))
+	if(PlayerCharacter->Inventory->GetSlotsBySplitType(ESlotSplitType::Skill).IsValidIndex(3))
 	{
-		PlayerCharacter->Inventory->GetSplitSlots(ESplitSlotType::Skill)[3]->ActiveItem();
+		PlayerCharacter->Inventory->GetSlotsBySplitType(ESlotSplitType::Skill)[3]->ActiveItem();
 	}
 }
 

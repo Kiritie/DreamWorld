@@ -6,8 +6,8 @@ UDWMonsterCharacterData::UDWMonsterCharacterData()
 {
 	InventoryData = FInventorySaveData();
 	InventoryData.Items.SetNum(16);
-	InventoryData.SplitInfos.Add(ESplitSlotType::Default, FSplitSlotInfo(0, 10));
-	InventoryData.SplitInfos.Add(ESplitSlotType::Equip, FSplitSlotInfo(10, 6));
+	InventoryData.SplitItems.Add(ESlotSplitType::Default).Items.SetNum(10);
+	InventoryData.SplitItems.Add(ESlotSplitType::Equip).Items.SetNum(6);
 
 	AttackHitSound = nullptr;
 	AttackMissSound = nullptr;

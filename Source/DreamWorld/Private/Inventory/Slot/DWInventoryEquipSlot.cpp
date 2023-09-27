@@ -11,12 +11,12 @@ UDWInventoryEquipSlot::UDWInventoryEquipSlot()
 {
 }
 
-void UDWInventoryEquipSlot::OnInitialize(UAbilityInventoryBase* InInventory, FAbilityItem InItem, EAbilityItemType InLimitType /* = EAbilityItemType::None */, ESplitSlotType InSplitType /*= ESplitSlotType::Default*/)
+void UDWInventoryEquipSlot::OnInitialize(UAbilityInventoryBase* InInventory, FAbilityItem InItem, EAbilityItemType InLimitType /* = EAbilityItemType::None */, ESlotSplitType InSplitType /*= ESlotSplitType::Default*/)
 {
 	Super::OnInitialize(InInventory, InItem, InLimitType, InSplitType);
 }
 
-void UDWInventoryEquipSlot::OnInitialize(UAbilityInventoryBase* InInventory, FAbilityItem InItem, EAbilityItemType InLimitType, ESplitSlotType InSplitType, int32 InPartType)
+void UDWInventoryEquipSlot::OnInitialize(UAbilityInventoryBase* InInventory, FAbilityItem InItem, EAbilityItemType InLimitType, ESlotSplitType InSplitType, int32 InPartType)
 {
 	Super::OnInitialize(InInventory, InItem, InLimitType, InSplitType, InPartType);
 

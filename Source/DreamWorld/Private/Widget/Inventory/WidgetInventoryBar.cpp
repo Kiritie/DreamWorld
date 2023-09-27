@@ -39,9 +39,9 @@ UWidgetInventoryBar::UWidgetInventoryBar(const FObjectInitializer& ObjectInitial
 	AuxiliarySlotClass = LoadClass<UWidgetInventoryAuxiliarySlot>(nullptr, TEXT("WidgetBlueprint'/Game/Blueprints/Widget/Inventory/Slot/WB_InventoryAuxiliarySlot.WB_InventoryAuxiliarySlot_C'"));
 	SkillSlotClass = LoadClass<UWidgetInventorySkillSlot>(nullptr, TEXT("WidgetBlueprint'/Game/Blueprints/Widget/Inventory/Slot/WB_InventorySkillSlot.WB_InventorySkillSlot_C'"));
 
-	UISlotDatas.Add(ESplitSlotType::Shortcut);
-	UISlotDatas.Add(ESplitSlotType::Auxiliary);
-	UISlotDatas.Add(ESplitSlotType::Skill);
+	UISlotDatas.Add(ESlotSplitType::Shortcut);
+	UISlotDatas.Add(ESlotSplitType::Auxiliary);
+	UISlotDatas.Add(ESlotSplitType::Skill);
 }
 
 void UWidgetInventoryBar::OnInitialize_Implementation(UObject* InOwner)
@@ -53,13 +53,13 @@ void UWidgetInventoryBar::OnInitialize_Implementation(UObject* InOwner)
 
 	Super::OnInitialize_Implementation(InOwner);
 	
-	if(ShortcutContent && UISlotDatas.Contains(ESplitSlotType::Shortcut))
+	if(ShortcutContent && UISlotDatas.Contains(ESlotSplitType::Shortcut))
 	{
-		const auto ShortcutSlots = GetInventory()->GetSplitSlots<UAbilityInventorySlot>(ESplitSlotType::Shortcut);
-		if(UISlotDatas[ESplitSlotType::Shortcut].Slots.Num() != ShortcutSlots.Num())
+		const auto ShortcutSlots = GetInventory()->GetSlotsBySplitType(ESlotSplitType::Shortcut);
+		if(UISlotDatas[ESlotSplitType::Shortcut].Slots.Num() != ShortcutSlots.Num())
 		{
 			ShortcutContent->ClearChildren();
-			UISlotDatas[ESplitSlotType::Shortcut].Slots.Empty();
+			UISlotDatas[ESlotSplitType::Shortcut].Slots.Empty();
 			for(int32 i = 0; i < ShortcutSlots.Num(); i++)
 			{
 				if(UWidgetInventoryShortcutSlot* ShortcutSlot = CreateSubWidget<UWidgetInventoryShortcutSlot>({ ShortcutSlots[i] }, ShortcutSlotClass))
@@ -71,22 +71,22 @@ void UWidgetInventoryBar::OnInitialize_Implementation(UObject* InOwner)
 						GridSlot->SetPadding(FMargin(0.f, 0.f, 5.f, 0.f));
 						GridSlot->SetColumn(i);
 					}
-					UISlotDatas[ESplitSlotType::Shortcut].Slots.Add(ShortcutSlot);
+					UISlotDatas[ESlotSplitType::Shortcut].Slots.Add(ShortcutSlot);
 				}
 			}
 		}
 		else
 		{
-			for(int32 i = 0; i < UISlotDatas[ESplitSlotType::Shortcut].Slots.Num(); i++)
+			for(int32 i = 0; i < UISlotDatas[ESlotSplitType::Shortcut].Slots.Num(); i++)
 			{
-				UISlotDatas[ESplitSlotType::Shortcut].Slots[i]->OnInitialize({ ShortcutSlots[i] });
+				UISlotDatas[ESlotSplitType::Shortcut].Slots[i]->OnInitialize({ ShortcutSlots[i] });
 			}
 		}
 	}
-	if(AuxiliaryContent && UISlotDatas.Contains(ESplitSlotType::Auxiliary))
+	if(AuxiliaryContent && UISlotDatas.Contains(ESlotSplitType::Auxiliary))
 	{
-		const auto AuxiliarySlots = GetInventory()->GetSplitSlots<UAbilityInventorySlot>(ESplitSlotType::Auxiliary);
-		if(UISlotDatas[ESplitSlotType::Auxiliary].Slots.Num() == 0)
+		const auto AuxiliarySlots = GetInventory()->GetSlotsBySplitType(ESlotSplitType::Auxiliary);
+		if(UISlotDatas[ESlotSplitType::Auxiliary].Slots.Num() == 0)
 		{
 			for(int32 i = 0; i < AuxiliarySlots.Num(); i++)
 			{
@@ -99,22 +99,22 @@ void UWidgetInventoryBar::OnInitialize_Implementation(UObject* InOwner)
 						GridSlot->SetPadding(FMargin(0.f, 0.f, 5.f, 0.f));
 						GridSlot->SetColumn(i);
 					}
-					UISlotDatas[ESplitSlotType::Auxiliary].Slots.Add(AuxiliarySlot);
+					UISlotDatas[ESlotSplitType::Auxiliary].Slots.Add(AuxiliarySlot);
 				}
 			}
 		}
 		else
 		{
-			for(int32 i = 0; i < UISlotDatas[ESplitSlotType::Auxiliary].Slots.Num(); i++)
+			for(int32 i = 0; i < UISlotDatas[ESlotSplitType::Auxiliary].Slots.Num(); i++)
 			{
-				UISlotDatas[ESplitSlotType::Auxiliary].Slots[i]->OnInitialize({ AuxiliarySlots[i] });
+				UISlotDatas[ESlotSplitType::Auxiliary].Slots[i]->OnInitialize({ AuxiliarySlots[i] });
 			}
 		}
 	}
-	if(LeftSkillContent && RightSkillContent && UISlotDatas.Contains(ESplitSlotType::Skill))
+	if(LeftSkillContent && RightSkillContent && UISlotDatas.Contains(ESlotSplitType::Skill))
 	{
-		const auto SkillSlots = GetInventory()->GetSplitSlots<UAbilityInventorySlot>(ESplitSlotType::Skill);
-		if(UISlotDatas[ESplitSlotType::Skill].Slots.Num() == 0)
+		const auto SkillSlots = GetInventory()->GetSlotsBySplitType(ESlotSplitType::Skill);
+		if(UISlotDatas[ESlotSplitType::Skill].Slots.Num() == 0)
 		{
 			for(int32 i = 0; i < SkillSlots.Num(); i++)
 			{
@@ -126,15 +126,15 @@ void UWidgetInventoryBar::OnInitialize_Implementation(UObject* InOwner)
 						GridSlot->SetPadding(FMargin(0.f, 0.f, 5.f, 0.f));
 						GridSlot->SetColumn(i % (SkillSlots.Num() / 2));
 					}
-					UISlotDatas[ESplitSlotType::Skill].Slots.Add(SkillSlot);
+					UISlotDatas[ESlotSplitType::Skill].Slots.Add(SkillSlot);
 				}
 			}
 		}
 		else
 		{
-			for(int32 i = 0; i < UISlotDatas[ESplitSlotType::Skill].Slots.Num(); i++)
+			for(int32 i = 0; i < UISlotDatas[ESlotSplitType::Skill].Slots.Num(); i++)
 			{
-				UISlotDatas[ESplitSlotType::Skill].Slots[i]->OnInitialize({ SkillSlots[i] });
+				UISlotDatas[ESlotSplitType::Skill].Slots[i]->OnInitialize({ SkillSlots[i] });
 			}
 		}
 	}
@@ -143,7 +143,7 @@ void UWidgetInventoryBar::OnInitialize_Implementation(UObject* InOwner)
 
 	if(GetInventory()->GetSelectedSlot())
 	{
-		SelectInventorySlot(GetInventory()->GetSelectedSlot()->GetSplitIndex(ESplitSlotType::Shortcut), false);
+		SelectInventorySlot(GetInventory()->GetSelectedSlot()->GetSplitIndex(ESlotSplitType::Shortcut), false);
 	}
 	else
 	{
@@ -170,7 +170,7 @@ void UWidgetInventoryBar::OnInventorySlotSelected(UAbilityInventorySlot* InInven
 {
 	if(InInventorySlot)
 	{
-		SelectInventorySlot(InInventorySlot->GetSplitIndex(ESplitSlotType::Shortcut), false);
+		SelectInventorySlot(InInventorySlot->GetSplitIndex(ESlotSplitType::Shortcut), false);
 	}
 }
 
@@ -227,7 +227,7 @@ void UWidgetInventoryBar::SetSkillBoxVisible(bool bValue)
 
 UAbilityInventorySlot* UWidgetInventoryBar::GetSelectedSlot() const
 {
-	auto SplitUISlots = GetSplitUISlots(ESplitSlotType::Shortcut);
+	auto SplitUISlots = GetSplitUISlots(ESlotSplitType::Shortcut);
 	if(SplitUISlots.IsValidIndex(SelectedSlotIndex))
 	{
 		return SplitUISlots[SelectedSlotIndex]->GetOwnerSlot();

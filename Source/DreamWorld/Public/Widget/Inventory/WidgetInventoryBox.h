@@ -35,7 +35,7 @@ protected:
 	class UWrapBox* TargetContent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	TMap<ESplitSlotType, FWidgetSplitSlotData> TargetUISlotDatas;
+	TMap<ESlotSplitType, FWidgetInventorySlots> TargetUISlotDatas;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TSubclassOf<class UWidgetInventorySlot> DefaultSlotClass;

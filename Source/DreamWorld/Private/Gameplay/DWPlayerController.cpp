@@ -64,7 +64,7 @@ void ADWPlayerController::LoadData(FSaveData* InSaveData, EPhase InPhase)
 		if(bNeedSpawn)
 		{
 			UnloadData(InPhase);
-			PlayerCharacter = UObjectPoolModuleBPLibrary::SpawnObject<ADWPlayerCharacter>({ &SaveData.ID }, SaveData.GetCharacterData().Class);
+			PlayerCharacter = UObjectPoolModuleBPLibrary::SpawnObject<ADWPlayerCharacter>({ &SaveData.ID }, SaveData.GetItemData<UDWCharacterData>().Class);
 			if(PlayerCharacter)
 			{
 				SetPlayerPawn(PlayerCharacter);

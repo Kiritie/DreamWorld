@@ -637,7 +637,7 @@ bool ADWCharacter::Attack(int32 InAbilityIndex /*= -1*/)
 
 bool ADWCharacter::SkillAttack(const FPrimaryAssetId& InSkillID)
 {
-	if(auto SkillSlot = Inventory->GetSkillSlotByID(InSkillID))
+	if(const auto SkillSlot = Inventory->GetSlotBySplitTypeAndItemID(ESlotSplitType::Skill, InSkillID))
 	{
 		return SkillSlot->ActiveItem();
 	}
@@ -646,7 +646,7 @@ bool ADWCharacter::SkillAttack(const FPrimaryAssetId& InSkillID)
 
 bool ADWCharacter::SkillAttack(ESkillType InSkillType, int32 InAbilityIndex)
 {
-	if(auto SkillSlot = Inventory->GetSkillSlotByID(GetSkillAbility(InSkillType, InAbilityIndex, true).AbilityID))
+	if(const auto SkillSlot = Inventory->GetSlotBySplitTypeAndItemID(ESlotSplitType::Skill, GetSkillAbility(InSkillType, InAbilityIndex, true).AbilityID))
 	{
 		return SkillSlot->ActiveItem();
 	}
@@ -705,12 +705,12 @@ bool ADWCharacter::OnGenerateVoxel(const FVoxelHitResult& InVoxelHitResult)
 {
 	if(!GenerateVoxelID.IsValid()) return false;
 	
-	FQueryItemInfo QueryItemInfo = Inventory->QueryItemByRange(EQueryItemType::Remove, FAbilityItem(GenerateVoxelID, 1), -1);
-	if(QueryItemInfo.IsSuccess() && DoAction(EDWCharacterActionType::Generate))
+	FItemQueryInfo ItemQueryInfo = Inventory->QueryItemByRange(EItemQueryType::Remove, FAbilityItem(GenerateVoxelID, 1), -1);
+	if(ItemQueryInfo.IsValid() && DoAction(EDWCharacterActionType::Generate))
 	{
 		if(Super::OnGenerateVoxel(InVoxelHitResult))
 		{
-			Inventory->RemoveItemByQueryInfo(QueryItemInfo);
+			Inventory->RemoveItemByQueryInfo(ItemQueryInfo);
 			UCommonBPLibrary::GetGameInstance()->GetSubsystem<UAchievementSubSystem>()->Unlock(FName("FirstGenerateVoxel"));
 			return true;
 		}
@@ -1256,14 +1256,7 @@ bool ADWCharacter::HasSkillAbility(const FPrimaryAssetId& InSkillID, bool bNeedA
 	if(SkillAbilities.Contains(InSkillID))
 	{
 		if(!bNeedAssembled) return true;
-		auto SkillSlots = Inventory->GetSplitSlots<UAbilityInventorySkillSlot>(ESplitSlotType::Skill);
-		for (int32 i = 0; i < SkillSlots.Num(); i++)
-		{
-			if(SkillSlots[i]->GetItem().ID == InSkillID)
-			{
-				return true;
-			}
-		}
+		return Inventory->QueryItemBySplitType(EItemQueryType::Get, InSkillID, ESlotSplitType::Skill).IsValid();
 	}
 	return false;
 }
@@ -1271,7 +1264,7 @@ bool ADWCharacter::HasSkillAbility(const FPrimaryAssetId& InSkillID, bool bNeedA
 bool ADWCharacter::HasSkillAbility(ESkillType InSkillType, int32 InAbilityIndex, bool bNeedAssembled) const
 {
 	TArray<FDWCharacterSkillAbilityData> Abilities = TArray<FDWCharacterSkillAbilityData>();
-	for (auto Iter : SkillAbilities)
+	for (auto& Iter : SkillAbilities)
 	{
 		if(Iter.Value.GetItemData<UAbilitySkillDataBase>().SkillType == InSkillType)
 		{
@@ -1280,15 +1273,7 @@ bool ADWCharacter::HasSkillAbility(ESkillType InSkillType, int32 InAbilityIndex,
 	}
 	if(Abilities.IsValidIndex(InAbilityIndex))
 	{
-		if(!bNeedAssembled) return true;
-		auto SkillSlots = Inventory->GetSplitSlots<UAbilityInventorySkillSlot>(ESplitSlotType::Skill);
-		for (int32 i = 0; i < SkillSlots.Num(); i++)
-		{
-			if(SkillSlots[i]->GetItem().ID == Abilities[InAbilityIndex].AbilityID)
-			{
-				return true;
-			}
-		}
+		return HasSkillAbility(Abilities[InAbilityIndex].AbilityID, bNeedAssembled);
 	}
 	return false;
 }

@@ -30,7 +30,7 @@ void UDWCharacterInventory::UnloadData(EPhase InPhase)
 	Super::UnloadData(InPhase);
 }
 
-FQueryItemInfo UDWCharacterInventory::QueryItemByRange(EQueryItemType InActionType, FAbilityItem InItem, int32 InStartIndex, int32 InEndIndex)
+FItemQueryInfo UDWCharacterInventory::QueryItemByRange(EItemQueryType InActionType, FAbilityItem InItem, int32 InStartIndex, int32 InEndIndex)
 {
 	return Super::QueryItemByRange(InActionType, InItem, InStartIndex, InEndIndex);
 }
@@ -78,12 +78,12 @@ void UDWCharacterInventory::ClearAllItem()
 
 UAbilityInventoryEquipSlot* UDWCharacterInventory::GetEquipSlotByPartType(EDWEquipPartType InPartType)
 {
-	auto EquipSlots = GetSplitSlots<UAbilityInventoryEquipSlot>(ESplitSlotType::Equip);
-	for (int32 i = 0; i < EquipSlots.Num(); i++)
+	auto EquipSlots = GetSlotsBySplitType(ESlotSplitType::Equip);
+	for(int32 i = 0; i < EquipSlots.Num(); i++)
 	{
 		if(EquipSlots[i]->GetItem().GetData<UDWEquipData>().PartType == InPartType)
 		{
-			return EquipSlots[i];
+			return Cast<UAbilityInventoryEquipSlot>(EquipSlots[i]);
 		}
 	}
 	return nullptr;
