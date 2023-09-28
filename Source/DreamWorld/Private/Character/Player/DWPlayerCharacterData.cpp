@@ -7,7 +7,6 @@ UDWPlayerCharacterData::UDWPlayerCharacterData()
 	Nature = EDWCharacterNature::Player;
 	
 	InventoryData = FInventorySaveData();
-	InventoryData.Items.SetNum(61);
 	InventoryData.SplitItems.Add(ESlotSplitType::Default).Items.SetNum(40);
 	InventoryData.SplitItems.Add(ESlotSplitType::Shortcut).Items.SetNum(10);
 	InventoryData.SplitItems.Add(ESlotSplitType::Auxiliary).Items.SetNum(1);

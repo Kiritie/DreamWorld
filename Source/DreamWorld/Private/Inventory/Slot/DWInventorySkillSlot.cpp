@@ -10,9 +10,9 @@ UDWInventorySkillSlot::UDWInventorySkillSlot()
 {
 }
 
-void UDWInventorySkillSlot::OnInitialize(UAbilityInventoryBase* InInventory, FAbilityItem InItem, EAbilityItemType InLimitType /* = EAbilityItemType::None */, ESlotSplitType InSplitType /*= ESlotSplitType::Default*/)
+void UDWInventorySkillSlot::OnInitialize(UAbilityInventoryBase* InInventory, EAbilityItemType InLimitType, ESlotSplitType InSplitType, int32 InSlotIndex)
 {
-	Super::OnInitialize(InInventory, InItem, InLimitType, InSplitType);
+	Super::OnInitialize(InInventory, InLimitType, InSplitType, InSlotIndex);
 }
 
 void UDWInventorySkillSlot::OnItemPreChange(FAbilityItem& InNewItem)

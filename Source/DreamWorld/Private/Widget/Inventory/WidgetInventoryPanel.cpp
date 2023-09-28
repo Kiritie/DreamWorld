@@ -71,8 +71,11 @@ void UWidgetInventoryPanel::OnInitialize_Implementation(UObject* InOwner)
 	if(LeftEquipContent && RightEquipContent && UISlotDatas.Contains(ESlotSplitType::Equip))
 	{
 		const auto EquipSlots = GetInventory()->GetSlotsBySplitType(ESlotSplitType::Equip);
-		if(UISlotDatas[ESlotSplitType::Equip].Slots.Num() == 0)
+		if(UISlotDatas[ESlotSplitType::Equip].Slots.Num() != EquipSlots.Num())
 		{
+			LeftEquipContent->ClearChildren();
+			RightEquipContent->ClearChildren();
+			UISlotDatas[ESlotSplitType::Equip].Slots.Empty();
 			for(int32 i = 0; i < EquipSlots.Num(); i++)
 			{
 				if(UWidgetInventoryEquipSlot* EquipSlot = CreateSubWidget<UWidgetInventoryEquipSlot>({ EquipSlots[i] }, EquipSlotClass))

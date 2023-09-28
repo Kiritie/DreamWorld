@@ -34,13 +34,16 @@ void ADWAbilityModule::OnDestroy()
 void ADWAbilityModule::OnInitialize_Implementation()
 {
 	Super::OnInitialize_Implementation();
-	
-	UAssetModuleBPLibrary::AddEnumMapping(TEXT("/Script/WHFramework.EInteractAction"), TEXT("/Script/WHFramework.EDWInteractAction"));
 }
 
 void ADWAbilityModule::OnPreparatory_Implementation(EPhase InPhase)
 {
 	Super::OnPreparatory_Implementation(InPhase);
+
+	if(PHASEC(InPhase, EPhase::Primary))
+	{
+		UAssetModuleBPLibrary::AddEnumMapping(TEXT("/Script/WHFramework.EInteractAction"), TEXT("/Script/WHFramework.EDWInteractAction"));
+	}
 }
 
 void ADWAbilityModule::OnRefresh_Implementation(float DeltaSeconds)

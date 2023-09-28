@@ -68,8 +68,6 @@ public:
 
 	virtual void DoLookAtTarget(ADWCharacter* InTargetCharacter) override;
 
-	virtual void RefreshEquip(EDWEquipPartType InPartType, const FAbilityItem& InItem) override;
-
 	virtual bool CanInteract(EInteractAction InInteractAction, IInteractionAgentInterface* InInteractionAgent) override;
 
 	virtual void OnEnterInteract(IInteractionAgentInterface* InInteractionAgent) override;
@@ -92,6 +90,10 @@ protected:
 	virtual void MoveUp_Implementation(float InValue) override;
 
 public:
+	virtual void OnAssembleItem(const FAbilityItem& InItem) override;
+
+	virtual void OnDischargeItem(const FAbilityItem& InItem) override;
+	
 	virtual void OnSelectItem(const FAbilityItem& InItem) override;
 	
 	virtual void OnAttributeChange(const FOnAttributeChangeData& InAttributeChangeData) override;

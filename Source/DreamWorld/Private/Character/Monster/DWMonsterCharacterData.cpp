@@ -5,7 +5,6 @@
 UDWMonsterCharacterData::UDWMonsterCharacterData()
 {
 	InventoryData = FInventorySaveData();
-	InventoryData.Items.SetNum(16);
 	InventoryData.SplitItems.Add(ESlotSplitType::Default).Items.SetNum(10);
 	InventoryData.SplitItems.Add(ESlotSplitType::Equip).Items.SetNum(6);
 

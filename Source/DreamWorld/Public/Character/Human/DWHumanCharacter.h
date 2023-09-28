@@ -30,11 +30,13 @@ protected:
 	virtual void OnDespawn_Implementation(bool bRecovery) override;
 
 public:
+	virtual void OnAssembleItem(const FAbilityItem& InItem) override;
+
+	virtual void OnDischargeItem(const FAbilityItem& InItem) override;
+	
 	virtual void OnSelectItem(const FAbilityItem& InItem) override;
 
 	virtual void OnAuxiliaryItem(const FAbilityItem& InItem) override;
-
-	virtual void RefreshEquip(EDWEquipPartType InPartType, const FAbilityItem& InItem) override;
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)

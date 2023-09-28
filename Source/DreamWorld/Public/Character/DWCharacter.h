@@ -186,9 +186,6 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual void UnDefend();
 
-	UFUNCTION(BlueprintCallable)
-	virtual void RefreshEquip(EDWEquipPartType InPartType, const FAbilityItem& InItem);
-
 	virtual bool OnPickUp_Implementation(AAbilityPickUpBase* InPickUp) override;
 
 	virtual bool OnGenerateVoxel(const FVoxelHitResult& InVoxelHitResult) override;

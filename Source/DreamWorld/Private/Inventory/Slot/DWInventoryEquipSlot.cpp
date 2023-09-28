@@ -11,16 +11,11 @@ UDWInventoryEquipSlot::UDWInventoryEquipSlot()
 {
 }
 
-void UDWInventoryEquipSlot::OnInitialize(UAbilityInventoryBase* InInventory, FAbilityItem InItem, EAbilityItemType InLimitType /* = EAbilityItemType::None */, ESlotSplitType InSplitType /*= ESlotSplitType::Default*/)
+void UDWInventoryEquipSlot::OnInitialize(UAbilityInventoryBase* InInventory, EAbilityItemType InLimitType, ESlotSplitType InSplitType, int32 InSlotIndex)
 {
-	Super::OnInitialize(InInventory, InItem, InLimitType, InSplitType);
-}
+	Super::OnInitialize(InInventory, InLimitType, InSplitType, InSlotIndex);
 
-void UDWInventoryEquipSlot::OnInitialize(UAbilityInventoryBase* InInventory, FAbilityItem InItem, EAbilityItemType InLimitType, ESlotSplitType InSplitType, int32 InPartType)
-{
-	Super::OnInitialize(InInventory, InItem, InLimitType, InSplitType, InPartType);
-
-	PartType = (EDWEquipPartType)InPartType;
+	PartType = (EDWEquipPartType)InSlotIndex;
 }
 
 void UDWInventoryEquipSlot::OnSpawn_Implementation(const TArray<FParameter>& InParams)
@@ -28,7 +23,7 @@ void UDWInventoryEquipSlot::OnSpawn_Implementation(const TArray<FParameter>& InP
 	Super::OnSpawn_Implementation(InParams);
 }
 
-void UDWInventoryEquipSlot::OnDespawn_Implementation(bool bRecovery)
+void UDWInventoryEquipSlot::OnDespawn_Implementation(bool bRecovery) 
 {
 	Super::OnDespawn_Implementation(bRecovery);
 
@@ -43,11 +38,6 @@ bool UDWInventoryEquipSlot::CheckSlot(FAbilityItem& InItem) const
 void UDWInventoryEquipSlot::Refresh()
 {
 	Super::Refresh();
-
-	if (ADWCharacter* Character = GetInventory()->GetOwnerAgent<ADWCharacter>())
-	{
-		Character->RefreshEquip(PartType, Item);
-	}
 }
 
 void UDWInventoryEquipSlot::OnItemPreChange(FAbilityItem& InNewItem)

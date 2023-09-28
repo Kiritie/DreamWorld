@@ -22,7 +22,6 @@
 #include "Ability/Item/Equip/AbilityEquipDataBase.h"
 #include "Ability/Item/Prop/AbilityPropDataBase.h"
 #include "Ability/Item/Skill/AbilitySkillDataBase.h"
-#include "Ability/AbilityModuleBPLibrary.h"
 #include "Ability/AbilityModuleTypes.h"
 #include "Ability/Character/AbilityCharacterInventoryBase.h"
 #include "Camera/CameraModuleBPLibrary.h"
@@ -47,9 +46,9 @@
 #include "Widget/World/WorldWidgetComponent.h"
 #include "Widget/WidgetContextBox.h"
 #include "Ability/Item/Raw/AbilityRawDataBase.h"
-#include "Character/Player/DWPlayerCharacterData.h"
 #include "Common/Targeting/TargetingComponent.h"
 #include "Gameplay/WHGameInstance.h"
+#include "Item/Equip/DWEquipData.h"
 #include "Vitality/DWVitality.h"
 #include "Voxel/Voxels/VoxelInteract.h"
 #include "Voxel/Voxels/Auxiliary/VoxelAuxiliary.h"
@@ -145,60 +144,53 @@ void ADWPlayerCharacter::LoadData(FSaveData* InSaveData, EPhase InPhase)
 		{
 			switch (SaveData.InventoryInitType)
 			{
-				case EDWPlayerInventoryInitType::Default:
-				{
-					SaveData.InventoryData = GetCharacterData<UDWPlayerCharacterData>().InventoryData;
-					break;
-				}
 				case EDWPlayerInventoryInitType::Empty:
 				{
-					SaveData.InventoryData = GetCharacterData<UDWPlayerCharacterData>().InventoryData;
 					SaveData.InventoryData.ClearAllItem();
 					break;
 				}
 				case EDWPlayerInventoryInitType::All:
 				{
-					SaveData.InventoryData = GetCharacterData<UDWPlayerCharacterData>().InventoryData;
-
-					auto VoxelDatas = UAssetModuleBPLibrary::LoadPrimaryAssets<UVoxelData>(UAbilityModuleBPLibrary::ItemTypeToAssetType(EAbilityItemType::Voxel));
+					auto VoxelDatas = UAssetModuleBPLibrary::LoadPrimaryAssets<UVoxelData>(FName("Voxel"));
 					for (int32 i = 0; i < VoxelDatas.Num(); i++)
 					{
 						if(VoxelDatas[i]->VoxelType != EVoxelType::Empty && VoxelDatas[i]->VoxelType != EVoxelType::Unknown && VoxelDatas[i]->bMainPart)
 						{
 							FAbilityItem tmpItem = FAbilityItem(VoxelDatas[i]->GetPrimaryAssetId(), VoxelDatas[i]->MaxCount);
-							SaveData.InventoryData.AddItem(tmpItem);
+							SaveData.InventoryData.AddItem(tmpItem, { ESlotSplitType::Default, ESlotSplitType::Shortcut });
 						}
 					}
 	
-					auto RawDatas = UAssetModuleBPLibrary::LoadPrimaryAssets<UAbilityRawDataBase>(UAbilityModuleBPLibrary::ItemTypeToAssetType(EAbilityItemType::Raw));
+					auto RawDatas = UAssetModuleBPLibrary::LoadPrimaryAssets<UAbilityRawDataBase>(FName("Raw"));
 					for (int32 i = 0; i < RawDatas.Num(); i++)
 					{
 						FAbilityItem tmpItem = FAbilityItem(RawDatas[i]->GetPrimaryAssetId(), RawDatas[i]->MaxCount);
-						SaveData.InventoryData.AddItem(tmpItem);
+						SaveData.InventoryData.AddItem(tmpItem, { ESlotSplitType::Default, ESlotSplitType::Shortcut });
 					}
 	
-					auto EquipDatas = UAssetModuleBPLibrary::LoadPrimaryAssets<UAbilityEquipDataBase>(UAbilityModuleBPLibrary::ItemTypeToAssetType(EAbilityItemType::Equip));
+					auto EquipDatas = UAssetModuleBPLibrary::LoadPrimaryAssets<UAbilityEquipDataBase>(FName("Equip"));
 					for (int32 i = 0; i < EquipDatas.Num(); i++)
 					{
 						FAbilityItem tmpItem = FAbilityItem(EquipDatas[i]->GetPrimaryAssetId(), EquipDatas[i]->MaxCount);
-						SaveData.InventoryData.AddItem(tmpItem);
+						SaveData.InventoryData.AddItem(tmpItem, { ESlotSplitType::Default, ESlotSplitType::Shortcut });
 					}
 		
-					auto PropDatas = UAssetModuleBPLibrary::LoadPrimaryAssets<UAbilityPropDataBase>(UAbilityModuleBPLibrary::ItemTypeToAssetType(EAbilityItemType::Prop));
+					auto PropDatas = UAssetModuleBPLibrary::LoadPrimaryAssets<UAbilityPropDataBase>(FName("Prop"));
 					for (int32 i = 0; i < PropDatas.Num(); i++)
 					{
 						FAbilityItem tmpItem = FAbilityItem(PropDatas[i]->GetPrimaryAssetId(), PropDatas[i]->MaxCount);
-						SaveData.InventoryData.AddItem(tmpItem);
+						SaveData.InventoryData.AddItem(tmpItem, { ESlotSplitType::Default, ESlotSplitType::Shortcut });
 					}
 
-					auto SkillDatas = UAssetModuleBPLibrary::LoadPrimaryAssets<UAbilitySkillDataBase>(UAbilityModuleBPLibrary::ItemTypeToAssetType(EAbilityItemType::Skill));
+					auto SkillDatas = UAssetModuleBPLibrary::LoadPrimaryAssets<UAbilitySkillDataBase>(FName("Skill"));
 					for (int32 i = 0; i < SkillDatas.Num(); i++)
 					{
 						FAbilityItem tmpItem = FAbilityItem(SkillDatas[i]->GetPrimaryAssetId(), SkillDatas[i]->MaxCount);
-						SaveData.InventoryData.AddItem(tmpItem);
+						SaveData.InventoryData.AddItem(tmpItem, { ESlotSplitType::Default, ESlotSplitType::Shortcut });
 					}
 					break;
 				}
+				default: break;
 			}
 		}
 	}
@@ -306,26 +298,6 @@ void ADWPlayerCharacter::OnTargetLockedOff(AActor* InTargetActor)
 void ADWPlayerCharacter::OnTargetSetRotation(AActor* InTargetActor, FRotator InControlRotation)
 {
 	UCameraModuleBPLibrary::SetCameraRotation(InControlRotation.Yaw, InControlRotation.Pitch);
-}
-
-void ADWPlayerCharacter::RefreshEquip(EDWEquipPartType InPartType, const FAbilityItem& InItem)
-{
-	if(InItem.IsValid())
-	{
-		Super::RefreshEquip(InPartType, InItem);
-		if(GetEquip(InPartType))
-		{
-			PreviewCapture->ShowOnlyActors.Add(GetEquip(InPartType));
-		}
-	}
-	else
-	{
-		if(GetEquip(InPartType))
-		{
-			PreviewCapture->ShowOnlyActors.Remove(GetEquip(InPartType));
-		}
-		Super::RefreshEquip(InPartType, InItem);
-	}
 }
 
 bool ADWPlayerCharacter::CanInteract(EInteractAction InInteractAction, IInteractionAgentInterface* InInteractionAgent)
@@ -491,6 +463,46 @@ void ADWPlayerCharacter::MoveUp_Implementation(float InValue)
 		const FRotator YawRotation(0, Rotation.Yaw, 0);
 		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
 		AddMovementInput(FVector(Direction.X * 0.2f, Direction.Y * 0.2f, 0.5f * InValue), 1.f);
+	}
+}
+
+void ADWPlayerCharacter::OnAssembleItem(const FAbilityItem& InItem)
+{
+	Super::OnAssembleItem(InItem);
+
+	const auto& ItemData = InItem.GetData<UAbilityItemDataBase>();
+	switch(ItemData.GetItemType())
+	{
+		case EAbilityItemType::Equip:
+		{
+			const auto& EquipData = InItem.GetData<UDWEquipData>();
+			if(AAbilityEquipBase* Equip = GetEquip(EquipData.PartType))
+			{
+				PreviewCapture->ShowOnlyActors.Add(Equip);
+			}
+			break;
+		}
+		default: break;
+	}
+}
+
+void ADWPlayerCharacter::OnDischargeItem(const FAbilityItem& InItem)
+{
+	Super::OnDischargeItem(InItem);
+
+	const auto& ItemData = InItem.GetData<UAbilityItemDataBase>();
+	switch(ItemData.GetItemType())
+	{
+		case EAbilityItemType::Equip:
+		{
+			const auto& EquipData = InItem.GetData<UDWEquipData>();
+			if(AAbilityEquipBase* Equip = GetEquip(EquipData.PartType))
+			{
+				PreviewCapture->ShowOnlyActors.Remove(Equip);
+			}
+			break;
+		}
+		default: break;
 	}
 }
 

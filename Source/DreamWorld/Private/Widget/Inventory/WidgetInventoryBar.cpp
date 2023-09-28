@@ -86,8 +86,10 @@ void UWidgetInventoryBar::OnInitialize_Implementation(UObject* InOwner)
 	if(AuxiliaryContent && UISlotDatas.Contains(ESlotSplitType::Auxiliary))
 	{
 		const auto AuxiliarySlots = GetInventory()->GetSlotsBySplitType(ESlotSplitType::Auxiliary);
-		if(UISlotDatas[ESlotSplitType::Auxiliary].Slots.Num() == 0)
+		if(UISlotDatas[ESlotSplitType::Auxiliary].Slots.Num() != AuxiliarySlots.Num())
 		{
+			AuxiliaryContent->ClearChildren();
+			UISlotDatas[ESlotSplitType::Auxiliary].Slots.Empty();
 			for(int32 i = 0; i < AuxiliarySlots.Num(); i++)
 			{
 				if(UWidgetInventoryAuxiliarySlot* AuxiliarySlot = CreateSubWidget<UWidgetInventoryAuxiliarySlot>({ AuxiliarySlots[i] }, AuxiliarySlotClass))
@@ -114,8 +116,11 @@ void UWidgetInventoryBar::OnInitialize_Implementation(UObject* InOwner)
 	if(LeftSkillContent && RightSkillContent && UISlotDatas.Contains(ESlotSplitType::Skill))
 	{
 		const auto SkillSlots = GetInventory()->GetSlotsBySplitType(ESlotSplitType::Skill);
-		if(UISlotDatas[ESlotSplitType::Skill].Slots.Num() == 0)
+		if(UISlotDatas[ESlotSplitType::Skill].Slots.Num() != SkillSlots.Num())
 		{
+			LeftSkillContent->ClearChildren();
+			RightSkillContent->ClearChildren();
+			UISlotDatas[ESlotSplitType::Skill].Slots.Empty();
 			for(int32 i = 0; i < SkillSlots.Num(); i++)
 			{
 				if(UWidgetInventorySkillSlot* SkillSlot = CreateSubWidget<UWidgetInventorySkillSlot>({ SkillSlots[i] }, SkillSlotClass))

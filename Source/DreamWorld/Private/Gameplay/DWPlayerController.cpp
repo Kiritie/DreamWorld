@@ -76,6 +76,7 @@ void ADWPlayerController::LoadData(FSaveData* InSaveData, EPhase InPhase)
 	{
 		if(PlayerCharacter)
 		{
+			SaveData.InventoryData = SaveData.GetItemData<UDWCharacterData>().InventoryData;
 			PlayerCharacter->LoadSaveData(&SaveData, InPhase);
 		}
 	}

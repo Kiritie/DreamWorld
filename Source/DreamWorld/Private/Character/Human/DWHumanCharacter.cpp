@@ -14,6 +14,7 @@
 #include "Ability/Item/Equip/AbilityEquipBase.h"
 #include "Ability/Item/Equip/AbilityEquipDataBase.h"
 #include "Common/Interaction/InteractionComponent.h"
+#include "Item/Equip/DWEquipData.h"
 #include "Voxel/Datas/VoxelData.h"
 
 ADWHumanCharacter::ADWHumanCharacter()
@@ -47,6 +48,51 @@ void ADWHumanCharacter::OnDespawn_Implementation(bool bRecovery)
 	UObjectPoolModuleBPLibrary::DespawnObject(AuxiliaryVoxelEntity);
 	GenerateVoxelEntity = nullptr;
 	AuxiliaryVoxelEntity = nullptr;
+}
+
+void ADWHumanCharacter::OnAssembleItem(const FAbilityItem& InItem)
+{
+	Super::OnAssembleItem(InItem);
+
+	const auto& ItemData = InItem.GetData<UAbilityItemDataBase>();
+	switch(ItemData.GetItemType())
+	{
+		case EAbilityItemType::Equip:
+		{
+			const auto& EquipData = InItem.GetData<UDWEquipData>();
+			if(AAbilityEquipBase* Equip = UObjectPoolModuleBPLibrary::SpawnObject<AAbilityEquipBase>(nullptr, InItem.GetData<UAbilityEquipDataBase>().EquipClass))
+			{
+				Equip->Initialize(this, InItem);
+				Equip->OnAssemble();
+				Equip->Execute_SetActorVisible(Equip, Execute_IsVisible(this) && ControlMode == EDWCharacterControlMode::Fighting);
+				Equips.Emplace(EquipData.PartType, Equip);
+			}
+			break;
+		}
+		default: break;
+	}
+}
+
+void ADWHumanCharacter::OnDischargeItem(const FAbilityItem& InItem)
+{
+	Super::OnDischargeItem(InItem);
+
+	const auto& ItemData = InItem.GetData<UAbilityItemDataBase>();
+	switch(ItemData.GetItemType())
+	{
+		case EAbilityItemType::Equip:
+		{
+			const auto& EquipData = InItem.GetData<UDWEquipData>();
+			if(AAbilityEquipBase* Equip = GetEquip(EquipData.PartType))
+			{
+				Equip->OnDischarge();
+				UObjectPoolModuleBPLibrary::DespawnObject(Equip);
+				Equips.Emplace(EquipData.PartType, nullptr);
+			}
+			break;
+		}
+		default: break;
+	}
 }
 
 void ADWHumanCharacter::OnSelectItem(const FAbilityItem& InItem)
@@ -95,34 +141,6 @@ void ADWHumanCharacter::OnAuxiliaryItem(const FAbilityItem& InItem)
 		AuxiliaryVoxelEntity->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 		UObjectPoolModuleBPLibrary::DespawnObject(AuxiliaryVoxelEntity);
 		AuxiliaryVoxelEntity = nullptr;
-	}
-}
-
-void ADWHumanCharacter::RefreshEquip(EDWEquipPartType InPartType, const FAbilityItem& InItem)
-{
-	AAbilityEquipBase* Equip = GetEquip(InPartType);
-	if (InItem.IsValid())
-	{
-		if(Equip && !Equip->GetItemData().EqualID(InItem.ID))
-		{
-			Equip->OnDischarge();
-			UObjectPoolModuleBPLibrary::DespawnObject(Equip);
-			Equip = nullptr;
-		}
-		if(!Equip)
-		{
-			Equip = UObjectPoolModuleBPLibrary::SpawnObject<AAbilityEquipBase>(nullptr, InItem.GetData<UAbilityEquipDataBase>().EquipClass);
-			Equip->Initialize(this, InItem);
-			Equip->OnAssemble();
-			Equip->Execute_SetActorVisible(Equip, Execute_IsVisible(this) && ControlMode == EDWCharacterControlMode::Fighting);
-			Equips.Emplace(InPartType, Equip);
-		}
-	}
-	else if(Equip)
-	{
-		Equip->OnDischarge();
-		UObjectPoolModuleBPLibrary::DespawnObject(Equip);
-		Equips.Remove(InPartType);
 	}
 }
 

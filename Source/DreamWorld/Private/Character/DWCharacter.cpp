@@ -269,12 +269,12 @@ void ADWCharacter::LoadData(FSaveData* InSaveData, EPhase InPhase)
 	{
 		if(!SaveData.IsSaved() && !IsPlayer())
 		{
-			auto EquipDatas = UAssetModuleBPLibrary::LoadPrimaryAssets<UAbilityEquipDataBase>(UAbilityModuleBPLibrary::ItemTypeToAssetType(EAbilityItemType::Equip));
+			auto EquipDatas = UAssetModuleBPLibrary::LoadPrimaryAssets<UAbilityEquipDataBase>(FName("Equip"));
 			const int32 EquipNum = FMath::Clamp(FMath::Rand() < 0.2f ? FMath::RandRange(1, 3) : 0, 0, EquipDatas.Num());
 			for (int32 i = 0; i < EquipNum; i++)
 			{
 				FAbilityItem tmpItem = FAbilityItem(EquipDatas[FMath::RandRange(0, EquipDatas.Num() - 1)]->GetPrimaryAssetId(), 1);
-				SaveData.InventoryData.AddItem(tmpItem);
+				SaveData.InventoryData.AddItem(tmpItem, { ESlotSplitType::Default });
 			}
 		}
 	}
@@ -383,7 +383,8 @@ void ADWCharacter::OnActiveItem(const FAbilityItem& InItem, bool bPassive, bool 
 		}
 		else if(IsPlayer())
 		{
-			UWidgetModuleBPLibrary::OpenUserWidget<UWidgetItemInfoBox>({ FString::Printf(TEXT("该%s还未准备好！"), *UCommonBPLibrary::GetEnumValueDisplayName(TEXT("/Script/WHFramework.EAbilityItemType"), (int32)InItem.GetType()).ToString()) });
+			UWidgetModuleBPLibrary::OpenUserWidget<UWidgetItemInfoBox>({ FString::Printf(TEXT("该%s还未准备好！"),
+				*UCommonBPLibrary::GetEnumValueDisplayName(TEXT("/Script/WHFramework.EAbilityItemType"), (int32)InItem.GetType()).ToString()) });
 		}
 	}
 }
@@ -690,10 +691,6 @@ void ADWCharacter::UnDefend()
 	{
 		FSM->SwitchState(nullptr);
 	}
-}
-
-void ADWCharacter::RefreshEquip(EDWEquipPartType InPartType, const FAbilityItem& InItem)
-{
 }
 
 bool ADWCharacter::OnPickUp_Implementation(AAbilityPickUpBase* InPickUp)
