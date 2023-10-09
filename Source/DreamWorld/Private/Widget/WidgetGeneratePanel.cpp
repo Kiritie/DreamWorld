@@ -17,6 +17,7 @@
 #include "Components/Button.h"
 #include "Ability/Inventory/AbilityInventoryBase.h"
 #include "Character/DWCharacter.h"
+#include "Character/Player/DWPlayerCharacter.h"
 #include "Gameplay/WHGameInstance.h"
 #include "Voxel/Voxels/Auxiliary/VoxelInteractAuxiliary.h"
 
@@ -71,12 +72,9 @@ void UWidgetGeneratePanel::OnOpen_Implementation(const TArray<FParameter>& InPar
 
 	FPrimaryAssetId GenerateToolID = FPrimaryAssetId();
 
-	if(InParams.IsValidIndex(0))
+	if(AVoxelInteractAuxiliary* InteractionAgent = GetOwnerObject<ADWPlayerCharacter>()->GetInteractingAgent<AVoxelInteractAuxiliary>())
 	{
-		if(AVoxelInteractAuxiliary* InteractionAgent = InParams[0].GetObjectValue<AVoxelInteractAuxiliary>())
-		{
-			GenerateToolID = InteractionAgent->GetVoxelItem().ID;
-		}
+		GenerateToolID = InteractionAgent->GetVoxelItem().ID;
 	}
 
 	TArray<FDWGenerateItemData> GenerateItemDatas;
@@ -110,13 +108,6 @@ void UWidgetGeneratePanel::OnClose_Implementation(bool bInstant)
 {
 	Super::OnClose_Implementation(bInstant);
 
-	if(WidgetParams.IsValidIndex(0))
-	{
-		if(AVoxelInteractAuxiliary* InteractionAgent = WidgetParams[0].GetObjectValue<AVoxelInteractAuxiliary>())
-		{
-			GetOwnerObject<IInteractionAgentInterface>()->DoInteract((EInteractAction)EVoxelInteractAction::Close, InteractionAgent);
-		}
-	}
 	PreviewGenerateRawDataIndex = 0;
 	SelectedGenerateRawData = FDWGenerateRawData();
 }

@@ -245,6 +245,15 @@ void ADWPlayerCharacter::DoLookAtTarget(ADWCharacter* InTargetCharacter)
 	}
 }
 
+void ADWPlayerCharacter::ChangeHand()
+{
+	TArray<UAbilityInventorySlot*> AuxiliarySlots = Inventory->GetSlotsBySplitType(ESlotSplitType::Auxiliary);
+	if(AuxiliarySlots.Num() > 0 && Inventory->GetSelectedSlot())
+	{
+		AuxiliarySlots[0]->Replace(Inventory->GetSelectedSlot());
+	}
+}
+
 FString ADWPlayerCharacter::GetHeadInfo() const
 {
 	return FString::Printf(TEXT("Lv.%d \"%s\" (Exp: %d/%d)"), Level, *Name.ToString(), (int32)GetExp(), (int32)GetMaxExp());
@@ -322,7 +331,7 @@ void ADWPlayerCharacter::OnEnterInteract(IInteractionAgentInterface* InInteracti
 
 	if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>())
 	{
-		UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>()->ShowInteractActions(GetInteractableActions(InInteractionAgent));
+		UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>()->ShowInteractActions(GetInteractableActions());
 	}
 }
 
@@ -330,7 +339,7 @@ void ADWPlayerCharacter::OnLeaveInteract(IInteractionAgentInterface* InInteracti
 {
 	Super::OnLeaveInteract(InInteractionAgent);
 
-	if(GetInteractingAgent() == InInteractionAgent && UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>())
+	if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>())
 	{
 		UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>()->HideInteractActions();
 	}
@@ -352,17 +361,35 @@ void ADWPlayerCharacter::OnInteract(EInteractAction InInteractAction, IInteracti
 				{
 					case EVoxelType::Chest:
 					{
-						UWidgetModuleBPLibrary::OpenUserWidget<UWidgetInventoryBox>({ InteractionAgent });
+						UWidgetModuleBPLibrary::OpenUserWidget<UWidgetInventoryBox>();
+						FDelegateHandle DelegateHandle = UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryBox>()->OnClosed.AddLambda([this, InteractionAgent, DelegateHandle](bool bInstant)
+						{
+							DoInteract((EInteractAction)EVoxelInteractAction::Close, InteractionAgent);
+							UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryBox>()->OnClosed.Remove(DelegateHandle);
+						});
 						break;
 					}
 					case EVoxelType::Furnace:
 					case EVoxelType::Crafting_Table:
 					{
-						UWidgetModuleBPLibrary::OpenUserWidget<UWidgetGeneratePanel>({ InteractionAgent });
+						UWidgetModuleBPLibrary::OpenUserWidget<UWidgetGeneratePanel>();
+						FDelegateHandle DelegateHandle = UWidgetModuleBPLibrary::GetUserWidget<UWidgetGeneratePanel>()->OnClosed.AddLambda([this, InteractionAgent, DelegateHandle](bool bInstant)
+						{
+							DoInteract((EInteractAction)EVoxelInteractAction::Close, InteractionAgent);
+							UWidgetModuleBPLibrary::GetUserWidget<UWidgetGeneratePanel>()->OnClosed.Remove(DelegateHandle);
+						});
 						break;
 					}
 					default: break;
 				}
+			}
+			break;
+		}
+		case EVoxelInteractAction::Close:
+		{
+			if(!IsOverlapping(InInteractionAgent))
+			{
+				SetInteractingAgent(nullptr, true);
 			}
 			break;
 		}
@@ -370,51 +397,12 @@ void ADWPlayerCharacter::OnInteract(EInteractAction InInteractAction, IInteracti
 	}
 	if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>())
 	{
-		UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>()->ShowInteractActions(GetInteractableActions(InInteractionAgent));
-	}
-}
-
-void ADWPlayerCharacter::ChangeHand()
-{
-	TArray<UAbilityInventorySlot*> AuxiliarySlots = Inventory->GetSlotsBySplitType(ESlotSplitType::Auxiliary);
-	if(AuxiliarySlots.Num() > 0 && Inventory->GetSelectedSlot())
-	{
-		AuxiliarySlots[0]->Replace(Inventory->GetSelectedSlot());
+		UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>()->ShowInteractActions(GetInteractableActions());
 	}
 }
 
 bool ADWPlayerCharacter::OnInteractVoxel(const FVoxelHitResult& InVoxelHitResult, EInputInteractAction InInteractAction)
 {
-	switch(InInteractAction)
-	{
-		case EInputInteractAction::Action2:
-		{
-			if(AVoxelInteractAuxiliary* InteractionAgent = Cast<AVoxelInteractAuxiliary>(InVoxelHitResult.VoxelItem.Auxiliary))
-			{
-				switch(InteractionAgent->GetVoxelItem().GetVoxelType())
-				{
-					case EVoxelType::Chest:
-					{
-						UWidgetModuleBPLibrary::OpenUserWidget<UWidgetInventoryBox>({ InteractionAgent });
-						break;
-					}
-					case EVoxelType::Furnace:
-					case EVoxelType::Crafting_Table:
-					{
-						UWidgetModuleBPLibrary::OpenUserWidget<UWidgetGeneratePanel>({ InteractionAgent });
-						break;
-					}
-					default: break;
-				}
-				if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>())
-				{
-					UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>()->ShowInteractActions(GetInteractableActions(InteractionAgent));
-				}
-			}
-			break;
-		}
-		default: break;
-	}
 	return Super::OnInteractVoxel(InVoxelHitResult, InInteractAction);
 }
 

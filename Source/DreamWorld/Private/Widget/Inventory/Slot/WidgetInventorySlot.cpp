@@ -110,7 +110,35 @@ FReply UWidgetInventorySlot::NativeOnMouseMove(const FGeometry& InGeometry, cons
 
 FReply UWidgetInventorySlot::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
 {
-	return UWidgetBlueprintLibrary::DetectDragIfPressed(InMouseEvent, this, FKey("LeftMouseButton")).NativeReply;
+	if(InMouseEvent.GetEffectingButton() == FKey("RightMouseButton"))
+	{
+		if(InMouseEvent.IsLeftControlDown())
+		{
+			MoveItem(-1);
+		}
+		else if(InMouseEvent.IsLeftShiftDown())
+		{
+			UseItem(-1);
+		}
+		else
+		{
+			UseItem(1);
+		}
+		return FReply::Handled();
+	}
+	else if(InMouseEvent.GetEffectingButton() == FKey("MiddleMouseButton"))
+	{
+		if(InMouseEvent.IsLeftShiftDown())
+		{
+			DiscardItem(-1);
+		}
+		else
+		{
+			DiscardItem(1);
+		}
+		return FReply::Handled();
+	}
+	return Super::NativeOnMouseButtonDown(InGeometry, InMouseEvent);
 }
 
 void UWidgetInventorySlot::OnCreate_Implementation(UUserWidgetBase* InOwner, const TArray<FParameter>& InParams)

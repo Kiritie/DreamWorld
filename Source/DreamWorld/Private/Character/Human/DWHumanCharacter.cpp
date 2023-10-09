@@ -107,9 +107,6 @@ void ADWHumanCharacter::OnSelectItem(const FAbilityItem& InItem)
 			GenerateVoxelEntity->Execute_SetActorVisible(GenerateVoxelEntity, Execute_IsVisible(this) && ControlMode == EDWCharacterControlMode::Creating);
 			GenerateVoxelEntity->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("GenerateVoxelMesh"));
 			GenerateVoxelEntity->SetActorScale3D(FVector(0.3f));
-			GenerateVoxelEntity->GetMeshComponent()->SetCastShadow(false);
-			GenerateVoxelEntity->GetMeshComponent()->OffsetScale = FVector(0.f, 0.f, 1.f);
-			GenerateVoxelEntity->GetMeshComponent()->CenterOffset = FVector(0.f, 0.f, 0.5f);
 		}
 		GenerateVoxelEntity->LoadSaveData(new FVoxelItem(InItem));
 	}

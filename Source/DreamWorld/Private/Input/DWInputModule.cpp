@@ -16,6 +16,7 @@
 #include "Procedure/Procedure_Pausing.h"
 #include "Procedure/Procedure_Playing.h"
 #include "Voxel/VoxelModuleBPLibrary.h"
+#include "Voxel/Voxels/Auxiliary/VoxelInteractAuxiliary.h"
 #include "Widget/WidgetGeneratePanel.h"
 #include "Widget/WidgetModuleBPLibrary.h"
 #include "Widget/Inventory/WidgetInventoryBar.h"
@@ -504,7 +505,14 @@ void ADWInputModule::OpenGeneratePanel()
 	
 	if(UProcedureModuleBPLibrary::IsCurrentProcedureClass<UProcedure_Playing>())
 	{
-		UWidgetModuleBPLibrary::OpenUserWidget<UWidgetGeneratePanel>();
+		if(AVoxelInteractAuxiliary* InteractionAgent = PlayerCharacter->GetInteractingAgent<AVoxelInteractAuxiliary>())
+		{
+			PlayerCharacter->DoInteract((EInteractAction)EVoxelInteractAction::Open, InteractionAgent);
+		}
+		else
+		{
+			UWidgetModuleBPLibrary::OpenUserWidget<UWidgetGeneratePanel>();
+		}
 	}
 }
 

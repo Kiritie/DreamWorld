@@ -6,6 +6,7 @@
 #include "Ability/Inventory/AbilityInventoryBase.h"
 #include "Ability/Inventory/AbilityInventoryAgentInterface.h"
 #include "Ability/Inventory/Slot/AbilityInventorySlot.h"
+#include "Character/Player/DWPlayerCharacter.h"
 #include "Components/WrapBox.h"
 #include "Components/WrapBoxSlot.h"
 #include "Voxel/Voxels/Auxiliary/VoxelInteractAuxiliary.h"
@@ -68,11 +69,7 @@ void UWidgetInventoryBox::OnOpen_Implementation(const TArray<FParameter>& InPara
 {
 	Super::OnOpen_Implementation(InParams, bInstant);
 
-	UAbilityInventoryBase* TargetInventory = nullptr;
-	if(InParams.IsValidIndex(0))
-	{
-		TargetInventory = InParams[0].GetObjectValue<IAbilityInventoryAgentInterface>()->GetInventory();
-	}
+	UAbilityInventoryBase* TargetInventory = GetOwnerObject<ADWPlayerCharacter>()->GetInteractingAgent<IAbilityInventoryAgentInterface>()->GetInventory();
 
 	if(!TargetInventory) return;
 	
@@ -112,14 +109,6 @@ void UWidgetInventoryBox::OnClose_Implementation(bool bInstant)
 	Super::OnClose_Implementation(bInstant);
 
 	GetInventory()->SetConnectInventory(nullptr);
-
-	if(WidgetParams.IsValidIndex(0))
-	{
-		if(AVoxelInteractAuxiliary* InteractionAgent = WidgetParams[0].GetObjectValue<AVoxelInteractAuxiliary>())
-		{
-			GetOwnerObject<IInteractionAgentInterface>()->DoInteract((EInteractAction)EVoxelInteractAction::Close, InteractionAgent);
-		}
-	}
 }
 
 void UWidgetInventoryBox::OnRefresh_Implementation()

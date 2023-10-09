@@ -48,7 +48,7 @@ void UDWPlayerCharacterState_Death::OnLeave(UFiniteStateBase* InNextFiniteState)
 
 	ADWPlayerCharacter* PlayerCharacter = GetAgent<ADWPlayerCharacter>();
 
-	PlayerCharacter->SetInteractingAgent(nullptr);
+	PlayerCharacter->SetInteractingAgent(nullptr, true);
 	
 	PlayerCharacter->GetInteractionComponent()->SetInteractable(true);
 }
@@ -69,5 +69,5 @@ void UDWPlayerCharacterState_Death::DeathEnd()
 
 	ADWPlayerCharacter* PlayerCharacter = GetAgent<ADWPlayerCharacter>();
 
-	PlayerCharacter->SetInteractingAgent(PlayerCharacter);
+	PlayerCharacter->SetInteractingAgent(PlayerCharacter, true);
 }
