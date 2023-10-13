@@ -2,7 +2,7 @@
 
 #include "Character/DWCharacter.h"
 
-#include "AchievementSubSystem.h"
+#include "Achievement/AchievementModuleBPLibrary.h"
 #include "TimerManager.h"
 #include "Ability/AbilityModuleBPLibrary.h"
 #include "Ability/Components/DWAbilitySystemComponent.h"
@@ -50,7 +50,6 @@
 #include "FSM/Components/FSMComponent.h"
 #include "Ability/Inventory/Slot/AbilityInventorySkillSlot.h"
 #include "Gameplay/WHGameInstance.h"
-#include "Team/DWTeamModule.h"
 #include "Voxel/VoxelModuleBPLibrary.h"
 #include "Widget/Item/WidgetItemInfoBox.h"
 #include "Widget/WidgetModuleBPLibrary.h"
@@ -188,6 +187,22 @@ void ADWCharacter::LoadData(FSaveData* InSaveData, EPhase InPhase)
 {
 	auto& SaveData = InSaveData->CastRef<FDWCharacterSaveData>();
 
+	if(PHASEC(InPhase, EPhase::PrimaryAndLesser))
+	{
+		if(!SaveData.InventoryData.IsSaved() && !IsPlayer())
+		{
+			SaveData.InventoryData = SaveData.GetItemData<UDWCharacterData>().InventoryData;
+
+			auto EquipDatas = UAssetModuleBPLibrary::LoadPrimaryAssets<UAbilityEquipDataBase>(FName("Equip"));
+			const int32 EquipNum = FMath::Clamp(FMath::Rand() < 0.2f ? FMath::RandRange(1, 3) : 0, 0, EquipDatas.Num());
+			for (int32 i = 0; i < EquipNum; i++)
+			{
+				FAbilityItem tmpItem = FAbilityItem(EquipDatas[FMath::RandRange(0, EquipDatas.Num() - 1)]->GetPrimaryAssetId(), 1);
+				SaveData.InventoryData.AddItem(tmpItem, { ESlotSplitType::Default });
+			}
+		}
+	}
+
 	if(PHASEC(InPhase, EPhase::Primary))
 	{
 		SetControlMode(SaveData.ControlMode);
@@ -233,7 +248,7 @@ void ADWCharacter::LoadData(FSaveData* InSaveData, EPhase InPhase)
 			{
 				TArray<FDWCharacterAttackAbilityData> attackAbilities;
 				UAssetModuleBPLibrary::ReadDataTable(CharacterData.AttackAbilityTable, attackAbilities);
-				for(auto Iter : attackAbilities)
+				for(auto& Iter : attackAbilities)
 				{
 					Iter.AbilityHandle = AbilitySystem->K2_GiveAbility(Iter.AbilityClass, Iter.AbilityLevel);
 					if(!AttackAbilities.Contains(Iter.WeaponType)) AttackAbilities.Add(Iter.WeaponType);
@@ -242,7 +257,7 @@ void ADWCharacter::LoadData(FSaveData* InSaveData, EPhase InPhase)
 
 				TArray<FDWCharacterSkillAbilityData> skillAbilities;
 				UAssetModuleBPLibrary::ReadDataTable(CharacterData.SkillAbilityTable, skillAbilities);
-				for(auto Iter : skillAbilities)
+				for(auto& Iter : skillAbilities)
 				{
 					Iter.AbilityHandle = AbilitySystem->K2_GiveAbility(Iter.AbilityClass, Iter.AbilityLevel);
 					SkillAbilities.Add(Iter.AbilityID, Iter);
@@ -250,7 +265,7 @@ void ADWCharacter::LoadData(FSaveData* InSaveData, EPhase InPhase)
 
 				TArray<FDWCharacterActionAbilityData> actionAbilities;
 				UAssetModuleBPLibrary::ReadDataTable(CharacterData.ActionAbilityTable, actionAbilities);
-				for(auto Iter : actionAbilities)
+				for(auto& Iter : actionAbilities)
 				{
 					Iter.AbilityHandle = AbilitySystem->K2_GiveAbility(Iter.AbilityClass, Iter.AbilityLevel);
 					ActionAbilities.Add(Iter.ActionType, Iter);
@@ -262,19 +277,6 @@ void ADWCharacter::LoadData(FSaveData* InSaveData, EPhase InPhase)
 					FallingAttackAbility.AbilityHandle = AbilitySystem->K2_GiveAbility(FallingAttackAbility.AbilityClass, FallingAttackAbility.AbilityLevel);
 				}
 			
-			}
-		}
-	}
-	if(PHASEC(InPhase, EPhase::Final))
-	{
-		if(!SaveData.IsSaved() && !IsPlayer())
-		{
-			auto EquipDatas = UAssetModuleBPLibrary::LoadPrimaryAssets<UAbilityEquipDataBase>(FName("Equip"));
-			const int32 EquipNum = FMath::Clamp(FMath::Rand() < 0.2f ? FMath::RandRange(1, 3) : 0, 0, EquipDatas.Num());
-			for (int32 i = 0; i < EquipNum; i++)
-			{
-				FAbilityItem tmpItem = FAbilityItem(EquipDatas[FMath::RandRange(0, EquipDatas.Num() - 1)]->GetPrimaryAssetId(), 1);
-				SaveData.InventoryData.AddItem(tmpItem, { ESlotSplitType::Default });
 			}
 		}
 	}
@@ -307,9 +309,9 @@ void ADWCharacter::ResetData()
 	SetStamina(GetMaxStamina());
 }
 
-void ADWCharacter::SetActorVisible_Implementation(bool bNewVisible)
+void ADWCharacter::SetActorVisible_Implementation(bool bInVisible)
 {
-	Super::SetActorVisible_Implementation(bNewVisible);
+	Super::SetActorVisible_Implementation(bInVisible);
 
 	SetControlMode(ControlMode);
 }
@@ -693,9 +695,9 @@ void ADWCharacter::UnDefend()
 	}
 }
 
-bool ADWCharacter::OnPickUp_Implementation(AAbilityPickUpBase* InPickUp)
+bool ADWCharacter::OnPickUp(AAbilityPickUpBase* InPickUp)
 {
-	return Super::OnPickUp_Implementation(InPickUp);
+	return Super::OnPickUp(InPickUp);
 }
 
 bool ADWCharacter::OnGenerateVoxel(const FVoxelHitResult& InVoxelHitResult)
@@ -708,7 +710,7 @@ bool ADWCharacter::OnGenerateVoxel(const FVoxelHitResult& InVoxelHitResult)
 		if(Super::OnGenerateVoxel(InVoxelHitResult))
 		{
 			Inventory->RemoveItemByQueryInfo(ItemQueryInfo);
-			UCommonBPLibrary::GetGameInstance()->GetSubsystem<UAchievementSubSystem>()->Unlock(FName("FirstGenerateVoxel"));
+			UAchievementModuleBPLibrary::UnlockAchievement(FName("FirstGenerateVoxel"));
 			return true;
 		}
 	}
@@ -721,7 +723,7 @@ bool ADWCharacter::OnDestroyVoxel(const FVoxelHitResult& InVoxelHitResult)
 	{
 		if(Super::OnDestroyVoxel(InVoxelHitResult))
 		{
-			UCommonBPLibrary::GetGameInstance()->GetSubsystem<UAchievementSubSystem>()->Unlock(FName("FirstDestroyVoxel"));
+			UAchievementModuleBPLibrary::UnlockAchievement(FName("FirstDestroyVoxel"));
 			return true;
 		}
 	}
@@ -733,7 +735,7 @@ bool ADWCharacter::DoAction(EDWCharacterActionType InActionType)
 	if (!HasActionAbility(InActionType)) return false;
 
 	const FDWCharacterActionAbilityData AbilityData = GetActionAbility(InActionType);
-	bool bSuccess = AbilitySystem->TryActivateAbility(AbilityData.AbilityHandle);
+	const bool bSuccess = AbilitySystem->TryActivateAbility(AbilityData.AbilityHandle);
 	const FGameplayAbilitySpec Spec = AbilitySystem->FindAbilitySpecForHandle(AbilityData.AbilityHandle);
 	if(UDWCharacterActionAbility* Ability = Cast<UDWCharacterActionAbility>(Spec.GetPrimaryInstance()))
 	{
@@ -995,15 +997,6 @@ UWidgetCharacterHP* ADWCharacter::GetCharacterHPWidget() const
 	return nullptr;
 }
 
-FDWTeamData* ADWCharacter::GetTeamData() const
-{
-	if(ADWTeamModule* TeamModule = ADWTeamModule::Get())
-	{
-		return TeamModule->GetTeamData(TeamID);
-	}
-	return nullptr;
-}
-
 bool ADWCharacter::IsTargetable_Implementation() const
 {
 	return Super::IsTargetable_Implementation();
@@ -1177,7 +1170,7 @@ FDWCharacterSkillAbilityData ADWCharacter::GetSkillAbility(ESkillType InSkillTyp
 	if(HasSkillAbility(InSkillType, InAbilityIndex, bNeedAssembled))
 	{
 		TArray<FDWCharacterSkillAbilityData> Abilities = TArray<FDWCharacterSkillAbilityData>();
-		for (auto Iter : SkillAbilities)
+		for (auto& Iter : SkillAbilities)
 		{
 			if(Iter.Value.GetItemData<UAbilitySkillDataBase>().SkillType == InSkillType)
 			{
@@ -1229,16 +1222,6 @@ bool ADWCharacter::RaycastStep(FHitResult& OutHitResult)
 	return UKismetSystemLibrary::LineTraceSingle(this, rayStart, rayEnd, UCommonBPLibrary::GetGameTraceType((ECollisionChannel)EDWGameTraceChannel::Step), false, {}, EDrawDebugTrace::None, OutHitResult, true);
 }
 
-bool ADWCharacter::HasTeam() const
-{
-	return GetTeamData()->IsValid();
-}
-
-bool ADWCharacter::IsTeamMate(ADWCharacter* InTargetCharacter) const
-{
-	return InTargetCharacter->TeamID == TeamID;
-}
-
 bool ADWCharacter::HasAttackAbility(int32 InAbilityIndex) const
 {
 	if(AttackAbilities.Contains(GetWeaponType()))
@@ -1282,84 +1265,10 @@ bool ADWCharacter::HasActionAbility(EDWCharacterActionType InActionType) const
 	return ActionAbilities.Contains(InActionType);
 }
 
-bool ADWCharacter::CreateTeam(const FName& InTeamName /*= MANE_None*/, FString InTeamDetail /*= TEXT("")*/)
+bool ADWCharacter::IsEnemy(IAbilityPawnInterface* InTarget) const
 {
-	if(ADWTeamModule* TeamModule = ADWTeamModule::Get())
-	{
-		return TeamModule->CreateTeam(this, InTeamName, InTeamDetail);
-	}
-	return false;
-}
-
-bool ADWCharacter::DissolveTeam()
-{
-	if(ADWTeamModule* TeamModule = ADWTeamModule::Get())
-	{
-		return TeamModule->DissolveTeam(TeamID, this);
-	}
-	return false;
-}
-
-bool ADWCharacter::JoinTeam(const FName& InTeamID)
-{
-	if(ADWTeamModule* TeamModule = ADWTeamModule::Get())
-	{
-		if(TeamModule->IsExistTeam(InTeamID))
-		{
-			TeamModule->GetTeamData(InTeamID)->AddMember(this);
-			return true;
-		}
-	}
-	return false;
-}
-
-bool ADWCharacter::JoinTeam(ADWCharacter* InTargetCharacter)
-{
-	return JoinTeam(InTargetCharacter->GetTeamID());
-}
-
-bool ADWCharacter::LeaveTeam()
-{
-	if (HasTeam())
-	{
-		GetTeamData()->RemoveMember(this);
-		return true;
-	}
-	return false;
-}
-
-bool ADWCharacter::AddTeamMate(ADWCharacter* InTargetCharacter)
-{
-	if (HasTeam() && GetTeamData()->IsCaptain(this))
-	{
-		GetTeamData()->AddMember(InTargetCharacter);
-		return true;
-	}
-	return false;
-}
-
-bool ADWCharacter::RemoveTeamMate(ADWCharacter* InTargetCharacter)
-{
-	if (HasTeam() && GetTeamData()->IsCaptain(this))
-	{
-		GetTeamData()->RemoveMember(InTargetCharacter);
-		return true;
-	}
-	return false;
-}
-
-TArray<ADWCharacter*> ADWCharacter::GetTeamMates()
-{
-	return GetTeamData()->GetMembers(this);
-}
-
-bool ADWCharacter::IsPlayer(bool bCheckNature) const
-{
-	return !bCheckNature ? UCommonBPLibrary::GetPlayerPawn() == this : GetNature() == EDWCharacterNature::Player;
-}
-
-bool ADWCharacter::IsEnemy(ADWCharacter* InTargetCharacter) const
-{
+	ADWCharacter* TargetCharacter = Cast<ADWCharacter>(InTarget);
+	
 	switch (GetNature())
 	{
 		case EDWCharacterNature::NPC:
@@ -1369,7 +1278,7 @@ bool ADWCharacter::IsEnemy(ADWCharacter* InTargetCharacter) const
 		}
 		default:
 		{
-			switch (InTargetCharacter->GetNature())
+			switch (Cast<ADWCharacter>(InTarget)->GetNature())
 			{
 				case EDWCharacterNature::NPC:
 				case EDWCharacterNature::AIFriendly:
@@ -1381,11 +1290,11 @@ bool ADWCharacter::IsEnemy(ADWCharacter* InTargetCharacter) const
 			break;
 		}
 	}
-	if(IsTeamMate(InTargetCharacter))
+	if(IsTeamMate(TargetCharacter))
 	{
 		return false;
 	}
-	else if(InTargetCharacter->GetRaceID().IsEqual(RaceID))
+	else if(TargetCharacter->GetRaceID().IsEqual(RaceID))
 	{
 		return false;
 	}

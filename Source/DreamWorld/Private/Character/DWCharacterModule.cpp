@@ -67,9 +67,9 @@ FDWPlayerBasicSaveData& ADWCharacterModule::GetPlayerBasicData()
 	PlayerBasicData.RaceID = PlayerRaceData.ID;
 	if(PlayerRaceData.Items.Num() > 0)
 	{
-		PlayerBasicData.ID = PlayerRaceData.Items[0].ID;
+		PlayerBasicData.AssetID = PlayerRaceData.Items[0].ID;
 		PlayerBasicData.Level = PlayerRaceData.Items[0].Level;
 	}
-	PlayerBasicData.InventoryData = UAssetModuleBPLibrary::LoadPrimaryAssetRef<UDWPlayerCharacterData>(PlayerBasicData.ID).InventoryData;
+	PlayerBasicData.InventoryData = UAssetModuleBPLibrary::LoadPrimaryAssetRef<UDWPlayerCharacterData>(PlayerBasicData.AssetID).InventoryData;
 	return PlayerBasicData;
 }

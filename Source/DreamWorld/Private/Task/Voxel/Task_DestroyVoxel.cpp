@@ -73,6 +73,8 @@ void UTask_DestroyVoxel::OnComplete(ETaskExecuteResult InTaskExecuteResult)
 void UTask_DestroyVoxel::OnLeave()
 {
 	Super::OnLeave();
+
+	UEventModuleBPLibrary::UnsubscribeEvent<UEventHandle_DestroyVoxel>(this, FName("OnDestroyVoxel"));
 }
 
 void UTask_DestroyVoxel::Serialize(FArchive& Ar)

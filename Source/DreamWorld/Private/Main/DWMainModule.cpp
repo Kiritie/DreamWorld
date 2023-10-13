@@ -4,6 +4,7 @@
 
 #include "Ability/AbilityModule.h"
 #include "Ability/DWAbilityModule.h"
+#include "Achievement/AchievementModule.h"
 #include "AI/AIModule.h"
 #include "Animation/AnimationModule.h"
 #include "Asset/AssetModule.h"
@@ -37,6 +38,7 @@ ADWMainModule::ADWMainModule()
 	
 	ModuleClasses = TArray<TSubclassOf<AModuleBase>>();
 	ModuleClasses.Add(ADWAbilityModule::StaticClass());
+	ModuleClasses.Add(AAchievementModule::StaticClass());
 	ModuleClasses.Add(AAIModule::StaticClass());
 	ModuleClasses.Add(AAnimationModule::StaticClass());
 	ModuleClasses.Add(AAssetModule::StaticClass());

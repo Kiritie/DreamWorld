@@ -69,7 +69,7 @@ void UWidgetInventoryBox::OnOpen_Implementation(const TArray<FParameter>& InPara
 {
 	Super::OnOpen_Implementation(InParams, bInstant);
 
-	UAbilityInventoryBase* TargetInventory = GetOwnerObject<ADWPlayerCharacter>()->GetInteractingAgent<IAbilityInventoryAgentInterface>()->GetInventory();
+	UAbilityInventoryBase* TargetInventory = InParams.IsValidIndex(0) ? InParams[0].GetObjectValue<IAbilityInventoryAgentInterface>()->GetInventory() : nullptr;
 
 	if(!TargetInventory) return;
 	

@@ -59,7 +59,7 @@ void UDWCharacterAnim::NativeUpdateAnimation(float DeltaSeconds)
 	
 	ADWCharacter* Character = Cast<ADWCharacter>(TryGetPawnOwner());
 
-	if(!Character || !Character->GetAssetID().IsValid() || !UCommonBPLibrary::IsPlaying()) return;
+	if(!Character || !Character->Execute_GetAssetID(Character).IsValid() || !UCommonBPLibrary::IsPlaying()) return;
 
 	bSprinting = Character->IsSprinting();
 	bAttacking = Character->IsAttacking();

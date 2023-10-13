@@ -507,7 +507,20 @@ void ADWInputModule::OpenGeneratePanel()
 	{
 		if(AVoxelInteractAuxiliary* InteractionAgent = PlayerCharacter->GetInteractingAgent<AVoxelInteractAuxiliary>())
 		{
-			PlayerCharacter->DoInteract((EInteractAction)EVoxelInteractAction::Open, InteractionAgent);
+			switch(InteractionAgent->GetVoxelItem().GetVoxelType())
+			{
+				case EVoxelType::Furnace:
+				case EVoxelType::Crafting_Table:
+				{
+					PlayerCharacter->DoInteract((EInteractAction)EVoxelInteractAction::Open, InteractionAgent);
+					break;
+				}
+				default:
+				{
+					UWidgetModuleBPLibrary::OpenUserWidget<UWidgetGeneratePanel>();
+					break;
+				}
+			}
 		}
 		else
 		{

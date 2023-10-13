@@ -164,12 +164,12 @@ void ADWHumanCharacter::SetAttackHitAble(bool bValue)
 {
 	Super::SetAttackHitAble(bValue);
 
-	if(GetWeapon()) GetWeapon()->Execute_SetHitAble(GetWeapon(), bValue);
+	if(GetWeapon()) GetWeapon()->SetHitAble(bValue);
 }
 
 void ADWHumanCharacter::ClearAttackHitTargets()
 {
 	Super::ClearAttackHitTargets();
 
-	if(GetWeapon()) GetWeapon()->Execute_ClearHitTargets(GetWeapon());
+	if(GetWeapon()) GetWeapon()->ClearHitTargets();
 }

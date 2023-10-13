@@ -41,18 +41,6 @@ protected:
 	virtual void OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex) override;
 
 	//////////////////////////////////////////////////////////////////////////
-	// Stats
-protected:
-	UPROPERTY(VisibleAnywhere, Category = "Stats")
-	TArray<ADWCharacter*> Characters;
-
-	UPROPERTY(VisibleAnywhere, Category = "Stats")
-	TArray<ADWVitality*> Vitalitys;
-
-	UPROPERTY(VisibleAnywhere, Category = "Stats")
-	bool bRaceGenerated;
-
-	//////////////////////////////////////////////////////////////////////////
 	// Chunk
 public:
 	virtual void Initialize(FIndex InIndex, int32 InBatch) override;
@@ -63,19 +51,8 @@ public:
 
 	virtual void BuildMesh() override;
 
-	virtual void SpawnActors() override;
+	virtual void LoadSceneActors(FSaveData* InSaveData) override;
 
-	virtual void LoadActors(FSaveData* InSaveData) override;
-
-	virtual void CreateActors() override;
-
-	virtual void DestroyActors() override;
-
-	//////////////////////////////////////////////////////////////////////////
-	// SceneContainer
-public:
-	virtual void AddSceneActor(AActor* InActor) override;
-
-	virtual void RemoveSceneActor(AActor* InActor) override;
+	virtual void SpawnSceneActors() override;
 };
 

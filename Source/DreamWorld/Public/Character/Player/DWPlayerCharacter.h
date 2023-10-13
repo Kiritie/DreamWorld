@@ -109,7 +109,7 @@ public:
 	
 	virtual FString GetHeadInfo() const override;
 
-	virtual void SetActorVisible_Implementation(bool bNewVisible) override;
+	virtual void SetActorVisible_Implementation(bool bInVisible) override;
 		
 	virtual void SetControlMode_Implementation(EDWCharacterControlMode InControlMode) override;
 
@@ -140,8 +140,4 @@ protected:
 public:
 	UFUNCTION(BlueprintPure)
 	virtual UTargetingComponent* GetTargeting() const { return Targeting; }
-
-	virtual UCameraComponent* GetCameraComp_Implementation() override { return FollowCamera; }
-
-	virtual USpringArmComponent* GetCameraBoom_Implementation() override { return CameraBoom; }
 };

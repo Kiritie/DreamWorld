@@ -73,6 +73,8 @@ void UTask_GenerateVoxel::OnComplete(ETaskExecuteResult InTaskExecuteResult)
 void UTask_GenerateVoxel::OnLeave()
 {
 	Super::OnLeave();
+
+	UEventModuleBPLibrary::UnsubscribeEvent<UEventHandle_GenerateVoxel>(this, FName("OnGenerateVoxel"));
 }
 
 void UTask_GenerateVoxel::Serialize(FArchive& Ar)

@@ -11,16 +11,16 @@ ADWSkillRemote::ADWSkillRemote()
 
 }
 
-void ADWSkillRemote::Initialize_Implementation(AAbilityCharacterBase* InOwnerCharacter, const FAbilityItem& InItem)
+void ADWSkillRemote::Initialize_Implementation(AActor* InOwnerActor, const FAbilityItem& InItem)
 {
-	Super::Initialize_Implementation(InOwnerCharacter, InItem);
+	Super::Initialize_Implementation(InOwnerActor, InItem);
 }
 
-void ADWSkillRemote::OnHitTarget_Implementation(AActor* InTarget, const FHitResult& InHitResult)
+void ADWSkillRemote::OnHitTarget(AActor* InTarget, const FHitResult& InHitResult)
 {
 	const FVector HitLocation = GetActorLocation();
 
-	Super::OnHitTarget_Implementation(InTarget, InHitResult);
+	Super::OnHitTarget(InTarget, InHitResult);
 
 	const auto& SkillData = GetItemData<UDWSkillRemoteData>();
 	UAudioModuleBPLibrary::PlaySoundAtLocation(SkillData.AttackHitSound, HitLocation);

@@ -3,11 +3,9 @@
 
 #include "Widget/WidgetGeneratePanel.h"
 
-#include "AchievementSubSystem.h"
 #include "Widget/Inventory/WidgetInventoryBar.h"
 #include "Components/WrapBox.h"
 #include "Components/WrapBoxSlot.h"
-#include "Common/CommonBPLibrary.h"
 #include "Ability/Inventory/Slot/AbilityInventorySlot.h"
 #include "Asset/AssetModuleBPLibrary.h"
 #include "Widget/Inventory/Item/WidgetInventoryGenerateItem.h"
@@ -16,10 +14,8 @@
 #include "Components/ScrollBox.h"
 #include "Components/Button.h"
 #include "Ability/Inventory/AbilityInventoryBase.h"
+#include "Achievement/AchievementModuleBPLibrary.h"
 #include "Character/DWCharacter.h"
-#include "Character/Player/DWPlayerCharacter.h"
-#include "Gameplay/WHGameInstance.h"
-#include "Voxel/Voxels/Auxiliary/VoxelInteractAuxiliary.h"
 
 UWidgetGeneratePanel::UWidgetGeneratePanel(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -70,12 +66,7 @@ void UWidgetGeneratePanel::OnOpen_Implementation(const TArray<FParameter>& InPar
 {
 	Super::OnOpen_Implementation(InParams, bInstant);
 
-	FPrimaryAssetId GenerateToolID = FPrimaryAssetId();
-
-	if(AVoxelInteractAuxiliary* InteractionAgent = GetOwnerObject<ADWPlayerCharacter>()->GetInteractingAgent<AVoxelInteractAuxiliary>())
-	{
-		GenerateToolID = InteractionAgent->GetVoxelItem().ID;
-	}
+	const FPrimaryAssetId GenerateToolID = InParams.IsValidIndex(0) ? InParams[0].GetObjectValue<IPrimaryEntityInterface>()->Execute_GetAssetID(InParams[0].GetObjectValue()) : FPrimaryAssetId();
 
 	TArray<FDWGenerateItemData> GenerateItemDatas;
 	if(GenerateContent && UAssetModuleBPLibrary::ReadDataTable(GenerateItemDatas))
@@ -85,7 +76,7 @@ void UWidgetGeneratePanel::OnOpen_Implementation(const TArray<FParameter>& InPar
 			DestroySubWidget(Iter, true);
 		}
 		GenerateItems.Empty();
-		for(auto Iter : GenerateItemDatas)
+		for(auto& Iter : GenerateItemDatas)
 		{
 			if(Iter.ToolID.IsValid() && Iter.ToolID != GenerateToolID) continue;
 			
@@ -248,7 +239,7 @@ void UWidgetGeneratePanel::OnGenerateButtonClicked()
 		{
 			Cast<ADWCharacter>(OwnerObject)->OnDiscardItem(GenerateItemData.Item, false);
 		}
-		UCommonBPLibrary::GetGameInstance()->GetSubsystem<UAchievementSubSystem>()->Unlock(FName("FirstGenerateItem"));
+		UAchievementModuleBPLibrary::UnlockAchievement(FName("FirstGenerateItem"));
 	}
 }
 

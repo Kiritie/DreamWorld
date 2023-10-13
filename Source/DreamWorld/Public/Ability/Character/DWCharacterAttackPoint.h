@@ -18,11 +18,11 @@ public:
 	UDWCharacterAttackPoint(const FObjectInitializer& ObjectInitializer);
 
 public:
-	virtual bool CanHitTarget_Implementation(AActor* InTarget) override;
+	virtual bool CanHitTarget(AActor* InTarget) const override;
 
-	virtual void OnHitTarget_Implementation(AActor* InTarget, const FHitResult& InHitResult) override;
+	virtual void OnHitTarget(AActor* InTarget, const FHitResult& InHitResult) override;
 	
-	virtual void ClearHitTargets_Implementation() override;
+	virtual void ClearHitTargets() override;
 
-	virtual void SetHitAble_Implementation(bool bValue) override;
+	virtual void SetHitAble(bool bValue) override;
 };

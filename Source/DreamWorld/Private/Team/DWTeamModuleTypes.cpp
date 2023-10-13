@@ -3,27 +3,28 @@
 
 #include "Team/DWTeamModuleTypes.h"
 
-#include "Character/DWCharacter.h"
+#include "Scene/SceneModuleBPLibrary.h"
+#include "Team/Agent/DWTeamAgentInterface.h"
 
-FDWTeamData FDWTeamData::Empty = FDWTeamData();
+FDWTeamSaveData FDWTeamSaveData::Empty = FDWTeamSaveData();
 
-void FDWTeamData::AddMember(ADWCharacter* InMember)
+void FDWTeamSaveData::AddMember(IDWTeamAgentInterface* InMember)
 {
-	if (!Members.Contains(InMember))
+	if (!Members.Contains(InMember->GetActorIDT()))
 	{
 		InMember->SetTeamID(ID);
-		Members.Add(InMember);
+		Members.Add(InMember->GetActorIDT());
 	}
 }
 
-void FDWTeamData::RemoveMember(ADWCharacter* InMember)
+void FDWTeamSaveData::RemoveMember(IDWTeamAgentInterface* InMember)
 {
-	if (Members.Contains(InMember))
+	if (Members.Contains(InMember->GetActorIDT()))
 	{
 		if(!IsCaptain(InMember))
 		{
 			InMember->SetTeamID(TEXT(""));
-			Members.Remove(InMember);
+			Members.Remove(InMember->GetActorIDT());
 		}
 		else
 		{
@@ -32,25 +33,29 @@ void FDWTeamData::RemoveMember(ADWCharacter* InMember)
 	}
 }
 
-void FDWTeamData::DissolveTeam()
+void FDWTeamSaveData::DissolveTeam()
 {
 	for (int i = 0; i < Members.Num(); i++)
 	{
-		if(Members[i] && Members[i]->IsValidLowLevel())
-		{
-			Members[i]->SetTeamID(TEXT(""));
-		}
+		USceneModuleBPLibrary::GetSceneActor<IDWTeamAgentInterface>(Members[i])->SetTeamID(TEXT(""));
 	}
 	Members.Empty();
 }
 
-TArray<ADWCharacter*> FDWTeamData::GetMembers(ADWCharacter* InMember)
+TArray<IDWTeamAgentInterface*> FDWTeamSaveData::GetMembers(IDWTeamAgentInterface* InMember)
 {
-	auto tmpArr = TArray<ADWCharacter*>();
+	auto tmpArr = TArray<IDWTeamAgentInterface*>();
 	for (int i = 0; i < Members.Num(); i++)
 	{
-		if (Members[i] != InMember)
-			tmpArr.Add(Members[i]);
+		if (Members[i] != InMember->GetActorIDT())
+		{
+			tmpArr.Add(USceneModuleBPLibrary::GetSceneActor<IDWTeamAgentInterface>(Members[i]));
+		}
 	}
 	return tmpArr;
+}
+
+bool FDWTeamSaveData::IsCaptain(IDWTeamAgentInterface* InMember) const
+{
+	return !Captain.IsValid() || Captain == InMember->GetActorIDT();
 }

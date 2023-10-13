@@ -60,9 +60,9 @@ void ADWVitality::LoadData(FSaveData* InSaveData, EPhase InPhase)
 {
 	auto& SaveData = InSaveData->CastRef<FDWVitalitySaveData>();
 
-	if(PHASEC(InPhase, EPhase::Final))
+	if(PHASEC(InPhase, EPhase::PrimaryAndLesser))
 	{
-		if(!SaveData.IsSaved())
+		if(!SaveData.InventoryData.IsSaved())
 		{
 			auto PropDatas = UAssetModuleBPLibrary::LoadPrimaryAssets<UAbilityPropDataBase>(FName("Prop"));
 			const int32 PropNum = FMath::Clamp(FMath::Rand() < 0.2f ? FMath::RandRange(1, 3) : 0, 0, PropDatas.Num());

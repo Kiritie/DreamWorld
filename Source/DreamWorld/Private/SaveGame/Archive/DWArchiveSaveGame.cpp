@@ -9,6 +9,7 @@
 #include "Common/CommonBPLibrary.h"
 #include "SaveGame/SaveGameModuleBPLibrary.h"
 #include "Task/DWTaskModule.h"
+#include "Team/DWTeamModule.h"
 #include "Voxel/VoxelModule.h"
 #include "Voxel/DWVoxelModule.h"
 
@@ -44,6 +45,7 @@ void UDWArchiveSaveGame::OnLoad_Implementation(EPhase InPhase)
 	AVoxelModule::Get()->LoadSaveData(&DWArchiveSaveData.WorldData, InPhase);
 	UCommonBPLibrary::GetPlayerController<ADWPlayerController>()->LoadSaveData(&DWArchiveSaveData.PlayerData, InPhase);
 	ADWTaskModule::Get()->LoadSaveData(&DWArchiveSaveData.TaskData, InPhase);
+	ADWTeamModule::Get()->LoadSaveData(&DWArchiveSaveData.TeamData, InPhase);
 }
 
 void UDWArchiveSaveGame::OnUnload_Implementation(EPhase InPhase)
@@ -57,6 +59,7 @@ void UDWArchiveSaveGame::OnUnload_Implementation(EPhase InPhase)
 	ADWVoxelModule::Get()->UnloadSaveData(InPhase);
 	UCommonBPLibrary::GetPlayerController<ADWPlayerController>()->UnloadSaveData(InPhase);
 	ADWTaskModule::Get()->UnloadSaveData(InPhase);
+	ADWTeamModule::Get()->UnloadSaveData(InPhase);
 }
 
 void UDWArchiveSaveGame::OnRefresh_Implementation()
@@ -65,7 +68,8 @@ void UDWArchiveSaveGame::OnRefresh_Implementation()
 
 	DWArchiveSaveData.WorldData = ADWVoxelModule::Get()->GetSaveDataRef<FDWWorldSaveData>(true);
 	DWArchiveSaveData.PlayerData = UCommonBPLibrary::GetPlayerPawn<ADWPlayerCharacter>()->GetSaveDataRef<FDWPlayerSaveData>(true);
-	DWArchiveSaveData.TaskData = ADWTaskModule::Get()->GetSaveDataRef<FDWTaskSaveData>(true);
+	DWArchiveSaveData.TaskData = ADWTaskModule::Get()->GetSaveDataRef<FDWTaskModuleSaveData>(true);
+	DWArchiveSaveData.TeamData = ADWTeamModule::Get()->GetSaveDataRef<FDWTeamModuleSaveData>(true);
 }
 
 void UDWArchiveSaveGame::OnDestroy_Implementation()

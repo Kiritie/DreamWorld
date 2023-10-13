@@ -3,28 +3,28 @@
 
 #include "Item/Equip/DWEquip.h"
 
-#include "Ability/Character/AbilityCharacterBase.h"
 #include "Item/Equip/DWEquipData.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Common/CommonBPLibrary.h"
 #include "Ability/Inventory/AbilityInventoryBase.h"
+#include "Character/DWCharacter.h"
 
 ADWEquip::ADWEquip()
 {
 
 }
 
-void ADWEquip::Initialize_Implementation(AAbilityCharacterBase* InOwnerCharacter, const FAbilityItem& InItem)
+void ADWEquip::Initialize_Implementation(AActor* InOwnerActor, const FAbilityItem& InItem)
 {
-	Super::Initialize_Implementation(InOwnerCharacter, InItem);
+	Super::Initialize_Implementation(InOwnerActor, InItem);
 }
 
 void ADWEquip::OnAssemble_Implementation()
 {
 	Super::OnAssemble_Implementation();
 
-	AttachToComponent(OwnerCharacter->GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, *UCommonBPLibrary::GetEnumValueAuthoredName(TEXT("/Script/DreamWorld.EDWEquipPartType"), (int32)GetItemData<UDWEquipData>().PartType));
+	AttachToComponent(GetOwnerActor<ADWCharacter>()->GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, *UCommonBPLibrary::GetEnumValueAuthoredName(TEXT("/Script/DreamWorld.EDWEquipPartType"), (int32)GetItemData<UDWEquipData>().PartType));
 }
 
 void ADWEquip::OnDischarge_Implementation()

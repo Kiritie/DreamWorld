@@ -3,7 +3,6 @@
 
 #include "Item/Equip/Weapon/DWEquipWeapon.h"
 #include "Components/BoxComponent.h"
-#include "Ability/Character/AbilityCharacterBase.h"
 #include "AbilitySystemBlueprintLibrary.h"
 #include <Ability/Vitality/AbilityVitalityInterface.h>
 #include <Audio/AudioModuleBPLibrary.h>
@@ -26,9 +25,9 @@ ADWEquipWeapon::ADWEquipWeapon()
 
 void ADWEquipWeapon::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if(Execute_CanHitTarget(this, OtherActor))
+	if(CanHitTarget(OtherActor))
 	{
-		Execute_OnHitTarget(this, OtherActor, SweepResult);
+		OnHitTarget(OtherActor, SweepResult);
 	}
 }
 
@@ -36,23 +35,23 @@ void ADWEquipWeapon::OnDespawn_Implementation(bool bRecovery)
 {
 	Super::OnDespawn_Implementation(bRecovery);
 
-	Execute_SetHitAble(this, false);
-	Execute_ClearHitTargets(this);
+	SetHitAble(false);
+	ClearHitTargets();
 }
 
-bool ADWEquipWeapon::CanHitTarget_Implementation(AActor* InTarget)
+bool ADWEquipWeapon::CanHitTarget(AActor* InTarget) const
 {
-	return InTarget != GetOwnerCharacter() && !HitTargets.Contains(InTarget);
+	return InTarget != GetOwnerActor() && !HitTargets.Contains(InTarget);
 }
 
-void ADWEquipWeapon::OnHitTarget_Implementation(AActor* InTarget, const FHitResult& InHitResult)
+void ADWEquipWeapon::OnHitTarget(AActor* InTarget, const FHitResult& InHitResult)
 {
 	HitTargets.Add(InTarget);
 	
 	FGameplayEventData EventData;
-	EventData.Instigator = GetOwnerCharacter();
+	EventData.Instigator = GetOwnerActor();
 	EventData.Target = InTarget;
-	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(GetOwnerCharacter(), FGameplayTag::RequestGameplayTag("Event.Hit.Attack"), EventData);
+	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(GetOwnerActor(), FGameplayTag::RequestGameplayTag("Event.Hit.Attack"), EventData);
 
 	const auto& WeaponData = GetItemData<UDWEquipWeaponData>();
 	const FVector HitLocation = MeshComponent->GetSocketLocation(FName("HitPoint"));
@@ -60,12 +59,12 @@ void ADWEquipWeapon::OnHitTarget_Implementation(AActor* InTarget, const FHitResu
 	UGameplayStatics::SpawnEmitterAtLocation(this, InTarget->Implements<UAbilityVitalityInterface>() ? WeaponData.AttackHitEffect : WeaponData.AttackMissEffect, HitLocation);
 }
 
-void ADWEquipWeapon::ClearHitTargets_Implementation()
+void ADWEquipWeapon::ClearHitTargets()
 {
 	HitTargets.Empty();
 }
 
-void ADWEquipWeapon::SetHitAble_Implementation(bool bValue)
+void ADWEquipWeapon::SetHitAble(bool bValue)
 {
 	BoxComponent->SetGenerateOverlapEvents(bValue);
 }

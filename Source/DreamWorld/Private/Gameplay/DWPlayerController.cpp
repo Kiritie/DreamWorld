@@ -55,7 +55,7 @@ void ADWPlayerController::LoadData(FSaveData* InSaveData, EPhase InPhase)
 		bool bNeedSpawn = true;
 		if(PlayerCharacter)
 		{
-			if(PlayerCharacter->GetAssetID() == SaveData.ID)
+			if(PlayerCharacter->Execute_GetAssetID(PlayerCharacter) == SaveData.AssetID)
 			{
 				bNeedSpawn = false;
 			}
@@ -64,7 +64,7 @@ void ADWPlayerController::LoadData(FSaveData* InSaveData, EPhase InPhase)
 		if(bNeedSpawn)
 		{
 			UnloadData(InPhase);
-			PlayerCharacter = UObjectPoolModuleBPLibrary::SpawnObject<ADWPlayerCharacter>({ &SaveData.ID }, SaveData.GetItemData<UDWCharacterData>().Class);
+			PlayerCharacter = UObjectPoolModuleBPLibrary::SpawnObject<ADWPlayerCharacter>({ &SaveData.ActorID, &SaveData.AssetID }, SaveData.GetItemData<UDWCharacterData>().Class);
 			if(PlayerCharacter)
 			{
 				SetPlayerPawn(PlayerCharacter);
@@ -76,7 +76,6 @@ void ADWPlayerController::LoadData(FSaveData* InSaveData, EPhase InPhase)
 	{
 		if(PlayerCharacter)
 		{
-			SaveData.InventoryData = SaveData.GetItemData<UDWCharacterData>().InventoryData;
 			PlayerCharacter->LoadSaveData(&SaveData, InPhase);
 		}
 	}
@@ -98,7 +97,7 @@ void ADWPlayerController::UnloadData(EPhase InPhase)
 	
 	if(PlayerCharacter)
 	{
-		if(PHASEC(InPhase, EPhase::PrimaryAndFinal))
+		if(PHASEC(InPhase, EPhase::Primary))
 		{
 			UObjectPoolModuleBPLibrary::DespawnObject(PlayerCharacter);
 			SetPlayerPawn(nullptr);

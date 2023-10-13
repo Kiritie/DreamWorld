@@ -3,7 +3,7 @@
 
 #include "Team/DWTeamModule.h"
 
-#include "Character/Player/DWPlayerCharacter.h"
+#include "Team/Agent/DWTeamAgentInterface.h"
 
 IMPLEMENTATION_MODULE(ADWTeamModule)
 
@@ -12,7 +12,7 @@ ADWTeamModule::ADWTeamModule()
 {
 	ModuleName = FName("TeamModule");
 
-	TeamMap = TMap<FName, FDWTeamData>();
+	TeamDatas = TMap<FName, FDWTeamSaveData>();
 }
 
 ADWTeamModule::~ADWTeamModule()
@@ -62,46 +62,74 @@ void ADWTeamModule::OnTermination_Implementation(EPhase InPhase)
 	Super::OnTermination_Implementation(InPhase);
 }
 
-bool ADWTeamModule::IsExistTeam(const FName& InTeamID) const
+void ADWTeamModule::LoadData(FSaveData* InSaveData, EPhase InPhase)
 {
-	return TeamMap.Contains(InTeamID);
+	const auto& SaveData = InSaveData->CastRef<FDWTeamModuleSaveData>();
+
+	if(PHASEC(InPhase, EPhase::Final))
+	{
+		TeamDatas = SaveData.TeamDatas;
+	}
 }
 
-bool ADWTeamModule::CreateTeam(ADWCharacter* InCaptain, FName InTeamName /*= NAME_None*/, FString InTeamDetail /*= TEXT("")*/)
+FSaveData* ADWTeamModule::ToData(bool bRefresh)
+{
+	static FDWTeamModuleSaveData* SaveData;
+	SaveData = new FDWTeamModuleSaveData();
+
+	SaveData->TeamDatas = TeamDatas;
+
+	return SaveData;
+}
+
+void ADWTeamModule::UnloadData(EPhase InPhase)
+{
+	if(PHASEC(InPhase, EPhase::Primary))
+	{
+		TeamDatas.Empty();
+	}
+}
+
+bool ADWTeamModule::IsExistTeam(const FName& InTeamID) const
+{
+	return TeamDatas.Contains(InTeamID);
+}
+
+bool ADWTeamModule::CreateTeam(IDWTeamAgentInterface* InCaptain, FName InTeamName /*= NAME_None*/, FString InTeamDetail /*= TEXT("")*/)
 {
 	if (InCaptain->GetTeamID().IsNone())
 	{
-		auto tmpData = FDWTeamData();
-		tmpData.ID = *FString::Printf(TEXT("Team_%d"), TeamMap.Num());
+		auto tmpData = FDWTeamSaveData();
+		tmpData.ID = *FString::Printf(TEXT("Team_%d"), TeamDatas.Num());
 		if (!IsExistTeam(tmpData.ID))
 		{
-			tmpData.Name = !InTeamName.IsNone() ? InTeamName : *FString::Printf(TEXT("%s Team"), *InCaptain->GetNameC().ToString());
+			tmpData.Name = !InTeamName.IsNone() ? InTeamName : *FString::Printf(TEXT("%s Team"), *InCaptain->GetNameT().ToString());
 			tmpData.Detail = !InTeamDetail.IsEmpty() ? InTeamDetail : tmpData.Name.ToString();
-			tmpData.Captain = InCaptain;
+			tmpData.Captain = InCaptain->GetActorIDT();
 			tmpData.AddMember(InCaptain);
-			TeamMap.Add(tmpData.ID, tmpData);
+			TeamDatas.Add(tmpData.ID, tmpData);
 			return true;
 		}
 	}
 	return false;
 }
 
-bool ADWTeamModule::DissolveTeam(const FName& InTeamID, ADWCharacter* InCaptain)
+bool ADWTeamModule::DissolveTeam(const FName& InTeamID, IDWTeamAgentInterface* InCaptain)
 {
-	if (IsExistTeam(InTeamID) && TeamMap[InTeamID].IsCaptain(InCaptain))
+	if (IsExistTeam(InTeamID) && TeamDatas[InTeamID].IsCaptain(InCaptain))
 	{
-		TeamMap[InTeamID].DissolveTeam();
-		TeamMap.Remove(InTeamID);
+		TeamDatas[InTeamID].DissolveTeam();
+		TeamDatas.Remove(InTeamID);
 		return true;
 	}
 	return false;
 }
 
-FDWTeamData* ADWTeamModule::GetTeamData(const FName& InTeamID)
+FDWTeamSaveData& ADWTeamModule::GetTeamData(const FName& InTeamID)
 {
-	if (TeamMap.Contains(InTeamID))
+	if (TeamDatas.Contains(InTeamID))
 	{
-		return &TeamMap[InTeamID];
+		return TeamDatas[InTeamID];
 	}
-	return &FDWTeamData::Empty;
+	return FDWTeamSaveData::Empty;
 }

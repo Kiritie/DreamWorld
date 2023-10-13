@@ -17,7 +17,7 @@ public:
 	ADWEquip();
 
 public:
-	virtual void Initialize_Implementation(AAbilityCharacterBase* InOwnerCharacter, const FAbilityItem& InItem = FAbilityItem::Empty) override;
+	virtual void Initialize_Implementation(AActor* InOwnerActor, const FAbilityItem& InItem = FAbilityItem::Empty) override;
 
 public:
 	virtual void OnAssemble_Implementation() override;

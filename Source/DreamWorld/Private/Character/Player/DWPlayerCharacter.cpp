@@ -2,7 +2,7 @@
 
 #include "Character/Player/DWPlayerCharacter.h"
 
-#include "AchievementSubSystem.h"
+#include "Achievement/AchievementModuleBPLibrary.h"
 #include "Ability/Character/DWCharacterAttributeSet.h"
 #include "Item/Equip/Weapon/DWEquipWeapon.h"
 #include "Asset/AssetModuleBPLibrary.h"
@@ -46,6 +46,7 @@
 #include "Widget/World/WorldWidgetComponent.h"
 #include "Widget/WidgetContextBox.h"
 #include "Ability/Item/Raw/AbilityRawDataBase.h"
+#include "Character/DWCharacterData.h"
 #include "Common/Targeting/TargetingComponent.h"
 #include "Gameplay/WHGameInstance.h"
 #include "Item/Equip/DWEquipData.h"
@@ -134,14 +135,13 @@ void ADWPlayerCharacter::OnDespawn_Implementation(bool bRecovery)
 void ADWPlayerCharacter::LoadData(FSaveData* InSaveData, EPhase InPhase)
 {
 	auto& SaveData = InSaveData->CastRef<FDWPlayerSaveData>();
-	
-	if(PHASEC(InPhase, EPhase::All))
-	{
-		SetBodyColor(SaveData.BodyColorIndex);
-		SetCapeColor(SaveData.CapeColorIndex);
 
-		if(!SaveData.IsSaved())
+	if(PHASEC(InPhase, EPhase::PrimaryAndLesser))
+	{
+		if(!SaveData.InventoryData.IsSaved())
 		{
+			SaveData.InventoryData = SaveData.GetItemData<UDWCharacterData>().InventoryData;
+
 			switch (SaveData.InventoryInitType)
 			{
 				case EDWPlayerInventoryInitType::Empty:
@@ -160,21 +160,21 @@ void ADWPlayerCharacter::LoadData(FSaveData* InSaveData, EPhase InPhase)
 							SaveData.InventoryData.AddItem(tmpItem, { ESlotSplitType::Default, ESlotSplitType::Shortcut });
 						}
 					}
-	
+
 					auto RawDatas = UAssetModuleBPLibrary::LoadPrimaryAssets<UAbilityRawDataBase>(FName("Raw"));
 					for (int32 i = 0; i < RawDatas.Num(); i++)
 					{
 						FAbilityItem tmpItem = FAbilityItem(RawDatas[i]->GetPrimaryAssetId(), RawDatas[i]->MaxCount);
 						SaveData.InventoryData.AddItem(tmpItem, { ESlotSplitType::Default, ESlotSplitType::Shortcut });
 					}
-	
+
 					auto EquipDatas = UAssetModuleBPLibrary::LoadPrimaryAssets<UAbilityEquipDataBase>(FName("Equip"));
 					for (int32 i = 0; i < EquipDatas.Num(); i++)
 					{
 						FAbilityItem tmpItem = FAbilityItem(EquipDatas[i]->GetPrimaryAssetId(), EquipDatas[i]->MaxCount);
 						SaveData.InventoryData.AddItem(tmpItem, { ESlotSplitType::Default, ESlotSplitType::Shortcut });
 					}
-		
+	
 					auto PropDatas = UAssetModuleBPLibrary::LoadPrimaryAssets<UAbilityPropDataBase>(FName("Prop"));
 					for (int32 i = 0; i < PropDatas.Num(); i++)
 					{
@@ -193,6 +193,12 @@ void ADWPlayerCharacter::LoadData(FSaveData* InSaveData, EPhase InPhase)
 				default: break;
 			}
 		}
+	}
+
+	if(PHASEC(InPhase, EPhase::All))
+	{
+		SetBodyColor(SaveData.BodyColorIndex);
+		SetCapeColor(SaveData.CapeColorIndex);
 	}
 
 	Super::LoadData(InSaveData, InPhase);
@@ -223,11 +229,11 @@ void ADWPlayerCharacter::Kill(IAbilityVitalityInterface* InTarget)
 
 	if(Cast<ADWCharacter>(InTarget))
 	{
-		UCommonBPLibrary::GetGameInstance()->GetSubsystem<UAchievementSubSystem>()->Unlock(FName("FirstKillMonster"));
+		UAchievementModuleBPLibrary::UnlockAchievement(FName("FirstKillMonster"));
 	}
 	else if(Cast<ADWVitality>(InTarget))
 	{
-		UCommonBPLibrary::GetGameInstance()->GetSubsystem<UAchievementSubSystem>()->Unlock(FName("FirstKillVitality"));
+		UAchievementModuleBPLibrary::UnlockAchievement(FName("FirstKillVitality"));
 	}
 }
 
@@ -259,9 +265,9 @@ FString ADWPlayerCharacter::GetHeadInfo() const
 	return FString::Printf(TEXT("Lv.%d \"%s\" (Exp: %d/%d)"), Level, *Name.ToString(), (int32)GetExp(), (int32)GetMaxExp());
 }
 
-void ADWPlayerCharacter::SetActorVisible_Implementation(bool bNewVisible)
+void ADWPlayerCharacter::SetActorVisible_Implementation(bool bInVisible)
 {
-	Super::SetActorVisible_Implementation(bNewVisible);
+	Super::SetActorVisible_Implementation(bInVisible);
 }
 
 void ADWPlayerCharacter::SetControlMode_Implementation(EDWCharacterControlMode InControlMode)
@@ -361,7 +367,7 @@ void ADWPlayerCharacter::OnInteract(EInteractAction InInteractAction, IInteracti
 				{
 					case EVoxelType::Chest:
 					{
-						UWidgetModuleBPLibrary::OpenUserWidget<UWidgetInventoryBox>();
+						UWidgetModuleBPLibrary::OpenUserWidget<UWidgetInventoryBox>({ InteractionAgent });
 						FDelegateHandle DelegateHandle = UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryBox>()->OnClosed.AddLambda([this, InteractionAgent, DelegateHandle](bool bInstant)
 						{
 							DoInteract((EInteractAction)EVoxelInteractAction::Close, InteractionAgent);
@@ -372,7 +378,7 @@ void ADWPlayerCharacter::OnInteract(EInteractAction InInteractAction, IInteracti
 					case EVoxelType::Furnace:
 					case EVoxelType::Crafting_Table:
 					{
-						UWidgetModuleBPLibrary::OpenUserWidget<UWidgetGeneratePanel>();
+						UWidgetModuleBPLibrary::OpenUserWidget<UWidgetGeneratePanel>({ InteractionAgent });
 						FDelegateHandle DelegateHandle = UWidgetModuleBPLibrary::GetUserWidget<UWidgetGeneratePanel>()->OnClosed.AddLambda([this, InteractionAgent, DelegateHandle](bool bInstant)
 						{
 							DoInteract((EInteractAction)EVoxelInteractAction::Close, InteractionAgent);

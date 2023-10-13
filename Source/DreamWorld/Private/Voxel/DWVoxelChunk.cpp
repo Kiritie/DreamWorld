@@ -19,10 +19,6 @@
 // Sets default values
 ADWVoxelChunk::ADWVoxelChunk()
 {
-	Characters = TArray<ADWCharacter*>();
-	Vitalitys = TArray<ADWVitality*>();
-
-	bRaceGenerated = false;
 }
 
 void ADWVoxelChunk::OnSpawn_Implementation(const TArray<FParameter>& InParams)
@@ -33,28 +29,34 @@ void ADWVoxelChunk::OnSpawn_Implementation(const TArray<FParameter>& InParams)
 void ADWVoxelChunk::OnDespawn_Implementation(bool bRecovery)
 {
 	Super::OnDespawn_Implementation(bRecovery);
-	
-	bRaceGenerated = false;
 }
 
 void ADWVoxelChunk::LoadData(FSaveData* InSaveData, EPhase InPhase)
 {
 	Super::LoadData(InSaveData, InPhase);
 }
- 
+
 FSaveData* ADWVoxelChunk::ToData(bool bRefresh)
 {
 	static FDWVoxelChunkSaveData SaveData;
 	SaveData = Super::ToData(bRefresh)->CastRef<FVoxelChunkSaveData>();
 
-	for(auto& Iter : Characters)
+	for(auto& Iter : SceneActorMap)
 	{
-		SaveData.CharacterDatas.Add(Iter->GetSaveDataRef<FDWCharacterSaveData>(bRefresh));
-	}
-
-	for(auto& Iter : Vitalitys)
-	{
-		SaveData.VitalityDatas.Add(Iter->GetSaveDataRef<FDWVitalitySaveData>(bRefresh));
+		if(ADWCharacter* Character = Cast<ADWCharacter>(Iter.Value))
+		{
+			if(!Character->IsPlayer() && !Character->IsDead())
+			{
+				SaveData.CharacterDatas.Add(Character->GetSaveDataRef<FDWCharacterSaveData>(bRefresh));
+			}
+		}
+		if(ADWVitality* Vitality = Cast<ADWVitality>(Iter.Value))
+		{
+			if(!Vitality->IsDead())
+			{
+				SaveData.VitalityDatas.Add(Vitality->GetSaveDataRef<FDWVitalitySaveData>(bRefresh));
+			}
+		}
 	}
 
 	return &SaveData;
@@ -154,32 +156,27 @@ void ADWVoxelChunk::BuildMesh()
 	Super::BuildMesh();
 }
 
-void ADWVoxelChunk::SpawnActors()
+void ADWVoxelChunk::LoadSceneActors(FSaveData* InSaveData)
 {
-	Super::SpawnActors();
-}
-
-void ADWVoxelChunk::LoadActors(FSaveData* InSaveData)
-{
-	Super::LoadActors(InSaveData);
+	Super::LoadSceneActors(InSaveData);
 
 	auto& SaveData = InSaveData->CastRef<FDWVoxelChunkSaveData>();
 	for(auto& Iter : SaveData.VitalityDatas)
 	{
-		UAbilityModuleBPLibrary::SpawnVitality(&Iter, this);
+		UAbilityModuleBPLibrary::SpawnAbilityVitality(&Iter, this);
 	}
 	for(auto& Iter : SaveData.CharacterDatas)
 	{
-		UAbilityModuleBPLibrary::SpawnCharacter(&Iter, this);
+		UAbilityModuleBPLibrary::SpawnAbilityCharacter(&Iter, this);
 	}
 }
 
-void ADWVoxelChunk::CreateActors()
+void ADWVoxelChunk::SpawnSceneActors()
 {
-	Super::CreateActors();
+	Super::SpawnSceneActors();
 
 	const auto& WorldData = AVoxelModule::Get()->GetWorldData();
-	const FVector2D WorldLocation = FVector2D(GetChunkLocation().X + WorldData.GetChunkRealSize().X * 0.5f, GetChunkLocation().Y + WorldData.GetChunkRealSize().Y * 0.5f);
+	const FVector2D WorldLocation = FVector2D(GetChunkLocation().X + WorldData.GetChunkRealSize().X * 0.5f, GetChunkLocation().Y + WorldData.GetChunkRealSize().Y * 0.5f) / WorldData.BlockSize;
 	
 	TArray<FVitalityRaceData> VitalityRaceDatas;
 	if(UAbilityModuleBPLibrary::GetNoiseRaceDatas(WorldLocation, WorldData.WorldSeed, VitalityRaceDatas))
@@ -195,14 +192,14 @@ void ADWVoxelChunk::CreateActors()
 					if(UVoxelModuleBPLibrary::VoxelAgentTraceSingle(Index, VitalityData.Radius, VitalityData.HalfHeight, {}, HitResult, true, 10, false))
 					{
 						auto SaveData = FDWVitalitySaveData();
-						SaveData.ID = VitalityData.GetPrimaryAssetId();
+						SaveData.AssetID = VitalityData.GetPrimaryAssetId();
 						SaveData.Name = *VitalityData.Name.ToString();
 						SaveData.RaceID = RaceData.ID;
 						SaveData.Level = VitalityItem.Level;
 						SaveData.SpawnLocation = HitResult.Location;
 						SaveData.SpawnRotation = FRotator(0.f, FMath::RandRange(0.f, 360.f), 0.f);
 						SaveData.InventoryData = VitalityData.InventoryData;
-						UAbilityModuleBPLibrary::SpawnVitality(&SaveData, this);
+						UAbilityModuleBPLibrary::SpawnAbilityVitality(&SaveData, UVoxelModuleBPLibrary::FindChunkByLocation(SaveData.SpawnLocation));
 					}
 				)
 			}
@@ -223,14 +220,14 @@ void ADWVoxelChunk::CreateActors()
 					if(UVoxelModuleBPLibrary::VoxelAgentTraceSingle(Index, CharacterData.Radius, CharacterData.HalfHeight, {}, HitResult, true, 10, false))
 					{
 						auto SaveData = FDWCharacterSaveData();
-						SaveData.ID = CharacterData.GetPrimaryAssetId();
+						SaveData.AssetID = CharacterData.GetPrimaryAssetId();
 						SaveData.Name = *CharacterData.Name.ToString();
 						SaveData.RaceID = RaceData.ID;
 						SaveData.Level = CharacterItem.Level;
 						SaveData.SpawnLocation = HitResult.Location;
 						SaveData.SpawnRotation = FRotator(0.f, FMath::RandRange(0.f, 360.f), 0.f);
 						SaveData.InventoryData = CharacterData.InventoryData;
-						if(ADWCharacter* Character = Cast<ADWCharacter>(UAbilityModuleBPLibrary::SpawnCharacter(&SaveData, this)))
+						if(ADWCharacter* Character = Cast<ADWCharacter>(UAbilityModuleBPLibrary::SpawnAbilityCharacter(&SaveData, UVoxelModuleBPLibrary::FindChunkByLocation(SaveData.SpawnLocation))))
 						{
 							if(!Captain)
 							{
@@ -247,50 +244,4 @@ void ADWVoxelChunk::CreateActors()
 			}
 		}
 	}
-}
-
-void ADWVoxelChunk::DestroyActors()
-{
-	Super::DestroyActors();
-
-	UObjectPoolModuleBPLibrary::DespawnObjects(Characters);
-	Characters.Empty();
-
-	UObjectPoolModuleBPLibrary::DespawnObjects(Vitalitys);
-	Vitalitys.Empty();
-}
-
-void ADWVoxelChunk::AddSceneActor(AActor* InActor)
-{
-	if(!InActor || !InActor->Implements<USceneActorInterface>() || ISceneActorInterface::Execute_GetContainer(InActor) == this) return;
-
-	if(ADWCharacter* Character = Cast<ADWCharacter>(InActor))
-	{
-		if(!Character->IsPlayer())
-		{
-			Characters.Add(Character);
-		}
-	}
-	else if(ADWVitality* Vitality = Cast<ADWVitality>(InActor))
-	{
-		Vitalitys.Add(Vitality);
-	}
-
-	Super::AddSceneActor(InActor);
-}
-
-void ADWVoxelChunk::RemoveSceneActor(AActor* InActor)
-{
-	if(!InActor || !InActor->Implements<USceneActorInterface>() || ISceneActorInterface::Execute_GetContainer(InActor) != this) return;
-
-	if(ADWCharacter* Character = Cast<ADWCharacter>(InActor))
-	{
-		Characters.Remove(Character);
-	}
-	else if(ADWVitality* Vitality = Cast<ADWVitality>(InActor))
-	{
-		Vitalitys.Remove(Vitality);
-	}
-
-	Super::RemoveSceneActor(InActor);
 }

@@ -7,11 +7,12 @@
 #include "Voxel/VoxelModule.h"
 #include "DWTeamModule.generated.h"
 
+class IDWTeamAgentInterface;
 /**
  * 体素模块
  */
 UCLASS()
-class DREAMWORLD_API ADWTeamModule : public AModuleBase
+class DREAMWORLD_API ADWTeamModule : public AModuleBase, public ISaveDataInterface
 {
 	GENERATED_BODY()
 		
@@ -44,18 +45,25 @@ public:
 
 	virtual void OnTermination_Implementation(EPhase InPhase) override;
 
+protected:
+	virtual void LoadData(FSaveData* InSaveData, EPhase InPhase) override;
+
+	virtual FSaveData* ToData(bool bRefresh) override;
+
+	virtual void UnloadData(EPhase InPhase) override;
+
 	//////////////////////////////////////////////////////////////////////////
 	// Team
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Team")
-	TMap<FName, FDWTeamData> TeamMap;
+	TMap<FName, FDWTeamSaveData> TeamDatas;
 
 public:
 	virtual bool IsExistTeam(const FName& InTeamID) const;
 
-	virtual bool CreateTeam(ADWCharacter* InCaptain, FName InTeamName = NAME_None, FString InTeamDetail = TEXT(""));
+	virtual bool CreateTeam(IDWTeamAgentInterface* InCaptain, FName InTeamName = NAME_None, FString InTeamDetail = TEXT(""));
 
-	virtual bool DissolveTeam(const FName& InTeamID, ADWCharacter* InCaptain = nullptr);
+	virtual bool DissolveTeam(const FName& InTeamID, IDWTeamAgentInterface* InCaptain = nullptr);
 
-	virtual FDWTeamData* GetTeamData(const FName& InTeamID);
+	virtual FDWTeamSaveData& GetTeamData(const FName& InTeamID);
 };

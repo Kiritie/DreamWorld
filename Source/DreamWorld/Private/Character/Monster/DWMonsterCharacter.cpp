@@ -99,7 +99,7 @@ void ADWMonsterCharacter::SetAttackHitAble(bool bValue)
 
 	for(auto Iter : GetAttackPoints())
 	{
-		Iter->Execute_SetHitAble(Iter, bValue);
+		Iter->SetHitAble(bValue);
 	}
 }
 
@@ -109,7 +109,7 @@ void ADWMonsterCharacter::ClearAttackHitTargets()
 
 	for(auto Iter : GetAttackPoints())
 	{
-		Iter->Execute_ClearHitTargets(Iter);
+		Iter->ClearHitTargets();
 	}
 }
 

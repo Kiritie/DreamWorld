@@ -3,13 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "SaveGame/SaveGameModuleTypes.h"
 
 #include "DWTeamModuleTypes.generated.h"
 
-class ADWCharacter;
+class IDWTeamAgentInterface;
 
 USTRUCT(BlueprintType)
-struct DREAMWORLD_API FDWTeamData
+struct DREAMWORLD_API FDWTeamSaveData : public FSaveData
 {
 	GENERATED_BODY()
 
@@ -23,43 +24,64 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString Detail;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	ADWCharacter* Captain;
+	UPROPERTY()
+	FGuid Captain;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TArray<ADWCharacter*> Members;
+	UPROPERTY()
+	TArray<FGuid> Members;
 	
-	static FDWTeamData Empty;
+	static FDWTeamSaveData Empty;
 
-	FORCEINLINE FDWTeamData()
+	FORCEINLINE FDWTeamSaveData()
 	{
 		ID = NAME_None;
 		Name = NAME_None;
 		Detail = TEXT("");
-		Captain = nullptr;
-		Members = TArray<ADWCharacter*>();
 	}
 
-	void AddMember(ADWCharacter* InMember);
+	void AddMember(IDWTeamAgentInterface* InMember);
 
-	void RemoveMember(ADWCharacter* InMember);
+	void RemoveMember(IDWTeamAgentInterface* InMember);
 
 	void DissolveTeam();
 
-	TArray<ADWCharacter*> GetMembers(ADWCharacter* InMember = nullptr);
+	TArray<IDWTeamAgentInterface*> GetMembers(IDWTeamAgentInterface* InMember = nullptr);
 
 	FORCEINLINE int32 GetNumMember() const
 	{
 		return Members.Num();
 	}
 
-	FORCEINLINE bool IsCaptain(ADWCharacter* InMember) const
-	{
-		return Captain == nullptr || Captain == InMember;
-	}
+	FORCEINLINE bool IsCaptain(IDWTeamAgentInterface* InMember) const;
 
-	FORCEINLINE bool IsValid() const
+	FORCEINLINE bool IsValid() const override
 	{
 		return !ID.IsNone();
+	}
+};
+
+USTRUCT(BlueprintType)
+struct DREAMWORLD_API FDWTeamModuleSaveData : public FSaveData
+{
+	GENERATED_BODY()
+
+public:
+	FORCEINLINE FDWTeamModuleSaveData()
+	{
+		TeamDatas = TMap<FName, FDWTeamSaveData>();
+	}
+
+public:
+	UPROPERTY(BlueprintReadOnly)
+	TMap<FName, FDWTeamSaveData> TeamDatas;
+
+public:
+	virtual void MakeSaved() override
+	{
+		Super::MakeSaved();
+		for(auto& Iter : TeamDatas)
+		{
+			Iter.Value.MakeSaved();
+		}
 	}
 };

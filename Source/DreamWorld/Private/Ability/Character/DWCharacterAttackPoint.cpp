@@ -11,14 +11,14 @@ UDWCharacterAttackPoint::UDWCharacterAttackPoint(const FObjectInitializer& Objec
 {
 }
 
-bool UDWCharacterAttackPoint::CanHitTarget_Implementation(AActor* InTarget)
+bool UDWCharacterAttackPoint::CanHitTarget(AActor* InTarget) const
 {
-	return Super::CanHitTarget_Implementation(InTarget);
+	return Super::CanHitTarget(InTarget);
 }
 
-void UDWCharacterAttackPoint::OnHitTarget_Implementation(AActor* InTarget, const FHitResult& InHitResult)
+void UDWCharacterAttackPoint::OnHitTarget(AActor* InTarget, const FHitResult& InHitResult)
 {
-	Super::OnHitTarget_Implementation(InTarget, InHitResult);
+	Super::OnHitTarget(InTarget, InHitResult);
 
 	if(GetOwnerCharacter()->IsA<ADWMonsterCharacter>())
 	{
@@ -29,12 +29,12 @@ void UDWCharacterAttackPoint::OnHitTarget_Implementation(AActor* InTarget, const
 	}
 }
 
-void UDWCharacterAttackPoint::ClearHitTargets_Implementation()
+void UDWCharacterAttackPoint::ClearHitTargets()
 {
-	Super::ClearHitTargets_Implementation();
+	Super::ClearHitTargets();
 }
 
-void UDWCharacterAttackPoint::SetHitAble_Implementation(bool bValue)
+void UDWCharacterAttackPoint::SetHitAble(bool bValue)
 {
-	Super::SetHitAble_Implementation(bValue);
+	Super::SetHitAble(bValue);
 }

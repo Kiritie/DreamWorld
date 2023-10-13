@@ -33,8 +33,7 @@ public class DreamWorld : ModuleRules
 				"GameplayAbilities",
 				"GameplayTags",
 				"GameplayTasks",
-				"ProceduralMeshComponent",
-				"AchievementSystem"
+				"ProceduralMeshComponent"
 			}
 		);
 	}

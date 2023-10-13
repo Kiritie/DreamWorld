@@ -3,7 +3,7 @@
 
 #include "Procedure/Procedure_Playing.h"
 
-#include "AchievementSubSystem.h"
+#include "Achievement/AchievementModuleBPLibrary.h"
 #include "Camera/CameraModule.h"
 #include "Character/Player/DWPlayerCharacter.h"
 #include "Common/CommonBPLibrary.h"
@@ -53,7 +53,7 @@ void UProcedure_Playing::OnEnter(UProcedureBase* InLastProcedure)
 		UWidgetModuleBPLibrary::OpenUserWidget<UWidgetGameHUD>();
 	}
 
-	UCommonBPLibrary::GetGameInstance()->GetSubsystem<UAchievementSubSystem>()->Unlock(FName("FirstPlay"));
+	UAchievementModuleBPLibrary::UnlockAchievement(FName("FirstPlay"));
 }
 
 void UProcedure_Playing::OnRefresh()

@@ -72,7 +72,7 @@ void ADWVoxelModule::OnTermination_Implementation(EPhase InPhase)
 	Super::OnTermination_Implementation(InPhase);
 }
 
-FVoxelWorldSaveData* ADWVoxelModule::NewWorldData(FSaveData* InBasicData) const
+FVoxelModuleSaveData* ADWVoxelModule::NewWorldData(FSaveData* InBasicData) const
 {
 	static FDWWorldSaveData SaveData;
 	SaveData = !InBasicData ? FDWWorldSaveData(WorldBasicData) : InBasicData->CastRef<FDWWorldSaveData>();

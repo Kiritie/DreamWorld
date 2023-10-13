@@ -5,7 +5,7 @@
 #include "Ability/Character/AbilityCharacterBase.h"
 #include "Ability/Character/DWCharacterAttributeSet.h"
 #include "Common/DWCommonTypes.h"
-#include "Team/DWTeamModuleTypes.h"
+#include "Team/Agent/DWTeamAgentInterface.h"
 
 #include "DWCharacter.generated.h"
 
@@ -35,7 +35,7 @@ class AAbilitySkillBase;
  * 角色
  */
 UCLASS()
-class DREAMWORLD_API ADWCharacter : public AAbilityCharacterBase
+class DREAMWORLD_API ADWCharacter : public AAbilityCharacterBase, public IDWTeamAgentInterface
 {
 	GENERATED_UCLASS_BODY()
 
@@ -74,7 +74,7 @@ protected:
 
 	virtual void ResetData() override;
 
-	virtual void SetActorVisible_Implementation(bool bNewVisible) override;
+	virtual void SetActorVisible_Implementation(bool bInVisible) override;
 
 	virtual void RefreshState() override;
 	
@@ -186,7 +186,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual void UnDefend();
 
-	virtual bool OnPickUp_Implementation(AAbilityPickUpBase* InPickUp) override;
+	virtual bool OnPickUp(AAbilityPickUpBase* InPickUp) override;
 
 	virtual bool OnGenerateVoxel(const FVoxelHitResult& InVoxelHitResult) override;
 
@@ -232,12 +232,6 @@ public:
 
 public:
 	UFUNCTION(BlueprintPure)
-	bool HasTeam() const;
-
-	UFUNCTION(BlueprintPure)
-	bool IsTeamMate(ADWCharacter* InTargetCharacter) const;
-
-	UFUNCTION(BlueprintPure)
 	bool HasAttackAbility(int32 InAbilityIndex = 0) const;
 
 	UFUNCTION(BlueprintCallable)
@@ -248,36 +242,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	bool HasActionAbility(EDWCharacterActionType InActionType) const;
 
-	UFUNCTION(BlueprintCallable)
-	bool CreateTeam(const FName& InTeamName = NAME_None, FString InTeamDetail = TEXT(""));
-		
-	UFUNCTION(BlueprintCallable)
-	bool DissolveTeam();
-
-	UFUNCTION(BlueprintCallable)
-	bool JoinTeam(const FName& InTeamID);
-		
-	bool JoinTeam(ADWCharacter* InTargetCharacter);
-
-	UFUNCTION(BlueprintCallable)
-	bool LeaveTeam();
-		
-	UFUNCTION(BlueprintCallable)
-	bool AddTeamMate(ADWCharacter* InTargetCharacter);
-	
-	UFUNCTION(BlueprintCallable)
-	bool RemoveTeamMate(ADWCharacter* InTargetCharacter);
-
-	UFUNCTION(BlueprintCallable)
-	TArray<ADWCharacter*> GetTeamMates();
-
-	UFUNCTION(BlueprintPure)
-	virtual bool IsPlayer(bool bCheckNature = false) const;
-	
-	UFUNCTION(BlueprintPure)
-	virtual bool IsEnemy(ADWCharacter* InTargetCharacter) const;
-
 public:
+	virtual bool IsEnemy(IAbilityPawnInterface* InTarget) const override;
+	
 	UFUNCTION(BlueprintPure)
 	virtual bool IsExhausted() const;
 	
@@ -377,6 +344,10 @@ protected:
 	TMap<EDWCharacterActionType, FDWCharacterActionAbilityData> ActionAbilities;
 
 public:
+	virtual FGuid GetActorIDT() const override { return ActorID; }
+	
+	virtual FName GetNameT() const override { return Name; }
+	
 	virtual void SetNameV(FName InName) override;
 
 	virtual void SetRaceID(FName InRaceID) override;
@@ -395,13 +366,11 @@ public:
 	UFUNCTION(BlueprintPure)
 	UWidgetCharacterHP* GetCharacterHPWidget() const;
 
-	FDWTeamData* GetTeamData() const;
-
 	UFUNCTION(BlueprintPure)
-	FName GetTeamID() const { return TeamID; }
+	virtual FName GetTeamID() const override { return TeamID; }
 
 	UFUNCTION(BlueprintCallable)
-	virtual void SetTeamID(FName InTeamID);
+	virtual void SetTeamID(FName InTeamID) override;
 	
 	UFUNCTION(BlueprintPure)
 	EDWCharacterNature GetNature() const;
