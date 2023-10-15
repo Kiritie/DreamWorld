@@ -10,7 +10,7 @@
  * 
  */
 UCLASS()
-class DREAMWORLD_API ADWEventManager : public AEventManagerBase
+class DREAMWORLD_API UDWEventManager : public UEventManagerBase
 {
 	GENERATED_BODY()
 	
