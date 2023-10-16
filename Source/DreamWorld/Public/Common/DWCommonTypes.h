@@ -2,9 +2,12 @@
 
 #include "GameplayEffectTypes.h"
 #include "Ability/AbilityModuleTypes.h"
+#include "Achievement/AchievementModuleTypes.h"
 #include "SaveGame/SaveGameModuleTypes.h"
 #include "Voxel/VoxelModuleTypes.h"
 #include "Asset/AssetModuleTypes.h"
+#include "Audio/AudioModuleTypes.h"
+#include "Camera/CameraModuleTypes.h"
 #include "Task/TaskModuleTypes.h"
 #include "Team/DWTeamModuleTypes.h"
 
@@ -486,7 +489,7 @@ public:
 };
 
 USTRUCT(BlueprintType)
-struct DREAMWORLD_API FDWWorldSaveData : public FVoxelModuleSaveData
+struct DREAMWORLD_API FDWWorldSaveData : public FVoxelWorldSaveData
 {
 	GENERATED_BODY()
 
@@ -496,7 +499,7 @@ public:
 		ChunkDatas = TMap<FVector, FDWVoxelChunkSaveData>();
 	}
 	
-	FORCEINLINE FDWWorldSaveData(const FVoxelModuleBasicSaveData& InBasicSaveData) : FVoxelModuleSaveData(InBasicSaveData)
+	FORCEINLINE FDWWorldSaveData(const FVoxelWorldBasicSaveData& InBasicSaveData) : FVoxelWorldSaveData(InBasicSaveData)
 	{
 		ChunkDatas = TMap<FVector, FDWVoxelChunkSaveData>();
 	}
@@ -532,17 +535,6 @@ public:
 };
 
 USTRUCT(BlueprintType)
-struct DREAMWORLD_API FDWTaskModuleSaveData : public FTaskModuleSaveData
-{
-	GENERATED_BODY()
-
-public:
-	FORCEINLINE FDWTaskModuleSaveData()
-	{
-	}
-};
-
-USTRUCT(BlueprintType)
 struct DREAMWORLD_API FDWArchiveBasicSaveData : public FSaveData
 {
 	GENERATED_BODY()
@@ -574,7 +566,9 @@ public:
 	{
 		WorldData = FDWWorldSaveData();
 		PlayerData = FDWPlayerSaveData();
-		TaskData = FDWTaskModuleSaveData();
+		AchievementData = FAchievementModuleSaveData();
+		TaskData = FTaskModuleSaveData();
+		TeamData = FDWTeamModuleSaveData();
 	}
 
 public:
@@ -585,7 +579,10 @@ public:
 	FDWPlayerSaveData PlayerData;
 
 	UPROPERTY(VisibleAnywhere)
-	FDWTaskModuleSaveData TaskData;
+	FAchievementModuleSaveData AchievementData;
+
+	UPROPERTY(VisibleAnywhere)
+	FTaskModuleSaveData TaskData;
 
 	UPROPERTY(VisibleAnywhere)
 	FDWTeamModuleSaveData TeamData;
@@ -597,30 +594,65 @@ public:
 		
 		PlayerData.MakeSaved();
 		WorldData.MakeSaved();
+		AchievementData.MakeSaved();
 		TaskData.MakeSaved();
 		TeamData.MakeSaved();
 	}
 };
 
+UENUM(BlueprintType)
+enum class EDWGameLevel : uint8
+{
+	// 简单
+	Sample,
+	// 普通
+	Normal,
+	// 困难
+	Hard
+};
+
 USTRUCT(BlueprintType)
-struct DREAMWORLD_API FDWGeneralSaveData : public FGeneralSaveData
+struct DREAMWORLD_API FDWGameSaveData : public FSaveData
 {
 	GENERATED_BODY()
 
 public:
-	FORCEINLINE FDWGeneralSaveData()
+	FORCEINLINE FDWGameSaveData()
 	{
-		bAutoJump = true;
-	}
-
-	FORCEINLINE FDWGeneralSaveData(const FGeneralSaveData& InGeneralSaveData) : FGeneralSaveData(InGeneralSaveData)
-	{
+		GameLevel = EDWGameLevel::Normal;
 		bAutoJump = true;
 	}
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	EDWGameLevel GameLevel;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bAutoJump;
+};
+
+USTRUCT(BlueprintType)
+struct DREAMWORLD_API FDWSettingSaveData : public FSaveData
+{
+	GENERATED_BODY()
+
+public:
+	FORCEINLINE FDWSettingSaveData()
+	{
+		GameData = FDWGameSaveData();
+		AudioData = FAudioModuleSaveData();
+		CameraData = FCameraModuleSaveData();
+	}
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Game")
+	FDWGameSaveData GameData;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Audio")
+	FAudioModuleSaveData AudioData;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera")
+	FCameraModuleSaveData CameraData;
 };
 
 USTRUCT(BlueprintType)

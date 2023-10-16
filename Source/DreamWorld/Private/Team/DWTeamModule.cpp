@@ -66,13 +66,10 @@ void ADWTeamModule::LoadData(FSaveData* InSaveData, EPhase InPhase)
 {
 	const auto& SaveData = InSaveData->CastRef<FDWTeamModuleSaveData>();
 
-	if(PHASEC(InPhase, EPhase::Final))
-	{
-		TeamDatas = SaveData.TeamDatas;
-	}
+	TeamDatas = SaveData.TeamDatas;
 }
 
-FSaveData* ADWTeamModule::ToData(bool bRefresh)
+FSaveData* ADWTeamModule::ToData()
 {
 	static FDWTeamModuleSaveData* SaveData;
 	SaveData = new FDWTeamModuleSaveData();

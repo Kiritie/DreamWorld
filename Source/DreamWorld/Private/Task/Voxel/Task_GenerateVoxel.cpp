@@ -99,9 +99,9 @@ void UTask_GenerateVoxel::LoadData(FSaveData* InSaveData, EPhase InPhase)
 	Super::LoadData(InSaveData, InPhase);
 }
 
-FSaveData* UTask_GenerateVoxel::ToData(bool bRefresh)
+FSaveData* UTask_GenerateVoxel::ToData()
 {
-	return Super::ToData(bRefresh);
+	return Super::ToData();
 }
 
 float UTask_GenerateVoxel::CheckTaskProgress_Implementation(FString& OutInfo) const

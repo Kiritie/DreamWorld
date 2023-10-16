@@ -57,7 +57,7 @@ protected:
 
 	virtual void LoadData(FSaveData* InSaveData, EPhase InPhase) override;
 
-	virtual FSaveData* ToData(bool bRefresh) override;
+	virtual FSaveData* ToData() override;
 
 public:
 	virtual void Death(IAbilityVitalityInterface* InKiller /* = nullptr */) override;

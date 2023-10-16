@@ -204,10 +204,10 @@ void ADWPlayerCharacter::LoadData(FSaveData* InSaveData, EPhase InPhase)
 	Super::LoadData(InSaveData, InPhase);
 }
 
-FSaveData* ADWPlayerCharacter::ToData(bool bRefresh)
+FSaveData* ADWPlayerCharacter::ToData()
 {
 	static FDWPlayerSaveData SaveData;
-	SaveData = Super::ToData(bRefresh)->CastRef<FDWCharacterSaveData>();
+	SaveData = Super::ToData()->CastRef<FDWCharacterSaveData>();
 	
 	SaveData.BodyColorIndex = GetBodyColor();
 	SaveData.CapeColorIndex = GetCapeColor();

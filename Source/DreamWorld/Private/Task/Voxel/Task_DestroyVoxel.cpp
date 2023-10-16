@@ -99,9 +99,9 @@ void UTask_DestroyVoxel::LoadData(FSaveData* InSaveData, EPhase InPhase)
 	Super::LoadData(InSaveData, InPhase);
 }
 
-FSaveData* UTask_DestroyVoxel::ToData(bool bRefresh)
+FSaveData* UTask_DestroyVoxel::ToData()
 {
-	return Super::ToData(bRefresh);
+	return Super::ToData();
 }
 
 float UTask_DestroyVoxel::CheckTaskProgress_Implementation(FString& OutInfo) const

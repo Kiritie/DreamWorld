@@ -3,7 +3,6 @@
 
 #include "SaveGame/DWSaveGameModule.h"
 
-#include "SaveGame/General/DWGeneralSaveGame.h"
 #include "SaveGame/SaveGameModuleBPLibrary.h"
 	
 IMPLEMENTATION_MODULE(ADWSaveGameModule)
@@ -11,7 +10,6 @@ IMPLEMENTATION_MODULE(ADWSaveGameModule)
 // ParamSets default values
 ADWSaveGameModule::ADWSaveGameModule()
 {
-	ModuleSaveGame = UDWGeneralSaveGame::StaticClass();
 }
 
 ADWSaveGameModule::~ADWSaveGameModule()
@@ -66,7 +64,7 @@ void ADWSaveGameModule::LoadData(FSaveData* InSaveData, EPhase InPhase)
 	Super::LoadData(InSaveData, InPhase);
 }
 
-FSaveData* ADWSaveGameModule::ToData(bool bRefresh)
+FSaveData* ADWSaveGameModule::ToData()
 {
-	return Super::ToData(bRefresh);
+	return Super::ToData();
 }

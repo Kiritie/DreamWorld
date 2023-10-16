@@ -43,9 +43,9 @@ void ADWVitalityVoxel::LoadData(FSaveData* InSaveData, EPhase InPhase)
 
 }
 
-FSaveData* ADWVitalityVoxel::ToData(bool bRefresh)
+FSaveData* ADWVitalityVoxel::ToData()
 {
-	return Super::ToData(bRefresh);
+	return Super::ToData();
 }
 
 UVoxelData& ADWVitalityVoxel::GetVoxelData() const

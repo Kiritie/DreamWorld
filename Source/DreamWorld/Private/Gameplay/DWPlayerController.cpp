@@ -86,7 +86,7 @@ void ADWPlayerController::LoadData(FSaveData* InSaveData, EPhase InPhase)
 	}
 }
 
-FSaveData* ADWPlayerController::ToData(bool bRefresh)
+FSaveData* ADWPlayerController::ToData()
 {
 	return nullptr;
 }

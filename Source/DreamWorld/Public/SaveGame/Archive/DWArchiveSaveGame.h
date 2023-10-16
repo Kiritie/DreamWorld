@@ -33,16 +33,16 @@ public:
 	
 protected:
 	UPROPERTY()
-	FDWArchiveSaveData DWArchiveSaveData;
+	FDWArchiveSaveData SaveData;
 
 public:
-	virtual FSaveData* GetSaveData() override { return &DWArchiveSaveData; }
+	virtual FSaveData* GetSaveData() override { return &SaveData; }
 
-	virtual void SetSaveData(FSaveData* InSaveData) override { DWArchiveSaveData = InSaveData->CastRef<FDWArchiveSaveData>(); }
+	virtual void SetSaveData(FSaveData* InSaveData) override { SaveData = InSaveData->CastRef<FDWArchiveSaveData>(); }
 
 	UFUNCTION(BlueprintPure, meta = (DisplayName = "GetSaveData"))
-	FDWArchiveSaveData& K2_GetSaveData() { return DWArchiveSaveData; }
+	FDWArchiveSaveData& K2_GetSaveData() { return SaveData; }
 
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "SetSaveData"))
-	void K2_SetSaveData(const FDWArchiveSaveData& InSaveData) { this->DWArchiveSaveData = InSaveData; }
+	void K2_SetSaveData(const FDWArchiveSaveData& InSaveData) { SaveData = InSaveData; }
 };

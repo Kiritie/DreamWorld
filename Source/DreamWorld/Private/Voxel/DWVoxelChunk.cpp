@@ -36,10 +36,10 @@ void ADWVoxelChunk::LoadData(FSaveData* InSaveData, EPhase InPhase)
 	Super::LoadData(InSaveData, InPhase);
 }
 
-FSaveData* ADWVoxelChunk::ToData(bool bRefresh)
+FSaveData* ADWVoxelChunk::ToData()
 {
 	static FDWVoxelChunkSaveData SaveData;
-	SaveData = Super::ToData(bRefresh)->CastRef<FVoxelChunkSaveData>();
+	SaveData = Super::ToData()->CastRef<FVoxelChunkSaveData>();
 
 	for(auto& Iter : SceneActorMap)
 	{
@@ -47,14 +47,14 @@ FSaveData* ADWVoxelChunk::ToData(bool bRefresh)
 		{
 			if(!Character->IsPlayer() && !Character->IsDead())
 			{
-				SaveData.CharacterDatas.Add(Character->GetSaveDataRef<FDWCharacterSaveData>(bRefresh));
+				SaveData.CharacterDatas.Add(Character->GetSaveDataRef<FDWCharacterSaveData>(true));
 			}
 		}
 		if(ADWVitality* Vitality = Cast<ADWVitality>(Iter.Value))
 		{
 			if(!Vitality->IsDead())
 			{
-				SaveData.VitalityDatas.Add(Vitality->GetSaveDataRef<FDWVitalitySaveData>(bRefresh));
+				SaveData.VitalityDatas.Add(Vitality->GetSaveDataRef<FDWVitalitySaveData>(true));
 			}
 		}
 	}

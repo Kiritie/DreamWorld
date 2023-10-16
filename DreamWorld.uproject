@@ -28,6 +28,10 @@
 				"Android",
 				"IOS"
 			]
+		},
+		{
+			"Name": "CommonUI",
+			"Enabled": true
 		}
 	]
 }

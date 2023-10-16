@@ -44,12 +44,12 @@ public:
 	virtual void OnTermination_Implementation(EPhase InPhase) override;
 
 public:
-	virtual FVoxelModuleSaveData* NewWorldData(FSaveData* InBasicData) const override;
+	virtual FVoxelWorldSaveData* NewWorldData(FSaveData* InBasicData) const override;
 
 protected:
 	virtual void LoadData(FSaveData* InSaveData, EPhase InPhase) override;
 
-	virtual FSaveData* ToData(bool bRefresh) override;
+	virtual FSaveData* ToData() override;
 
 	virtual void UnloadData(EPhase InPhase) override;
 

@@ -62,7 +62,7 @@ void ADWTaskModule::LoadData(FSaveData* InSaveData, EPhase InPhase)
 	Super::LoadData(InSaveData, InPhase);
 }
 
-FSaveData* ADWTaskModule::ToData(bool bRefresh)
+FSaveData* ADWTaskModule::ToData()
 {
-	return Super::ToData(bRefresh);
+	return Super::ToData();
 }

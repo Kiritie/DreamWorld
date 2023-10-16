@@ -49,6 +49,7 @@
 #include "Character/States/DWCharacterState_Walk.h"
 #include "FSM/Components/FSMComponent.h"
 #include "Ability/Inventory/Slot/AbilityInventorySkillSlot.h"
+#include "Gameplay/DWGameMode.h"
 #include "Gameplay/WHGameInstance.h"
 #include "Voxel/VoxelModuleBPLibrary.h"
 #include "Widget/Item/WidgetItemInfoBox.h"
@@ -284,10 +285,10 @@ void ADWCharacter::LoadData(FSaveData* InSaveData, EPhase InPhase)
 	Super::LoadData(InSaveData, InPhase);
 }
 
-FSaveData* ADWCharacter::ToData(bool bRefresh)
+FSaveData* ADWCharacter::ToData()
 {
 	static FDWCharacterSaveData SaveData;
-	SaveData = Super::ToData(bRefresh)->CastRef<FCharacterSaveData>();
+	SaveData = Super::ToData()->CastRef<FCharacterSaveData>();
 
 	SaveData.TeamID = TeamID;
 	SaveData.BirthLocation = BirthLocation;
@@ -894,7 +895,7 @@ void ADWCharacter::AddMovementInput(FVector WorldDirection, float ScaleValue, bo
 
 	Super::AddMovementInput(WorldDirection, ScaleValue, bForce);
 
-	if (!IsPlayer())
+	if (!IsPlayer() || UCommonBPLibrary::GetGameMode<ADWGameMode>()->IsAutoJump())
 	{
 		FHitResult hitResult;
 		if (RaycastStep(hitResult))
