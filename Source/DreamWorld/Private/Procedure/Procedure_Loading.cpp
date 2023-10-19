@@ -13,8 +13,8 @@
 #include "SaveGame/SaveGameModuleBPLibrary.h"
 #include "Voxel/DWVoxelModule.h"
 #include "Widget/WidgetGameHUD.h"
-#include "Widget/WidgetLoadingPanel.h"
 #include "Widget/WidgetModuleBPLibrary.h"
+#include "Widget/Loading/WidgetLoadingPanel.h"
 
 UProcedure_Loading::UProcedure_Loading()
 {

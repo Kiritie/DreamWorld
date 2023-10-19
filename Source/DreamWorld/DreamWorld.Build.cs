@@ -29,6 +29,7 @@ public class DreamWorld : ModuleRules
 				"InputCore",
 				"SlateCore",
 				"UMG",
+				"CommonUI",
 				"AIModule",
 				"GameplayAbilities",
 				"GameplayTags",

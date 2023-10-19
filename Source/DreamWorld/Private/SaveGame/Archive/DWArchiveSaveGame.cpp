@@ -72,8 +72,8 @@ void UDWArchiveSaveGame::OnRefresh_Implementation()
 
 	SaveData.WorldData = ADWVoxelModule::Get()->GetSaveDataRef<FDWWorldSaveData>(true);
 	SaveData.PlayerData = UCommonBPLibrary::GetPlayerPawn<ADWPlayerCharacter>()->GetSaveDataRef<FDWPlayerSaveData>(true);
-	SaveData.AchievementData = AAchievementModule::Get()->GetSaveDataRef<FAchievementModuleSaveData>(true);
-	SaveData.TaskData = ADWTaskModule::Get()->GetSaveDataRef<FTaskModuleSaveData>(true);
+	SaveData.AchievementData = AAchievementModule::Get()->GetSaveDataRef<FDWAchievementModuleSaveData>(true);
+	SaveData.TaskData = ADWTaskModule::Get()->GetSaveDataRef<FDWTaskModuleSaveData>(true);
 	SaveData.TeamData = ADWTeamModule::Get()->GetSaveDataRef<FDWTeamModuleSaveData>(true);
 }
 

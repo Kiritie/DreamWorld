@@ -13,6 +13,7 @@
 #include "Components/WrapBoxSlot.h"
 #include "Common/CommonBPLibrary.h"
 #include "Ability/Inventory/Slot/AbilityInventorySlot.h"
+#include "Asset/AssetModuleBPLibrary.h"
 #include "ObjectPool/ObjectPoolModuleBPLibrary.h"
 #include "Widget/Inventory/Slot/WidgetInventoryEquipSlot.h"
 
@@ -30,9 +31,6 @@ UWidgetInventoryPanel::UWidgetInventoryPanel(const FObjectInitializer& ObjectIni
 
 	SetIsFocusable(true);
 
-	DefaultSlotClass = LoadClass<UWidgetInventorySlot>(nullptr, TEXT("WidgetBlueprint'/Game/Blueprints/Widget/Inventory/Slot/WB_InventorySlot.WB_InventorySlot_C'"));
-	EquipSlotClass = LoadClass<UWidgetInventoryEquipSlot>(nullptr, TEXT("WidgetBlueprint'/Game/Blueprints/Widget/Inventory/Slot/WB_InventoryEquipSlot.WB_InventoryEquipSlot_C'"));
-
 	UISlotDatas.Add(ESlotSplitType::Default);
 	UISlotDatas.Add(ESlotSplitType::Equip);
 }
@@ -40,6 +38,8 @@ UWidgetInventoryPanel::UWidgetInventoryPanel(const FObjectInitializer& ObjectIni
 void UWidgetInventoryPanel::OnInitialize_Implementation(UObject* InOwner)
 {
 	Super::OnInitialize_Implementation(InOwner);
+
+	if(!InOwner) return;
 
 	if(DefaultContent && UISlotDatas.Contains(ESlotSplitType::Default))
 	{
@@ -50,7 +50,7 @@ void UWidgetInventoryPanel::OnInitialize_Implementation(UObject* InOwner)
 			UISlotDatas[ESlotSplitType::Default].Slots.Empty();
 			for(int32 i = 0; i < DefaultSlots.Num(); i++)
 			{
-				if(UWidgetInventorySlot* DefaultSlot = CreateSubWidget<UWidgetInventorySlot>({ DefaultSlots[i] }, DefaultSlotClass))
+				if(UWidgetInventorySlot* DefaultSlot = CreateSubWidget<UWidgetInventorySlot>({ DefaultSlots[i] }, UAssetModuleBPLibrary::GetStaticClass(FName("InventoryDefaultSlot"))))
 				{
 					if(UWrapBoxSlot* WrapBoxSlot = DefaultContent->AddChildToWrapBox(DefaultSlot))
 					{
@@ -78,7 +78,7 @@ void UWidgetInventoryPanel::OnInitialize_Implementation(UObject* InOwner)
 			UISlotDatas[ESlotSplitType::Equip].Slots.Empty();
 			for(int32 i = 0; i < EquipSlots.Num(); i++)
 			{
-				if(UWidgetInventoryEquipSlot* EquipSlot = CreateSubWidget<UWidgetInventoryEquipSlot>({ EquipSlots[i] }, EquipSlotClass))
+				if(UWidgetInventoryEquipSlot* EquipSlot = CreateSubWidget<UWidgetInventoryEquipSlot>({ EquipSlots[i] }, UAssetModuleBPLibrary::GetStaticClass(FName("InventoryEquipSlot"))))
 				{
 					EquipSlot->SetEquipPartType(UCommonBPLibrary::GetEnumValueDisplayName(TEXT("/Script/WHFramework.EEquipPartType"), i));
 					if(UGridSlot* GridSlot = i % 2 == 0 ? LeftEquipContent->AddChildToGrid(EquipSlot) : RightEquipContent->AddChildToGrid(EquipSlot))

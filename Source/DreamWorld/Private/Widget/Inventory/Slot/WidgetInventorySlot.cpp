@@ -14,18 +14,12 @@
 #include "Materials/MaterialInstanceDynamic.h"
 #include "Blueprint/WidgetLayoutLibrary.h"
 #include "Components/CanvasPanelSlot.h"
-#include "Widget/Inventory/Item/WidgetInventoryItemInfoBox.h"
 #include "Widget/WidgetModuleBPLibrary.h"
 #include "Common/CommonBPLibrary.h"
-#include "Widget/Inventory/Item/WidgetInventoryItem.h"
+#include "Widget/Item/WidgetAbilityItemInfoBox.h"
 
 UWidgetInventorySlot::UWidgetInventorySlot(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
-	static ConstructorHelpers::FClassFinder<UWidgetAbilityInventoryItemBase> ItemDragVisualClassFinder(TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/Blueprints/Widget/Inventory/Item/WB_InventoryItemDragVisual.WB_InventoryItemDragVisual_C'"));
-	if(ItemDragVisualClassFinder.Succeeded())
-	{
-		DragVisualClass = ItemDragVisualClassFinder.Class;
-	}
 }
 
 void UWidgetInventorySlot::NativePreConstruct()
@@ -78,7 +72,7 @@ void UWidgetInventorySlot::NativeOnMouseEnter(const FGeometry& InGeometry, const
 	if(!IsEmpty())
 	{
 		const auto& ItemData = GetItem().GetData();
-		UWidgetModuleBPLibrary::OpenUserWidget<UWidgetInventoryItemInfoBox>({ ItemData.Name, ItemData.Detail });
+		UWidgetModuleBPLibrary::OpenUserWidget<UWidgetAbilityItemInfoBox>({ ItemData.Name, ItemData.Detail });
 	}
 }
 
@@ -90,7 +84,7 @@ void UWidgetInventorySlot::NativeOnMouseLeave(const FPointerEvent& InMouseEvent)
 
 	if(!IsEmpty())
 	{
-		UWidgetModuleBPLibrary::CloseUserWidget<UWidgetInventoryItemInfoBox>();
+		UWidgetModuleBPLibrary::CloseUserWidget<UWidgetAbilityItemInfoBox>();
 	}
 }
 
@@ -98,7 +92,7 @@ FReply UWidgetInventorySlot::NativeOnMouseMove(const FGeometry& InGeometry, cons
 {
 	if(!IsEmpty())
 	{
-		if(const auto ItemInfoBoxSlot = Cast<UCanvasPanelSlot>(UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryItemInfoBox>()->Slot))
+		if(const auto ItemInfoBoxSlot = Cast<UCanvasPanelSlot>(UWidgetModuleBPLibrary::GetUserWidget<UWidgetAbilityItemInfoBox>()->Slot))
 		{
 			float PosX, PosY;
 			UWidgetLayoutLibrary::GetMousePositionScaledByDPI(UCommonBPLibrary::GetPlayerController(), PosX, PosY);
@@ -176,7 +170,7 @@ void UWidgetInventorySlot::OnRefresh_Implementation()
 		}
 		if(IsHovered())
 		{
-			UWidgetModuleBPLibrary::OpenUserWidget<UWidgetInventoryItemInfoBox>({ ItemData.Name, ItemData.Detail });
+			UWidgetModuleBPLibrary::OpenUserWidget<UWidgetAbilityItemInfoBox>({ ItemData.Name, ItemData.Detail });
 		}
 	}
 	else
@@ -188,7 +182,7 @@ void UWidgetInventorySlot::OnRefresh_Implementation()
 		}
 		if(IsHovered())
 		{
-			UWidgetModuleBPLibrary::CloseUserWidget<UWidgetInventoryItemInfoBox>();
+			UWidgetModuleBPLibrary::CloseUserWidget<UWidgetAbilityItemInfoBox>();
 		}
 	}
 }

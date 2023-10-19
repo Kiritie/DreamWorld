@@ -8,6 +8,7 @@
 #include "AI/AIModule.h"
 #include "Animation/AnimationModule.h"
 #include "Asset/AssetModule.h"
+#include "Asset/AssetModuleBPLibrary.h"
 #include "Audio/AudioModule.h"
 #include "Camera/DWCameraModule.h"
 #include "Character/DWCharacterModule.h"
@@ -73,6 +74,9 @@ ADWMainModule::~ADWMainModule()
 void ADWMainModule::OnInitialize_Implementation()
 {
 	Super::OnInitialize_Implementation();
+
+	UAssetModuleBPLibrary::AddStaticObject(FName("EDWEquipPartType"), FStaticObject(UEnum::StaticClass(), TEXT("/Script/DreamWorld.EDWEquipPartType")));
+	UAssetModuleBPLibrary::AddStaticObject(FName("EDWGameLevel"), FStaticObject(UEnum::StaticClass(), TEXT("/Script/DreamWorld.EDWGameLevel")));
 }
 
 void ADWMainModule::OnPreparatory_Implementation(EPhase InPhase)

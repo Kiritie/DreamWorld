@@ -52,7 +52,7 @@
 #include "Gameplay/DWGameMode.h"
 #include "Gameplay/WHGameInstance.h"
 #include "Voxel/VoxelModuleBPLibrary.h"
-#include "Widget/Item/WidgetItemInfoBox.h"
+#include "Widget/WidgetMessageBox.h"
 #include "Widget/WidgetModuleBPLibrary.h"
 #include "Widget/World/WorldWidgetComponent.h"
 #include "Inventory/DWCharacterInventory.h"
@@ -386,7 +386,7 @@ void ADWCharacter::OnActiveItem(const FAbilityItem& InItem, bool bPassive, bool 
 		}
 		else if(IsPlayer())
 		{
-			UWidgetModuleBPLibrary::OpenUserWidget<UWidgetItemInfoBox>({ FString::Printf(TEXT("该%s还未准备好！"),
+			UWidgetModuleBPLibrary::OpenUserWidget<UWidgetMessageBox>({ FString::Printf(TEXT("该%s还未准备好！"),
 				*UCommonBPLibrary::GetEnumValueDisplayName(TEXT("/Script/WHFramework.EAbilityItemType"), (int32)InItem.GetType()).ToString()) });
 		}
 	}

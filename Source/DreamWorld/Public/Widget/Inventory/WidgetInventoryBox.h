@@ -36,7 +36,4 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	TMap<ESlotSplitType, FWidgetInventorySlots> TargetUISlotDatas;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	TSubclassOf<class UWidgetInventorySlot> DefaultSlotClass;
 };

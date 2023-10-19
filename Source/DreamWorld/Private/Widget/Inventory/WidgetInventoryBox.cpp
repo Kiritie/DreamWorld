@@ -6,10 +6,10 @@
 #include "Ability/Inventory/AbilityInventoryBase.h"
 #include "Ability/Inventory/AbilityInventoryAgentInterface.h"
 #include "Ability/Inventory/Slot/AbilityInventorySlot.h"
+#include "Asset/AssetModuleBPLibrary.h"
 #include "Character/Player/DWPlayerCharacter.h"
 #include "Components/WrapBox.h"
 #include "Components/WrapBoxSlot.h"
-#include "Voxel/Voxels/Auxiliary/VoxelInteractAuxiliary.h"
 #include "Widget/Inventory/Slot/WidgetInventorySlot.h"
 
 UWidgetInventoryBox::UWidgetInventoryBox(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
@@ -26,8 +26,6 @@ UWidgetInventoryBox::UWidgetInventoryBox(const FObjectInitializer& ObjectInitial
 
 	SetIsFocusable(true);
 
-	DefaultSlotClass = LoadClass<UWidgetInventorySlot>(nullptr, TEXT("WidgetBlueprint'/Game/Blueprints/Widget/Inventory/Slot/WB_InventorySlot.WB_InventorySlot_C'"));
-
 	UISlotDatas.Add(ESlotSplitType::Default);
 	TargetUISlotDatas.Add(ESlotSplitType::Default);
 }
@@ -36,6 +34,8 @@ void UWidgetInventoryBox::OnInitialize_Implementation(UObject* InOwner)
 {
 	Super::OnInitialize_Implementation(InOwner);
 	
+	if(!InOwner) return;
+
 	if(DefaultContent && UISlotDatas.Contains(ESlotSplitType::Default))
 	{
 		const auto DefaultSlots = GetInventory()->GetSlotsBySplitType(ESlotSplitType::Default);
@@ -45,7 +45,7 @@ void UWidgetInventoryBox::OnInitialize_Implementation(UObject* InOwner)
 			UISlotDatas[ESlotSplitType::Default].Slots.Empty();
 			for(int32 i = 0; i < DefaultSlots.Num(); i++)
 			{
-				if(UWidgetInventorySlot* DefaultSlot = CreateSubWidget<UWidgetInventorySlot>({ DefaultSlots[i] }, DefaultSlotClass))
+				if(UWidgetInventorySlot* DefaultSlot = CreateSubWidget<UWidgetInventorySlot>({ DefaultSlots[i] }, UAssetModuleBPLibrary::GetStaticClass(FName("InventoryDefaultSlot"))))
 				{
 					if(UWrapBoxSlot* WrapBoxSlot = DefaultContent->AddChildToWrapBox(DefaultSlot))
 					{
@@ -84,7 +84,7 @@ void UWidgetInventoryBox::OnOpen_Implementation(const TArray<FParameter>& InPara
 			TargetUISlotDatas[ESlotSplitType::Default].Slots.Empty();
 			for(int32 i = 0; i < DefaultSlots.Num(); i++)
 			{
-				if(UWidgetInventorySlot* DefaultSlot = CreateSubWidget<UWidgetInventorySlot>({ DefaultSlots[i] }, DefaultSlotClass))
+				if(UWidgetInventorySlot* DefaultSlot = CreateSubWidget<UWidgetInventorySlot>({ DefaultSlots[i] }, UAssetModuleBPLibrary::GetStaticClass(FName("InventoryDefaultSlot"))))
 				{
 					if(UWrapBoxSlot* WrapBoxSlot = TargetContent->AddChildToWrapBox(DefaultSlot))
 					{

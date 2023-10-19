@@ -35,7 +35,4 @@ protected:
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components", meta = (BindWidget, OptionalWidget = false))
 	class UVerticalBox* ContentBox;
-	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	TSubclassOf<class UWidgetTaskInfoItem> TaskInfoItemClass;
 };

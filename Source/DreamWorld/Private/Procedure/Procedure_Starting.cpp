@@ -11,9 +11,9 @@
 #include "Procedure/Archive/Procedure_ArchiveChoosing.h"
 #include "SaveGame/Archive/DWArchiveSaveGame.h"
 #include "SaveGame/SaveGameModuleBPLibrary.h"
-#include "Widget/WidgetMainMenu.h"
 #include "Widget/WidgetModuleBPLibrary.h"
 #include "Widget/Archive/WidgetArchiveChoosingPanel.h"
+#include "Widget/Menu/WidgetMainMenu.h"
 
 UProcedure_Starting::UProcedure_Starting()
 {

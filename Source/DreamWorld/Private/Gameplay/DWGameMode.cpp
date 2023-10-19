@@ -29,7 +29,7 @@ void ADWGameMode::OnPreparatory_Implementation(EPhase InPhase)
 	
 	if(PHASEC(InPhase, EPhase::Lesser))
 	{
-		LoadSaveData(&USaveGameModuleBPLibrary::GetOrCreateSaveGame<UDWSettingSaveGame>(0)->GetSaveDataRef<FDWSettingSaveData>().GameData);
+		USaveGameModuleBPLibrary::LoadOrCreateSaveGame<UDWSettingSaveGame>(0);
 	}
 }
 

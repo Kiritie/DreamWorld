@@ -8,8 +8,8 @@
 #include "Procedure/Procedure_Starting.h"
 #include "Widget/WidgetGameHUD.h"
 #include "Widget/WidgetModuleBPLibrary.h"
-#include "Widget/WidgetPausingMenu.h"
 #include "Widget/Inventory/WidgetInventoryBar.h"
+#include "Widget/Menu/WidgetPausingMenu.h"
 
 UProcedure_Pausing::UProcedure_Pausing()
 {

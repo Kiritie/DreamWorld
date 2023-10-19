@@ -6,8 +6,8 @@
 #include "TimerManager.h"
 #include "Procedure/ProcedureModuleBPLibrary.h"
 #include "Procedure/Procedure_Starting.h"
-#include "Widget/WidgetMainMenu.h"
 #include "Widget/WidgetModuleBPLibrary.h"
+#include "Widget/Menu/WidgetMainMenu.h"
 
 UProcedure_Initializing::UProcedure_Initializing()
 {

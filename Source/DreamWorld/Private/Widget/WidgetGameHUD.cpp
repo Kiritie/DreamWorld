@@ -20,7 +20,7 @@ UWidgetGameHUD::UWidgetGameHUD(const FObjectInitializer& ObjectInitializer) : Su
 	    FName("GeneratePanel"),
 	    FName("ShopPanel"),
 	    FName("ContextBox"),
-	    FName("ItemInfoBox"),
+	    FName("MessageBox"),
 	    FName("TaskInfoBox")
 	};
 	WidgetType = EWidgetType::Permanent;

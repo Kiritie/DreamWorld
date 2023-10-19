@@ -3,6 +3,7 @@
 
 #include "Widget/Task/WidgetTaskInfoBox.h"
 
+#include "Asset/AssetModuleBPLibrary.h"
 #include "Components/VerticalBox.h"
 #include "Components/VerticalBoxSlot.h"
 #include "Event/EventModuleBPLibrary.h"
@@ -20,8 +21,6 @@ UWidgetTaskInfoBox::UWidgetTaskInfoBox(const FObjectInitializer& ObjectInitializ
 	WidgetType = EWidgetType::Permanent;
 	WidgetInputMode = EInputMode::None;
 	WidgetCreateType = EWidgetCreateType::AutoCreateAndOpen;
-
-	TaskInfoItemClass = LoadClass<UWidgetTaskInfoItem>(nullptr, TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/Blueprints/Widget/Task/WB_TaskInfoItem.WB_TaskInfoItem_C'"));
 }
 
 void UWidgetTaskInfoBox::OnCreate_Implementation(UObject* InOwner)
@@ -61,7 +60,7 @@ void UWidgetTaskInfoBox::OnRefresh_Implementation()
 
 void UWidgetTaskInfoBox::CreateTaskInfoItem(UTaskBase* InTask)
 {
-	if(UWidgetTaskInfoItem* TaskInfoItem = CreateSubWidget<UWidgetTaskInfoItem>({ InTask }, TaskInfoItemClass))
+	if(UWidgetTaskInfoItem* TaskInfoItem = CreateSubWidget<UWidgetTaskInfoItem>({ InTask }, UAssetModuleBPLibrary::GetStaticClass(FName("TaskInfoItem"))))
 	{
 		if(const auto TempSlot = ContentBox->AddChildToVerticalBox(TaskInfoItem))
 		{

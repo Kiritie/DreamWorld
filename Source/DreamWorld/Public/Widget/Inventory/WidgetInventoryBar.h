@@ -44,15 +44,6 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Default")
 	int32 SelectedSlotIndex;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	TSubclassOf<class UWidgetInventoryShortcutSlot> ShortcutSlotClass;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	TSubclassOf<class UWidgetInventoryAuxiliarySlot> AuxiliarySlotClass;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	TSubclassOf<class UWidgetInventorySkillSlot> SkillSlotClass;
-
 public:
 	virtual void OnInitialize_Implementation(UObject* InOwner) override;
 

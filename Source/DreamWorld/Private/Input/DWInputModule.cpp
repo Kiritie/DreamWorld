@@ -17,8 +17,8 @@
 #include "Procedure/Procedure_Playing.h"
 #include "Voxel/VoxelModuleBPLibrary.h"
 #include "Voxel/Voxels/Auxiliary/VoxelInteractAuxiliary.h"
-#include "Widget/WidgetGeneratePanel.h"
 #include "Widget/WidgetModuleBPLibrary.h"
+#include "Widget/Generate/WidgetGeneratePanel.h"
 #include "Widget/Inventory/WidgetInventoryBar.h"
 #include "Widget/Inventory/WidgetInventoryPanel.h"
 

@@ -557,6 +557,50 @@ public:
 };
 
 USTRUCT(BlueprintType)
+struct DREAMWORLD_API FDWAudioModuleSaveData : public FAudioModuleSaveData
+{
+	GENERATED_BODY()
+
+public:
+	FORCEINLINE FDWAudioModuleSaveData()
+	{
+	}
+};
+
+USTRUCT(BlueprintType)
+struct DREAMWORLD_API FDWCameraModuleSaveData : public FCameraModuleSaveData
+{
+	GENERATED_BODY()
+
+public:
+	FORCEINLINE FDWCameraModuleSaveData()
+	{
+	}
+};
+
+USTRUCT(BlueprintType)
+struct DREAMWORLD_API FDWTaskModuleSaveData : public FTaskModuleSaveData
+{
+	GENERATED_BODY()
+
+public:
+	FORCEINLINE FDWTaskModuleSaveData()
+	{
+	}
+};
+
+USTRUCT(BlueprintType)
+struct DREAMWORLD_API FDWAchievementModuleSaveData : public FAchievementModuleSaveData
+{
+	GENERATED_BODY()
+
+public:
+	FORCEINLINE FDWAchievementModuleSaveData()
+	{
+	}
+};
+
+USTRUCT(BlueprintType)
 struct DREAMWORLD_API FDWArchiveSaveData : public FDWArchiveBasicSaveData
 {
 	GENERATED_BODY()
@@ -566,8 +610,8 @@ public:
 	{
 		WorldData = FDWWorldSaveData();
 		PlayerData = FDWPlayerSaveData();
-		AchievementData = FAchievementModuleSaveData();
-		TaskData = FTaskModuleSaveData();
+		AchievementData = FDWAchievementModuleSaveData();
+		TaskData = FDWTaskModuleSaveData();
 		TeamData = FDWTeamModuleSaveData();
 	}
 
@@ -579,10 +623,10 @@ public:
 	FDWPlayerSaveData PlayerData;
 
 	UPROPERTY(VisibleAnywhere)
-	FAchievementModuleSaveData AchievementData;
+	FDWAchievementModuleSaveData AchievementData;
 
 	UPROPERTY(VisibleAnywhere)
-	FTaskModuleSaveData TaskData;
+	FDWTaskModuleSaveData TaskData;
 
 	UPROPERTY(VisibleAnywhere)
 	FDWTeamModuleSaveData TeamData;
@@ -604,11 +648,11 @@ UENUM(BlueprintType)
 enum class EDWGameLevel : uint8
 {
 	// 简单
-	Sample,
+	Sample UMETA(DisplayName = "简单"),
 	// 普通
-	Normal,
+	Normal UMETA(DisplayName = "普通"),
 	// 困难
-	Hard
+	Hard UMETA(DisplayName = "困难")
 };
 
 USTRUCT(BlueprintType)
@@ -640,8 +684,8 @@ public:
 	FORCEINLINE FDWSettingSaveData()
 	{
 		GameData = FDWGameSaveData();
-		AudioData = FAudioModuleSaveData();
-		CameraData = FCameraModuleSaveData();
+		AudioData = FDWAudioModuleSaveData();
+		CameraData = FDWCameraModuleSaveData();
 	}
 
 public:
@@ -649,10 +693,20 @@ public:
 	FDWGameSaveData GameData;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Audio")
-	FAudioModuleSaveData AudioData;
+	FDWAudioModuleSaveData AudioData;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera")
-	FCameraModuleSaveData CameraData;
+	FDWCameraModuleSaveData CameraData;
+
+public:
+	virtual void MakeSaved() override
+	{
+		Super::MakeSaved();
+		
+		GameData.MakeSaved();
+		AudioData.MakeSaved();
+		CameraData.MakeSaved();
+	}
 };
 
 USTRUCT(BlueprintType)

@@ -37,12 +37,6 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components", meta = (BindWidget, OptionalWidget = false))
 	class UGridPanel* RightEquipContent;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	TSubclassOf<class UWidgetInventorySlot> DefaultSlotClass;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	TSubclassOf<class UWidgetInventoryEquipSlot> EquipSlotClass;
-
 public:
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
 	void SetHeadInfo(const FString& InHeadInfo);

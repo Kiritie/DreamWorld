@@ -48,13 +48,12 @@
 #include "Ability/Item/Raw/AbilityRawDataBase.h"
 #include "Character/DWCharacterData.h"
 #include "Common/Targeting/TargetingComponent.h"
-#include "Gameplay/WHGameInstance.h"
 #include "Item/Equip/DWEquipData.h"
 #include "Vitality/DWVitality.h"
 #include "Voxel/Voxels/VoxelInteract.h"
 #include "Voxel/Voxels/Auxiliary/VoxelAuxiliary.h"
 #include "Voxel/Voxels/Auxiliary/VoxelInteractAuxiliary.h"
-#include "Widget/WidgetGeneratePanel.h"
+#include "Widget/Generate/WidgetGeneratePanel.h"
 #include "Widget/Inventory/WidgetInventoryBox.h"
 
 //////////////////////////////////////////////////////////////////////////
