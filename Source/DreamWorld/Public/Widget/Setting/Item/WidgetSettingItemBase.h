@@ -1,17 +1,20 @@
 // Fill out your copyright notice in the Description Item of Project Settings.
 
 #pragma once
-#include "Blueprint/UserWidget.h"
 #include "ObjectPool/ObjectPoolInterface.h"
+#include "Widget/Screen/UMG/SubWidgetBase.h"
 
 #include "WidgetSettingItemBase.generated.h"
 
 class UTextBlock;
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnSettingItemValueChanged, UWidgetSettingItemBase*, InSettingItem, const FParameter&, InValue);
+
 /**
  * 
  */
 UCLASS()
-class DREAMWORLD_API UWidgetSettingItemBase : public UUserWidget, public IObjectPoolInterface
+class DREAMWORLD_API UWidgetSettingItemBase : public USubWidgetBase
 {
 	GENERATED_BODY()
 	
@@ -24,6 +27,15 @@ public:
 	virtual void OnSpawn_Implementation(const TArray<FParameter>& InParams) override;
 
 	virtual void OnDespawn_Implementation(bool bRecovery) override;
+
+public:
+	virtual void OnCreate_Implementation(UUserWidgetBase* InOwner, const TArray<FParameter>& InParams) override;
+
+	virtual void OnInitialize_Implementation(const TArray<FParameter>& InParams) override;
+
+	virtual void OnRefresh_Implementation() override;
+
+	virtual void OnDestroy_Implementation() override;
 
 public:
 	UFUNCTION(BlueprintPure)
@@ -42,4 +54,8 @@ public:
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components", meta = (BindWidget, OptionalWidget = false))
 	UTextBlock* Txt_Label;
+
+public:
+	UPROPERTY(BlueprintAssignable)
+	FOnSettingItemValueChanged OnValueChanged;
 };

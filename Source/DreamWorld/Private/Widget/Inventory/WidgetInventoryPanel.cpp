@@ -29,6 +29,8 @@ UWidgetInventoryPanel::UWidgetInventoryPanel(const FObjectInitializer& ObjectIni
 	WidgetOpenFinishType = EWidgetOpenFinishType::Procedure;
 	WidgetCloseFinishType = EWidgetCloseFinishType::Procedure;
 
+	WidgetZOrder = 1;
+
 	SetIsFocusable(true);
 
 	UISlotDatas.Add(ESlotSplitType::Default);

@@ -7,7 +7,7 @@ UWidgetLoadingPanel::UWidgetLoadingPanel(const FObjectInitializer& ObjectInitial
 {
 	WidgetName = FName("LoadingPanel");
 	WidgetType = EWidgetType::Temporary;
-	WidgetZOrder = 5;
+	WidgetZOrder = 15;
 }
 
 void UWidgetLoadingPanel::OnInitialize_Implementation(UObject* InOwner)

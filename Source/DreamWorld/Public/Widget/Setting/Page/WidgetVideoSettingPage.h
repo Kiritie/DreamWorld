@@ -2,8 +2,11 @@
 
 #pragma once
 #include "WidgetSettingPageBase.h"
+#include "Common/DWCommonTypes.h"
 
 #include "WidgetVideoSettingPage.generated.h"
+
+class UWidgetEnumSettingItem;
 
 /**
  * 
@@ -33,4 +36,22 @@ public:
 	virtual bool CanApply_Implementation() const override;
 
 	virtual bool CanReset_Implementation() const override;
+
+protected:
+	UFUNCTION()
+	void OnSettingItemValueChange(UWidgetSettingItemBase* InSettingItem, const FParameter& InValue);
+
+protected:
+	UPROPERTY(BlueprintReadOnly, Category = "Components")
+	UWidgetEnumSettingItem* SettingItem_GlobalVideoQuality;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Components")
+	UWidgetEnumSettingItem* SettingItem_ViewDistanceQuality;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Components")
+	UWidgetEnumSettingItem* SettingItem_ShadowQuality;
+
+public:
+	UFUNCTION(BlueprintPure)
+	FDWVideoModuleSaveData& GetDefaultVideoData() const;
 };

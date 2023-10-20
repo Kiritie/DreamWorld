@@ -3,22 +3,22 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Camera/CameraModule.h"
+#include "Audio/AudioModule.h"
 
-#include "DWCameraModule.generated.h"
+#include "DWAudioModule.generated.h"
 
 UCLASS()
-class DREAMWORLD_API ADWCameraModule : public ACameraModule
+class DREAMWORLD_API ADWAudioModule : public AAudioModule
 {
 	GENERATED_BODY()
 	
-	GENERATED_MODULE(ADWCameraModule)
+	GENERATED_MODULE(ADWAudioModule)
 
 public:	
 	// ParamSets default values for this actor's properties
-	ADWCameraModule();
+	ADWAudioModule();
 	
-	~ADWCameraModule();
+	~ADWAudioModule();
 
 	//////////////////////////////////////////////////////////////////////////
 	/// Module

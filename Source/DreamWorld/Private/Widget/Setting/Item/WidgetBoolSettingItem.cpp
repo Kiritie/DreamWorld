@@ -20,6 +20,37 @@ void UWidgetBoolSettingItem::OnDespawn_Implementation(bool bRecovery)
 	Super::OnDespawn_Implementation(bRecovery);
 }
 
+void UWidgetBoolSettingItem::OnCreate_Implementation(UUserWidgetBase* InOwner, const TArray<FParameter>& InParams)
+{
+	Super::OnCreate_Implementation(InOwner, InParams);
+	
+	CheckBox_Value->OnCheckStateChanged.AddDynamic(this, &UWidgetBoolSettingItem::OnCheckBoxStateChanged);
+}
+
+void UWidgetBoolSettingItem::OnInitialize_Implementation(const TArray<FParameter>& InParams)
+{
+	Super::OnInitialize_Implementation(InParams);
+}
+
+void UWidgetBoolSettingItem::OnRefresh_Implementation()
+{
+	Super::OnRefresh_Implementation();
+}
+
+void UWidgetBoolSettingItem::OnDestroy_Implementation()
+{
+	Super::OnDestroy_Implementation();
+}
+
+void UWidgetBoolSettingItem::OnCheckBoxStateChanged(bool bIsChecked)
+{
+	if(OnValueChanged.IsBound())
+	{
+		OnValueChanged.Broadcast(this, bIsChecked);
+	}
+	Refresh();
+}
+
 FParameter UWidgetBoolSettingItem::GetValue() const
 {
 	return CheckBox_Value->IsChecked();
@@ -28,4 +59,5 @@ FParameter UWidgetBoolSettingItem::GetValue() const
 void UWidgetBoolSettingItem::SetValue(const FParameter& InValue)
 {
 	CheckBox_Value->SetIsChecked(InValue.GetBooleanValue());
+	Refresh();
 }

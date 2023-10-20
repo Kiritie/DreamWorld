@@ -15,5 +15,7 @@ UWidgetShopPanel::UWidgetShopPanel(const FObjectInitializer& ObjectInitializer) 
 	WidgetOpenFinishType = EWidgetOpenFinishType::Procedure;
 	WidgetCloseFinishType = EWidgetCloseFinishType::Procedure;
 
+	WidgetZOrder = 1;
+
 	SetIsFocusable(true);
 }

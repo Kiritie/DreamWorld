@@ -12,7 +12,7 @@ class IDWTeamAgentInterface;
  * 体素模块
  */
 UCLASS()
-class DREAMWORLD_API ADWTeamModule : public AModuleBase, public ISaveDataInterface
+class DREAMWORLD_API ADWTeamModule : public AModuleBase
 {
 	GENERATED_BODY()
 		

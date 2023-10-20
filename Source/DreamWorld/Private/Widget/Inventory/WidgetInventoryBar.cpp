@@ -32,7 +32,7 @@ UWidgetInventoryBar::UWidgetInventoryBar(const FObjectInitializer& ObjectInitial
 	
 	WidgetCreateType = EWidgetCreateType::AutoCreateAndOpen;
 
-	WidgetZOrder = 1;
+	WidgetZOrder = 2;
 
 	SelectedSlotIndex = 0;
 

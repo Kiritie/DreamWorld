@@ -4,12 +4,12 @@
 
 #include "Ability/AbilityModule.h"
 #include "Ability/DWAbilityModule.h"
-#include "Achievement/AchievementModule.h"
+#include "Achievement/DWAchievementModule.h"
 #include "AI/AIModule.h"
 #include "Animation/AnimationModule.h"
 #include "Asset/AssetModule.h"
 #include "Asset/AssetModuleBPLibrary.h"
-#include "Audio/AudioModule.h"
+#include "Audio/DWAudioModule.h"
 #include "Camera/DWCameraModule.h"
 #include "Character/DWCharacterModule.h"
 #include "Common/CommonBPLibrary.h"
@@ -17,7 +17,6 @@
 #include "Event/EventModule.h"
 #include "FSM/FSMModule.h"
 #include "Input/DWInputModule.h"
-#include "Media/MediaModule.h"
 #include "Network/NetworkModule.h"
 #include "ObjectPool/ObjectPoolModule.h"
 #include "Parameter/ParameterModule.h"
@@ -27,6 +26,7 @@
 #include "Step/StepModule.h"
 #include "Task/DWTaskModule.h"
 #include "Team/DWTeamModule.h"
+#include "Video/DWVideoModule.h"
 #include "Voxel/DWVoxelModule.h"
 #include "WebRequest/WebRequestModule.h"
 #include "Widget/WidgetModule.h"
@@ -39,18 +39,18 @@ ADWMainModule::ADWMainModule()
 	
 	ModuleClasses = TArray<TSubclassOf<AModuleBase>>();
 	ModuleClasses.Add(ADWAbilityModule::StaticClass());
-	ModuleClasses.Add(AAchievementModule::StaticClass());
+	ModuleClasses.Add(ADWAchievementModule::StaticClass());
 	ModuleClasses.Add(AAIModule::StaticClass());
 	ModuleClasses.Add(AAnimationModule::StaticClass());
 	ModuleClasses.Add(AAssetModule::StaticClass());
-	ModuleClasses.Add(AAudioModule::StaticClass());
+	ModuleClasses.Add(ADWAudioModule::StaticClass());
 	ModuleClasses.Add(ADWCameraModule::StaticClass());
 	ModuleClasses.Add(ADWCharacterModule::StaticClass());
 	ModuleClasses.Add(ADebugModule::StaticClass());
 	ModuleClasses.Add(AEventModule::StaticClass());
 	ModuleClasses.Add(AFSMModule::StaticClass());
 	ModuleClasses.Add(ADWInputModule::StaticClass());
-	ModuleClasses.Add(AMediaModule::StaticClass());
+	ModuleClasses.Add(ADWVideoModule::StaticClass());
 	ModuleClasses.Add(ANetworkModule::StaticClass());
 	ModuleClasses.Add(AObjectPoolModule::StaticClass());
 	ModuleClasses.Add(AParameterModule::StaticClass());
@@ -77,6 +77,7 @@ void ADWMainModule::OnInitialize_Implementation()
 
 	UAssetModuleBPLibrary::AddStaticObject(FName("EDWEquipPartType"), FStaticObject(UEnum::StaticClass(), TEXT("/Script/DreamWorld.EDWEquipPartType")));
 	UAssetModuleBPLibrary::AddStaticObject(FName("EDWGameLevel"), FStaticObject(UEnum::StaticClass(), TEXT("/Script/DreamWorld.EDWGameLevel")));
+	UAssetModuleBPLibrary::AddStaticObject(FName("EDWInventoryInitType"), FStaticObject(UEnum::StaticClass(), TEXT("/Script/DreamWorld.EDWInventoryInitType")));
 }
 
 void ADWMainModule::OnPreparatory_Implementation(EPhase InPhase)

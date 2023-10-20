@@ -64,10 +64,10 @@ void UWidgetSettingPageBase::Apply()
 
 void UWidgetSettingPageBase::AddSettingItem_Implementation(UWidgetSettingItemBase* InSettingItem, const FText& InCategory)
 {
-	if(!InCategory.IsEmpty())
+	if(!InCategory.IsEmpty() && !InCategory.EqualTo(LastCategory))
 	{
-		UWidgetSettingItemCategory* ItemCategory = UObjectPoolModuleBPLibrary::SpawnObject<UWidgetSettingItemCategory>({ InCategory }, UAssetModuleBPLibrary::GetStaticClass(FName("SettingItemCategory")));
-		if(UScrollBoxSlot* ScrollBoxSlot = Cast<UScrollBoxSlot>(ContentBox->AddChild(ItemCategory)))
+		LastCategory = InCategory;
+		if(UScrollBoxSlot* ScrollBoxSlot = Cast<UScrollBoxSlot>(ContentBox->AddChild(CreateSubWidget<UWidgetSettingItemCategory>({ InCategory }, UAssetModuleBPLibrary::GetStaticClass(FName("SettingItemCategory"))))))
 		{
 			ScrollBoxSlot->SetPadding(FMargin(2.5f, 0.f));
 		}
@@ -80,5 +80,12 @@ void UWidgetSettingPageBase::AddSettingItem_Implementation(UWidgetSettingItemBas
 
 void UWidgetSettingPageBase::ClearSettingItems_Implementation()
 {
+	for(auto Iter : ContentBox->GetAllChildren())
+	{
+		if(USubWidgetBase* SubWidget = Cast<USubWidgetBase>(Iter))
+		{
+			SubWidget->Destroy(true);
+		}
+	}
 	ContentBox->ClearChildren();
 }

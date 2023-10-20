@@ -23,6 +23,19 @@ public:
 	virtual void OnDespawn_Implementation(bool bRecovery) override;
 
 public:
+	virtual void OnCreate_Implementation(UUserWidgetBase* InOwner, const TArray<FParameter>& InParams) override;
+
+	virtual void OnInitialize_Implementation(const TArray<FParameter>& InParams) override;
+
+	virtual void OnRefresh_Implementation() override;
+
+	virtual void OnDestroy_Implementation() override;
+
+protected:
+	UFUNCTION()
+	virtual void OnCheckBoxStateChanged(bool bIsChecked);
+
+public:
 	virtual FParameter GetValue() const override;
 
 	virtual void SetValue(const FParameter& InValue) override;

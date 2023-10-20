@@ -12,15 +12,39 @@ UWidgetSettingItemCategory::UWidgetSettingItemCategory(const FObjectInitializer&
 
 void UWidgetSettingItemCategory::OnSpawn_Implementation(const TArray<FParameter>& InParams)
 {
+	Super::OnSpawn_Implementation(InParams);
+}
+
+void UWidgetSettingItemCategory::OnDespawn_Implementation(bool bRecovery)
+{
+	Super::OnDespawn_Implementation(bRecovery);
+	
+	SetCategory(FText::GetEmpty());
+}
+
+void UWidgetSettingItemCategory::OnCreate_Implementation(UUserWidgetBase* InOwner, const TArray<FParameter>& InParams)
+{
+	Super::OnCreate_Implementation(InOwner, InParams);
+}
+
+void UWidgetSettingItemCategory::OnInitialize_Implementation(const TArray<FParameter>& InParams)
+{
+	Super::OnInitialize_Implementation(InParams);
+
 	if(InParams.IsValidIndex(0))
 	{
 		SetCategory(InParams[0].GetTextValue());
 	}
 }
 
-void UWidgetSettingItemCategory::OnDespawn_Implementation(bool bRecovery)
+void UWidgetSettingItemCategory::OnRefresh_Implementation()
 {
-	SetCategory(FText::GetEmpty());
+	Super::OnRefresh_Implementation();
+}
+
+void UWidgetSettingItemCategory::OnDestroy_Implementation()
+{
+	Super::OnDestroy_Implementation();
 }
 
 FText UWidgetSettingItemCategory::GetCategory() const

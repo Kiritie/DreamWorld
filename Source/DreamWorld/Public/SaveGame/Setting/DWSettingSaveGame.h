@@ -32,6 +32,9 @@ public:
 protected:
 	UPROPERTY()
 	FDWSettingSaveData SaveData;
+	
+	UPROPERTY()
+	FDWSettingSaveData DefaultData;
 
 public:
 	virtual FSaveData* GetSaveData() override { return &SaveData; }
@@ -43,4 +46,8 @@ public:
 
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "SetSaveData"))
 	void K2_SetSaveData(const FDWSettingSaveData& InSaveData) { SaveData = InSaveData; }
+
+	virtual FSaveData* GetDefaultData() override { return &DefaultData; }
+
+	virtual void SetDefaultData(FSaveData* InDefaultData) override { DefaultData = InDefaultData->CastRef<FDWSettingSaveData>(); }
 };

@@ -13,6 +13,8 @@ UWidgetPausingMenu::UWidgetPausingMenu(const FObjectInitializer& ObjectInitializ
 	WidgetType = EWidgetType::Temporary;
 	WidgetInputMode = EInputMode::UIOnly;
 
+	WidgetZOrder = 10;
+
 	SetIsFocusable(true);
 }
 

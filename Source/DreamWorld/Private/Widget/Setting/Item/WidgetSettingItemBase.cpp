@@ -12,16 +12,39 @@ UWidgetSettingItemBase::UWidgetSettingItemBase(const FObjectInitializer& ObjectI
 
 void UWidgetSettingItemBase::OnSpawn_Implementation(const TArray<FParameter>& InParams)
 {
+	Super::OnSpawn_Implementation(InParams);;
+}
+
+void UWidgetSettingItemBase::OnDespawn_Implementation(bool bRecovery)
+{
+	Super::OnDespawn_Implementation(bRecovery);
+	SetLabel(FText::GetEmpty());
+	SetValue(FParameter());
+}
+
+void UWidgetSettingItemBase::OnCreate_Implementation(UUserWidgetBase* InOwner, const TArray<FParameter>& InParams)
+{
+	Super::OnCreate_Implementation(InOwner, InParams);
+}
+
+void UWidgetSettingItemBase::OnInitialize_Implementation(const TArray<FParameter>& InParams)
+{
+	Super::OnInitialize_Implementation(InParams);
+
 	if(InParams.IsValidIndex(0))
 	{
 		SetLabel(InParams[0].GetTextValue());
 	}
 }
 
-void UWidgetSettingItemBase::OnDespawn_Implementation(bool bRecovery)
+void UWidgetSettingItemBase::OnRefresh_Implementation()
 {
-	SetLabel(FText::GetEmpty());
-	SetValue(FParameter());
+	Super::OnRefresh_Implementation();
+}
+
+void UWidgetSettingItemBase::OnDestroy_Implementation()
+{
+	Super::OnDestroy_Implementation();
 }
 
 FText UWidgetSettingItemBase::GetLabel() const

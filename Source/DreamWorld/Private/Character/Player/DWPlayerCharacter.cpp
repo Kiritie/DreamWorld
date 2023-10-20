@@ -143,12 +143,12 @@ void ADWPlayerCharacter::LoadData(FSaveData* InSaveData, EPhase InPhase)
 
 			switch (SaveData.InventoryInitType)
 			{
-				case EDWPlayerInventoryInitType::Empty:
+				case EDWInventoryInitType::Empty:
 				{
 					SaveData.InventoryData.ClearAllItem();
 					break;
 				}
-				case EDWPlayerInventoryInitType::All:
+				case EDWInventoryInitType::All:
 				{
 					auto VoxelDatas = UAssetModuleBPLibrary::LoadPrimaryAssets<UVoxelData>(FName("Voxel"));
 					for (int32 i = 0; i < VoxelDatas.Num(); i++)

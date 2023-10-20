@@ -5,6 +5,8 @@
 
 #include "Asset/AssetModuleBPLibrary.h"
 #include "Audio/AudioModuleBPLibrary.h"
+#include "SaveGame/SaveGameModuleBPLibrary.h"
+#include "SaveGame/Setting/DWSettingSaveGame.h"
 #include "Widget/WidgetModuleBPLibrary.h"
 #include "Widget/Setting/Item/WidgetFloatSettingItem.h"
 
@@ -13,8 +15,6 @@ UWidgetAudioSettingPage::UWidgetAudioSettingPage(const FObjectInitializer& Objec
 	WidgetName = FName("AudioSettingPage");
 
 	Title = FText::FromString(TEXT("音频"));
-
-	DefaultAudioData = FDWAudioModuleSaveData();
 }
 
 void UWidgetAudioSettingPage::OnInitialize_Implementation(UObject* InOwner)
@@ -26,16 +26,16 @@ void UWidgetAudioSettingPage::OnCreate_Implementation(UObject* InOwner)
 {
 	Super::OnCreate_Implementation(InOwner);
 
-	SettingItem_GlobalSoundVolume = UObjectPoolModuleBPLibrary::SpawnObject<UWidgetFloatSettingItem>({ FText::FromString(TEXT("音量大小")) }, UAssetModuleBPLibrary::GetStaticClass(FName("FloatSettingItem")));
+	SettingItem_GlobalSoundVolume = CreateSubWidget<UWidgetFloatSettingItem>({ FText::FromString(TEXT("音量大小")), 0.f, 1.f, 0, 100.f }, UAssetModuleBPLibrary::GetStaticClass(FName("FloatSettingItem")));
 	AddSettingItem(SettingItem_GlobalSoundVolume, FText::FromString(TEXT("全局")));
 
-	SettingItem_BackgroundSoundVolume = UObjectPoolModuleBPLibrary::SpawnObject<UWidgetFloatSettingItem>({ FText::FromString(TEXT("音量大小")) }, UAssetModuleBPLibrary::GetStaticClass(FName("FloatSettingItem")));
+	SettingItem_BackgroundSoundVolume = CreateSubWidget<UWidgetFloatSettingItem>({ FText::FromString(TEXT("音量大小")), 0.f, 1.f, 0, 100.f }, UAssetModuleBPLibrary::GetStaticClass(FName("FloatSettingItem")));
 	AddSettingItem(SettingItem_BackgroundSoundVolume, FText::FromString(TEXT("背景")));
 
-	SettingItem_EnvironmentSoundVolume = UObjectPoolModuleBPLibrary::SpawnObject<UWidgetFloatSettingItem>({ FText::FromString(TEXT("音量大小")) }, UAssetModuleBPLibrary::GetStaticClass(FName("FloatSettingItem")));
+	SettingItem_EnvironmentSoundVolume = CreateSubWidget<UWidgetFloatSettingItem>({ FText::FromString(TEXT("音量大小")), 0.f, 1.f, 0, 100.f }, UAssetModuleBPLibrary::GetStaticClass(FName("FloatSettingItem")));
 	AddSettingItem(SettingItem_EnvironmentSoundVolume, FText::FromString(TEXT("环境")));
 
-	SettingItem_EffectSoundVolume = UObjectPoolModuleBPLibrary::SpawnObject<UWidgetFloatSettingItem>({ FText::FromString(TEXT("音量大小")) }, UAssetModuleBPLibrary::GetStaticClass(FName("FloatSettingItem")));
+	SettingItem_EffectSoundVolume = CreateSubWidget<UWidgetFloatSettingItem>({ FText::FromString(TEXT("音量大小")), 0.f, 1.f, 0, 100.f }, UAssetModuleBPLibrary::GetStaticClass(FName("FloatSettingItem")));
 	AddSettingItem(SettingItem_EffectSoundVolume, FText::FromString(TEXT("音效")));
 }
 
@@ -63,10 +63,10 @@ void UWidgetAudioSettingPage::OnReset_Implementation()
 {
 	Super::OnReset_Implementation();
 
-	SettingItem_GlobalSoundVolume->SetValue(DefaultAudioData.GlobalSoundParams.Volume);
-	SettingItem_BackgroundSoundVolume->SetValue(DefaultAudioData.BackgroundSoundParams.Volume);
-	SettingItem_EnvironmentSoundVolume->SetValue(DefaultAudioData.EnvironmentSoundParams.Volume);
-	SettingItem_EffectSoundVolume->SetValue(DefaultAudioData.EffectSoundParams.Volume);
+	SettingItem_GlobalSoundVolume->SetValue(GetDefaultAudioData().GlobalSoundParams.Volume);
+	SettingItem_BackgroundSoundVolume->SetValue(GetDefaultAudioData().BackgroundSoundParams.Volume);
+	SettingItem_EnvironmentSoundVolume->SetValue(GetDefaultAudioData().EnvironmentSoundParams.Volume);
+	SettingItem_EffectSoundVolume->SetValue(GetDefaultAudioData().EffectSoundParams.Volume);
 }
 
 void UWidgetAudioSettingPage::OnClose_Implementation(bool bInstant)
@@ -84,8 +84,13 @@ bool UWidgetAudioSettingPage::CanApply_Implementation() const
 
 bool UWidgetAudioSettingPage::CanReset_Implementation() const
 {
-	return UAudioModuleBPLibrary::GetGlobalSoundVolume() != DefaultAudioData.GlobalSoundParams.Volume ||
-		UAudioModuleBPLibrary::GetBackgroundSoundVolume() != DefaultAudioData.BackgroundSoundParams.Volume ||
-		UAudioModuleBPLibrary::GetEnvironmentSoundVolume() != DefaultAudioData.EnvironmentSoundParams.Volume ||
-		UAudioModuleBPLibrary::GetEffectSoundVolume() != DefaultAudioData.EffectSoundParams.Volume;
+	return UAudioModuleBPLibrary::GetGlobalSoundVolume() != GetDefaultAudioData().GlobalSoundParams.Volume ||
+		UAudioModuleBPLibrary::GetBackgroundSoundVolume() != GetDefaultAudioData().BackgroundSoundParams.Volume ||
+		UAudioModuleBPLibrary::GetEnvironmentSoundVolume() != GetDefaultAudioData().EnvironmentSoundParams.Volume ||
+		UAudioModuleBPLibrary::GetEffectSoundVolume() != GetDefaultAudioData().EffectSoundParams.Volume;
+}
+
+FDWAudioModuleSaveData& UWidgetAudioSettingPage::GetDefaultAudioData() const
+{
+	return USaveGameModuleBPLibrary::GetSaveGame<UDWSettingSaveGame>()->GetDefaultDataRef<FDWSettingSaveData>().AudioData;
 }

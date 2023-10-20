@@ -13,11 +13,6 @@ UWidgetTextSettingItem::UWidgetTextSettingItem(const FObjectInitializer& ObjectI
 void UWidgetTextSettingItem::OnSpawn_Implementation(const TArray<FParameter>& InParams)
 {
 	Super::OnSpawn_Implementation(InParams);
-
-	if(InParams.IsValidIndex(1))
-	{
-		TxtBox_Value->KeyboardType = InParams[1].GetPointerValueRef<EVirtualKeyboardType::Type>();
-	}
 }
 
 void UWidgetTextSettingItem::OnDespawn_Implementation(bool bRecovery)
@@ -25,6 +20,42 @@ void UWidgetTextSettingItem::OnDespawn_Implementation(bool bRecovery)
 	TxtBox_Value->KeyboardType = EVirtualKeyboardType::Default;
 
 	Super::OnDespawn_Implementation(bRecovery);
+}
+
+void UWidgetTextSettingItem::OnCreate_Implementation(UUserWidgetBase* InOwner, const TArray<FParameter>& InParams)
+{
+	Super::OnCreate_Implementation(InOwner, InParams);
+
+	TxtBox_Value->OnTextChanged.AddDynamic(this, &UWidgetTextSettingItem::OnTextBoxContentChanged);
+}
+
+void UWidgetTextSettingItem::OnInitialize_Implementation(const TArray<FParameter>& InParams)
+{
+	Super::OnInitialize_Implementation(InParams);
+
+	if(InParams.IsValidIndex(1))
+	{
+		TxtBox_Value->KeyboardType = InParams[1].GetPointerValueRef<EVirtualKeyboardType::Type>();
+	}
+}
+
+void UWidgetTextSettingItem::OnRefresh_Implementation()
+{
+	Super::OnRefresh_Implementation();
+}
+
+void UWidgetTextSettingItem::OnDestroy_Implementation()
+{
+	Super::OnDestroy_Implementation();
+}
+
+void UWidgetTextSettingItem::OnTextBoxContentChanged(const FText& InText)
+{
+	if(OnValueChanged.IsBound())
+	{
+		OnValueChanged.Broadcast(this, InText);
+	}
+	Refresh();
 }
 
 FParameter UWidgetTextSettingItem::GetValue() const
@@ -59,10 +90,11 @@ void UWidgetTextSettingItem::SetValue(const FParameter& InValue)
 		}
 		case EVirtualKeyboardType::Number:
 		{
-			Text = FText::FromString(FString::Printf(TEXT("%3f"), InValue.GetFloatValue()));
+			Text = FText::FromString(FString::Printf(TEXT("%0.2f"), InValue.GetFloatValue()));
 			break;
 		}
 		default: break;
 	}
 	TxtBox_Value->SetText(Text);
+	Refresh();
 }

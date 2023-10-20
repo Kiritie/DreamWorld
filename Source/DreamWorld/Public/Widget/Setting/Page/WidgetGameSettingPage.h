@@ -45,6 +45,6 @@ protected:
 	UWidgetBoolSettingItem* SettingItem_AutoJump;
 
 public:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	FDWGameSaveData DefaultGameData;
+	UFUNCTION(BlueprintPure)
+	FDWGameSaveData& GetDefaultGameData() const;
 };

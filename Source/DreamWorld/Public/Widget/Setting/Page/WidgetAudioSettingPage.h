@@ -50,6 +50,6 @@ protected:
 	UWidgetFloatSettingItem* SettingItem_EffectSoundVolume;
 
 public:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	FDWAudioModuleSaveData DefaultAudioData;
+	UFUNCTION(BlueprintPure)
+	FDWAudioModuleSaveData& GetDefaultAudioData() const;
 };

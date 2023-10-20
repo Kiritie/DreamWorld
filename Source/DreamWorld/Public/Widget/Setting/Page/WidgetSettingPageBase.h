@@ -58,4 +58,7 @@ protected:
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FText Title;
+
+private:
+	FText LastCategory;
 };

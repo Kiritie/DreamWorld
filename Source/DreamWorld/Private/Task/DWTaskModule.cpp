@@ -3,6 +3,8 @@
 
 #include "Task/DWTaskModule.h"
 
+#include "Common/DWCommonTypes.h"
+
 IMPLEMENTATION_MODULE(ADWTaskModule)
 
 // ParamSets default values
@@ -60,9 +62,14 @@ void ADWTaskModule::OnTermination_Implementation(EPhase InPhase)
 void ADWTaskModule::LoadData(FSaveData* InSaveData, EPhase InPhase)
 {
 	Super::LoadData(InSaveData, InPhase);
+
+	const auto& SaveData = InSaveData->CastRef<FDWTaskModuleSaveData>();
 }
 
 FSaveData* ADWTaskModule::ToData()
 {
-	return Super::ToData();
+	static FDWTaskModuleSaveData SaveData;
+	SaveData = Super::ToData()->CastRef<FTaskModuleSaveData>();
+
+	return &SaveData;
 }

@@ -19,6 +19,8 @@ UWidgetSettingPanel::UWidgetSettingPanel(const FObjectInitializer& ObjectInitial
 	WidgetType = EWidgetType::Temporary;
 	WidgetInputMode = EInputMode::UIOnly;
 
+	WidgetZOrder = 10;
+
 	SetIsFocusable(true);
 }
 

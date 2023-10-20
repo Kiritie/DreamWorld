@@ -2,8 +2,12 @@
 
 #pragma once
 #include "WidgetSettingPageBase.h"
+#include "Common/DWCommonTypes.h"
 
 #include "WidgetCameraSettingPage.generated.h"
+
+class UWidgetBoolSettingItem;
+class UWidgetFloatSettingItem;
 
 /**
  * 
@@ -33,4 +37,42 @@ public:
 	virtual bool CanApply_Implementation() const override;
 
 	virtual bool CanReset_Implementation() const override;
+
+protected:
+	UPROPERTY(BlueprintReadOnly, Category = "Components")
+	UWidgetFloatSettingItem* SettingItem_CameraMoveRate;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Components")
+	UWidgetBoolSettingItem* SettingItem_SmoothCameraMove;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Components")
+	UWidgetFloatSettingItem* SettingItem_CameraMoveSpeed;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Components")
+	UWidgetBoolSettingItem* SettingItem_ReverseCameraPitch;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Components")
+	UWidgetFloatSettingItem* SettingItem_CameraTurnRate;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Components")
+	UWidgetFloatSettingItem* SettingItem_CameraLookUpRate;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Components")
+	UWidgetBoolSettingItem* SettingItem_SmoothCameraRotate;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Components")
+	UWidgetFloatSettingItem* SettingItem_CameraRotateSpeed;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Components")
+	UWidgetFloatSettingItem* SettingItem_CameraZoomRate;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Components")
+	UWidgetBoolSettingItem* SettingItem_SmoothCameraZoom;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Components")
+	UWidgetFloatSettingItem* SettingItem_CameraZoomSpeed;
+
+public:
+	UFUNCTION(BlueprintPure)
+	FDWCameraModuleSaveData& GetDefaultCameraData() const;
 };

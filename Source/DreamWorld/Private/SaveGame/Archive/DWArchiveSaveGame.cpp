@@ -3,6 +3,7 @@
 #include "SaveGame/Archive/DWArchiveSaveGame.h"
 
 #include "Achievement/AchievementModule.h"
+#include "Achievement/DWAchievementModule.h"
 #include "Character/DWCharacterModule.h"
 #include "Character/Player/DWPlayerCharacter.h"
 #include "Debug/DebugModuleTypes.h"
@@ -46,7 +47,7 @@ void UDWArchiveSaveGame::OnLoad_Implementation(EPhase InPhase)
 	}
 	AVoxelModule::Get()->LoadSaveData(&SaveData.WorldData, InPhase);
 	UCommonBPLibrary::GetPlayerController<ADWPlayerController>()->LoadSaveData(&SaveData.PlayerData, InPhase);
-	AAchievementModule::Get()->LoadSaveData(&SaveData.AchievementData, InPhase);
+	ADWAchievementModule::Get()->LoadSaveData(&SaveData.AchievementData, InPhase);
 	ADWTaskModule::Get()->LoadSaveData(&SaveData.TaskData, InPhase);
 	ADWTeamModule::Get()->LoadSaveData(&SaveData.TeamData, InPhase);
 }
@@ -61,7 +62,7 @@ void UDWArchiveSaveGame::OnUnload_Implementation(EPhase InPhase)
 	}
 	ADWVoxelModule::Get()->UnloadSaveData(InPhase);
 	UCommonBPLibrary::GetPlayerController<ADWPlayerController>()->UnloadSaveData(InPhase);
-	AAchievementModule::Get()->UnloadSaveData(InPhase);
+	ADWAchievementModule::Get()->UnloadSaveData(InPhase);
 	ADWTaskModule::Get()->UnloadSaveData(InPhase);
 	ADWTeamModule::Get()->UnloadSaveData(InPhase);
 }
@@ -72,7 +73,7 @@ void UDWArchiveSaveGame::OnRefresh_Implementation()
 
 	SaveData.WorldData = ADWVoxelModule::Get()->GetSaveDataRef<FDWWorldSaveData>(true);
 	SaveData.PlayerData = UCommonBPLibrary::GetPlayerPawn<ADWPlayerCharacter>()->GetSaveDataRef<FDWPlayerSaveData>(true);
-	SaveData.AchievementData = AAchievementModule::Get()->GetSaveDataRef<FDWAchievementModuleSaveData>(true);
+	SaveData.AchievementData = ADWAchievementModule::Get()->GetSaveDataRef<FDWAchievementModuleSaveData>(true);
 	SaveData.TaskData = ADWTaskModule::Get()->GetSaveDataRef<FDWTaskModuleSaveData>(true);
 	SaveData.TeamData = ADWTeamModule::Get()->GetSaveDataRef<FDWTeamModuleSaveData>(true);
 }

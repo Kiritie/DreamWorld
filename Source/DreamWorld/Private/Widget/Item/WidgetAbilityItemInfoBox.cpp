@@ -11,6 +11,8 @@ UWidgetAbilityItemInfoBox::UWidgetAbilityItemInfoBox(const FObjectInitializer& O
 	WidgetInputMode = EInputMode::None;
 
 	WidgetType = EWidgetType::Permanent;
+
+	WidgetZOrder = 3;
 }
 
 void UWidgetAbilityItemInfoBox::OnCreate_Implementation(UObject* InOwner)
