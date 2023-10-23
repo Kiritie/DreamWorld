@@ -37,9 +37,9 @@ UWidgetInventoryPanel::UWidgetInventoryPanel(const FObjectInitializer& ObjectIni
 	UISlotDatas.Add(ESlotSplitType::Equip);
 }
 
-void UWidgetInventoryPanel::OnInitialize_Implementation(UObject* InOwner)
+void UWidgetInventoryPanel::OnInitialize(UObject* InOwner)
 {
-	Super::OnInitialize_Implementation(InOwner);
+	Super::OnInitialize(InOwner);
 
 	if(!InOwner) return;
 
@@ -102,17 +102,17 @@ void UWidgetInventoryPanel::OnInitialize_Implementation(UObject* InOwner)
 	}
 }
 
-void UWidgetInventoryPanel::OnOpen_Implementation(const TArray<FParameter>& InParams, bool bInstant)
+void UWidgetInventoryPanel::OnOpen(const TArray<FParameter>& InParams, bool bInstant)
 {
-	Super::OnOpen_Implementation(InParams, bInstant);
+	Super::OnOpen(InParams, bInstant);
 }
 
-void UWidgetInventoryPanel::OnClose_Implementation(bool bInstant)
+void UWidgetInventoryPanel::OnClose(bool bInstant)
 {
-	Super::OnClose_Implementation(bInstant);
+	Super::OnClose(bInstant);
 }
 
-void UWidgetInventoryPanel::OnRefresh_Implementation()
+void UWidgetInventoryPanel::OnRefresh()
 {
-	Super::OnRefresh_Implementation();
+	Super::OnRefresh();
 }

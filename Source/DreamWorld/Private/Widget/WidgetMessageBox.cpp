@@ -14,22 +14,22 @@ UWidgetMessageBox::UWidgetMessageBox(const FObjectInitializer& ObjectInitializer
 	WidgetCreateType = EWidgetCreateType::AutoCreate;
 }
 
-void UWidgetMessageBox::OnCreate_Implementation(UObject* InOwner)
+void UWidgetMessageBox::OnCreate(UObject* InOwner)
 {
-	Super::OnCreate_Implementation(InOwner);
+	Super::OnCreate(InOwner);
 }
 
-void UWidgetMessageBox::OnInitialize_Implementation(UObject* InOwner)
+void UWidgetMessageBox::OnInitialize(UObject* InOwner)
 {
-	Super::OnInitialize_Implementation(InOwner);
+	Super::OnInitialize(InOwner);
 }
 
-void UWidgetMessageBox::OnOpen_Implementation(const TArray<FParameter>& InParams, bool bInstant)
+void UWidgetMessageBox::OnOpen(const TArray<FParameter>& InParams, bool bInstant)
 {
-	Super::OnOpen_Implementation(InParams, bInstant);
+	Super::OnOpen(InParams, bInstant);
 }
 
-void UWidgetMessageBox::OnClose_Implementation(bool bInstant)
+void UWidgetMessageBox::OnClose(bool bInstant)
 {
-	Super::OnClose_Implementation(bInstant);
+	Super::OnClose(bInstant);
 }

@@ -32,9 +32,9 @@ UWidgetGeneratePanel::UWidgetGeneratePanel(const FObjectInitializer& ObjectIniti
 	SetIsFocusable(true);
 }
 
-void UWidgetGeneratePanel::OnCreate_Implementation(UObject* InOwner)
+void UWidgetGeneratePanel::OnCreate(UObject* InOwner)
 {
-	Super::OnCreate_Implementation(InOwner);
+	Super::OnCreate(InOwner);
 	
 	if(BtnGenerate)
 	{
@@ -42,7 +42,7 @@ void UWidgetGeneratePanel::OnCreate_Implementation(UObject* InOwner)
 	}
 }
 
-void UWidgetGeneratePanel::OnInitialize_Implementation(UObject* InOwner)
+void UWidgetGeneratePanel::OnInitialize(UObject* InOwner)
 {
 	if(OwnerObject)
 	{
@@ -50,7 +50,7 @@ void UWidgetGeneratePanel::OnInitialize_Implementation(UObject* InOwner)
 		Inventory->OnRefresh.RemoveDynamic(this, &UWidgetGeneratePanel::Refresh);
 	}
 
-	Super::OnInitialize_Implementation(InOwner);
+	Super::OnInitialize(InOwner);
 
 	if(InOwner)
 	{
@@ -59,9 +59,9 @@ void UWidgetGeneratePanel::OnInitialize_Implementation(UObject* InOwner)
 	}
 }
 
-void UWidgetGeneratePanel::OnOpen_Implementation(const TArray<FParameter>& InParams, bool bInstant)
+void UWidgetGeneratePanel::OnOpen(const TArray<FParameter>& InParams, bool bInstant)
 {
-	Super::OnOpen_Implementation(InParams, bInstant);
+	Super::OnOpen(InParams, bInstant);
 
 	const FPrimaryAssetId GenerateToolID = InParams.IsValidIndex(0) ? InParams[0].GetObjectValue<IPrimaryEntityInterface>()->Execute_GetAssetID(InParams[0].GetObjectValue()) : FPrimaryAssetId();
 
@@ -92,17 +92,17 @@ void UWidgetGeneratePanel::OnOpen_Implementation(const TArray<FParameter>& InPar
 	Refresh();
 }
 
-void UWidgetGeneratePanel::OnClose_Implementation(bool bInstant)
+void UWidgetGeneratePanel::OnClose(bool bInstant)
 {
-	Super::OnClose_Implementation(bInstant);
+	Super::OnClose(bInstant);
 
 	PreviewGenerateRawDataIndex = 0;
 	SelectedGenerateRawData = FDWGenerateRawData();
 }
 
-void UWidgetGeneratePanel::OnRefresh_Implementation()
+void UWidgetGeneratePanel::OnRefresh()
 {
-	Super::OnRefresh_Implementation();
+	Super::OnRefresh();
 
 	for(auto Iter : PreviewItems)
 	{
@@ -142,9 +142,9 @@ void UWidgetGeneratePanel::OnRefresh_Implementation()
 	}
 }
 
-void UWidgetGeneratePanel::OnDestroy_Implementation(bool bRecovery)
+void UWidgetGeneratePanel::OnDestroy(bool bRecovery)
 {
-	Super::OnDestroy_Implementation(bRecovery);
+	Super::OnDestroy(bRecovery);
 	
 	for(auto Iter : GenerateItems)
 	{

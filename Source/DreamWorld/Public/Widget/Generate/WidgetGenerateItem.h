@@ -20,7 +20,7 @@ public:
 public:
 	virtual void OnDespawn_Implementation(bool bRecovery) override;
 
-	virtual void OnInitialize_Implementation(const TArray<FParameter>& InParams) override;
+	virtual void OnInitialize(const TArray<FParameter>& InParams) override;
 
 public:
 	virtual void OnSelected_Implementation() override;

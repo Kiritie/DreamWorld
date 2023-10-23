@@ -31,6 +31,7 @@ public class DreamWorld : ModuleRules
 				"UMG",
 				"CommonUI",
 				"AIModule",
+				"EnhancedInput",
 				"GameplayAbilities",
 				"GameplayTags",
 				"GameplayTasks",

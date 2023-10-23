@@ -10,17 +10,17 @@ UWidgetMainMenu::UWidgetMainMenu(const FObjectInitializer& ObjectInitializer) : 
 	WidgetInputMode = EInputMode::UIOnly;
 }
 
-void UWidgetMainMenu::OnInitialize_Implementation(UObject* InOwner)
+void UWidgetMainMenu::OnInitialize(UObject* InOwner)
 {
-	Super::OnInitialize_Implementation(InOwner);
+	Super::OnInitialize(InOwner);
 }
 
-void UWidgetMainMenu::OnOpen_Implementation(const TArray<FParameter>& InParams, bool bInstant)
+void UWidgetMainMenu::OnOpen(const TArray<FParameter>& InParams, bool bInstant)
 {
-	Super::OnOpen_Implementation(InParams, bInstant);
+	Super::OnOpen(InParams, bInstant);
 }
 
-void UWidgetMainMenu::OnClose_Implementation(bool bInstant)
+void UWidgetMainMenu::OnClose(bool bInstant)
 {
-	Super::OnClose_Implementation(bInstant);
+	Super::OnClose(bInstant);
 }

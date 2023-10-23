@@ -24,11 +24,11 @@ protected:
 	class UTextBlock* TextBlock_ItemDetail;
 
 public:
-	virtual void OnCreate_Implementation(UObject* InOwner) override;
+	virtual void OnCreate(UObject* InOwner) override;
 
-	virtual void OnInitialize_Implementation(UObject* InOwner) override;
+	virtual void OnInitialize(UObject* InOwner) override;
 
-	virtual void OnOpen_Implementation(const TArray<FParameter>& InParams, bool bInstant) override;
+	virtual void OnOpen(const TArray<FParameter>& InParams, bool bInstant) override;
 
-	virtual void OnClose_Implementation(bool bInstant) override;
+	virtual void OnClose(bool bInstant) override;
 };

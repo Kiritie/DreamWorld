@@ -41,14 +41,14 @@ UWidgetInventoryBar::UWidgetInventoryBar(const FObjectInitializer& ObjectInitial
 	UISlotDatas.Add(ESlotSplitType::Skill);
 }
 
-void UWidgetInventoryBar::OnInitialize_Implementation(UObject* InOwner)
+void UWidgetInventoryBar::OnInitialize(UObject* InOwner)
 {
 	if(GetInventory())
 	{
 		GetInventory()->OnSlotSelected.RemoveDynamic(this, &UWidgetInventoryBar::OnInventorySlotSelected);
 	}
 
-	Super::OnInitialize_Implementation(InOwner);
+	Super::OnInitialize(InOwner);
 
 	if(!InOwner) return;
 	
@@ -155,19 +155,19 @@ void UWidgetInventoryBar::OnInitialize_Implementation(UObject* InOwner)
 	}
 }
 
-void UWidgetInventoryBar::OnOpen_Implementation(const TArray<FParameter>& InParams, bool bInstant)
+void UWidgetInventoryBar::OnOpen(const TArray<FParameter>& InParams, bool bInstant)
 {
-	Super::OnOpen_Implementation(InParams, bInstant);
+	Super::OnOpen(InParams, bInstant);
 }
 
-void UWidgetInventoryBar::OnClose_Implementation(bool bInstant)
+void UWidgetInventoryBar::OnClose(bool bInstant)
 {
-	Super::OnClose_Implementation(bInstant);
+	Super::OnClose(bInstant);
 }
 
-void UWidgetInventoryBar::OnRefresh_Implementation()
+void UWidgetInventoryBar::OnRefresh()
 {
-	Super::OnRefresh_Implementation();
+	Super::OnRefresh();
 }
 
 void UWidgetInventoryBar::OnInventorySlotSelected(UAbilityInventorySlot* InInventorySlot)

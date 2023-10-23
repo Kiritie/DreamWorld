@@ -5,12 +5,12 @@ UWidgetInventory::UWidgetInventory(const FObjectInitializer& ObjectInitializer) 
 
 }
 
-void UWidgetInventory::OnInitialize_Implementation(UObject* InOwner)
+void UWidgetInventory::OnInitialize(UObject* InOwner)
 {
-	Super::OnInitialize_Implementation(InOwner);
+	Super::OnInitialize(InOwner);
 }
 
-void UWidgetInventory::OnRefresh_Implementation()
+void UWidgetInventory::OnRefresh()
 {
-	Super::OnRefresh_Implementation();
+	Super::OnRefresh();
 }

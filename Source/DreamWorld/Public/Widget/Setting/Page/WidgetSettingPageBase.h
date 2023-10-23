@@ -19,19 +19,26 @@ public:
 	UWidgetSettingPageBase(const FObjectInitializer& ObjectInitializer);
 	
 public:
-	virtual void OnInitialize_Implementation(UObject* InOwner) override;
+	virtual void OnInitialize(UObject* InOwner) override;
 
-	virtual void OnCreate_Implementation(UObject* InOwner) override;
+	virtual void OnCreate(UObject* InOwner) override;
 
-	virtual void OnOpen_Implementation(const TArray<FParameter>& InParams, bool bInstant) override;
+	virtual void OnOpen(const TArray<FParameter>& InParams, bool bInstant) override;
 
-	virtual void OnReset_Implementation() override;
+	virtual void OnReset() override;
 
-	virtual void OnClose_Implementation(bool bInstant) override;
+	virtual void OnClose(bool bInstant) override;
 
 public:
-	UFUNCTION(BlueprintNativeEvent)
-	void OnApply();
+	UFUNCTION(BlueprintImplementableEvent, DisplayName = "OnApply")
+	void K2_OnApply();
+	virtual void OnApply();
+
+protected:
+	UFUNCTION(BlueprintImplementableEvent, DisplayName = "OnValueChange")
+	void K2_OnValueChange(UWidgetSettingItemBase* InSettingItem, const FParameter& InValue);
+	UFUNCTION()
+	virtual void OnValueChange(UWidgetSettingItemBase* InSettingItem, const FParameter& InValue);
 
 public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintPure)

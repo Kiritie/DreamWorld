@@ -19,14 +19,14 @@ UWidgetCameraSettingPage::UWidgetCameraSettingPage(const FObjectInitializer& Obj
 	Title = FText::FromString(TEXT("摄像机"));
 }
 
-void UWidgetCameraSettingPage::OnInitialize_Implementation(UObject* InOwner)
+void UWidgetCameraSettingPage::OnInitialize(UObject* InOwner)
 {
-	Super::OnInitialize_Implementation(InOwner);
+	Super::OnInitialize(InOwner);
 }
 
-void UWidgetCameraSettingPage::OnCreate_Implementation(UObject* InOwner)
+void UWidgetCameraSettingPage::OnCreate(UObject* InOwner)
 {
-	Super::OnCreate_Implementation(InOwner);
+	Super::OnCreate(InOwner);
 
 	SettingItem_CameraMoveRate = CreateSubWidget<UWidgetFloatSettingItem>({ FText::FromString(TEXT("移动速度")), 100.f, 500.f, 0 }, UAssetModuleBPLibrary::GetStaticClass(FName("FloatSettingItem")));
 	AddSettingItem(SettingItem_CameraMoveRate, FText::FromString(TEXT("移动")));
@@ -62,9 +62,9 @@ void UWidgetCameraSettingPage::OnCreate_Implementation(UObject* InOwner)
 	AddSettingItem(SettingItem_CameraZoomSpeed, FText::FromString(TEXT("缩放")));
 }
 
-void UWidgetCameraSettingPage::OnOpen_Implementation(const TArray<FParameter>& InParams, bool bInstant)
+void UWidgetCameraSettingPage::OnOpen(const TArray<FParameter>& InParams, bool bInstant)
 {
-	Super::OnOpen_Implementation(InParams, bInstant);
+	Super::OnOpen(InParams, bInstant);
 
 	SettingItem_CameraMoveRate->SetValue(ADWCameraModule::Get()->GetCameraMoveRate());
 	SettingItem_SmoothCameraMove->SetValue(ADWCameraModule::Get()->IsSmoothCameraMove());
@@ -79,9 +79,9 @@ void UWidgetCameraSettingPage::OnOpen_Implementation(const TArray<FParameter>& I
 	SettingItem_CameraZoomSpeed->SetValue(ADWCameraModule::Get()->GetCameraZoomSpeed());
 }
 
-void UWidgetCameraSettingPage::OnApply_Implementation()
+void UWidgetCameraSettingPage::OnApply()
 {
-	Super::OnApply_Implementation();
+	Super::OnApply();
 
 	ADWCameraModule::Get()->SetCameraMoveRate(SettingItem_CameraMoveRate->GetValue().GetFloatValue());
 	ADWCameraModule::Get()->SetSmoothCameraMove(SettingItem_SmoothCameraMove->GetValue().GetBooleanValue());
@@ -96,9 +96,9 @@ void UWidgetCameraSettingPage::OnApply_Implementation()
 	ADWCameraModule::Get()->SetCameraZoomSpeed(SettingItem_CameraZoomSpeed->GetValue().GetFloatValue());
 }
 
-void UWidgetCameraSettingPage::OnReset_Implementation()
+void UWidgetCameraSettingPage::OnReset()
 {
-	Super::OnReset_Implementation();
+	Super::OnReset();
 
 	SettingItem_CameraMoveRate->SetValue(GetDefaultCameraData().CameraMoveRate);
 	SettingItem_SmoothCameraMove->SetValue(GetDefaultCameraData().bSmoothCameraMove);
@@ -113,9 +113,9 @@ void UWidgetCameraSettingPage::OnReset_Implementation()
 	SettingItem_CameraZoomSpeed->SetValue(GetDefaultCameraData().CameraZoomSpeed);
 }
 
-void UWidgetCameraSettingPage::OnClose_Implementation(bool bInstant)
+void UWidgetCameraSettingPage::OnClose(bool bInstant)
 {
-	Super::OnClose_Implementation(bInstant);
+	Super::OnClose(bInstant);
 }
 
 bool UWidgetCameraSettingPage::CanApply_Implementation() const

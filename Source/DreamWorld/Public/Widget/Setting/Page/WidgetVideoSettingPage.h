@@ -20,26 +20,24 @@ public:
 	UWidgetVideoSettingPage(const FObjectInitializer& ObjectInitializer);
 	
 public:
-	virtual void OnInitialize_Implementation(UObject* InOwner) override;
+	virtual void OnInitialize(UObject* InOwner) override;
 
-	virtual void OnCreate_Implementation(UObject* InOwner) override;
+	virtual void OnCreate(UObject* InOwner) override;
 
-	virtual void OnOpen_Implementation(const TArray<FParameter>& InParams, bool bInstant) override;
+	virtual void OnOpen(const TArray<FParameter>& InParams, bool bInstant) override;
 
-	virtual void OnApply_Implementation() override;
+	virtual void OnApply() override;
 
-	virtual void OnReset_Implementation() override;
+	virtual void OnReset() override;
 
-	virtual void OnClose_Implementation(bool bInstant) override;
+	virtual void OnValueChange(UWidgetSettingItemBase* InSettingItem, const FParameter& InValue) override;
+
+	virtual void OnClose(bool bInstant) override;
 
 public:
 	virtual bool CanApply_Implementation() const override;
 
 	virtual bool CanReset_Implementation() const override;
-
-protected:
-	UFUNCTION()
-	void OnSettingItemValueChange(UWidgetSettingItemBase* InSettingItem, const FParameter& InValue);
 
 protected:
 	UPROPERTY(BlueprintReadOnly, Category = "Components")
@@ -50,6 +48,30 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly, Category = "Components")
 	UWidgetEnumSettingItem* SettingItem_ShadowQuality;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Components")
+	UWidgetEnumSettingItem* SettingItem_GlobalIlluminationQuality;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Components")
+	UWidgetEnumSettingItem* SettingItem_ReflectionQuality;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Components")
+	UWidgetEnumSettingItem* SettingItem_AntiAliasingQuality;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Components")
+	UWidgetEnumSettingItem* SettingItem_TextureQuality;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Components")
+	UWidgetEnumSettingItem* SettingItem_VisualEffectQuality;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Components")
+	UWidgetEnumSettingItem* SettingItem_PostProcessingQuality;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Components")
+	UWidgetEnumSettingItem* SettingItem_FoliageQuality;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Components")
+	UWidgetEnumSettingItem* SettingItem_ShadingQuality;
 
 public:
 	UFUNCTION(BlueprintPure)

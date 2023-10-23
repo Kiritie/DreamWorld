@@ -53,7 +53,6 @@ protected:
 
 	virtual void UnloadData(EPhase InPhase) override;
 
-
 	//////////////////////////////////////////////////////////////////////////
 	// Components
 protected:

@@ -135,19 +135,19 @@ FReply UWidgetInventorySlot::NativeOnMouseButtonDown(const FGeometry& InGeometry
 	return Super::NativeOnMouseButtonDown(InGeometry, InMouseEvent);
 }
 
-void UWidgetInventorySlot::OnCreate_Implementation(UUserWidgetBase* InOwner, const TArray<FParameter>& InParams)
+void UWidgetInventorySlot::OnCreate(UUserWidgetBase* InOwner, const TArray<FParameter>& InParams)
 {
-	Super::OnCreate_Implementation(InOwner, InParams);
+	Super::OnCreate(InOwner, InParams);
 }
 
-void UWidgetInventorySlot::OnInitialize_Implementation(const TArray<FParameter>& InParams)
+void UWidgetInventorySlot::OnInitialize(const TArray<FParameter>& InParams)
 {
-	Super::OnInitialize_Implementation(InParams);
+	Super::OnInitialize(InParams);
 }
 
-void UWidgetInventorySlot::OnRefresh_Implementation()
+void UWidgetInventorySlot::OnRefresh()
 {
-	Super::OnRefresh_Implementation();
+	Super::OnRefresh();
 
 	if(!OwnerSlot) return;
 

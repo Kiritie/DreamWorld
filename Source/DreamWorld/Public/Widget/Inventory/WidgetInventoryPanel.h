@@ -19,13 +19,13 @@ public:
 	UWidgetInventoryPanel(const FObjectInitializer& ObjectInitializer);
 
 public:
-	virtual void OnInitialize_Implementation(UObject* InOwner) override;
+	virtual void OnInitialize(UObject* InOwner) override;
 
-	virtual void OnOpen_Implementation(const TArray<FParameter>& InParams, bool bInstant) override;
+	virtual void OnOpen(const TArray<FParameter>& InParams, bool bInstant) override;
 
-	virtual void OnClose_Implementation(bool bInstant) override;
+	virtual void OnClose(bool bInstant) override;
 
-	virtual void OnRefresh_Implementation() override;
+	virtual void OnRefresh() override;
 	
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components", meta = (BindWidget, OptionalWidget = false))

@@ -22,16 +22,16 @@ void UWidgetTextSettingItem::OnDespawn_Implementation(bool bRecovery)
 	Super::OnDespawn_Implementation(bRecovery);
 }
 
-void UWidgetTextSettingItem::OnCreate_Implementation(UUserWidgetBase* InOwner, const TArray<FParameter>& InParams)
+void UWidgetTextSettingItem::OnCreate(UUserWidgetBase* InOwner, const TArray<FParameter>& InParams)
 {
-	Super::OnCreate_Implementation(InOwner, InParams);
+	Super::OnCreate(InOwner, InParams);
 
 	TxtBox_Value->OnTextChanged.AddDynamic(this, &UWidgetTextSettingItem::OnTextBoxContentChanged);
 }
 
-void UWidgetTextSettingItem::OnInitialize_Implementation(const TArray<FParameter>& InParams)
+void UWidgetTextSettingItem::OnInitialize(const TArray<FParameter>& InParams)
 {
-	Super::OnInitialize_Implementation(InParams);
+	Super::OnInitialize(InParams);
 
 	if(InParams.IsValidIndex(1))
 	{
@@ -39,21 +39,21 @@ void UWidgetTextSettingItem::OnInitialize_Implementation(const TArray<FParameter
 	}
 }
 
-void UWidgetTextSettingItem::OnRefresh_Implementation()
+void UWidgetTextSettingItem::OnRefresh()
 {
-	Super::OnRefresh_Implementation();
+	Super::OnRefresh();
 }
 
-void UWidgetTextSettingItem::OnDestroy_Implementation()
+void UWidgetTextSettingItem::OnDestroy()
 {
-	Super::OnDestroy_Implementation();
+	Super::OnDestroy();
 }
 
 void UWidgetTextSettingItem::OnTextBoxContentChanged(const FText& InText)
 {
 	if(OnValueChanged.IsBound())
 	{
-		OnValueChanged.Broadcast(this, InText);
+		OnValueChanged.Broadcast(this, GetValue());
 	}
 	Refresh();
 }
@@ -96,5 +96,5 @@ void UWidgetTextSettingItem::SetValue(const FParameter& InValue)
 		default: break;
 	}
 	TxtBox_Value->SetText(Text);
-	Refresh();
+	Super::SetValue(InValue);
 }

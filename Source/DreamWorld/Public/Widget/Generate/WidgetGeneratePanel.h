@@ -10,7 +10,7 @@ class UScrollBox;
 class UWrapBox;
 class UWidgetGenerateItem;
 class UWidgetAbilityPreviewItem;
-class UCommonButtonBase;
+class UWidgetButtonBase;
 
 /**
  * 制作面板
@@ -24,17 +24,17 @@ public:
 	UWidgetGeneratePanel(const FObjectInitializer& ObjectInitializer);
 
 public:
-	virtual void OnCreate_Implementation(UObject* InOwner) override;
+	virtual void OnCreate(UObject* InOwner) override;
 
-	virtual void OnInitialize_Implementation(UObject* InOwner) override;
+	virtual void OnInitialize(UObject* InOwner) override;
 
-	virtual void OnOpen_Implementation(const TArray<FParameter>& InParams, bool bInstant) override;
+	virtual void OnOpen(const TArray<FParameter>& InParams, bool bInstant) override;
 
-	virtual void OnClose_Implementation(bool bInstant) override;
+	virtual void OnClose(bool bInstant) override;
 
-	virtual void OnRefresh_Implementation() override;
+	virtual void OnRefresh() override;
 
-	virtual void OnDestroy_Implementation(bool bRecovery = false) override;
+	virtual void OnDestroy(bool bRecovery = false) override;
 
 public:
 	UFUNCTION(BlueprintNativeEvent)
@@ -58,7 +58,7 @@ protected:
 	UWrapBox* PreviewContent;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components", meta = (BindWidget, OptionalWidget = false))
-	UCommonButtonBase* BtnGenerate;
+	UWidgetButtonBase* BtnGenerate;
 
 protected:
 	TArray<UWidgetGenerateItem*> GenerateItems;

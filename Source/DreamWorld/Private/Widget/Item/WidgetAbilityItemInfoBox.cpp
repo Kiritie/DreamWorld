@@ -15,19 +15,19 @@ UWidgetAbilityItemInfoBox::UWidgetAbilityItemInfoBox(const FObjectInitializer& O
 	WidgetZOrder = 3;
 }
 
-void UWidgetAbilityItemInfoBox::OnCreate_Implementation(UObject* InOwner)
+void UWidgetAbilityItemInfoBox::OnCreate(UObject* InOwner)
 {
-	Super::OnCreate_Implementation(InOwner);
+	Super::OnCreate(InOwner);
 }
 
-void UWidgetAbilityItemInfoBox::OnInitialize_Implementation(UObject* InOwner)
+void UWidgetAbilityItemInfoBox::OnInitialize(UObject* InOwner)
 {
-	Super::OnInitialize_Implementation(InOwner);
+	Super::OnInitialize(InOwner);
 }
 
-void UWidgetAbilityItemInfoBox::OnOpen_Implementation(const TArray<FParameter>& InParams, bool bInstant)
+void UWidgetAbilityItemInfoBox::OnOpen(const TArray<FParameter>& InParams, bool bInstant)
 {
-	Super::OnOpen_Implementation(InParams, bInstant);
+	Super::OnOpen(InParams, bInstant);
 
 	if(TextBlock_ItemName && InParams.IsValidIndex(0))
 	{
@@ -40,7 +40,7 @@ void UWidgetAbilityItemInfoBox::OnOpen_Implementation(const TArray<FParameter>& 
 	}
 }
 
-void UWidgetAbilityItemInfoBox::OnClose_Implementation(bool bInstant)
+void UWidgetAbilityItemInfoBox::OnClose(bool bInstant)
 {
-	Super::OnClose_Implementation(bInstant);
+	Super::OnClose(bInstant);
 }

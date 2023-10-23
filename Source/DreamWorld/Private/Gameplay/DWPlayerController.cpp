@@ -3,7 +3,6 @@
 
 #include "Gameplay/DWPlayerController.h"
 
-#include "Engine/World.h"
 #include "Ability/Character/AbilityCharacterDataBase.h"
 #include "Camera/CameraModuleBPLibrary.h"
 #include "Character/Player/DWPlayerCharacter.h"
@@ -82,7 +81,11 @@ void ADWPlayerController::LoadData(FSaveData* InSaveData, EPhase InPhase)
 	if(PHASEC(InPhase, EPhase::Final))
 	{
 		UCharacterModuleBPLibrary::SwitchCharacter(PlayerCharacter, true, true);
-		UCameraModuleBPLibrary::SetCameraRotationAndDistance(SaveData.CameraRotation.Yaw, SaveData.CameraRotation.Pitch, SaveData.CameraDistance, true);
+		if(SaveData.IsSaved())
+		{
+			UCameraModuleBPLibrary::SetCameraRotation(SaveData.CameraRotation.Yaw, SaveData.CameraRotation.Pitch, true);
+		}
+		UCameraModuleBPLibrary::SetCameraDistance(SaveData.CameraDistance, true);
 	}
 }
 

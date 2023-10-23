@@ -23,33 +23,33 @@ UWidgetTaskInfoBox::UWidgetTaskInfoBox(const FObjectInitializer& ObjectInitializ
 	WidgetCreateType = EWidgetCreateType::AutoCreateAndOpen;
 }
 
-void UWidgetTaskInfoBox::OnCreate_Implementation(UObject* InOwner)
+void UWidgetTaskInfoBox::OnCreate(UObject* InOwner)
 {
-	Super::OnCreate_Implementation(InOwner);
+	Super::OnCreate(InOwner);
 }
 
-void UWidgetTaskInfoBox::OnInitialize_Implementation(UObject* InOwner)
+void UWidgetTaskInfoBox::OnInitialize(UObject* InOwner)
 {
-	Super::OnInitialize_Implementation(InOwner);
+	Super::OnInitialize(InOwner);
 }
 
-void UWidgetTaskInfoBox::OnOpen_Implementation(const TArray<FParameter>& InParams, bool bInstant)
+void UWidgetTaskInfoBox::OnOpen(const TArray<FParameter>& InParams, bool bInstant)
 {
-	Super::OnOpen_Implementation(InParams, bInstant);
+	Super::OnOpen(InParams, bInstant);
 
 	UEventModuleBPLibrary::SubscribeEvent<UEventHandle_EnterTask>(this, FName("Refresh"));
 }
 
-void UWidgetTaskInfoBox::OnClose_Implementation(bool bInstant)
+void UWidgetTaskInfoBox::OnClose(bool bInstant)
 {
-	Super::OnClose_Implementation(bInstant);
+	Super::OnClose(bInstant);
 
 	UEventModuleBPLibrary::UnsubscribeEvent<UEventHandle_EnterTask>(this, FName("Refresh"));
 }
 
-void UWidgetTaskInfoBox::OnRefresh_Implementation()
+void UWidgetTaskInfoBox::OnRefresh()
 {
-	Super::OnRefresh_Implementation();
+	Super::OnRefresh();
 
 	if(UTaskBase* RootTask = UTaskModuleBPLibrary::GetCurrentRootTask())
 	{

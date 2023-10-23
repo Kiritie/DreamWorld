@@ -15,13 +15,13 @@ void UWidgetGenerateItem::OnDespawn_Implementation(bool bRecovery)
 	GenerateItemData = FDWGenerateItemData();
 }
 
-void UWidgetGenerateItem::OnInitialize_Implementation(const TArray<FParameter>& InParams)
+void UWidgetGenerateItem::OnInitialize(const TArray<FParameter>& InParams)
 {
 	if(InParams.IsValidIndex(1))
 	{
 		GenerateItemData = InParams[1].GetPointerValueRef<FDWGenerateItemData>();
 	}
-	Super::OnInitialize_Implementation(InParams);
+	Super::OnInitialize(InParams);
 }
 
 void UWidgetGenerateItem::OnSelected_Implementation()

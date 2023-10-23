@@ -33,14 +33,14 @@ void UWidgetFloatSettingItem::OnDespawn_Implementation(bool bRecovery)
 	ScaleFactor = 1.f;
 }
 
-void UWidgetFloatSettingItem::OnCreate_Implementation(UUserWidgetBase* InOwner, const TArray<FParameter>& InParams)
+void UWidgetFloatSettingItem::OnCreate(UUserWidgetBase* InOwner, const TArray<FParameter>& InParams)
 {
-	Super::OnCreate_Implementation(InOwner, InParams);
+	Super::OnCreate(InOwner, InParams);
 
 	Slider_Value->OnValueChanged.AddDynamic(this, &UWidgetFloatSettingItem::OnSliderValueChanged);
 }
 
-void UWidgetFloatSettingItem::OnInitialize_Implementation(const TArray<FParameter>& InParams)
+void UWidgetFloatSettingItem::OnInitialize(const TArray<FParameter>& InParams)
 {
 	if(InParams.IsValidIndex(1))
 	{
@@ -62,12 +62,12 @@ void UWidgetFloatSettingItem::OnInitialize_Implementation(const TArray<FParamete
 		ScaleFactor = InParams[4].GetFloatValue();
 	}
 
-	Super::OnInitialize_Implementation(InParams);
+	Super::OnInitialize(InParams);
 }
 
-void UWidgetFloatSettingItem::OnRefresh_Implementation()
+void UWidgetFloatSettingItem::OnRefresh()
 {
-	Super::OnRefresh_Implementation();
+	Super::OnRefresh();
 
 	if(Txt_MinValue)
 	{
@@ -83,16 +83,16 @@ void UWidgetFloatSettingItem::OnRefresh_Implementation()
 	}
 }
 
-void UWidgetFloatSettingItem::OnDestroy_Implementation()
+void UWidgetFloatSettingItem::OnDestroy()
 {
-	Super::OnDestroy_Implementation();
+	Super::OnDestroy();
 }
 
 void UWidgetFloatSettingItem::OnSliderValueChanged(float InValue)
 {
 	if(OnValueChanged.IsBound())
 	{
-		OnValueChanged.Broadcast(this, FMath::Lerp(MinValue, MaxValue, InValue));
+		OnValueChanged.Broadcast(this, GetValue());
 	}
 	Refresh();
 }
@@ -105,5 +105,5 @@ FParameter UWidgetFloatSettingItem::GetValue() const
 void UWidgetFloatSettingItem::SetValue(const FParameter& InValue)
 {
 	Slider_Value->SetValue((InValue.GetFloatValue() - MinValue) / (MaxValue - MinValue));
-	Refresh();
+	Super::SetValue(InValue);
 }

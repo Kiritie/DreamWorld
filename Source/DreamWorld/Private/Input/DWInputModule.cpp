@@ -31,58 +31,58 @@ ADWInputModule::ADWInputModule()
 	bPressedDefendGenerate = false;
 	bPressedSprint = false;
 
-	ActionMappings.Add(FInputActionMapping("Jump", IE_Pressed, this, "OnJumpPressed"));
-	ActionMappings.Add(FInputActionMapping("Jump", IE_Released, this, "OnJumpReleased"));
-	ActionMappings.Add(FInputActionMapping("Sprint", IE_Pressed, this, "OnSprintPressed"));
-	ActionMappings.Add(FInputActionMapping("Sprint", IE_Released, this, "OnSprintReleased"));
-	
-	ActionMappings.Add(FInputActionMapping("Interact1", IE_Pressed, this, "DoInteractAction1"));
-	ActionMappings.Add(FInputActionMapping("Interact2", IE_Pressed, this, "DoInteractAction2"));
-	ActionMappings.Add(FInputActionMapping("Interact3", IE_Pressed, this, "DoInteractAction3"));
-	ActionMappings.Add(FInputActionMapping("Interact4", IE_Pressed, this, "DoInteractAction4"));
-	ActionMappings.Add(FInputActionMapping("Interact5", IE_Pressed, this, "DoInteractAction5"));
-
-	ActionMappings.Add(FInputActionMapping("Dodge", IE_Pressed, this, "OnDodgePressed"));
-	ActionMappings.Add(FInputActionMapping("Dodge", IE_Released, this, "OnDodgeReleased"));
-
-	ActionMappings.Add(FInputActionMapping("ToggleCrouch", IE_Released, this, "ToggleCrouch"));
-	ActionMappings.Add(FInputActionMapping("ToggleControlMode", IE_Pressed, this, "ToggleControlMode"));
-	ActionMappings.Add(FInputActionMapping("ToggleLockSightTarget", IE_Pressed, this, "ToggleLockTarget"));
-	ActionMappings.Add(FInputActionMapping("ChangeHand", IE_Pressed, this, "ChangeHand"));
-
-	ActionMappings.Add(FInputActionMapping("Attack/Destroy", IE_Pressed, this, "OnAttackDestroyPressed"));
-	ActionMappings.Add(FInputActionMapping("Attack/Destroy", IE_Released, this, "OnAttackDestroyReleased"));
-
-	ActionMappings.Add(FInputActionMapping("Defend/Generate", IE_Pressed, this, "OnDefendGeneratePressed"));
-	ActionMappings.Add(FInputActionMapping("Defend/Generate", IE_Released, this, "OnDefendGenerateReleased"));
-
-	ActionMappings.Add(FInputActionMapping("ReleaseSkillAbility1", IE_Pressed, this, "ReleaseSkillAbility1"));
-	ActionMappings.Add(FInputActionMapping("ReleaseSkillAbility2", IE_Pressed, this, "ReleaseSkillAbility2"));
-	ActionMappings.Add(FInputActionMapping("ReleaseSkillAbility3", IE_Pressed, this, "ReleaseSkillAbility3"));
-	ActionMappings.Add(FInputActionMapping("ReleaseSkillAbility4", IE_Pressed, this, "ReleaseSkillAbility4"));
-
-	ActionMappings.Add(FInputActionMapping("UseInventoryItem", IE_Pressed, this, "UseInventoryItem"));
-	ActionMappings.Add(FInputActionMapping("UseAllInventoryItem", IE_Pressed, this, "UseAllInventoryItem"));
-	ActionMappings.Add(FInputActionMapping("DiscardInventoryItem", IE_Pressed, this, "DiscardInventoryItem"));
-	ActionMappings.Add(FInputActionMapping("DiscardAllInventoryItem", IE_Pressed, this, "DiscardAllInventoryItem"));
-	ActionMappings.Add(FInputActionMapping("PrevInventorySlot", IE_Pressed, this, "PrevInventorySlot"));
-	ActionMappings.Add(FInputActionMapping("NextInventorySlot", IE_Pressed, this, "NextInventorySlot"));
-	ActionMappings.Add(FInputActionMapping("SelectInventorySlot1", IE_Pressed, this, "SelectInventorySlot1"));
-	ActionMappings.Add(FInputActionMapping("SelectInventorySlot2", IE_Pressed, this, "SelectInventorySlot2"));
-	ActionMappings.Add(FInputActionMapping("SelectInventorySlot3", IE_Pressed, this, "SelectInventorySlot3"));
-	ActionMappings.Add(FInputActionMapping("SelectInventorySlot4", IE_Pressed, this, "SelectInventorySlot4"));
-	ActionMappings.Add(FInputActionMapping("SelectInventorySlot5", IE_Pressed, this, "SelectInventorySlot5"));
-	ActionMappings.Add(FInputActionMapping("SelectInventorySlot6", IE_Pressed, this, "SelectInventorySlot6"));
-	ActionMappings.Add(FInputActionMapping("SelectInventorySlot7", IE_Pressed, this, "SelectInventorySlot7"));
-	ActionMappings.Add(FInputActionMapping("SelectInventorySlot8", IE_Pressed, this, "SelectInventorySlot8"));
-	ActionMappings.Add(FInputActionMapping("SelectInventorySlot9", IE_Pressed, this, "SelectInventorySlot9"));
-	ActionMappings.Add(FInputActionMapping("SelectInventorySlot10", IE_Pressed, this, "SelectInventorySlot10"));
-
-	ActionMappings.Add(FInputActionMapping("OpenInventoryPanel", IE_Pressed, this, "OpenInventoryPanel"));
-	
-	ActionMappings.Add(FInputActionMapping("OpenGeneratePanel", IE_Pressed, this, "OpenGeneratePanel"));
-
-	ActionMappings.Add(FInputActionMapping("PauseGame", IE_Pressed, this, "PauseGame"));
+	// ActionMappings.Add(FInputActionMapping("Jump", IE_Pressed, this, "OnJumpPressed"));
+	// ActionMappings.Add(FInputActionMapping("Jump", IE_Released, this, "OnJumpReleased"));
+	// ActionMappings.Add(FInputActionMapping("Sprint", IE_Pressed, this, "OnSprintPressed"));
+	// ActionMappings.Add(FInputActionMapping("Sprint", IE_Released, this, "OnSprintReleased"));
+	//
+	// ActionMappings.Add(FInputActionMapping("Interact1", IE_Pressed, this, "DoInteractAction1"));
+	// ActionMappings.Add(FInputActionMapping("Interact2", IE_Pressed, this, "DoInteractAction2"));
+	// ActionMappings.Add(FInputActionMapping("Interact3", IE_Pressed, this, "DoInteractAction3"));
+	// ActionMappings.Add(FInputActionMapping("Interact4", IE_Pressed, this, "DoInteractAction4"));
+	// ActionMappings.Add(FInputActionMapping("Interact5", IE_Pressed, this, "DoInteractAction5"));
+	//
+	// ActionMappings.Add(FInputActionMapping("Dodge", IE_Pressed, this, "OnDodgePressed"));
+	// ActionMappings.Add(FInputActionMapping("Dodge", IE_Released, this, "OnDodgeReleased"));
+	//
+	// ActionMappings.Add(FInputActionMapping("ToggleCrouch", IE_Released, this, "ToggleCrouch"));
+	// ActionMappings.Add(FInputActionMapping("ToggleControlMode", IE_Pressed, this, "ToggleControlMode"));
+	// ActionMappings.Add(FInputActionMapping("ToggleLockSightTarget", IE_Pressed, this, "ToggleLockTarget"));
+	// ActionMappings.Add(FInputActionMapping("ChangeHand", IE_Pressed, this, "ChangeHand"));
+	//
+	// ActionMappings.Add(FInputActionMapping("Attack/Destroy", IE_Pressed, this, "OnAttackDestroyPressed"));
+	// ActionMappings.Add(FInputActionMapping("Attack/Destroy", IE_Released, this, "OnAttackDestroyReleased"));
+	//
+	// ActionMappings.Add(FInputActionMapping("Defend/Generate", IE_Pressed, this, "OnDefendGeneratePressed"));
+	// ActionMappings.Add(FInputActionMapping("Defend/Generate", IE_Released, this, "OnDefendGenerateReleased"));
+	//
+	// ActionMappings.Add(FInputActionMapping("ReleaseSkillAbility1", IE_Pressed, this, "ReleaseSkillAbility1"));
+	// ActionMappings.Add(FInputActionMapping("ReleaseSkillAbility2", IE_Pressed, this, "ReleaseSkillAbility2"));
+	// ActionMappings.Add(FInputActionMapping("ReleaseSkillAbility3", IE_Pressed, this, "ReleaseSkillAbility3"));
+	// ActionMappings.Add(FInputActionMapping("ReleaseSkillAbility4", IE_Pressed, this, "ReleaseSkillAbility4"));
+	//
+	// ActionMappings.Add(FInputActionMapping("UseInventoryItem", IE_Pressed, this, "UseInventoryItem"));
+	// ActionMappings.Add(FInputActionMapping("UseAllInventoryItem", IE_Pressed, this, "UseAllInventoryItem"));
+	// ActionMappings.Add(FInputActionMapping("DiscardInventoryItem", IE_Pressed, this, "DiscardInventoryItem"));
+	// ActionMappings.Add(FInputActionMapping("DiscardAllInventoryItem", IE_Pressed, this, "DiscardAllInventoryItem"));
+	// ActionMappings.Add(FInputActionMapping("PrevInventorySlot", IE_Pressed, this, "PrevInventorySlot"));
+	// ActionMappings.Add(FInputActionMapping("NextInventorySlot", IE_Pressed, this, "NextInventorySlot"));
+	// ActionMappings.Add(FInputActionMapping("SelectInventorySlot1", IE_Pressed, this, "SelectInventorySlot1"));
+	// ActionMappings.Add(FInputActionMapping("SelectInventorySlot2", IE_Pressed, this, "SelectInventorySlot2"));
+	// ActionMappings.Add(FInputActionMapping("SelectInventorySlot3", IE_Pressed, this, "SelectInventorySlot3"));
+	// ActionMappings.Add(FInputActionMapping("SelectInventorySlot4", IE_Pressed, this, "SelectInventorySlot4"));
+	// ActionMappings.Add(FInputActionMapping("SelectInventorySlot5", IE_Pressed, this, "SelectInventorySlot5"));
+	// ActionMappings.Add(FInputActionMapping("SelectInventorySlot6", IE_Pressed, this, "SelectInventorySlot6"));
+	// ActionMappings.Add(FInputActionMapping("SelectInventorySlot7", IE_Pressed, this, "SelectInventorySlot7"));
+	// ActionMappings.Add(FInputActionMapping("SelectInventorySlot8", IE_Pressed, this, "SelectInventorySlot8"));
+	// ActionMappings.Add(FInputActionMapping("SelectInventorySlot9", IE_Pressed, this, "SelectInventorySlot9"));
+	// ActionMappings.Add(FInputActionMapping("SelectInventorySlot10", IE_Pressed, this, "SelectInventorySlot10"));
+	//
+	// ActionMappings.Add(FInputActionMapping("OpenInventoryPanel", IE_Pressed, this, "OpenInventoryPanel"));
+	//
+	// ActionMappings.Add(FInputActionMapping("OpenGeneratePanel", IE_Pressed, this, "OpenGeneratePanel"));
+	//
+	// ActionMappings.Add(FInputActionMapping("PauseGame", IE_Pressed, this, "PauseGame"));
 }
 
 #if WITH_EDITOR
@@ -581,7 +581,7 @@ void ADWInputModule::PrevInventorySlot()
 {
 	ADWPlayerCharacter* PlayerCharacter = UCommonBPLibrary::GetPlayerPawn<ADWPlayerCharacter>();
 	
-	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput() || GetPlayerController()->IsInputKeyDown(UInputModuleBPLibrary::GetKeyShortcutByName(FName("CameraZoom")).Key)) return;
+	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput() || UInputModuleBPLibrary::GetKeyShortcutByName(FName("CameraZoom")).IsPressing(GetPlayerController())) return;
 	
 	if(UProcedureModuleBPLibrary::IsCurrentProcedureClass<UProcedure_Playing>())
 	{
@@ -593,7 +593,7 @@ void ADWInputModule::NextInventorySlot()
 {
 	ADWPlayerCharacter* PlayerCharacter = UCommonBPLibrary::GetPlayerPawn<ADWPlayerCharacter>();
 	
-	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput() || GetPlayerController()->IsInputKeyDown(UInputModuleBPLibrary::GetKeyShortcutByName(FName("CameraZoom")).Key)) return;
+	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput() || UInputModuleBPLibrary::GetKeyShortcutByName(FName("CameraZoom")).IsPressing(GetPlayerController())) return;
 	
 	if(UProcedureModuleBPLibrary::IsCurrentProcedureClass<UProcedure_Playing>())
 	{

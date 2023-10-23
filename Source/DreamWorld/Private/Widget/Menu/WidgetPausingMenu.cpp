@@ -18,19 +18,19 @@ UWidgetPausingMenu::UWidgetPausingMenu(const FObjectInitializer& ObjectInitializ
 	SetIsFocusable(true);
 }
 
-void UWidgetPausingMenu::OnInitialize_Implementation(UObject* InOwner)
+void UWidgetPausingMenu::OnInitialize(UObject* InOwner)
 {
-	Super::OnInitialize_Implementation(InOwner);
+	Super::OnInitialize(InOwner);
 }
 
-void UWidgetPausingMenu::OnOpen_Implementation(const TArray<FParameter>& InParams, bool bInstant)
+void UWidgetPausingMenu::OnOpen(const TArray<FParameter>& InParams, bool bInstant)
 {
-	Super::OnOpen_Implementation(InParams, bInstant);
+	Super::OnOpen(InParams, bInstant);
 }
 
-void UWidgetPausingMenu::OnClose_Implementation(bool bInstant)
+void UWidgetPausingMenu::OnClose(bool bInstant)
 {
-	Super::OnClose_Implementation(bInstant);
+	Super::OnClose(bInstant);
 }
 
 FReply UWidgetPausingMenu::NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent)

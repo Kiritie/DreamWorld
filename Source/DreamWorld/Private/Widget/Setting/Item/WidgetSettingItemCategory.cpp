@@ -22,14 +22,14 @@ void UWidgetSettingItemCategory::OnDespawn_Implementation(bool bRecovery)
 	SetCategory(FText::GetEmpty());
 }
 
-void UWidgetSettingItemCategory::OnCreate_Implementation(UUserWidgetBase* InOwner, const TArray<FParameter>& InParams)
+void UWidgetSettingItemCategory::OnCreate(UUserWidgetBase* InOwner, const TArray<FParameter>& InParams)
 {
-	Super::OnCreate_Implementation(InOwner, InParams);
+	Super::OnCreate(InOwner, InParams);
 }
 
-void UWidgetSettingItemCategory::OnInitialize_Implementation(const TArray<FParameter>& InParams)
+void UWidgetSettingItemCategory::OnInitialize(const TArray<FParameter>& InParams)
 {
-	Super::OnInitialize_Implementation(InParams);
+	Super::OnInitialize(InParams);
 
 	if(InParams.IsValidIndex(0))
 	{
@@ -37,14 +37,14 @@ void UWidgetSettingItemCategory::OnInitialize_Implementation(const TArray<FParam
 	}
 }
 
-void UWidgetSettingItemCategory::OnRefresh_Implementation()
+void UWidgetSettingItemCategory::OnRefresh()
 {
-	Super::OnRefresh_Implementation();
+	Super::OnRefresh();
 }
 
-void UWidgetSettingItemCategory::OnDestroy_Implementation()
+void UWidgetSettingItemCategory::OnDestroy()
 {
-	Super::OnDestroy_Implementation();
+	Super::OnDestroy();
 }
 
 FText UWidgetSettingItemCategory::GetCategory() const

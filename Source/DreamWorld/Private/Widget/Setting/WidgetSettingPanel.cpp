@@ -24,19 +24,19 @@ UWidgetSettingPanel::UWidgetSettingPanel(const FObjectInitializer& ObjectInitial
 	SetIsFocusable(true);
 }
 
-void UWidgetSettingPanel::OnInitialize_Implementation(UObject* InOwner)
+void UWidgetSettingPanel::OnInitialize(UObject* InOwner)
 {
-	Super::OnInitialize_Implementation(InOwner);
+	Super::OnInitialize(InOwner);
 }
 
-void UWidgetSettingPanel::OnOpen_Implementation(const TArray<FParameter>& InParams, bool bInstant)
+void UWidgetSettingPanel::OnOpen(const TArray<FParameter>& InParams, bool bInstant)
 {
-	Super::OnOpen_Implementation(InParams, bInstant);
+	Super::OnOpen(InParams, bInstant);
 }
 
-void UWidgetSettingPanel::OnClose_Implementation(bool bInstant)
+void UWidgetSettingPanel::OnClose(bool bInstant)
 {
-	Super::OnClose_Implementation(bInstant);
+	Super::OnClose(bInstant);
 }
 
 FReply UWidgetSettingPanel::NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent)

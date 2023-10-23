@@ -7,6 +7,7 @@
 #include "Camera/DWCameraModule.h"
 #include "Common/CommonBPLibrary.h"
 #include "Gameplay/DWGameMode.h"
+#include "Input/DWInputModule.h"
 #include "Video/DWVideoModule.h"
 
 UDWSettingSaveGame::UDWSettingSaveGame()
@@ -30,6 +31,7 @@ void UDWSettingSaveGame::OnLoad_Implementation(EPhase InPhase)
 	ADWAudioModule::Get()->LoadSaveData(&SaveData.AudioData, InPhase);
 	ADWVideoModule::Get()->LoadSaveData(&SaveData.VideoData, InPhase);
 	ADWCameraModule::Get()->LoadSaveData(&SaveData.CameraData, InPhase);
+	ADWInputModule::Get()->LoadSaveData(&SaveData.InputData, InPhase);
 }
 
 void UDWSettingSaveGame::OnUnload_Implementation(EPhase InPhase)
@@ -45,4 +47,5 @@ void UDWSettingSaveGame::OnRefresh_Implementation()
 	SaveData.AudioData = ADWAudioModule::Get()->GetSaveDataRef<FDWAudioModuleSaveData>(true);
 	SaveData.VideoData = ADWVideoModule::Get()->GetSaveDataRef<FDWVideoModuleSaveData>(true);
 	SaveData.CameraData = ADWCameraModule::Get()->GetSaveDataRef<FDWCameraModuleSaveData>(true);
+	SaveData.InputData = ADWInputModule::Get()->GetSaveDataRef<FDWInputModuleSaveData>(true);
 }

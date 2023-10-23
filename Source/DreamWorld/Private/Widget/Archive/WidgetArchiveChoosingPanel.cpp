@@ -10,17 +10,17 @@ UWidgetArchiveChoosingPanel::UWidgetArchiveChoosingPanel(const FObjectInitialize
 	WidgetInputMode = EInputMode::UIOnly;
 }
 
-void UWidgetArchiveChoosingPanel::OnInitialize_Implementation(UObject* InOwner)
+void UWidgetArchiveChoosingPanel::OnInitialize(UObject* InOwner)
 {
-	Super::OnInitialize_Implementation(InOwner);
+	Super::OnInitialize(InOwner);
 }
 
-void UWidgetArchiveChoosingPanel::OnOpen_Implementation(const TArray<FParameter>& InParams, bool bInstant)
+void UWidgetArchiveChoosingPanel::OnOpen(const TArray<FParameter>& InParams, bool bInstant)
 {
-	Super::OnOpen_Implementation(InParams, bInstant);
+	Super::OnOpen(InParams, bInstant);
 }
 
-void UWidgetArchiveChoosingPanel::OnClose_Implementation(bool bInstant)
+void UWidgetArchiveChoosingPanel::OnClose(bool bInstant)
 {
-	Super::OnClose_Implementation(bInstant);
+	Super::OnClose(bInstant);
 }

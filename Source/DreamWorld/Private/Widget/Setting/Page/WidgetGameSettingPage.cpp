@@ -21,14 +21,14 @@ UWidgetGameSettingPage::UWidgetGameSettingPage(const FObjectInitializer& ObjectI
 	Title = FText::FromString(TEXT("游戏"));
 }
 
-void UWidgetGameSettingPage::OnInitialize_Implementation(UObject* InOwner)
+void UWidgetGameSettingPage::OnInitialize(UObject* InOwner)
 {
-	Super::OnInitialize_Implementation(InOwner);
+	Super::OnInitialize(InOwner);
 }
 
-void UWidgetGameSettingPage::OnCreate_Implementation(UObject* InOwner)
+void UWidgetGameSettingPage::OnCreate(UObject* InOwner)
 {
-	Super::OnCreate_Implementation(InOwner);
+	Super::OnCreate(InOwner);
 
 	SettingItem_GameLevel = CreateSubWidget<UWidgetEnumSettingItem>({ FText::FromString(TEXT("游戏难度")), FString("/Script/DreamWorld.EDWGameLevel") }, UAssetModuleBPLibrary::GetStaticClass(FName("EnumSettingItem")));
 	AddSettingItem(SettingItem_GameLevel, FText::FromString(TEXT("游戏")));
@@ -37,33 +37,33 @@ void UWidgetGameSettingPage::OnCreate_Implementation(UObject* InOwner)
 	AddSettingItem(SettingItem_AutoJump, FText::FromString(TEXT("控制")));
 }
 
-void UWidgetGameSettingPage::OnOpen_Implementation(const TArray<FParameter>& InParams, bool bInstant)
+void UWidgetGameSettingPage::OnOpen(const TArray<FParameter>& InParams, bool bInstant)
 {
-	Super::OnOpen_Implementation(InParams, bInstant);
+	Super::OnOpen(InParams, bInstant);
 
 	SettingItem_GameLevel->SetValue((int32)UCommonBPLibrary::GetGameMode<ADWGameMode>()->GetGameLevel());
 	SettingItem_AutoJump->SetValue(UCommonBPLibrary::GetGameMode<ADWGameMode>()->IsAutoJump());
 }
 
-void UWidgetGameSettingPage::OnApply_Implementation()
+void UWidgetGameSettingPage::OnApply()
 {
-	Super::OnApply_Implementation();
+	Super::OnApply();
 
 	UCommonBPLibrary::GetGameMode<ADWGameMode>()->SetGameLevel((EDWGameLevel)SettingItem_GameLevel->GetValue().GetIntegerValue());
 	UCommonBPLibrary::GetGameMode<ADWGameMode>()->SetAutoJump(SettingItem_AutoJump->GetValue().GetBooleanValue());
 }
 
-void UWidgetGameSettingPage::OnReset_Implementation()
+void UWidgetGameSettingPage::OnReset()
 {
-	Super::OnReset_Implementation();
+	Super::OnReset();
 
 	SettingItem_GameLevel->SetValue((int32)GetDefaultGameData().GameLevel);
 	SettingItem_AutoJump->SetValue(GetDefaultGameData().bAutoJump);
 }
 
-void UWidgetGameSettingPage::OnClose_Implementation(bool bInstant)
+void UWidgetGameSettingPage::OnClose(bool bInstant)
 {
-	Super::OnClose_Implementation(bInstant);
+	Super::OnClose(bInstant);
 }
 
 bool UWidgetGameSettingPage::CanApply_Implementation() const

@@ -7,13 +7,8 @@
 #include "SaveGame/SaveGameModuleBPLibrary.h"
 #include "SaveGame/Setting/DWSettingSaveGame.h"
 
-struct FDWGameSaveData;
-
 ADWGameMode::ADWGameMode()
 {
-	// set default pawn class to our Blueprinted character
-	DefaultPawnClass = APawn::StaticClass();
-
 	GameLevel = EDWGameLevel::Normal;
 	bAutoJump = true;
 }

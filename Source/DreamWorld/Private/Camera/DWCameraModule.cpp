@@ -13,6 +13,7 @@ IMPLEMENTATION_MODULE(ADWCameraModule)
 ADWCameraModule::ADWCameraModule()
 {
 	bCameraMoveControlAble = false;
+	CameraMoveSpeed = 6.f;
 	CameraZoomSpeed = 8.f;
 	MinCameraDistance = 150.f;
 	InitCameraDistance = 200.f;

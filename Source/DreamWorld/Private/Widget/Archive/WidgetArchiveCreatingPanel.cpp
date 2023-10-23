@@ -10,22 +10,22 @@ UWidgetArchiveCreatingPanel::UWidgetArchiveCreatingPanel(const FObjectInitialize
 	WidgetInputMode = EInputMode::GameAndUI_NotHideCursor;
 }
 
-void UWidgetArchiveCreatingPanel::OnInitialize_Implementation(UObject* InOwner)
+void UWidgetArchiveCreatingPanel::OnInitialize(UObject* InOwner)
 {
-	Super::OnInitialize_Implementation(InOwner);
+	Super::OnInitialize(InOwner);
 }
 
-void UWidgetArchiveCreatingPanel::OnOpen_Implementation(const TArray<FParameter>& InParams, bool bInstant)
+void UWidgetArchiveCreatingPanel::OnOpen(const TArray<FParameter>& InParams, bool bInstant)
 {
-	Super::OnOpen_Implementation(InParams, bInstant);
+	Super::OnOpen(InParams, bInstant);
 }
 
-void UWidgetArchiveCreatingPanel::OnClose_Implementation(bool bInstant)
+void UWidgetArchiveCreatingPanel::OnClose(bool bInstant)
 {
-	Super::OnClose_Implementation(bInstant);
+	Super::OnClose(bInstant);
 }
 
-void UWidgetArchiveCreatingPanel::OnRefresh_Implementation()
+void UWidgetArchiveCreatingPanel::OnRefresh()
 {
-	Super::OnRefresh_Implementation();
+	Super::OnRefresh();
 }

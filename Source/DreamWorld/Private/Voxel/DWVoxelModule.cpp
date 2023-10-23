@@ -5,12 +5,10 @@
 
 #include "Components/StaticMeshComponent.h"
 #include "Common/CommonBPLibrary.h"
-#include "Procedure/Archive/Procedure_ArchiveCreating.h"
 #include "Voxel/DWVoxelChunk.h"
 #include "Voxel/VoxelModuleBPLibrary.h"
 #include "Widget/WidgetGameHUD.h"
 #include "SaveGame/SaveGameModuleBPLibrary.h"
-#include "UObject/ConstructorHelpers.h"
 	
 IMPLEMENTATION_MODULE(ADWVoxelModule)
 
@@ -105,8 +103,8 @@ void ADWVoxelModule::GenerateWorld()
 
 	if(BoundsMesh && ChunkGenerateIndex != Index_Empty)
 	{
-		BoundsMesh->SetRelativeLocation(AVoxelModule::ChunkIndexToLocation(FIndex(ChunkGenerateIndex.X, ChunkGenerateIndex.Y, 0)));
-		BoundsMesh->SetRelativeScale3D(FVector(WorldData->GetWorldRealSize().X * WorldData->BlockSize * 0.01f, WorldData->GetWorldRealSize().Y * WorldData->BlockSize * 0.01f, 15.f));
+		BoundsMesh->SetRelativeLocation(ChunkIndexToLocation(ChunkGenerateIndex));
+		BoundsMesh->SetRelativeScale3D(WorldData->GetWorldRealSize() * 0.01f);
 	}
 }
 

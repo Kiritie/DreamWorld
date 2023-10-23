@@ -19,9 +19,9 @@ public:
 	UWidgetTaskInfoItem(const FObjectInitializer& ObjectInitializer);
 
 public:
-	virtual void OnInitialize_Implementation(const TArray<FParameter>& InParams) override;
+	virtual void OnInitialize(const TArray<FParameter>& InParams) override;
 
-	virtual void OnRefresh_Implementation() override;
+	virtual void OnRefresh() override;
 
 protected:
 	UPROPERTY(BlueprintReadOnly, Category = "Default")

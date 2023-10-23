@@ -17,9 +17,9 @@ public:
 	UWidgetInventorySkillSlot(const FObjectInitializer& ObjectInitializer);
 
 public:
-	virtual void OnInitialize_Implementation(const TArray<FParameter>& InParams) override;
+	virtual void OnInitialize(const TArray<FParameter>& InParams) override;
 
-	virtual void OnRefresh_Implementation() override;
+	virtual void OnRefresh() override;
 
 public:
 	virtual void UseItem_Implementation(int InCount) override;

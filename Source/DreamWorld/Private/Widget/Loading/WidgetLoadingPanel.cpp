@@ -10,17 +10,17 @@ UWidgetLoadingPanel::UWidgetLoadingPanel(const FObjectInitializer& ObjectInitial
 	WidgetZOrder = 15;
 }
 
-void UWidgetLoadingPanel::OnInitialize_Implementation(UObject* InOwner)
+void UWidgetLoadingPanel::OnInitialize(UObject* InOwner)
 {
-	Super::OnInitialize_Implementation(InOwner);
+	Super::OnInitialize(InOwner);
 }
 
-void UWidgetLoadingPanel::OnOpen_Implementation(const TArray<FParameter>& InParams, bool bInstant)
+void UWidgetLoadingPanel::OnOpen(const TArray<FParameter>& InParams, bool bInstant)
 {
-	Super::OnOpen_Implementation(InParams, bInstant);
+	Super::OnOpen(InParams, bInstant);
 }
 
-void UWidgetLoadingPanel::OnClose_Implementation(bool bInstant)
+void UWidgetLoadingPanel::OnClose(bool bInstant)
 {
-	Super::OnClose_Implementation(bInstant);
+	Super::OnClose(bInstant);
 }

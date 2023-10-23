@@ -8,6 +8,7 @@
 #include "Asset/AssetModuleTypes.h"
 #include "Audio/AudioModuleTypes.h"
 #include "Camera/CameraModuleTypes.h"
+#include "Input/InputModuleTypes.h"
 #include "Task/TaskModuleTypes.h"
 #include "Team/DWTeamModuleTypes.h"
 #include "Video/VideoModuleTypes.h"
@@ -644,6 +645,21 @@ public:
 };
 
 USTRUCT(BlueprintType)
+struct DREAMWORLD_API FDWInputModuleSaveData : public FInputModuleSaveData
+{
+	GENERATED_BODY()
+
+public:
+	FORCEINLINE FDWInputModuleSaveData()
+	{
+	}
+
+	FORCEINLINE FDWInputModuleSaveData(const FInputModuleSaveData& InInputModuleSaveData) : FInputModuleSaveData(InInputModuleSaveData)
+	{
+	}
+};
+
+USTRUCT(BlueprintType)
 struct DREAMWORLD_API FDWArchiveSaveData : public FDWArchiveBasicSaveData
 {
 	GENERATED_BODY()
@@ -730,6 +746,7 @@ public:
 		AudioData = FDWAudioModuleSaveData();
 		VideoData = FDWVideoModuleSaveData();
 		CameraData = FDWCameraModuleSaveData();
+		InputData = FDWInputModuleSaveData();
 	}
 
 public:
@@ -745,6 +762,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera")
 	FDWCameraModuleSaveData CameraData;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Input")
+	FDWInputModuleSaveData InputData;
+
 public:
 	virtual void MakeSaved() override
 	{
@@ -754,6 +774,7 @@ public:
 		AudioData.MakeSaved();
 		VideoData.MakeSaved();
 		CameraData.MakeSaved();
+		InputData.MakeSaved();
 	}
 };
 

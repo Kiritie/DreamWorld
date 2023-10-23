@@ -18,7 +18,7 @@ public:
 	UWidgetInventory(const FObjectInitializer& ObjectInitializer);
 
 public:
-	virtual void OnInitialize_Implementation(UObject* InOwner) override;
+	virtual void OnInitialize(UObject* InOwner) override;
 	
-	virtual void OnRefresh_Implementation() override;
+	virtual void OnRefresh() override;
 };

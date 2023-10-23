@@ -17,14 +17,14 @@ UWidgetAudioSettingPage::UWidgetAudioSettingPage(const FObjectInitializer& Objec
 	Title = FText::FromString(TEXT("音频"));
 }
 
-void UWidgetAudioSettingPage::OnInitialize_Implementation(UObject* InOwner)
+void UWidgetAudioSettingPage::OnInitialize(UObject* InOwner)
 {
-	Super::OnInitialize_Implementation(InOwner);
+	Super::OnInitialize(InOwner);
 }
 
-void UWidgetAudioSettingPage::OnCreate_Implementation(UObject* InOwner)
+void UWidgetAudioSettingPage::OnCreate(UObject* InOwner)
 {
-	Super::OnCreate_Implementation(InOwner);
+	Super::OnCreate(InOwner);
 
 	SettingItem_GlobalSoundVolume = CreateSubWidget<UWidgetFloatSettingItem>({ FText::FromString(TEXT("音量大小")), 0.f, 1.f, 0, 100.f }, UAssetModuleBPLibrary::GetStaticClass(FName("FloatSettingItem")));
 	AddSettingItem(SettingItem_GlobalSoundVolume, FText::FromString(TEXT("全局")));
@@ -39,9 +39,9 @@ void UWidgetAudioSettingPage::OnCreate_Implementation(UObject* InOwner)
 	AddSettingItem(SettingItem_EffectSoundVolume, FText::FromString(TEXT("音效")));
 }
 
-void UWidgetAudioSettingPage::OnOpen_Implementation(const TArray<FParameter>& InParams, bool bInstant)
+void UWidgetAudioSettingPage::OnOpen(const TArray<FParameter>& InParams, bool bInstant)
 {
-	Super::OnOpen_Implementation(InParams, bInstant);
+	Super::OnOpen(InParams, bInstant);
 
 	SettingItem_GlobalSoundVolume->SetValue(UAudioModuleBPLibrary::GetGlobalSoundVolume());
 	SettingItem_BackgroundSoundVolume->SetValue(UAudioModuleBPLibrary::GetBackgroundSoundVolume());
@@ -49,9 +49,9 @@ void UWidgetAudioSettingPage::OnOpen_Implementation(const TArray<FParameter>& In
 	SettingItem_EffectSoundVolume->SetValue(UAudioModuleBPLibrary::GetEffectSoundVolume());
 }
 
-void UWidgetAudioSettingPage::OnApply_Implementation()
+void UWidgetAudioSettingPage::OnApply()
 {
-	Super::OnApply_Implementation();
+	Super::OnApply();
 
 	UAudioModuleBPLibrary::SetGlobalSoundVolume(SettingItem_GlobalSoundVolume->GetValue().GetFloatValue());
 	UAudioModuleBPLibrary::SetBackgroundSoundVolume(SettingItem_BackgroundSoundVolume->GetValue().GetFloatValue());
@@ -59,9 +59,9 @@ void UWidgetAudioSettingPage::OnApply_Implementation()
 	UAudioModuleBPLibrary::SetEffectSoundVolume(SettingItem_EffectSoundVolume->GetValue().GetFloatValue());
 }
 
-void UWidgetAudioSettingPage::OnReset_Implementation()
+void UWidgetAudioSettingPage::OnReset()
 {
-	Super::OnReset_Implementation();
+	Super::OnReset();
 
 	SettingItem_GlobalSoundVolume->SetValue(GetDefaultAudioData().GlobalSoundParams.Volume);
 	SettingItem_BackgroundSoundVolume->SetValue(GetDefaultAudioData().BackgroundSoundParams.Volume);
@@ -69,9 +69,9 @@ void UWidgetAudioSettingPage::OnReset_Implementation()
 	SettingItem_EffectSoundVolume->SetValue(GetDefaultAudioData().EffectSoundParams.Volume);
 }
 
-void UWidgetAudioSettingPage::OnClose_Implementation(bool bInstant)
+void UWidgetAudioSettingPage::OnClose(bool bInstant)
 {
-	Super::OnClose_Implementation(bInstant);
+	Super::OnClose(bInstant);
 }
 
 bool UWidgetAudioSettingPage::CanApply_Implementation() const

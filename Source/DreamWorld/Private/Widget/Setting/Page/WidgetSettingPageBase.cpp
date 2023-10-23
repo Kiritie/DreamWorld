@@ -18,33 +18,39 @@ UWidgetSettingPageBase::UWidgetSettingPageBase(const FObjectInitializer& ObjectI
 	WidgetCreateType = EWidgetCreateType::AutoCreate;
 }
 
-void UWidgetSettingPageBase::OnInitialize_Implementation(UObject* InOwner)
+void UWidgetSettingPageBase::OnInitialize(UObject* InOwner)
 {
-	Super::OnInitialize_Implementation(InOwner);
+	Super::OnInitialize(InOwner);
 }
 
-void UWidgetSettingPageBase::OnCreate_Implementation(UObject* InOwner)
+void UWidgetSettingPageBase::OnCreate(UObject* InOwner)
 {
-	Super::OnCreate_Implementation(InOwner);
+	Super::OnCreate(InOwner);
 }
 
-void UWidgetSettingPageBase::OnOpen_Implementation(const TArray<FParameter>& InParams, bool bInstant)
+void UWidgetSettingPageBase::OnOpen(const TArray<FParameter>& InParams, bool bInstant)
 {
-	Super::OnOpen_Implementation(InParams, bInstant);
+	Super::OnOpen(InParams, bInstant);
 }
 
-void UWidgetSettingPageBase::OnReset_Implementation()
+void UWidgetSettingPageBase::OnReset()
 {
-	Super::OnReset_Implementation();
+	Super::OnReset();
 }
 
-void UWidgetSettingPageBase::OnClose_Implementation(bool bInstant)
+void UWidgetSettingPageBase::OnClose(bool bInstant)
 {
-	Super::OnClose_Implementation(bInstant);
+	Super::OnClose(bInstant);
 }
 
-void UWidgetSettingPageBase::OnApply_Implementation()
+void UWidgetSettingPageBase::OnApply()
 {
+	K2_OnApply();
+}
+
+void UWidgetSettingPageBase::OnValueChange(UWidgetSettingItemBase* InSettingItem, const FParameter& InValue)
+{
+	K2_OnValueChange(InSettingItem, InValue);
 }
 
 bool UWidgetSettingPageBase::CanApply_Implementation() const
@@ -64,6 +70,7 @@ void UWidgetSettingPageBase::Apply()
 
 void UWidgetSettingPageBase::AddSettingItem_Implementation(UWidgetSettingItemBase* InSettingItem, const FText& InCategory)
 {
+	InSettingItem->OnValueChanged.AddDynamic(this, &UWidgetSettingPageBase::OnValueChange);
 	if(!InCategory.IsEmpty() && !InCategory.EqualTo(LastCategory))
 	{
 		LastCategory = InCategory;

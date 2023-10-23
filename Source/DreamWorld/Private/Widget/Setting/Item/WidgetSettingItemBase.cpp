@@ -22,14 +22,14 @@ void UWidgetSettingItemBase::OnDespawn_Implementation(bool bRecovery)
 	SetValue(FParameter());
 }
 
-void UWidgetSettingItemBase::OnCreate_Implementation(UUserWidgetBase* InOwner, const TArray<FParameter>& InParams)
+void UWidgetSettingItemBase::OnCreate(UUserWidgetBase* InOwner, const TArray<FParameter>& InParams)
 {
-	Super::OnCreate_Implementation(InOwner, InParams);
+	Super::OnCreate(InOwner, InParams);
 }
 
-void UWidgetSettingItemBase::OnInitialize_Implementation(const TArray<FParameter>& InParams)
+void UWidgetSettingItemBase::OnInitialize(const TArray<FParameter>& InParams)
 {
-	Super::OnInitialize_Implementation(InParams);
+	Super::OnInitialize(InParams);
 
 	if(InParams.IsValidIndex(0))
 	{
@@ -37,14 +37,14 @@ void UWidgetSettingItemBase::OnInitialize_Implementation(const TArray<FParameter
 	}
 }
 
-void UWidgetSettingItemBase::OnRefresh_Implementation()
+void UWidgetSettingItemBase::OnRefresh()
 {
-	Super::OnRefresh_Implementation();
+	Super::OnRefresh();
 }
 
-void UWidgetSettingItemBase::OnDestroy_Implementation()
+void UWidgetSettingItemBase::OnDestroy()
 {
-	Super::OnDestroy_Implementation();
+	Super::OnDestroy();
 }
 
 FText UWidgetSettingItemBase::GetLabel() const
@@ -64,4 +64,9 @@ FParameter UWidgetSettingItemBase::GetValue() const
 
 void UWidgetSettingItemBase::SetValue(const FParameter& InValue)
 {
+	if(OnValueChanged.IsBound())
+	{
+		OnValueChanged.Broadcast(this, InValue);
+	}
+	Refresh();
 }

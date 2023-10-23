@@ -23,16 +23,16 @@ void UWidgetEnumSettingItem::OnDespawn_Implementation(bool bRecovery)
 	ComboBox_Value->ClearOptions();
 }
 
-void UWidgetEnumSettingItem::OnCreate_Implementation(UUserWidgetBase* InOwner, const TArray<FParameter>& InParams)
+void UWidgetEnumSettingItem::OnCreate(UUserWidgetBase* InOwner, const TArray<FParameter>& InParams)
 {
-	Super::OnCreate_Implementation(InOwner, InParams);
+	Super::OnCreate(InOwner, InParams);
 
 	ComboBox_Value->OnSelectionChanged.AddDynamic(this, &UWidgetEnumSettingItem::OnComboBoxSelectionChanged);
 }
 
-void UWidgetEnumSettingItem::OnInitialize_Implementation(const TArray<FParameter>& InParams)
+void UWidgetEnumSettingItem::OnInitialize(const TArray<FParameter>& InParams)
 {
-	Super::OnInitialize_Implementation(InParams);
+	Super::OnInitialize(InParams);
 
 	FString EnumName;
 	int32 EnumMaxNum = -1;
@@ -55,22 +55,23 @@ void UWidgetEnumSettingItem::OnInitialize_Implementation(const TArray<FParameter
 	}
 }
 
-void UWidgetEnumSettingItem::OnRefresh_Implementation()
+void UWidgetEnumSettingItem::OnRefresh()
 {
-	Super::OnRefresh_Implementation();
+	Super::OnRefresh();
 }
 
-void UWidgetEnumSettingItem::OnDestroy_Implementation()
+void UWidgetEnumSettingItem::OnDestroy()
 {
-	Super::OnDestroy_Implementation();
+	Super::OnDestroy();
 }
 
 void UWidgetEnumSettingItem::OnComboBoxSelectionChanged(FString InSelectedItem, ESelectInfo::Type InSelectionType)
 {
 	if(OnValueChanged.IsBound())
 	{
-		OnValueChanged.Broadcast(this, ComboBox_Value->FindOptionIndex(InSelectedItem));
+		OnValueChanged.Broadcast(this, GetValue());
 	}
+	Refresh();
 }
 
 FParameter UWidgetEnumSettingItem::GetValue() const
@@ -81,5 +82,5 @@ FParameter UWidgetEnumSettingItem::GetValue() const
 void UWidgetEnumSettingItem::SetValue(const FParameter& InValue)
 {
 	ComboBox_Value->SetSelectedIndex(InValue.GetIntegerValue());
-	Refresh();
+	Super::SetValue(InValue);
 }

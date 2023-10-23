@@ -32,9 +32,9 @@ UWidgetInventoryBox::UWidgetInventoryBox(const FObjectInitializer& ObjectInitial
 	TargetUISlotDatas.Add(ESlotSplitType::Default);
 }
 
-void UWidgetInventoryBox::OnInitialize_Implementation(UObject* InOwner)
+void UWidgetInventoryBox::OnInitialize(UObject* InOwner)
 {
-	Super::OnInitialize_Implementation(InOwner);
+	Super::OnInitialize(InOwner);
 	
 	if(!InOwner) return;
 
@@ -67,9 +67,9 @@ void UWidgetInventoryBox::OnInitialize_Implementation(UObject* InOwner)
 	}
 }
 
-void UWidgetInventoryBox::OnOpen_Implementation(const TArray<FParameter>& InParams, bool bInstant)
+void UWidgetInventoryBox::OnOpen(const TArray<FParameter>& InParams, bool bInstant)
 {
-	Super::OnOpen_Implementation(InParams, bInstant);
+	Super::OnOpen(InParams, bInstant);
 
 	UAbilityInventoryBase* TargetInventory = InParams.IsValidIndex(0) ? InParams[0].GetObjectValue<IAbilityInventoryAgentInterface>()->GetInventory() : nullptr;
 
@@ -106,14 +106,14 @@ void UWidgetInventoryBox::OnOpen_Implementation(const TArray<FParameter>& InPara
 	}
 }
 
-void UWidgetInventoryBox::OnClose_Implementation(bool bInstant)
+void UWidgetInventoryBox::OnClose(bool bInstant)
 {
-	Super::OnClose_Implementation(bInstant);
+	Super::OnClose(bInstant);
 
 	GetInventory()->SetConnectInventory(nullptr);
 }
 
-void UWidgetInventoryBox::OnRefresh_Implementation()
+void UWidgetInventoryBox::OnRefresh()
 {
-	Super::OnRefresh_Implementation();
+	Super::OnRefresh();
 }

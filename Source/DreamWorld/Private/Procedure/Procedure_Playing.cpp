@@ -5,9 +5,9 @@
 
 #include "Achievement/AchievementModuleBPLibrary.h"
 #include "Camera/CameraModule.h"
+#include "Camera/CameraModuleBPLibrary.h"
 #include "Character/Player/DWPlayerCharacter.h"
 #include "Common/CommonBPLibrary.h"
-#include "Gameplay/WHGameInstance.h"
 #include "Main/MainModule.h"
 #include "Procedure/Procedure_Loading.h"
 #include "Procedure/Procedure_Starting.h"
@@ -49,7 +49,7 @@ void UProcedure_Playing::OnEnter(UProcedureBase* InLastProcedure)
 		AMainModule::UnPauseModuleByClass<ACameraModule>();
 
 		ISceneActorInterface::Execute_SetActorVisible(UCommonBPLibrary::GetPlayerPawn<ADWPlayerCharacter>(), true);
-		
+
 		UWidgetModuleBPLibrary::OpenUserWidget<UWidgetGameHUD>();
 	}
 

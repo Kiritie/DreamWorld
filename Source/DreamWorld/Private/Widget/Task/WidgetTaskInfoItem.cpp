@@ -10,16 +10,16 @@ UWidgetTaskInfoItem::UWidgetTaskInfoItem(const FObjectInitializer& ObjectInitial
 {
 }
 
-void UWidgetTaskInfoItem::OnInitialize_Implementation(const TArray<FParameter>& InParams)
+void UWidgetTaskInfoItem::OnInitialize(const TArray<FParameter>& InParams)
 {
 	if(InParams.IsValidIndex(0))
 	{
 		Task = InParams[0].GetObjectValue<UTaskBase>();
 	}
-	Super::OnInitialize_Implementation(InParams);
+	Super::OnInitialize(InParams);
 }
 
-void UWidgetTaskInfoItem::OnRefresh_Implementation()
+void UWidgetTaskInfoItem::OnRefresh()
 {
-	Super::OnRefresh_Implementation();
+	Super::OnRefresh();
 }

@@ -15,22 +15,22 @@ UWidgetContextBox::UWidgetContextBox(const FObjectInitializer& ObjectInitializer
 	WidgetCreateType = EWidgetCreateType::AutoCreateAndOpen;
 }
 
-void UWidgetContextBox::OnCreate_Implementation(UObject* InOwner)
+void UWidgetContextBox::OnCreate(UObject* InOwner)
 {
-	Super::OnCreate_Implementation(InOwner);
+	Super::OnCreate(InOwner);
 }
 
-void UWidgetContextBox::OnInitialize_Implementation(UObject* InOwner)
+void UWidgetContextBox::OnInitialize(UObject* InOwner)
 {
-	Super::OnInitialize_Implementation(InOwner);
+	Super::OnInitialize(InOwner);
 }
 
-void UWidgetContextBox::OnOpen_Implementation(const TArray<FParameter>& InParams, bool bInstant)
+void UWidgetContextBox::OnOpen(const TArray<FParameter>& InParams, bool bInstant)
 {
-	Super::OnOpen_Implementation(InParams, bInstant);
+	Super::OnOpen(InParams, bInstant);
 }
 
-void UWidgetContextBox::OnClose_Implementation(bool bInstant)
+void UWidgetContextBox::OnClose(bool bInstant)
 {
-	Super::OnClose_Implementation(bInstant);
+	Super::OnClose(bInstant);
 }
