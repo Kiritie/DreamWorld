@@ -26,9 +26,11 @@ public:
 	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
 
 public:
-	UFUNCTION(BlueprintNativeEvent)
-	void OnSelected();
+	UFUNCTION(BlueprintImplementableEvent, DisplayName = "OnSelected")
+	void K2_OnSelected();
+	virtual void OnSelected();
 
-	UFUNCTION(BlueprintNativeEvent)
-	void OnUnSelected();
+	UFUNCTION(BlueprintImplementableEvent, DisplayName = "OnUnSelected")
+	void K2_OnUnSelected();
+	virtual void OnUnSelected();
 };

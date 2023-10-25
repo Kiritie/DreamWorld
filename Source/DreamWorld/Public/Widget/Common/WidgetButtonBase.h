@@ -6,20 +6,28 @@
 
 #include "WidgetButtonBase.generated.h"
 
-class UObject;
-struct FFrame;
+class UCommonTextBlock;
 
 UCLASS(Abstract, BlueprintType, Blueprintable)
 class UWidgetButtonBase : public UCommonButtonBase
 {
 	GENERATED_BODY()
+
+public:
+	virtual void NativeOnCurrentTextStyleChanged() override;
 	
 protected:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components", meta = (BindWidget, OptionalWidget = false))
+	UCommonTextBlock* Txt_Title;
+
+protected:
+	UPROPERTY(EditAnywhere, Category = "Default")
 	FText ButtonText;
 
 public:
+	UFUNCTION(BlueprintPure)
 	FText GetButtonText() const { return ButtonText; }
 
-	void SetButtonText(const FText& InButtonText) { ButtonText = InButtonText; }
+	UFUNCTION(BlueprintCallable)
+	void SetButtonText(const FText InButtonText);
 };

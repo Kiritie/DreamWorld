@@ -9,7 +9,7 @@
 /**
  * 
  */
-UCLASS(Abstract)
+UCLASS()
 class DREAMWORLD_API UWidgetPressAnyKeyPanel : public UUserWidgetBase
 {
 	GENERATED_BODY()

@@ -32,6 +32,7 @@ public:
 public:
 	UFUNCTION(BlueprintImplementableEvent, DisplayName = "OnApply")
 	void K2_OnApply();
+	UFUNCTION()
 	virtual void OnApply();
 
 protected:

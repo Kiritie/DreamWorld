@@ -3,6 +3,7 @@
 
 #include "Input/DWInputModule.h"
 
+#include "EnhancedInputComponent.h"
 #include "Ability/Character/AbilityCharacterInventoryBase.h"
 #include "Ability/Inventory/Slot/AbilityInventorySlot.h"
 #include "Camera/CameraModule.h"
@@ -12,6 +13,7 @@
 #include "Common/Targeting/TargetingComponent.h"
 #include "Input/InputModule.h"
 #include "Input/InputModuleBPLibrary.h"
+#include "Input/Base/InputActionBase.h"
 #include "Procedure/ProcedureModuleBPLibrary.h"
 #include "Procedure/Procedure_Pausing.h"
 #include "Procedure/Procedure_Playing.h"
@@ -83,6 +85,11 @@ ADWInputModule::ADWInputModule()
 	// ActionMappings.Add(FInputActionMapping("OpenGeneratePanel", IE_Pressed, this, "OpenGeneratePanel"));
 	//
 	// ActionMappings.Add(FInputActionMapping("PauseGame", IE_Pressed, this, "PauseGame"));
+}
+
+ADWInputModule::~ADWInputModule()
+{
+	TERMINATION_MODULE(ADWInputModule)
 }
 
 #if WITH_EDITOR
@@ -178,6 +185,37 @@ void ADWInputModule::OnPause_Implementation()
 void ADWInputModule::OnUnPause_Implementation()
 {
 	Super::OnUnPause_Implementation();
+}
+
+void ADWInputModule::LoadData(FSaveData* InSaveData, EPhase InPhase)
+{
+	Super::LoadData(InSaveData, InPhase);
+
+	const auto& SaveData = InSaveData->CastRef<FDWInputModuleSaveData>();
+}
+
+void ADWInputModule::UnloadData(EPhase InPhase)
+{
+	Super::UnloadData(InPhase);
+}
+
+FSaveData* ADWInputModule::ToData()
+{
+	static FDWInputModuleSaveData SaveData;
+	SaveData = Super::ToData()->CastRef<FInputModuleSaveData>();
+
+	return &SaveData;
+}
+
+void ADWInputModule::OnBindAction_Implementation(UEnhancedInputComponent* InInputComponent, UInputActionBase* InInputAction)
+{
+	Super::OnBindAction_Implementation(InInputComponent, InInputAction);
+
+	if(InInputAction->ActionName == TEXT("Jump"))
+	{
+		InInputComponent->BindAction(InInputAction, ETriggerEvent::Triggered, this, &ADWInputModule::OnJumpPressed);
+		InInputComponent->BindAction(InInputAction, ETriggerEvent::Completed, this, &ADWInputModule::OnJumpReleased);
+	}
 }
 
 void ADWInputModule::OnJumpPressed()

@@ -24,9 +24,9 @@ void UWidgetGenerateItem::OnInitialize(const TArray<FParameter>& InParams)
 	Super::OnInitialize(InParams);
 }
 
-void UWidgetGenerateItem::OnSelected_Implementation()
+void UWidgetGenerateItem::OnSelected()
 {
-	Super::OnSelected_Implementation();
+	Super::OnSelected();
 
 	if(UWidgetGeneratePanel* GeneratePanel = Cast<UWidgetGeneratePanel>(Owner))
 	{
@@ -34,7 +34,7 @@ void UWidgetGenerateItem::OnSelected_Implementation()
 	}
 }
 
-void UWidgetGenerateItem::OnUnSelected_Implementation()
+void UWidgetGenerateItem::OnUnSelected()
 {
-	Super::OnUnSelected_Implementation();
+	Super::OnUnSelected();
 }

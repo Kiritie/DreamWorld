@@ -7,6 +7,7 @@
 
 class UWidgetButtonBase;
 class UEditableTextBox;
+class UWidgetPressAnyKeyPanel;
 /**
  * 
  */

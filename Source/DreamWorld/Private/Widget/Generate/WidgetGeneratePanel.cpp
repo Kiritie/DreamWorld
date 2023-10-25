@@ -14,6 +14,7 @@
 #include "Ability/Inventory/AbilityInventoryBase.h"
 #include "Achievement/AchievementModuleBPLibrary.h"
 #include "Character/DWCharacter.h"
+#include "Widget/Common/WidgetButtonBase.h"
 #include "Widget/Generate/WidgetGenerateItem.h"
 #include "Widget/Item/WidgetAbilityPreviewItem.h"
 

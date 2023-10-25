@@ -23,9 +23,9 @@ public:
 	virtual void OnInitialize(const TArray<FParameter>& InParams) override;
 
 public:
-	virtual void OnSelected_Implementation() override;
+	virtual void OnSelected() override;
 
-	virtual void OnUnSelected_Implementation() override;
+	virtual void OnUnSelected() override;
 
 public:
 	UPROPERTY(BlueprintReadOnly)

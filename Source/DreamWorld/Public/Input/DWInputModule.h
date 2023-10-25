@@ -18,6 +18,8 @@ public:
 	// ParamSets default values for this actor's properties
 	ADWInputModule();
 	
+	~ADWInputModule();
+
 	//////////////////////////////////////////////////////////////////////////
 	/// Module
 public:
@@ -38,6 +40,16 @@ public:
 	virtual void OnPause_Implementation() override;
 
 	virtual void OnUnPause_Implementation() override;
+
+protected:
+	virtual void LoadData(FSaveData* InSaveData, EPhase InPhase) override;
+
+	virtual void UnloadData(EPhase InPhase) override;
+
+	virtual FSaveData* ToData() override;
+
+protected:
+	virtual void OnBindAction_Implementation(UEnhancedInputComponent* InInputComponent, UInputActionBase* InInputAction) override;
 	
 protected:
 	UPROPERTY(VisibleAnywhere, Category = "InputStates|Player")

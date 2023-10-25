@@ -28,6 +28,7 @@ public class DreamWorld : ModuleRules
 			new string[] {
 				"InputCore",
 				"SlateCore",
+				"Slate",
 				"UMG",
 				"CommonUI",
 				"AIModule",

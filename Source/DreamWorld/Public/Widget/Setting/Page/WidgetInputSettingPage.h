@@ -39,8 +39,7 @@ public:
 	virtual bool CanReset_Implementation() const override;
 
 protected:
-	UPROPERTY(BlueprintReadOnly, Category = "Components")
-	UWidgetKeySettingItem* SettingItem_Jump;
+	TMap<FName, TArray<UWidgetKeySettingItem*>> SettingItems;
 
 public:
 	UFUNCTION(BlueprintPure)

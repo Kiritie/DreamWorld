@@ -55,10 +55,10 @@ FReply UWidgetAbilityItem::NativeOnMouseButtonDown(const FGeometry& InGeometry, 
 	return Super::NativeOnMouseButtonDown(InGeometry, InMouseEvent);
 }
 
-void UWidgetAbilityItem::OnSelected_Implementation()
+void UWidgetAbilityItem::OnSelected()
 {
 }
 
-void UWidgetAbilityItem::OnUnSelected_Implementation()
+void UWidgetAbilityItem::OnUnSelected()
 {
 }
