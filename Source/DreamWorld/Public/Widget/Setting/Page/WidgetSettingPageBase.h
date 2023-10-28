@@ -59,10 +59,10 @@ public:
 
 public:
 	UFUNCTION(BlueprintNativeEvent)
-	virtual void AddSettingItem(UWidgetSettingItemBase* InSettingItem, const FText& InCategory = FText::GetEmpty());
+	void AddSettingItem(UWidgetSettingItemBase* InSettingItem, const FText& InCategory = FText::GetEmpty());
 
 	UFUNCTION(BlueprintNativeEvent)
-	virtual void ClearSettingItems();
+	void ClearSettingItems();
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components", meta = (BindWidget, OptionalWidget = false))

@@ -36,7 +36,7 @@ void UDWCharacterState_Ride::OnEnter(UFiniteStateBase* InLastFiniteState)
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 	ADWCharacter* RidingTarget = Character->GetRidingTarget();
 
-	Character->GetAbilitySystemComponent()->AddLooseGameplayTag(Character->GetCharacterData<UDWCharacterData>().RidingTag);
+	Character->GetAbilitySystemComponent()->AddLooseGameplayTag(GameplayTags::StateTag_Character_Riding);
 
 	UCharacterModuleBPLibrary::SwitchCharacter(RidingTarget);
 	Character->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
@@ -60,7 +60,7 @@ void UDWCharacterState_Ride::OnLeave(UFiniteStateBase* InNextFiniteState)
 
 	Character->StopAction(EDWCharacterActionType::Ride);
 
-	Character->GetAbilitySystemComponent()->RemoveLooseGameplayTag(Character->GetCharacterData<UDWCharacterData>().RidingTag);
+	Character->GetAbilitySystemComponent()->RemoveLooseGameplayTag(GameplayTags::StateTag_Character_Riding);
 
 	Character->FreeToAnim();
 	if(Character->IsActive()) Character->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);

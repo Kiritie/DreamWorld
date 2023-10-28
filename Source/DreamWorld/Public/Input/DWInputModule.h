@@ -62,12 +62,19 @@ protected:
 	bool bPressedSprint;
 
 protected:
-	UFUNCTION()
-	virtual void OnJumpPressed();
+	virtual void TurnPlayer(const FInputActionValue& InValue) override;
+	
+	virtual void MoveHPlayer(const FInputActionValue& InValue) override;
 
-	UFUNCTION()
-	virtual void OnJumpReleased();
+	virtual void MoveVPlayer(const FInputActionValue& InValue) override;
 
+	virtual void MoveForwardPlayer(const FInputActionValue& InValue) override;
+
+	virtual void MoveRightPlayer(const FInputActionValue& InValue) override;
+	
+	virtual void MoveUpPlayer(const FInputActionValue& InValue) override;
+	
+protected:
 	UFUNCTION()
 	virtual void OnSprintPressed();
 
@@ -141,13 +148,7 @@ protected:
 	virtual void UseInventoryItem();
 
 	UFUNCTION()
-	virtual void UseAllInventoryItem();
-
-	UFUNCTION()
 	virtual void DiscardInventoryItem();
-
-	UFUNCTION()
-	virtual void DiscardAllInventoryItem();
 
 	UFUNCTION()
 	virtual void PrevInventorySlot();

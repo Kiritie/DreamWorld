@@ -3,10 +3,8 @@
 #include "Character/DWCharacter.h"
 
 #include "Achievement/AchievementModuleBPLibrary.h"
-#include "TimerManager.h"
 #include "Ability/AbilityModuleBPLibrary.h"
 #include "Ability/Components/DWAbilitySystemComponent.h"
-#include "Components/SkeletalMeshComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Ability/Item/Equip/AbilityEquipBase.h"
 #include "AI/DWAIController.h"
@@ -50,7 +48,6 @@
 #include "FSM/Components/FSMComponent.h"
 #include "Ability/Inventory/Slot/AbilityInventorySkillSlot.h"
 #include "Gameplay/DWGameMode.h"
-#include "Gameplay/WHGameInstance.h"
 #include "Voxel/VoxelModuleBPLibrary.h"
 #include "Widget/WidgetMessageBox.h"
 #include "Widget/WidgetModuleBPLibrary.h"
@@ -426,11 +423,11 @@ void ADWCharacter::FreeToAnim(bool bUnLockRotation /*= true*/)
 {
 	if (!IsFreeToAnim()/* && !IsFlying() && !IsFalling() && !IsRiding() && !IsClimbing() && !IsDodging() && !IsDefending() && !IsInterrupting()*/)
 	{
-		AbilitySystem->AddLooseGameplayTag(GetCharacterData<UDWCharacterData>().FreeToAnimTag);
+		AbilitySystem->AddLooseGameplayTag(GameplayTags::StateTag_Character_FreeToAnim);
 	}
 	if (bUnLockRotation && IsLockRotation())
 	{
-		AbilitySystem->RemoveLooseGameplayTag(GetCharacterData<UDWCharacterData>().LockRotationTag);
+		AbilitySystem->RemoveLooseGameplayTag(GameplayTags::StateTag_Character_LockRotation);
 	}
 }
 
@@ -438,11 +435,11 @@ void ADWCharacter::LimitToAnim(bool bLockRotation /*= false*/)
 {
 	if (IsFreeToAnim())
 	{
-		AbilitySystem->RemoveLooseGameplayTag(GetCharacterData<UDWCharacterData>().FreeToAnimTag);
+		AbilitySystem->RemoveLooseGameplayTag(GameplayTags::StateTag_Character_FreeToAnim);
 	}
 	if (bLockRotation && !IsLockRotation())
 	{
-		AbilitySystem->AddLooseGameplayTag(GetCharacterData<UDWCharacterData>().LockRotationTag);
+		AbilitySystem->AddLooseGameplayTag(GameplayTags::StateTag_Character_LockRotation);
 	}
 }
 
@@ -916,77 +913,77 @@ void ADWCharacter::SetMotionRate_Implementation(float InMovementRate, float InRo
 
 bool ADWCharacter::IsExhausted() const
 {
-	return AbilitySystem->HasMatchingGameplayTag(GetCharacterData<UDWCharacterData>().ExhaustedTag);
+	return AbilitySystem->HasMatchingGameplayTag(GameplayTags::StateTag_Character_Exhausted);
 }
 
 bool ADWCharacter::IsFreeToAnim() const
 {
-	return AbilitySystem->HasMatchingGameplayTag(GetCharacterData<UDWCharacterData>().FreeToAnimTag);
+	return AbilitySystem->HasMatchingGameplayTag(GameplayTags::StateTag_Character_FreeToAnim);
 }
 
 bool ADWCharacter::IsDodging() const
 {
-	return AbilitySystem->HasMatchingGameplayTag(GetCharacterData<UDWCharacterData>().DodgingTag);
+	return AbilitySystem->HasMatchingGameplayTag(GameplayTags::StateTag_Character_Dodging);
 }
 
 bool ADWCharacter::IsSprinting() const
 {
-	return AbilitySystem->HasMatchingGameplayTag(GetCharacterData<UDWCharacterData>().SprintingTag);
+	return AbilitySystem->HasMatchingGameplayTag(GameplayTags::StateTag_Character_Sprinting);
 }
 
 bool ADWCharacter::IsCrouching(bool bMovementMode) const
 {
-	return !bMovementMode ? AbilitySystem->HasMatchingGameplayTag(GetCharacterData<UDWCharacterData>().CrouchingTag) : GetCharacterMovement()->IsFlying();
+	return !bMovementMode ? AbilitySystem->HasMatchingGameplayTag(GameplayTags::StateTag_Character_Crouching) : GetCharacterMovement()->IsFlying();
 }
 
 bool ADWCharacter::IsSwimming(bool bMovementMode) const
 {
-	return !bMovementMode ? AbilitySystem->HasMatchingGameplayTag(GetCharacterData<UDWCharacterData>().SwimmingTag) : GetCharacterMovement()->IsFlying();
+	return !bMovementMode ? AbilitySystem->HasMatchingGameplayTag(GameplayTags::StateTag_Character_Swimming) : GetCharacterMovement()->IsFlying();
 }
 
 bool ADWCharacter::IsFloating() const
 {
-	return AbilitySystem->HasMatchingGameplayTag(GetCharacterData<UDWCharacterData>().FloatingTag);
+	return AbilitySystem->HasMatchingGameplayTag(GameplayTags::StateTag_Character_Floating);
 }
 
 bool ADWCharacter::IsAttacking(bool bCheckAttacked) const
 {
-	return !bCheckAttacked ? AbilitySystem->HasMatchingGameplayTag(GetCharacterData<UDWCharacterData>().AttackingTag) : (AttackType != EDWCharacterAttackType::None);
+	return !bCheckAttacked ? AbilitySystem->HasMatchingGameplayTag(GameplayTags::StateTag_Character_Attacking) : (AttackType != EDWCharacterAttackType::None);
 }
 
 bool ADWCharacter::IsDefending() const
 {
-	return AbilitySystem->HasMatchingGameplayTag(GetCharacterData<UDWCharacterData>().DefendingTag);
+	return AbilitySystem->HasMatchingGameplayTag(GameplayTags::StateTag_Character_Defending);
 }
 
 bool ADWCharacter::IsClimbing() const
 {
-	return AbilitySystem->HasMatchingGameplayTag(GetCharacterData<UDWCharacterData>().ClimbingTag);
+	return AbilitySystem->HasMatchingGameplayTag(GameplayTags::StateTag_Character_Climbing);
 }
 
 bool ADWCharacter::IsRiding() const
 {
-	return AbilitySystem->HasMatchingGameplayTag(GetCharacterData<UDWCharacterData>().RidingTag);
+	return AbilitySystem->HasMatchingGameplayTag(GameplayTags::StateTag_Character_Riding);
 }
 
 bool ADWCharacter::IsFlying(bool bMovementMode) const
 {
-	return !bMovementMode ? AbilitySystem->HasMatchingGameplayTag(GetCharacterData<UDWCharacterData>().FlyingTag) : GetCharacterMovement()->IsFlying();
+	return !bMovementMode ? AbilitySystem->HasMatchingGameplayTag(GameplayTags::StateTag_Character_Flying) : GetCharacterMovement()->IsFlying();
 }
 
 bool ADWCharacter::IsInterrupting() const
 {
-	return AbilitySystem->HasMatchingGameplayTag(GetCharacterData<UDWCharacterData>().InterruptingTag);
+	return AbilitySystem->HasMatchingGameplayTag(GameplayTags::StateTag_Character_Interrupting);
 }
 
 bool ADWCharacter::IsLockRotation() const
 {
-	return AbilitySystem->HasMatchingGameplayTag(GetCharacterData<UDWCharacterData>().LockRotationTag);
+	return AbilitySystem->HasMatchingGameplayTag(GameplayTags::StateTag_Character_LockRotation);
 }
 
 bool ADWCharacter::IsBreakAllInput() const
 {
-	return AbilitySystem->HasMatchingGameplayTag(GetCharacterData<UDWCharacterData>().BreakAllInputTag);
+	return AbilitySystem->HasMatchingGameplayTag(GameplayTags::StateTag_Character_BreakAllInput);
 }
 
 UWidgetCharacterHP* ADWCharacter::GetCharacterHPWidget() const
@@ -1357,14 +1354,14 @@ void ADWCharacter::OnAttributeChange(const FOnAttributeChangeData& InAttributeCh
 			if(!IsExhausted())
 			{
 				UnSprint();
-				AbilitySystem->AddLooseGameplayTag(GetCharacterData<UDWCharacterData>().ExhaustedTag);
+				AbilitySystem->AddLooseGameplayTag(GameplayTags::StateTag_Character_Exhausted);
 			}
 		}
 		else if(GetStamina() >= 10.f)
 		{
 			if(IsExhausted())
 			{
-				AbilitySystem->RemoveLooseGameplayTag(GetCharacterData<UDWCharacterData>().ExhaustedTag);
+				AbilitySystem->RemoveLooseGameplayTag(GameplayTags::StateTag_Character_Exhausted);
 			}
 		}
 	}

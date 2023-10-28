@@ -33,7 +33,7 @@ void UDWCharacterState_Fly::OnEnter(UFiniteStateBase* InLastFiniteState)
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 	
-	Character->GetAbilitySystemComponent()->AddLooseGameplayTag(Character->GetCharacterData<UDWCharacterData>().FlyingTag);
+	Character->GetAbilitySystemComponent()->AddLooseGameplayTag(GameplayTags::StateTag_Character_Flying);
 
 	Character->LimitToAnim();
 	Character->GetCharacterMovement()->SetMovementMode(MOVE_Flying);
@@ -67,7 +67,7 @@ void UDWCharacterState_Fly::OnLeave(UFiniteStateBase* InNextFiniteState)
 
 	Character->StopAction(EDWCharacterActionType::Fly);
 	
-	Character->GetAbilitySystemComponent()->RemoveLooseGameplayTag(Character->GetCharacterData<UDWCharacterData>().FlyingTag);
+	Character->GetAbilitySystemComponent()->RemoveLooseGameplayTag(GameplayTags::StateTag_Character_Flying);
 
 	Character->FreeToAnim();
 	Character->GetCharacterMovement()->SetMovementMode(MOVE_Walking);

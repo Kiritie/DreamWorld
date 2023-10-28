@@ -30,7 +30,7 @@ void UDWCharacterState_Climb::OnEnter(UFiniteStateBase* InLastFiniteState)
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 	
-	Character->GetAbilitySystemComponent()->AddLooseGameplayTag(Character->GetCharacterData<UDWCharacterData>().ClimbingTag);
+	Character->GetAbilitySystemComponent()->AddLooseGameplayTag(GameplayTags::StateTag_Character_Climbing);
 
 	Character->LimitToAnim();
 }
@@ -48,7 +48,7 @@ void UDWCharacterState_Climb::OnLeave(UFiniteStateBase* InNextFiniteState)
 
 	Character->StopAction(EDWCharacterActionType::Climb);
 		
-	Character->GetAbilitySystemComponent()->RemoveLooseGameplayTag(Character->GetCharacterData<UDWCharacterData>().ClimbingTag);
+	Character->GetAbilitySystemComponent()->RemoveLooseGameplayTag(GameplayTags::StateTag_Character_Climbing);
 
 	Character->FreeToAnim();
 }

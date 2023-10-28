@@ -30,7 +30,7 @@ void UDWCharacterState_Crouch::OnEnter(UFiniteStateBase* InLastFiniteState)
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 	
-	Character->GetAbilitySystemComponent()->AddLooseGameplayTag(Character->GetCharacterData<UDWCharacterData>().CrouchingTag);
+	Character->GetAbilitySystemComponent()->AddLooseGameplayTag(GameplayTags::StateTag_Character_Crouching);
 
 	Character->LimitToAnim();
 }
@@ -48,7 +48,7 @@ void UDWCharacterState_Crouch::OnLeave(UFiniteStateBase* InNextFiniteState)
 
 	Character->StopAction(EDWCharacterActionType::Crouch);
 	
-	Character->GetAbilitySystemComponent()->RemoveLooseGameplayTag(Character->GetCharacterData<UDWCharacterData>().CrouchingTag);
+	Character->GetAbilitySystemComponent()->RemoveLooseGameplayTag(GameplayTags::StateTag_Character_Crouching);
 
 	Character->FreeToAnim();
 }

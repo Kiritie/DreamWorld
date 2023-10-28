@@ -31,7 +31,7 @@ void UDWCharacterState_Dodge::OnEnter(UFiniteStateBase* InLastFiniteState)
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 	
-	Character->GetAbilitySystemComponent()->AddLooseGameplayTag(Character->GetCharacterData<UDWCharacterData>().DodgingTag);
+	Character->GetAbilitySystemComponent()->AddLooseGameplayTag(GameplayTags::StateTag_Character_Dodging);
 
 	Character->LimitToAnim();
 	Character->GetCapsuleComponent()->SetGenerateOverlapEvents(false);
@@ -51,7 +51,7 @@ void UDWCharacterState_Dodge::OnLeave(UFiniteStateBase* InNextFiniteState)
 
 	Character->StopAction(EDWCharacterActionType::Dodge);
 	
-	Character->GetAbilitySystemComponent()->RemoveLooseGameplayTag(Character->GetCharacterData<UDWCharacterData>().DodgingTag);
+	Character->GetAbilitySystemComponent()->RemoveLooseGameplayTag(GameplayTags::StateTag_Character_Dodging);
 
 	Character->FreeToAnim();
 	Character->GetCapsuleComponent()->SetGenerateOverlapEvents(true);

@@ -7,6 +7,7 @@
 #include "Widget/WidgetModuleBPLibrary.h"
 #include "Widget/Common/WidgetButtonBase.h"
 #include "Widget/Setting/Misc/WidgetPressAnyKeyPanel.h"
+#include "Widget/Setting/Page/WidgetInputSettingPage.h"
 
 UWidgetKeySettingItem::UWidgetKeySettingItem(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -76,7 +77,7 @@ TArray<FParameter> UWidgetKeySettingItem::GetValues() const
 	TArray<FParameter> Values;
 	for(int32 i = 0; i < Btn_Values.Num(); i++)
 	{
-		Values.Add(Btn_Values[i]->GetButtonText());
+		Values.Add(Btn_Values[i]->GetButtonText().ToString());
 	}
 	return Values;
 }
@@ -85,27 +86,7 @@ void UWidgetKeySettingItem::SetValues(const TArray<FParameter>& InValues)
 {
 	for(int32 i = 0; i < InValues.Num(); i++)
 	{
-		Btn_Values[i]->SetButtonText(InValues[i].GetTextValue());
+		Btn_Values[i]->SetButtonText(FText::FromString(InValues[i].GetStringValue()));
 	}
 	Super::SetValues(InValues);
-}
-
-bool UWidgetKeySettingItem::ChangeBinding(int32 InKeyBindSlot)
-{
-	TArray<FEnhancedActionKeyMapping>& Mappings = GetValues();
-	// Early out if they hit the same button that is already bound. This allows for them to exit binding if they made a mistake.
-	if (Mappings[InKeyBindSlot].Key == NewKey)
-	{
-		return false;
-	}
-	
-	if (!NewKey.IsGamepadKey())
-	{
-		ULocalPlayer* LocalPlayer = CastChecked<ULocalPlayer>(GetOwningLocalPlayer());
-		AInputModule::Get()->AddOrUpdateCustomKeyboardBindings(Mappings[InKeyBindSlot].PlayerMappableOptions.Name, NewKey, LocalPlayer);
-		Mappings[InKeyBindSlot].Key = NewKey;
-		return true;
-	}
-
-	return false;
 }

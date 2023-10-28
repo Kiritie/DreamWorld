@@ -45,8 +45,6 @@ public:
 
 	virtual void SetValues(const TArray<FParameter>& InValues) override;
 
-	bool ChangeBinding(int32 InKeyBindSlot);
-
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
 	TArray<UWidgetButtonBase*> Btn_Values;

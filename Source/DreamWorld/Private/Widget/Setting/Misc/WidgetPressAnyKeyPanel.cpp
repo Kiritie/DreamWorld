@@ -55,11 +55,11 @@ public:
 		return true;
 	}
 
-	DECLARE_MULTICAST_DELEGATE(FSettingsPressAnyKeyInputPreProcessorCanceled);
-	FSettingsPressAnyKeyInputPreProcessorCanceled OnKeySelectionCanceled;
+	DECLARE_MULTICAST_DELEGATE(FOnKeySelectionCanceled);
+	FOnKeySelectionCanceled OnKeySelectionCanceled;
 
-	DECLARE_MULTICAST_DELEGATE_OneParam(FSettingsPressAnyKeyInputPreProcessorKeySelected, FKey);
-	FSettingsPressAnyKeyInputPreProcessorKeySelected OnKeySelected;
+	DECLARE_MULTICAST_DELEGATE_OneParam(FOnKeySelected, FKey);
+	FOnKeySelected OnKeySelected;
 
 private:
 	void HandleKey(const FKey& Key)
