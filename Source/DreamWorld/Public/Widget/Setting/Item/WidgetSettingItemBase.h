@@ -9,6 +9,7 @@
 class UTextBlock;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnSettingItemValueChanged, UWidgetSettingItemBase*, InSettingItem, const FParameter&, InValue);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnSettingItemValuesChanged, UWidgetSettingItemBase*, InSettingItem, const TArray<FParameter>&, InValues);
 
 /**
  * 
@@ -51,6 +52,12 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual void SetValue(const FParameter& InValue);
 
+	UFUNCTION(BlueprintPure)
+	virtual TArray<FParameter> GetValues() const;
+
+	UFUNCTION(BlueprintCallable)
+	virtual void SetValues(const TArray<FParameter>& InValues);
+
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components", meta = (BindWidget, OptionalWidget = false))
 	UTextBlock* Txt_Label;
@@ -58,4 +65,7 @@ protected:
 public:
 	UPROPERTY(BlueprintAssignable)
 	FOnSettingItemValueChanged OnValueChanged;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnSettingItemValuesChanged OnValuesChanged;
 };

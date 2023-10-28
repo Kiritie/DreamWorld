@@ -41,6 +41,11 @@ protected:
 	UFUNCTION()
 	virtual void OnValueChange(UWidgetSettingItemBase* InSettingItem, const FParameter& InValue);
 
+	UFUNCTION(BlueprintImplementableEvent, DisplayName = "OnValueChange")
+	void K2_OnValuesChange(UWidgetSettingItemBase* InSettingItem, const TArray<FParameter>& InValues);
+	UFUNCTION()
+	virtual void OnValuesChange(UWidgetSettingItemBase* InSettingItem, const TArray<FParameter>& InValues);
+
 public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintPure)
 	bool CanApply() const;
@@ -54,10 +59,10 @@ public:
 
 public:
 	UFUNCTION(BlueprintNativeEvent)
-	void AddSettingItem(UWidgetSettingItemBase* InSettingItem, const FText& InCategory = FText::GetEmpty());
+	virtual void AddSettingItem(UWidgetSettingItemBase* InSettingItem, const FText& InCategory = FText::GetEmpty());
 
 	UFUNCTION(BlueprintNativeEvent)
-	void ClearSettingItems();
+	virtual void ClearSettingItems();
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components", meta = (BindWidget, OptionalWidget = false))
@@ -67,6 +72,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FText Title;
 
-private:
+protected:
 	FText LastCategory;
+
+	UPROPERTY()
+	TArray<UWidgetSettingItemBase*> SettingItems;
 };

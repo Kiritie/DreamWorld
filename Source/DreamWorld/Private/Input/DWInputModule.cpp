@@ -207,15 +207,9 @@ FSaveData* ADWInputModule::ToData()
 	return &SaveData;
 }
 
-void ADWInputModule::OnBindAction_Implementation(UEnhancedInputComponent* InInputComponent, UInputActionBase* InInputAction)
+void ADWInputModule::OnBindAction_Implementation(UInputComponentBase* InInputComponent, UPlayerMappableInputConfig* InInputConfig)
 {
-	Super::OnBindAction_Implementation(InInputComponent, InInputAction);
-
-	if(InInputAction->ActionName == TEXT("Jump"))
-	{
-		InInputComponent->BindAction(InInputAction, ETriggerEvent::Triggered, this, &ADWInputModule::OnJumpPressed);
-		InInputComponent->BindAction(InInputAction, ETriggerEvent::Completed, this, &ADWInputModule::OnJumpReleased);
-	}
+	Super::OnBindAction_Implementation(InInputComponent, InInputConfig);
 }
 
 void ADWInputModule::OnJumpPressed()

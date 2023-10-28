@@ -26,7 +26,10 @@ void UWidgetKeySettingItem::OnCreate(UUserWidgetBase* InOwner, const TArray<FPar
 {
 	Super::OnCreate(InOwner, InParams);
 
-	Btn_Value->OnClicked().AddUObject(this, &UWidgetKeySettingItem::OnValueButtonClicked);
+	for(int32 i = 0; i < Btn_Values.Num(); i++)
+	{
+		Btn_Values[i]->OnClicked().AddUObject(this, &UWidgetKeySettingItem::OnValueButtonClicked, i);
+	}
 }
 
 void UWidgetKeySettingItem::OnInitialize(const TArray<FParameter>& InParams)
@@ -44,21 +47,21 @@ void UWidgetKeySettingItem::OnDestroy()
 	Super::OnDestroy();
 }
 
-void UWidgetKeySettingItem::OnValueButtonClicked()
+void UWidgetKeySettingItem::OnValueButtonClicked(int32 InIndex)
 {
 	UWidgetPressAnyKeyPanel* PressAnyKeyPanel = UWidgetModuleBPLibrary::CreateUserWidget<UWidgetPressAnyKeyPanel>();
 	PressAnyKeyPanel->OnKeySelected.AddUObject(this, &ThisClass::OnKeySelected, PressAnyKeyPanel);
 	PressAnyKeyPanel->OnKeySelectionCanceled.AddUObject(this, &ThisClass::OnKeySelectionCanceled, PressAnyKeyPanel);
-	PressAnyKeyPanel->Open();
+	PressAnyKeyPanel->Open({ InIndex });
 }
 
 void UWidgetKeySettingItem::OnKeySelected(FKey InKey, UWidgetPressAnyKeyPanel* InPressAnyKeyPanel)
 {
 	InPressAnyKeyPanel->OnKeySelected.RemoveAll(this);
-	Btn_Value->SetButtonText(FText::FromString(InKey.ToString()));
-	if(OnValueChanged.IsBound())
+	Btn_Values[InPressAnyKeyPanel->GetWidgetParams()[0].GetIntegerValue()]->SetButtonText(FText::FromString(InKey.ToString()));
+	if(OnValuesChanged.IsBound())
 	{
-		OnValueChanged.Broadcast(this, GetValue());
+		OnValuesChanged.Broadcast(this, GetValues());
 	}
 	Refresh();
 }
@@ -68,13 +71,41 @@ void UWidgetKeySettingItem::OnKeySelectionCanceled(UWidgetPressAnyKeyPanel* InPr
 	InPressAnyKeyPanel->OnKeySelectionCanceled.RemoveAll(this);
 }
 
-FParameter UWidgetKeySettingItem::GetValue() const
+TArray<FParameter> UWidgetKeySettingItem::GetValues() const
 {
-	return Btn_Value->GetButtonText().ToString();
+	TArray<FParameter> Values;
+	for(int32 i = 0; i < Btn_Values.Num(); i++)
+	{
+		Values.Add(Btn_Values[i]->GetButtonText());
+	}
+	return Values;
 }
 
-void UWidgetKeySettingItem::SetValue(const FParameter& InValue)
+void UWidgetKeySettingItem::SetValues(const TArray<FParameter>& InValues)
 {
-	Btn_Value->SetButtonText(FText::FromString(InValue.GetStringValue()));
-	Super::SetValue(InValue);
+	for(int32 i = 0; i < InValues.Num(); i++)
+	{
+		Btn_Values[i]->SetButtonText(InValues[i].GetTextValue());
+	}
+	Super::SetValues(InValues);
+}
+
+bool UWidgetKeySettingItem::ChangeBinding(int32 InKeyBindSlot)
+{
+	TArray<FEnhancedActionKeyMapping>& Mappings = GetValues();
+	// Early out if they hit the same button that is already bound. This allows for them to exit binding if they made a mistake.
+	if (Mappings[InKeyBindSlot].Key == NewKey)
+	{
+		return false;
+	}
+	
+	if (!NewKey.IsGamepadKey())
+	{
+		ULocalPlayer* LocalPlayer = CastChecked<ULocalPlayer>(GetOwningLocalPlayer());
+		AInputModule::Get()->AddOrUpdateCustomKeyboardBindings(Mappings[InKeyBindSlot].PlayerMappableOptions.Name, NewKey, LocalPlayer);
+		Mappings[InKeyBindSlot].Key = NewKey;
+		return true;
+	}
+
+	return false;
 }

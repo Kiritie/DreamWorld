@@ -69,7 +69,7 @@ void UDWCharacterState_Death::DeathEnd()
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 
 	Character->GetAbilitySystemComponent()->RemoveLooseGameplayTag(Character->GetCharacterData<UAbilityCharacterDataBase>().DyingTag);
-	Character->GetAbilitySystemComponent()->AddLooseGameplayTag(Character->GetCharacterData<UAbilityCharacterDataBase>().DeadTag);
+	Character->GetAbilitySystemComponent()->AddLooseGameplayTag(GameplayTags::StateTag_Dead);
 
 	Character->StopAction(EDWCharacterActionType::Death);
 

@@ -29,7 +29,7 @@ public:
 
 	virtual void OnReset() override;
 
-	virtual void OnValueChange(UWidgetSettingItemBase* InSettingItem, const FParameter& InValue) override;
+	virtual void OnValuesChange(UWidgetSettingItemBase* InSettingItem, const TArray<FParameter>& InValues) override;
 
 	virtual void OnClose(bool bInstant) override;
 
@@ -38,10 +38,20 @@ public:
 
 	virtual bool CanReset_Implementation() const override;
 
-protected:
-	TMap<FName, TArray<UWidgetKeySettingItem*>> SettingItems;
+	virtual void AddSettingItem(UWidgetSettingItemBase* InSettingItem, const FText& InCategory) override;
+
+	virtual void AddSettingItem(UWidgetSettingItemBase* InSettingItem, const FText& InCategory, FEnhancedActionKeyMapping InActionMapping);
+
+	virtual void ClearSettingItems() override;
+
+	bool ChangeBinding(UWidgetSettingItemBase* InSettingItem, int32 InKeyBindSlot);
+
+	void GetAllMappedActionsFromKey(FKey Key, TArray<FName>& OutActionNames) const;
 
 public:
 	UFUNCTION(BlueprintPure)
 	FDWInputModuleSaveData& GetDefaultInputData() const;
+
+protected:
+	TMap<UWidgetSettingItemBase*, TArray<FEnhancedActionKeyMapping>> ItemMappings;
 };

@@ -34,18 +34,20 @@ public:
 	virtual void OnDestroy() override;
 
 protected:
-	void OnValueButtonClicked();
+	void OnValueButtonClicked(int32 InIndex);
 
 	void OnKeySelected(FKey InKey, UWidgetPressAnyKeyPanel* InPressAnyKeyPanel);
 
 	void OnKeySelectionCanceled(UWidgetPressAnyKeyPanel* InPressAnyKeyPanel);
 
 public:
-	virtual FParameter GetValue() const override;
+	virtual TArray<FParameter> GetValues() const override;
 
-	virtual void SetValue(const FParameter& InValue) override;
+	virtual void SetValues(const TArray<FParameter>& InValues) override;
+
+	bool ChangeBinding(int32 InKeyBindSlot);
 
 protected:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components", meta = (BindWidget, OptionalWidget = false))
-	UWidgetButtonBase* Btn_Value;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
+	TArray<UWidgetButtonBase*> Btn_Values;
 };

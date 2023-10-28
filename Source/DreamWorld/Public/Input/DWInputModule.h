@@ -49,7 +49,7 @@ protected:
 	virtual FSaveData* ToData() override;
 
 protected:
-	virtual void OnBindAction_Implementation(UEnhancedInputComponent* InInputComponent, UInputActionBase* InInputAction) override;
+	virtual void OnBindAction_Implementation(UInputComponentBase* InInputComponent, UPlayerMappableInputConfig* InInputConfig) override;
 	
 protected:
 	UPROPERTY(VisibleAnywhere, Category = "InputStates|Player")

@@ -70,3 +70,12 @@ void UWidgetSettingItemBase::SetValue(const FParameter& InValue)
 	}
 	Refresh();
 }
+
+TArray<FParameter> UWidgetSettingItemBase::GetValues() const
+{
+	return TArray<FParameter>();
+}
+
+void UWidgetSettingItemBase::SetValues(const TArray<FParameter>& InValues)
+{
+}

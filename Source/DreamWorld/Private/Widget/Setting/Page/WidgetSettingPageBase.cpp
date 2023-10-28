@@ -53,6 +53,11 @@ void UWidgetSettingPageBase::OnValueChange(UWidgetSettingItemBase* InSettingItem
 	K2_OnValueChange(InSettingItem, InValue);
 }
 
+void UWidgetSettingPageBase::OnValuesChange(UWidgetSettingItemBase* InSettingItem, const TArray<FParameter>& InValues)
+{
+	K2_OnValuesChange(InSettingItem, InValues);
+}
+
 bool UWidgetSettingPageBase::CanApply_Implementation() const
 {
 	return false;
@@ -70,7 +75,12 @@ void UWidgetSettingPageBase::Apply()
 
 void UWidgetSettingPageBase::AddSettingItem_Implementation(UWidgetSettingItemBase* InSettingItem, const FText& InCategory)
 {
+	if(SettingItems.Contains(InSettingItem)) return;
+	
+	InSettingItem->OnValueChanged.RemoveAll(this);
 	InSettingItem->OnValueChanged.AddDynamic(this, &UWidgetSettingPageBase::OnValueChange);
+	InSettingItem->OnValuesChanged.RemoveAll(this);
+	InSettingItem->OnValuesChanged.AddDynamic(this, &UWidgetSettingPageBase::OnValuesChange);
 	if(!InCategory.IsEmpty() && !InCategory.EqualTo(LastCategory))
 	{
 		LastCategory = InCategory;
@@ -83,16 +93,18 @@ void UWidgetSettingPageBase::AddSettingItem_Implementation(UWidgetSettingItemBas
 	{
 		ScrollBoxSlot->SetPadding(FMargin(2.5f));
 	}
+	SettingItems.Add(InSettingItem);
 }
 
 void UWidgetSettingPageBase::ClearSettingItems_Implementation()
 {
 	for(auto Iter : ContentBox->GetAllChildren())
 	{
-		if(USubWidgetBase* SubWidget = Cast<USubWidgetBase>(Iter))
+		if(UWidgetSettingItemBase* SettingItem = Cast<UWidgetSettingItemBase>(Iter))
 		{
-			SubWidget->Destroy(true);
+			SettingItem->Destroy(true);
 		}
 	}
 	ContentBox->ClearChildren();
+	SettingItems.Empty();
 }
