@@ -1,13 +1,13 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
-#include "WidgetSettingPageBase.h"
 #include "Common/DWCommonTypes.h"
+#include "Setting/Widget/Page/WidgetSettingPageBase.h"
 
 #include "WidgetGameSettingPage.generated.h"
 
-class UWidgetBoolSettingItem;
-class UWidgetEnumSettingItem;
+class UWidgetBoolSettingItemBase;
+class UWidgetEnumSettingItemBase;
 /**
  * 
  */
@@ -38,13 +38,12 @@ public:
 	virtual bool CanReset_Implementation() const override;
 
 protected:
+	virtual FSaveData* GetDefaultSaveData() const override;
+
+protected:
 	UPROPERTY(BlueprintReadOnly, Category = "Components")
-	UWidgetEnumSettingItem* SettingItem_GameLevel;
+	UWidgetEnumSettingItemBase* SettingItem_GameLevel;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Components")
-	UWidgetBoolSettingItem* SettingItem_AutoJump;
-
-public:
-	UFUNCTION(BlueprintPure)
-	FDWGameSaveData& GetDefaultGameData() const;
+	UWidgetBoolSettingItemBase* SettingItem_AutoJump;
 };

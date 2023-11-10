@@ -3,26 +3,16 @@
 
 #include "Widget/Setting/WidgetSettingPanel.h"
 
-#include "Components/TextBlock.h"
 #include "Widget/WidgetModuleStatics.h"
-#include "Widget/Setting/Page/WidgetSettingPageBase.h"
 
 UWidgetSettingPanel::UWidgetSettingPanel(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
-	WidgetName = FName("SettingPanel");
-
+	ChildNames.Empty();
 	ChildNames.Add(FName("GameSettingPage"));
 	ChildNames.Add(FName("AudioSettingPage"));
 	ChildNames.Add(FName("VideoSettingPage"));
 	ChildNames.Add(FName("CameraSettingPage"));
 	ChildNames.Add(FName("InputSettingPage"));
-
-	WidgetType = EWidgetType::Temporary;
-	WidgetInputMode = EInputMode::UIOnly;
-
-	WidgetZOrder = 10;
-
-	SetIsFocusable(true);
 }
 
 void UWidgetSettingPanel::OnInitialize(UObject* InOwner)
@@ -48,14 +38,4 @@ FReply UWidgetSettingPanel::NativeOnKeyDown(const FGeometry& InGeometry, const F
 		return FReply::Handled();
 	}
 	return FReply::Unhandled();
-}
-
-void UWidgetSettingPanel::ChangePage(int32 InPageIndex)
-{
-	PageIndex = InPageIndex;
-	if(const auto Page = GetChild<UWidgetSettingPageBase>(PageIndex))
-	{
-		Page->Open();
-		Txt_Title->SetText(Page->Title);
-	}
 }
