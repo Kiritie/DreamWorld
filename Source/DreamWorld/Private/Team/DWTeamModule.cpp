@@ -5,71 +5,74 @@
 
 #include "Team/Agent/DWTeamAgentInterface.h"
 
-IMPLEMENTATION_MODULE(ADWTeamModule)
+IMPLEMENTATION_MODULE(UDWTeamModule)
 
 // Sets default values
-ADWTeamModule::ADWTeamModule()
+UDWTeamModule::UDWTeamModule()
 {
 	ModuleName = FName("TeamModule");
+	ModuleDisplayName = FText::FromString(TEXT("Team Module"));
 
 	TeamDatas = TMap<FName, FDWTeamSaveData>();
 }
 
-ADWTeamModule::~ADWTeamModule()
+UDWTeamModule::~UDWTeamModule()
 {
-	TERMINATION_MODULE(ADWTeamModule)
+	TERMINATION_MODULE(UDWTeamModule)
 }
 
 #if WITH_EDITOR
-void ADWTeamModule::OnGenerate()
+void UDWTeamModule::OnGenerate()
 {
 	Super::OnGenerate();
 }
 
-void ADWTeamModule::OnDestroy()
+void UDWTeamModule::OnDestroy()
 {
 	Super::OnDestroy();
+
+	TERMINATION_MODULE(UDWTeamModule)
 }
 #endif
 
-void ADWTeamModule::OnInitialize_Implementation()
+void UDWTeamModule::OnInitialize()
 {
-	Super::OnInitialize_Implementation();
+	Super::OnInitialize();
 }
 
-void ADWTeamModule::OnPreparatory_Implementation(EPhase InPhase)
+void UDWTeamModule::OnPreparatory(EPhase InPhase)
 {
-	Super::OnPreparatory_Implementation(InPhase);
+	Super::OnPreparatory(InPhase);
 }
 
-void ADWTeamModule::OnRefresh_Implementation(float DeltaSeconds)
+void UDWTeamModule::OnRefresh(float DeltaSeconds)
 {
-	Super::OnRefresh_Implementation(DeltaSeconds);
+	Super::OnRefresh(DeltaSeconds);
 }
 
-void ADWTeamModule::OnPause_Implementation()
+void UDWTeamModule::OnPause()
 {
-	Super::OnPause_Implementation();
+	Super::OnPause();
 }
 
-void ADWTeamModule::OnUnPause_Implementation()
+void UDWTeamModule::OnUnPause()
 {
-	Super::OnUnPause_Implementation();
+	Super::OnUnPause();
 }
 
-void ADWTeamModule::OnTermination_Implementation(EPhase InPhase)
+void UDWTeamModule::OnTermination(EPhase InPhase)
 {
-	Super::OnTermination_Implementation(InPhase);
+	Super::OnTermination(InPhase);
 }
 
-void ADWTeamModule::LoadData(FSaveData* InSaveData, EPhase InPhase)
+void UDWTeamModule::LoadData(FSaveData* InSaveData, EPhase InPhase)
 {
 	const auto& SaveData = InSaveData->CastRef<FDWTeamModuleSaveData>();
 
 	TeamDatas = SaveData.TeamDatas;
 }
 
-FSaveData* ADWTeamModule::ToData()
+FSaveData* UDWTeamModule::ToData()
 {
 	static FDWTeamModuleSaveData* SaveData;
 	SaveData = new FDWTeamModuleSaveData();
@@ -79,7 +82,7 @@ FSaveData* ADWTeamModule::ToData()
 	return SaveData;
 }
 
-void ADWTeamModule::UnloadData(EPhase InPhase)
+void UDWTeamModule::UnloadData(EPhase InPhase)
 {
 	if(PHASEC(InPhase, EPhase::Primary))
 	{
@@ -87,12 +90,12 @@ void ADWTeamModule::UnloadData(EPhase InPhase)
 	}
 }
 
-bool ADWTeamModule::IsExistTeam(const FName& InTeamID) const
+bool UDWTeamModule::IsExistTeam(const FName& InTeamID) const
 {
 	return TeamDatas.Contains(InTeamID);
 }
 
-bool ADWTeamModule::CreateTeam(IDWTeamAgentInterface* InCaptain, FName InTeamName /*= NAME_None*/, FString InTeamDetail /*= TEXT("")*/)
+bool UDWTeamModule::CreateTeam(IDWTeamAgentInterface* InCaptain, FName InTeamName /*= NAME_None*/, FString InTeamDetail /*= TEXT("")*/)
 {
 	if (InCaptain->GetTeamID().IsNone())
 	{
@@ -111,7 +114,7 @@ bool ADWTeamModule::CreateTeam(IDWTeamAgentInterface* InCaptain, FName InTeamNam
 	return false;
 }
 
-bool ADWTeamModule::DissolveTeam(const FName& InTeamID, IDWTeamAgentInterface* InCaptain)
+bool UDWTeamModule::DissolveTeam(const FName& InTeamID, IDWTeamAgentInterface* InCaptain)
 {
 	if (IsExistTeam(InTeamID) && TeamDatas[InTeamID].IsCaptain(InCaptain))
 	{
@@ -122,7 +125,7 @@ bool ADWTeamModule::DissolveTeam(const FName& InTeamID, IDWTeamAgentInterface* I
 	return false;
 }
 
-FDWTeamSaveData& ADWTeamModule::GetTeamData(const FName& InTeamID)
+FDWTeamSaveData& UDWTeamModule::GetTeamData(const FName& InTeamID)
 {
 	if (TeamDatas.Contains(InTeamID))
 	{

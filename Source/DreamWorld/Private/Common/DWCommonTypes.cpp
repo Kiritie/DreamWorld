@@ -3,7 +3,7 @@
 #include "Ability/Vitality/AbilityVitalityBase.h"
 #include "Character/DWCharacter.h"
 #include "Ability/Vitality/AbilityVitalityInterface.h"
-#include "Scene/SceneModuleBPLibrary.h"
+#include "Scene/SceneModuleStatics.h"
 
 void UDWDamageHandle::HandleDamage(AActor* SourceActor, AActor* TargetActor, float DamageValue, EDamageType DamageType, const FHitResult& HitResult, const FGameplayTagContainer& SourceTags)
 {
@@ -67,7 +67,7 @@ void UDWDamageHandle::HandleDamage(AActor* SourceActor, AActor* TargetActor, flo
 	{
 		if (TargetCharacter)
 		{
-			USceneModuleBPLibrary::SpawnWorldText(FString::FromInt(LocalDamageDone * DefendRateDone), FColor::Cyan, EWorldTextStyle::Normal, TargetCharacter->GetActorLocation(), FVector(20.f));
+			USceneModuleStatics::SpawnWorldText(FString::FromInt(LocalDamageDone * DefendRateDone), FColor::Cyan, EWorldTextStyle::Normal, TargetCharacter->GetActorLocation(), FVector(20.f));
 		}
 		LocalDamageDone *= (1.f - DefendRateDone);
 	}

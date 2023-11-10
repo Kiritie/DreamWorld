@@ -4,7 +4,7 @@
 #include "Widget/WidgetGameHUD.h"
 
 #include "Character/DWCharacter.h"
-#include "Event/EventModuleBPLibrary.h"
+#include "Event/EventModuleStatics.h"
 #include "Event/Handle/Input/EventHandle_ChangeInputMode.h"
 #include "Widget/WidgetModule.h"
 
@@ -35,7 +35,7 @@ void UWidgetGameHUD::OnCreate(UObject* InOwner)
 {
 	Super::OnCreate(InOwner);
 
-	UEventModuleBPLibrary::SubscribeEvent(UEventHandle_ChangeInputMode::StaticClass(), this, FName("OnChangeInputMode"));
+	UEventModuleStatics::SubscribeEvent(UEventHandle_ChangeInputMode::StaticClass(), this, FName("OnChangeInputMode"));
 }
 
 void UWidgetGameHUD::OnInitialize(UObject* InOwner)

@@ -14,8 +14,8 @@
 #include "Materials/MaterialInstanceDynamic.h"
 #include "Blueprint/WidgetLayoutLibrary.h"
 #include "Components/CanvasPanelSlot.h"
-#include "Widget/WidgetModuleBPLibrary.h"
-#include "Common/CommonBPLibrary.h"
+#include "Widget/WidgetModuleStatics.h"
+#include "Common/CommonStatics.h"
 #include "Widget/Item/WidgetAbilityItemInfoBox.h"
 
 UWidgetInventorySlot::UWidgetInventorySlot(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
@@ -72,7 +72,7 @@ void UWidgetInventorySlot::NativeOnMouseEnter(const FGeometry& InGeometry, const
 	if(!IsEmpty())
 	{
 		const auto& ItemData = GetItem().GetData();
-		UWidgetModuleBPLibrary::OpenUserWidget<UWidgetAbilityItemInfoBox>({ ItemData.Name, ItemData.Detail });
+		UWidgetModuleStatics::OpenUserWidget<UWidgetAbilityItemInfoBox>({ ItemData.Name, ItemData.Detail });
 	}
 }
 
@@ -84,7 +84,7 @@ void UWidgetInventorySlot::NativeOnMouseLeave(const FPointerEvent& InMouseEvent)
 
 	if(!IsEmpty())
 	{
-		UWidgetModuleBPLibrary::CloseUserWidget<UWidgetAbilityItemInfoBox>();
+		UWidgetModuleStatics::CloseUserWidget<UWidgetAbilityItemInfoBox>();
 	}
 }
 
@@ -92,10 +92,10 @@ FReply UWidgetInventorySlot::NativeOnMouseMove(const FGeometry& InGeometry, cons
 {
 	if(!IsEmpty())
 	{
-		if(const auto ItemInfoBoxSlot = Cast<UCanvasPanelSlot>(UWidgetModuleBPLibrary::GetUserWidget<UWidgetAbilityItemInfoBox>()->Slot))
+		if(const auto ItemInfoBoxSlot = Cast<UCanvasPanelSlot>(UWidgetModuleStatics::GetUserWidget<UWidgetAbilityItemInfoBox>()->Slot))
 		{
 			float PosX, PosY;
-			UWidgetLayoutLibrary::GetMousePositionScaledByDPI(UCommonBPLibrary::GetPlayerController(), PosX, PosY);
+			UWidgetLayoutLibrary::GetMousePositionScaledByDPI(UCommonStatics::GetPlayerController(), PosX, PosY);
 			ItemInfoBoxSlot->SetPosition(FVector2D(PosX, PosY));
 		}
 	}
@@ -170,7 +170,7 @@ void UWidgetInventorySlot::OnRefresh()
 		}
 		if(IsHovered())
 		{
-			UWidgetModuleBPLibrary::OpenUserWidget<UWidgetAbilityItemInfoBox>({ ItemData.Name, ItemData.Detail });
+			UWidgetModuleStatics::OpenUserWidget<UWidgetAbilityItemInfoBox>({ ItemData.Name, ItemData.Detail });
 		}
 	}
 	else
@@ -182,7 +182,7 @@ void UWidgetInventorySlot::OnRefresh()
 		}
 		if(IsHovered())
 		{
-			UWidgetModuleBPLibrary::CloseUserWidget<UWidgetAbilityItemInfoBox>();
+			UWidgetModuleStatics::CloseUserWidget<UWidgetAbilityItemInfoBox>();
 		}
 	}
 }

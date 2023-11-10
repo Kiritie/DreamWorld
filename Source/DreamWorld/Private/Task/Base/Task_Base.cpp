@@ -5,7 +5,7 @@
 
 #include "TimerManager.h"
 #include "Character/Player/DWPlayerCharacter.h"
-#include "Common/CommonBPLibrary.h"
+#include "Common/CommonStatics.h"
 
 UTask_Base::UTask_Base()
 {
@@ -67,7 +67,7 @@ void UTask_Base::OnLeave()
 
 bool UTask_Base::CheckTaskCondition_Implementation(FString& OutInfo) const
 {
-	if(const ADWPlayerCharacter* PlayerCharacter = UCommonBPLibrary::GetPlayerPawn<ADWPlayerCharacter>())
+	if(const ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>())
 	{
 		if(PlayerCharacter->GetLevelV() < NeedLevel)
 		{

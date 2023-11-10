@@ -4,7 +4,7 @@
 #include "Widget/Setting/Item/WidgetSettingItemBase.h"
 
 #include "Components/TextBlock.h"
-#include "Widget/WidgetModuleBPLibrary.h"
+#include "Widget/WidgetModuleStatics.h"
 
 UWidgetSettingItemBase::UWidgetSettingItemBase(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {

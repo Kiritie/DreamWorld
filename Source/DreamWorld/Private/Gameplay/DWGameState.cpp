@@ -2,7 +2,7 @@
 
 #include "Gameplay/DWGameState.h"
 #include "Engine/World.h"
-#include "SaveGame/SaveGameModuleBPLibrary.h"
+#include "SaveGame/SaveGameModuleStatics.h"
 
 ADWGameState::ADWGameState()
 {

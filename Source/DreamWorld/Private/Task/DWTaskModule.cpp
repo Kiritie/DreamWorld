@@ -5,68 +5,70 @@
 
 #include "Common/DWCommonTypes.h"
 
-IMPLEMENTATION_MODULE(ADWTaskModule)
+IMPLEMENTATION_MODULE(UDWTaskModule)
 
 // ParamSets default values
-ADWTaskModule::ADWTaskModule()
+UDWTaskModule::UDWTaskModule()
 {
 }
 
-ADWTaskModule::~ADWTaskModule()
+UDWTaskModule::~UDWTaskModule()
 {
-	TERMINATION_MODULE(ADWTaskModule)
+	TERMINATION_MODULE(UDWTaskModule)
 }
 
 #if WITH_EDITOR
-void ADWTaskModule::OnGenerate()
+void UDWTaskModule::OnGenerate()
 {
 	Super::OnGenerate();
 }
 
-void ADWTaskModule::OnDestroy()
+void UDWTaskModule::OnDestroy()
 {
 	Super::OnDestroy();
+
+	TERMINATION_MODULE(UDWTaskModule)
 }
 #endif
 
-void ADWTaskModule::OnInitialize_Implementation()
+void UDWTaskModule::OnInitialize()
 {
-	Super::OnInitialize_Implementation();
+	Super::OnInitialize();
 }
 
-void ADWTaskModule::OnPreparatory_Implementation(EPhase InPhase)
+void UDWTaskModule::OnPreparatory(EPhase InPhase)
 {
-	Super::OnPreparatory_Implementation(InPhase);
+	Super::OnPreparatory(InPhase);
 }
 
-void ADWTaskModule::OnRefresh_Implementation(float DeltaSeconds)
+void UDWTaskModule::OnRefresh(float DeltaSeconds)
 {
-	Super::OnRefresh_Implementation(DeltaSeconds);
+	Super::OnRefresh(DeltaSeconds);
 }
 
-void ADWTaskModule::OnPause_Implementation()
+void UDWTaskModule::OnPause()
 {
-	Super::OnPause_Implementation();
+	Super::OnPause();
 }
 
-void ADWTaskModule::OnUnPause_Implementation()
+void UDWTaskModule::OnUnPause()
 {
-	Super::OnUnPause_Implementation();
+	Super::OnUnPause();
 }
 
-void ADWTaskModule::OnTermination_Implementation(EPhase InPhase)
+void UDWTaskModule::OnTermination(EPhase InPhase)
 {
-	Super::OnTermination_Implementation(InPhase);
+	Super::OnTermination(InPhase);
 }
 
-void ADWTaskModule::LoadData(FSaveData* InSaveData, EPhase InPhase)
+void UDWTaskModule::LoadData(FSaveData* InSaveData, EPhase InPhase)
 {
 	Super::LoadData(InSaveData, InPhase);
 
 	const auto& SaveData = InSaveData->CastRef<FDWTaskModuleSaveData>();
 }
 
-FSaveData* ADWTaskModule::ToData()
+FSaveData* UDWTaskModule::ToData()
 {
 	static FDWTaskModuleSaveData SaveData;
 	SaveData = Super::ToData()->CastRef<FTaskModuleSaveData>();

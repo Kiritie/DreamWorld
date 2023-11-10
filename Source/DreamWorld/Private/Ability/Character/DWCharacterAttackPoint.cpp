@@ -3,7 +3,7 @@
 
 #include "Ability/Character/DWCharacterAttackPoint.h"
 #include "Character/Monster/DWMonsterCharacterData.h"
-#include "Audio/AudioModuleBPLibrary.h"
+#include "Audio/AudioModuleStatics.h"
 #include "Kismet/GameplayStatics.h"
 #include "Character/Monster/DWMonsterCharacter.h"
 
@@ -24,7 +24,7 @@ void UDWCharacterAttackPoint::OnHitTarget(AActor* InTarget, const FHitResult& In
 	{
 		const auto& CharacterData = GetOwnerCharacter()->GetCharacterData<UDWMonsterCharacterData>();
 		const FVector HitLocation = GetComponentLocation();
-		UAudioModuleBPLibrary::PlaySoundAtLocation(InTarget->Implements<UAbilityVitalityInterface>() ? CharacterData.AttackHitSound : CharacterData.AttackMissSound, HitLocation);
+		UAudioModuleStatics::PlaySoundAtLocation(InTarget->Implements<UAbilityVitalityInterface>() ? CharacterData.AttackHitSound : CharacterData.AttackMissSound, HitLocation);
 		UGameplayStatics::SpawnEmitterAtLocation(this, InTarget->Implements<UAbilityVitalityInterface>() ? CharacterData.AttackHitEffect : CharacterData.AttackMissEffect, HitLocation);
 	}
 }

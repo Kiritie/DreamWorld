@@ -6,7 +6,7 @@
 #include "Character/DWCharacter.h"
 #include "AIModule/Classes/BehaviorTree/BlackboardComponent.h"
 #include "Common/CommonTypes.h"
-#include "Voxel/VoxelModuleBPLibrary.h"
+#include "Voxel/VoxelModuleStatics.h"
 
 UDWAITask_AIPatrol::UDWAITask_AIPatrol(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -66,10 +66,10 @@ EBTNodeResult::Type UDWAITask_AIPatrol::ExecuteTask(UBehaviorTreeComponent& Owne
 	PatrolLocation = GetAgent<ADWCharacter>()->GetActorLocation();
 	DON(10,
 		FVector rayStart = GetAgent<ADWCharacter>()->GetBirthLocation() + FRotator(0.f, FMath::RandRange(0.f, 360.f), 0.f).Vector() * FMath::FRandRange(0.f, PatrolDistance);
-		rayStart.Z = UVoxelModuleBPLibrary::GetWorldData().GetWorldRealSize().Z;
+		rayStart.Z = UVoxelModuleStatics::GetWorldData().GetWorldRealSize().Z;
 		const FVector rayEnd = FVector(rayStart.X, rayStart.Y, 0.f);
 		FHitResult hitResult;
-		if(UVoxelModuleBPLibrary::VoxelAgentTraceSingle(rayStart, rayEnd, GetAgent<ADWCharacter>()->GetRadius(), GetAgent<ADWCharacter>()->GetHalfHeight(), {}, hitResult))
+		if(UVoxelModuleStatics::VoxelAgentTraceSingle(rayStart, rayEnd, GetAgent<ADWCharacter>()->GetRadius(), GetAgent<ADWCharacter>()->GetHalfHeight(), {}, hitResult))
 		{
 			PatrolLocation = hitResult.Location;
 			break;

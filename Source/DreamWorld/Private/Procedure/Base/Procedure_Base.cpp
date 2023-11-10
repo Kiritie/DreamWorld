@@ -3,8 +3,8 @@
 
 #include "Procedure/Base/Procedure_Base.h"
 
-#include "Audio/AudioModuleBPLibrary.h"
-#include "Camera/CameraModuleBPLibrary.h"
+#include "Audio/AudioModuleStatics.h"
+#include "Camera/CameraModuleStatics.h"
 
 FSingleSoundHandle UProcedure_Base::BGMHandle = FSingleSoundHandle();
 
@@ -36,14 +36,14 @@ void UProcedure_Base::OnEnter(UProcedureBase* InLastProcedure)
 {
 	Super::OnEnter(InLastProcedure);
 
-	if(BGMHandle.IsValid() && UAudioModuleBPLibrary::GetSingleSoundInfo(BGMHandle).Sound != BGMSound)
+	if(BGMHandle.IsValid() && UAudioModuleStatics::GetSingleSoundInfo(BGMHandle).Sound != BGMSound)
 	{
-		UAudioModuleBPLibrary::StopSingleSound(BGMHandle);
+		UAudioModuleStatics::StopSingleSound(BGMHandle);
 		BGMHandle = -1;
 	}
 	if(!BGMHandle.IsValid() && BGMSound)
 	{
-		BGMHandle = UAudioModuleBPLibrary::PlaySingleSound2D(BGMSound);
+		BGMHandle = UAudioModuleStatics::PlaySingleSound2D(BGMSound);
 	}
 }
 
@@ -53,7 +53,7 @@ void UProcedure_Base::OnRefresh()
 
 	if(CameraRotationSpeed != 0.f)
 	{
-		UCameraModuleBPLibrary::AddCameraRotationInput(CameraRotationSpeed, 0.f);
+		UCameraModuleStatics::AddCameraRotationInput(CameraRotationSpeed, 0.f);
 	}
 }
 

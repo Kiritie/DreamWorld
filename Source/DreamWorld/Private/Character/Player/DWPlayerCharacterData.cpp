@@ -1,6 +1,6 @@
 #include "Character/Player/DWPlayerCharacterData.h"
 
-#include "Ability/AbilityModuleBPLibrary.h"
+#include "Ability/AbilityModuleStatics.h"
 
 UDWPlayerCharacterData::UDWPlayerCharacterData()
 {

@@ -4,9 +4,9 @@
 #include "Procedure/Procedure_Initializing.h"
 
 #include "TimerManager.h"
-#include "Procedure/ProcedureModuleBPLibrary.h"
+#include "Procedure/ProcedureModuleStatics.h"
 #include "Procedure/Procedure_Starting.h"
-#include "Widget/WidgetModuleBPLibrary.h"
+#include "Widget/WidgetModuleStatics.h"
 #include "Widget/Menu/WidgetMainMenu.h"
 
 UProcedure_Initializing::UProcedure_Initializing()
@@ -36,9 +36,9 @@ void UProcedure_Initializing::OnEnter(UProcedureBase* InLastProcedure)
 {
 	Super::OnEnter(InLastProcedure);
 
-	UWidgetModuleBPLibrary::CreateUserWidget<UWidgetMainMenu>();
+	UWidgetModuleStatics::CreateUserWidget<UWidgetMainMenu>();
 
-	UProcedureModuleBPLibrary::SwitchProcedureByClass<UProcedure_Starting>();
+	UProcedureModuleStatics::SwitchProcedureByClass<UProcedure_Starting>();
 }
 
 void UProcedure_Initializing::OnRefresh()

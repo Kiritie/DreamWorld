@@ -4,7 +4,7 @@
 
 bool IDWTeamAgentInterface::HasTeam() const
 {
-	return ADWTeamModule::Get()->GetTeamData(GetTeamID()).IsValid();
+	return UDWTeamModule::Get().GetTeamData(GetTeamID()).IsValid();
 }
 
 bool IDWTeamAgentInterface::IsTeamMate(IDWTeamAgentInterface* InTargetCharacter) const
@@ -14,31 +14,20 @@ bool IDWTeamAgentInterface::IsTeamMate(IDWTeamAgentInterface* InTargetCharacter)
 
 bool IDWTeamAgentInterface::CreateTeam(const FName& InTeamName /*= MANE_None*/, FString InTeamDetail /*= TEXT("")*/)
 {
-	if(ADWTeamModule* TeamModule = ADWTeamModule::Get())
-	{
-		return TeamModule->CreateTeam(this, InTeamName, InTeamDetail);
-	}
-	return false;
+	return UDWTeamModule::Get().CreateTeam(this, InTeamName, InTeamDetail);
 }
 
 bool IDWTeamAgentInterface::DissolveTeam()
 {
-	if(ADWTeamModule* TeamModule = ADWTeamModule::Get())
-	{
-		return TeamModule->DissolveTeam(GetTeamID(), this);
-	}
-	return false;
+	return UDWTeamModule::Get().DissolveTeam(GetTeamID(), this);
 }
 
 bool IDWTeamAgentInterface::JoinTeam(const FName& InTeamID)
 {
-	if(ADWTeamModule* TeamModule = ADWTeamModule::Get())
+	if(UDWTeamModule::Get().IsExistTeam(InTeamID))
 	{
-		if(TeamModule->IsExistTeam(InTeamID))
-		{
-			TeamModule->GetTeamData(InTeamID).AddMember(this);
-			return true;
-		}
+		UDWTeamModule::Get().GetTeamData(InTeamID).AddMember(this);
+		return true;
 	}
 	return false;
 }
@@ -52,7 +41,7 @@ bool IDWTeamAgentInterface::LeaveTeam()
 {
 	if (HasTeam())
 	{
-		ADWTeamModule::Get()->GetTeamData(GetTeamID()).RemoveMember(this);
+		UDWTeamModule::Get().GetTeamData(GetTeamID()).RemoveMember(this);
 		return true;
 	}
 	return false;
@@ -60,9 +49,9 @@ bool IDWTeamAgentInterface::LeaveTeam()
 
 bool IDWTeamAgentInterface::AddTeamMate(IDWTeamAgentInterface* InTargetCharacter)
 {
-	if (HasTeam() && ADWTeamModule::Get()->GetTeamData(GetTeamID()).IsCaptain(this))
+	if (HasTeam() && UDWTeamModule::Get().GetTeamData(GetTeamID()).IsCaptain(this))
 	{
-		ADWTeamModule::Get()->GetTeamData(GetTeamID()).AddMember(InTargetCharacter);
+		UDWTeamModule::Get().GetTeamData(GetTeamID()).AddMember(InTargetCharacter);
 		return true;
 	}
 	return false;
@@ -70,9 +59,9 @@ bool IDWTeamAgentInterface::AddTeamMate(IDWTeamAgentInterface* InTargetCharacter
 
 bool IDWTeamAgentInterface::RemoveTeamMate(IDWTeamAgentInterface* InTargetCharacter)
 {
-	if (HasTeam() && ADWTeamModule::Get()->GetTeamData(GetTeamID()).IsCaptain(this))
+	if (HasTeam() && UDWTeamModule::Get().GetTeamData(GetTeamID()).IsCaptain(this))
 	{
-		ADWTeamModule::Get()->GetTeamData(GetTeamID()).RemoveMember(InTargetCharacter);
+		UDWTeamModule::Get().GetTeamData(GetTeamID()).RemoveMember(InTargetCharacter);
 		return true;
 	}
 	return false;
@@ -80,5 +69,5 @@ bool IDWTeamAgentInterface::RemoveTeamMate(IDWTeamAgentInterface* InTargetCharac
 
 TArray<IDWTeamAgentInterface*> IDWTeamAgentInterface::GetTeamMates()
 {
-	return ADWTeamModule::Get()->GetTeamData(GetTeamID()).GetMembers(this);
+	return UDWTeamModule::Get().GetTeamData(GetTeamID()).GetMembers(this);
 }

@@ -4,7 +4,7 @@
 #include "Widget/Setting/Item/WidgetTextSettingItem.h"
 
 #include "Components/EditableTextBox.h"
-#include "Widget/WidgetModuleBPLibrary.h"
+#include "Widget/WidgetModuleStatics.h"
 
 UWidgetTextSettingItem::UWidgetTextSettingItem(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {

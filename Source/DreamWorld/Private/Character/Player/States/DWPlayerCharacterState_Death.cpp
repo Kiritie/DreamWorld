@@ -2,10 +2,10 @@
 
 #include "Character/Player/States/DWPlayerCharacterState_Death.h"
 
-#include "Achievement/AchievementModuleBPLibrary.h"
+#include "Achievement/AchievementModuleStatics.h"
 #include "Character/Player/DWPlayerCharacter.h"
 #include "Gameplay/WHGameInstance.h"
-#include "Common/CommonBPLibrary.h"
+#include "Common/CommonStatics.h"
 #include "Common/Interaction/InteractionComponent.h"
 #include "Common/Targeting/TargetingComponent.h"
 
@@ -34,7 +34,7 @@ void UDWPlayerCharacterState_Death::OnEnter(UFiniteStateBase* InLastFiniteState)
 
 	PlayerCharacter->GetInteractionComponent()->SetInteractable(false);
 	
-	UAchievementModuleBPLibrary::UnlockAchievement(FName("FirstDeath"));
+	UAchievementModuleStatics::UnlockAchievement(FName("FirstDeath"));
 }
 
 void UDWPlayerCharacterState_Death::OnRefresh()

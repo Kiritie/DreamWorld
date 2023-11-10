@@ -9,17 +9,17 @@
 #include "DWCharacterModule.generated.h"
 
 UCLASS()
-class DREAMWORLD_API ADWCharacterModule : public ACharacterModule
+class DREAMWORLD_API UDWCharacterModule : public UCharacterModule
 {
 	GENERATED_BODY()
 		
-	GENERATED_MODULE(ADWCharacterModule)
+	GENERATED_MODULE(UDWCharacterModule)
 
 public:	
 	// ParamSets default values for this actor's properties
-	ADWCharacterModule();
+	UDWCharacterModule();
 
-	~ADWCharacterModule();
+	~UDWCharacterModule();
 	
 	//////////////////////////////////////////////////////////////////////////
 	/// Module
@@ -30,17 +30,17 @@ public:
 	virtual void OnDestroy() override;
 #endif
 
-	virtual void OnInitialize_Implementation() override;
+	virtual void OnInitialize() override;
 
-	virtual void OnPreparatory_Implementation(EPhase InPhase) override;
+	virtual void OnPreparatory(EPhase InPhase) override;
 
-	virtual void OnRefresh_Implementation(float DeltaSeconds) override;
+	virtual void OnRefresh(float DeltaSeconds) override;
 
-	virtual void OnPause_Implementation() override;
+	virtual void OnPause() override;
 
-	virtual void OnUnPause_Implementation() override;
+	virtual void OnUnPause() override;
 
-	virtual void OnTermination_Implementation(EPhase InPhase) override;
+	virtual void OnTermination(EPhase InPhase) override;
 
 	//////////////////////////////////////////////////////////////////////////
 	/// Player

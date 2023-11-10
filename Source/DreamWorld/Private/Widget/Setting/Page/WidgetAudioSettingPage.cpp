@@ -3,11 +3,11 @@
 
 #include "Widget/Setting/Page/WidgetAudioSettingPage.h"
 
-#include "Asset/AssetModuleBPLibrary.h"
-#include "Audio/AudioModuleBPLibrary.h"
-#include "SaveGame/SaveGameModuleBPLibrary.h"
+#include "Asset/AssetModuleStatics.h"
+#include "Audio/AudioModuleStatics.h"
+#include "SaveGame/SaveGameModuleStatics.h"
 #include "SaveGame/Setting/DWSettingSaveGame.h"
-#include "Widget/WidgetModuleBPLibrary.h"
+#include "Widget/WidgetModuleStatics.h"
 #include "Widget/Setting/Item/WidgetFloatSettingItem.h"
 
 UWidgetAudioSettingPage::UWidgetAudioSettingPage(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
@@ -26,16 +26,16 @@ void UWidgetAudioSettingPage::OnCreate(UObject* InOwner)
 {
 	Super::OnCreate(InOwner);
 
-	SettingItem_GlobalSoundVolume = CreateSubWidget<UWidgetFloatSettingItem>({ FText::FromString(TEXT("音量大小")), 0.f, 1.f, 0, 100.f }, UAssetModuleBPLibrary::GetStaticClass(FName("FloatSettingItem")));
+	SettingItem_GlobalSoundVolume = CreateSubWidget<UWidgetFloatSettingItem>({ FText::FromString(TEXT("音量大小")), 0.f, 1.f, 0, 100.f }, UAssetModuleStatics::GetStaticClass(FName("FloatSettingItem")));
 	AddSettingItem(SettingItem_GlobalSoundVolume, FText::FromString(TEXT("全局")));
 
-	SettingItem_BackgroundSoundVolume = CreateSubWidget<UWidgetFloatSettingItem>({ FText::FromString(TEXT("音量大小")), 0.f, 1.f, 0, 100.f }, UAssetModuleBPLibrary::GetStaticClass(FName("FloatSettingItem")));
+	SettingItem_BackgroundSoundVolume = CreateSubWidget<UWidgetFloatSettingItem>({ FText::FromString(TEXT("音量大小")), 0.f, 1.f, 0, 100.f }, UAssetModuleStatics::GetStaticClass(FName("FloatSettingItem")));
 	AddSettingItem(SettingItem_BackgroundSoundVolume, FText::FromString(TEXT("背景")));
 
-	SettingItem_EnvironmentSoundVolume = CreateSubWidget<UWidgetFloatSettingItem>({ FText::FromString(TEXT("音量大小")), 0.f, 1.f, 0, 100.f }, UAssetModuleBPLibrary::GetStaticClass(FName("FloatSettingItem")));
+	SettingItem_EnvironmentSoundVolume = CreateSubWidget<UWidgetFloatSettingItem>({ FText::FromString(TEXT("音量大小")), 0.f, 1.f, 0, 100.f }, UAssetModuleStatics::GetStaticClass(FName("FloatSettingItem")));
 	AddSettingItem(SettingItem_EnvironmentSoundVolume, FText::FromString(TEXT("环境")));
 
-	SettingItem_EffectSoundVolume = CreateSubWidget<UWidgetFloatSettingItem>({ FText::FromString(TEXT("音量大小")), 0.f, 1.f, 0, 100.f }, UAssetModuleBPLibrary::GetStaticClass(FName("FloatSettingItem")));
+	SettingItem_EffectSoundVolume = CreateSubWidget<UWidgetFloatSettingItem>({ FText::FromString(TEXT("音量大小")), 0.f, 1.f, 0, 100.f }, UAssetModuleStatics::GetStaticClass(FName("FloatSettingItem")));
 	AddSettingItem(SettingItem_EffectSoundVolume, FText::FromString(TEXT("音效")));
 }
 
@@ -43,20 +43,20 @@ void UWidgetAudioSettingPage::OnOpen(const TArray<FParameter>& InParams, bool bI
 {
 	Super::OnOpen(InParams, bInstant);
 
-	SettingItem_GlobalSoundVolume->SetValue(UAudioModuleBPLibrary::GetGlobalSoundVolume());
-	SettingItem_BackgroundSoundVolume->SetValue(UAudioModuleBPLibrary::GetBackgroundSoundVolume());
-	SettingItem_EnvironmentSoundVolume->SetValue(UAudioModuleBPLibrary::GetEnvironmentSoundVolume());
-	SettingItem_EffectSoundVolume->SetValue(UAudioModuleBPLibrary::GetEffectSoundVolume());
+	SettingItem_GlobalSoundVolume->SetValue(UAudioModuleStatics::GetGlobalSoundVolume());
+	SettingItem_BackgroundSoundVolume->SetValue(UAudioModuleStatics::GetBackgroundSoundVolume());
+	SettingItem_EnvironmentSoundVolume->SetValue(UAudioModuleStatics::GetEnvironmentSoundVolume());
+	SettingItem_EffectSoundVolume->SetValue(UAudioModuleStatics::GetEffectSoundVolume());
 }
 
 void UWidgetAudioSettingPage::OnApply()
 {
 	Super::OnApply();
 
-	UAudioModuleBPLibrary::SetGlobalSoundVolume(SettingItem_GlobalSoundVolume->GetValue().GetFloatValue());
-	UAudioModuleBPLibrary::SetBackgroundSoundVolume(SettingItem_BackgroundSoundVolume->GetValue().GetFloatValue());
-	UAudioModuleBPLibrary::SetEnvironmentSoundVolume(SettingItem_EnvironmentSoundVolume->GetValue().GetFloatValue());
-	UAudioModuleBPLibrary::SetEffectSoundVolume(SettingItem_EffectSoundVolume->GetValue().GetFloatValue());
+	UAudioModuleStatics::SetGlobalSoundVolume(SettingItem_GlobalSoundVolume->GetValue().GetFloatValue());
+	UAudioModuleStatics::SetBackgroundSoundVolume(SettingItem_BackgroundSoundVolume->GetValue().GetFloatValue());
+	UAudioModuleStatics::SetEnvironmentSoundVolume(SettingItem_EnvironmentSoundVolume->GetValue().GetFloatValue());
+	UAudioModuleStatics::SetEffectSoundVolume(SettingItem_EffectSoundVolume->GetValue().GetFloatValue());
 }
 
 void UWidgetAudioSettingPage::OnReset()
@@ -76,21 +76,21 @@ void UWidgetAudioSettingPage::OnClose(bool bInstant)
 
 bool UWidgetAudioSettingPage::CanApply_Implementation() const
 {
-	return UAudioModuleBPLibrary::GetGlobalSoundVolume() != SettingItem_GlobalSoundVolume->GetValue().GetFloatValue() ||
-		UAudioModuleBPLibrary::GetBackgroundSoundVolume() != SettingItem_BackgroundSoundVolume->GetValue().GetFloatValue() ||
-		UAudioModuleBPLibrary::GetEnvironmentSoundVolume() != SettingItem_EnvironmentSoundVolume->GetValue().GetFloatValue() ||
-		UAudioModuleBPLibrary::GetEffectSoundVolume() != SettingItem_EffectSoundVolume->GetValue().GetFloatValue();
+	return UAudioModuleStatics::GetGlobalSoundVolume() != SettingItem_GlobalSoundVolume->GetValue().GetFloatValue() ||
+		UAudioModuleStatics::GetBackgroundSoundVolume() != SettingItem_BackgroundSoundVolume->GetValue().GetFloatValue() ||
+		UAudioModuleStatics::GetEnvironmentSoundVolume() != SettingItem_EnvironmentSoundVolume->GetValue().GetFloatValue() ||
+		UAudioModuleStatics::GetEffectSoundVolume() != SettingItem_EffectSoundVolume->GetValue().GetFloatValue();
 }
 
 bool UWidgetAudioSettingPage::CanReset_Implementation() const
 {
-	return UAudioModuleBPLibrary::GetGlobalSoundVolume() != GetDefaultAudioData().GlobalSoundParams.Volume ||
-		UAudioModuleBPLibrary::GetBackgroundSoundVolume() != GetDefaultAudioData().BackgroundSoundParams.Volume ||
-		UAudioModuleBPLibrary::GetEnvironmentSoundVolume() != GetDefaultAudioData().EnvironmentSoundParams.Volume ||
-		UAudioModuleBPLibrary::GetEffectSoundVolume() != GetDefaultAudioData().EffectSoundParams.Volume;
+	return UAudioModuleStatics::GetGlobalSoundVolume() != GetDefaultAudioData().GlobalSoundParams.Volume ||
+		UAudioModuleStatics::GetBackgroundSoundVolume() != GetDefaultAudioData().BackgroundSoundParams.Volume ||
+		UAudioModuleStatics::GetEnvironmentSoundVolume() != GetDefaultAudioData().EnvironmentSoundParams.Volume ||
+		UAudioModuleStatics::GetEffectSoundVolume() != GetDefaultAudioData().EffectSoundParams.Volume;
 }
 
 FDWAudioModuleSaveData& UWidgetAudioSettingPage::GetDefaultAudioData() const
 {
-	return USaveGameModuleBPLibrary::GetSaveGame<UDWSettingSaveGame>()->GetDefaultDataRef<FDWSettingSaveData>().AudioData;
+	return USaveGameModuleStatics::GetSaveGame<UDWSettingSaveGame>()->GetDefaultDataRef<FDWSettingSaveData>().AudioData;
 }

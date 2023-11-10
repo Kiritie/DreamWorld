@@ -4,7 +4,7 @@
 #include "Vitality/DWVitality.h"
 
 #include "Ability/Components/DWAbilitySystemComponent.h"
-#include "Ability/AbilityModuleBPLibrary.h"
+#include "Ability/AbilityModuleStatics.h"
 #include "Ability/Vitality/DWVitalityAttributeSet.h"
 #include "Ability/Item/Prop/AbilityPropDataBase.h"
 #include "Character/DWCharacter.h"
@@ -64,7 +64,7 @@ void ADWVitality::LoadData(FSaveData* InSaveData, EPhase InPhase)
 	{
 		if(!SaveData.InventoryData.IsSaved())
 		{
-			auto PropDatas = UAssetModuleBPLibrary::LoadPrimaryAssets<UAbilityPropDataBase>(FName("Prop"));
+			auto PropDatas = UAssetModuleStatics::LoadPrimaryAssets<UAbilityPropDataBase>(FName("Prop"));
 			const int32 PropNum = FMath::Clamp(FMath::Rand() < 0.2f ? FMath::RandRange(1, 3) : 0, 0, PropDatas.Num());
 			for (int32 i = 0; i < PropNum; i++)
 			{

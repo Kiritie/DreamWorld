@@ -6,7 +6,7 @@
 #include "Ability/Inventory/AbilityInventoryBase.h"
 #include "Ability/Inventory/AbilityInventoryAgentInterface.h"
 #include "Ability/Inventory/Slot/AbilityInventorySlot.h"
-#include "Asset/AssetModuleBPLibrary.h"
+#include "Asset/AssetModuleStatics.h"
 #include "Character/Player/DWPlayerCharacter.h"
 #include "Components/WrapBox.h"
 #include "Components/WrapBoxSlot.h"
@@ -47,7 +47,7 @@ void UWidgetInventoryBox::OnInitialize(UObject* InOwner)
 			UISlotDatas[ESlotSplitType::Default].Slots.Empty();
 			for(int32 i = 0; i < DefaultSlots.Num(); i++)
 			{
-				if(UWidgetInventorySlot* DefaultSlot = CreateSubWidget<UWidgetInventorySlot>({ DefaultSlots[i] }, UAssetModuleBPLibrary::GetStaticClass(FName("InventoryDefaultSlot"))))
+				if(UWidgetInventorySlot* DefaultSlot = CreateSubWidget<UWidgetInventorySlot>({ DefaultSlots[i] }, UAssetModuleStatics::GetStaticClass(FName("InventoryDefaultSlot"))))
 				{
 					if(UWrapBoxSlot* WrapBoxSlot = DefaultContent->AddChildToWrapBox(DefaultSlot))
 					{
@@ -86,7 +86,7 @@ void UWidgetInventoryBox::OnOpen(const TArray<FParameter>& InParams, bool bInsta
 			TargetUISlotDatas[ESlotSplitType::Default].Slots.Empty();
 			for(int32 i = 0; i < DefaultSlots.Num(); i++)
 			{
-				if(UWidgetInventorySlot* DefaultSlot = CreateSubWidget<UWidgetInventorySlot>({ DefaultSlots[i] }, UAssetModuleBPLibrary::GetStaticClass(FName("InventoryDefaultSlot"))))
+				if(UWidgetInventorySlot* DefaultSlot = CreateSubWidget<UWidgetInventorySlot>({ DefaultSlots[i] }, UAssetModuleStatics::GetStaticClass(FName("InventoryDefaultSlot"))))
 				{
 					if(UWrapBoxSlot* WrapBoxSlot = TargetContent->AddChildToWrapBox(DefaultSlot))
 					{

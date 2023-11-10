@@ -8,17 +8,17 @@
 #include "DWVideoModule.generated.h"
 
 UCLASS()
-class DREAMWORLD_API ADWVideoModule : public AVideoModule
+class DREAMWORLD_API UDWVideoModule : public UVideoModule
 {
 	GENERATED_BODY()
 	
-	GENERATED_MODULE(ADWVideoModule)
+	GENERATED_MODULE(UDWVideoModule)
 
 public:	
 	// ParamSets default values for this actor's properties
-	ADWVideoModule();
+	UDWVideoModule();
 	
-	~ADWVideoModule();
+	~UDWVideoModule();
 
 	//////////////////////////////////////////////////////////////////////////
 	/// Module
@@ -29,15 +29,15 @@ public:
 	virtual void OnDestroy() override;
 #endif
 
-	virtual void OnInitialize_Implementation() override;
+	virtual void OnInitialize() override;
 
-	virtual void OnPreparatory_Implementation(EPhase InPhase) override;
+	virtual void OnPreparatory(EPhase InPhase) override;
 
-	virtual void OnRefresh_Implementation(float DeltaSeconds) override;
+	virtual void OnRefresh(float DeltaSeconds) override;
 
-	virtual void OnPause_Implementation() override;
+	virtual void OnPause() override;
 
-	virtual void OnUnPause_Implementation() override;
+	virtual void OnUnPause() override;
 
 protected:
 	virtual void LoadData(FSaveData* InSaveData, EPhase InPhase) override;

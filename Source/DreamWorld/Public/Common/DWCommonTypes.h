@@ -16,7 +16,7 @@
 #include "DWCommonTypes.generated.h"
 
 class UBehaviorTree;
-class AVoxelModule;
+class UVoxelModule;
 class ADWPlayerCharacter;
 class ADWGameMode;
 class UParticleSystem;

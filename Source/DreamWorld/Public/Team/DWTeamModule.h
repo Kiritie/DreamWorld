@@ -12,17 +12,17 @@ class IDWTeamAgentInterface;
  * 体素模块
  */
 UCLASS()
-class DREAMWORLD_API ADWTeamModule : public AModuleBase
+class DREAMWORLD_API UDWTeamModule : public UModuleBase
 {
 	GENERATED_BODY()
 		
-	GENERATED_MODULE(ADWTeamModule)
+	GENERATED_MODULE(UDWTeamModule)
 
 public:
 	// Sets default values for this actor's properties
-	ADWTeamModule();
+	UDWTeamModule();
 
-	~ADWTeamModule();
+	~UDWTeamModule();
 
 	//////////////////////////////////////////////////////////////////////////
 	/// Module
@@ -33,17 +33,17 @@ public:
 	virtual void OnDestroy() override;
 #endif
 
-	virtual void OnInitialize_Implementation() override;
+	virtual void OnInitialize() override;
 
-	virtual void OnPreparatory_Implementation(EPhase InPhase) override;
+	virtual void OnPreparatory(EPhase InPhase) override;
 
-	virtual void OnRefresh_Implementation(float DeltaSeconds) override;
+	virtual void OnRefresh(float DeltaSeconds) override;
 
-	virtual void OnPause_Implementation() override;
+	virtual void OnPause() override;
 
-	virtual void OnUnPause_Implementation() override;
+	virtual void OnUnPause() override;
 
-	virtual void OnTermination_Implementation(EPhase InPhase) override;
+	virtual void OnTermination(EPhase InPhase) override;
 
 protected:
 	virtual void LoadData(FSaveData* InSaveData, EPhase InPhase) override;

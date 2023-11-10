@@ -4,71 +4,71 @@
 #include "Video/DWVideoModule.h"
 
 #include "Common/DWCommonTypes.h"
-#include "Procedure/ProcedureModuleBPLibrary.h"
-#include "SaveGame/SaveGameModuleBPLibrary.h"
+#include "Procedure/ProcedureModuleStatics.h"
+#include "SaveGame/SaveGameModuleStatics.h"
 	
-IMPLEMENTATION_MODULE(ADWVideoModule)
+IMPLEMENTATION_MODULE(UDWVideoModule)
 
 // ParamSets default values
-ADWVideoModule::ADWVideoModule()
+UDWVideoModule::UDWVideoModule()
 {
 }
 
-ADWVideoModule::~ADWVideoModule()
+UDWVideoModule::~UDWVideoModule()
 {
-	TERMINATION_MODULE(ADWVideoModule)
+	TERMINATION_MODULE(UDWVideoModule)
 }
 
 #if WITH_EDITOR
-void ADWVideoModule::OnGenerate()
+void UDWVideoModule::OnGenerate()
 {
 	Super::OnGenerate();
 }
 
-void ADWVideoModule::OnDestroy()
+void UDWVideoModule::OnDestroy()
 {
 	Super::OnDestroy();
 }
 #endif
 
-void ADWVideoModule::OnInitialize_Implementation()
+void UDWVideoModule::OnInitialize()
 {
-	Super::OnInitialize_Implementation();
+	Super::OnInitialize();
 }
 
-void ADWVideoModule::OnPreparatory_Implementation(EPhase InPhase)
+void UDWVideoModule::OnPreparatory(EPhase InPhase)
 {
-	Super::OnPreparatory_Implementation(InPhase);
+	Super::OnPreparatory(InPhase);
 }
 
-void ADWVideoModule::OnRefresh_Implementation(float DeltaSeconds)
+void UDWVideoModule::OnRefresh(float DeltaSeconds)
 {
-	Super::OnRefresh_Implementation(DeltaSeconds);
+	Super::OnRefresh(DeltaSeconds);
 }
 
-void ADWVideoModule::OnPause_Implementation()
+void UDWVideoModule::OnPause()
 {
-	Super::OnPause_Implementation();
+	Super::OnPause();
 }
 
-void ADWVideoModule::OnUnPause_Implementation()
+void UDWVideoModule::OnUnPause()
 {
-	Super::OnUnPause_Implementation();
+	Super::OnUnPause();
 }
 
-void ADWVideoModule::LoadData(FSaveData* InSaveData, EPhase InPhase)
+void UDWVideoModule::LoadData(FSaveData* InSaveData, EPhase InPhase)
 {
 	Super::LoadData(InSaveData, InPhase);
 
 	const auto& SaveData = InSaveData->CastRef<FDWVideoModuleSaveData>();
 }
 
-void ADWVideoModule::UnloadData(EPhase InPhase)
+void UDWVideoModule::UnloadData(EPhase InPhase)
 {
 	Super::UnloadData(InPhase);
 }
 
-FSaveData* ADWVideoModule::ToData()
+FSaveData* UDWVideoModule::ToData()
 {
 	static FDWVideoModuleSaveData SaveData;
 	SaveData = Super::ToData()->CastRef<FVideoModuleSaveData>();

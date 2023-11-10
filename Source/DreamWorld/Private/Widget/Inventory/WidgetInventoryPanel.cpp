@@ -11,10 +11,10 @@
 #include "Components/GridSlot.h"
 #include "Components/WrapBox.h"
 #include "Components/WrapBoxSlot.h"
-#include "Common/CommonBPLibrary.h"
+#include "Common/CommonStatics.h"
 #include "Ability/Inventory/Slot/AbilityInventorySlot.h"
-#include "Asset/AssetModuleBPLibrary.h"
-#include "ObjectPool/ObjectPoolModuleBPLibrary.h"
+#include "Asset/AssetModuleStatics.h"
+#include "ObjectPool/ObjectPoolModuleStatics.h"
 #include "Widget/Inventory/Slot/WidgetInventoryEquipSlot.h"
 
 UWidgetInventoryPanel::UWidgetInventoryPanel(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
@@ -52,7 +52,7 @@ void UWidgetInventoryPanel::OnInitialize(UObject* InOwner)
 			UISlotDatas[ESlotSplitType::Default].Slots.Empty();
 			for(int32 i = 0; i < DefaultSlots.Num(); i++)
 			{
-				if(UWidgetInventorySlot* DefaultSlot = CreateSubWidget<UWidgetInventorySlot>({ DefaultSlots[i] }, UAssetModuleBPLibrary::GetStaticClass(FName("InventoryDefaultSlot"))))
+				if(UWidgetInventorySlot* DefaultSlot = CreateSubWidget<UWidgetInventorySlot>({ DefaultSlots[i] }, UAssetModuleStatics::GetStaticClass(FName("InventoryDefaultSlot"))))
 				{
 					if(UWrapBoxSlot* WrapBoxSlot = DefaultContent->AddChildToWrapBox(DefaultSlot))
 					{
@@ -80,9 +80,9 @@ void UWidgetInventoryPanel::OnInitialize(UObject* InOwner)
 			UISlotDatas[ESlotSplitType::Equip].Slots.Empty();
 			for(int32 i = 0; i < EquipSlots.Num(); i++)
 			{
-				if(UWidgetInventoryEquipSlot* EquipSlot = CreateSubWidget<UWidgetInventoryEquipSlot>({ EquipSlots[i] }, UAssetModuleBPLibrary::GetStaticClass(FName("InventoryEquipSlot"))))
+				if(UWidgetInventoryEquipSlot* EquipSlot = CreateSubWidget<UWidgetInventoryEquipSlot>({ EquipSlots[i] }, UAssetModuleStatics::GetStaticClass(FName("InventoryEquipSlot"))))
 				{
-					EquipSlot->SetEquipPartType(UCommonBPLibrary::GetEnumValueDisplayName(TEXT("/Script/WHFramework.EEquipPartType"), i));
+					EquipSlot->SetEquipPartType(UCommonStatics::GetEnumValueDisplayName(TEXT("/Script/WHFramework.EEquipPartType"), i));
 					if(UGridSlot* GridSlot = i % 2 == 0 ? LeftEquipContent->AddChildToGrid(EquipSlot) : RightEquipContent->AddChildToGrid(EquipSlot))
 					{
 						GridSlot->SetPadding(FMargin(2.5f, 2.5f, 2.5f, 2.5f));

@@ -3,12 +3,12 @@
 
 #include "Widget/Setting/Page/WidgetCameraSettingPage.h"
 
-#include "Asset/AssetModuleBPLibrary.h"
-#include "Camera/CameraModuleBPLibrary.h"
+#include "Asset/AssetModuleStatics.h"
+#include "Camera/CameraModuleStatics.h"
 #include "Camera/DWCameraModule.h"
-#include "SaveGame/SaveGameModuleBPLibrary.h"
+#include "SaveGame/SaveGameModuleStatics.h"
 #include "SaveGame/Setting/DWSettingSaveGame.h"
-#include "Widget/WidgetModuleBPLibrary.h"
+#include "Widget/WidgetModuleStatics.h"
 #include "Widget/Setting/Item/WidgetBoolSettingItem.h"
 #include "Widget/Setting/Item/WidgetFloatSettingItem.h"
 
@@ -28,37 +28,37 @@ void UWidgetCameraSettingPage::OnCreate(UObject* InOwner)
 {
 	Super::OnCreate(InOwner);
 
-	SettingItem_CameraMoveRate = CreateSubWidget<UWidgetFloatSettingItem>({ FText::FromString(TEXT("移动速度")), 100.f, 500.f, 0 }, UAssetModuleBPLibrary::GetStaticClass(FName("FloatSettingItem")));
+	SettingItem_CameraMoveRate = CreateSubWidget<UWidgetFloatSettingItem>({ FText::FromString(TEXT("移动速度")), 100.f, 500.f, 0 }, UAssetModuleStatics::GetStaticClass(FName("FloatSettingItem")));
 	AddSettingItem(SettingItem_CameraMoveRate, FText::FromString(TEXT("移动")));
 
-	SettingItem_SmoothCameraMove = CreateSubWidget<UWidgetBoolSettingItem>({ FText::FromString(TEXT("平滑移动")) }, UAssetModuleBPLibrary::GetStaticClass(FName("BoolSettingItem")));
+	SettingItem_SmoothCameraMove = CreateSubWidget<UWidgetBoolSettingItem>({ FText::FromString(TEXT("平滑移动")) }, UAssetModuleStatics::GetStaticClass(FName("BoolSettingItem")));
 	AddSettingItem(SettingItem_SmoothCameraMove, FText::FromString(TEXT("移动")));
 
-	SettingItem_CameraMoveSpeed = CreateSubWidget<UWidgetFloatSettingItem>({ FText::FromString(TEXT("平滑速度")), 1.f, 10.f, 0 }, UAssetModuleBPLibrary::GetStaticClass(FName("FloatSettingItem")));
+	SettingItem_CameraMoveSpeed = CreateSubWidget<UWidgetFloatSettingItem>({ FText::FromString(TEXT("平滑速度")), 1.f, 10.f, 0 }, UAssetModuleStatics::GetStaticClass(FName("FloatSettingItem")));
 	AddSettingItem(SettingItem_CameraMoveSpeed, FText::FromString(TEXT("移动")));
 
-	SettingItem_ReverseCameraPitch = CreateSubWidget<UWidgetBoolSettingItem>({ FText::FromString(TEXT("垂直反转")) }, UAssetModuleBPLibrary::GetStaticClass(FName("BoolSettingItem")));
+	SettingItem_ReverseCameraPitch = CreateSubWidget<UWidgetBoolSettingItem>({ FText::FromString(TEXT("垂直反转")) }, UAssetModuleStatics::GetStaticClass(FName("BoolSettingItem")));
 	AddSettingItem(SettingItem_ReverseCameraPitch, FText::FromString(TEXT("旋转")));
 
-	SettingItem_CameraTurnRate = CreateSubWidget<UWidgetFloatSettingItem>({ FText::FromString(TEXT("水平速度")), 30.f, 150.f, 0 }, UAssetModuleBPLibrary::GetStaticClass(FName("FloatSettingItem")));
+	SettingItem_CameraTurnRate = CreateSubWidget<UWidgetFloatSettingItem>({ FText::FromString(TEXT("水平速度")), 30.f, 150.f, 0 }, UAssetModuleStatics::GetStaticClass(FName("FloatSettingItem")));
 	AddSettingItem(SettingItem_CameraTurnRate, FText::FromString(TEXT("旋转")));
 
-	SettingItem_CameraLookUpRate = CreateSubWidget<UWidgetFloatSettingItem>({ FText::FromString(TEXT("垂直速度")), 30.f, 150.f, 0 }, UAssetModuleBPLibrary::GetStaticClass(FName("FloatSettingItem")));
+	SettingItem_CameraLookUpRate = CreateSubWidget<UWidgetFloatSettingItem>({ FText::FromString(TEXT("垂直速度")), 30.f, 150.f, 0 }, UAssetModuleStatics::GetStaticClass(FName("FloatSettingItem")));
 	AddSettingItem(SettingItem_CameraLookUpRate, FText::FromString(TEXT("旋转")));
 
-	SettingItem_SmoothCameraRotate = CreateSubWidget<UWidgetBoolSettingItem>({ FText::FromString(TEXT("平滑旋转")) }, UAssetModuleBPLibrary::GetStaticClass(FName("BoolSettingItem")));
+	SettingItem_SmoothCameraRotate = CreateSubWidget<UWidgetBoolSettingItem>({ FText::FromString(TEXT("平滑旋转")) }, UAssetModuleStatics::GetStaticClass(FName("BoolSettingItem")));
 	AddSettingItem(SettingItem_SmoothCameraRotate, FText::FromString(TEXT("旋转")));
 
-	SettingItem_CameraRotateSpeed = CreateSubWidget<UWidgetFloatSettingItem>({ FText::FromString(TEXT("平滑速度")), 1.f, 10.f, 0 }, UAssetModuleBPLibrary::GetStaticClass(FName("FloatSettingItem")));
+	SettingItem_CameraRotateSpeed = CreateSubWidget<UWidgetFloatSettingItem>({ FText::FromString(TEXT("平滑速度")), 1.f, 10.f, 0 }, UAssetModuleStatics::GetStaticClass(FName("FloatSettingItem")));
 	AddSettingItem(SettingItem_CameraRotateSpeed, FText::FromString(TEXT("旋转")));
 
-	SettingItem_CameraZoomRate = CreateSubWidget<UWidgetFloatSettingItem>({ FText::FromString(TEXT("缩放速度")), 50.f, 300.f, 0 }, UAssetModuleBPLibrary::GetStaticClass(FName("FloatSettingItem")));
+	SettingItem_CameraZoomRate = CreateSubWidget<UWidgetFloatSettingItem>({ FText::FromString(TEXT("缩放速度")), 50.f, 300.f, 0 }, UAssetModuleStatics::GetStaticClass(FName("FloatSettingItem")));
 	AddSettingItem(SettingItem_CameraZoomRate, FText::FromString(TEXT("缩放")));
 
-	SettingItem_SmoothCameraZoom = CreateSubWidget<UWidgetBoolSettingItem>({ FText::FromString(TEXT("平滑缩放")) }, UAssetModuleBPLibrary::GetStaticClass(FName("BoolSettingItem")));
+	SettingItem_SmoothCameraZoom = CreateSubWidget<UWidgetBoolSettingItem>({ FText::FromString(TEXT("平滑缩放")) }, UAssetModuleStatics::GetStaticClass(FName("BoolSettingItem")));
 	AddSettingItem(SettingItem_SmoothCameraZoom, FText::FromString(TEXT("缩放")));
 
-	SettingItem_CameraZoomSpeed = CreateSubWidget<UWidgetFloatSettingItem>({ FText::FromString(TEXT("平滑速度")), 1.f, 10.f, 0 }, UAssetModuleBPLibrary::GetStaticClass(FName("FloatSettingItem")));
+	SettingItem_CameraZoomSpeed = CreateSubWidget<UWidgetFloatSettingItem>({ FText::FromString(TEXT("平滑速度")), 1.f, 10.f, 0 }, UAssetModuleStatics::GetStaticClass(FName("FloatSettingItem")));
 	AddSettingItem(SettingItem_CameraZoomSpeed, FText::FromString(TEXT("缩放")));
 }
 
@@ -66,34 +66,34 @@ void UWidgetCameraSettingPage::OnOpen(const TArray<FParameter>& InParams, bool b
 {
 	Super::OnOpen(InParams, bInstant);
 
-	SettingItem_CameraMoveRate->SetValue(ADWCameraModule::Get()->GetCameraMoveRate());
-	SettingItem_SmoothCameraMove->SetValue(ADWCameraModule::Get()->IsSmoothCameraMove());
-	SettingItem_CameraMoveSpeed->SetValue(ADWCameraModule::Get()->GetCameraMoveSpeed());
-	SettingItem_ReverseCameraPitch->SetValue(ADWCameraModule::Get()->IsReverseCameraPitch());
-	SettingItem_CameraTurnRate->SetValue(ADWCameraModule::Get()->GetCameraTurnRate());
-	SettingItem_CameraLookUpRate->SetValue(ADWCameraModule::Get()->GetCameraLookUpRate());
-	SettingItem_SmoothCameraRotate->SetValue(ADWCameraModule::Get()->IsSmoothCameraRotate());
-	SettingItem_CameraRotateSpeed->SetValue(ADWCameraModule::Get()->GetCameraRotateSpeed());
-	SettingItem_CameraZoomRate->SetValue(ADWCameraModule::Get()->GetCameraZoomRate());
-	SettingItem_SmoothCameraZoom->SetValue(ADWCameraModule::Get()->IsSmoothCameraZoom());
-	SettingItem_CameraZoomSpeed->SetValue(ADWCameraModule::Get()->GetCameraZoomSpeed());
+	SettingItem_CameraMoveRate->SetValue(UDWCameraModule::Get().GetCameraMoveRate());
+	SettingItem_SmoothCameraMove->SetValue(UDWCameraModule::Get().IsSmoothCameraMove());
+	SettingItem_CameraMoveSpeed->SetValue(UDWCameraModule::Get().GetCameraMoveSpeed());
+	SettingItem_ReverseCameraPitch->SetValue(UDWCameraModule::Get().IsReverseCameraPitch());
+	SettingItem_CameraTurnRate->SetValue(UDWCameraModule::Get().GetCameraTurnRate());
+	SettingItem_CameraLookUpRate->SetValue(UDWCameraModule::Get().GetCameraLookUpRate());
+	SettingItem_SmoothCameraRotate->SetValue(UDWCameraModule::Get().IsSmoothCameraRotate());
+	SettingItem_CameraRotateSpeed->SetValue(UDWCameraModule::Get().GetCameraRotateSpeed());
+	SettingItem_CameraZoomRate->SetValue(UDWCameraModule::Get().GetCameraZoomRate());
+	SettingItem_SmoothCameraZoom->SetValue(UDWCameraModule::Get().IsSmoothCameraZoom());
+	SettingItem_CameraZoomSpeed->SetValue(UDWCameraModule::Get().GetCameraZoomSpeed());
 }
 
 void UWidgetCameraSettingPage::OnApply()
 {
 	Super::OnApply();
 
-	ADWCameraModule::Get()->SetCameraMoveRate(SettingItem_CameraMoveRate->GetValue().GetFloatValue());
-	ADWCameraModule::Get()->SetSmoothCameraMove(SettingItem_SmoothCameraMove->GetValue().GetBooleanValue());
-	ADWCameraModule::Get()->SetCameraMoveSpeed(SettingItem_CameraMoveSpeed->GetValue().GetFloatValue());
-	ADWCameraModule::Get()->SetReverseCameraPitch(SettingItem_ReverseCameraPitch->GetValue().GetBooleanValue());
-	ADWCameraModule::Get()->SetCameraTurnRate(SettingItem_CameraTurnRate->GetValue().GetFloatValue());
-	ADWCameraModule::Get()->SetCameraLookUpRate(SettingItem_CameraLookUpRate->GetValue().GetFloatValue());
-	ADWCameraModule::Get()->SetSmoothCameraRotate(SettingItem_SmoothCameraRotate->GetValue().GetBooleanValue());
-	ADWCameraModule::Get()->SetCameraRotateSpeed(SettingItem_CameraRotateSpeed->GetValue().GetFloatValue());
-	ADWCameraModule::Get()->SetCameraZoomRate(SettingItem_CameraZoomRate->GetValue().GetFloatValue());
-	ADWCameraModule::Get()->SetSmoothCameraZoom(SettingItem_SmoothCameraZoom->GetValue().GetBooleanValue());
-	ADWCameraModule::Get()->SetCameraZoomSpeed(SettingItem_CameraZoomSpeed->GetValue().GetFloatValue());
+	UDWCameraModule::Get().SetCameraMoveRate(SettingItem_CameraMoveRate->GetValue().GetFloatValue());
+	UDWCameraModule::Get().SetSmoothCameraMove(SettingItem_SmoothCameraMove->GetValue().GetBooleanValue());
+	UDWCameraModule::Get().SetCameraMoveSpeed(SettingItem_CameraMoveSpeed->GetValue().GetFloatValue());
+	UDWCameraModule::Get().SetReverseCameraPitch(SettingItem_ReverseCameraPitch->GetValue().GetBooleanValue());
+	UDWCameraModule::Get().SetCameraTurnRate(SettingItem_CameraTurnRate->GetValue().GetFloatValue());
+	UDWCameraModule::Get().SetCameraLookUpRate(SettingItem_CameraLookUpRate->GetValue().GetFloatValue());
+	UDWCameraModule::Get().SetSmoothCameraRotate(SettingItem_SmoothCameraRotate->GetValue().GetBooleanValue());
+	UDWCameraModule::Get().SetCameraRotateSpeed(SettingItem_CameraRotateSpeed->GetValue().GetFloatValue());
+	UDWCameraModule::Get().SetCameraZoomRate(SettingItem_CameraZoomRate->GetValue().GetFloatValue());
+	UDWCameraModule::Get().SetSmoothCameraZoom(SettingItem_SmoothCameraZoom->GetValue().GetBooleanValue());
+	UDWCameraModule::Get().SetCameraZoomSpeed(SettingItem_CameraZoomSpeed->GetValue().GetFloatValue());
 }
 
 void UWidgetCameraSettingPage::OnReset()
@@ -120,35 +120,35 @@ void UWidgetCameraSettingPage::OnClose(bool bInstant)
 
 bool UWidgetCameraSettingPage::CanApply_Implementation() const
 {
-	return ADWCameraModule::Get()->GetCameraMoveRate() != SettingItem_CameraMoveRate->GetValue().GetFloatValue() ||
-		ADWCameraModule::Get()->IsSmoothCameraMove() != SettingItem_SmoothCameraMove->GetValue().GetBooleanValue() ||
-		ADWCameraModule::Get()->GetCameraMoveSpeed() != SettingItem_CameraMoveSpeed->GetValue().GetFloatValue() ||
-		ADWCameraModule::Get()->IsReverseCameraPitch() != SettingItem_ReverseCameraPitch->GetValue().GetBooleanValue() ||
-		ADWCameraModule::Get()->GetCameraTurnRate() != SettingItem_CameraTurnRate->GetValue().GetFloatValue() ||
-		ADWCameraModule::Get()->GetCameraLookUpRate() != SettingItem_CameraLookUpRate->GetValue().GetFloatValue() ||
-		ADWCameraModule::Get()->IsSmoothCameraRotate() != SettingItem_SmoothCameraRotate->GetValue().GetBooleanValue() ||
-		ADWCameraModule::Get()->GetCameraRotateSpeed() != SettingItem_CameraRotateSpeed->GetValue().GetFloatValue() ||
-		ADWCameraModule::Get()->GetCameraZoomRate() != SettingItem_CameraZoomRate->GetValue().GetFloatValue() ||
-		ADWCameraModule::Get()->IsSmoothCameraZoom() != SettingItem_SmoothCameraZoom->GetValue().GetBooleanValue() ||
-		ADWCameraModule::Get()->GetCameraZoomSpeed() != SettingItem_CameraZoomSpeed->GetValue().GetFloatValue();
+	return UDWCameraModule::Get().GetCameraMoveRate() != SettingItem_CameraMoveRate->GetValue().GetFloatValue() ||
+		UDWCameraModule::Get().IsSmoothCameraMove() != SettingItem_SmoothCameraMove->GetValue().GetBooleanValue() ||
+		UDWCameraModule::Get().GetCameraMoveSpeed() != SettingItem_CameraMoveSpeed->GetValue().GetFloatValue() ||
+		UDWCameraModule::Get().IsReverseCameraPitch() != SettingItem_ReverseCameraPitch->GetValue().GetBooleanValue() ||
+		UDWCameraModule::Get().GetCameraTurnRate() != SettingItem_CameraTurnRate->GetValue().GetFloatValue() ||
+		UDWCameraModule::Get().GetCameraLookUpRate() != SettingItem_CameraLookUpRate->GetValue().GetFloatValue() ||
+		UDWCameraModule::Get().IsSmoothCameraRotate() != SettingItem_SmoothCameraRotate->GetValue().GetBooleanValue() ||
+		UDWCameraModule::Get().GetCameraRotateSpeed() != SettingItem_CameraRotateSpeed->GetValue().GetFloatValue() ||
+		UDWCameraModule::Get().GetCameraZoomRate() != SettingItem_CameraZoomRate->GetValue().GetFloatValue() ||
+		UDWCameraModule::Get().IsSmoothCameraZoom() != SettingItem_SmoothCameraZoom->GetValue().GetBooleanValue() ||
+		UDWCameraModule::Get().GetCameraZoomSpeed() != SettingItem_CameraZoomSpeed->GetValue().GetFloatValue();
 }
 
 bool UWidgetCameraSettingPage::CanReset_Implementation() const
 {
-	return ADWCameraModule::Get()->GetCameraMoveRate() != GetDefaultCameraData().CameraMoveRate ||
-		ADWCameraModule::Get()->IsSmoothCameraMove() != GetDefaultCameraData().bSmoothCameraMove ||
-		ADWCameraModule::Get()->GetCameraMoveSpeed() != GetDefaultCameraData().CameraMoveSpeed ||
-		ADWCameraModule::Get()->IsReverseCameraPitch() != GetDefaultCameraData().bReverseCameraPitch ||
-		ADWCameraModule::Get()->GetCameraTurnRate() != GetDefaultCameraData().CameraTurnRate ||
-		ADWCameraModule::Get()->GetCameraLookUpRate() != GetDefaultCameraData().CameraLookUpRate ||
-		ADWCameraModule::Get()->IsSmoothCameraRotate() != GetDefaultCameraData().bSmoothCameraRotate ||
-		ADWCameraModule::Get()->GetCameraRotateSpeed() != GetDefaultCameraData().CameraRotateSpeed ||
-		ADWCameraModule::Get()->GetCameraZoomRate() != GetDefaultCameraData().CameraZoomRate ||
-		ADWCameraModule::Get()->IsSmoothCameraZoom() != GetDefaultCameraData().bSmoothCameraZoom ||
-		ADWCameraModule::Get()->GetCameraZoomSpeed() != GetDefaultCameraData().CameraZoomSpeed;
+	return UDWCameraModule::Get().GetCameraMoveRate() != GetDefaultCameraData().CameraMoveRate ||
+		UDWCameraModule::Get().IsSmoothCameraMove() != GetDefaultCameraData().bSmoothCameraMove ||
+		UDWCameraModule::Get().GetCameraMoveSpeed() != GetDefaultCameraData().CameraMoveSpeed ||
+		UDWCameraModule::Get().IsReverseCameraPitch() != GetDefaultCameraData().bReverseCameraPitch ||
+		UDWCameraModule::Get().GetCameraTurnRate() != GetDefaultCameraData().CameraTurnRate ||
+		UDWCameraModule::Get().GetCameraLookUpRate() != GetDefaultCameraData().CameraLookUpRate ||
+		UDWCameraModule::Get().IsSmoothCameraRotate() != GetDefaultCameraData().bSmoothCameraRotate ||
+		UDWCameraModule::Get().GetCameraRotateSpeed() != GetDefaultCameraData().CameraRotateSpeed ||
+		UDWCameraModule::Get().GetCameraZoomRate() != GetDefaultCameraData().CameraZoomRate ||
+		UDWCameraModule::Get().IsSmoothCameraZoom() != GetDefaultCameraData().bSmoothCameraZoom ||
+		UDWCameraModule::Get().GetCameraZoomSpeed() != GetDefaultCameraData().CameraZoomSpeed;
 }
 
 FDWCameraModuleSaveData& UWidgetCameraSettingPage::GetDefaultCameraData() const
 {
-	return USaveGameModuleBPLibrary::GetSaveGame<UDWSettingSaveGame>()->GetDefaultDataRef<FDWSettingSaveData>().CameraData;
+	return USaveGameModuleStatics::GetSaveGame<UDWSettingSaveGame>()->GetDefaultDataRef<FDWSettingSaveData>().CameraData;
 }

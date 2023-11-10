@@ -5,7 +5,7 @@
 #include "Character/DWCharacter.h"
 #include "Voxel/Chunks/VoxelChunk.h"
 #include "Ability/Character/AbilityCharacterBase.h"
-#include "ObjectPool/ObjectPoolModuleBPLibrary.h"
+#include "ObjectPool/ObjectPoolModuleStatics.h"
 #include "Ability/Character/AbilityCharacterDataBase.h"
 #include "Ability/Character/AbilityCharacterInventoryBase.h"
 
@@ -77,7 +77,7 @@ void UDWCharacterState_Death::DeathEnd()
 
 	if(!Character->IsPlayer())
 	{
-		UObjectPoolModuleBPLibrary::DespawnObject(Character);
+		UObjectPoolModuleStatics::DespawnObject(Character);
 	}
 	else
 	{

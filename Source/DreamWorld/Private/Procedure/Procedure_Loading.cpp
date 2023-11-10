@@ -5,15 +5,15 @@
 
 #include "Camera/CameraModule.h"
 #include "Character/Player/DWPlayerCharacter.h"
-#include "Common/CommonBPLibrary.h"
+#include "Common/CommonStatics.h"
 #include "Main/MainModule.h"
-#include "Procedure/ProcedureModuleBPLibrary.h"
+#include "Procedure/ProcedureModuleStatics.h"
 #include "Procedure/Procedure_Playing.h"
 #include "SaveGame/Archive/DWArchiveSaveGame.h"
-#include "SaveGame/SaveGameModuleBPLibrary.h"
+#include "SaveGame/SaveGameModuleStatics.h"
 #include "Voxel/DWVoxelModule.h"
 #include "Widget/WidgetGameHUD.h"
-#include "Widget/WidgetModuleBPLibrary.h"
+#include "Widget/WidgetModuleStatics.h"
 #include "Widget/Loading/WidgetLoadingPanel.h"
 
 UProcedure_Loading::UProcedure_Loading()
@@ -43,22 +43,22 @@ void UProcedure_Loading::OnEnter(UProcedureBase* InLastProcedure)
 {
 	Super::OnEnter(InLastProcedure);
 
-	AMainModule::PauseModuleByClass<ACameraModule>();
+	AMainModule::PauseModuleByClass<UCameraModule>();
 
-	UWidgetModuleBPLibrary::CreateUserWidget<UWidgetGameHUD>(UCommonBPLibrary::GetPlayerPawn<ADWPlayerCharacter>());
+	UWidgetModuleStatics::CreateUserWidget<UWidgetGameHUD>(UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>());
 
-	UWidgetModuleBPLibrary::OpenUserWidget<UWidgetLoadingPanel>({ FString(TEXT("生成世界中...")) });
+	UWidgetModuleStatics::OpenUserWidget<UWidgetLoadingPanel>({ FString(TEXT("生成世界中...")) });
 
-	USaveGameModuleBPLibrary::LoadSaveGame<UDWArchiveSaveGame>(-1, EPhase::Final);
+	USaveGameModuleStatics::LoadSaveGame<UDWArchiveSaveGame>(-1, EPhase::Final);
 }
 
 void UProcedure_Loading::OnRefresh()
 {
 	Super::OnRefresh();
 
-	if(AVoxelModule::Get()->IsBasicGenerated())
+	if(UVoxelModule::Get().IsBasicGenerated())
 	{
-		UProcedureModuleBPLibrary::SwitchProcedureByClass<UProcedure_Playing>();
+		UProcedureModuleStatics::SwitchProcedureByClass<UProcedure_Playing>();
 	}
 }
 
@@ -71,5 +71,5 @@ void UProcedure_Loading::OnLeave(UProcedureBase* InNextProcedure)
 {
 	Super::OnLeave(InNextProcedure);
 
-	UWidgetModuleBPLibrary::CloseUserWidget<UWidgetLoadingPanel>();
+	UWidgetModuleStatics::CloseUserWidget<UWidgetLoadingPanel>();
 }

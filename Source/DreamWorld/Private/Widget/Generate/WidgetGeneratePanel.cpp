@@ -7,12 +7,12 @@
 #include "Components/WrapBox.h"
 #include "Components/WrapBoxSlot.h"
 #include "Ability/Inventory/Slot/AbilityInventorySlot.h"
-#include "Asset/AssetModuleBPLibrary.h"
+#include "Asset/AssetModuleStatics.h"
 #include "Components/ScrollBoxSlot.h"
 #include "Components/ScrollBox.h"
 #include "CommonButtonBase.h"
 #include "Ability/Inventory/AbilityInventoryBase.h"
-#include "Achievement/AchievementModuleBPLibrary.h"
+#include "Achievement/AchievementModuleStatics.h"
 #include "Character/DWCharacter.h"
 #include "Widget/Common/WidgetButtonBase.h"
 #include "Widget/Generate/WidgetGenerateItem.h"
@@ -67,7 +67,7 @@ void UWidgetGeneratePanel::OnOpen(const TArray<FParameter>& InParams, bool bInst
 	const FPrimaryAssetId GenerateToolID = InParams.IsValidIndex(0) ? InParams[0].GetObjectValue<IPrimaryEntityInterface>()->Execute_GetAssetID(InParams[0].GetObjectValue()) : FPrimaryAssetId();
 
 	TArray<FDWGenerateItemData> GenerateItemDatas;
-	if(GenerateContent && UAssetModuleBPLibrary::ReadDataTable(GenerateItemDatas))
+	if(GenerateContent && UAssetModuleStatics::ReadDataTable(GenerateItemDatas))
 	{
 		for(auto Iter : GenerateItems)
 		{
@@ -78,7 +78,7 @@ void UWidgetGeneratePanel::OnOpen(const TArray<FParameter>& InParams, bool bInst
 		{
 			if(Iter.ToolID.IsValid() && Iter.ToolID != GenerateToolID) continue;
 			
-			if(UWidgetGenerateItem* GenerateItem = CreateSubWidget<UWidgetGenerateItem>({ &Iter.Item, &Iter}, UAssetModuleBPLibrary::GetStaticClass(FName("GenerateItem"))))
+			if(UWidgetGenerateItem* GenerateItem = CreateSubWidget<UWidgetGenerateItem>({ &Iter.Item, &Iter}, UAssetModuleStatics::GetStaticClass(FName("GenerateItem"))))
 			{
 				if(UScrollBoxSlot* ScrollBoxSlot = Cast<UScrollBoxSlot>(GenerateContent->AddChild(GenerateItem)))
 				{
@@ -201,7 +201,7 @@ void UWidgetGeneratePanel::OnPreviewContentRefresh()
 			PreviewItems.Empty();
 			for(auto& Iter : GenerateItemData.RawDatas[PreviewGenerateRawDataIndex].Raws)
 			{
-				if(UWidgetAbilityPreviewItem* PreviewItem = CreateSubWidget<UWidgetAbilityPreviewItem>({ &Iter }, UAssetModuleBPLibrary::GetStaticClass(FName("PreviewItem"))))
+				if(UWidgetAbilityPreviewItem* PreviewItem = CreateSubWidget<UWidgetAbilityPreviewItem>({ &Iter }, UAssetModuleStatics::GetStaticClass(FName("PreviewItem"))))
 				{
 					if(UWrapBoxSlot* WrapBoxSlot = PreviewContent->AddChildToWrapBox(PreviewItem))
 					{
@@ -237,7 +237,7 @@ void UWidgetGeneratePanel::OnGenerateButtonClicked()
 		{
 			Cast<ADWCharacter>(OwnerObject)->OnDiscardItem(GenerateItemData.Item, false);
 		}
-		UAchievementModuleBPLibrary::UnlockAchievement(FName("FirstGenerateItem"));
+		UAchievementModuleStatics::UnlockAchievement(FName("FirstGenerateItem"));
 	}
 }
 

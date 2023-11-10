@@ -4,71 +4,73 @@
 #include "Audio/DWAudioModule.h"
 
 #include "Common/DWCommonTypes.h"
-#include "Procedure/ProcedureModuleBPLibrary.h"
-#include "SaveGame/SaveGameModuleBPLibrary.h"
+#include "Procedure/ProcedureModuleStatics.h"
+#include "SaveGame/SaveGameModuleStatics.h"
 	
-IMPLEMENTATION_MODULE(ADWAudioModule)
+IMPLEMENTATION_MODULE(UDWAudioModule)
 
 // ParamSets default values
-ADWAudioModule::ADWAudioModule()
+UDWAudioModule::UDWAudioModule()
 {
 }
 
-ADWAudioModule::~ADWAudioModule()
+UDWAudioModule::~UDWAudioModule()
 {
-	TERMINATION_MODULE(ADWAudioModule)
+	TERMINATION_MODULE(UDWAudioModule)
 }
 
 #if WITH_EDITOR
-void ADWAudioModule::OnGenerate()
+void UDWAudioModule::OnGenerate()
 {
 	Super::OnGenerate();
 }
 
-void ADWAudioModule::OnDestroy()
+void UDWAudioModule::OnDestroy()
 {
 	Super::OnDestroy();
+
+	TERMINATION_MODULE(UDWAudioModule)
 }
 #endif
 
-void ADWAudioModule::OnInitialize_Implementation()
+void UDWAudioModule::OnInitialize()
 {
-	Super::OnInitialize_Implementation();
+	Super::OnInitialize();
 }
 
-void ADWAudioModule::OnPreparatory_Implementation(EPhase InPhase)
+void UDWAudioModule::OnPreparatory(EPhase InPhase)
 {
-	Super::OnPreparatory_Implementation(InPhase);
+	Super::OnPreparatory(InPhase);
 }
 
-void ADWAudioModule::OnRefresh_Implementation(float DeltaSeconds)
+void UDWAudioModule::OnRefresh(float DeltaSeconds)
 {
-	Super::OnRefresh_Implementation(DeltaSeconds);
+	Super::OnRefresh(DeltaSeconds);
 }
 
-void ADWAudioModule::OnPause_Implementation()
+void UDWAudioModule::OnPause()
 {
-	Super::OnPause_Implementation();
+	Super::OnPause();
 }
 
-void ADWAudioModule::OnUnPause_Implementation()
+void UDWAudioModule::OnUnPause()
 {
-	Super::OnUnPause_Implementation();
+	Super::OnUnPause();
 }
 
-void ADWAudioModule::LoadData(FSaveData* InSaveData, EPhase InPhase)
+void UDWAudioModule::LoadData(FSaveData* InSaveData, EPhase InPhase)
 {
 	Super::LoadData(InSaveData, InPhase);
 
 	const auto& SaveData = InSaveData->CastRef<FDWAudioModuleSaveData>();
 }
 
-void ADWAudioModule::UnloadData(EPhase InPhase)
+void UDWAudioModule::UnloadData(EPhase InPhase)
 {
 	Super::UnloadData(InPhase);
 }
 
-FSaveData* ADWAudioModule::ToData()
+FSaveData* UDWAudioModule::ToData()
 {
 	static FDWAudioModuleSaveData SaveData;
 	SaveData = Super::ToData()->CastRef<FAudioModuleSaveData>();

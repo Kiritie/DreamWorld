@@ -1,6 +1,6 @@
 #include "Character/Human/DWHumanCharacterData.h"
 
-#include "Ability/AbilityModuleBPLibrary.h"
+#include "Ability/AbilityModuleStatics.h"
 
 UDWHumanCharacterData::UDWHumanCharacterData()
 {

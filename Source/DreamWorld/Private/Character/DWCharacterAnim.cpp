@@ -5,7 +5,7 @@
 #include "Character/DWCharacter.h"
 #include "Character/States/DWCharacterState_Attack.h"
 #include "FSM/Components/FSMComponent.h"
-#include "Common/CommonBPLibrary.h"
+#include "Common/CommonStatics.h"
 
 UDWCharacterAnim::UDWCharacterAnim()
 {
@@ -59,7 +59,7 @@ void UDWCharacterAnim::NativeUpdateAnimation(float DeltaSeconds)
 	
 	ADWCharacter* Character = Cast<ADWCharacter>(TryGetPawnOwner());
 
-	if(!Character || !Character->Execute_GetAssetID(Character).IsValid() || !UCommonBPLibrary::IsPlaying()) return;
+	if(!Character || !Character->Execute_GetAssetID(Character).IsValid() || !UCommonStatics::IsPlaying()) return;
 
 	bSprinting = Character->IsSprinting();
 	bAttacking = Character->IsAttacking();

@@ -9,7 +9,7 @@
 #include "FSM/Components/FSMComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Voxel/VoxelModule.h"
-#include "Voxel/VoxelModuleBPLibrary.h"
+#include "Voxel/VoxelModuleStatics.h"
 #include "Voxel/Chunks/VoxelChunk.h"
 #include "Voxel/Voxels/Voxel.h"
 
@@ -82,13 +82,13 @@ void UDWCharacterState_Default::TrySwitchToWalk()
 	{
 		FSM->SwitchStateByClass<UDWCharacterState_Walk>();
 	}
-	else if(AVoxelModule::Get()->IsBasicGenerated())
+	else if(UVoxelModule::Get().IsBasicGenerated())
 	{
 		if(Character->GetActorLocation().IsNearlyZero())
 		{
 			const auto& characterData = Character->GetCharacterData<UAbilityCharacterDataBase>();
 			FHitResult hitResult;
-			if(UVoxelModuleBPLibrary::VoxelAgentTraceSingle(Character->GetActorLocation(), FVector2D(1000.f), characterData.Radius, characterData.HalfHeight, {}, hitResult, true, 10, true))
+			if(UVoxelModuleStatics::VoxelAgentTraceSingle(Character->GetActorLocation(), FVector2D(1000.f), characterData.Radius, characterData.HalfHeight, {}, hitResult, true, 10, true))
 			{
 				Character->SetActorLocationAndRotation(hitResult.Location, FRotator::ZeroRotator);
 				FSM->SwitchStateByClass<UDWCharacterState_Walk>();

@@ -7,7 +7,7 @@
 #include "Item/Equip/DWEquipData.h"
 #include "Character/DWCharacter.h"
 #include "Widget/WidgetContextBox.h"
-#include "Widget/WidgetModuleBPLibrary.h"
+#include "Widget/WidgetModuleStatics.h"
 
 UDWCharacterInventory::UDWCharacterInventory()
 {
@@ -47,11 +47,11 @@ void UDWCharacterInventory::AddItemBySlots(FAbilityItem& InItem, const TArray<UA
 	{
 		if(tmpItem.Count > 0)
 		{
-			UWidgetModuleBPLibrary::GetUserWidget<UWidgetContextBox>()->AddMessage(FString::Printf(TEXT("获得: %s × %d"), *InItem.GetData().Name.ToString(), tmpItem.Count));
+			UWidgetModuleStatics::GetUserWidget<UWidgetContextBox>()->AddMessage(FString::Printf(TEXT("获得: %s × %d"), *InItem.GetData().Name.ToString(), tmpItem.Count));
 		}
 		else
 		{
-			UWidgetModuleBPLibrary::GetUserWidget<UWidgetContextBox>()->AddMessage(FString::Printf(TEXT("无法再获得: %s"), *InItem.GetData().Name.ToString()));
+			UWidgetModuleStatics::GetUserWidget<UWidgetContextBox>()->AddMessage(FString::Printf(TEXT("无法再获得: %s"), *InItem.GetData().Name.ToString()));
 		}
 	}
 }
@@ -60,7 +60,7 @@ void UDWCharacterInventory::RemoveItemBySlots(FAbilityItem& InItem, const TArray
 {
 	if(GetOwnerAgent<ADWCharacter>()->IsPlayer())
 	{
-		//UWidgetModuleBPLibrary::GetUserWidget<UWidgetContextBox>()->AddMessage(FString::Printf(TEXT("失去: %s × %d"), *InItem.GetData().Name.ToString(), InItem.Count));
+		//UWidgetModuleStatics::GetUserWidget<UWidgetContextBox>()->AddMessage(FString::Printf(TEXT("失去: %s × %d"), *InItem.GetData().Name.ToString(), InItem.Count));
 	}
 
 	Super::RemoveItemBySlots(InItem, InSlots);

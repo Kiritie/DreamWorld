@@ -3,11 +3,11 @@
 
 #include "Widget/Item/WidgetAbilityItem.h"
 
-#include "Widget/WidgetModuleBPLibrary.h"
+#include "Widget/WidgetModuleStatics.h"
 #include "Blueprint/WidgetLayoutLibrary.h"
 #include "Components/CanvasPanelSlot.h"
 #include "Ability/Item/AbilityItemDataBase.h"
-#include "Common/CommonBPLibrary.h"
+#include "Common/CommonStatics.h"
 #include "Widget/Item/WidgetAbilityItemInfoBox.h"
 
 class UWidgetAbilityItemInfoBox;
@@ -22,14 +22,14 @@ void UWidgetAbilityItem::NativeOnMouseEnter(const FGeometry& InGeometry, const F
 	Super::NativeOnMouseEnter(InGeometry, InMouseEvent);
 
 	const auto& ItemData = Item.GetData();
-	UWidgetModuleBPLibrary::OpenUserWidget<UWidgetAbilityItemInfoBox>({ ItemData.Name, ItemData.Detail });
+	UWidgetModuleStatics::OpenUserWidget<UWidgetAbilityItemInfoBox>({ ItemData.Name, ItemData.Detail });
 }
 
 void UWidgetAbilityItem::NativeOnMouseLeave(const FPointerEvent& InMouseEvent)
 {
 	Super::NativeOnMouseLeave(InMouseEvent);
 
-	UWidgetModuleBPLibrary::CloseUserWidget<UWidgetAbilityItemInfoBox>();
+	UWidgetModuleStatics::CloseUserWidget<UWidgetAbilityItemInfoBox>();
 }
 
 FReply UWidgetAbilityItem::NativeOnFocusReceived(const FGeometry& InGeometry, const FFocusEvent& InFocusEvent)
@@ -40,10 +40,10 @@ FReply UWidgetAbilityItem::NativeOnFocusReceived(const FGeometry& InGeometry, co
 
 FReply UWidgetAbilityItem::NativeOnMouseMove(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
 {
-	if(const auto ItemInfoBoxSlot = Cast<UCanvasPanelSlot>(UWidgetModuleBPLibrary::GetUserWidget<UWidgetAbilityItemInfoBox>()->Slot))
+	if(const auto ItemInfoBoxSlot = Cast<UCanvasPanelSlot>(UWidgetModuleStatics::GetUserWidget<UWidgetAbilityItemInfoBox>()->Slot))
 	{
 		float PosX, PosY;
-		UWidgetLayoutLibrary::GetMousePositionScaledByDPI(UCommonBPLibrary::GetPlayerController(), PosX, PosY);
+		UWidgetLayoutLibrary::GetMousePositionScaledByDPI(UCommonStatics::GetPlayerController(), PosX, PosY);
 		ItemInfoBoxSlot->SetPosition(FVector2D(PosX, PosY));
 	}
 

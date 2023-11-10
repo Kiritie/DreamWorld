@@ -3,16 +3,16 @@
 
 #include "Procedure/Archive/Procedure_ArchiveChoosing.h"
 
-#include "Camera/CameraModuleBPLibrary.h"
+#include "Camera/CameraModuleStatics.h"
 #include "Gameplay/DWPlayerController.h"
-#include "Common/CommonBPLibrary.h"
-#include "Procedure/ProcedureModuleBPLibrary.h"
+#include "Common/CommonStatics.h"
+#include "Procedure/ProcedureModuleStatics.h"
 #include "Procedure/Archive/Procedure_ArchiveCreating.h"
 #include "Procedure/Procedure_Loading.h"
 #include "Procedure/Procedure_Starting.h"
 #include "SaveGame/Archive/DWArchiveSaveGame.h"
-#include "SaveGame/SaveGameModuleBPLibrary.h"
-#include "Widget/WidgetModuleBPLibrary.h"
+#include "SaveGame/SaveGameModuleStatics.h"
+#include "Widget/WidgetModuleStatics.h"
 #include "Widget/Archive/WidgetArchiveChoosingPanel.h"
 #include "Widget/Archive/WidgetArchiveCreatingPanel.h"
 
@@ -41,21 +41,21 @@ void UProcedure_ArchiveChoosing::OnInitialize()
 {
 	Super::OnInitialize();
 
-	UCommonBPLibrary::GetPlayerController<ADWPlayerController>()->OnPlayerPawnChanged.AddDynamic(this, &UProcedure_ArchiveChoosing::OnPlayerChanged);
+	UCommonStatics::GetPlayerController<ADWPlayerController>()->OnPlayerPawnChanged.AddDynamic(this, &UProcedure_ArchiveChoosing::OnPlayerChanged);
 }
 
 void UProcedure_ArchiveChoosing::OnEnter(UProcedureBase* InLastProcedure)
 {
 	if(InLastProcedure && InLastProcedure->IsA<UProcedure_Starting>())
 	{
-		CameraViewYaw = UCameraModuleBPLibrary::GetCameraRotation().Yaw;
+		CameraViewYaw = UCameraModuleStatics::GetCameraRotation().Yaw;
 	}
 	
 	Super::OnEnter(InLastProcedure);
 
-	UWidgetModuleBPLibrary::OpenUserWidget<UWidgetArchiveChoosingPanel>();
+	UWidgetModuleStatics::OpenUserWidget<UWidgetArchiveChoosingPanel>();
 
-	UWidgetModuleBPLibrary::CreateUserWidget<UWidgetArchiveCreatingPanel>();
+	UWidgetModuleStatics::CreateUserWidget<UWidgetArchiveCreatingPanel>();
 }
 
 void UProcedure_ArchiveChoosing::OnRefresh()
@@ -80,26 +80,26 @@ void UProcedure_ArchiveChoosing::OnPlayerChanged(APawn* InPlayerPawn)
 
 void UProcedure_ArchiveChoosing::CreateArchive()
 {
-	if(USaveGameModuleBPLibrary::GetSaveGame<UDWArchiveSaveGame>()->IsSaved())
+	if(USaveGameModuleStatics::GetSaveGame<UDWArchiveSaveGame>()->IsSaved())
 	{
-		USaveGameModuleBPLibrary::CreateSaveGame<UDWArchiveSaveGame>(-1, EPhase::Primary);
+		USaveGameModuleStatics::CreateSaveGame<UDWArchiveSaveGame>(-1, EPhase::Primary);
 	}
-	UProcedureModuleBPLibrary::SwitchProcedureByClass<UProcedure_ArchiveCreating>();
+	UProcedureModuleStatics::SwitchProcedureByClass<UProcedure_ArchiveCreating>();
 }
 
 void UProcedure_ArchiveChoosing::RemoveArchive(int32 InArchiveID)
 {
-	const bool bNeedCreateArchive = USaveGameModuleBPLibrary::GetSaveGameInfo<UDWArchiveSaveGame>().ActiveIndex == InArchiveID;
-	USaveGameModuleBPLibrary::DestroySaveGame<UDWArchiveSaveGame>(InArchiveID);
-	if(bNeedCreateArchive) USaveGameModuleBPLibrary::CreateSaveGame<UDWArchiveSaveGame>(-1, EPhase::Primary);
-	UWidgetModuleBPLibrary::GetUserWidget<UWidgetArchiveChoosingPanel>()->Refresh();
+	const bool bNeedCreateArchive = USaveGameModuleStatics::GetSaveGameInfo<UDWArchiveSaveGame>().ActiveIndex == InArchiveID;
+	USaveGameModuleStatics::DestroySaveGame<UDWArchiveSaveGame>(InArchiveID);
+	if(bNeedCreateArchive) USaveGameModuleStatics::CreateSaveGame<UDWArchiveSaveGame>(-1, EPhase::Primary);
+	UWidgetModuleStatics::GetUserWidget<UWidgetArchiveChoosingPanel>()->Refresh();
 }
 
 void UProcedure_ArchiveChoosing::ChooseArchive(int32 InArchiveID)
 {
-	if(USaveGameModuleBPLibrary::GetSaveGameInfo<UDWArchiveSaveGame>().ActiveIndex != InArchiveID)
+	if(USaveGameModuleStatics::GetSaveGameInfo<UDWArchiveSaveGame>().ActiveIndex != InArchiveID)
 	{
-		USaveGameModuleBPLibrary::LoadSaveGame<UDWArchiveSaveGame>(InArchiveID, EPhase::Primary);
+		USaveGameModuleStatics::LoadSaveGame<UDWArchiveSaveGame>(InArchiveID, EPhase::Primary);
 	}
-	UProcedureModuleBPLibrary::SwitchProcedureByClass<UProcedure_Loading>();
+	UProcedureModuleStatics::SwitchProcedureByClass<UProcedure_Loading>();
 }

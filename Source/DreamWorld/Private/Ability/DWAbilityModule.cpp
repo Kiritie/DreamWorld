@@ -3,65 +3,67 @@
 
 #include "Ability/DWAbilityModule.h"
 
-#include "Ability/AbilityModuleBPLibrary.h"
+#include "Ability/AbilityModuleStatics.h"
 #include "Common/DWCommonTypes.h"
 
-IMPLEMENTATION_MODULE(ADWAbilityModule)
+IMPLEMENTATION_MODULE(UDWAbilityModule)
 
 // ParamSets default values
-ADWAbilityModule::ADWAbilityModule()
+UDWAbilityModule::UDWAbilityModule()
 {
 	
 }
 
-ADWAbilityModule::~ADWAbilityModule()
+UDWAbilityModule::~UDWAbilityModule()
 {
-	TERMINATION_MODULE(ADWAbilityModule)
+	TERMINATION_MODULE(UDWAbilityModule)
 }
 
 #if WITH_EDITOR
-void ADWAbilityModule::OnGenerate()
+void UDWAbilityModule::OnGenerate()
 {
 	Super::OnGenerate();
 }
 
-void ADWAbilityModule::OnDestroy()
+void UDWAbilityModule::OnDestroy()
 {
 	Super::OnDestroy();
+
+	TERMINATION_MODULE(UDWAbilityModule)
 }
 #endif
 
-void ADWAbilityModule::OnInitialize_Implementation()
+void UDWAbilityModule::OnInitialize()
 {
-	Super::OnInitialize_Implementation();
+	Super::OnInitialize();
 }
 
-void ADWAbilityModule::OnPreparatory_Implementation(EPhase InPhase)
+void UDWAbilityModule::OnPreparatory(EPhase InPhase)
 {
-	Super::OnPreparatory_Implementation(InPhase);
+	Super::OnPreparatory(InPhase);
 
 	if(PHASEC(InPhase, EPhase::Primary))
 	{
-		UAssetModuleBPLibrary::AddEnumMapping(TEXT("/Script/WHFramework.EInteractAction"), TEXT("/Script/WHFramework.EDWInteractAction"));
+		UAssetModuleStatics::AddEnumMapping(TEXT("/Script/WHFramework.EInteractAction"), TEXT("/Script/WHFramework.EDWInteractAction"));
 	}
 }
 
-void ADWAbilityModule::OnRefresh_Implementation(float DeltaSeconds)
+void UDWAbilityModule::OnRefresh(float DeltaSeconds)
 {
-	Super::OnRefresh_Implementation(DeltaSeconds);
+	Super::OnRefresh(DeltaSeconds);
 }
 
-void ADWAbilityModule::OnPause_Implementation()
+void UDWAbilityModule::OnPause()
 {
-	Super::OnPause_Implementation();
+	Super::OnPause();
 }
 
-void ADWAbilityModule::OnUnPause_Implementation()
+void UDWAbilityModule::OnUnPause()
 {
-	Super::OnUnPause_Implementation();
+	Super::OnUnPause();
 }
 
-ECollisionChannel ADWAbilityModule::GetPickUpTraceChannel() const
+ECollisionChannel UDWAbilityModule::GetPickUpTraceChannel() const
 {
 	return (ECollisionChannel)EDWGameTraceChannel::Chunk;
 }

@@ -3,7 +3,7 @@
 
 #include "Team/DWTeamModuleTypes.h"
 
-#include "Scene/SceneModuleBPLibrary.h"
+#include "Scene/SceneModuleStatics.h"
 #include "Team/Agent/DWTeamAgentInterface.h"
 
 FDWTeamSaveData FDWTeamSaveData::Empty = FDWTeamSaveData();
@@ -37,7 +37,7 @@ void FDWTeamSaveData::DissolveTeam()
 {
 	for (int i = 0; i < Members.Num(); i++)
 	{
-		USceneModuleBPLibrary::GetSceneActor<IDWTeamAgentInterface>(Members[i])->SetTeamID(TEXT(""));
+		USceneModuleStatics::GetSceneActor<IDWTeamAgentInterface>(Members[i])->SetTeamID(TEXT(""));
 	}
 	Members.Empty();
 }
@@ -49,7 +49,7 @@ TArray<IDWTeamAgentInterface*> FDWTeamSaveData::GetMembers(IDWTeamAgentInterface
 	{
 		if (Members[i] != InMember->GetActorIDT())
 		{
-			tmpArr.Add(USceneModuleBPLibrary::GetSceneActor<IDWTeamAgentInterface>(Members[i]));
+			tmpArr.Add(USceneModuleStatics::GetSceneActor<IDWTeamAgentInterface>(Members[i]));
 		}
 	}
 	return tmpArr;

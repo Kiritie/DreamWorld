@@ -1,6 +1,6 @@
 #include "Character/Monster/DWMonsterCharacterData.h"
 
-#include "Ability/AbilityModuleBPLibrary.h"
+#include "Ability/AbilityModuleStatics.h"
 
 UDWMonsterCharacterData::UDWMonsterCharacterData()
 {

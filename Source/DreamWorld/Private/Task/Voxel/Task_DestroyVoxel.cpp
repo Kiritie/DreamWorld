@@ -4,9 +4,9 @@
 #include "Task/Voxel/Task_DestroyVoxel.h"
 
 #include "TimerManager.h"
-#include "Event/EventModuleBPLibrary.h"
+#include "Event/EventModuleStatics.h"
 #include "Event/Handle/Voxel/EventHandle_DestroyVoxel.h"
-#include "Common/CommonBPLibrary.h"
+#include "Common/CommonStatics.h"
 
 UTask_DestroyVoxel::UTask_DestroyVoxel()
 {
@@ -60,21 +60,21 @@ void UTask_DestroyVoxel::OnExecute()
 {
 	Super::OnExecute();
 
-	UEventModuleBPLibrary::SubscribeEvent<UEventHandle_DestroyVoxel>(this, FName("OnDestroyVoxel"));
+	UEventModuleStatics::SubscribeEvent<UEventHandle_DestroyVoxel>(this, FName("OnDestroyVoxel"));
 }
 
 void UTask_DestroyVoxel::OnComplete(ETaskExecuteResult InTaskExecuteResult)
 {
 	Super::OnComplete(InTaskExecuteResult);
 
-	UEventModuleBPLibrary::UnsubscribeEvent<UEventHandle_DestroyVoxel>(this, FName("OnDestroyVoxel"));
+	UEventModuleStatics::UnsubscribeEvent<UEventHandle_DestroyVoxel>(this, FName("OnDestroyVoxel"));
 }
 
 void UTask_DestroyVoxel::OnLeave()
 {
 	Super::OnLeave();
 
-	UEventModuleBPLibrary::UnsubscribeEvent<UEventHandle_DestroyVoxel>(this, FName("OnDestroyVoxel"));
+	UEventModuleStatics::UnsubscribeEvent<UEventHandle_DestroyVoxel>(this, FName("OnDestroyVoxel"));
 }
 
 void UTask_DestroyVoxel::Serialize(FArchive& Ar)

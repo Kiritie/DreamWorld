@@ -8,7 +8,7 @@
 #include "Components/StaticMeshComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Item/Equip/Weapon/DWEquipWeapon.h"
-#include "ObjectPool/ObjectPoolModuleBPLibrary.h"
+#include "ObjectPool/ObjectPoolModuleStatics.h"
 #include "Voxel/Components/VoxelMeshComponent.h"
 #include "Voxel/Voxels/Entity/VoxelEntity.h"
 #include "Ability/Item/Equip/AbilityEquipBase.h"
@@ -44,8 +44,8 @@ void ADWHumanCharacter::OnDespawn_Implementation(bool bRecovery)
 {
 	Super::OnDespawn_Implementation(bRecovery);
 
-	UObjectPoolModuleBPLibrary::DespawnObject(GenerateVoxelEntity);
-	UObjectPoolModuleBPLibrary::DespawnObject(AuxiliaryVoxelEntity);
+	UObjectPoolModuleStatics::DespawnObject(GenerateVoxelEntity);
+	UObjectPoolModuleStatics::DespawnObject(AuxiliaryVoxelEntity);
 	GenerateVoxelEntity = nullptr;
 	AuxiliaryVoxelEntity = nullptr;
 }
@@ -60,7 +60,7 @@ void ADWHumanCharacter::OnAssembleItem(const FAbilityItem& InItem)
 		case EAbilityItemType::Equip:
 		{
 			const auto& EquipData = InItem.GetData<UDWEquipData>();
-			if(AAbilityEquipBase* Equip = UObjectPoolModuleBPLibrary::SpawnObject<AAbilityEquipBase>(nullptr, InItem.GetData<UAbilityEquipDataBase>().EquipClass))
+			if(AAbilityEquipBase* Equip = UObjectPoolModuleStatics::SpawnObject<AAbilityEquipBase>(nullptr, InItem.GetData<UAbilityEquipDataBase>().EquipClass))
 			{
 				Equip->Initialize(this, InItem);
 				Equip->OnAssemble();
@@ -86,7 +86,7 @@ void ADWHumanCharacter::OnDischargeItem(const FAbilityItem& InItem)
 			if(AAbilityEquipBase* Equip = GetEquip(EquipData.PartType))
 			{
 				Equip->OnDischarge();
-				UObjectPoolModuleBPLibrary::DespawnObject(Equip);
+				UObjectPoolModuleStatics::DespawnObject(Equip);
 				Equips.Emplace(EquipData.PartType, nullptr);
 			}
 			break;
@@ -103,7 +103,7 @@ void ADWHumanCharacter::OnSelectItem(const FAbilityItem& InItem)
 	{
 		if(!GenerateVoxelEntity)
 		{
-			GenerateVoxelEntity = UObjectPoolModuleBPLibrary::SpawnObject<AVoxelEntity>();
+			GenerateVoxelEntity = UObjectPoolModuleStatics::SpawnObject<AVoxelEntity>();
 			GenerateVoxelEntity->Execute_SetActorVisible(GenerateVoxelEntity, Execute_IsVisible(this) && ControlMode == EDWCharacterControlMode::Creating);
 			GenerateVoxelEntity->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("GenerateVoxelMesh"));
 			GenerateVoxelEntity->SetActorScale3D(FVector(0.3f));
@@ -113,7 +113,7 @@ void ADWHumanCharacter::OnSelectItem(const FAbilityItem& InItem)
 	else if(GenerateVoxelEntity)
 	{
 		GenerateVoxelEntity->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
-		UObjectPoolModuleBPLibrary::DespawnObject(GenerateVoxelEntity);
+		UObjectPoolModuleStatics::DespawnObject(GenerateVoxelEntity);
 		GenerateVoxelEntity = nullptr;
 	}
 }
@@ -126,7 +126,7 @@ void ADWHumanCharacter::OnAuxiliaryItem(const FAbilityItem& InItem)
 	{
 		if(!AuxiliaryVoxelEntity)
 		{
-			AuxiliaryVoxelEntity = UObjectPoolModuleBPLibrary::SpawnObject<AVoxelEntity>();
+			AuxiliaryVoxelEntity = UObjectPoolModuleStatics::SpawnObject<AVoxelEntity>();
 			AuxiliaryVoxelEntity->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("AuxiliaryVoxelMesh"));
 			AuxiliaryVoxelEntity->SetActorScale3D(FVector(0.3f));
 			AuxiliaryVoxelEntity->GetMeshComponent()->SetCastShadow(false);
@@ -136,7 +136,7 @@ void ADWHumanCharacter::OnAuxiliaryItem(const FAbilityItem& InItem)
 	else if(AuxiliaryVoxelEntity)
 	{
 		AuxiliaryVoxelEntity->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
-		UObjectPoolModuleBPLibrary::DespawnObject(AuxiliaryVoxelEntity);
+		UObjectPoolModuleStatics::DespawnObject(AuxiliaryVoxelEntity);
 		AuxiliaryVoxelEntity = nullptr;
 	}
 }

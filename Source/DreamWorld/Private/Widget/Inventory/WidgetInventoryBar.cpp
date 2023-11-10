@@ -10,14 +10,14 @@
 #include "Components/GridPanel.h"
 #include "Components/GridSlot.h"
 #include "Components/SizeBox.h"
-#include "Common/CommonBPLibrary.h"
+#include "Common/CommonStatics.h"
 #include "Ability/Inventory/AbilityInventoryBase.h"
 #include "Widget/Inventory/WidgetInventoryPanel.h"
 #include "Ability/Inventory/Slot/AbilityInventorySlot.h"
-#include "Asset/AssetModuleBPLibrary.h"
-#include "Procedure/ProcedureModuleBPLibrary.h"
+#include "Asset/AssetModuleStatics.h"
+#include "Procedure/ProcedureModuleStatics.h"
 #include "Procedure/Procedure_Playing.h"
-#include "Widget/WidgetModuleBPLibrary.h"
+#include "Widget/WidgetModuleStatics.h"
 #include "Widget/WidgetGameHUD.h"
 #include "Widget/WidgetMessageBox.h"
 #include "Widget/Inventory/Slot/WidgetInventoryAuxiliarySlot.h"
@@ -61,7 +61,7 @@ void UWidgetInventoryBar::OnInitialize(UObject* InOwner)
 			UISlotDatas[ESlotSplitType::Shortcut].Slots.Empty();
 			for(int32 i = 0; i < ShortcutSlots.Num(); i++)
 			{
-				if(UWidgetInventoryShortcutSlot* ShortcutSlot = CreateSubWidget<UWidgetInventoryShortcutSlot>({ ShortcutSlots[i] }, UAssetModuleBPLibrary::GetStaticClass(FName("InventoryShortcutSlot"))))
+				if(UWidgetInventoryShortcutSlot* ShortcutSlot = CreateSubWidget<UWidgetInventoryShortcutSlot>({ ShortcutSlots[i] }, UAssetModuleStatics::GetStaticClass(FName("InventoryShortcutSlot"))))
 				{
 					//ShortcutSlot->SetKeyCode(UDWHelper::GetInputActionKeyCodeByName(FString::Printf(TEXT("SelectInventorySlot%d"), i + 1)));
 					ShortcutSlot->SetKeyCode(FText::FromString(FString::FromInt(i < 9 ? i + 1 : 0)));
@@ -91,9 +91,9 @@ void UWidgetInventoryBar::OnInitialize(UObject* InOwner)
 			UISlotDatas[ESlotSplitType::Auxiliary].Slots.Empty();
 			for(int32 i = 0; i < AuxiliarySlots.Num(); i++)
 			{
-				if(UWidgetInventoryAuxiliarySlot* AuxiliarySlot = CreateSubWidget<UWidgetInventoryAuxiliarySlot>({ AuxiliarySlots[i] }, UAssetModuleBPLibrary::GetStaticClass(FName("InventoryAuxiliarySlot"))))
+				if(UWidgetInventoryAuxiliarySlot* AuxiliarySlot = CreateSubWidget<UWidgetInventoryAuxiliarySlot>({ AuxiliarySlots[i] }, UAssetModuleStatics::GetStaticClass(FName("InventoryAuxiliarySlot"))))
 				{
-					//AuxiliarySlot->SetKeyCode(UCommonBPLibrary::GetInputActionKeyCodeByName(FString::Printf(TEXT("ReleaseAuxiliaryAbility%d"), i + 1)));
+					//AuxiliarySlot->SetKeyCode(UCommonStatics::GetInputActionKeyCodeByName(FString::Printf(TEXT("ReleaseAuxiliaryAbility%d"), i + 1)));
 					AuxiliarySlot->SetKeyCode(FText::FromString(TEXT("X")));
 					if(UGridSlot* GridSlot = AuxiliaryContent->AddChildToGrid(AuxiliarySlot))
 					{
@@ -122,9 +122,9 @@ void UWidgetInventoryBar::OnInitialize(UObject* InOwner)
 			UISlotDatas[ESlotSplitType::Skill].Slots.Empty();
 			for(int32 i = 0; i < SkillSlots.Num(); i++)
 			{
-				if(UWidgetInventorySkillSlot* SkillSlot = CreateSubWidget<UWidgetInventorySkillSlot>({ SkillSlots[i] }, UAssetModuleBPLibrary::GetStaticClass(FName("InventorySkillSlot"))))
+				if(UWidgetInventorySkillSlot* SkillSlot = CreateSubWidget<UWidgetInventorySkillSlot>({ SkillSlots[i] }, UAssetModuleStatics::GetStaticClass(FName("InventorySkillSlot"))))
 				{
-					SkillSlot->SetKeyCode(UCommonBPLibrary::GetInputActionKeyCodeByName(FString::Printf(TEXT("ReleaseSkillAbility%d"), i + 1)));
+					SkillSlot->SetKeyCode(UCommonStatics::GetInputActionKeyCodeByName(FString::Printf(TEXT("ReleaseSkillAbility%d"), i + 1)));
 					if(UGridSlot* GridSlot = i < SkillSlots.Num() / 2 ? LeftSkillContent->AddChildToGrid(SkillSlot) : RightSkillContent->AddChildToGrid(SkillSlot))
 					{
 						GridSlot->SetPadding(FMargin(0.f, 0.f, 5.f, 0.f));
@@ -203,9 +203,9 @@ void UWidgetInventoryBar::SelectInventorySlot(int32 InSlotIndex, bool bRefreshIn
 		{
 			GetInventory()->SetSelectedSlot(SelectedSlot);
 		}
-		if(!SelectedSlot->IsEmpty() && UProcedureModuleBPLibrary::IsCurrentProcedureClass<UProcedure_Playing>())
+		if(!SelectedSlot->IsEmpty() && UProcedureModuleStatics::IsCurrentProcedureClass<UProcedure_Playing>())
 		{
-			UWidgetModuleBPLibrary::OpenUserWidget<UWidgetMessageBox>({ SelectedSlot->GetItem().GetData().Name });
+			UWidgetModuleStatics::OpenUserWidget<UWidgetMessageBox>({ SelectedSlot->GetItem().GetData().Name });
 		}
 	}
 	if(SelectBox)

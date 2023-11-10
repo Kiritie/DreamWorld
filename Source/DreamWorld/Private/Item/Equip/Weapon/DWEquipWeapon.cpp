@@ -5,7 +5,7 @@
 #include "Components/BoxComponent.h"
 #include "AbilitySystemBlueprintLibrary.h"
 #include <Ability/Vitality/AbilityVitalityInterface.h>
-#include <Audio/AudioModuleBPLibrary.h>
+#include <Audio/AudioModuleStatics.h>
 #include "Item/Equip/Weapon/DWEquipWeaponData.h"
 #include <Kismet/GameplayStatics.h>
 
@@ -55,7 +55,7 @@ void ADWEquipWeapon::OnHitTarget(AActor* InTarget, const FHitResult& InHitResult
 
 	const auto& WeaponData = GetItemData<UDWEquipWeaponData>();
 	const FVector HitLocation = MeshComponent->GetSocketLocation(FName("HitPoint"));
-	UAudioModuleBPLibrary::PlaySoundAtLocation(InTarget->Implements<UAbilityVitalityInterface>() ? WeaponData.AttackHitSound : WeaponData.AttackMissSound, HitLocation);
+	UAudioModuleStatics::PlaySoundAtLocation(InTarget->Implements<UAbilityVitalityInterface>() ? WeaponData.AttackHitSound : WeaponData.AttackMissSound, HitLocation);
 	UGameplayStatics::SpawnEmitterAtLocation(this, InTarget->Implements<UAbilityVitalityInterface>() ? WeaponData.AttackHitEffect : WeaponData.AttackMissEffect, HitLocation);
 }
 

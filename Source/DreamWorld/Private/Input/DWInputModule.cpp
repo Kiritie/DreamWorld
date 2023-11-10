@@ -9,64 +9,66 @@
 #include "Camera/CameraModule.h"
 #include "Character/DWCharacter.h"
 #include "Character/Player/DWPlayerCharacter.h"
-#include "Common/CommonBPLibrary.h"
+#include "Common/CommonStatics.h"
 #include "Common/Targeting/TargetingComponent.h"
 #include "Input/InputModule.h"
-#include "Input/InputModuleBPLibrary.h"
+#include "Input/InputModuleStatics.h"
 #include "Input/Components/InputComponentBase.h"
-#include "Procedure/ProcedureModuleBPLibrary.h"
+#include "Procedure/ProcedureModuleStatics.h"
 #include "Procedure/Procedure_Pausing.h"
 #include "Procedure/Procedure_Playing.h"
-#include "Voxel/VoxelModuleBPLibrary.h"
+#include "Voxel/VoxelModuleStatics.h"
 #include "Voxel/Voxels/Auxiliary/VoxelInteractAuxiliary.h"
-#include "Widget/WidgetModuleBPLibrary.h"
+#include "Widget/WidgetModuleStatics.h"
 #include "Widget/Generate/WidgetGeneratePanel.h"
 #include "Widget/Inventory/WidgetInventoryBar.h"
 #include "Widget/Inventory/WidgetInventoryPanel.h"
 #include "Common/DWCommonTypes.h"
 
-IMPLEMENTATION_MODULE(ADWInputModule)
+IMPLEMENTATION_MODULE(UDWInputModule)
 
 // ParamSets default values
-ADWInputModule::ADWInputModule()
+UDWInputModule::UDWInputModule()
 {
 	bPressedAttackDestroy = false;
 	bPressedDefendGenerate = false;
 	bPressedSprint = false;
 }
 
-ADWInputModule::~ADWInputModule()
+UDWInputModule::~UDWInputModule()
 {
-	TERMINATION_MODULE(ADWInputModule)
+	TERMINATION_MODULE(UDWInputModule)
 }
 
 #if WITH_EDITOR
-void ADWInputModule::OnGenerate()
+void UDWInputModule::OnGenerate()
 {
 	Super::OnGenerate();
 }
 
-void ADWInputModule::OnDestroy()
+void UDWInputModule::OnDestroy()
 {
 	Super::OnDestroy();
+
+	TERMINATION_MODULE(UDWInputModule)
 }
 #endif
 
-void ADWInputModule::OnInitialize_Implementation()
+void UDWInputModule::OnInitialize()
 {
-	Super::OnInitialize_Implementation();
+	Super::OnInitialize();
 }
 
-void ADWInputModule::OnPreparatory_Implementation(EPhase InPhase)
+void UDWInputModule::OnPreparatory(EPhase InPhase)
 {
-	Super::OnPreparatory_Implementation(InPhase);
+	Super::OnPreparatory(InPhase);
 }
 
-void ADWInputModule::OnRefresh_Implementation(float DeltaSeconds)
+void UDWInputModule::OnRefresh(float DeltaSeconds)
 {
-	Super::OnRefresh_Implementation(DeltaSeconds);
+	Super::OnRefresh(DeltaSeconds);
 
-	ADWCharacter* PossessedCharacter = UCommonBPLibrary::GetPossessedPawn<ADWCharacter>();
+	ADWCharacter* PossessedCharacter = UCommonStatics::GetPossessedPawn<ADWCharacter>();
 	
 	if(!PossessedCharacter || PossessedCharacter->IsBreakAllInput()) return;
 
@@ -116,38 +118,38 @@ void ADWInputModule::OnRefresh_Implementation(float DeltaSeconds)
 	}
 }
 
-void ADWInputModule::OnReset_Implementation()
+void UDWInputModule::OnReset()
 {
-	Super::OnReset_Implementation();
+	Super::OnReset();
 }
 
-void ADWInputModule::OnPause_Implementation()
+void UDWInputModule::OnPause()
 {
-	Super::OnPause_Implementation();
+	Super::OnPause();
 
 	bPressedAttackDestroy = false;
 	bPressedDefendGenerate = false;
 	bPressedSprint = false;
 }
 
-void ADWInputModule::OnUnPause_Implementation()
+void UDWInputModule::OnUnPause()
 {
-	Super::OnUnPause_Implementation();
+	Super::OnUnPause();
 }
 
-void ADWInputModule::LoadData(FSaveData* InSaveData, EPhase InPhase)
+void UDWInputModule::LoadData(FSaveData* InSaveData, EPhase InPhase)
 {
 	Super::LoadData(InSaveData, InPhase);
 
 	const auto& SaveData = InSaveData->CastRef<FDWInputModuleSaveData>();
 }
 
-void ADWInputModule::UnloadData(EPhase InPhase)
+void UDWInputModule::UnloadData(EPhase InPhase)
 {
 	Super::UnloadData(InPhase);
 }
 
-FSaveData* ADWInputModule::ToData()
+FSaveData* UDWInputModule::ToData()
 {
 	static FDWInputModuleSaveData SaveData;
 	SaveData = Super::ToData()->CastRef<FInputModuleSaveData>();
@@ -155,120 +157,120 @@ FSaveData* ADWInputModule::ToData()
 	return &SaveData;
 }
 
-void ADWInputModule::OnBindAction_Implementation(UInputComponentBase* InInputComponent, UPlayerMappableInputConfig* InInputConfig)
+void UDWInputModule::OnBindAction_Implementation(UInputComponentBase* InInputComponent, UPlayerMappableInputConfig* InInputConfig)
 {
 	Super::OnBindAction_Implementation(InInputComponent, InInputConfig);
 
-	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_Sprint, ETriggerEvent::Started, this, &ADWInputModule::OnSprintPressed);
-	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_Sprint, ETriggerEvent::Completed, this, &ADWInputModule::OnSprintReleased);
+	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_Sprint, ETriggerEvent::Started, this, &UDWInputModule::OnSprintPressed);
+	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_Sprint, ETriggerEvent::Completed, this, &UDWInputModule::OnSprintReleased);
 	
-	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_Interact1, ETriggerEvent::Started, this, &ADWInputModule::DoInteractAction1);
-	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_Interact2, ETriggerEvent::Started, this, &ADWInputModule::DoInteractAction2);
-	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_Interact3, ETriggerEvent::Started, this, &ADWInputModule::DoInteractAction3);
-	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_Interact4, ETriggerEvent::Started, this, &ADWInputModule::DoInteractAction4);
-	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_Interact5, ETriggerEvent::Started, this, &ADWInputModule::DoInteractAction5);
+	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_Interact1, ETriggerEvent::Started, this, &UDWInputModule::DoInteractAction1);
+	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_Interact2, ETriggerEvent::Started, this, &UDWInputModule::DoInteractAction2);
+	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_Interact3, ETriggerEvent::Started, this, &UDWInputModule::DoInteractAction3);
+	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_Interact4, ETriggerEvent::Started, this, &UDWInputModule::DoInteractAction4);
+	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_Interact5, ETriggerEvent::Started, this, &UDWInputModule::DoInteractAction5);
 	
-	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_Dodge, ETriggerEvent::Started, this, &ADWInputModule::OnDodgePressed);
-	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_Dodge, ETriggerEvent::Completed, this, &ADWInputModule::OnDodgeReleased);
+	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_Dodge, ETriggerEvent::Started, this, &UDWInputModule::OnDodgePressed);
+	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_Dodge, ETriggerEvent::Completed, this, &UDWInputModule::OnDodgeReleased);
 	
-	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_ToggleCrouch, ETriggerEvent::Started, this, &ADWInputModule::ToggleCrouch);
-	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_ToggleControlMode, ETriggerEvent::Started, this, &ADWInputModule::ToggleControlMode);
-	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_ToggleLockSightTarget, ETriggerEvent::Started, this, &ADWInputModule::ToggleLockTarget);
-	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_ChangeHand, ETriggerEvent::Started, this, &ADWInputModule::ChangeHand);
+	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_ToggleCrouch, ETriggerEvent::Started, this, &UDWInputModule::ToggleCrouch);
+	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_ToggleControlMode, ETriggerEvent::Started, this, &UDWInputModule::ToggleControlMode);
+	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_ToggleLockSightTarget, ETriggerEvent::Started, this, &UDWInputModule::ToggleLockTarget);
+	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_ChangeHand, ETriggerEvent::Started, this, &UDWInputModule::ChangeHand);
 	
-	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_Primary, ETriggerEvent::Started, this, &ADWInputModule::OnAttackDestroyPressed);
-	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_Primary, ETriggerEvent::Completed, this, &ADWInputModule::OnAttackDestroyReleased);
+	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_Primary, ETriggerEvent::Started, this, &UDWInputModule::OnAttackDestroyPressed);
+	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_Primary, ETriggerEvent::Completed, this, &UDWInputModule::OnAttackDestroyReleased);
 	
-	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_Minor, ETriggerEvent::Started, this, &ADWInputModule::OnDefendGeneratePressed);
-	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_Minor, ETriggerEvent::Completed, this, &ADWInputModule::OnDefendGenerateReleased);
+	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_Minor, ETriggerEvent::Started, this, &UDWInputModule::OnDefendGeneratePressed);
+	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_Minor, ETriggerEvent::Completed, this, &UDWInputModule::OnDefendGenerateReleased);
 	
-	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_ReleaseSkillAbility1, ETriggerEvent::Started, this, &ADWInputModule::ReleaseSkillAbility1);
-	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_ReleaseSkillAbility2, ETriggerEvent::Started, this, &ADWInputModule::ReleaseSkillAbility2);
-	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_ReleaseSkillAbility3, ETriggerEvent::Started, this, &ADWInputModule::ReleaseSkillAbility3);
-	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_ReleaseSkillAbility4, ETriggerEvent::Started, this, &ADWInputModule::ReleaseSkillAbility4);
+	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_ReleaseSkillAbility1, ETriggerEvent::Started, this, &UDWInputModule::ReleaseSkillAbility1);
+	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_ReleaseSkillAbility2, ETriggerEvent::Started, this, &UDWInputModule::ReleaseSkillAbility2);
+	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_ReleaseSkillAbility3, ETriggerEvent::Started, this, &UDWInputModule::ReleaseSkillAbility3);
+	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_ReleaseSkillAbility4, ETriggerEvent::Started, this, &UDWInputModule::ReleaseSkillAbility4);
 	
-	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_UseInventoryItem, ETriggerEvent::Started, this, &ADWInputModule::UseInventoryItem);
-	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_DiscardInventoryItem, ETriggerEvent::Started, this, &ADWInputModule::DiscardInventoryItem);
-	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_PrevInventorySlot, ETriggerEvent::Started, this, &ADWInputModule::PrevInventorySlot);
-	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_NextInventorySlot, ETriggerEvent::Started, this, &ADWInputModule::NextInventorySlot);
-	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_SelectInventorySlot1, ETriggerEvent::Started, this, &ADWInputModule::SelectInventorySlot1);
-	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_SelectInventorySlot2, ETriggerEvent::Started, this, &ADWInputModule::SelectInventorySlot2);
-	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_SelectInventorySlot3, ETriggerEvent::Started, this, &ADWInputModule::SelectInventorySlot3);
-	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_SelectInventorySlot4, ETriggerEvent::Started, this, &ADWInputModule::SelectInventorySlot4);
-	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_SelectInventorySlot5, ETriggerEvent::Started, this, &ADWInputModule::SelectInventorySlot5);
-	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_SelectInventorySlot6, ETriggerEvent::Started, this, &ADWInputModule::SelectInventorySlot6);
-	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_SelectInventorySlot7, ETriggerEvent::Started, this, &ADWInputModule::SelectInventorySlot7);
-	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_SelectInventorySlot8, ETriggerEvent::Started, this, &ADWInputModule::SelectInventorySlot8);
-	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_SelectInventorySlot9, ETriggerEvent::Started, this, &ADWInputModule::SelectInventorySlot9);
-	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_SelectInventorySlot10, ETriggerEvent::Started, this, &ADWInputModule::SelectInventorySlot10);
+	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_UseInventoryItem, ETriggerEvent::Started, this, &UDWInputModule::UseInventoryItem);
+	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_DiscardInventoryItem, ETriggerEvent::Started, this, &UDWInputModule::DiscardInventoryItem);
+	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_PrevInventorySlot, ETriggerEvent::Started, this, &UDWInputModule::PrevInventorySlot);
+	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_NextInventorySlot, ETriggerEvent::Started, this, &UDWInputModule::NextInventorySlot);
+	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_SelectInventorySlot1, ETriggerEvent::Started, this, &UDWInputModule::SelectInventorySlot1);
+	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_SelectInventorySlot2, ETriggerEvent::Started, this, &UDWInputModule::SelectInventorySlot2);
+	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_SelectInventorySlot3, ETriggerEvent::Started, this, &UDWInputModule::SelectInventorySlot3);
+	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_SelectInventorySlot4, ETriggerEvent::Started, this, &UDWInputModule::SelectInventorySlot4);
+	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_SelectInventorySlot5, ETriggerEvent::Started, this, &UDWInputModule::SelectInventorySlot5);
+	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_SelectInventorySlot6, ETriggerEvent::Started, this, &UDWInputModule::SelectInventorySlot6);
+	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_SelectInventorySlot7, ETriggerEvent::Started, this, &UDWInputModule::SelectInventorySlot7);
+	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_SelectInventorySlot8, ETriggerEvent::Started, this, &UDWInputModule::SelectInventorySlot8);
+	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_SelectInventorySlot9, ETriggerEvent::Started, this, &UDWInputModule::SelectInventorySlot9);
+	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_SelectInventorySlot10, ETriggerEvent::Started, this, &UDWInputModule::SelectInventorySlot10);
 	
-	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_OpenInventoryPanel, ETriggerEvent::Started, this, &ADWInputModule::OpenInventoryPanel);
+	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_OpenInventoryPanel, ETriggerEvent::Started, this, &UDWInputModule::OpenInventoryPanel);
 	
-	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_OpenGeneratePanel, ETriggerEvent::Started, this, &ADWInputModule::OpenGeneratePanel);
+	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_OpenGeneratePanel, ETriggerEvent::Started, this, &UDWInputModule::OpenGeneratePanel);
 	
-	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_PauseGame, ETriggerEvent::Started, this, &ADWInputModule::PauseGame);
+	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_PauseGame, ETriggerEvent::Started, this, &UDWInputModule::PauseGame);
 }
 
-void ADWInputModule::TurnPlayer(const FInputActionValue& InValue)
+void UDWInputModule::TurnPlayer(const FInputActionValue& InValue)
 {
 	if(InValue.Get<float>() == 0.f) return;
 	
-	ADWCharacter* PossessedCharacter = UCommonBPLibrary::GetPossessedPawn<ADWCharacter>();
+	ADWCharacter* PossessedCharacter = UCommonStatics::GetPossessedPawn<ADWCharacter>();
 
 	if(!PossessedCharacter || PossessedCharacter->IsBreakAllInput()) return;
 
 	IWHPlayerInterface::Execute_Turn(PossessedCharacter, InValue.Get<float>());
 }
 
-void ADWInputModule::MoveHPlayer(const FInputActionValue& InValue)
+void UDWInputModule::MoveHPlayer(const FInputActionValue& InValue)
 {
 	if(InValue.Get<float>() == 0.f) return;
 	
-	ADWCharacter* PossessedCharacter = UCommonBPLibrary::GetPossessedPawn<ADWCharacter>();
+	ADWCharacter* PossessedCharacter = UCommonStatics::GetPossessedPawn<ADWCharacter>();
 
 	if(!PossessedCharacter || PossessedCharacter->IsBreakAllInput()) return;
 
 	IWHPlayerInterface::Execute_MoveH(PossessedCharacter, InValue.Get<float>());
 }
 
-void ADWInputModule::MoveVPlayer(const FInputActionValue& InValue)
+void UDWInputModule::MoveVPlayer(const FInputActionValue& InValue)
 {
 	if(InValue.Get<float>() == 0.f) return;
 	
-	ADWCharacter* PossessedCharacter = UCommonBPLibrary::GetPossessedPawn<ADWCharacter>();
+	ADWCharacter* PossessedCharacter = UCommonStatics::GetPossessedPawn<ADWCharacter>();
 
 	if(!PossessedCharacter || PossessedCharacter->IsBreakAllInput()) return;
 
 	IWHPlayerInterface::Execute_MoveV(PossessedCharacter, InValue.Get<float>());
 }
 
-void ADWInputModule::MoveForwardPlayer(const FInputActionValue& InValue)
+void UDWInputModule::MoveForwardPlayer(const FInputActionValue& InValue)
 {
 	if(InValue.Get<float>() == 0.f) return;
 	
-	ADWCharacter* PossessedCharacter = UCommonBPLibrary::GetPossessedPawn<ADWCharacter>();
+	ADWCharacter* PossessedCharacter = UCommonStatics::GetPossessedPawn<ADWCharacter>();
 
 	if(!PossessedCharacter || PossessedCharacter->IsBreakAllInput()) return;
 
 	IWHPlayerInterface::Execute_MoveForward(PossessedCharacter, InValue.Get<float>());
 }
 
-void ADWInputModule::MoveRightPlayer(const FInputActionValue& InValue)
+void UDWInputModule::MoveRightPlayer(const FInputActionValue& InValue)
 {
 	if(InValue.Get<float>() == 0.f) return;
 	
-	ADWCharacter* PossessedCharacter = UCommonBPLibrary::GetPossessedPawn<ADWCharacter>();
+	ADWCharacter* PossessedCharacter = UCommonStatics::GetPossessedPawn<ADWCharacter>();
 
 	if(!PossessedCharacter || PossessedCharacter->IsBreakAllInput()) return;
 
 	IWHPlayerInterface::Execute_MoveRight(PossessedCharacter, InValue.Get<float>());
 }
 
-void ADWInputModule::MoveUpPlayer(const FInputActionValue& InValue)
+void UDWInputModule::MoveUpPlayer(const FInputActionValue& InValue)
 {
 	if(InValue.Get<float>() == 0.f) return;
 	
-	ADWCharacter* PossessedCharacter = UCommonBPLibrary::GetPossessedPawn<ADWCharacter>();
+	ADWCharacter* PossessedCharacter = UCommonStatics::GetPossessedPawn<ADWCharacter>();
 
 	if(!PossessedCharacter || PossessedCharacter->IsBreakAllInput()) return;
 
@@ -285,23 +287,23 @@ void ADWInputModule::MoveUpPlayer(const FInputActionValue& InValue)
 	}
 }
 
-void ADWInputModule::OnSprintPressed()
+void UDWInputModule::OnSprintPressed()
 {
-	ADWCharacter* PossessedCharacter = UCommonBPLibrary::GetPossessedPawn<ADWCharacter>();
+	ADWCharacter* PossessedCharacter = UCommonStatics::GetPossessedPawn<ADWCharacter>();
 
 	if(!PossessedCharacter || PossessedCharacter->IsBreakAllInput()) return;
 
 	bPressedSprint = true;
 }
 
-void ADWInputModule::OnSprintReleased()
+void UDWInputModule::OnSprintReleased()
 {
 	bPressedSprint = false;
 }
 
-void ADWInputModule::ToggleControlMode()
+void UDWInputModule::ToggleControlMode()
 {
-	ADWPlayerCharacter* PlayerCharacter = UCommonBPLibrary::GetPlayerPawn<ADWPlayerCharacter>();
+	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
 
 	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput()) return;
 
@@ -315,9 +317,9 @@ void ADWInputModule::ToggleControlMode()
 	}
 }
 
-void ADWInputModule::ToggleCrouch()
+void UDWInputModule::ToggleCrouch()
 {
-	ADWCharacter* PossessedCharacter = UCommonBPLibrary::GetPossessedPawn<ADWCharacter>();
+	ADWCharacter* PossessedCharacter = UCommonStatics::GetPossessedPawn<ADWCharacter>();
 
 	if(!PossessedCharacter || PossessedCharacter->IsBreakAllInput()) return;
 
@@ -331,45 +333,45 @@ void ADWInputModule::ToggleCrouch()
 	}
 }
 
-void ADWInputModule::ToggleLockTarget()
+void UDWInputModule::ToggleLockTarget()
 {
-	ADWPlayerCharacter* PlayerCharacter = UCommonBPLibrary::GetPlayerPawn<ADWPlayerCharacter>();
+	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
 
 	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput()) return;
 
 	PlayerCharacter->GetTargeting()->TargetActor();
 }
 
-void ADWInputModule::ChangeHand()
+void UDWInputModule::ChangeHand()
 {
-	ADWPlayerCharacter* PlayerCharacter = UCommonBPLibrary::GetPlayerPawn<ADWPlayerCharacter>();
+	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
 
 	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput()) return;
 
 	PlayerCharacter->ChangeHand();
 }
 
-void ADWInputModule::OnDodgePressed()
+void UDWInputModule::OnDodgePressed()
 {
-	ADWCharacter* PossessedCharacter = UCommonBPLibrary::GetPossessedPawn<ADWCharacter>();
+	ADWCharacter* PossessedCharacter = UCommonStatics::GetPossessedPawn<ADWCharacter>();
 
 	if(!PossessedCharacter || PossessedCharacter->IsBreakAllInput()) return;
 
 	PossessedCharacter->Dodge();
 }
 
-void ADWInputModule::OnDodgeReleased()
+void UDWInputModule::OnDodgeReleased()
 {
-	ADWCharacter* PossessedCharacter = UCommonBPLibrary::GetPossessedPawn<ADWCharacter>();
+	ADWCharacter* PossessedCharacter = UCommonStatics::GetPossessedPawn<ADWCharacter>();
 
 	if(!PossessedCharacter || PossessedCharacter->IsBreakAllInput()) return;
 
 	// PossessedCharacter->UnDodge();
 }
 
-void ADWInputModule::OnAttackDestroyPressed()
+void UDWInputModule::OnAttackDestroyPressed()
 {
-	ADWPlayerCharacter* PlayerCharacter = UCommonBPLibrary::GetPlayerPawn<ADWPlayerCharacter>();
+	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
 
 	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput()) return;
 
@@ -390,7 +392,7 @@ void ADWInputModule::OnAttackDestroyPressed()
 		case EDWCharacterControlMode::Creating:
 		{
 			FVoxelHitResult voxelHitResult;
-			if(UVoxelModuleBPLibrary::VoxelRaycastSinge(EVoxelRaycastType::FromAimPoint, PlayerCharacter->GetInteractDistance(), {}, voxelHitResult))
+			if(UVoxelModuleStatics::VoxelRaycastSinge(EVoxelRaycastType::FromAimPoint, PlayerCharacter->GetInteractDistance(), {}, voxelHitResult))
 			{
 				PlayerCharacter->OnInteractVoxel(voxelHitResult, EInputInteractAction::Action1);
 			}
@@ -399,9 +401,9 @@ void ADWInputModule::OnAttackDestroyPressed()
 	}
 }
 
-void ADWInputModule::OnAttackDestroyReleased()
+void UDWInputModule::OnAttackDestroyReleased()
 {
-	ADWPlayerCharacter* PlayerCharacter = UCommonBPLibrary::GetPlayerPawn<ADWPlayerCharacter>();
+	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
 
 	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput()) return;
 
@@ -419,9 +421,9 @@ void ADWInputModule::OnAttackDestroyReleased()
 	}
 }
 
-void ADWInputModule::OnDefendGeneratePressed()
+void UDWInputModule::OnDefendGeneratePressed()
 {
-	ADWPlayerCharacter* PlayerCharacter = UCommonBPLibrary::GetPlayerPawn<ADWPlayerCharacter>();
+	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
 
 	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput()) return;
 
@@ -435,7 +437,7 @@ void ADWInputModule::OnDefendGeneratePressed()
 		case EDWCharacterControlMode::Creating:
 		{
 			FVoxelHitResult voxelHitResult;
-			if(UVoxelModuleBPLibrary::VoxelRaycastSinge(EVoxelRaycastType::FromAimPoint, PlayerCharacter->GetInteractDistance(), {}, voxelHitResult))
+			if(UVoxelModuleStatics::VoxelRaycastSinge(EVoxelRaycastType::FromAimPoint, PlayerCharacter->GetInteractDistance(), {}, voxelHitResult))
 			{
 				PlayerCharacter->OnInteractVoxel(voxelHitResult, EInputInteractAction::Action2);
 			}
@@ -444,9 +446,9 @@ void ADWInputModule::OnDefendGeneratePressed()
 	}
 }
 
-void ADWInputModule::OnDefendGenerateReleased()
+void UDWInputModule::OnDefendGenerateReleased()
 {
-	ADWPlayerCharacter* PlayerCharacter = UCommonBPLibrary::GetPlayerPawn<ADWPlayerCharacter>();
+	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
 
 	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput()) return;
 
@@ -464,9 +466,9 @@ void ADWInputModule::OnDefendGenerateReleased()
 	}
 }
 
-void ADWInputModule::ReleaseSkillAbility1()
+void UDWInputModule::ReleaseSkillAbility1()
 {
-	ADWPlayerCharacter* PlayerCharacter = UCommonBPLibrary::GetPlayerPawn<ADWPlayerCharacter>();
+	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
 	
 	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput()) return;
 
@@ -476,9 +478,9 @@ void ADWInputModule::ReleaseSkillAbility1()
 	}
 }
 
-void ADWInputModule::ReleaseSkillAbility2()
+void UDWInputModule::ReleaseSkillAbility2()
 {
-	ADWPlayerCharacter* PlayerCharacter = UCommonBPLibrary::GetPlayerPawn<ADWPlayerCharacter>();
+	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
 	
 	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput()) return;
 
@@ -488,9 +490,9 @@ void ADWInputModule::ReleaseSkillAbility2()
 	}
 }
 
-void ADWInputModule::ReleaseSkillAbility3()
+void UDWInputModule::ReleaseSkillAbility3()
 {
-	ADWPlayerCharacter* PlayerCharacter = UCommonBPLibrary::GetPlayerPawn<ADWPlayerCharacter>();
+	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
 	
 	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput()) return;
 
@@ -500,9 +502,9 @@ void ADWInputModule::ReleaseSkillAbility3()
 	}
 }
 
-void ADWInputModule::ReleaseSkillAbility4()
+void UDWInputModule::ReleaseSkillAbility4()
 {
-	ADWPlayerCharacter* PlayerCharacter = UCommonBPLibrary::GetPlayerPawn<ADWPlayerCharacter>();
+	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
 	
 	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput()) return;
 
@@ -512,9 +514,9 @@ void ADWInputModule::ReleaseSkillAbility4()
 	}
 }
 
-void ADWInputModule::DoInteractAction1()
+void UDWInputModule::DoInteractAction1()
 {
-	ADWPlayerCharacter* PlayerCharacter = UCommonBPLibrary::GetPlayerPawn<ADWPlayerCharacter>();
+	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
 	
 	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput() || !PlayerCharacter->GetInteractingAgent()) return;
 	
@@ -524,9 +526,9 @@ void ADWInputModule::DoInteractAction1()
 	}
 }
 
-void ADWInputModule::DoInteractAction2()
+void UDWInputModule::DoInteractAction2()
 {
-	ADWPlayerCharacter* PlayerCharacter = UCommonBPLibrary::GetPlayerPawn<ADWPlayerCharacter>();
+	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
 	
 	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput() || !PlayerCharacter->GetInteractingAgent()) return;
 	
@@ -536,9 +538,9 @@ void ADWInputModule::DoInteractAction2()
 	}
 }
 
-void ADWInputModule::DoInteractAction3()
+void UDWInputModule::DoInteractAction3()
 {
-	ADWPlayerCharacter* PlayerCharacter = UCommonBPLibrary::GetPlayerPawn<ADWPlayerCharacter>();
+	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
 	
 	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput() || !PlayerCharacter->GetInteractingAgent()) return;
 	
@@ -548,9 +550,9 @@ void ADWInputModule::DoInteractAction3()
 	}
 }
 
-void ADWInputModule::DoInteractAction4()
+void UDWInputModule::DoInteractAction4()
 {
-	ADWPlayerCharacter* PlayerCharacter = UCommonBPLibrary::GetPlayerPawn<ADWPlayerCharacter>();
+	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
 	
 	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput() || !PlayerCharacter->GetInteractingAgent()) return;
 	
@@ -560,9 +562,9 @@ void ADWInputModule::DoInteractAction4()
 	}
 }
 
-void ADWInputModule::DoInteractAction5()
+void UDWInputModule::DoInteractAction5()
 {
-	ADWPlayerCharacter* PlayerCharacter = UCommonBPLibrary::GetPlayerPawn<ADWPlayerCharacter>();
+	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
 	
 	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput() || !PlayerCharacter->GetInteractingAgent()) return;
 	
@@ -572,25 +574,25 @@ void ADWInputModule::DoInteractAction5()
 	}
 }
 
-void ADWInputModule::OpenInventoryPanel()
+void UDWInputModule::OpenInventoryPanel()
 {
-	ADWPlayerCharacter* PlayerCharacter = UCommonBPLibrary::GetPlayerPawn<ADWPlayerCharacter>();
+	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
 	
 	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput()) return;
 	
-	if(UProcedureModuleBPLibrary::IsCurrentProcedureClass<UProcedure_Playing>())
+	if(UProcedureModuleStatics::IsCurrentProcedureClass<UProcedure_Playing>())
 	{
-		UWidgetModuleBPLibrary::OpenUserWidget<UWidgetInventoryPanel>(false);
+		UWidgetModuleStatics::OpenUserWidget<UWidgetInventoryPanel>(false);
 	}
 }
 
-void ADWInputModule::OpenGeneratePanel()
+void UDWInputModule::OpenGeneratePanel()
 {
-	ADWPlayerCharacter* PlayerCharacter = UCommonBPLibrary::GetPlayerPawn<ADWPlayerCharacter>();
+	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
 	
 	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput()) return;
 	
-	if(UProcedureModuleBPLibrary::IsCurrentProcedureClass<UProcedure_Playing>())
+	if(UProcedureModuleStatics::IsCurrentProcedureClass<UProcedure_Playing>())
 	{
 		if(AVoxelInteractAuxiliary* InteractionAgent = PlayerCharacter->GetInteractingAgent<AVoxelInteractAuxiliary>())
 		{
@@ -604,190 +606,190 @@ void ADWInputModule::OpenGeneratePanel()
 				}
 				default:
 				{
-					UWidgetModuleBPLibrary::OpenUserWidget<UWidgetGeneratePanel>();
+					UWidgetModuleStatics::OpenUserWidget<UWidgetGeneratePanel>();
 					break;
 				}
 			}
 		}
 		else
 		{
-			UWidgetModuleBPLibrary::OpenUserWidget<UWidgetGeneratePanel>();
+			UWidgetModuleStatics::OpenUserWidget<UWidgetGeneratePanel>();
 		}
 	}
 }
 
-void ADWInputModule::UseInventoryItem()
+void UDWInputModule::UseInventoryItem()
 {
-	ADWPlayerCharacter* PlayerCharacter = UCommonBPLibrary::GetPlayerPawn<ADWPlayerCharacter>();
+	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
 	
 	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput()) return;
 	
-	if(UProcedureModuleBPLibrary::IsCurrentProcedureClass<UProcedure_Playing>())
+	if(UProcedureModuleStatics::IsCurrentProcedureClass<UProcedure_Playing>())
 	{
-		UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryBar>()->GetSelectedSlot()->UseItem(UInputModuleBPLibrary::GetKeyShortcutByName("InventoryAll").IsPressing(GetPlayerController()) ? -1 : 1);
+		UWidgetModuleStatics::GetUserWidget<UWidgetInventoryBar>()->GetSelectedSlot()->UseItem(UInputModuleStatics::GetKeyShortcutByName("InventoryAll").IsPressing(GetPlayerController()) ? -1 : 1);
 	}
 }
 
-void ADWInputModule::DiscardInventoryItem()
+void UDWInputModule::DiscardInventoryItem()
 {
-	ADWPlayerCharacter* PlayerCharacter = UCommonBPLibrary::GetPlayerPawn<ADWPlayerCharacter>();
+	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
 	
 	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput()) return;
 	
-	if(UProcedureModuleBPLibrary::IsCurrentProcedureClass<UProcedure_Playing>())
+	if(UProcedureModuleStatics::IsCurrentProcedureClass<UProcedure_Playing>())
 	{
-		UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryBar>()->GetSelectedSlot()->DiscardItem(UInputModuleBPLibrary::GetKeyShortcutByName("InventoryAll").IsPressing(GetPlayerController()) ? -1 : 1, false);
+		UWidgetModuleStatics::GetUserWidget<UWidgetInventoryBar>()->GetSelectedSlot()->DiscardItem(UInputModuleStatics::GetKeyShortcutByName("InventoryAll").IsPressing(GetPlayerController()) ? -1 : 1, false);
 	}
 }
 
-void ADWInputModule::PrevInventorySlot()
+void UDWInputModule::PrevInventorySlot()
 {
-	ADWPlayerCharacter* PlayerCharacter = UCommonBPLibrary::GetPlayerPawn<ADWPlayerCharacter>();
+	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
 	
-	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput() || UInputModuleBPLibrary::GetKeyShortcutByName(FName("CameraZoom")).IsPressing(GetPlayerController())) return;
+	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput() || UInputModuleStatics::GetKeyShortcutByName(FName("CameraZoom")).IsPressing(GetPlayerController())) return;
 	
-	if(UProcedureModuleBPLibrary::IsCurrentProcedureClass<UProcedure_Playing>())
+	if(UProcedureModuleStatics::IsCurrentProcedureClass<UProcedure_Playing>())
 	{
-		UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryBar>()->PrevInventorySlot();
+		UWidgetModuleStatics::GetUserWidget<UWidgetInventoryBar>()->PrevInventorySlot();
 	}
 }
 
-void ADWInputModule::NextInventorySlot()
+void UDWInputModule::NextInventorySlot()
 {
-	ADWPlayerCharacter* PlayerCharacter = UCommonBPLibrary::GetPlayerPawn<ADWPlayerCharacter>();
+	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
 	
-	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput() || UInputModuleBPLibrary::GetKeyShortcutByName(FName("CameraZoom")).IsPressing(GetPlayerController())) return;
+	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput() || UInputModuleStatics::GetKeyShortcutByName(FName("CameraZoom")).IsPressing(GetPlayerController())) return;
 	
-	if(UProcedureModuleBPLibrary::IsCurrentProcedureClass<UProcedure_Playing>())
+	if(UProcedureModuleStatics::IsCurrentProcedureClass<UProcedure_Playing>())
 	{
-		UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryBar>()->NextInventorySlot();
+		UWidgetModuleStatics::GetUserWidget<UWidgetInventoryBar>()->NextInventorySlot();
 	}
 }
 
-void ADWInputModule::SelectInventorySlot1()
+void UDWInputModule::SelectInventorySlot1()
 {
-	ADWPlayerCharacter* PlayerCharacter = UCommonBPLibrary::GetPlayerPawn<ADWPlayerCharacter>();
+	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
 	
 	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput()) return;
 	
-	if(UProcedureModuleBPLibrary::IsCurrentProcedureClass<UProcedure_Playing>())
+	if(UProcedureModuleStatics::IsCurrentProcedureClass<UProcedure_Playing>())
 	{
-		UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryBar>()->SelectInventorySlot(0);
+		UWidgetModuleStatics::GetUserWidget<UWidgetInventoryBar>()->SelectInventorySlot(0);
 	}
 }
 
-void ADWInputModule::SelectInventorySlot2()
+void UDWInputModule::SelectInventorySlot2()
 {
-	ADWPlayerCharacter* PlayerCharacter = UCommonBPLibrary::GetPlayerPawn<ADWPlayerCharacter>();
+	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
 	
 	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput()) return;
 	
-	if(UProcedureModuleBPLibrary::IsCurrentProcedureClass<UProcedure_Playing>())
+	if(UProcedureModuleStatics::IsCurrentProcedureClass<UProcedure_Playing>())
 	{
-		UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryBar>()->SelectInventorySlot(1);
+		UWidgetModuleStatics::GetUserWidget<UWidgetInventoryBar>()->SelectInventorySlot(1);
 	}
 }
 
-void ADWInputModule::SelectInventorySlot3()
+void UDWInputModule::SelectInventorySlot3()
 {
-	ADWPlayerCharacter* PlayerCharacter = UCommonBPLibrary::GetPlayerPawn<ADWPlayerCharacter>();
+	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
 	
 	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput()) return;
 	
-	if(UProcedureModuleBPLibrary::IsCurrentProcedureClass<UProcedure_Playing>())
+	if(UProcedureModuleStatics::IsCurrentProcedureClass<UProcedure_Playing>())
 	{
-		UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryBar>()->SelectInventorySlot(2);
+		UWidgetModuleStatics::GetUserWidget<UWidgetInventoryBar>()->SelectInventorySlot(2);
 	}
 }
 
-void ADWInputModule::SelectInventorySlot4()
+void UDWInputModule::SelectInventorySlot4()
 {
-	ADWPlayerCharacter* PlayerCharacter = UCommonBPLibrary::GetPlayerPawn<ADWPlayerCharacter>();
+	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
 	
 	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput()) return;
 	
-	if(UProcedureModuleBPLibrary::IsCurrentProcedureClass<UProcedure_Playing>())
+	if(UProcedureModuleStatics::IsCurrentProcedureClass<UProcedure_Playing>())
 	{
-		UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryBar>()->SelectInventorySlot(3);
+		UWidgetModuleStatics::GetUserWidget<UWidgetInventoryBar>()->SelectInventorySlot(3);
 	}
 }
 
-void ADWInputModule::SelectInventorySlot5()
+void UDWInputModule::SelectInventorySlot5()
 {
-	ADWPlayerCharacter* PlayerCharacter = UCommonBPLibrary::GetPlayerPawn<ADWPlayerCharacter>();
+	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
 	
 	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput()) return;
 	
-	if(UProcedureModuleBPLibrary::IsCurrentProcedureClass<UProcedure_Playing>())
+	if(UProcedureModuleStatics::IsCurrentProcedureClass<UProcedure_Playing>())
 	{
-		UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryBar>()->SelectInventorySlot(4);
+		UWidgetModuleStatics::GetUserWidget<UWidgetInventoryBar>()->SelectInventorySlot(4);
 	}
 }
 
-void ADWInputModule::SelectInventorySlot6()
+void UDWInputModule::SelectInventorySlot6()
 {
-	ADWPlayerCharacter* PlayerCharacter = UCommonBPLibrary::GetPlayerPawn<ADWPlayerCharacter>();
+	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
 	
 	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput()) return;
 	
-	if(UProcedureModuleBPLibrary::IsCurrentProcedureClass<UProcedure_Playing>())
+	if(UProcedureModuleStatics::IsCurrentProcedureClass<UProcedure_Playing>())
 	{
-		UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryBar>()->SelectInventorySlot(5);
+		UWidgetModuleStatics::GetUserWidget<UWidgetInventoryBar>()->SelectInventorySlot(5);
 	}
 }
 
-void ADWInputModule::SelectInventorySlot7()
+void UDWInputModule::SelectInventorySlot7()
 {
-	ADWPlayerCharacter* PlayerCharacter = UCommonBPLibrary::GetPlayerPawn<ADWPlayerCharacter>();
+	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
 	
 	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput()) return;
 	
-	if(UProcedureModuleBPLibrary::IsCurrentProcedureClass<UProcedure_Playing>())
+	if(UProcedureModuleStatics::IsCurrentProcedureClass<UProcedure_Playing>())
 	{
-		UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryBar>()->SelectInventorySlot(6);
+		UWidgetModuleStatics::GetUserWidget<UWidgetInventoryBar>()->SelectInventorySlot(6);
 	}
 }
 
-void ADWInputModule::SelectInventorySlot8()
+void UDWInputModule::SelectInventorySlot8()
 {
-	ADWPlayerCharacter* PlayerCharacter = UCommonBPLibrary::GetPlayerPawn<ADWPlayerCharacter>();
+	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
 	
 	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput()) return;
 	
-	if(UProcedureModuleBPLibrary::IsCurrentProcedureClass<UProcedure_Playing>())
+	if(UProcedureModuleStatics::IsCurrentProcedureClass<UProcedure_Playing>())
 	{
-		UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryBar>()->SelectInventorySlot(7);
+		UWidgetModuleStatics::GetUserWidget<UWidgetInventoryBar>()->SelectInventorySlot(7);
 	}
 }
 
-void ADWInputModule::SelectInventorySlot9()
+void UDWInputModule::SelectInventorySlot9()
 {
-	ADWPlayerCharacter* PlayerCharacter = UCommonBPLibrary::GetPlayerPawn<ADWPlayerCharacter>();
+	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
 	
 	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput()) return;
 	
-	if(UProcedureModuleBPLibrary::IsCurrentProcedureClass<UProcedure_Playing>())
+	if(UProcedureModuleStatics::IsCurrentProcedureClass<UProcedure_Playing>())
 	{
-		UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryBar>()->SelectInventorySlot(8);
+		UWidgetModuleStatics::GetUserWidget<UWidgetInventoryBar>()->SelectInventorySlot(8);
 	}
 }
 
-void ADWInputModule::SelectInventorySlot10()
+void UDWInputModule::SelectInventorySlot10()
 {
-	ADWPlayerCharacter* PlayerCharacter = UCommonBPLibrary::GetPlayerPawn<ADWPlayerCharacter>();
+	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
 	
 	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput()) return;
 	
-	if(UProcedureModuleBPLibrary::IsCurrentProcedureClass<UProcedure_Playing>())
+	if(UProcedureModuleStatics::IsCurrentProcedureClass<UProcedure_Playing>())
 	{
-		UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryBar>()->SelectInventorySlot(9);
+		UWidgetModuleStatics::GetUserWidget<UWidgetInventoryBar>()->SelectInventorySlot(9);
 	}
 }
 
-void ADWInputModule::PauseGame()
+void UDWInputModule::PauseGame()
 {
-	if(UProcedureModuleBPLibrary::IsCurrentProcedureClass<UProcedure_Playing>())
+	if(UProcedureModuleStatics::IsCurrentProcedureClass<UProcedure_Playing>())
 	{
-		UProcedureModuleBPLibrary::SwitchProcedureByClass<UProcedure_Pausing>();
+		UProcedureModuleStatics::SwitchProcedureByClass<UProcedure_Pausing>();
 	}
 }

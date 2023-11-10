@@ -3,15 +3,15 @@
 
 #include "Procedure/Archive/Procedure_ArchiveCreating.h"
 
-#include "Camera/CameraModuleBPLibrary.h"
+#include "Camera/CameraModuleStatics.h"
 #include "Character/Player/DWPlayerCharacter.h"
 #include "Gameplay/DWPlayerController.h"
-#include "Common/CommonBPLibrary.h"
-#include "Procedure/ProcedureModuleBPLibrary.h"
+#include "Common/CommonStatics.h"
+#include "Procedure/ProcedureModuleStatics.h"
 #include "Procedure/Procedure_Loading.h"
 #include "SaveGame/Archive/DWArchiveSaveGame.h"
-#include "SaveGame/SaveGameModuleBPLibrary.h"
-#include "Widget/WidgetModuleBPLibrary.h"
+#include "SaveGame/SaveGameModuleStatics.h"
+#include "Widget/WidgetModuleStatics.h"
 #include "Widget/Archive/WidgetArchiveCreatingPanel.h"
 #include "Voxel/VoxelModule.h"
 #include "Common/DWCommonTypes.h"
@@ -42,7 +42,7 @@ void UProcedure_ArchiveCreating::OnInitialize()
 {
 	Super::OnInitialize();
 
-	UCommonBPLibrary::GetPlayerController<ADWPlayerController>()->OnPlayerPawnChanged.AddDynamic(this, &UProcedure_ArchiveCreating::OnPlayerChanged);
+	UCommonStatics::GetPlayerController<ADWPlayerController>()->OnPlayerPawnChanged.AddDynamic(this, &UProcedure_ArchiveCreating::OnPlayerChanged);
 }
 
 void UProcedure_ArchiveCreating::OnEnter(UProcedureBase* InLastProcedure)
@@ -56,22 +56,22 @@ void UProcedure_ArchiveCreating::OnEnter(UProcedureBase* InLastProcedure)
 
 	if(!InLastProcedure)
 	{
-		if(USaveGameModuleBPLibrary::GetSaveGameInfo<UDWArchiveSaveGame>().ActiveIndex == -1)
+		if(USaveGameModuleStatics::GetSaveGameInfo<UDWArchiveSaveGame>().ActiveIndex == -1)
 		{
-			USaveGameModuleBPLibrary::LoadOrCreateSaveGame<UDWArchiveSaveGame>(-1, EPhase::Primary);
+			USaveGameModuleStatics::LoadOrCreateSaveGame<UDWArchiveSaveGame>(-1, EPhase::Primary);
 			CreatePlayer(PlayerSaveData, EPhase::Lesser);
 			CreateWorld(WorldSaveData, EPhase::Lesser);
-			CreateArchive(USaveGameModuleBPLibrary::GetSaveGame<UDWArchiveSaveGame>()->GetSaveDataRef<FDWArchiveSaveData>());
+			CreateArchive(USaveGameModuleStatics::GetSaveGame<UDWArchiveSaveGame>()->GetSaveDataRef<FDWArchiveSaveData>());
 		}
 		else
 		{
-			USaveGameModuleBPLibrary::LoadOrCreateSaveGame<UDWArchiveSaveGame>(-1, EPhase::Primary);
-			UProcedureModuleBPLibrary::SwitchProcedureByClass<UProcedure_Loading>();
+			USaveGameModuleStatics::LoadOrCreateSaveGame<UDWArchiveSaveGame>(-1, EPhase::Primary);
+			UProcedureModuleStatics::SwitchProcedureByClass<UProcedure_Loading>();
 		}
 	}
 	else
 	{
-		UWidgetModuleBPLibrary::OpenUserWidget<UWidgetArchiveCreatingPanel>();
+		UWidgetModuleStatics::OpenUserWidget<UWidgetArchiveCreatingPanel>();
 	}
 }
 
@@ -105,18 +105,18 @@ void UProcedure_ArchiveCreating::OnPlayerChanged(APawn* InPlayerPawn)
 
 void UProcedure_ArchiveCreating::CreatePlayer(FDWPlayerSaveData& InPlayerSaveData, EPhase InPhase)
 {
-	UCommonBPLibrary::GetPlayerController<ADWPlayerController>()->LoadSaveData(&InPlayerSaveData, InPhase);
-	USaveGameModuleBPLibrary::GetSaveGame<UDWArchiveSaveGame>()->GetSaveDataRef<FDWArchiveSaveData>().PlayerData = InPlayerSaveData;
+	UCommonStatics::GetPlayerController<ADWPlayerController>()->LoadSaveData(&InPlayerSaveData, InPhase);
+	USaveGameModuleStatics::GetSaveGame<UDWArchiveSaveGame>()->GetSaveDataRef<FDWArchiveSaveData>().PlayerData = InPlayerSaveData;
 }
 
 void UProcedure_ArchiveCreating::CreateWorld(FDWWorldSaveData& InWorldSaveData, EPhase InPhase)
 {
-	AVoxelModule::Get()->LoadSaveData(&InWorldSaveData, InPhase);
-	USaveGameModuleBPLibrary::GetSaveGame<UDWArchiveSaveGame>()->GetSaveDataRef<FDWArchiveSaveData>().WorldData = InWorldSaveData;
+	UVoxelModule::Get().LoadSaveData(&InWorldSaveData, InPhase);
+	USaveGameModuleStatics::GetSaveGame<UDWArchiveSaveGame>()->GetSaveDataRef<FDWArchiveSaveData>().WorldData = InWorldSaveData;
 }
 
 void UProcedure_ArchiveCreating::CreateArchive(FDWArchiveSaveData& InArchiveSaveData)
 {
-	USaveGameModuleBPLibrary::GetSaveGame<UDWArchiveSaveGame>()->SetSaveData(&InArchiveSaveData);
-	UProcedureModuleBPLibrary::SwitchProcedureByClass<UProcedure_Loading>();
+	USaveGameModuleStatics::GetSaveGame<UDWArchiveSaveGame>()->SetSaveData(&InArchiveSaveData);
+	UProcedureModuleStatics::SwitchProcedureByClass<UProcedure_Loading>();
 }

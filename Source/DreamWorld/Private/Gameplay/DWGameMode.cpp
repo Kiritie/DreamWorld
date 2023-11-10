@@ -4,7 +4,7 @@
 
 #include "Common/DWCommonTypes.h"
 #include "Gameplay/DWGameState.h"
-#include "SaveGame/SaveGameModuleBPLibrary.h"
+#include "SaveGame/SaveGameModuleStatics.h"
 #include "SaveGame/Setting/DWSettingSaveGame.h"
 
 ADWGameMode::ADWGameMode()
@@ -24,7 +24,7 @@ void ADWGameMode::OnPreparatory_Implementation(EPhase InPhase)
 	
 	if(PHASEC(InPhase, EPhase::Lesser))
 	{
-		USaveGameModuleBPLibrary::LoadOrCreateSaveGame<UDWSettingSaveGame>(0);
+		USaveGameModuleStatics::LoadOrCreateSaveGame<UDWSettingSaveGame>(0);
 	}
 }
 
@@ -39,7 +39,7 @@ void ADWGameMode::OnTermination_Implementation(EPhase InPhase)
 
 	if(PHASEC(InPhase, EPhase::Lesser))
 	{
-		USaveGameModuleBPLibrary::SaveSaveGame<UDWSettingSaveGame>(0, true);
+		USaveGameModuleStatics::SaveSaveGame<UDWSettingSaveGame>(0, true);
 	}
 }
 

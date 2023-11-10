@@ -6,7 +6,7 @@
 #include "Ability/Item/Skill/AbilitySkillBase.h"
 #include "Ability/Item/Skill/AbilitySkillDataBase.h"
 #include "Character/DWCharacter.h"
-#include "ObjectPool/ObjectPoolModuleBPLibrary.h"
+#include "ObjectPool/ObjectPoolModuleStatics.h"
 #include "Character/DWCharacterData.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
@@ -95,7 +95,7 @@ void UDWCharacterState_Attack::AttackStart()
 			const auto SkillAbilityData = Character->GetSkillAbility(Character->SkillAbilityID);
 			if(const auto SkillClass = SkillAbilityData.GetItemData<UAbilitySkillDataBase>().SkillClass)
 			{
-				if(AAbilitySkillBase* Skill = UObjectPoolModuleBPLibrary::SpawnObject<AAbilitySkillBase>(nullptr, SkillClass))
+				if(AAbilitySkillBase* Skill = UObjectPoolModuleStatics::SpawnObject<AAbilitySkillBase>(nullptr, SkillClass))
 				{
 					Skill->Initialize(Character, FAbilityItem(SkillAbilityData.AbilityID));
 				}

@@ -3,15 +3,15 @@
 
 #include "Procedure/Procedure_Starting.h"
 
-#include "Camera/CameraModuleBPLibrary.h"
+#include "Camera/CameraModuleStatics.h"
 #include "Gameplay/DWPlayerController.h"
-#include "Common/CommonBPLibrary.h"
-#include "Procedure/ProcedureModuleBPLibrary.h"
+#include "Common/CommonStatics.h"
+#include "Procedure/ProcedureModuleStatics.h"
 #include "Procedure/Procedure_Initializing.h"
 #include "Procedure/Archive/Procedure_ArchiveChoosing.h"
 #include "SaveGame/Archive/DWArchiveSaveGame.h"
-#include "SaveGame/SaveGameModuleBPLibrary.h"
-#include "Widget/WidgetModuleBPLibrary.h"
+#include "SaveGame/SaveGameModuleStatics.h"
+#include "Widget/WidgetModuleStatics.h"
 #include "Widget/Archive/WidgetArchiveChoosingPanel.h"
 #include "Widget/Menu/WidgetMainMenu.h"
 
@@ -40,28 +40,28 @@ void UProcedure_Starting::OnInitialize()
 {
 	Super::OnInitialize();
 	
-	UCommonBPLibrary::GetPlayerController<ADWPlayerController>()->OnPlayerPawnChanged.AddDynamic(this, &UProcedure_Starting::OnPlayerChanged);
+	UCommonStatics::GetPlayerController<ADWPlayerController>()->OnPlayerPawnChanged.AddDynamic(this, &UProcedure_Starting::OnPlayerChanged);
 }
 
 void UProcedure_Starting::OnEnter(UProcedureBase* InLastProcedure)
 {
 	if(!InLastProcedure || InLastProcedure->IsA<UProcedure_Initializing>())
 	{
-		USaveGameModuleBPLibrary::LoadOrCreateSaveGame<UDWArchiveSaveGame>(-1, EPhase::Primary);
+		USaveGameModuleStatics::LoadOrCreateSaveGame<UDWArchiveSaveGame>(-1, EPhase::Primary);
 	}
 	else
 	{
-		USaveGameModuleBPLibrary::UnloadSaveGame<UDWArchiveSaveGame>(-1, EPhase::Lesser);
+		USaveGameModuleStatics::UnloadSaveGame<UDWArchiveSaveGame>(-1, EPhase::Lesser);
 	}
 	if(InLastProcedure && InLastProcedure->IsA<UProcedure_ArchiveChoosing>())
 	{
-		CameraViewYaw = UCameraModuleBPLibrary::GetCameraRotation().Yaw;
+		CameraViewYaw = UCameraModuleStatics::GetCameraRotation().Yaw;
 	}
 
 	Super::OnEnter(InLastProcedure);
 
-	UWidgetModuleBPLibrary::OpenUserWidget<UWidgetMainMenu>();
-	UWidgetModuleBPLibrary::CreateUserWidget<UWidgetArchiveChoosingPanel>();
+	UWidgetModuleStatics::OpenUserWidget<UWidgetMainMenu>();
+	UWidgetModuleStatics::CreateUserWidget<UWidgetArchiveChoosingPanel>();
 }
 
 void UProcedure_Starting::OnRefresh()

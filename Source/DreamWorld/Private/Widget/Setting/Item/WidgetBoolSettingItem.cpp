@@ -4,7 +4,7 @@
 #include "Widget/Setting/Item/WidgetBoolSettingItem.h"
 
 #include "Components/CheckBox.h"
-#include "Widget/WidgetModuleBPLibrary.h"
+#include "Widget/WidgetModuleStatics.h"
 
 UWidgetBoolSettingItem::UWidgetBoolSettingItem(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {

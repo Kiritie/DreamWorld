@@ -3,12 +3,12 @@
 
 #include "Widget/Task/WidgetTaskInfoBox.h"
 
-#include "Asset/AssetModuleBPLibrary.h"
+#include "Asset/AssetModuleStatics.h"
 #include "Components/VerticalBox.h"
 #include "Components/VerticalBoxSlot.h"
-#include "Event/EventModuleBPLibrary.h"
+#include "Event/EventModuleStatics.h"
 #include "Event/Handle/Task/EventHandle_EnterTask.h"
-#include "Task/TaskModuleBPLibrary.h"
+#include "Task/TaskModuleStatics.h"
 #include "Task/Base/TaskBase.h"
 #include "Widget/WidgetModule.h"
 #include "Widget/Task/WidgetTaskInfoItem.h"
@@ -37,21 +37,21 @@ void UWidgetTaskInfoBox::OnOpen(const TArray<FParameter>& InParams, bool bInstan
 {
 	Super::OnOpen(InParams, bInstant);
 
-	UEventModuleBPLibrary::SubscribeEvent<UEventHandle_EnterTask>(this, FName("Refresh"));
+	UEventModuleStatics::SubscribeEvent<UEventHandle_EnterTask>(this, FName("Refresh"));
 }
 
 void UWidgetTaskInfoBox::OnClose(bool bInstant)
 {
 	Super::OnClose(bInstant);
 
-	UEventModuleBPLibrary::UnsubscribeEvent<UEventHandle_EnterTask>(this, FName("Refresh"));
+	UEventModuleStatics::UnsubscribeEvent<UEventHandle_EnterTask>(this, FName("Refresh"));
 }
 
 void UWidgetTaskInfoBox::OnRefresh()
 {
 	Super::OnRefresh();
 
-	if(UTaskBase* RootTask = UTaskModuleBPLibrary::GetCurrentRootTask())
+	if(UTaskBase* RootTask = UTaskModuleStatics::GetCurrentRootTask())
 	{
 		ContentBox->ClearChildren();
 		CreateTaskInfoItem(RootTask);
@@ -60,7 +60,7 @@ void UWidgetTaskInfoBox::OnRefresh()
 
 void UWidgetTaskInfoBox::CreateTaskInfoItem(UTaskBase* InTask)
 {
-	if(UWidgetTaskInfoItem* TaskInfoItem = CreateSubWidget<UWidgetTaskInfoItem>({ InTask }, UAssetModuleBPLibrary::GetStaticClass(FName("TaskInfoItem"))))
+	if(UWidgetTaskInfoItem* TaskInfoItem = CreateSubWidget<UWidgetTaskInfoItem>({ InTask }, UAssetModuleStatics::GetStaticClass(FName("TaskInfoItem"))))
 	{
 		if(const auto TempSlot = ContentBox->AddChildToVerticalBox(TaskInfoItem))
 		{

@@ -2,10 +2,10 @@
 
 #include "Character/Player/DWPlayerCharacter.h"
 
-#include "Achievement/AchievementModuleBPLibrary.h"
+#include "Achievement/AchievementModuleStatics.h"
 #include "Ability/Character/DWCharacterAttributeSet.h"
 #include "Item/Equip/Weapon/DWEquipWeapon.h"
-#include "Asset/AssetModuleBPLibrary.h"
+#include "Asset/AssetModuleStatics.h"
 #include "Ability/Item/AbilityItemDataBase.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/InputComponent.h"
@@ -17,14 +17,14 @@
 #include "Widget/Inventory/WidgetInventoryPanel.h"
 #include "Ability/Inventory/Slot/AbilityInventorySlot.h"
 #include "Widget/WidgetGameHUD.h"
-#include "Widget/WidgetModuleBPLibrary.h"
+#include "Widget/WidgetModuleStatics.h"
 #include "Voxel/Datas/VoxelData.h"
 #include "Ability/Item/Equip/AbilityEquipDataBase.h"
 #include "Ability/Item/Prop/AbilityPropDataBase.h"
 #include "Ability/Item/Skill/AbilitySkillDataBase.h"
 #include "Ability/AbilityModuleTypes.h"
 #include "Ability/Character/AbilityCharacterInventoryBase.h"
-#include "Camera/CameraModuleBPLibrary.h"
+#include "Camera/CameraModuleStatics.h"
 #include "Character/Player/States/DWPlayerCharacterState_Attack.h"
 #include "Character/Player/States/DWPlayerCharacterState_Death.h"
 #include "Character/Player/States/DWPlayerCharacterState_Default.h"
@@ -42,7 +42,7 @@
 #include "Character/States/DWCharacterState_Swim.h"
 #include "Character/States/DWCharacterState_Walk.h"
 #include "FSM/Components/FSMComponent.h"
-#include "Common/CommonBPLibrary.h"
+#include "Common/CommonStatics.h"
 #include "Widget/World/WorldWidgetComponent.h"
 #include "Widget/WidgetContextBox.h"
 #include "Ability/Item/Raw/AbilityRawDataBase.h"
@@ -150,7 +150,7 @@ void ADWPlayerCharacter::LoadData(FSaveData* InSaveData, EPhase InPhase)
 				}
 				case EDWInventoryInitType::All:
 				{
-					auto VoxelDatas = UAssetModuleBPLibrary::LoadPrimaryAssets<UVoxelData>(FName("Voxel"));
+					auto VoxelDatas = UAssetModuleStatics::LoadPrimaryAssets<UVoxelData>(FName("Voxel"));
 					for (int32 i = 0; i < VoxelDatas.Num(); i++)
 					{
 						if(VoxelDatas[i]->VoxelType != EVoxelType::Empty && VoxelDatas[i]->VoxelType != EVoxelType::Unknown && VoxelDatas[i]->bMainPart)
@@ -160,28 +160,28 @@ void ADWPlayerCharacter::LoadData(FSaveData* InSaveData, EPhase InPhase)
 						}
 					}
 
-					auto RawDatas = UAssetModuleBPLibrary::LoadPrimaryAssets<UAbilityRawDataBase>(FName("Raw"));
+					auto RawDatas = UAssetModuleStatics::LoadPrimaryAssets<UAbilityRawDataBase>(FName("Raw"));
 					for (int32 i = 0; i < RawDatas.Num(); i++)
 					{
 						FAbilityItem tmpItem = FAbilityItem(RawDatas[i]->GetPrimaryAssetId(), RawDatas[i]->MaxCount);
 						SaveData.InventoryData.AddItem(tmpItem, { ESlotSplitType::Default, ESlotSplitType::Shortcut });
 					}
 
-					auto EquipDatas = UAssetModuleBPLibrary::LoadPrimaryAssets<UAbilityEquipDataBase>(FName("Equip"));
+					auto EquipDatas = UAssetModuleStatics::LoadPrimaryAssets<UAbilityEquipDataBase>(FName("Equip"));
 					for (int32 i = 0; i < EquipDatas.Num(); i++)
 					{
 						FAbilityItem tmpItem = FAbilityItem(EquipDatas[i]->GetPrimaryAssetId(), EquipDatas[i]->MaxCount);
 						SaveData.InventoryData.AddItem(tmpItem, { ESlotSplitType::Default, ESlotSplitType::Shortcut });
 					}
 	
-					auto PropDatas = UAssetModuleBPLibrary::LoadPrimaryAssets<UAbilityPropDataBase>(FName("Prop"));
+					auto PropDatas = UAssetModuleStatics::LoadPrimaryAssets<UAbilityPropDataBase>(FName("Prop"));
 					for (int32 i = 0; i < PropDatas.Num(); i++)
 					{
 						FAbilityItem tmpItem = FAbilityItem(PropDatas[i]->GetPrimaryAssetId(), PropDatas[i]->MaxCount);
 						SaveData.InventoryData.AddItem(tmpItem, { ESlotSplitType::Default, ESlotSplitType::Shortcut });
 					}
 
-					auto SkillDatas = UAssetModuleBPLibrary::LoadPrimaryAssets<UAbilitySkillDataBase>(FName("Skill"));
+					auto SkillDatas = UAssetModuleStatics::LoadPrimaryAssets<UAbilitySkillDataBase>(FName("Skill"));
 					for (int32 i = 0; i < SkillDatas.Num(); i++)
 					{
 						FAbilityItem tmpItem = FAbilityItem(SkillDatas[i]->GetPrimaryAssetId(), SkillDatas[i]->MaxCount);
@@ -218,7 +218,7 @@ void ADWPlayerCharacter::Death(IAbilityVitalityInterface* InKiller /* = nullptr 
 	Super::Death(InKiller);
 	if(InKiller)
 	{
-		UWidgetModuleBPLibrary::GetUserWidget<UWidgetContextBox>()->AddMessage(FString::Printf(TEXT("你被 %s 杀死了！"), *InKiller->GetNameV().ToString()));
+		UWidgetModuleStatics::GetUserWidget<UWidgetContextBox>()->AddMessage(FString::Printf(TEXT("你被 %s 杀死了！"), *InKiller->GetNameV().ToString()));
 	}
 }
 
@@ -228,11 +228,11 @@ void ADWPlayerCharacter::Kill(IAbilityVitalityInterface* InTarget)
 
 	if(Cast<ADWCharacter>(InTarget))
 	{
-		UAchievementModuleBPLibrary::UnlockAchievement(FName("FirstKillMonster"));
+		UAchievementModuleStatics::UnlockAchievement(FName("FirstKillMonster"));
 	}
 	else if(Cast<ADWVitality>(InTarget))
 	{
-		UAchievementModuleBPLibrary::UnlockAchievement(FName("FirstKillVitality"));
+		UAchievementModuleStatics::UnlockAchievement(FName("FirstKillVitality"));
 	}
 }
 
@@ -277,17 +277,17 @@ void ADWPlayerCharacter::SetControlMode_Implementation(EDWCharacterControlMode I
 	{
 		case EDWCharacterControlMode::Fighting:
 		{
-			if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryBar>())
+			if(UWidgetModuleStatics::GetUserWidget<UWidgetInventoryBar>())
 			{
-				UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryBar>()->SetSkillBoxVisible(true);
+				UWidgetModuleStatics::GetUserWidget<UWidgetInventoryBar>()->SetSkillBoxVisible(true);
 			}
 			break;
 		}
 		case EDWCharacterControlMode::Creating:
 		{
-			if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryBar>())
+			if(UWidgetModuleStatics::GetUserWidget<UWidgetInventoryBar>())
 			{
-				UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryBar>()->SetSkillBoxVisible(false);
+				UWidgetModuleStatics::GetUserWidget<UWidgetInventoryBar>()->SetSkillBoxVisible(false);
 			}
 			break;
 		}
@@ -311,7 +311,7 @@ void ADWPlayerCharacter::OnTargetLockedOff(AActor* InTargetActor)
 
 void ADWPlayerCharacter::OnTargetSetRotation(AActor* InTargetActor, FRotator InControlRotation)
 {
-	UCameraModuleBPLibrary::SetCameraRotation(InControlRotation.Yaw, InControlRotation.Pitch);
+	UCameraModuleStatics::SetCameraRotation(InControlRotation.Yaw, InControlRotation.Pitch);
 }
 
 bool ADWPlayerCharacter::CanInteract(EInteractAction InInteractAction, IInteractionAgentInterface* InInteractionAgent)
@@ -334,9 +334,9 @@ void ADWPlayerCharacter::OnEnterInteract(IInteractionAgentInterface* InInteracti
 {
 	Super::OnEnterInteract(InInteractionAgent);
 
-	if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>())
+	if(UWidgetModuleStatics::GetUserWidget<UWidgetGameHUD>())
 	{
-		UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>()->ShowInteractActions(GetInteractableActions());
+		UWidgetModuleStatics::GetUserWidget<UWidgetGameHUD>()->ShowInteractActions(GetInteractableActions());
 	}
 }
 
@@ -344,9 +344,9 @@ void ADWPlayerCharacter::OnLeaveInteract(IInteractionAgentInterface* InInteracti
 {
 	Super::OnLeaveInteract(InInteractionAgent);
 
-	if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>())
+	if(UWidgetModuleStatics::GetUserWidget<UWidgetGameHUD>())
 	{
-		UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>()->HideInteractActions();
+		UWidgetModuleStatics::GetUserWidget<UWidgetGameHUD>()->HideInteractActions();
 	}
 }
 
@@ -366,22 +366,22 @@ void ADWPlayerCharacter::OnInteract(EInteractAction InInteractAction, IInteracti
 				{
 					case EVoxelType::Chest:
 					{
-						UWidgetModuleBPLibrary::OpenUserWidget<UWidgetInventoryBox>({ InteractionAgent });
-						FDelegateHandle DelegateHandle = UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryBox>()->OnClosed.AddLambda([this, InteractionAgent, DelegateHandle](bool bInstant)
+						UWidgetModuleStatics::OpenUserWidget<UWidgetInventoryBox>({ InteractionAgent });
+						FDelegateHandle DelegateHandle = UWidgetModuleStatics::GetUserWidget<UWidgetInventoryBox>()->OnClosed.AddLambda([this, InteractionAgent, DelegateHandle](bool bInstant)
 						{
 							DoInteract((EInteractAction)EVoxelInteractAction::Close, InteractionAgent);
-							UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryBox>()->OnClosed.Remove(DelegateHandle);
+							UWidgetModuleStatics::GetUserWidget<UWidgetInventoryBox>()->OnClosed.Remove(DelegateHandle);
 						});
 						break;
 					}
 					case EVoxelType::Furnace:
 					case EVoxelType::Crafting_Table:
 					{
-						UWidgetModuleBPLibrary::OpenUserWidget<UWidgetGeneratePanel>({ InteractionAgent });
-						FDelegateHandle DelegateHandle = UWidgetModuleBPLibrary::GetUserWidget<UWidgetGeneratePanel>()->OnClosed.AddLambda([this, InteractionAgent, DelegateHandle](bool bInstant)
+						UWidgetModuleStatics::OpenUserWidget<UWidgetGeneratePanel>({ InteractionAgent });
+						FDelegateHandle DelegateHandle = UWidgetModuleStatics::GetUserWidget<UWidgetGeneratePanel>()->OnClosed.AddLambda([this, InteractionAgent, DelegateHandle](bool bInstant)
 						{
 							DoInteract((EInteractAction)EVoxelInteractAction::Close, InteractionAgent);
-							UWidgetModuleBPLibrary::GetUserWidget<UWidgetGeneratePanel>()->OnClosed.Remove(DelegateHandle);
+							UWidgetModuleStatics::GetUserWidget<UWidgetGeneratePanel>()->OnClosed.Remove(DelegateHandle);
 						});
 						break;
 					}
@@ -400,9 +400,9 @@ void ADWPlayerCharacter::OnInteract(EInteractAction InInteractAction, IInteracti
 		}
 		default: break;
 	}
-	if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>())
+	if(UWidgetModuleStatics::GetUserWidget<UWidgetGameHUD>())
 	{
-		UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>()->ShowInteractActions(GetInteractableActions());
+		UWidgetModuleStatics::GetUserWidget<UWidgetGameHUD>()->ShowInteractActions(GetInteractableActions());
 	}
 }
 
@@ -510,96 +510,96 @@ void ADWPlayerCharacter::OnAttributeChange(const FOnAttributeChangeData& InAttri
 	
 	if(InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetHealthAttribute() || InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetMaxHealthAttribute())
 	{
-		if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>())
+		if(UWidgetModuleStatics::GetUserWidget<UWidgetGameHUD>())
 		{
-			UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>()->SetHealthPercent(GetHealth(), GetMaxHealth());
+			UWidgetModuleStatics::GetUserWidget<UWidgetGameHUD>()->SetHealthPercent(GetHealth(), GetMaxHealth());
 		}
-		if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>())
+		if(UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>())
 		{
-			UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>()->SetHealthInfo(FString::Printf(TEXT("%d/%d"), (int32)GetHealth(), (int32)GetMaxHealth()));
+			UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>()->SetHealthInfo(FString::Printf(TEXT("%d/%d"), (int32)GetHealth(), (int32)GetMaxHealth()));
 		}
 	}
 	else if(InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetExpAttribute())
 	{
-		if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetContextBox>())
+		if(UWidgetModuleStatics::GetUserWidget<UWidgetContextBox>())
 		{
 			if(DeltaValue > 0.f)
 			{
-				UWidgetModuleBPLibrary::GetUserWidget<UWidgetContextBox>()->AddMessage(FString::Printf(TEXT("获得: %d点经验值"), (int32)DeltaValue));
+				UWidgetModuleStatics::GetUserWidget<UWidgetContextBox>()->AddMessage(FString::Printf(TEXT("获得: %d点经验值"), (int32)DeltaValue));
 			}
 			if(InAttributeChangeData.NewValue >= GetAttributeSet<UDWCharacterAttributeSet>()->GetMaxExp())
 			{
-				UWidgetModuleBPLibrary::GetUserWidget<UWidgetContextBox>()->AddMessage(FString::Printf(TEXT("你已升到 %d 级！"), Level));
+				UWidgetModuleStatics::GetUserWidget<UWidgetContextBox>()->AddMessage(FString::Printf(TEXT("你已升到 %d 级！"), Level));
 			}
 		}
-		if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>())
+		if(UWidgetModuleStatics::GetUserWidget<UWidgetGameHUD>())
 		{
-			UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>()->SetHeadInfo(GetHeadInfo());
+			UWidgetModuleStatics::GetUserWidget<UWidgetGameHUD>()->SetHeadInfo(GetHeadInfo());
 		}
-		if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>())
+		if(UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>())
 		{
-			UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>()->SetHeadInfo(GetHeadInfo());
+			UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>()->SetHeadInfo(GetHeadInfo());
 		}
 	}
 	else if(InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetMaxExpAttribute())
 	{
-		if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>())
+		if(UWidgetModuleStatics::GetUserWidget<UWidgetGameHUD>())
 		{
-			UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>()->SetHeadInfo(GetHeadInfo());
+			UWidgetModuleStatics::GetUserWidget<UWidgetGameHUD>()->SetHeadInfo(GetHeadInfo());
 		}
-		if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>())
+		if(UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>())
 		{
-			UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>()->SetHeadInfo(GetHeadInfo());
+			UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>()->SetHeadInfo(GetHeadInfo());
 		}
 	}
 	else if(InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetManaAttribute() || InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetMaxManaAttribute())
 	{
-		if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>())
+		if(UWidgetModuleStatics::GetUserWidget<UWidgetGameHUD>())
 		{
-			UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>()->SetManaPercent(GetMana(), GetMaxMana());
+			UWidgetModuleStatics::GetUserWidget<UWidgetGameHUD>()->SetManaPercent(GetMana(), GetMaxMana());
 		}
-		if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>())
+		if(UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>())
 		{
-			UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>()->SetManaInfo(FString::Printf(TEXT("%d/%d"), (int32)GetMana(), (int32)GetMaxMana()));
+			UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>()->SetManaInfo(FString::Printf(TEXT("%d/%d"), (int32)GetMana(), (int32)GetMaxMana()));
 		}
 	}
 	else if(InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetStaminaAttribute() || InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetMaxStaminaAttribute())
 	{
-		if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>())
+		if(UWidgetModuleStatics::GetUserWidget<UWidgetGameHUD>())
 		{
-			UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>()->SetStaminaPercent(GetStamina(), GetMaxStamina());
+			UWidgetModuleStatics::GetUserWidget<UWidgetGameHUD>()->SetStaminaPercent(GetStamina(), GetMaxStamina());
 		}
-		if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>())
+		if(UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>())
 		{
-			UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>()->SetStaminaInfo(FString::Printf(TEXT("%d/%d"), (int32)GetStamina(), (int32)GetMaxStamina()));
+			UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>()->SetStaminaInfo(FString::Printf(TEXT("%d/%d"), (int32)GetStamina(), (int32)GetMaxStamina()));
 		}
 	}
 	else if(InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetMoveSpeedAttribute())
 	{
-		if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>())
+		if(UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>())
 		{
-			UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>()->SetMoveSpeed(FString::FromInt(InAttributeChangeData.NewValue));
+			UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>()->SetMoveSpeed(FString::FromInt(InAttributeChangeData.NewValue));
 		}
 	}
 	else if(InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetSwimSpeedAttribute())
 	{
-		if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>())
+		if(UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>())
 		{
-			UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>()->SetSwimSpeed(FString::FromInt(InAttributeChangeData.NewValue));
+			UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>()->SetSwimSpeed(FString::FromInt(InAttributeChangeData.NewValue));
 		}
 	}
 	else if(InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetRideSpeedAttribute())
 	{
-		if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>())
+		if(UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>())
 		{
-			UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>()->SetRideSpeed(FString::FromInt(InAttributeChangeData.NewValue));
+			UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>()->SetRideSpeed(FString::FromInt(InAttributeChangeData.NewValue));
 		}
 	}
 	else if(InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetFlySpeedAttribute())
 	{
-		if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>())
+		if(UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>())
 		{
-			UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>()->SetFlySpeed(FString::FromInt(InAttributeChangeData.NewValue));
+			UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>()->SetFlySpeed(FString::FromInt(InAttributeChangeData.NewValue));
 		}
 	}
 	else if(InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetRotationSpeedAttribute())
@@ -608,65 +608,65 @@ void ADWPlayerCharacter::OnAttributeChange(const FOnAttributeChangeData& InAttri
 	}
 	else if(InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetAttackForceAttribute())
 	{
-		if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>())
+		if(UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>())
 		{
-			UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>()->SetAttackForce(FString::FromInt(InAttributeChangeData.NewValue));
+			UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>()->SetAttackForce(FString::FromInt(InAttributeChangeData.NewValue));
 		}
 	}
 	else if(InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetRepulseForceAttribute())
 	{
-		if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>())
+		if(UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>())
 		{
-			UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>()->SetRepulseForce(FString::FromInt(InAttributeChangeData.NewValue));
+			UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>()->SetRepulseForce(FString::FromInt(InAttributeChangeData.NewValue));
 		}
 	}
 	else if(InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetAttackSpeedAttribute())
 	{
-		if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>())
+		if(UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>())
 		{
-			UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>()->SetAttackSpeed(FString::SanitizeFloat(InAttributeChangeData.NewValue, 1));
+			UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>()->SetAttackSpeed(FString::SanitizeFloat(InAttributeChangeData.NewValue, 1));
 		}
 	}
 	else if(InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetAttackCritRateAttribute())
 	{
-		if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>())
+		if(UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>())
 		{
-			UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>()->SetAttackCritRate(FString::Printf(TEXT("%d%%"), (int32)(InAttributeChangeData.NewValue * 100)));
+			UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>()->SetAttackCritRate(FString::Printf(TEXT("%d%%"), (int32)(InAttributeChangeData.NewValue * 100)));
 		}
 	}
 	else if(InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetAttackStealRateAttribute())
 	{
-		if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>())
+		if(UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>())
 		{
-			UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>()->SetAttackStealRate(FString::Printf(TEXT("%d%%"), (int32)(InAttributeChangeData.NewValue * 100)));
+			UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>()->SetAttackStealRate(FString::Printf(TEXT("%d%%"), (int32)(InAttributeChangeData.NewValue * 100)));
 		}
 	}
 	else if(InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetDefendRateAttribute())
 	{
-		if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>())
+		if(UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>())
 		{
-			UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>()->SetDefendRate(FString::Printf(TEXT("%d%%"), (int32)(InAttributeChangeData.NewValue * 100)));
+			UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>()->SetDefendRate(FString::Printf(TEXT("%d%%"), (int32)(InAttributeChangeData.NewValue * 100)));
 		}
 	}
 	else if(InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetPhysicsDefRateAttribute())
 	{
-		if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>())
+		if(UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>())
 		{
-			UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>()->SetPhysicsDefRate(FString::Printf(TEXT("%d%%"), (int32)(InAttributeChangeData.NewValue * 100)));
+			UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>()->SetPhysicsDefRate(FString::Printf(TEXT("%d%%"), (int32)(InAttributeChangeData.NewValue * 100)));
 		}
 	}
 	else if(InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetMagicDefRateAttribute())
 	{
-		if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>())
+		if(UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>())
 		{
-			UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>()->SetMagicDefRate(FString::Printf(TEXT("%d%%"), (int32)(InAttributeChangeData.NewValue * 100)));
+			UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>()->SetMagicDefRate(FString::Printf(TEXT("%d%%"), (int32)(InAttributeChangeData.NewValue * 100)));
 		}
 	}
 	else if(InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetToughnessRateAttribute())
 	{
-		if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>())
+		if(UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>())
 		{
-			UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>()->SetToughnessRate(FString::Printf(TEXT("%d%%"), (int32)(InAttributeChangeData.NewValue * 100)));
+			UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>()->SetToughnessRate(FString::Printf(TEXT("%d%%"), (int32)(InAttributeChangeData.NewValue * 100)));
 		}
 	}
 	Super::OnAttributeChange(InAttributeChangeData);
@@ -675,26 +675,26 @@ void ADWPlayerCharacter::OnAttributeChange(const FOnAttributeChangeData& InAttri
 void ADWPlayerCharacter::SetNameV(FName InName)
 {
 	Super::SetNameV(InName);
-	if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>())
+	if(UWidgetModuleStatics::GetUserWidget<UWidgetGameHUD>())
 	{
-		UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>()->SetHeadInfo(GetHeadInfo());
+		UWidgetModuleStatics::GetUserWidget<UWidgetGameHUD>()->SetHeadInfo(GetHeadInfo());
 	}
-	if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>())
+	if(UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>())
 	{
-		UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>()->SetHeadInfo(GetHeadInfo());
+		UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>()->SetHeadInfo(GetHeadInfo());
 	}
 }
 
 void ADWPlayerCharacter::SetRaceID(FName InRaceID)
 {
 	Super::SetRaceID(InRaceID);
-	if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>())
+	if(UWidgetModuleStatics::GetUserWidget<UWidgetGameHUD>())
 	{
-		UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>()->SetHeadInfo(GetHeadInfo());
+		UWidgetModuleStatics::GetUserWidget<UWidgetGameHUD>()->SetHeadInfo(GetHeadInfo());
 	}
-	if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>())
+	if(UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>())
 	{
-		UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>()->SetHeadInfo(GetHeadInfo());
+		UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>()->SetHeadInfo(GetHeadInfo());
 	}
 }
 
@@ -702,13 +702,13 @@ bool ADWPlayerCharacter::SetLevelV(int32 InLevel)
 {
 	if(!Super::SetLevelV(InLevel)) return false;
 
-	if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>())
+	if(UWidgetModuleStatics::GetUserWidget<UWidgetGameHUD>())
 	{
-		UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>()->SetHeadInfo(GetHeadInfo());
+		UWidgetModuleStatics::GetUserWidget<UWidgetGameHUD>()->SetHeadInfo(GetHeadInfo());
 	}
-	if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>())
+	if(UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>())
 	{
-		UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>()->SetHeadInfo(GetHeadInfo());
+		UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>()->SetHeadInfo(GetHeadInfo());
 	}
 	return true;
 }
@@ -716,12 +716,12 @@ bool ADWPlayerCharacter::SetLevelV(int32 InLevel)
 void ADWPlayerCharacter::SetTeamID(FName InTeamID)
 {
 	Super::SetTeamID(InTeamID);
-	if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>())
+	if(UWidgetModuleStatics::GetUserWidget<UWidgetGameHUD>())
 	{
-		UWidgetModuleBPLibrary::GetUserWidget<UWidgetGameHUD>()->SetHeadInfo(GetHeadInfo());
+		UWidgetModuleStatics::GetUserWidget<UWidgetGameHUD>()->SetHeadInfo(GetHeadInfo());
 	}
-	if(UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>())
+	if(UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>())
 	{
-		UWidgetModuleBPLibrary::GetUserWidget<UWidgetInventoryPanel>()->SetHeadInfo(GetHeadInfo());
+		UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>()->SetHeadInfo(GetHeadInfo());
 	}
 }

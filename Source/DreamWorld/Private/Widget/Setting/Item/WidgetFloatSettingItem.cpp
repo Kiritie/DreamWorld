@@ -6,7 +6,7 @@
 #include "Components/Slider.h"
 #include "Components/TextBlock.h"
 #include "Kismet/KismetTextLibrary.h"
-#include "Widget/WidgetModuleBPLibrary.h"
+#include "Widget/WidgetModuleStatics.h"
 
 UWidgetFloatSettingItem::UWidgetFloatSettingItem(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {

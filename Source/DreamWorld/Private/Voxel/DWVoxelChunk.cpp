@@ -3,7 +3,7 @@
 
 #include "Voxel/DWVoxelChunk.h"
 
-#include "Ability/AbilityModuleBPLibrary.h"
+#include "Ability/AbilityModuleStatics.h"
 #include "Ability/Character/AbilityCharacterDataBase.h"
 #include "Ability/PickUp/AbilityPickUpBase.h"
 #include "Ability/Vitality/AbilityVitalityDataBase.h"
@@ -12,9 +12,9 @@
 #include "Team/DWTeamModule.h"
 #include "Vitality/DWVitality.h"
 #include "Voxel/VoxelModule.h"
-#include "ObjectPool/ObjectPoolModuleBPLibrary.h"
-#include "SaveGame/SaveGameModuleBPLibrary.h"
-#include "Voxel/VoxelModuleBPLibrary.h"
+#include "ObjectPool/ObjectPoolModuleStatics.h"
+#include "SaveGame/SaveGameModuleStatics.h"
+#include "Voxel/VoxelModuleStatics.h"
 
 // Sets default values
 ADWVoxelChunk::ADWVoxelChunk()
@@ -80,7 +80,7 @@ void ADWVoxelChunk::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AAc
 	// 			Debug(FString::Printf(TEXT("%s"), *SweepResult.ImpactPoint.ToString()));
 	// 			Debug(FString::Printf(TEXT("%s"), *SweepResult.ImpactNormal.ToString()));
 	// 			const FVector normal = FVector(FMath::Min((character->GetMoveDirection(false) * 2.5f).X, 1.f), FMath::Min((character->GetMoveDirection(false) * 2.5f).Y, 1.f), FMath::Min((character->GetMoveDirection(false) * 2.5f).Z, 1.f));
-	// 			const FVector point = characterPart->GetComponentLocation() + characterPart->GetScaledCapsuleRadius() * normal + AVoxelModule::Get()->GetWorldData().GetBlockSizedNormal(normal);
+	// 			const FVector point = characterPart->GetComponentLocation() + characterPart->GetScaledCapsuleRadius() * normal + UVoxelModule::Get().GetWorldData().GetBlockSizedNormal(normal);
 	// 			if(FVector::Distance(character->GetLocation(), point) > 100)
 	// 			{
 	// 				Debug(FString::Printf(TEXT("%f"), FVector::Distance(character->GetLocation(), point)));
@@ -113,7 +113,7 @@ void ADWVoxelChunk::OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 	// 		if(ACharacterBase* character = characterPart->GetOwnerCharacter())
 	// 		{
 	// 			const FVector normal = FVector(FMath::Min((character->GetMoveDirection(false) * 2.5f).X, 1.f), FMath::Min((character->GetMoveDirection(false) * 2.5f).Y, 1.f), FMath::Min((character->GetMoveDirection(false) * 2.5f).Z, 1.f));
-	// 			const FVector point = characterPart->GetComponentLocation() - characterPart->GetScaledCapsuleRadius() * normal - AVoxelModule::Get()->GetWorldData().GetBlockSizedNormal(normal);
+	// 			const FVector point = characterPart->GetComponentLocation() - characterPart->GetScaledCapsuleRadius() * normal - UVoxelModule::Get().GetWorldData().GetBlockSizedNormal(normal);
 	// 			UKismetSystemLibrary::DrawDebugBox(this, point, FVector(5), FColor::Red, FRotator::ZeroRotator, 100);
 	// 			const FVoxelItem& voxelItem = GetVoxelItem(LocationToIndex(point));
 	// 			const UVoxelAsset VoxelData = voxelItem.GetData<UVoxelAsset>();
@@ -163,11 +163,11 @@ void ADWVoxelChunk::LoadSceneActors(FSaveData* InSaveData)
 	auto& SaveData = InSaveData->CastRef<FDWVoxelChunkSaveData>();
 	for(auto& Iter : SaveData.VitalityDatas)
 	{
-		UAbilityModuleBPLibrary::SpawnAbilityVitality(&Iter, this);
+		UAbilityModuleStatics::SpawnAbilityVitality(&Iter, this);
 	}
 	for(auto& Iter : SaveData.CharacterDatas)
 	{
-		UAbilityModuleBPLibrary::SpawnAbilityCharacter(&Iter, this);
+		UAbilityModuleStatics::SpawnAbilityCharacter(&Iter, this);
 	}
 }
 
@@ -175,11 +175,11 @@ void ADWVoxelChunk::SpawnSceneActors()
 {
 	Super::SpawnSceneActors();
 
-	const auto& WorldData = AVoxelModule::Get()->GetWorldData();
+	const auto& WorldData = UVoxelModule::Get().GetWorldData();
 	const FVector2D WorldLocation = FVector2D(GetChunkLocation().X + WorldData.GetChunkRealSize().X * 0.5f, GetChunkLocation().Y + WorldData.GetChunkRealSize().Y * 0.5f) / WorldData.BlockSize;
 	
 	TArray<FVitalityRaceData> VitalityRaceDatas;
-	if(UAbilityModuleBPLibrary::GetNoiseRaceDatas(WorldLocation, WorldData.WorldSeed, VitalityRaceDatas))
+	if(UAbilityModuleStatics::GetNoiseRaceDatas(WorldLocation, WorldData.WorldSeed, VitalityRaceDatas))
 	{
 		for(auto& RaceData : VitalityRaceDatas)
 		{
@@ -189,7 +189,7 @@ void ADWVoxelChunk::SpawnSceneActors()
 				const int32 tmpNum = VitalityItem.Count != 0 ? VitalityItem.Count : WorldData.RandomStream.RandRange(VitalityItem.MinCount, VitalityItem.MaxCount);
 				DON(tmpNum,
 					FHitResult HitResult;
-					if(UVoxelModuleBPLibrary::VoxelAgentTraceSingle(Index, VitalityData.Radius, VitalityData.HalfHeight, {}, HitResult, true, 10, false))
+					if(UVoxelModuleStatics::VoxelAgentTraceSingle(Index, VitalityData.Radius, VitalityData.HalfHeight, {}, HitResult, true, 10, false))
 					{
 						auto SaveData = FDWVitalitySaveData();
 						SaveData.AssetID = VitalityData.GetPrimaryAssetId();
@@ -199,14 +199,14 @@ void ADWVoxelChunk::SpawnSceneActors()
 						SaveData.SpawnLocation = HitResult.Location;
 						SaveData.SpawnRotation = FRotator(0.f, FMath::RandRange(0.f, 360.f), 0.f);
 						SaveData.InventoryData = VitalityData.InventoryData;
-						UAbilityModuleBPLibrary::SpawnAbilityVitality(&SaveData, UVoxelModuleBPLibrary::FindChunkByLocation(SaveData.SpawnLocation));
+						UAbilityModuleStatics::SpawnAbilityVitality(&SaveData, UVoxelModuleStatics::FindChunkByLocation(SaveData.SpawnLocation));
 					}
 				)
 			}
 		}
 	}
 	TArray<FCharacterRaceData> CharacterRaceDatas;
-	if(UAbilityModuleBPLibrary::GetNoiseRaceDatas(WorldLocation, WorldData.WorldSeed, CharacterRaceDatas))
+	if(UAbilityModuleStatics::GetNoiseRaceDatas(WorldLocation, WorldData.WorldSeed, CharacterRaceDatas))
 	{
 		for(auto& RaceData : CharacterRaceDatas)
 		{
@@ -217,7 +217,7 @@ void ADWVoxelChunk::SpawnSceneActors()
 				const int32 tmpNum = CharacterItem.Count != 0 ? CharacterItem.Count : WorldData.RandomStream.RandRange(CharacterItem.MinCount, CharacterItem.MaxCount);
 				DON(tmpNum,
 					FHitResult HitResult;
-					if(UVoxelModuleBPLibrary::VoxelAgentTraceSingle(Index, CharacterData.Radius, CharacterData.HalfHeight, {}, HitResult, true, 10, false))
+					if(UVoxelModuleStatics::VoxelAgentTraceSingle(Index, CharacterData.Radius, CharacterData.HalfHeight, {}, HitResult, true, 10, false))
 					{
 						auto SaveData = FDWCharacterSaveData();
 						SaveData.AssetID = CharacterData.GetPrimaryAssetId();
@@ -227,12 +227,12 @@ void ADWVoxelChunk::SpawnSceneActors()
 						SaveData.SpawnLocation = HitResult.Location;
 						SaveData.SpawnRotation = FRotator(0.f, FMath::RandRange(0.f, 360.f), 0.f);
 						SaveData.InventoryData = CharacterData.InventoryData;
-						if(ADWCharacter* Character = Cast<ADWCharacter>(UAbilityModuleBPLibrary::SpawnAbilityCharacter(&SaveData, UVoxelModuleBPLibrary::FindChunkByLocation(SaveData.SpawnLocation))))
+						if(ADWCharacter* Character = Cast<ADWCharacter>(UAbilityModuleStatics::SpawnAbilityCharacter(&SaveData, UVoxelModuleStatics::FindChunkByLocation(SaveData.SpawnLocation))))
 						{
 							if(!Captain)
 							{
 								Captain = Character;
-								ADWTeamModule::Get()->CreateTeam(Captain);
+								UDWTeamModule::Get().CreateTeam(Captain);
 							}
 							else
 							{

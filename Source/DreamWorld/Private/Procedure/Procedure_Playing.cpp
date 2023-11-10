@@ -3,18 +3,18 @@
 
 #include "Procedure/Procedure_Playing.h"
 
-#include "Achievement/AchievementModuleBPLibrary.h"
+#include "Achievement/AchievementModuleStatics.h"
 #include "Camera/CameraModule.h"
-#include "Camera/CameraModuleBPLibrary.h"
+#include "Camera/CameraModuleStatics.h"
 #include "Character/Player/DWPlayerCharacter.h"
-#include "Common/CommonBPLibrary.h"
+#include "Common/CommonStatics.h"
 #include "Main/MainModule.h"
 #include "Procedure/Procedure_Loading.h"
 #include "Procedure/Procedure_Starting.h"
 #include "Scene/SceneModule.h"
 #include "Widget/WidgetContextBox.h"
 #include "Widget/WidgetGameHUD.h"
-#include "Widget/WidgetModuleBPLibrary.h"
+#include "Widget/WidgetModuleStatics.h"
 
 UProcedure_Playing::UProcedure_Playing()
 {
@@ -45,15 +45,15 @@ void UProcedure_Playing::OnEnter(UProcedureBase* InLastProcedure)
 
 	if(InLastProcedure->IsA<UProcedure_Loading>())
 	{
-		AMainModule::UnPauseModuleByClass<ASceneModule>();
-		AMainModule::UnPauseModuleByClass<ACameraModule>();
+		AMainModule::UnPauseModuleByClass<USceneModule>();
+		AMainModule::UnPauseModuleByClass<UCameraModule>();
 
-		ISceneActorInterface::Execute_SetActorVisible(UCommonBPLibrary::GetPlayerPawn<ADWPlayerCharacter>(), true);
+		ISceneActorInterface::Execute_SetActorVisible(UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>(), true);
 
-		UWidgetModuleBPLibrary::OpenUserWidget<UWidgetGameHUD>();
+		UWidgetModuleStatics::OpenUserWidget<UWidgetGameHUD>();
 	}
 
-	UAchievementModuleBPLibrary::UnlockAchievement(FName("FirstPlay"));
+	UAchievementModuleStatics::UnlockAchievement(FName("FirstPlay"));
 }
 
 void UProcedure_Playing::OnRefresh()
@@ -71,6 +71,6 @@ void UProcedure_Playing::OnLeave(UProcedureBase* InNextProcedure)
 	Super::OnLeave(InNextProcedure);
 	if(InNextProcedure->IsA<UProcedure_Starting>())
 	{
-		UWidgetModuleBPLibrary::GetUserWidget<UWidgetContextBox>()->ClearContext();
+		UWidgetModuleStatics::GetUserWidget<UWidgetContextBox>()->ClearContext();
 	}
 }

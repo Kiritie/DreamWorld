@@ -2,14 +2,14 @@
 
 #include "Character/DWCharacter.h"
 
-#include "Achievement/AchievementModuleBPLibrary.h"
-#include "Ability/AbilityModuleBPLibrary.h"
+#include "Achievement/AchievementModuleStatics.h"
+#include "Ability/AbilityModuleStatics.h"
 #include "Ability/Components/DWAbilitySystemComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Ability/Item/Equip/AbilityEquipBase.h"
 #include "AI/DWAIController.h"
 #include "Character/DWCharacterPart.h"
-#include "Common/CommonBPLibrary.h"
+#include "Common/CommonStatics.h"
 #include "Scene/Actor/PhysicsVolume/PhysicsVolumeBase.h"
 #include "Voxel/DWVoxelChunk.h"
 #include "Voxel/VoxelModule.h"
@@ -27,7 +27,7 @@
 #include "Ability/Item/Skill/AbilitySkillDataBase.h"
 #include "Ability/PickUp/AbilityPickUpBase.h"
 #include "AI/DWAIBlackboard.h"
-#include "Asset/AssetModuleBPLibrary.h"
+#include "Asset/AssetModuleStatics.h"
 #include "Character/DWCharacterData.h"
 #include "Character/States/DWCharacterState_Attack.h"
 #include "Character/States/DWCharacterState_Climb.h"
@@ -48,9 +48,9 @@
 #include "FSM/Components/FSMComponent.h"
 #include "Ability/Inventory/Slot/AbilityInventorySkillSlot.h"
 #include "Gameplay/DWGameMode.h"
-#include "Voxel/VoxelModuleBPLibrary.h"
+#include "Voxel/VoxelModuleStatics.h"
 #include "Widget/WidgetMessageBox.h"
-#include "Widget/WidgetModuleBPLibrary.h"
+#include "Widget/WidgetModuleStatics.h"
 #include "Widget/World/WorldWidgetComponent.h"
 #include "Inventory/DWCharacterInventory.h"
 
@@ -176,7 +176,7 @@ void ADWCharacter::OnDespawn_Implementation(bool bRecovery)
 
 	for(auto& Iter : Equips)
 	{
-		UObjectPoolModuleBPLibrary::DespawnObject(Iter.Value);
+		UObjectPoolModuleStatics::DespawnObject(Iter.Value);
 	}
 	Equips.Empty();
 }
@@ -191,7 +191,7 @@ void ADWCharacter::LoadData(FSaveData* InSaveData, EPhase InPhase)
 		{
 			SaveData.InventoryData = SaveData.GetItemData<UDWCharacterData>().InventoryData;
 
-			auto EquipDatas = UAssetModuleBPLibrary::LoadPrimaryAssets<UAbilityEquipDataBase>(FName("Equip"));
+			auto EquipDatas = UAssetModuleStatics::LoadPrimaryAssets<UAbilityEquipDataBase>(FName("Equip"));
 			const int32 EquipNum = FMath::Clamp(FMath::Rand() < 0.2f ? FMath::RandRange(1, 3) : 0, 0, EquipDatas.Num());
 			for (int32 i = 0; i < EquipNum; i++)
 			{
@@ -245,7 +245,7 @@ void ADWCharacter::LoadData(FSaveData* InSaveData, EPhase InPhase)
 			if(CharacterData.IsValid())
 			{
 				TArray<FDWCharacterAttackAbilityData> attackAbilities;
-				UAssetModuleBPLibrary::ReadDataTable(CharacterData.AttackAbilityTable, attackAbilities);
+				UAssetModuleStatics::ReadDataTable(CharacterData.AttackAbilityTable, attackAbilities);
 				for(auto& Iter : attackAbilities)
 				{
 					Iter.AbilityHandle = AbilitySystem->K2_GiveAbility(Iter.AbilityClass, Iter.AbilityLevel);
@@ -254,7 +254,7 @@ void ADWCharacter::LoadData(FSaveData* InSaveData, EPhase InPhase)
 				}
 
 				TArray<FDWCharacterSkillAbilityData> skillAbilities;
-				UAssetModuleBPLibrary::ReadDataTable(CharacterData.SkillAbilityTable, skillAbilities);
+				UAssetModuleStatics::ReadDataTable(CharacterData.SkillAbilityTable, skillAbilities);
 				for(auto& Iter : skillAbilities)
 				{
 					Iter.AbilityHandle = AbilitySystem->K2_GiveAbility(Iter.AbilityClass, Iter.AbilityLevel);
@@ -262,7 +262,7 @@ void ADWCharacter::LoadData(FSaveData* InSaveData, EPhase InPhase)
 				}
 
 				TArray<FDWCharacterActionAbilityData> actionAbilities;
-				UAssetModuleBPLibrary::ReadDataTable(CharacterData.ActionAbilityTable, actionAbilities);
+				UAssetModuleStatics::ReadDataTable(CharacterData.ActionAbilityTable, actionAbilities);
 				for(auto& Iter : actionAbilities)
 				{
 					Iter.AbilityHandle = AbilitySystem->K2_GiveAbility(Iter.AbilityClass, Iter.AbilityLevel);
@@ -383,8 +383,8 @@ void ADWCharacter::OnActiveItem(const FAbilityItem& InItem, bool bPassive, bool 
 		}
 		else if(IsPlayer())
 		{
-			UWidgetModuleBPLibrary::OpenUserWidget<UWidgetMessageBox>({ FString::Printf(TEXT("该%s还未准备好！"),
-				*UCommonBPLibrary::GetEnumValueDisplayName(TEXT("/Script/WHFramework.EAbilityItemType"), (int32)InItem.GetType()).ToString()) });
+			UWidgetModuleStatics::OpenUserWidget<UWidgetMessageBox>({ FString::Printf(TEXT("该%s还未准备好！"),
+				*UCommonStatics::GetEnumValueDisplayName(TEXT("/Script/WHFramework.EAbilityItemType"), (int32)InItem.GetType()).ToString()) });
 		}
 	}
 }
@@ -708,7 +708,7 @@ bool ADWCharacter::OnGenerateVoxel(const FVoxelHitResult& InVoxelHitResult)
 		if(Super::OnGenerateVoxel(InVoxelHitResult))
 		{
 			Inventory->RemoveItemByQueryInfo(ItemQueryInfo);
-			UAchievementModuleBPLibrary::UnlockAchievement(FName("FirstGenerateVoxel"));
+			UAchievementModuleStatics::UnlockAchievement(FName("FirstGenerateVoxel"));
 			return true;
 		}
 	}
@@ -721,7 +721,7 @@ bool ADWCharacter::OnDestroyVoxel(const FVoxelHitResult& InVoxelHitResult)
 	{
 		if(Super::OnDestroyVoxel(InVoxelHitResult))
 		{
-			UAchievementModuleBPLibrary::UnlockAchievement(FName("FirstDestroyVoxel"));
+			UAchievementModuleStatics::UnlockAchievement(FName("FirstDestroyVoxel"));
 			return true;
 		}
 	}
@@ -892,7 +892,7 @@ void ADWCharacter::AddMovementInput(FVector WorldDirection, float ScaleValue, bo
 
 	Super::AddMovementInput(WorldDirection, ScaleValue, bForce);
 
-	if (!IsPlayer() || UCommonBPLibrary::GetGameMode<ADWGameMode>()->IsAutoJump())
+	if (!IsPlayer() || UCommonStatics::GetGameMode<ADWGameMode>()->IsAutoJump())
 	{
 		FHitResult hitResult;
 		if (RaycastStep(hitResult))
@@ -1216,8 +1216,8 @@ void ADWCharacter::ClearAttackHitTargets()
 bool ADWCharacter::RaycastStep(FHitResult& OutHitResult)
 {
 	const FVector rayStart = GetActorLocation() + FVector::DownVector * (GetHalfHeight() - GetCharacterMovement()->MaxStepHeight);
-	const FVector rayEnd = rayStart + GetMoveDirection() * (GetRadius() + AVoxelModule::Get()->GetWorldData().BlockSize * FMath::Clamp(GetMoveDirection().Size() * 0.005f, 0.5f, 1.3f));
-	return UKismetSystemLibrary::LineTraceSingle(this, rayStart, rayEnd, UCommonBPLibrary::GetGameTraceType((ECollisionChannel)EDWGameTraceChannel::Step), false, {}, EDrawDebugTrace::None, OutHitResult, true);
+	const FVector rayEnd = rayStart + GetMoveDirection() * (GetRadius() + UVoxelModule::Get().GetWorldData().BlockSize * FMath::Clamp(GetMoveDirection().Size() * 0.005f, 0.5f, 1.3f));
+	return UKismetSystemLibrary::LineTraceSingle(this, rayStart, rayEnd, UCommonStatics::GetGameTraceType((ECollisionChannel)EDWGameTraceChannel::Step), false, {}, EDrawDebugTrace::None, OutHitResult, true);
 }
 
 bool ADWCharacter::HasAttackAbility(int32 InAbilityIndex) const

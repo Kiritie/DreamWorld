@@ -6,7 +6,7 @@
 #include "Item/Equip/DWEquipData.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/SkeletalMeshComponent.h"
-#include "Common/CommonBPLibrary.h"
+#include "Common/CommonStatics.h"
 #include "Ability/Inventory/AbilityInventoryBase.h"
 #include "Character/DWCharacter.h"
 
@@ -24,7 +24,7 @@ void ADWEquip::OnAssemble_Implementation()
 {
 	Super::OnAssemble_Implementation();
 
-	AttachToComponent(GetOwnerActor<ADWCharacter>()->GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, *UCommonBPLibrary::GetEnumValueAuthoredName(TEXT("/Script/DreamWorld.EDWEquipPartType"), (int32)GetItemData<UDWEquipData>().PartType));
+	AttachToComponent(GetOwnerActor<ADWCharacter>()->GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, *UCommonStatics::GetEnumValueAuthoredName(TEXT("/Script/DreamWorld.EDWEquipPartType"), (int32)GetItemData<UDWEquipData>().PartType));
 }
 
 void ADWEquip::OnDischarge_Implementation()

@@ -2,7 +2,7 @@
 
 
 #include "Item/Skill/Remote/DWSkillRemote.h"
-#include "Audio/AudioModuleBPLibrary.h"
+#include "Audio/AudioModuleStatics.h"
 #include "Kismet/GameplayStatics.h"
 #include "Item/Skill/Remote/DWSkillRemoteData.h"
 
@@ -23,6 +23,6 @@ void ADWSkillRemote::OnHitTarget(AActor* InTarget, const FHitResult& InHitResult
 	Super::OnHitTarget(InTarget, InHitResult);
 
 	const auto& SkillData = GetItemData<UDWSkillRemoteData>();
-	UAudioModuleBPLibrary::PlaySoundAtLocation(SkillData.AttackHitSound, HitLocation);
+	UAudioModuleStatics::PlaySoundAtLocation(SkillData.AttackHitSound, HitLocation);
 	UGameplayStatics::SpawnEmitterAtLocation(this, SkillData.AttackHitEffect, HitLocation);
 }

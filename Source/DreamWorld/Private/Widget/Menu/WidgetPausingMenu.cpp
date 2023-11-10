@@ -3,7 +3,7 @@
 
 #include "Widget/Menu/WidgetPausingMenu.h"
 
-#include "Procedure/ProcedureModuleBPLibrary.h"
+#include "Procedure/ProcedureModuleStatics.h"
 #include "Procedure/Procedure_Pausing.h"
 #include "Procedure/Procedure_Playing.h"
 
@@ -37,9 +37,9 @@ FReply UWidgetPausingMenu::NativeOnKeyDown(const FGeometry& InGeometry, const FK
 {
 	if(InKeyEvent.GetKey() == FKey("Escape"))
 	{
-		if(UProcedureModuleBPLibrary::IsCurrentProcedureClass<UProcedure_Pausing>())
+		if(UProcedureModuleStatics::IsCurrentProcedureClass<UProcedure_Pausing>())
 		{
-			UProcedureModuleBPLibrary::SwitchProcedureByClass<UProcedure_Playing>();
+			UProcedureModuleStatics::SwitchProcedureByClass<UProcedure_Playing>();
 			return FReply::Handled();
 		}
 	}

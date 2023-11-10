@@ -4,12 +4,12 @@
 #include "Widget/Setting/Page/WidgetInputSettingPage.h"
 
 #include "InputMappingContext.h"
-#include "Asset/AssetModuleBPLibrary.h"
+#include "Asset/AssetModuleStatics.h"
 #include "Gameplay/DWGameMode.h"
 #include "Input/DWInputModule.h"
-#include "SaveGame/SaveGameModuleBPLibrary.h"
+#include "SaveGame/SaveGameModuleStatics.h"
 #include "SaveGame/Setting/DWSettingSaveGame.h"
-#include "Widget/WidgetModuleBPLibrary.h"
+#include "Widget/WidgetModuleStatics.h"
 #include "Widget/Setting/Item/WidgetKeySettingItem.h"
 
 class UDWSettingSaveGame;
@@ -30,7 +30,7 @@ void UWidgetInputSettingPage::OnCreate(UObject* InOwner)
 {
 	Super::OnCreate(InOwner);
 
-	for (const auto& Mapping : AInputModule::Get()->GetAllPlayerMappableActionKeyMappings())
+	for (const auto& Mapping : UInputModule::Get().GetAllPlayerMappableActionKeyMappings())
 	{
 		if (Mapping.PlayerMappableOptions.Name != NAME_None && !Mapping.PlayerMappableOptions.DisplayName.IsEmpty())
 		{
@@ -45,7 +45,7 @@ void UWidgetInputSettingPage::OnCreate(UObject* InOwner)
 			}
 			if(!SettingItem)
 			{
-				SettingItem = CreateSubWidget<UWidgetKeySettingItem>({ Mapping.PlayerMappableOptions.DisplayName }, UAssetModuleBPLibrary::GetStaticClass(FName("KeySettingItem")));
+				SettingItem = CreateSubWidget<UWidgetKeySettingItem>({ Mapping.PlayerMappableOptions.DisplayName }, UAssetModuleStatics::GetStaticClass(FName("KeySettingItem")));
 			}
 			AddSettingItem(SettingItem, Mapping.PlayerMappableOptions.DisplayCategory);
 		}
@@ -58,7 +58,7 @@ void UWidgetInputSettingPage::OnOpen(const TArray<FParameter>& InParams, bool bI
 
 	for(auto& Iter1 : SettingItems)
 	{
-		TArray<FEnhancedActionKeyMapping> Mappings = ADWInputModule::Get()->GetAllActionMappingByDisplayName(Iter1->GetLabel());
+		TArray<FEnhancedActionKeyMapping> Mappings = UDWInputModule::Get().GetAllActionMappingByDisplayName(Iter1->GetLabel());
 		TArray<FParameter> Values;
 		for(auto& Iter2 : Mappings)
 		{
@@ -74,13 +74,13 @@ void UWidgetInputSettingPage::OnApply()
 
 	for(auto& Iter : SettingItems)
 	{
-		TArray<FEnhancedActionKeyMapping> Mappings = ADWInputModule::Get()->GetAllActionMappingByDisplayName(Iter->GetLabel());
+		TArray<FEnhancedActionKeyMapping> Mappings = UDWInputModule::Get().GetAllActionMappingByDisplayName(Iter->GetLabel());
 		TArray<FParameter> Values = Iter->GetValues();
 		for(int32 i = 0; i < Values.Num(); i++)
 		{
 			if(*Values[i].GetStringValue() != Mappings[i].Key)
 			{
-				AInputModule::Get()->AddOrUpdateCustomKeyboardBindings(Mappings[i].PlayerMappableOptions.Name, *Values[i].GetStringValue(), GetOwningLocalPlayer()->GetLocalPlayerIndex());
+				UInputModule::Get().AddOrUpdateCustomKeyboardBindings(Mappings[i].PlayerMappableOptions.Name, *Values[i].GetStringValue(), GetOwningLocalPlayer()->GetLocalPlayerIndex());
 			}
 		}
 	}
@@ -119,7 +119,7 @@ bool UWidgetInputSettingPage::CanApply_Implementation() const
 {
 	for(auto& Iter : SettingItems)
 	{
-		TArray<FEnhancedActionKeyMapping> Mappings = ADWInputModule::Get()->GetAllActionMappingByDisplayName(Iter->GetLabel());
+		TArray<FEnhancedActionKeyMapping> Mappings = UDWInputModule::Get().GetAllActionMappingByDisplayName(Iter->GetLabel());
 		TArray<FParameter> Values = Iter->GetValues();
 		for(int32 i = 0; i < Values.Num(); i++)
 		{
@@ -136,7 +136,7 @@ bool UWidgetInputSettingPage::CanReset_Implementation() const
 {
 	for(auto& Iter : SettingItems)
 	{
-		TArray<FEnhancedActionKeyMapping> Mappings1 = ADWInputModule::Get()->GetAllActionMappingByDisplayName(Iter->GetLabel());
+		TArray<FEnhancedActionKeyMapping> Mappings1 = UDWInputModule::Get().GetAllActionMappingByDisplayName(Iter->GetLabel());
 		TArray<FEnhancedActionKeyMapping> Mappings2 = GetDefaultInputData().GetAllActionMappingByDisplayName(Iter->GetLabel());
 		for(int32 i = 0; i < Mappings1.Num(); i++)
 		{
@@ -151,5 +151,5 @@ bool UWidgetInputSettingPage::CanReset_Implementation() const
 
 FDWInputModuleSaveData& UWidgetInputSettingPage::GetDefaultInputData() const
 {
-	return USaveGameModuleBPLibrary::GetSaveGame<UDWSettingSaveGame>()->GetDefaultDataRef<FDWSettingSaveData>().InputData;
+	return USaveGameModuleStatics::GetSaveGame<UDWSettingSaveGame>()->GetDefaultDataRef<FDWSettingSaveData>().InputData;
 }

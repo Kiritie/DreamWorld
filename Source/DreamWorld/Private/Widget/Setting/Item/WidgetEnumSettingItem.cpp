@@ -3,9 +3,9 @@
 
 #include "Widget/Setting/Item/WidgetEnumSettingItem.h"
 
-#include "Common/CommonBPLibrary.h"
+#include "Common/CommonStatics.h"
 #include "Components/ComboBoxString.h"
-#include "Widget/WidgetModuleBPLibrary.h"
+#include "Widget/WidgetModuleStatics.h"
 
 UWidgetEnumSettingItem::UWidgetEnumSettingItem(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -48,9 +48,9 @@ void UWidgetEnumSettingItem::OnInitialize(const TArray<FParameter>& InParams)
 	
 	if(!EnumName.IsEmpty())
 	{
-		for(int32 i = 0; i < (EnumMaxNum != -1 ? EnumMaxNum : UCommonBPLibrary::GetEnumItemNum(EnumName)); i++)
+		for(int32 i = 0; i < (EnumMaxNum != -1 ? EnumMaxNum : UCommonStatics::GetEnumItemNum(EnumName)); i++)
 		{
-			ComboBox_Value->AddOption(UCommonBPLibrary::GetEnumValueDisplayName(EnumName, i).ToString());
+			ComboBox_Value->AddOption(UCommonStatics::GetEnumValueDisplayName(EnumName, i).ToString());
 		}
 	}
 }

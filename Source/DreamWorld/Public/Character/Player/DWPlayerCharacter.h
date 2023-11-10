@@ -26,7 +26,7 @@ class DREAMWORLD_API ADWPlayerCharacter : public ADWHumanCharacter
 	GENERATED_BODY()
 	
 	friend class ADWPlayerController;
-	friend class ADWInputModule;
+	friend class UDWInputModule;
 
 	friend class UDWPlayerCharacterState_Attack;
 	friend class UDWPlayerCharacterState_Death;

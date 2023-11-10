@@ -2,74 +2,76 @@
 
 
 #include "Character/DWCharacterModule.h"
-#include "Asset/AssetModuleBPLibrary.h"
+#include "Asset/AssetModuleStatics.h"
 #include "Character/Player/DWPlayerCharacterData.h"
 
-IMPLEMENTATION_MODULE(ADWCharacterModule)
+IMPLEMENTATION_MODULE(UDWCharacterModule)
 
 // ParamSets default values
-ADWCharacterModule::ADWCharacterModule()
+UDWCharacterModule::UDWCharacterModule()
 {
 	PlayerBasicData = FDWPlayerBasicSaveData();
 }
 
-ADWCharacterModule::~ADWCharacterModule()
+UDWCharacterModule::~UDWCharacterModule()
 {
-	TERMINATION_MODULE(ADWCharacterModule)
+	TERMINATION_MODULE(UDWCharacterModule)
 }
 
 #if WITH_EDITOR
-void ADWCharacterModule::OnGenerate()
+void UDWCharacterModule::OnGenerate()
 {
 	Super::OnGenerate();
 }
 
-void ADWCharacterModule::OnDestroy()
+void UDWCharacterModule::OnDestroy()
 {
 	Super::OnDestroy();
+
+	TERMINATION_MODULE(UDWCharacterModule)
 }
 #endif
 
-void ADWCharacterModule::OnInitialize_Implementation()
+void UDWCharacterModule::OnInitialize()
 {
-	Super::OnInitialize_Implementation();
+	Super::OnInitialize();
 }
 
-void ADWCharacterModule::OnPreparatory_Implementation(EPhase InPhase)
+void UDWCharacterModule::OnPreparatory(EPhase InPhase)
 {
-	Super::OnPreparatory_Implementation(InPhase);
+	Super::OnPreparatory(InPhase);
 }
 
-void ADWCharacterModule::OnRefresh_Implementation(float DeltaSeconds)
+void UDWCharacterModule::OnRefresh(float DeltaSeconds)
 {
-	Super::OnRefresh_Implementation(DeltaSeconds);
+	Super::OnRefresh(DeltaSeconds);
 }
 
-void ADWCharacterModule::OnPause_Implementation()
+void UDWCharacterModule::OnPause()
 {
-	Super::OnPause_Implementation();
+	Super::OnPause();
 }
 
-void ADWCharacterModule::OnUnPause_Implementation()
+void UDWCharacterModule::OnUnPause()
 {
-	Super::OnUnPause_Implementation();
+	Super::OnUnPause();
 }
 
-void ADWCharacterModule::OnTermination_Implementation(EPhase InPhase)
+void UDWCharacterModule::OnTermination(EPhase InPhase)
 {
-	Super::OnTermination_Implementation(InPhase);
+	Super::OnTermination(InPhase);
 }
 
-FDWPlayerBasicSaveData& ADWCharacterModule::GetPlayerBasicData()
+FDWPlayerBasicSaveData& UDWCharacterModule::GetPlayerBasicData()
 {
 	FPlayerRaceData PlayerRaceData;
-	UAssetModuleBPLibrary::GetDataTableRow(0, PlayerRaceData);
+	UAssetModuleStatics::GetDataTableRow(0, PlayerRaceData);
 	PlayerBasicData.RaceID = PlayerRaceData.ID;
 	if(PlayerRaceData.Items.Num() > 0)
 	{
 		PlayerBasicData.AssetID = PlayerRaceData.Items[0].ID;
 		PlayerBasicData.Level = PlayerRaceData.Items[0].Level;
 	}
-	PlayerBasicData.InventoryData = UAssetModuleBPLibrary::LoadPrimaryAssetRef<UDWPlayerCharacterData>(PlayerBasicData.AssetID).InventoryData;
+	PlayerBasicData.InventoryData = UAssetModuleStatics::LoadPrimaryAssetRef<UDWPlayerCharacterData>(PlayerBasicData.AssetID).InventoryData;
 	return PlayerBasicData;
 }

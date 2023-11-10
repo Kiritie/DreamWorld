@@ -3,68 +3,70 @@
 
 #include "SaveGame/DWSaveGameModule.h"
 
-#include "SaveGame/SaveGameModuleBPLibrary.h"
+#include "SaveGame/SaveGameModuleStatics.h"
 	
-IMPLEMENTATION_MODULE(ADWSaveGameModule)
+IMPLEMENTATION_MODULE(UDWSaveGameModule)
 
 // ParamSets default values
-ADWSaveGameModule::ADWSaveGameModule()
+UDWSaveGameModule::UDWSaveGameModule()
 {
 }
 
-ADWSaveGameModule::~ADWSaveGameModule()
+UDWSaveGameModule::~UDWSaveGameModule()
 {
-	TERMINATION_MODULE(ADWSaveGameModule)
+	TERMINATION_MODULE(UDWSaveGameModule)
 }
 
 #if WITH_EDITOR
-void ADWSaveGameModule::OnGenerate()
+void UDWSaveGameModule::OnGenerate()
 {
 	Super::OnGenerate();
 }
 
-void ADWSaveGameModule::OnDestroy()
+void UDWSaveGameModule::OnDestroy()
 {
 	Super::OnDestroy();
+
+	TERMINATION_MODULE(UDWSaveGameModule)
 }
 #endif
 
-void ADWSaveGameModule::OnInitialize_Implementation()
+void UDWSaveGameModule::OnInitialize()
 {
-	Super::OnInitialize_Implementation();
+	Super::OnInitialize();
 }
 
-void ADWSaveGameModule::OnPreparatory_Implementation(EPhase InPhase)
+void UDWSaveGameModule::OnPreparatory(EPhase InPhase)
 {
-	Super::OnPreparatory_Implementation(InPhase);
+	Super::OnPreparatory(InPhase);
 }
 
-void ADWSaveGameModule::OnRefresh_Implementation(float DeltaSeconds)
+void UDWSaveGameModule::OnRefresh(float DeltaSeconds)
 {
-	Super::OnRefresh_Implementation(DeltaSeconds);
+	Super::OnRefresh(DeltaSeconds);
 }
 
-void ADWSaveGameModule::OnPause_Implementation()
+void UDWSaveGameModule::OnPause()
 {
-	Super::OnPause_Implementation();
+	Super::OnPause();
 }
 
-void ADWSaveGameModule::OnUnPause_Implementation()
+void UDWSaveGameModule::OnUnPause()
 {
-	Super::OnUnPause_Implementation();
+	Super::OnUnPause();
 }
 
-void ADWSaveGameModule::OnTermination_Implementation(EPhase InPhase)
+void UDWSaveGameModule::OnTermination(EPhase InPhase)
 {
-	Super::OnTermination_Implementation(InPhase);
+	Super::OnTermination(InPhase);
 }
 
-void ADWSaveGameModule::LoadData(FSaveData* InSaveData, EPhase InPhase)
+void UDWSaveGameModule::LoadData(FSaveData* InSaveData, EPhase InPhase)
 {
 	Super::LoadData(InSaveData, InPhase);
 }
 
-FSaveData* ADWSaveGameModule::ToData()
+FSaveData* UDWSaveGameModule::ToData()
 {
 	return Super::ToData();
 }

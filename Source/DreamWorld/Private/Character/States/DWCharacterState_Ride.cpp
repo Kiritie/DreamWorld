@@ -2,12 +2,12 @@
 
 #include "Character/States/DWCharacterState_Ride.h"
 
-#include "Character/CharacterModuleBPLibrary.h"
+#include "Character/CharacterModuleStatics.h"
 #include "Character/DWCharacter.h"
 #include "Character/DWCharacterData.h"
 #include "Components/CapsuleComponent.h"
 #include "Voxel/VoxelModule.h"
-#include "Voxel/VoxelModuleBPLibrary.h"
+#include "Voxel/VoxelModuleStatics.h"
 
 UDWCharacterState_Ride::UDWCharacterState_Ride()
 {
@@ -38,7 +38,7 @@ void UDWCharacterState_Ride::OnEnter(UFiniteStateBase* InLastFiniteState)
 
 	Character->GetAbilitySystemComponent()->AddLooseGameplayTag(GameplayTags::StateTag_Character_Riding);
 
-	UCharacterModuleBPLibrary::SwitchCharacter(RidingTarget);
+	UCharacterModuleStatics::SwitchCharacter(RidingTarget);
 	Character->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	Character->AttachToComponent(RidingTarget->GetMesh(), FAttachmentTransformRules::KeepWorldTransform, FName("RiderPoint"));
 	Character->SetActorRelativeLocation(FVector::ZeroVector);
@@ -67,12 +67,12 @@ void UDWCharacterState_Ride::OnLeave(UFiniteStateBase* InNextFiniteState)
 	Character->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 	if(RidingTarget)
 	{
-		UCharacterModuleBPLibrary::SwitchCharacter(Character);
+		UCharacterModuleStatics::SwitchCharacter(Character);
 		FHitResult hitResult;
 		const FVector offset = Character->GetActorRightVector() * (Character->GetRadius() + RidingTarget->GetRadius());
-		const FVector rayStart = FVector(Character->GetActorLocation().X, Character->GetActorLocation().Y, AVoxelModule::Get()->GetWorldData().GetWorldRealSize().Z) + offset;
+		const FVector rayStart = FVector(Character->GetActorLocation().X, Character->GetActorLocation().Y, UVoxelModule::Get().GetWorldData().GetWorldRealSize().Z) + offset;
 		const FVector rayEnd = FVector(Character->GetActorLocation().X, Character->GetActorLocation().Y, 0) + offset;
-		if (UVoxelModuleBPLibrary::VoxelAgentTraceSingle(rayStart, rayEnd, Character->GetRadius(), Character->GetHalfHeight(), {}, hitResult))
+		if (UVoxelModuleStatics::VoxelAgentTraceSingle(rayStart, rayEnd, Character->GetRadius(), Character->GetHalfHeight(), {}, hitResult))
 		{
 			Character->SetActorLocation(hitResult.Location);
 		}

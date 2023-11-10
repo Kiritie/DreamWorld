@@ -3,11 +3,11 @@
 
 #include "Procedure/Procedure_Pausing.h"
 
-#include "Common/CommonBPLibrary.h"
-#include "Main/MainModuleBPLibrary.h"
+#include "Common/CommonStatics.h"
+#include "Main/MainModuleStatics.h"
 #include "Procedure/Procedure_Starting.h"
 #include "Widget/WidgetGameHUD.h"
-#include "Widget/WidgetModuleBPLibrary.h"
+#include "Widget/WidgetModuleStatics.h"
 #include "Widget/Inventory/WidgetInventoryBar.h"
 #include "Widget/Menu/WidgetPausingMenu.h"
 
@@ -39,9 +39,9 @@ void UProcedure_Pausing::OnEnter(UProcedureBase* InLastProcedure)
 	Super::OnEnter(InLastProcedure);
 
 	UGameplayStatics::SetGamePaused(this, true);
-	UMainModuleBPLibrary::PauseAllModule();
+	UMainModuleStatics::PauseAllModule();
 
-	UWidgetModuleBPLibrary::OpenUserWidget<UWidgetPausingMenu>();
+	UWidgetModuleStatics::OpenUserWidget<UWidgetPausingMenu>();
 }
 
 void UProcedure_Pausing::OnRefresh()
@@ -59,13 +59,13 @@ void UProcedure_Pausing::OnLeave(UProcedureBase* InNextProcedure)
 	Super::OnLeave(InNextProcedure);
 
 	UGameplayStatics::SetGamePaused(this, false);
-	UMainModuleBPLibrary::UnPauseAllModule();
+	UMainModuleStatics::UnPauseAllModule();
 
 	if(InNextProcedure->IsA<UProcedure_Starting>())
 	{
-		UWidgetModuleBPLibrary::CloseUserWidget<UWidgetGameHUD>();
-		UWidgetModuleBPLibrary::CloseUserWidget<UWidgetInventoryBar>();
+		UWidgetModuleStatics::CloseUserWidget<UWidgetGameHUD>();
+		UWidgetModuleStatics::CloseUserWidget<UWidgetInventoryBar>();
 	}
 
-	UWidgetModuleBPLibrary::CloseUserWidget<UWidgetPausingMenu>();
+	UWidgetModuleStatics::CloseUserWidget<UWidgetPausingMenu>();
 }

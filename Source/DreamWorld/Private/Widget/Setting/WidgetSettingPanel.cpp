@@ -4,7 +4,7 @@
 #include "Widget/Setting/WidgetSettingPanel.h"
 
 #include "Components/TextBlock.h"
-#include "Widget/WidgetModuleBPLibrary.h"
+#include "Widget/WidgetModuleStatics.h"
 #include "Widget/Setting/Page/WidgetSettingPageBase.h"
 
 UWidgetSettingPanel::UWidgetSettingPanel(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)

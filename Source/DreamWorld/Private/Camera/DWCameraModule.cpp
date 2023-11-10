@@ -4,13 +4,13 @@
 #include "Camera/DWCameraModule.h"
 
 #include "Common/DWCommonTypes.h"
-#include "Procedure/ProcedureModuleBPLibrary.h"
-#include "SaveGame/SaveGameModuleBPLibrary.h"
+#include "Procedure/ProcedureModuleStatics.h"
+#include "SaveGame/SaveGameModuleStatics.h"
 	
-IMPLEMENTATION_MODULE(ADWCameraModule)
+IMPLEMENTATION_MODULE(UDWCameraModule)
 
 // ParamSets default values
-ADWCameraModule::ADWCameraModule()
+UDWCameraModule::UDWCameraModule()
 {
 	bCameraMoveControlAble = false;
 	CameraMoveSpeed = 6.f;
@@ -20,61 +20,63 @@ ADWCameraModule::ADWCameraModule()
 	MaxCameraDistance = 350.f;
 }
 
-ADWCameraModule::~ADWCameraModule()
+UDWCameraModule::~UDWCameraModule()
 {
-	TERMINATION_MODULE(ADWCameraModule)
+	TERMINATION_MODULE(UDWCameraModule)
 }
 
 #if WITH_EDITOR
-void ADWCameraModule::OnGenerate()
+void UDWCameraModule::OnGenerate()
 {
 	Super::OnGenerate();
 }
 
-void ADWCameraModule::OnDestroy()
+void UDWCameraModule::OnDestroy()
 {
 	Super::OnDestroy();
+
+	TERMINATION_MODULE(UDWCameraModule)
 }
 #endif
 
-void ADWCameraModule::OnInitialize_Implementation()
+void UDWCameraModule::OnInitialize()
 {
-	Super::OnInitialize_Implementation();
+	Super::OnInitialize();
 }
 
-void ADWCameraModule::OnPreparatory_Implementation(EPhase InPhase)
+void UDWCameraModule::OnPreparatory(EPhase InPhase)
 {
-	Super::OnPreparatory_Implementation(InPhase);
+	Super::OnPreparatory(InPhase);
 }
 
-void ADWCameraModule::OnRefresh_Implementation(float DeltaSeconds)
+void UDWCameraModule::OnRefresh(float DeltaSeconds)
 {
-	Super::OnRefresh_Implementation(DeltaSeconds);
+	Super::OnRefresh(DeltaSeconds);
 }
 
-void ADWCameraModule::OnPause_Implementation()
+void UDWCameraModule::OnPause()
 {
-	Super::OnPause_Implementation();
+	Super::OnPause();
 }
 
-void ADWCameraModule::OnUnPause_Implementation()
+void UDWCameraModule::OnUnPause()
 {
-	Super::OnUnPause_Implementation();
+	Super::OnUnPause();
 }
 
-void ADWCameraModule::LoadData(FSaveData* InSaveData, EPhase InPhase)
+void UDWCameraModule::LoadData(FSaveData* InSaveData, EPhase InPhase)
 {
 	Super::LoadData(InSaveData, InPhase);
 
 	const auto& SaveData = InSaveData->CastRef<FDWCameraModuleSaveData>();
 }
 
-void ADWCameraModule::UnloadData(EPhase InPhase)
+void UDWCameraModule::UnloadData(EPhase InPhase)
 {
 	Super::UnloadData(InPhase);
 }
 
-FSaveData* ADWCameraModule::ToData()
+FSaveData* UDWCameraModule::ToData()
 {
 	static FDWCameraModuleSaveData SaveData;
 	SaveData = Super::ToData()->CastRef<FCameraModuleSaveData>();

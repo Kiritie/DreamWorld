@@ -4,9 +4,9 @@
 #include "Task/Voxel/Task_GenerateVoxel.h"
 
 #include "TimerManager.h"
-#include "Event/EventModuleBPLibrary.h"
+#include "Event/EventModuleStatics.h"
 #include "Event/Handle/Voxel/EventHandle_GenerateVoxel.h"
-#include "Common/CommonBPLibrary.h"
+#include "Common/CommonStatics.h"
 
 UTask_GenerateVoxel::UTask_GenerateVoxel()
 {
@@ -60,21 +60,21 @@ void UTask_GenerateVoxel::OnExecute()
 {
 	Super::OnExecute();
 
-	UEventModuleBPLibrary::SubscribeEvent<UEventHandle_GenerateVoxel>(this, FName("OnGenerateVoxel"));
+	UEventModuleStatics::SubscribeEvent<UEventHandle_GenerateVoxel>(this, FName("OnGenerateVoxel"));
 }
 
 void UTask_GenerateVoxel::OnComplete(ETaskExecuteResult InTaskExecuteResult)
 {
 	Super::OnComplete(InTaskExecuteResult);
 
-	UEventModuleBPLibrary::UnsubscribeEvent<UEventHandle_GenerateVoxel>(this, FName("OnGenerateVoxel"));
+	UEventModuleStatics::UnsubscribeEvent<UEventHandle_GenerateVoxel>(this, FName("OnGenerateVoxel"));
 }
 
 void UTask_GenerateVoxel::OnLeave()
 {
 	Super::OnLeave();
 
-	UEventModuleBPLibrary::UnsubscribeEvent<UEventHandle_GenerateVoxel>(this, FName("OnGenerateVoxel"));
+	UEventModuleStatics::UnsubscribeEvent<UEventHandle_GenerateVoxel>(this, FName("OnGenerateVoxel"));
 }
 
 void UTask_GenerateVoxel::Serialize(FArchive& Ar)

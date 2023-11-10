@@ -1,6 +1,6 @@
 #include "Vitality/DWVitalityData.h"
 
-#include "Ability/AbilityModuleBPLibrary.h"
+#include "Ability/AbilityModuleStatics.h"
 
 UDWVitalityData::UDWVitalityData()
 {

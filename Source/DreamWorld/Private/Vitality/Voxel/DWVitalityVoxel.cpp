@@ -3,7 +3,7 @@
 
 #include "Vitality/Voxel/DWVitalityVoxel.h"
 
-#include "Asset/AssetModuleBPLibrary.h"
+#include "Asset/AssetModuleStatics.h"
 #include "Components/BoxComponent.h"
 #include "Common/DWCommonTypes.h"
 #include "Vitality/Voxel/DWVitalityVoxelData.h"
@@ -37,7 +37,7 @@ void ADWVitalityVoxel::LoadData(FSaveData* InSaveData, EPhase InPhase)
 		{
 			VoxelMesh->CreateVoxel(VoxelID);
 			const FVector Range = GetVoxelData().GetRange();
-			BoxComponent->SetBoxExtent(Range * AVoxelModule::Get()->GetWorldData().BlockSize * 0.5f);
+			BoxComponent->SetBoxExtent(Range * UVoxelModule::Get().GetWorldData().BlockSize * 0.5f);
 		}
 	}
 
@@ -50,5 +50,5 @@ FSaveData* ADWVitalityVoxel::ToData()
 
 UVoxelData& ADWVitalityVoxel::GetVoxelData() const
 {
-	return UAssetModuleBPLibrary::LoadPrimaryAssetRef<UVoxelData>(VoxelID);
+	return UAssetModuleStatics::LoadPrimaryAssetRef<UVoxelData>(VoxelID);
 }

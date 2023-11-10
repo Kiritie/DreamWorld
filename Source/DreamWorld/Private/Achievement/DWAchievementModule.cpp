@@ -4,71 +4,73 @@
 #include "Achievement/DWAchievementModule.h"
 
 #include "Common/DWCommonTypes.h"
-#include "Procedure/ProcedureModuleBPLibrary.h"
-#include "SaveGame/SaveGameModuleBPLibrary.h"
+#include "Procedure/ProcedureModuleStatics.h"
+#include "SaveGame/SaveGameModuleStatics.h"
 	
-IMPLEMENTATION_MODULE(ADWAchievementModule)
+IMPLEMENTATION_MODULE(UDWAchievementModule)
 
 // ParamSets default values
-ADWAchievementModule::ADWAchievementModule()
+UDWAchievementModule::UDWAchievementModule()
 {
 }
 
-ADWAchievementModule::~ADWAchievementModule()
+UDWAchievementModule::~UDWAchievementModule()
 {
-	TERMINATION_MODULE(ADWAchievementModule)
+	TERMINATION_MODULE(UDWAchievementModule)
 }
 
 #if WITH_EDITOR
-void ADWAchievementModule::OnGenerate()
+void UDWAchievementModule::OnGenerate()
 {
 	Super::OnGenerate();
 }
 
-void ADWAchievementModule::OnDestroy()
+void UDWAchievementModule::OnDestroy()
 {
 	Super::OnDestroy();
+
+	TERMINATION_MODULE(UDWAchievementModule)
 }
 #endif
 
-void ADWAchievementModule::OnInitialize_Implementation()
+void UDWAchievementModule::OnInitialize()
 {
-	Super::OnInitialize_Implementation();
+	Super::OnInitialize();
 }
 
-void ADWAchievementModule::OnPreparatory_Implementation(EPhase InPhase)
+void UDWAchievementModule::OnPreparatory(EPhase InPhase)
 {
-	Super::OnPreparatory_Implementation(InPhase);
+	Super::OnPreparatory(InPhase);
 }
 
-void ADWAchievementModule::OnRefresh_Implementation(float DeltaSeconds)
+void UDWAchievementModule::OnRefresh(float DeltaSeconds)
 {
-	Super::OnRefresh_Implementation(DeltaSeconds);
+	Super::OnRefresh(DeltaSeconds);
 }
 
-void ADWAchievementModule::OnPause_Implementation()
+void UDWAchievementModule::OnPause()
 {
-	Super::OnPause_Implementation();
+	Super::OnPause();
 }
 
-void ADWAchievementModule::OnUnPause_Implementation()
+void UDWAchievementModule::OnUnPause()
 {
-	Super::OnUnPause_Implementation();
+	Super::OnUnPause();
 }
 
-void ADWAchievementModule::LoadData(FSaveData* InSaveData, EPhase InPhase)
+void UDWAchievementModule::LoadData(FSaveData* InSaveData, EPhase InPhase)
 {
 	Super::LoadData(InSaveData, InPhase);
 
 	const auto& SaveData = InSaveData->CastRef<FDWAchievementModuleSaveData>();
 }
 
-void ADWAchievementModule::UnloadData(EPhase InPhase)
+void UDWAchievementModule::UnloadData(EPhase InPhase)
 {
 	Super::UnloadData(InPhase);
 }
 
-FSaveData* ADWAchievementModule::ToData()
+FSaveData* UDWAchievementModule::ToData()
 {
 	static FDWAchievementModuleSaveData SaveData;
 	SaveData = Super::ToData()->CastRef<FAchievementModuleSaveData>();

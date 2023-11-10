@@ -4,7 +4,7 @@
 #include "Widget/Setting/Item/WidgetKeySettingItem.h"
 
 #include "CommonButtonBase.h"
-#include "Widget/WidgetModuleBPLibrary.h"
+#include "Widget/WidgetModuleStatics.h"
 #include "Widget/Common/WidgetButtonBase.h"
 #include "Widget/Setting/Misc/WidgetPressAnyKeyPanel.h"
 #include "Widget/Setting/Page/WidgetInputSettingPage.h"
@@ -50,7 +50,7 @@ void UWidgetKeySettingItem::OnDestroy()
 
 void UWidgetKeySettingItem::OnValueButtonClicked(int32 InIndex)
 {
-	UWidgetPressAnyKeyPanel* PressAnyKeyPanel = UWidgetModuleBPLibrary::CreateUserWidget<UWidgetPressAnyKeyPanel>();
+	UWidgetPressAnyKeyPanel* PressAnyKeyPanel = UWidgetModuleStatics::CreateUserWidget<UWidgetPressAnyKeyPanel>();
 	PressAnyKeyPanel->OnKeySelected.AddUObject(this, &ThisClass::OnKeySelected, PressAnyKeyPanel);
 	PressAnyKeyPanel->OnKeySelectionCanceled.AddUObject(this, &ThisClass::OnKeySelectionCanceled, PressAnyKeyPanel);
 	PressAnyKeyPanel->Open({ InIndex });

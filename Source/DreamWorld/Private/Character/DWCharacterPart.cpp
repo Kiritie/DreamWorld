@@ -81,7 +81,7 @@ void UDWCharacterPart::OnExitVoxel(UVoxel& InVoxel, const FVoxelHitResult& InHit
 				{
 					if(!InHitResult.IsValid() || InHitResult.VoxelItem.GetVoxelType() != EVoxelType::Water)
 					{
-						OwnerCharacter->Float(InVoxel.GetOwner()->IndexToLocation(InVoxel.GetIndex()).Z + AVoxelModule::Get()->GetWorldData().BlockSize);
+						OwnerCharacter->Float(InVoxel.GetOwner()->IndexToLocation(InVoxel.GetIndex()).Z + UVoxelModule::Get().GetWorldData().BlockSize);
 					}
 					else if(InHitResult.VoxelItem.GetVoxelType() == EVoxelType::Water)
 					{

@@ -4,18 +4,18 @@
 #include "Gameplay/DWPlayerController.h"
 
 #include "Ability/Character/AbilityCharacterDataBase.h"
-#include "Camera/CameraModuleBPLibrary.h"
+#include "Camera/CameraModuleStatics.h"
 #include "Character/Player/DWPlayerCharacter.h"
 #include "Character/DWCharacterData.h"
-#include "Common/CommonBPLibrary.h"
-#include "Procedure/ProcedureModuleBPLibrary.h"
-#include "SaveGame/SaveGameModuleBPLibrary.h"
+#include "Common/CommonStatics.h"
+#include "Procedure/ProcedureModuleStatics.h"
+#include "SaveGame/SaveGameModuleStatics.h"
 #include "Voxel/VoxelModule.h"
-#include "Widget/WidgetModuleBPLibrary.h"
-#include "ObjectPool/ObjectPoolModuleBPLibrary.h"
+#include "Widget/WidgetModuleStatics.h"
+#include "ObjectPool/ObjectPoolModuleStatics.h"
 #include "Voxel/Chunks/VoxelChunk.h"
 #include "Procedure/Archive/Procedure_ArchiveCreating.h"
-#include "Character/CharacterModuleBPLibrary.h"
+#include "Character/CharacterModuleStatics.h"
 #include "Main/MainModule.h"
 
 ADWPlayerController::ADWPlayerController()
@@ -63,11 +63,11 @@ void ADWPlayerController::LoadData(FSaveData* InSaveData, EPhase InPhase)
 		if(bNeedSpawn)
 		{
 			UnloadData(InPhase);
-			PlayerCharacter = UObjectPoolModuleBPLibrary::SpawnObject<ADWPlayerCharacter>({ &SaveData.ActorID, &SaveData.AssetID }, SaveData.GetItemData<UDWCharacterData>().Class);
+			PlayerCharacter = UObjectPoolModuleStatics::SpawnObject<ADWPlayerCharacter>({ &SaveData.ActorID, &SaveData.AssetID }, SaveData.GetItemData<UDWCharacterData>().Class);
 			if(PlayerCharacter)
 			{
 				SetPlayerPawn(PlayerCharacter);
-				PlayerCharacter->Execute_SetActorVisible(PlayerCharacter, UProcedureModuleBPLibrary::IsCurrentProcedureClass<UProcedure_ArchiveCreating>());
+				PlayerCharacter->Execute_SetActorVisible(PlayerCharacter, UProcedureModuleStatics::IsCurrentProcedureClass<UProcedure_ArchiveCreating>());
 			}
 		}
 	}
@@ -80,12 +80,12 @@ void ADWPlayerController::LoadData(FSaveData* InSaveData, EPhase InPhase)
 	}
 	if(PHASEC(InPhase, EPhase::Final))
 	{
-		UCharacterModuleBPLibrary::SwitchCharacter(PlayerCharacter, true, true);
+		UCharacterModuleStatics::SwitchCharacter(PlayerCharacter, true, true);
 		if(SaveData.IsSaved())
 		{
-			UCameraModuleBPLibrary::SetCameraRotation(SaveData.CameraRotation.Yaw, SaveData.CameraRotation.Pitch, true);
+			UCameraModuleStatics::SetCameraRotation(SaveData.CameraRotation.Yaw, SaveData.CameraRotation.Pitch, true);
 		}
-		UCameraModuleBPLibrary::SetCameraDistance(SaveData.CameraDistance, true);
+		UCameraModuleStatics::SetCameraDistance(SaveData.CameraDistance, true);
 	}
 }
 
@@ -102,7 +102,7 @@ void ADWPlayerController::UnloadData(EPhase InPhase)
 	{
 		if(PHASEC(InPhase, EPhase::Primary))
 		{
-			UObjectPoolModuleBPLibrary::DespawnObject(PlayerCharacter);
+			UObjectPoolModuleStatics::DespawnObject(PlayerCharacter);
 			SetPlayerPawn(nullptr);
 		}
 		if(PHASEC(InPhase, EPhase::Lesser))
@@ -121,7 +121,7 @@ void ADWPlayerController::OnUnPossess()
 {
 	Super::OnUnPossess();
 
-	AMainModule::ResetModuleByClass<AInputModule>();
+	AMainModule::ResetModuleByClass<UInputModule>();
 }
 
 void ADWPlayerController::SetPlayerPawn(APawn* InPlayerPawn)

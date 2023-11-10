@@ -4,16 +4,16 @@
 #include "Voxel/DWVoxelModule.h"
 
 #include "Components/StaticMeshComponent.h"
-#include "Common/CommonBPLibrary.h"
+#include "Common/CommonStatics.h"
 #include "Voxel/DWVoxelChunk.h"
-#include "Voxel/VoxelModuleBPLibrary.h"
+#include "Voxel/VoxelModuleStatics.h"
 #include "Widget/WidgetGameHUD.h"
-#include "SaveGame/SaveGameModuleBPLibrary.h"
+#include "SaveGame/SaveGameModuleStatics.h"
 	
-IMPLEMENTATION_MODULE(ADWVoxelModule)
+IMPLEMENTATION_MODULE(UDWVoxelModule)
 
 // Sets default values
-ADWVoxelModule::ADWVoxelModule()
+UDWVoxelModule::UDWVoxelModule()
 {
 	ChunkSpawnClass = ADWVoxelChunk::StaticClass();
 
@@ -23,81 +23,83 @@ ADWVoxelModule::ADWVoxelModule()
 	BoundsMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
-ADWVoxelModule::~ADWVoxelModule()
+UDWVoxelModule::~UDWVoxelModule()
 {
-	TERMINATION_MODULE(ADWVoxelModule)
+	TERMINATION_MODULE(UDWVoxelModule)
 }
 
 #if WITH_EDITOR
-void ADWVoxelModule::OnGenerate()
+void UDWVoxelModule::OnGenerate()
 {
 	Super::OnGenerate();
 }
 
-void ADWVoxelModule::OnDestroy()
+void UDWVoxelModule::OnDestroy()
 {
 	Super::OnDestroy();
+
+	TERMINATION_MODULE(UDWVoxelModule)
 }
 #endif
 
-void ADWVoxelModule::OnInitialize_Implementation()
+void UDWVoxelModule::OnInitialize()
 {
-	Super::OnInitialize_Implementation();
+	Super::OnInitialize();
 }
 
-void ADWVoxelModule::OnPreparatory_Implementation(EPhase InPhase)
+void UDWVoxelModule::OnPreparatory(EPhase InPhase)
 {
-	Super::OnPreparatory_Implementation(InPhase);
+	Super::OnPreparatory(InPhase);
 }
 
-void ADWVoxelModule::OnRefresh_Implementation(float DeltaSeconds)
+void UDWVoxelModule::OnRefresh(float DeltaSeconds)
 {
-	Super::OnRefresh_Implementation(DeltaSeconds);
+	Super::OnRefresh(DeltaSeconds);
 }
 
-void ADWVoxelModule::OnPause_Implementation()
+void UDWVoxelModule::OnPause()
 {
-	Super::OnPause_Implementation();
+	Super::OnPause();
 }
 
-void ADWVoxelModule::OnUnPause_Implementation()
+void UDWVoxelModule::OnUnPause()
 {
-	Super::OnUnPause_Implementation();
+	Super::OnUnPause();
 }
 
-void ADWVoxelModule::OnTermination_Implementation(EPhase InPhase)
+void UDWVoxelModule::OnTermination(EPhase InPhase)
 {
-	Super::OnTermination_Implementation(InPhase);
+	Super::OnTermination(InPhase);
 }
 
-FVoxelWorldSaveData* ADWVoxelModule::NewWorldData(FSaveData* InBasicData) const
+FVoxelWorldSaveData* UDWVoxelModule::NewWorldData(FSaveData* InBasicData) const
 {
 	static FDWWorldSaveData SaveData;
 	SaveData = !InBasicData ? FDWWorldSaveData(WorldBasicData) : InBasicData->CastRef<FDWWorldSaveData>();
 	return &SaveData;
 }
 
-void ADWVoxelModule::LoadData(FSaveData* InSaveData, EPhase InPhase)
+void UDWVoxelModule::LoadData(FSaveData* InSaveData, EPhase InPhase)
 {
 	Super::LoadData(InSaveData, InPhase);
 }
 
-FSaveData* ADWVoxelModule::ToData()
+FSaveData* UDWVoxelModule::ToData()
 {
 	return Super::ToData();
 }
 
-void ADWVoxelModule::UnloadData(EPhase InPhase)
+void UDWVoxelModule::UnloadData(EPhase InPhase)
 {
 	Super::UnloadData(InPhase);
 }
 
-void ADWVoxelModule::OnWorldStateChanged()
+void UDWVoxelModule::OnWorldStateChanged()
 {
 	Super::OnWorldStateChanged();
 }
 
-void ADWVoxelModule::GenerateWorld()
+void UDWVoxelModule::GenerateWorld()
 {
 	Super::GenerateWorld();
 
@@ -108,37 +110,37 @@ void ADWVoxelModule::GenerateWorld()
 	}
 }
 
-void ADWVoxelModule::BuildChunkMap(FIndex InIndex, int32 InStage)
+void UDWVoxelModule::BuildChunkMap(FIndex InIndex, int32 InStage)
 {
 	Super::BuildChunkMap(InIndex, InStage);
 }
 
-void ADWVoxelModule::BuildChunkMesh(FIndex InIndex)
+void UDWVoxelModule::BuildChunkMesh(FIndex InIndex)
 {
 	Super::BuildChunkMesh(InIndex);
 }
 
-void ADWVoxelModule::GenerateChunk(FIndex InIndex)
+void UDWVoxelModule::GenerateChunk(FIndex InIndex)
 {
 	Super::GenerateChunk(InIndex);
 }
 
-void ADWVoxelModule::DestroyChunk(FIndex InIndex)
+void UDWVoxelModule::DestroyChunk(FIndex InIndex)
 {
 	Super::DestroyChunk(InIndex);
 }
 
-AVoxelChunk* ADWVoxelModule::SpawnChunk(FIndex InIndex, bool bAddToQueue)
+AVoxelChunk* UDWVoxelModule::SpawnChunk(FIndex InIndex, bool bAddToQueue)
 {
 	return Super::SpawnChunk(InIndex, bAddToQueue);
 }
 
-ECollisionChannel ADWVoxelModule::GetChunkTraceChannel() const
+ECollisionChannel UDWVoxelModule::GetChunkTraceChannel() const
 {
 	return (ECollisionChannel)EDWGameTraceChannel::Chunk;
 }
 
-ECollisionChannel ADWVoxelModule::GetVoxelTraceChannel() const
+ECollisionChannel UDWVoxelModule::GetVoxelTraceChannel() const
 {
 	return (ECollisionChannel)EDWGameTraceChannel::Voxel;
 }
