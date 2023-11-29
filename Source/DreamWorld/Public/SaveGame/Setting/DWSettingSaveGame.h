@@ -3,7 +3,7 @@
 #pragma once
 
 #include "Common/DWCommonTypes.h"
-#include "SaveGame/Base/SaveGameBase.h"
+#include "SaveGame/Module/ModuleSaveGame.h"
 
 #include "DWSettingSaveGame.generated.h"
 
@@ -13,7 +13,7 @@ class UDWArchiveSaveGame;
  * 常规游戏数据存取类
  */
 UCLASS()
-class DREAMWORLD_API UDWSettingSaveGame : public USaveGameBase
+class DREAMWORLD_API UDWSettingSaveGame : public UModuleSaveGame
 {
 	GENERATED_BODY()
 
@@ -31,23 +31,23 @@ public:
 
 protected:
 	UPROPERTY()
-	FDWSettingSaveData SaveData;
+	FDWSettingModuleSaveData SaveData;
 	
 	UPROPERTY()
-	FDWSettingSaveData DefaultData;
+	FDWSettingModuleSaveData DefaultData;
 
 public:
 	virtual FSaveData* GetSaveData() override { return &SaveData; }
 
-	virtual void SetSaveData(FSaveData* InSaveData) override { SaveData = InSaveData->CastRef<FDWSettingSaveData>(); }
+	virtual void SetSaveData(FSaveData* InSaveData) override { SaveData = InSaveData->CastRef<FDWSettingModuleSaveData>(); }
 
 	UFUNCTION(BlueprintPure, meta = (DisplayName = "GetSaveData"))
-	FDWSettingSaveData& K2_GetSaveData() { return SaveData; }
+	FDWSettingModuleSaveData& K2_GetSaveData() { return SaveData; }
 
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "SetSaveData"))
-	void K2_SetSaveData(const FDWSettingSaveData& InSaveData) { SaveData = InSaveData; }
+	void K2_SetSaveData(const FDWSettingModuleSaveData& InSaveData) { SaveData = InSaveData; }
 
 	virtual FSaveData* GetDefaultData() override { return &DefaultData; }
 
-	virtual void SetDefaultData(FSaveData* InDefaultData) override { DefaultData = InDefaultData->CastRef<FDWSettingSaveData>(); }
+	virtual void SetDefaultData(FSaveData* InDefaultData) override { DefaultData = InDefaultData->CastRef<FDWSettingModuleSaveData>(); }
 };

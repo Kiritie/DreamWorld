@@ -18,9 +18,9 @@ void UDWInventoryEquipSlot::OnInitialize(UAbilityInventoryBase* InInventory, EAb
 	PartType = (EDWEquipPartType)InSlotIndex;
 }
 
-void UDWInventoryEquipSlot::OnSpawn_Implementation(const TArray<FParameter>& InParams)
+void UDWInventoryEquipSlot::OnSpawn_Implementation(UObject* InOwner, const TArray<FParameter>& InParams)
 {
-	Super::OnSpawn_Implementation(InParams);
+	Super::OnSpawn_Implementation(InOwner, InParams);
 }
 
 void UDWInventoryEquipSlot::OnDespawn_Implementation(bool bRecovery) 

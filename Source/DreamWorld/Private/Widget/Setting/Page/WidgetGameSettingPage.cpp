@@ -3,11 +3,10 @@
 
 #include "Widget/Setting/Page/WidgetGameSettingPage.h"
 
-#include "Asset/AssetModuleStatics.h"
-#include "Common/CommonStatics.h"
-#include "Gameplay/DWGameMode.h"
 #include "SaveGame/SaveGameModuleStatics.h"
 #include "SaveGame/Setting/DWSettingSaveGame.h"
+#include "Setting/DWSettingModule.h"
+#include "Setting/SettingModule.h"
 #include "Setting/Widget/Item/WidgetBoolSettingItemBase.h"
 #include "Setting/Widget/Item/WidgetEnumSettingItemBase.h"
 #include "Widget/WidgetModuleStatics.h"
@@ -19,41 +18,41 @@ UWidgetGameSettingPage::UWidgetGameSettingPage(const FObjectInitializer& ObjectI
 	Title = FText::FromString(TEXT("游戏"));
 }
 
-void UWidgetGameSettingPage::OnInitialize(UObject* InOwner)
+void UWidgetGameSettingPage::OnInitialize(UObject* InOwner, const TArray<FParameter>& InParams)
 {
-	Super::OnInitialize(InOwner);
+	Super::OnInitialize(InOwner, InParams);
 }
 
-void UWidgetGameSettingPage::OnCreate(UObject* InOwner)
+void UWidgetGameSettingPage::OnCreate(UObject* InOwner, const TArray<FParameter>& InParams)
 {
-	Super::OnCreate(InOwner);
+	Super::OnCreate(InOwner, InParams);
 
-	SettingItem_GameLevel = CreateSubWidget<UWidgetEnumSettingItemBase>({ FText::FromString(TEXT("游戏难度")), FString("/Script/DreamWorld.EDWGameLevel") }, UAssetModuleStatics::GetStaticClass(FName("EnumSettingItem")));
-	AddSettingItem(SettingItem_GameLevel, FText::FromString(TEXT("游戏")));
+	SettingItem_GameLevel = CreateSubWidget<UWidgetEnumSettingItemBase>({ FText::FromString(TEXT("游戏难度")), FString("/Script/DreamWorld.EDWGameLevel") }, USettingModule::Get().GetEnumSettingItemClass());
+	AddSettingItem(FName("GameLevel"), SettingItem_GameLevel, FText::FromString(TEXT("游戏")));
 
-	SettingItem_AutoJump = CreateSubWidget<UWidgetBoolSettingItemBase>({ FText::FromString(TEXT("自动跳跃")) }, UAssetModuleStatics::GetStaticClass(FName("BoolSettingItem")));
-	AddSettingItem(SettingItem_AutoJump, FText::FromString(TEXT("控制")));
+	SettingItem_AutoJump = CreateSubWidget<UWidgetBoolSettingItemBase>({ FText::FromString(TEXT("自动跳跃")) }, USettingModule::Get().GetBoolSettingItemClass());
+	AddSettingItem(FName("AutoJump"), SettingItem_AutoJump, FText::FromString(TEXT("控制")));
 }
 
 void UWidgetGameSettingPage::OnOpen(const TArray<FParameter>& InParams, bool bInstant)
 {
 	Super::OnOpen(InParams, bInstant);
 
-	SettingItem_GameLevel->SetValue((int32)UCommonStatics::GetGameMode<ADWGameMode>()->GetGameLevel());
-	SettingItem_AutoJump->SetValue(UCommonStatics::GetGameMode<ADWGameMode>()->IsAutoJump());
+	SettingItem_GameLevel->SetValue((int32)UDWSettingModule::Get().GetGameLevel());
+	SettingItem_AutoJump->SetValue(UDWSettingModule::Get().IsAutoJump());
 }
 
 void UWidgetGameSettingPage::OnApply()
 {
 	Super::OnApply();
 
-	UCommonStatics::GetGameMode<ADWGameMode>()->SetGameLevel((EDWGameLevel)SettingItem_GameLevel->GetValue().GetIntegerValue());
-	UCommonStatics::GetGameMode<ADWGameMode>()->SetAutoJump(SettingItem_AutoJump->GetValue().GetBooleanValue());
+	UDWSettingModule::Get().SetGameLevel((EDWGameLevel)SettingItem_GameLevel->GetValue().GetIntegerValue());
+	UDWSettingModule::Get().SetAutoJump(SettingItem_AutoJump->GetValue().GetBooleanValue());
 }
 
-void UWidgetGameSettingPage::OnReset()
+void UWidgetGameSettingPage::OnReset(bool bForce)
 {
-	Super::OnReset();
+	Super::OnReset(bForce);
 
 	SettingItem_GameLevel->SetValue((int32)GetDefaultSaveData()->CastRef<FDWGameSaveData>().GameLevel);
 	SettingItem_AutoJump->SetValue(GetDefaultSaveData()->CastRef<FDWGameSaveData>().bAutoJump);
@@ -66,17 +65,17 @@ void UWidgetGameSettingPage::OnClose(bool bInstant)
 
 bool UWidgetGameSettingPage::CanApply_Implementation() const
 {
-	return UCommonStatics::GetGameMode<ADWGameMode>()->GetGameLevel() != (EDWGameLevel)SettingItem_GameLevel->GetValue().GetIntegerValue() ||
-		UCommonStatics::GetGameMode<ADWGameMode>()->IsAutoJump() != SettingItem_AutoJump->GetValue().GetBooleanValue();
+	return UDWSettingModule::Get().GetGameLevel() != (EDWGameLevel)SettingItem_GameLevel->GetValue().GetIntegerValue() ||
+		UDWSettingModule::Get().IsAutoJump() != SettingItem_AutoJump->GetValue().GetBooleanValue();
 }
 
 bool UWidgetGameSettingPage::CanReset_Implementation() const
 {
-	return UCommonStatics::GetGameMode<ADWGameMode>()->GetGameLevel() != GetDefaultSaveData()->CastRef<FDWGameSaveData>().GameLevel ||
-		UCommonStatics::GetGameMode<ADWGameMode>()->IsAutoJump() != GetDefaultSaveData()->CastRef<FDWGameSaveData>().bAutoJump;
+	return UDWSettingModule::Get().GetGameLevel() != GetDefaultSaveData()->CastRef<FDWGameSaveData>().GameLevel ||
+		UDWSettingModule::Get().IsAutoJump() != GetDefaultSaveData()->CastRef<FDWGameSaveData>().bAutoJump;
 }
 
 FSaveData* UWidgetGameSettingPage::GetDefaultSaveData() const
 {
-	return &USaveGameModuleStatics::GetSaveGame<UDWSettingSaveGame>()->GetDefaultDataRef<FDWSettingSaveData>().GameData;
+	return &USaveGameModuleStatics::GetSaveGame<UDWSettingSaveGame>()->GetDefaultDataRef<FDWSettingModuleSaveData>().GameData;
 }

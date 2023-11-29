@@ -35,9 +35,9 @@ ADWHumanCharacter::ADWHumanCharacter()
 	AuxiliaryVoxelEntity = nullptr;
 }
 
-void ADWHumanCharacter::OnSpawn_Implementation(const TArray<FParameter>& InParams)
+void ADWHumanCharacter::OnSpawn_Implementation(UObject* InOwner, const TArray<FParameter>& InParams)
 {
-	Super::OnSpawn_Implementation(InParams);
+	Super::OnSpawn_Implementation(InOwner, InParams);
 }
 
 void ADWHumanCharacter::OnDespawn_Implementation(bool bRecovery)
@@ -60,7 +60,7 @@ void ADWHumanCharacter::OnAssembleItem(const FAbilityItem& InItem)
 		case EAbilityItemType::Equip:
 		{
 			const auto& EquipData = InItem.GetData<UDWEquipData>();
-			if(AAbilityEquipBase* Equip = UObjectPoolModuleStatics::SpawnObject<AAbilityEquipBase>(nullptr, InItem.GetData<UAbilityEquipDataBase>().EquipClass))
+			if(AAbilityEquipBase* Equip = UObjectPoolModuleStatics::SpawnObject<AAbilityEquipBase>(nullptr, nullptr, InItem.GetData<UAbilityEquipDataBase>().EquipClass))
 			{
 				Equip->Initialize(this, InItem);
 				Equip->OnAssemble();

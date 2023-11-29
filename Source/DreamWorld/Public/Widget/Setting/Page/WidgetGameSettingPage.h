@@ -20,15 +20,15 @@ public:
 	UWidgetGameSettingPage(const FObjectInitializer& ObjectInitializer);
 	
 public:
-	virtual void OnInitialize(UObject* InOwner) override;
+	virtual void OnInitialize(UObject* InOwner, const TArray<FParameter>& InParams) override;
 
-	virtual void OnCreate(UObject* InOwner) override;
+	virtual void OnCreate(UObject* InOwner, const TArray<FParameter>& InParams) override;
 
 	virtual void OnOpen(const TArray<FParameter>& InParams, bool bInstant) override;
 
 	virtual void OnApply() override;
 
-	virtual void OnReset() override;
+	virtual void OnReset(bool bForce) override;
 
 	virtual void OnClose(bool bInstant) override;
 

@@ -95,7 +95,7 @@ void UDWCharacterState_Attack::AttackStart()
 			const auto SkillAbilityData = Character->GetSkillAbility(Character->SkillAbilityID);
 			if(const auto SkillClass = SkillAbilityData.GetItemData<UAbilitySkillDataBase>().SkillClass)
 			{
-				if(AAbilitySkillBase* Skill = UObjectPoolModuleStatics::SpawnObject<AAbilitySkillBase>(nullptr, SkillClass))
+				if(AAbilitySkillBase* Skill = UObjectPoolModuleStatics::SpawnObject<AAbilitySkillBase>(nullptr, nullptr, SkillClass))
 				{
 					Skill->Initialize(Character, FAbilityItem(SkillAbilityData.AbilityID));
 				}

@@ -25,7 +25,7 @@ public:
 	ADWHumanCharacter();
 
 protected:
-	virtual void OnSpawn_Implementation(const TArray<FParameter>& InParams) override;
+	virtual void OnSpawn_Implementation(UObject* InOwner, const TArray<FParameter>& InParams) override;
 
 	virtual void OnDespawn_Implementation(bool bRecovery) override;
 

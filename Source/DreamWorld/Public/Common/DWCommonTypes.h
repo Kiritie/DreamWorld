@@ -1,6 +1,7 @@
 #pragma once
 
 #include "GameplayEffectTypes.h"
+#include "NativeGameplayTags.h"
 #include "Ability/AbilityModuleTypes.h"
 #include "Achievement/AchievementModuleTypes.h"
 #include "SaveGame/SaveGameModuleTypes.h"
@@ -8,6 +9,7 @@
 #include "Asset/AssetModuleTypes.h"
 #include "Audio/AudioModuleTypes.h"
 #include "Camera/CameraModuleTypes.h"
+#include "Common/CommonTypes.h"
 #include "Input/InputModuleTypes.h"
 #include "Task/TaskModuleTypes.h"
 #include "Team/DWTeamModuleTypes.h"
@@ -735,12 +737,12 @@ public:
 };
 
 USTRUCT(BlueprintType)
-struct DREAMWORLD_API FDWSettingSaveData : public FSaveData
+struct DREAMWORLD_API FDWSettingModuleSaveData : public FSaveData
 {
 	GENERATED_BODY()
 
 public:
-	FORCEINLINE FDWSettingSaveData()
+	FORCEINLINE FDWSettingModuleSaveData()
 	{
 		GameData = FDWGameSaveData();
 		AudioData = FDWAudioModuleSaveData();

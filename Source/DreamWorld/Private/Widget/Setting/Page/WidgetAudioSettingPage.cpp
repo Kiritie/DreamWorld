@@ -13,5 +13,5 @@ UWidgetAudioSettingPage::UWidgetAudioSettingPage(const FObjectInitializer& Objec
 
 FSaveData* UWidgetAudioSettingPage::GetDefaultSaveData() const
 {
-	return &USaveGameModuleStatics::GetSaveGame<UDWSettingSaveGame>()->GetDefaultDataRef<FDWSettingSaveData>().AudioData;
+	return &USaveGameModuleStatics::GetSaveGame<UDWSettingSaveGame>()->GetDefaultDataRef<FDWSettingModuleSaveData>().AudioData;
 }

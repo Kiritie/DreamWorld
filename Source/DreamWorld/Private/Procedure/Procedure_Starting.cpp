@@ -21,7 +21,7 @@ UProcedure_Starting::UProcedure_Starting()
 	ProcedureDisplayName = FText::FromString(TEXT("开始"));
 
 	bTrackTarget = true;
-	TrackTargetMode = ETrackTargetMode::LocationOnly;
+	TrackTargetMode = ECameraTrackMode::LocationOnly;
 }
 
 #if WITH_EDITOR
@@ -55,7 +55,7 @@ void UProcedure_Starting::OnEnter(UProcedureBase* InLastProcedure)
 	}
 	if(InLastProcedure && InLastProcedure->IsA<UProcedure_ArchiveChoosing>())
 	{
-		CameraViewYaw = UCameraModuleStatics::GetCameraRotation().Yaw;
+		CameraViewParams.CameraViewYaw = UCameraModuleStatics::GetCameraRotation().Yaw;
 	}
 
 	Super::OnEnter(InLastProcedure);

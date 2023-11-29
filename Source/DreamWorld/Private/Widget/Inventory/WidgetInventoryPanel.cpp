@@ -37,9 +37,9 @@ UWidgetInventoryPanel::UWidgetInventoryPanel(const FObjectInitializer& ObjectIni
 	UISlotDatas.Add(ESlotSplitType::Equip);
 }
 
-void UWidgetInventoryPanel::OnInitialize(UObject* InOwner)
+void UWidgetInventoryPanel::OnInitialize(UObject* InOwner, const TArray<FParameter>& InParams)
 {
-	Super::OnInitialize(InOwner);
+	Super::OnInitialize(InOwner, InParams);
 
 	if(!InOwner) return;
 

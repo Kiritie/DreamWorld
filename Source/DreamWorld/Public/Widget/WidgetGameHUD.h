@@ -20,9 +20,9 @@ public:
 	UWidgetGameHUD(const FObjectInitializer& ObjectInitializer);
 
 public:
-	virtual void OnCreate(UObject* InOwner) override;
+	virtual void OnCreate(UObject* InOwner, const TArray<FParameter>& InParams) override;
 
-	virtual void OnInitialize(UObject* InOwner) override;
+	virtual void OnInitialize(UObject* InOwner, const TArray<FParameter>& InParams) override;
 
 	virtual void OnOpen(const TArray<FParameter>& InParams, bool bInstant) override;
 

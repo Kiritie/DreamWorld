@@ -41,9 +41,9 @@ ADWVitality::ADWVitality(const FObjectInitializer& ObjectInitializer) :
 	FSM->States.Add(UDWVitalityState_Death::StaticClass());
 }
 
-void ADWVitality::OnSpawn_Implementation(const TArray<FParameter>& InParams)
+void ADWVitality::OnSpawn_Implementation(UObject* InOwner, const TArray<FParameter>& InParams)
 {
-	Super::OnSpawn_Implementation(InParams);
+	Super::OnSpawn_Implementation(InOwner, InParams);
 }
 
 void ADWVitality::OnDespawn_Implementation(bool bRecovery)

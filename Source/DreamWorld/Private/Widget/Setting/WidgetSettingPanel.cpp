@@ -15,9 +15,9 @@ UWidgetSettingPanel::UWidgetSettingPanel(const FObjectInitializer& ObjectInitial
 	ChildNames.Add(FName("InputSettingPage"));
 }
 
-void UWidgetSettingPanel::OnInitialize(UObject* InOwner)
+void UWidgetSettingPanel::OnInitialize(UObject* InOwner, const TArray<FParameter>& InParams)
 {
-	Super::OnInitialize(InOwner);
+	Super::OnInitialize(InOwner, InParams);
 }
 
 void UWidgetSettingPanel::OnOpen(const TArray<FParameter>& InParams, bool bInstant)

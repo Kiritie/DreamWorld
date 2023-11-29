@@ -15,14 +15,14 @@ UWidgetContextBox::UWidgetContextBox(const FObjectInitializer& ObjectInitializer
 	WidgetCreateType = EWidgetCreateType::AutoCreateAndOpen;
 }
 
-void UWidgetContextBox::OnCreate(UObject* InOwner)
+void UWidgetContextBox::OnCreate(UObject* InOwner, const TArray<FParameter>& InParams)
 {
-	Super::OnCreate(InOwner);
+	Super::OnCreate(InOwner, InParams);
 }
 
-void UWidgetContextBox::OnInitialize(UObject* InOwner)
+void UWidgetContextBox::OnInitialize(UObject* InOwner, const TArray<FParameter>& InParams)
 {
-	Super::OnInitialize(InOwner);
+	Super::OnInitialize(InOwner, InParams);
 }
 
 void UWidgetContextBox::OnOpen(const TArray<FParameter>& InParams, bool bInstant)

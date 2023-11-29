@@ -15,14 +15,14 @@ UWidgetAbilityItemInfoBox::UWidgetAbilityItemInfoBox(const FObjectInitializer& O
 	WidgetZOrder = 3;
 }
 
-void UWidgetAbilityItemInfoBox::OnCreate(UObject* InOwner)
+void UWidgetAbilityItemInfoBox::OnCreate(UObject* InOwner, const TArray<FParameter>& InParams)
 {
-	Super::OnCreate(InOwner);
+	Super::OnCreate(InOwner, InParams);
 }
 
-void UWidgetAbilityItemInfoBox::OnInitialize(UObject* InOwner)
+void UWidgetAbilityItemInfoBox::OnInitialize(UObject* InOwner, const TArray<FParameter>& InParams)
 {
-	Super::OnInitialize(InOwner);
+	Super::OnInitialize(InOwner, InParams);
 }
 
 void UWidgetAbilityItemInfoBox::OnOpen(const TArray<FParameter>& InParams, bool bInstant)

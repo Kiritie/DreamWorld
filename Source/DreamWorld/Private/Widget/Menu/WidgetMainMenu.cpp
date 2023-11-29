@@ -10,9 +10,9 @@ UWidgetMainMenu::UWidgetMainMenu(const FObjectInitializer& ObjectInitializer) : 
 	WidgetInputMode = EInputMode::UIOnly;
 }
 
-void UWidgetMainMenu::OnInitialize(UObject* InOwner)
+void UWidgetMainMenu::OnInitialize(UObject* InOwner, const TArray<FParameter>& InParams)
 {
-	Super::OnInitialize(InOwner);
+	Super::OnInitialize(InOwner, InParams);
 }
 
 void UWidgetMainMenu::OnOpen(const TArray<FParameter>& InParams, bool bInstant)

@@ -22,7 +22,7 @@ UProcedure_ArchiveChoosing::UProcedure_ArchiveChoosing()
 	ProcedureDisplayName = FText::FromString(TEXT("选择存档"));
 
 	bTrackTarget = true;
-	TrackTargetMode = ETrackTargetMode::LocationOnly;
+	TrackTargetMode = ECameraTrackMode::LocationOnly;
 }
 
 #if WITH_EDITOR
@@ -48,7 +48,7 @@ void UProcedure_ArchiveChoosing::OnEnter(UProcedureBase* InLastProcedure)
 {
 	if(InLastProcedure && InLastProcedure->IsA<UProcedure_Starting>())
 	{
-		CameraViewYaw = UCameraModuleStatics::GetCameraRotation().Yaw;
+		CameraViewParams.CameraViewYaw = UCameraModuleStatics::GetCameraRotation().Yaw;
 	}
 	
 	Super::OnEnter(InLastProcedure);

@@ -137,6 +137,60 @@ void UDWInputModule::OnUnPause()
 	Super::OnUnPause();
 }
 
+void UDWInputModule::OnBindAction(UInputComponentBase* InInputComponent)
+{
+	Super::OnBindAction(InInputComponent);
+
+	InInputComponent->BindInputAction(GameplayTags::InputTag_Sprint, ETriggerEvent::Started, this, &UDWInputModule::OnSprintPressed);
+	InInputComponent->BindInputAction(GameplayTags::InputTag_Sprint, ETriggerEvent::Completed, this, &UDWInputModule::OnSprintReleased);
+	
+	InInputComponent->BindInputAction(GameplayTags::InputTag_Interact1, ETriggerEvent::Started, this, &UDWInputModule::DoInteractAction1);
+	InInputComponent->BindInputAction(GameplayTags::InputTag_Interact2, ETriggerEvent::Started, this, &UDWInputModule::DoInteractAction2);
+	InInputComponent->BindInputAction(GameplayTags::InputTag_Interact3, ETriggerEvent::Started, this, &UDWInputModule::DoInteractAction3);
+	InInputComponent->BindInputAction(GameplayTags::InputTag_Interact4, ETriggerEvent::Started, this, &UDWInputModule::DoInteractAction4);
+	InInputComponent->BindInputAction(GameplayTags::InputTag_Interact5, ETriggerEvent::Started, this, &UDWInputModule::DoInteractAction5);
+	
+	InInputComponent->BindInputAction(GameplayTags::InputTag_Dodge, ETriggerEvent::Started, this, &UDWInputModule::OnDodgePressed);
+	InInputComponent->BindInputAction(GameplayTags::InputTag_Dodge, ETriggerEvent::Completed, this, &UDWInputModule::OnDodgeReleased);
+	
+	InInputComponent->BindInputAction(GameplayTags::InputTag_ToggleCrouch, ETriggerEvent::Started, this, &UDWInputModule::ToggleCrouch);
+	InInputComponent->BindInputAction(GameplayTags::InputTag_ToggleControlMode, ETriggerEvent::Started, this, &UDWInputModule::ToggleControlMode);
+	InInputComponent->BindInputAction(GameplayTags::InputTag_ToggleLockSightTarget, ETriggerEvent::Started, this, &UDWInputModule::ToggleLockTarget);
+	InInputComponent->BindInputAction(GameplayTags::InputTag_ChangeHand, ETriggerEvent::Started, this, &UDWInputModule::ChangeHand);
+	
+	InInputComponent->BindInputAction(GameplayTags::InputTag_Primary, ETriggerEvent::Started, this, &UDWInputModule::OnAttackDestroyPressed);
+	InInputComponent->BindInputAction(GameplayTags::InputTag_Primary, ETriggerEvent::Completed, this, &UDWInputModule::OnAttackDestroyReleased);
+	
+	InInputComponent->BindInputAction(GameplayTags::InputTag_Minor, ETriggerEvent::Started, this, &UDWInputModule::OnDefendGeneratePressed);
+	InInputComponent->BindInputAction(GameplayTags::InputTag_Minor, ETriggerEvent::Completed, this, &UDWInputModule::OnDefendGenerateReleased);
+	
+	InInputComponent->BindInputAction(GameplayTags::InputTag_ReleaseSkillAbility1, ETriggerEvent::Started, this, &UDWInputModule::ReleaseSkillAbility1);
+	InInputComponent->BindInputAction(GameplayTags::InputTag_ReleaseSkillAbility2, ETriggerEvent::Started, this, &UDWInputModule::ReleaseSkillAbility2);
+	InInputComponent->BindInputAction(GameplayTags::InputTag_ReleaseSkillAbility3, ETriggerEvent::Started, this, &UDWInputModule::ReleaseSkillAbility3);
+	InInputComponent->BindInputAction(GameplayTags::InputTag_ReleaseSkillAbility4, ETriggerEvent::Started, this, &UDWInputModule::ReleaseSkillAbility4);
+	
+	InInputComponent->BindInputAction(GameplayTags::InputTag_UseInventoryItem, ETriggerEvent::Started, this, &UDWInputModule::UseInventoryItem);
+	InInputComponent->BindInputAction(GameplayTags::InputTag_DiscardInventoryItem, ETriggerEvent::Started, this, &UDWInputModule::DiscardInventoryItem);
+	InInputComponent->BindInputAction(GameplayTags::InputTag_PrevInventorySlot, ETriggerEvent::Started, this, &UDWInputModule::PrevInventorySlot);
+	InInputComponent->BindInputAction(GameplayTags::InputTag_NextInventorySlot, ETriggerEvent::Started, this, &UDWInputModule::NextInventorySlot);
+	InInputComponent->BindInputAction(GameplayTags::InputTag_SelectInventorySlot1, ETriggerEvent::Started, this, &UDWInputModule::SelectInventorySlot1);
+	InInputComponent->BindInputAction(GameplayTags::InputTag_SelectInventorySlot2, ETriggerEvent::Started, this, &UDWInputModule::SelectInventorySlot2);
+	InInputComponent->BindInputAction(GameplayTags::InputTag_SelectInventorySlot3, ETriggerEvent::Started, this, &UDWInputModule::SelectInventorySlot3);
+	InInputComponent->BindInputAction(GameplayTags::InputTag_SelectInventorySlot4, ETriggerEvent::Started, this, &UDWInputModule::SelectInventorySlot4);
+	InInputComponent->BindInputAction(GameplayTags::InputTag_SelectInventorySlot5, ETriggerEvent::Started, this, &UDWInputModule::SelectInventorySlot5);
+	InInputComponent->BindInputAction(GameplayTags::InputTag_SelectInventorySlot6, ETriggerEvent::Started, this, &UDWInputModule::SelectInventorySlot6);
+	InInputComponent->BindInputAction(GameplayTags::InputTag_SelectInventorySlot7, ETriggerEvent::Started, this, &UDWInputModule::SelectInventorySlot7);
+	InInputComponent->BindInputAction(GameplayTags::InputTag_SelectInventorySlot8, ETriggerEvent::Started, this, &UDWInputModule::SelectInventorySlot8);
+	InInputComponent->BindInputAction(GameplayTags::InputTag_SelectInventorySlot9, ETriggerEvent::Started, this, &UDWInputModule::SelectInventorySlot9);
+	InInputComponent->BindInputAction(GameplayTags::InputTag_SelectInventorySlot10, ETriggerEvent::Started, this, &UDWInputModule::SelectInventorySlot10);
+	
+	InInputComponent->BindInputAction(GameplayTags::InputTag_OpenInventoryPanel, ETriggerEvent::Started, this, &UDWInputModule::OpenInventoryPanel);
+	
+	InInputComponent->BindInputAction(GameplayTags::InputTag_OpenGeneratePanel, ETriggerEvent::Started, this, &UDWInputModule::OpenGeneratePanel);
+	
+	InInputComponent->BindInputAction(GameplayTags::InputTag_PauseGame, ETriggerEvent::Started, this, &UDWInputModule::PauseGame);
+}
+
 void UDWInputModule::LoadData(FSaveData* InSaveData, EPhase InPhase)
 {
 	Super::LoadData(InSaveData, InPhase);
@@ -155,60 +209,6 @@ FSaveData* UDWInputModule::ToData()
 	SaveData = Super::ToData()->CastRef<FInputModuleSaveData>();
 
 	return &SaveData;
-}
-
-void UDWInputModule::OnBindAction_Implementation(UInputComponentBase* InInputComponent, UPlayerMappableInputConfig* InInputConfig)
-{
-	Super::OnBindAction_Implementation(InInputComponent, InInputConfig);
-
-	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_Sprint, ETriggerEvent::Started, this, &UDWInputModule::OnSprintPressed);
-	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_Sprint, ETriggerEvent::Completed, this, &UDWInputModule::OnSprintReleased);
-	
-	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_Interact1, ETriggerEvent::Started, this, &UDWInputModule::DoInteractAction1);
-	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_Interact2, ETriggerEvent::Started, this, &UDWInputModule::DoInteractAction2);
-	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_Interact3, ETriggerEvent::Started, this, &UDWInputModule::DoInteractAction3);
-	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_Interact4, ETriggerEvent::Started, this, &UDWInputModule::DoInteractAction4);
-	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_Interact5, ETriggerEvent::Started, this, &UDWInputModule::DoInteractAction5);
-	
-	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_Dodge, ETriggerEvent::Started, this, &UDWInputModule::OnDodgePressed);
-	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_Dodge, ETriggerEvent::Completed, this, &UDWInputModule::OnDodgeReleased);
-	
-	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_ToggleCrouch, ETriggerEvent::Started, this, &UDWInputModule::ToggleCrouch);
-	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_ToggleControlMode, ETriggerEvent::Started, this, &UDWInputModule::ToggleControlMode);
-	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_ToggleLockSightTarget, ETriggerEvent::Started, this, &UDWInputModule::ToggleLockTarget);
-	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_ChangeHand, ETriggerEvent::Started, this, &UDWInputModule::ChangeHand);
-	
-	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_Primary, ETriggerEvent::Started, this, &UDWInputModule::OnAttackDestroyPressed);
-	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_Primary, ETriggerEvent::Completed, this, &UDWInputModule::OnAttackDestroyReleased);
-	
-	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_Minor, ETriggerEvent::Started, this, &UDWInputModule::OnDefendGeneratePressed);
-	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_Minor, ETriggerEvent::Completed, this, &UDWInputModule::OnDefendGenerateReleased);
-	
-	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_ReleaseSkillAbility1, ETriggerEvent::Started, this, &UDWInputModule::ReleaseSkillAbility1);
-	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_ReleaseSkillAbility2, ETriggerEvent::Started, this, &UDWInputModule::ReleaseSkillAbility2);
-	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_ReleaseSkillAbility3, ETriggerEvent::Started, this, &UDWInputModule::ReleaseSkillAbility3);
-	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_ReleaseSkillAbility4, ETriggerEvent::Started, this, &UDWInputModule::ReleaseSkillAbility4);
-	
-	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_UseInventoryItem, ETriggerEvent::Started, this, &UDWInputModule::UseInventoryItem);
-	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_DiscardInventoryItem, ETriggerEvent::Started, this, &UDWInputModule::DiscardInventoryItem);
-	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_PrevInventorySlot, ETriggerEvent::Started, this, &UDWInputModule::PrevInventorySlot);
-	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_NextInventorySlot, ETriggerEvent::Started, this, &UDWInputModule::NextInventorySlot);
-	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_SelectInventorySlot1, ETriggerEvent::Started, this, &UDWInputModule::SelectInventorySlot1);
-	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_SelectInventorySlot2, ETriggerEvent::Started, this, &UDWInputModule::SelectInventorySlot2);
-	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_SelectInventorySlot3, ETriggerEvent::Started, this, &UDWInputModule::SelectInventorySlot3);
-	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_SelectInventorySlot4, ETriggerEvent::Started, this, &UDWInputModule::SelectInventorySlot4);
-	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_SelectInventorySlot5, ETriggerEvent::Started, this, &UDWInputModule::SelectInventorySlot5);
-	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_SelectInventorySlot6, ETriggerEvent::Started, this, &UDWInputModule::SelectInventorySlot6);
-	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_SelectInventorySlot7, ETriggerEvent::Started, this, &UDWInputModule::SelectInventorySlot7);
-	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_SelectInventorySlot8, ETriggerEvent::Started, this, &UDWInputModule::SelectInventorySlot8);
-	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_SelectInventorySlot9, ETriggerEvent::Started, this, &UDWInputModule::SelectInventorySlot9);
-	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_SelectInventorySlot10, ETriggerEvent::Started, this, &UDWInputModule::SelectInventorySlot10);
-	
-	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_OpenInventoryPanel, ETriggerEvent::Started, this, &UDWInputModule::OpenInventoryPanel);
-	
-	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_OpenGeneratePanel, ETriggerEvent::Started, this, &UDWInputModule::OpenGeneratePanel);
-	
-	InInputComponent->BindInputAction(InInputConfig, GameplayTags::InputTag_PauseGame, ETriggerEvent::Started, this, &UDWInputModule::PauseGame);
 }
 
 void UDWInputModule::TurnPlayer(const FInputActionValue& InValue)

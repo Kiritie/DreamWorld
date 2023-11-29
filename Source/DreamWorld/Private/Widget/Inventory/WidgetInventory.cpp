@@ -5,9 +5,9 @@ UWidgetInventory::UWidgetInventory(const FObjectInitializer& ObjectInitializer) 
 
 }
 
-void UWidgetInventory::OnInitialize(UObject* InOwner)
+void UWidgetInventory::OnInitialize(UObject* InOwner, const TArray<FParameter>& InParams)
 {
-	Super::OnInitialize(InOwner);
+	Super::OnInitialize(InOwner, InParams);
 }
 
 void UWidgetInventory::OnRefresh()

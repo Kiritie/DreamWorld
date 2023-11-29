@@ -14,14 +14,14 @@ UWidgetMessageBox::UWidgetMessageBox(const FObjectInitializer& ObjectInitializer
 	WidgetCreateType = EWidgetCreateType::AutoCreate;
 }
 
-void UWidgetMessageBox::OnCreate(UObject* InOwner)
+void UWidgetMessageBox::OnCreate(UObject* InOwner, const TArray<FParameter>& InParams)
 {
-	Super::OnCreate(InOwner);
+	Super::OnCreate(InOwner, InParams);
 }
 
-void UWidgetMessageBox::OnInitialize(UObject* InOwner)
+void UWidgetMessageBox::OnInitialize(UObject* InOwner, const TArray<FParameter>& InParams)
 {
-	Super::OnInitialize(InOwner);
+	Super::OnInitialize(InOwner, InParams);
 }
 
 void UWidgetMessageBox::OnOpen(const TArray<FParameter>& InParams, bool bInstant)

@@ -10,7 +10,6 @@
 #include "Common/CommonStatics.h"
 #include "Procedure/ProcedureModuleStatics.h"
 #include "SaveGame/SaveGameModuleStatics.h"
-#include "Voxel/VoxelModule.h"
 #include "Widget/WidgetModuleStatics.h"
 #include "ObjectPool/ObjectPoolModuleStatics.h"
 #include "Voxel/Chunks/VoxelChunk.h"
@@ -63,7 +62,7 @@ void ADWPlayerController::LoadData(FSaveData* InSaveData, EPhase InPhase)
 		if(bNeedSpawn)
 		{
 			UnloadData(InPhase);
-			PlayerCharacter = UObjectPoolModuleStatics::SpawnObject<ADWPlayerCharacter>({ &SaveData.ActorID, &SaveData.AssetID }, SaveData.GetItemData<UDWCharacterData>().Class);
+			PlayerCharacter = UObjectPoolModuleStatics::SpawnObject<ADWPlayerCharacter>(nullptr, { &SaveData.ActorID, &SaveData.AssetID }, SaveData.GetItemData<UDWCharacterData>().Class);
 			if(PlayerCharacter)
 			{
 				SetPlayerPawn(PlayerCharacter);

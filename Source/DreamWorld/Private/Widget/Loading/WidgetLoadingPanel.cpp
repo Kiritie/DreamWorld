@@ -10,9 +10,9 @@ UWidgetLoadingPanel::UWidgetLoadingPanel(const FObjectInitializer& ObjectInitial
 	WidgetZOrder = 15;
 }
 
-void UWidgetLoadingPanel::OnInitialize(UObject* InOwner)
+void UWidgetLoadingPanel::OnInitialize(UObject* InOwner, const TArray<FParameter>& InParams)
 {
-	Super::OnInitialize(InOwner);
+	Super::OnInitialize(InOwner, InParams);
 }
 
 void UWidgetLoadingPanel::OnOpen(const TArray<FParameter>& InParams, bool bInstant)

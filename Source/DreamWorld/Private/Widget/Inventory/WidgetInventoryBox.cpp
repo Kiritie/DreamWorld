@@ -32,9 +32,9 @@ UWidgetInventoryBox::UWidgetInventoryBox(const FObjectInitializer& ObjectInitial
 	TargetUISlotDatas.Add(ESlotSplitType::Default);
 }
 
-void UWidgetInventoryBox::OnInitialize(UObject* InOwner)
+void UWidgetInventoryBox::OnInitialize(UObject* InOwner, const TArray<FParameter>& InParams)
 {
-	Super::OnInitialize(InOwner);
+	Super::OnInitialize(InOwner, InParams);
 	
 	if(!InOwner) return;
 

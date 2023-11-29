@@ -31,16 +31,16 @@ UWidgetGameHUD::UWidgetGameHUD(const FObjectInitializer& ObjectInitializer) : Su
 	SetIsFocusable(true);
 }
 
-void UWidgetGameHUD::OnCreate(UObject* InOwner)
+void UWidgetGameHUD::OnCreate(UObject* InOwner, const TArray<FParameter>& InParams)
 {
-	Super::OnCreate(InOwner);
+	Super::OnCreate(InOwner, InParams);
 
 	UEventModuleStatics::SubscribeEvent(UEventHandle_ChangeInputMode::StaticClass(), this, FName("OnChangeInputMode"));
 }
 
-void UWidgetGameHUD::OnInitialize(UObject* InOwner)
+void UWidgetGameHUD::OnInitialize(UObject* InOwner, const TArray<FParameter>& InParams)
 {
-	Super::OnInitialize(InOwner);
+	Super::OnInitialize(InOwner, InParams);
 }
 
 void UWidgetGameHUD::OnOpen(const TArray<FParameter>& InParams, bool bInstant)

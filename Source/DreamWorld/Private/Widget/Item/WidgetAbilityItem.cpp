@@ -57,8 +57,10 @@ FReply UWidgetAbilityItem::NativeOnMouseButtonDown(const FGeometry& InGeometry, 
 
 void UWidgetAbilityItem::OnSelected()
 {
+	K2_OnSelected();
 }
 
 void UWidgetAbilityItem::OnUnSelected()
 {
+	K2_OnUnSelected();
 }

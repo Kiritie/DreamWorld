@@ -13,5 +13,5 @@ UWidgetCameraSettingPage::UWidgetCameraSettingPage(const FObjectInitializer& Obj
 
 FSaveData* UWidgetCameraSettingPage::GetDefaultSaveData() const
 {
-	return &USaveGameModuleStatics::GetSaveGame<UDWSettingSaveGame>()->GetDefaultDataRef<FDWSettingSaveData>().CameraData;
+	return &USaveGameModuleStatics::GetSaveGame<UDWSettingSaveGame>()->GetDefaultDataRef<FDWSettingModuleSaveData>().CameraData;
 }

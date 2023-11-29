@@ -41,6 +41,8 @@ public:
 
 	virtual void OnUnPause() override;
 
+	virtual void OnBindAction(UInputComponentBase* InInputComponent) override;
+
 protected:
 	virtual void LoadData(FSaveData* InSaveData, EPhase InPhase) override;
 
@@ -48,9 +50,6 @@ protected:
 
 	virtual FSaveData* ToData() override;
 
-protected:
-	virtual void OnBindAction_Implementation(UInputComponentBase* InInputComponent, UPlayerMappableInputConfig* InInputConfig) override;
-	
 protected:
 	UPROPERTY(VisibleAnywhere, Category = "InputStates|Player")
 	bool bPressedAttackDestroy;

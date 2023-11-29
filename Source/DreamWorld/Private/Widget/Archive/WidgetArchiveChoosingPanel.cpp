@@ -10,9 +10,9 @@ UWidgetArchiveChoosingPanel::UWidgetArchiveChoosingPanel(const FObjectInitialize
 	WidgetInputMode = EInputMode::UIOnly;
 }
 
-void UWidgetArchiveChoosingPanel::OnInitialize(UObject* InOwner)
+void UWidgetArchiveChoosingPanel::OnInitialize(UObject* InOwner, const TArray<FParameter>& InParams)
 {
-	Super::OnInitialize(InOwner);
+	Super::OnInitialize(InOwner, InParams);
 }
 
 void UWidgetArchiveChoosingPanel::OnOpen(const TArray<FParameter>& InParams, bool bInstant)

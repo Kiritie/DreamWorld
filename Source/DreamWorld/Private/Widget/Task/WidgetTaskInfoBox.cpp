@@ -23,14 +23,14 @@ UWidgetTaskInfoBox::UWidgetTaskInfoBox(const FObjectInitializer& ObjectInitializ
 	WidgetCreateType = EWidgetCreateType::AutoCreateAndOpen;
 }
 
-void UWidgetTaskInfoBox::OnCreate(UObject* InOwner)
+void UWidgetTaskInfoBox::OnCreate(UObject* InOwner, const TArray<FParameter>& InParams)
 {
-	Super::OnCreate(InOwner);
+	Super::OnCreate(InOwner, InParams);
 }
 
-void UWidgetTaskInfoBox::OnInitialize(UObject* InOwner)
+void UWidgetTaskInfoBox::OnInitialize(UObject* InOwner, const TArray<FParameter>& InParams)
 {
-	Super::OnInitialize(InOwner);
+	Super::OnInitialize(InOwner, InParams);
 }
 
 void UWidgetTaskInfoBox::OnOpen(const TArray<FParameter>& InParams, bool bInstant)

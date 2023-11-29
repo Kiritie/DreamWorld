@@ -23,7 +23,7 @@ UProcedure_ArchiveCreating::UProcedure_ArchiveCreating()
 	ProcedureDisplayName = FText::FromString(TEXT("创建存档"));
 
 	bTrackTarget = true;
-	TrackTargetMode = ETrackTargetMode::LocationOnly;
+	TrackTargetMode = ECameraTrackMode::LocationOnly;
 }
 
 #if WITH_EDITOR

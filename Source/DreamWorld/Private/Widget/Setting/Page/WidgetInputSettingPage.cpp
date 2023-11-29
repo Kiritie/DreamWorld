@@ -13,5 +13,5 @@ UWidgetInputSettingPage::UWidgetInputSettingPage(const FObjectInitializer& Objec
 
 FSaveData* UWidgetInputSettingPage::GetDefaultSaveData() const
 {
-	return &USaveGameModuleStatics::GetSaveGame<UDWSettingSaveGame>()->GetDefaultDataRef<FDWSettingSaveData>().InputData;
+	return &USaveGameModuleStatics::GetSaveGame<UDWSettingSaveGame>()->GetDefaultDataRef<FDWSettingModuleSaveData>().InputData;
 }

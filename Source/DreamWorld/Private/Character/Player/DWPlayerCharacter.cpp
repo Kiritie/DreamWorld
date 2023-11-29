@@ -121,9 +121,9 @@ void ADWPlayerCharacter::OnInitialize_Implementation()
 	PreviewCapture->ShowOnlyActors.Add(this);
 }
 
-void ADWPlayerCharacter::OnSpawn_Implementation(const TArray<FParameter>& InParams)
+void ADWPlayerCharacter::OnSpawn_Implementation(UObject* InOwner, const TArray<FParameter>& InParams)
 {
-	Super::OnSpawn_Implementation(InParams);
+	Super::OnSpawn_Implementation(InOwner, InParams);
 }
 
 void ADWPlayerCharacter::OnDespawn_Implementation(bool bRecovery)

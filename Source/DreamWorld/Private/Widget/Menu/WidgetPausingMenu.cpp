@@ -18,9 +18,9 @@ UWidgetPausingMenu::UWidgetPausingMenu(const FObjectInitializer& ObjectInitializ
 	SetIsFocusable(true);
 }
 
-void UWidgetPausingMenu::OnInitialize(UObject* InOwner)
+void UWidgetPausingMenu::OnInitialize(UObject* InOwner, const TArray<FParameter>& InParams)
 {
-	Super::OnInitialize(InOwner);
+	Super::OnInitialize(InOwner, InParams);
 }
 
 void UWidgetPausingMenu::OnOpen(const TArray<FParameter>& InParams, bool bInstant)

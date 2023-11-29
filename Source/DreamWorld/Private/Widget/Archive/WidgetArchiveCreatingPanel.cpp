@@ -10,9 +10,9 @@ UWidgetArchiveCreatingPanel::UWidgetArchiveCreatingPanel(const FObjectInitialize
 	WidgetInputMode = EInputMode::GameAndUI_NotHideCursor;
 }
 
-void UWidgetArchiveCreatingPanel::OnInitialize(UObject* InOwner)
+void UWidgetArchiveCreatingPanel::OnInitialize(UObject* InOwner, const TArray<FParameter>& InParams)
 {
-	Super::OnInitialize(InOwner);
+	Super::OnInitialize(InOwner, InParams);
 }
 
 void UWidgetArchiveCreatingPanel::OnOpen(const TArray<FParameter>& InParams, bool bInstant)

@@ -47,12 +47,12 @@
 #include "Character/States/DWCharacterState_Walk.h"
 #include "FSM/Components/FSMComponent.h"
 #include "Ability/Inventory/Slot/AbilityInventorySkillSlot.h"
-#include "Gameplay/DWGameMode.h"
 #include "Voxel/VoxelModuleStatics.h"
 #include "Widget/WidgetMessageBox.h"
 #include "Widget/WidgetModuleStatics.h"
 #include "Widget/World/WorldWidgetComponent.h"
 #include "Inventory/DWCharacterInventory.h"
+#include "Setting/DWSettingModule.h"
 
 // Sets default values
 ADWCharacter::ADWCharacter(const FObjectInitializer& ObjectInitializer) :
@@ -165,9 +165,9 @@ void ADWCharacter::OnRefresh_Implementation(float DeltaSeconds)
 	}
 }
 
-void ADWCharacter::OnSpawn_Implementation(const TArray<FParameter>& InParams)
+void ADWCharacter::OnSpawn_Implementation(UObject* InOwner, const TArray<FParameter>& InParams)
 {
-	Super::OnSpawn_Implementation(InParams);
+	Super::OnSpawn_Implementation(InOwner, InParams);
 }
 
 void ADWCharacter::OnDespawn_Implementation(bool bRecovery)
@@ -892,7 +892,7 @@ void ADWCharacter::AddMovementInput(FVector WorldDirection, float ScaleValue, bo
 
 	Super::AddMovementInput(WorldDirection, ScaleValue, bForce);
 
-	if (!IsPlayer() || UCommonStatics::GetGameMode<ADWGameMode>()->IsAutoJump())
+	if (!IsPlayer() || UDWSettingModule::Get().IsAutoJump())
 	{
 		FHitResult hitResult;
 		if (RaycastStep(hitResult))

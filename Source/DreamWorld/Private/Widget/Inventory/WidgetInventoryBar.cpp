@@ -41,14 +41,14 @@ UWidgetInventoryBar::UWidgetInventoryBar(const FObjectInitializer& ObjectInitial
 	UISlotDatas.Add(ESlotSplitType::Skill);
 }
 
-void UWidgetInventoryBar::OnInitialize(UObject* InOwner)
+void UWidgetInventoryBar::OnInitialize(UObject* InOwner, const TArray<FParameter>& InParams)
 {
 	if(GetInventory())
 	{
 		GetInventory()->OnSlotSelected.RemoveDynamic(this, &UWidgetInventoryBar::OnInventorySlotSelected);
 	}
 
-	Super::OnInitialize(InOwner);
+	Super::OnInitialize(InOwner, InParams);
 
 	if(!InOwner) return;
 	

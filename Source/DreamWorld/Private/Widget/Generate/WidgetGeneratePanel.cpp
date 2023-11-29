@@ -14,7 +14,7 @@
 #include "Ability/Inventory/AbilityInventoryBase.h"
 #include "Achievement/AchievementModuleStatics.h"
 #include "Character/DWCharacter.h"
-#include "Widget/Common/WidgetButtonBase.h"
+#include "Widget/Common/CommonButton.h"
 #include "Widget/Generate/WidgetGenerateItem.h"
 #include "Widget/Item/WidgetAbilityPreviewItem.h"
 
@@ -33,9 +33,9 @@ UWidgetGeneratePanel::UWidgetGeneratePanel(const FObjectInitializer& ObjectIniti
 	SetIsFocusable(true);
 }
 
-void UWidgetGeneratePanel::OnCreate(UObject* InOwner)
+void UWidgetGeneratePanel::OnCreate(UObject* InOwner, const TArray<FParameter>& InParams)
 {
-	Super::OnCreate(InOwner);
+	Super::OnCreate(InOwner, InParams);
 	
 	if(BtnGenerate)
 	{
@@ -43,7 +43,7 @@ void UWidgetGeneratePanel::OnCreate(UObject* InOwner)
 	}
 }
 
-void UWidgetGeneratePanel::OnInitialize(UObject* InOwner)
+void UWidgetGeneratePanel::OnInitialize(UObject* InOwner, const TArray<FParameter>& InParams)
 {
 	if(OwnerObject)
 	{
@@ -51,7 +51,7 @@ void UWidgetGeneratePanel::OnInitialize(UObject* InOwner)
 		Inventory->OnRefresh.RemoveDynamic(this, &UWidgetGeneratePanel::Refresh);
 	}
 
-	Super::OnInitialize(InOwner);
+	Super::OnInitialize(InOwner, InParams);
 
 	if(InOwner)
 	{
