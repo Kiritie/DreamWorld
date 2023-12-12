@@ -5,7 +5,6 @@
 
 #include "Achievement/AchievementModuleStatics.h"
 #include "Camera/CameraModule.h"
-#include "Camera/CameraModuleStatics.h"
 #include "Character/Player/DWPlayerCharacter.h"
 #include "Common/CommonStatics.h"
 #include "Main/MainModule.h"
@@ -46,6 +45,7 @@ void UProcedure_Playing::OnEnter(UProcedureBase* InLastProcedure)
 	if(InLastProcedure->IsA<UProcedure_Loading>())
 	{
 		AMainModule::UnPauseModuleByClass<USceneModule>();
+		
 		AMainModule::UnPauseModuleByClass<UCameraModule>();
 
 		ISceneActorInterface::Execute_SetActorVisible(UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>(), true);

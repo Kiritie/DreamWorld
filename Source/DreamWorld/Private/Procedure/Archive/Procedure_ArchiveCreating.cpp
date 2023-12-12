@@ -49,9 +49,9 @@ void UProcedure_ArchiveCreating::OnEnter(UProcedureBase* InLastProcedure)
 {
 	Super::OnEnter(InLastProcedure);
 
-	if(OperationTarget && OperationTarget->Implements<USceneActorInterface>())
+	if(OperationTarget.LoadSynchronous() && OperationTarget.LoadSynchronous()->Implements<USceneActorInterface>())
 	{
-		ISceneActorInterface::Execute_SetActorVisible(OperationTarget, true);
+		ISceneActorInterface::Execute_SetActorVisible(OperationTarget.LoadSynchronous(), true);
 	}
 
 	if(!InLastProcedure)
@@ -91,9 +91,9 @@ void UProcedure_ArchiveCreating::OnLeave(UProcedureBase* InNextProcedure)
 
 	if(InNextProcedure->IsA<UProcedure_ArchiveChoosing>())
 	{
-		if(OperationTarget && OperationTarget->Implements<USceneActorInterface>())
+		if(OperationTarget.LoadSynchronous() && OperationTarget.LoadSynchronous()->Implements<USceneActorInterface>())
 		{
-			ISceneActorInterface::Execute_SetActorVisible(OperationTarget, false);
+			ISceneActorInterface::Execute_SetActorVisible(OperationTarget.LoadSynchronous(), false);
 		}
 	}
 }

@@ -45,7 +45,7 @@ void UDWArchiveSaveGame::OnLoad_Implementation(EPhase InPhase)
 	{
 		WHDebug(FString::Printf(TEXT("Loading archive : %d"), SaveData.ID), EDM_All, EDC_SaveGame);
 	}
-	UVoxelModule::Get().LoadSaveData(&SaveData.WorldData, InPhase);
+	UDWVoxelModule::Get().LoadSaveData(&SaveData.WorldData, InPhase);
 	UCommonStatics::GetPlayerController<ADWPlayerController>()->LoadSaveData(&SaveData.PlayerData, InPhase);
 	UDWAchievementModule::Get().LoadSaveData(&SaveData.AchievementData, InPhase);
 	UDWTaskModule::Get().LoadSaveData(&SaveData.TaskData, InPhase);

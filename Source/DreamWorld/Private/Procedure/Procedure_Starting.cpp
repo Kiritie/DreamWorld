@@ -3,14 +3,17 @@
 
 #include "Procedure/Procedure_Starting.h"
 
+#include "Camera/CameraModule.h"
 #include "Camera/CameraModuleStatics.h"
 #include "Gameplay/DWPlayerController.h"
 #include "Common/CommonStatics.h"
+#include "Main/MainModule.h"
 #include "Procedure/ProcedureModuleStatics.h"
 #include "Procedure/Procedure_Initializing.h"
 #include "Procedure/Archive/Procedure_ArchiveChoosing.h"
 #include "SaveGame/Archive/DWArchiveSaveGame.h"
 #include "SaveGame/SaveGameModuleStatics.h"
+#include "Scene/SceneModule.h"
 #include "Widget/WidgetModuleStatics.h"
 #include "Widget/Archive/WidgetArchiveChoosingPanel.h"
 #include "Widget/Menu/WidgetMainMenu.h"
@@ -59,6 +62,8 @@ void UProcedure_Starting::OnEnter(UProcedureBase* InLastProcedure)
 	}
 
 	Super::OnEnter(InLastProcedure);
+
+	AMainModule::PauseModuleByClass<USceneModule>();
 
 	UWidgetModuleStatics::OpenUserWidget<UWidgetMainMenu>();
 	UWidgetModuleStatics::CreateUserWidget<UWidgetArchiveChoosingPanel>();
