@@ -6,8 +6,8 @@
 #include "Ability/Inventory/Slot/AbilityInventoryEquipSlot.h"
 #include "Item/Equip/DWEquipData.h"
 #include "Character/DWCharacter.h"
-#include "Widget/WidgetContextBox.h"
 #include "Widget/WidgetModuleStatics.h"
+#include "Widget/Context/WidgetContextBox.h"
 
 UDWCharacterInventory::UDWCharacterInventory()
 {

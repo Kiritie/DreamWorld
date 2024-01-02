@@ -20,7 +20,7 @@ public:
 	ADWEquipWeapon();
 	
 protected:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Components")
 	UBoxComponent* BoxComponent;
 	
 	UPROPERTY()

@@ -126,10 +126,10 @@ namespace GameplayTags
 	
 	////////////////////////////////////////////////////
 	// Input_System
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(InputTag_ZoomInMiniMap, "Input.System.MiniMap.ZoomIn", "ZoomIn MiniMap");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(InputTag_ZoomOutMiniMap, "Input.System.MiniMap.ZoomOut", "ZoomOut MiniMap");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(InputTag_OpenInventoryPanel, "Input.System.OpenInventoryPanel", "Open Inventory Panel");
-	
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(InputTag_OpenGeneratePanel, "Input.System.OpenGeneratePanel", "Open Generate Panel");
-	
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(InputTag_PauseGame, "Input.System.PauseGame", "Pause Game");
 
 	////////////////////////////////////////////////////

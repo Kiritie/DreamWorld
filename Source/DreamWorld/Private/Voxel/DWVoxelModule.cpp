@@ -7,7 +7,6 @@
 #include "Common/CommonStatics.h"
 #include "Voxel/DWVoxelChunk.h"
 #include "Voxel/VoxelModuleStatics.h"
-#include "Widget/WidgetGameHUD.h"
 #include "SaveGame/SaveGameModuleStatics.h"
 	
 IMPLEMENTATION_MODULE(UDWVoxelModule)
@@ -17,10 +16,7 @@ UDWVoxelModule::UDWVoxelModule()
 {
 	ChunkSpawnClass = ADWVoxelChunk::StaticClass();
 
-	BoundsMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BoundsMesh"));
-	BoundsMesh->SetRelativeScale3D(FVector::ZeroVector);
-	BoundsMesh->SetRelativeRotation(FRotator(0, 0, 0));
-	BoundsMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	BoundsMesh = nullptr;
 }
 
 UDWVoxelModule::~UDWVoxelModule()
@@ -103,10 +99,10 @@ void UDWVoxelModule::GenerateWorld()
 {
 	Super::GenerateWorld();
 
-	if(BoundsMesh && ChunkGenerateIndex != Index_Empty)
+	if(BoundsMesh && ChunkGenerateIndex != EMPTY_Index)
 	{
-		BoundsMesh->SetRelativeLocation(ChunkIndexToLocation(ChunkGenerateIndex));
-		BoundsMesh->SetRelativeScale3D(WorldData->GetWorldRealSize() * 0.01f);
+		BoundsMesh->SetActorLocation(ChunkIndexToLocation(ChunkGenerateIndex));
+		BoundsMesh->SetActorScale3D(WorldData->GetWorldRealSize() * 0.01f);
 	}
 }
 

@@ -5,8 +5,8 @@
 
 #include "TimerManager.h"
 #include "Event/EventModuleStatics.h"
-#include "Event/Handle/Voxel/EventHandle_GenerateVoxel.h"
 #include "Common/CommonStatics.h"
+#include "Event/Handle/Voxel/EventHandle_VoxelGenerated.h"
 
 UTask_GenerateVoxel::UTask_GenerateVoxel()
 {
@@ -59,22 +59,22 @@ void UTask_GenerateVoxel::OnGuide()
 void UTask_GenerateVoxel::OnExecute()
 {
 	Super::OnExecute();
-
-	UEventModuleStatics::SubscribeEvent<UEventHandle_GenerateVoxel>(this, FName("OnGenerateVoxel"));
+	
+	UEventModuleStatics::SubscribeEvent<UEventHandle_VoxelGenerated>(this, FName("OnVoxelGenerated"));
 }
 
 void UTask_GenerateVoxel::OnComplete(ETaskExecuteResult InTaskExecuteResult)
 {
 	Super::OnComplete(InTaskExecuteResult);
 
-	UEventModuleStatics::UnsubscribeEvent<UEventHandle_GenerateVoxel>(this, FName("OnGenerateVoxel"));
+	UEventModuleStatics::UnsubscribeEvent<UEventHandle_VoxelGenerated>(this, FName("OnVoxelGenerated"));
 }
 
 void UTask_GenerateVoxel::OnLeave()
 {
 	Super::OnLeave();
 
-	UEventModuleStatics::UnsubscribeEvent<UEventHandle_GenerateVoxel>(this, FName("OnGenerateVoxel"));
+	UEventModuleStatics::UnsubscribeEvent<UEventHandle_VoxelGenerated>(this, FName("OnVoxelGenerated"));
 }
 
 void UTask_GenerateVoxel::Serialize(FArchive& Ar)
@@ -110,7 +110,7 @@ float UTask_GenerateVoxel::CheckTaskProgress_Implementation(FString& OutInfo) co
 	return (float)CurrentCount / MaxCount;
 }
 
-void UTask_GenerateVoxel::OnGenerateVoxel_Implementation(UObject* InSender, UEventHandle_GenerateVoxel* InEventHandle)
+void UTask_GenerateVoxel::OnVoxelGenerated_Implementation(UObject* InSender, UEventHandle_VoxelGenerated* InEventHandle)
 {
 	CurrentCount++;
 	if(CurrentCount >= MaxCount)

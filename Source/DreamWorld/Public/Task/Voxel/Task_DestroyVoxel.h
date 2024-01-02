@@ -6,7 +6,7 @@
 #include "Task/Base/Task_Base.h"
 #include "Task_DestroyVoxel.generated.h"
 
-class UEventHandle_DestroyVoxel;
+class UEventHandle_VoxelDestroyed;
 /**
  * 
  */
@@ -56,7 +56,7 @@ public:
 
 protected:
 	UFUNCTION(BlueprintNativeEvent)
-	void OnDestroyVoxel(UObject* InSender, UEventHandle_DestroyVoxel* InEventHandle);
+	void OnVoxelDestroyed(UObject* InSender, UEventHandle_VoxelDestroyed* InEventHandle);
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)

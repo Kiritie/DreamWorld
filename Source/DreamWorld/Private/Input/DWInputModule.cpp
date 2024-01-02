@@ -24,6 +24,7 @@
 #include "Widget/Inventory/WidgetInventoryBar.h"
 #include "Widget/Inventory/WidgetInventoryPanel.h"
 #include "Common/DWCommonTypes.h"
+#include "Scene/SceneModuleStatics.h"
 
 IMPLEMENTATION_MODULE(UDWInputModule)
 
@@ -184,10 +185,10 @@ void UDWInputModule::OnBindAction(UInputComponentBase* InInputComponent)
 	InInputComponent->BindInputAction(GameplayTags::InputTag_SelectInventorySlot9, ETriggerEvent::Started, this, &UDWInputModule::SelectInventorySlot9);
 	InInputComponent->BindInputAction(GameplayTags::InputTag_SelectInventorySlot10, ETriggerEvent::Started, this, &UDWInputModule::SelectInventorySlot10);
 	
+	InInputComponent->BindInputAction(GameplayTags::InputTag_ZoomInMiniMap, ETriggerEvent::Started, this, &UDWInputModule::ZoomInMiniMap);
+	InInputComponent->BindInputAction(GameplayTags::InputTag_ZoomOutMiniMap, ETriggerEvent::Started, this, &UDWInputModule::ZoomOutMiniMap);
 	InInputComponent->BindInputAction(GameplayTags::InputTag_OpenInventoryPanel, ETriggerEvent::Started, this, &UDWInputModule::OpenInventoryPanel);
-	
 	InInputComponent->BindInputAction(GameplayTags::InputTag_OpenGeneratePanel, ETriggerEvent::Started, this, &UDWInputModule::OpenGeneratePanel);
-	
 	InInputComponent->BindInputAction(GameplayTags::InputTag_PauseGame, ETriggerEvent::Started, this, &UDWInputModule::PauseGame);
 }
 
@@ -299,56 +300,6 @@ void UDWInputModule::OnSprintPressed()
 void UDWInputModule::OnSprintReleased()
 {
 	bPressedSprint = false;
-}
-
-void UDWInputModule::ToggleControlMode()
-{
-	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
-
-	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput()) return;
-
-	if(PlayerCharacter->ControlMode == EDWCharacterControlMode::Fighting)
-	{
-		PlayerCharacter->SetControlMode(EDWCharacterControlMode::Creating);
-	}
-	else
-	{
-		PlayerCharacter->SetControlMode(EDWCharacterControlMode::Fighting);
-	}
-}
-
-void UDWInputModule::ToggleCrouch()
-{
-	ADWCharacter* PossessedCharacter = UCommonStatics::GetPossessedPawn<ADWCharacter>();
-
-	if(!PossessedCharacter || PossessedCharacter->IsBreakAllInput()) return;
-
-	if(!PossessedCharacter->IsCrouching())
-	{
-		PossessedCharacter->Crouch(true);
-	}
-	else
-	{
-		PossessedCharacter->UnCrouch(true);
-	}
-}
-
-void UDWInputModule::ToggleLockTarget()
-{
-	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
-
-	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput()) return;
-
-	PlayerCharacter->GetTargeting()->TargetActor();
-}
-
-void UDWInputModule::ChangeHand()
-{
-	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
-
-	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput()) return;
-
-	PlayerCharacter->ChangeHand();
 }
 
 void UDWInputModule::OnDodgePressed()
@@ -466,6 +417,56 @@ void UDWInputModule::OnDefendGenerateReleased()
 	}
 }
 
+void UDWInputModule::ToggleControlMode()
+{
+	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
+
+	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput()) return;
+
+	if(PlayerCharacter->ControlMode == EDWCharacterControlMode::Fighting)
+	{
+		PlayerCharacter->SetControlMode(EDWCharacterControlMode::Creating);
+	}
+	else
+	{
+		PlayerCharacter->SetControlMode(EDWCharacterControlMode::Fighting);
+	}
+}
+
+void UDWInputModule::ToggleCrouch()
+{
+	ADWCharacter* PossessedCharacter = UCommonStatics::GetPossessedPawn<ADWCharacter>();
+
+	if(!PossessedCharacter || PossessedCharacter->IsBreakAllInput()) return;
+
+	if(!PossessedCharacter->IsCrouching())
+	{
+		PossessedCharacter->Crouch(true);
+	}
+	else
+	{
+		PossessedCharacter->UnCrouch(true);
+	}
+}
+
+void UDWInputModule::ToggleLockTarget()
+{
+	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
+
+	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput()) return;
+
+	PlayerCharacter->GetTargeting()->TargetActor();
+}
+
+void UDWInputModule::ChangeHand()
+{
+	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
+
+	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput()) return;
+
+	PlayerCharacter->ChangeHand();
+}
+
 void UDWInputModule::ReleaseSkillAbility1()
 {
 	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
@@ -571,50 +572,6 @@ void UDWInputModule::DoInteractAction5()
 	if(PlayerCharacter->GetInteractableActions().IsValidIndex(4))
 	{
 		PlayerCharacter->DoInteract(PlayerCharacter->GetInteractableActions()[4]);
-	}
-}
-
-void UDWInputModule::OpenInventoryPanel()
-{
-	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
-	
-	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput()) return;
-	
-	if(UProcedureModuleStatics::IsCurrentProcedureClass<UProcedure_Playing>())
-	{
-		UWidgetModuleStatics::OpenUserWidget<UWidgetInventoryPanel>(false);
-	}
-}
-
-void UDWInputModule::OpenGeneratePanel()
-{
-	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
-	
-	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput()) return;
-	
-	if(UProcedureModuleStatics::IsCurrentProcedureClass<UProcedure_Playing>())
-	{
-		if(AVoxelInteractAuxiliary* InteractionAgent = PlayerCharacter->GetInteractingAgent<AVoxelInteractAuxiliary>())
-		{
-			switch(InteractionAgent->GetVoxelItem().GetVoxelType())
-			{
-				case EVoxelType::Furnace:
-				case EVoxelType::Crafting_Table:
-				{
-					PlayerCharacter->DoInteract((EInteractAction)EVoxelInteractAction::Open, InteractionAgent);
-					break;
-				}
-				default:
-				{
-					UWidgetModuleStatics::OpenUserWidget<UWidgetGeneratePanel>();
-					break;
-				}
-			}
-		}
-		else
-		{
-			UWidgetModuleStatics::OpenUserWidget<UWidgetGeneratePanel>();
-		}
 	}
 }
 
@@ -783,6 +740,60 @@ void UDWInputModule::SelectInventorySlot10()
 	if(UProcedureModuleStatics::IsCurrentProcedureClass<UProcedure_Playing>())
 	{
 		UWidgetModuleStatics::GetUserWidget<UWidgetInventoryBar>()->SelectInventorySlot(9);
+	}
+}
+
+void UDWInputModule::ZoomInMiniMap()
+{
+	USceneModuleStatics::SetMiniMapRange(USceneModuleStatics::GetMiniMapRange() + 100.f);
+}
+
+void UDWInputModule::ZoomOutMiniMap()
+{
+	USceneModuleStatics::SetMiniMapRange(USceneModuleStatics::GetMiniMapRange() - 100.f);
+}
+
+void UDWInputModule::OpenInventoryPanel()
+{
+	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
+	
+	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput()) return;
+	
+	if(UProcedureModuleStatics::IsCurrentProcedureClass<UProcedure_Playing>())
+	{
+		UWidgetModuleStatics::OpenUserWidget<UWidgetInventoryPanel>(false);
+	}
+}
+
+void UDWInputModule::OpenGeneratePanel()
+{
+	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
+	
+	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput()) return;
+	
+	if(UProcedureModuleStatics::IsCurrentProcedureClass<UProcedure_Playing>())
+	{
+		if(AVoxelInteractAuxiliary* InteractionAgent = PlayerCharacter->GetInteractingAgent<AVoxelInteractAuxiliary>())
+		{
+			switch(InteractionAgent->GetVoxelItem().GetVoxelType())
+			{
+				case EVoxelType::Furnace:
+				case EVoxelType::Crafting_Table:
+				{
+					PlayerCharacter->DoInteract((EInteractAction)EVoxelInteractAction::Open, InteractionAgent);
+					break;
+				}
+				default:
+				{
+					UWidgetModuleStatics::OpenUserWidget<UWidgetGeneratePanel>();
+					break;
+				}
+			}
+		}
+		else
+		{
+			UWidgetModuleStatics::OpenUserWidget<UWidgetGeneratePanel>();
+		}
 	}
 }
 

@@ -48,11 +48,11 @@
 #include "FSM/Components/FSMComponent.h"
 #include "Ability/Inventory/Slot/AbilityInventorySkillSlot.h"
 #include "Voxel/VoxelModuleStatics.h"
-#include "Widget/WidgetMessageBox.h"
 #include "Widget/WidgetModuleStatics.h"
 #include "Widget/World/WorldWidgetComponent.h"
 #include "Inventory/DWCharacterInventory.h"
 #include "Setting/DWSettingModule.h"
+#include "Widget/Message/WidgetMessageBox.h"
 
 // Sets default values
 ADWCharacter::ADWCharacter(const FObjectInitializer& ObjectInitializer) :
@@ -64,7 +64,7 @@ ADWCharacter::ADWCharacter(const FObjectInitializer& ObjectInitializer) :
 	CharacterHP->SetupAttachment(RootComponent);
 	CharacterHP->SetRelativeLocation(FVector(0, 0, 90));
 	CharacterHP->SetWidgetSpace(EWidgetSpace::Screen);
-	static ConstructorHelpers::FClassFinder<UWidgetCharacterHP> CharacterHPClassFinder(TEXT("WidgetBlueprint'/Game/Blueprints/Widget/World/WB_CharacterHP.WB_CharacterHP_C'"));
+	static ConstructorHelpers::FClassFinder<UWidgetCharacterHP> CharacterHPClassFinder(TEXT("WidgetBlueprint'/Game/Blueprints/Widget/World/WBP_CharacterHP.WBP_CharacterHP_C'"));
 	if(CharacterHPClassFinder.Succeeded())
 	{
 		CharacterHP->SetWorldWidgetClass(CharacterHPClassFinder.Class);
@@ -104,7 +104,7 @@ ADWCharacter::ADWCharacter(const FObjectInitializer& ObjectInitializer) :
 	SkillAbilityID = FPrimaryAssetId();
 	AttackType = EDWCharacterAttackType::None;
 	BirthLocation = FVector(0, 0, 0);
-	AIMoveLocation = Vector_Empty;
+	AIMoveLocation = EMPTY_Vector;
 	AIMoveStopDistance = 0;
 
 	AttackAbilities = TMap<EDWWeaponType, FDWCharacterAttackAbilityDatas>();
@@ -134,7 +134,7 @@ void ADWCharacter::OnRefresh_Implementation(float DeltaSeconds)
 			}
 		}
 
-		if (AIMoveLocation != Vector_Empty)
+		if (AIMoveLocation != EMPTY_Vector)
 		{
 			if (DoAIMove(AIMoveLocation, AIMoveStopDistance))
 			{
@@ -871,7 +871,7 @@ bool ADWCharacter::DoAIMove(ADWCharacter* InTargetCharacter, float InMoveStopDis
 
 void ADWCharacter::StopAIMove(bool bMulticast /*= false*/)
 {
-	AIMoveLocation = Vector_Empty;
+	AIMoveLocation = EMPTY_Vector;
 }
 
 void ADWCharacter::AddMovementInput(FVector WorldDirection, float ScaleValue, bool bForce)

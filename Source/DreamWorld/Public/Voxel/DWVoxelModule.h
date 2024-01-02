@@ -54,10 +54,10 @@ protected:
 	virtual void UnloadData(EPhase InPhase) override;
 
 	//////////////////////////////////////////////////////////////////////////
-	// Components
+	// Bounds
 protected:
-	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Components")
-	UStaticMeshComponent* BoundsMesh;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Bounds")
+	AActor* BoundsMesh;
 
 	//////////////////////////////////////////////////////////////////////////
 	// World

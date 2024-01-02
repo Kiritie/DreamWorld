@@ -10,8 +10,8 @@ UWidgetVitalityHP::UWidgetVitalityHP(const FObjectInitializer& ObjectInitializer
 	WidgetName = FName("VitalityHP");
 
 	WidgetAlignment = FVector2D(0.5f);
-	bWidgetAutoVisibility = true;
-	WidgetShowDistance = 1000.f;
+	WidgetVisibilityMode = EWorldWidgetVisibilityMode::RenderAndDistance;
+	WidgetShowDistance = 1500.f;
 }
 
 void UWidgetVitalityHP::OnTick_Implementation(float DeltaSeconds)
@@ -19,15 +19,8 @@ void UWidgetVitalityHP::OnTick_Implementation(float DeltaSeconds)
 	Super::OnTick_Implementation(DeltaSeconds);
 }
 
-void UWidgetVitalityHP::RefreshVisibility_Implementation()
+bool UWidgetVitalityHP::IsWidgetVisible_Implementation(bool bRefresh)
 {
-	Super::RefreshVisibility_Implementation();
-
-	if(GetVisibility() == ESlateVisibility::SelfHitTestInvisible)
-	{
-		if(GetOwnerObject<ADWVitality>() && GetOwnerObject<ADWVitality>()->IsDead())
-		{
-			SetVisibility(ESlateVisibility::Hidden);
-		}
-	}
+	if(bRefresh) return Super::IsWidgetVisible_Implementation(bRefresh) && GetOwnerObject<ADWVitality>() && !GetOwnerObject<ADWVitality>()->IsDead();
+	return Super::IsWidgetVisible_Implementation(bRefresh);
 }

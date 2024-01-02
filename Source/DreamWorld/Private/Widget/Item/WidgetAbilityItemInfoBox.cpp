@@ -8,7 +8,6 @@ UWidgetAbilityItemInfoBox::UWidgetAbilityItemInfoBox(const FObjectInitializer& O
 {
 	WidgetName = FName("ItemInfoBox");
 	ParentName = FName("GameHUD");
-	WidgetInputMode = EInputMode::None;
 
 	WidgetType = EWidgetType::Permanent;
 

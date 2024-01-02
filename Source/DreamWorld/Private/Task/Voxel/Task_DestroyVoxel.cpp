@@ -5,8 +5,8 @@
 
 #include "TimerManager.h"
 #include "Event/EventModuleStatics.h"
-#include "Event/Handle/Voxel/EventHandle_DestroyVoxel.h"
 #include "Common/CommonStatics.h"
+#include "Event/Handle/Voxel/EventHandle_VoxelDestroyed.h"
 
 UTask_DestroyVoxel::UTask_DestroyVoxel()
 {
@@ -59,22 +59,22 @@ void UTask_DestroyVoxel::OnGuide()
 void UTask_DestroyVoxel::OnExecute()
 {
 	Super::OnExecute();
-
-	UEventModuleStatics::SubscribeEvent<UEventHandle_DestroyVoxel>(this, FName("OnDestroyVoxel"));
+	
+	UEventModuleStatics::SubscribeEvent<UEventHandle_VoxelDestroyed>(this, FName("OnVoxelDestroyed"));
 }
 
 void UTask_DestroyVoxel::OnComplete(ETaskExecuteResult InTaskExecuteResult)
 {
 	Super::OnComplete(InTaskExecuteResult);
 
-	UEventModuleStatics::UnsubscribeEvent<UEventHandle_DestroyVoxel>(this, FName("OnDestroyVoxel"));
+	UEventModuleStatics::UnsubscribeEvent<UEventHandle_VoxelDestroyed>(this, FName("OnVoxelDestroyed"));
 }
 
 void UTask_DestroyVoxel::OnLeave()
 {
 	Super::OnLeave();
 
-	UEventModuleStatics::UnsubscribeEvent<UEventHandle_DestroyVoxel>(this, FName("OnDestroyVoxel"));
+	UEventModuleStatics::UnsubscribeEvent<UEventHandle_VoxelDestroyed>(this, FName("OnVoxelDestroyed"));
 }
 
 void UTask_DestroyVoxel::Serialize(FArchive& Ar)
@@ -110,7 +110,7 @@ float UTask_DestroyVoxel::CheckTaskProgress_Implementation(FString& OutInfo) con
 	return (float)CurrentCount / MaxCount;
 }
 
-void UTask_DestroyVoxel::OnDestroyVoxel_Implementation(UObject* InSender, UEventHandle_DestroyVoxel* InEventHandle)
+void UTask_DestroyVoxel::OnVoxelDestroyed_Implementation(UObject* InSender, UEventHandle_VoxelDestroyed* InEventHandle)
 {
 	CurrentCount++;
 	if(CurrentCount >= MaxCount)

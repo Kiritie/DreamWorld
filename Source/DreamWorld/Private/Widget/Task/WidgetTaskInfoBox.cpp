@@ -7,7 +7,7 @@
 #include "Components/VerticalBox.h"
 #include "Components/VerticalBoxSlot.h"
 #include "Event/EventModuleStatics.h"
-#include "Event/Handle/Task/EventHandle_EnterTask.h"
+#include "Event/Handle/Task/EventHandle_TaskEntered.h"
 #include "Task/TaskModuleStatics.h"
 #include "Task/Base/TaskBase.h"
 #include "Widget/WidgetModule.h"
@@ -18,8 +18,8 @@ UWidgetTaskInfoBox::UWidgetTaskInfoBox(const FObjectInitializer& ObjectInitializ
 {
 	WidgetName = FName("TaskInfoBox");
 	ParentName = FName("GameHUD");
+	ParentSlot = FName("Slot_TaskInfoBox");
 	WidgetType = EWidgetType::Permanent;
-	WidgetInputMode = EInputMode::None;
 	WidgetCreateType = EWidgetCreateType::AutoCreateAndOpen;
 }
 
@@ -37,14 +37,14 @@ void UWidgetTaskInfoBox::OnOpen(const TArray<FParameter>& InParams, bool bInstan
 {
 	Super::OnOpen(InParams, bInstant);
 
-	UEventModuleStatics::SubscribeEvent<UEventHandle_EnterTask>(this, FName("Refresh"));
+	UEventModuleStatics::SubscribeEvent<UEventHandle_TaskEntered>(this, FName("Refresh"));
 }
 
 void UWidgetTaskInfoBox::OnClose(bool bInstant)
 {
 	Super::OnClose(bInstant);
 
-	UEventModuleStatics::UnsubscribeEvent<UEventHandle_EnterTask>(this, FName("Refresh"));
+	UEventModuleStatics::UnsubscribeEvent<UEventHandle_TaskEntered>(this, FName("Refresh"));
 }
 
 void UWidgetTaskInfoBox::OnRefresh()

@@ -2,7 +2,7 @@
 
 #pragma once
 #include "Common/DWCommonTypes.h"
-#include "Setting/Widget/Page/WidgetVideoSettingPageBase.h"
+#include "Setting/Widget/Page/Module/WidgetVideoSettingPageBase.h"
 
 #include "WidgetVideoSettingPage.generated.h"
 

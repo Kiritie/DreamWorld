@@ -79,7 +79,7 @@ void ADWPlayerController::LoadData(FSaveData* InSaveData, EPhase InPhase)
 	}
 	if(PHASEC(InPhase, EPhase::Final))
 	{
-		UCharacterModuleStatics::SwitchCharacter(PlayerCharacter, true, true);
+		UCharacterModuleStatics::SwitchCharacter(PlayerCharacter, true);
 		if(SaveData.IsSaved())
 		{
 			UCameraModuleStatics::SetCameraRotation(SaveData.CameraRotation.Yaw, SaveData.CameraRotation.Pitch, true);

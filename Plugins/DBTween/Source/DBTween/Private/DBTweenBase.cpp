@@ -15,7 +15,7 @@ UDBTweenBase::~UDBTweenBase()
 	DBTweenDic.Remove(MyDBTweenKey);
 }
 
-bool UDBTweenBase::DBTweenStop(FString TweenName)
+bool UDBTweenBase::DBTweenStop(FString TweenName, bool bComplete)
 {
 	if(!DBTweenDic.Contains(TweenName))
 	{
@@ -23,7 +23,14 @@ bool UDBTweenBase::DBTweenStop(FString TweenName)
 	}
 	else
 	{
-		DBTweenDic[TweenName]->SetReadyToDestroy();
+		UDBTweenBase* Target = DBTweenDic[TweenName];
+		if(!Target->Finished && bComplete)
+		{
+			Target->Finished = true;
+			Target->UpdateFunc(0.f);
+			Target->Finished = false;
+		}
+		Target->SetReadyToDestroy();
 		return true;
 	}
 }

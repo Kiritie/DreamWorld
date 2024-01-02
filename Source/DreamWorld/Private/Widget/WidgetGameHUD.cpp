@@ -5,37 +5,22 @@
 
 #include "Character/DWCharacter.h"
 #include "Event/EventModuleStatics.h"
-#include "Event/Handle/Input/EventHandle_ChangeInputMode.h"
+#include "Event/Handle/Input/EventHandle_InputModeChanged.h"
 #include "Widget/WidgetModule.h"
 
 
 UWidgetGameHUD::UWidgetGameHUD(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	WidgetName = FName("GameHUD");
-	ChildNames =
-	{
-		FName("InventoryBar"),
-	    FName("InventoryBox"),
-	    FName("InventoryPanel"),
-	    FName("GeneratePanel"),
-	    FName("ShopPanel"),
-	    FName("ContextBox"),
-	    FName("MessageBox"),
-	    FName("TaskInfoBox")
-	};
 	WidgetType = EWidgetType::Permanent;
 	WidgetInputMode = EInputMode::GameOnly;
-
-	WidgetRefreshType = EWidgetRefreshType::Tick;
-
-	SetIsFocusable(true);
 }
 
 void UWidgetGameHUD::OnCreate(UObject* InOwner, const TArray<FParameter>& InParams)
 {
 	Super::OnCreate(InOwner, InParams);
 
-	UEventModuleStatics::SubscribeEvent(UEventHandle_ChangeInputMode::StaticClass(), this, FName("OnChangeInputMode"));
+	UEventModuleStatics::SubscribeEvent(UEventHandle_InputModeChanged::StaticClass(), this, FName("OnInputModeChanged"));
 }
 
 void UWidgetGameHUD::OnInitialize(UObject* InOwner, const TArray<FParameter>& InParams)
@@ -71,7 +56,7 @@ FReply UWidgetGameHUD::NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEv
 	return FReply::Unhandled();
 }
 
-void UWidgetGameHUD::OnChangeInputMode(UObject* InSender, UEventHandle_ChangeInputMode* InEventHandle)
+void UWidgetGameHUD::OnInputModeChanged(UObject* InSender, UEventHandle_InputModeChanged* InEventHandle)
 {
 	if(ADWCharacter* OwnerCharacter = Cast<ADWCharacter>(OwnerObject))
 	{

@@ -2,7 +2,7 @@
 
 #pragma once
 #include "Common/DWCommonTypes.h"
-#include "Setting/Widget/Page/WidgetInputSettingPageBase.h"
+#include "Setting/Widget/Page/Module/WidgetInputSettingPageBase.h"
 
 #include "WidgetInputSettingPage.generated.h"
 

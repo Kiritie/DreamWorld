@@ -28,7 +28,7 @@ public:
 	virtual void ClearAttackHitTargets() override;
 
 protected:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Components")
 	UDWCharacterAttackPoint* AttackPoint;
 
 public:

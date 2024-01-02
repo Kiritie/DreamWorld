@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include "Ability/AbilityModuleTypes.h"
 #include "Widget/Screen/UMG/UserWidgetBase.h"
 #include "WidgetGameHUD.generated.h"
 
@@ -34,27 +33,9 @@ public:
 
 public:
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
-	void SetHeadInfo(const FString& InHeadInfo);
-	
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
-	void SetHealthPercent(float InHealth, float InMaxHealth);
-
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
-	void SetManaPercent(float InMana, float InMaxMana);
-	
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
-	void SetStaminaPercent(float InStamina, float InMaxStamina);
-	
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
 	void SetCrosshairVisible(bool bValue);
-
-	UFUNCTION(BlueprintImplementableEvent)
-	void ShowInteractActions(const TArray<EInteractAction>& InActions);
-		
-	UFUNCTION(BlueprintImplementableEvent)
-	void HideInteractActions();
 
 protected:
 	UFUNCTION()
-	void OnChangeInputMode(UObject* InSender, class UEventHandle_ChangeInputMode* InEventHandle);
+	void OnInputModeChanged(UObject* InSender, class UEventHandle_InputModeChanged* InEventHandle);
 };

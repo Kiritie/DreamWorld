@@ -960,15 +960,15 @@ namespace GameplayTags
 	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(InputTag_SelectInventorySlot8);
 	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(InputTag_SelectInventorySlot9);
 	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(InputTag_SelectInventorySlot10);
-	
+
 	////////////////////////////////////////////////////
 	// Input_System
+	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(InputTag_ZoomInMiniMap);
+	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(InputTag_ZoomOutMiniMap);
 	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(InputTag_OpenInventoryPanel);
-	
 	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(InputTag_OpenGeneratePanel);
-	
 	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(InputTag_PauseGame);
-	
+
 	////////////////////////////////////////////////////
 	// State_Character
 	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(StateTag_Character_Dodging);

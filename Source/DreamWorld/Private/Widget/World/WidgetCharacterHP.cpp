@@ -10,8 +10,8 @@ UWidgetCharacterHP::UWidgetCharacterHP(const FObjectInitializer& ObjectInitializ
 	WidgetName = FName("CharacterHP");
 	
 	WidgetAlignment = FVector2D(0.5f);
-	bWidgetAutoVisibility = true;
-	WidgetShowDistance = 1000.f;
+	WidgetVisibilityMode = EWorldWidgetVisibilityMode::RenderAndDistance;
+	WidgetShowDistance = 1500.f;
 }
 
 void UWidgetCharacterHP::OnTick_Implementation(float DeltaSeconds)
@@ -19,15 +19,8 @@ void UWidgetCharacterHP::OnTick_Implementation(float DeltaSeconds)
 	Super::OnTick_Implementation(DeltaSeconds);
 }
 
-void UWidgetCharacterHP::RefreshVisibility_Implementation()
+bool UWidgetCharacterHP::IsWidgetVisible_Implementation(bool bRefresh)
 {
-	Super::RefreshVisibility_Implementation();
-
-	if(GetVisibility() == ESlateVisibility::SelfHitTestInvisible)
-	{
-		if(GetOwnerObject<ADWCharacter>() && GetOwnerObject<ADWCharacter>()->IsDead())
-		{
-			SetVisibility(ESlateVisibility::Hidden);
-		}
-	}
+	if(bRefresh) return Super::IsWidgetVisible_Implementation(bRefresh) && GetOwnerObject<ADWCharacter>() && !GetOwnerObject<ADWCharacter>()->IsDead();
+	return Super::IsWidgetVisible_Implementation(bRefresh);
 }

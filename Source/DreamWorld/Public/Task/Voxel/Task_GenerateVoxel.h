@@ -6,7 +6,7 @@
 #include "Task/Base/Task_Base.h"
 #include "Task_GenerateVoxel.generated.h"
 
-class UEventHandle_GenerateVoxel;
+class UEventHandle_VoxelGenerated;
 /**
  * 
  */
@@ -56,7 +56,7 @@ public:
 
 protected:
 	UFUNCTION(BlueprintNativeEvent)
-	void OnGenerateVoxel(UObject* InSender, UEventHandle_GenerateVoxel* InEventHandle);
+	void OnVoxelGenerated(UObject* InSender, UEventHandle_VoxelGenerated* InEventHandle);
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)

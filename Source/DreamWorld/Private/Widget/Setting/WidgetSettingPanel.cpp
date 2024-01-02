@@ -7,12 +7,7 @@
 
 UWidgetSettingPanel::UWidgetSettingPanel(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
-	ChildNames.Empty();
-	ChildNames.Add(FName("GameSettingPage"));
-	ChildNames.Add(FName("AudioSettingPage"));
-	ChildNames.Add(FName("VideoSettingPage"));
-	ChildNames.Add(FName("CameraSettingPage"));
-	ChildNames.Add(FName("InputSettingPage"));
+	
 }
 
 void UWidgetSettingPanel::OnInitialize(UObject* InOwner, const TArray<FParameter>& InParams)

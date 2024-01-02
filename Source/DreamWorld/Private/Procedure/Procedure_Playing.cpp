@@ -11,9 +11,9 @@
 #include "Procedure/Procedure_Loading.h"
 #include "Procedure/Procedure_Starting.h"
 #include "Scene/SceneModule.h"
-#include "Widget/WidgetContextBox.h"
 #include "Widget/WidgetGameHUD.h"
 #include "Widget/WidgetModuleStatics.h"
+#include "Widget/Context/WidgetContextBox.h"
 
 UProcedure_Playing::UProcedure_Playing()
 {

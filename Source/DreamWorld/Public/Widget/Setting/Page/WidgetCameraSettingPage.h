@@ -2,7 +2,7 @@
 
 #pragma once
 #include "Common/DWCommonTypes.h"
-#include "Setting/Widget/Page/WidgetCameraSettingPageBase.h"
+#include "Setting/Widget/Page/Module/WidgetCameraSettingPageBase.h"
 
 #include "WidgetCameraSettingPage.generated.h"
 

@@ -46,7 +46,7 @@ void UDWCharacterState_Default::OnEnter(UFiniteStateBase* InLastFiniteState)
 	
 	// local
 	Character->AttackAbilityIndex = 0;
-	Character->AIMoveLocation = Vector_Empty;
+	Character->AIMoveLocation = EMPTY_Vector;
 	Character->AIMoveStopDistance = 0;
 
 	Character->GetCharacterMovement()->SetActive(false);

@@ -3,6 +3,7 @@
 
 #include "Widget/Inventory/WidgetInventoryBar.h"
 
+#include "Ability/Inventory/AbilityInventoryBase.h"
 #include "Ability/Item/AbilityItemDataBase.h"
 #include "Blueprint/WidgetBlueprintLibrary.h"
 #include "Widget/Inventory/Slot/WidgetInventorySlot.h"
@@ -11,7 +12,6 @@
 #include "Components/GridSlot.h"
 #include "Components/SizeBox.h"
 #include "Common/CommonStatics.h"
-#include "Ability/Inventory/AbilityInventoryBase.h"
 #include "Widget/Inventory/WidgetInventoryPanel.h"
 #include "Ability/Inventory/Slot/AbilityInventorySlot.h"
 #include "Asset/AssetModuleStatics.h"
@@ -19,16 +19,16 @@
 #include "Procedure/Procedure_Playing.h"
 #include "Widget/WidgetModuleStatics.h"
 #include "Widget/WidgetGameHUD.h"
-#include "Widget/WidgetMessageBox.h"
 #include "Widget/Inventory/Slot/WidgetInventoryAuxiliarySlot.h"
 #include "Widget/Inventory/Slot/WidgetInventoryShortcutSlot.h"
 #include "Widget/Inventory/Slot/WidgetInventorySkillSlot.h"
+#include "Widget/Message/WidgetMessageBox.h"
 
 UWidgetInventoryBar::UWidgetInventoryBar(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	WidgetName = FName("InventoryBar");
 	ParentName = FName("GameHUD");
-	WidgetInputMode = EInputMode::GameOnly;
+	ParentSlot = FName("Slot_InventoryBar");
 	
 	WidgetCreateType = EWidgetCreateType::AutoCreateAndOpen;
 

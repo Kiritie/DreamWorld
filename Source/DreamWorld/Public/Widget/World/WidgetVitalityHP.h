@@ -23,7 +23,7 @@ public:
 	virtual void OnTick_Implementation(float DeltaSeconds) override;
 	
 public:
-	virtual void RefreshVisibility_Implementation() override;
+	virtual bool IsWidgetVisible_Implementation(bool bRefresh) override;;
 
 public:
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)

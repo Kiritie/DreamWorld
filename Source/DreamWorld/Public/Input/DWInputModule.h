@@ -79,18 +79,6 @@ protected:
 
 	UFUNCTION()
 	virtual void OnSprintReleased();
-	
-	UFUNCTION()
-	virtual void ToggleControlMode();
-
-	UFUNCTION()
-	virtual void ToggleCrouch();
-
-	UFUNCTION()
-	virtual void ToggleLockTarget();
-	
-	UFUNCTION()
-	virtual void ChangeHand();
 
 	UFUNCTION()
 	virtual void OnDodgePressed();
@@ -110,81 +98,100 @@ protected:
 	UFUNCTION()
 	virtual void OnDefendGenerateReleased();
 
-	UFUNCTION()
+public:
+	UFUNCTION(BlueprintCallable)
+	virtual void ToggleControlMode();
+
+	UFUNCTION(BlueprintCallable)
+	virtual void ToggleCrouch();
+
+	UFUNCTION(BlueprintCallable)
+	virtual void ToggleLockTarget();
+	
+	UFUNCTION(BlueprintCallable)
+	virtual void ChangeHand();
+
+	UFUNCTION(BlueprintCallable)
 	virtual void ReleaseSkillAbility1();
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	virtual void ReleaseSkillAbility2();
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	virtual void ReleaseSkillAbility3();
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	virtual void ReleaseSkillAbility4();
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	virtual void DoInteractAction1();
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	virtual void DoInteractAction2();
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	virtual void DoInteractAction3();
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	virtual void DoInteractAction4();
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	virtual void DoInteractAction5();
 
-	UFUNCTION()
-	virtual void OpenInventoryPanel();
-	
-	UFUNCTION()
-	virtual void OpenGeneratePanel();
-
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	virtual void UseInventoryItem();
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	virtual void DiscardInventoryItem();
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	virtual void PrevInventorySlot();
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	virtual void NextInventorySlot();
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	virtual void SelectInventorySlot1();
 		
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	virtual void SelectInventorySlot2();
 		
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	virtual void SelectInventorySlot3();
 		
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	virtual void SelectInventorySlot4();
 		
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	virtual void SelectInventorySlot5();
 		
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	virtual void SelectInventorySlot6();
 		
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	virtual void SelectInventorySlot7();
 		
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	virtual void SelectInventorySlot8();
 		
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	virtual void SelectInventorySlot9();
 		
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	virtual void SelectInventorySlot10();
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
+	virtual void ZoomInMiniMap();
+
+	UFUNCTION(BlueprintCallable)
+	virtual void ZoomOutMiniMap();
+
+	UFUNCTION(BlueprintCallable)
+	virtual void OpenInventoryPanel();
+	
+	UFUNCTION(BlueprintCallable)
+	virtual void OpenGeneratePanel();
+
+	UFUNCTION(BlueprintCallable)
 	virtual void PauseGame();
 };

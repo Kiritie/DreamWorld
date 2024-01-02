@@ -48,6 +48,13 @@ void UProcedure_Starting::OnInitialize()
 
 void UProcedure_Starting::OnEnter(UProcedureBase* InLastProcedure)
 {
+	if(InLastProcedure && InLastProcedure->IsA<UProcedure_ArchiveChoosing>())
+	{
+		CameraViewParams.CameraViewYaw = UCameraModuleStatics::GetCameraRotation().Yaw;
+	}
+
+	Super::OnEnter(InLastProcedure);
+
 	if(!InLastProcedure || InLastProcedure->IsA<UProcedure_Initializing>())
 	{
 		USaveGameModuleStatics::LoadOrCreateSaveGame<UDWArchiveSaveGame>(-1, EPhase::Primary);
@@ -56,12 +63,6 @@ void UProcedure_Starting::OnEnter(UProcedureBase* InLastProcedure)
 	{
 		USaveGameModuleStatics::UnloadSaveGame<UDWArchiveSaveGame>(-1, EPhase::Lesser);
 	}
-	if(InLastProcedure && InLastProcedure->IsA<UProcedure_ArchiveChoosing>())
-	{
-		CameraViewParams.CameraViewYaw = UCameraModuleStatics::GetCameraRotation().Yaw;
-	}
-
-	Super::OnEnter(InLastProcedure);
 
 	AMainModule::PauseModuleByClass<USceneModule>();
 

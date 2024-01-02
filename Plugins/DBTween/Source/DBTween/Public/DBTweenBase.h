@@ -50,7 +50,7 @@ class DBTWEEN_API UDBTweenBase : public UBlueprintAsyncActionBase
 public:
 	~UDBTweenBase();
 	UFUNCTION(BlueprintCallable, Category = "DBTweenUtil | UDBTweenBase")
-		static bool DBTweenStop(FString TweenName);
+		static bool DBTweenStop(FString TweenName, bool bComplete = false);
 
 	UFUNCTION(BlueprintCallable, Category = "DBTweenUtil | UDBTweenBase")
 		static bool DBTweenReset(FString TweenName);

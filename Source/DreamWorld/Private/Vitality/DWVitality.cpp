@@ -29,7 +29,7 @@ ADWVitality::ADWVitality(const FObjectInitializer& ObjectInitializer) :
 	VitalityHP->SetupAttachment(RootComponent);
 	VitalityHP->SetRelativeLocation(FVector(0, 0, 50));
 	VitalityHP->SetWidgetSpace(EWidgetSpace::Screen);
-	static ConstructorHelpers::FClassFinder<UWidgetVitalityHP> VitalityHPClassFinder(TEXT("WidgetBlueprint'/Game/Blueprints/Widget/World/WB_VitalityHP.WB_VitalityHP_C'"));
+	static ConstructorHelpers::FClassFinder<UWidgetVitalityHP> VitalityHPClassFinder(TEXT("WidgetBlueprint'/Game/Blueprints/Widget/World/WBP_VitalityHP.WBP_VitalityHP_C'"));
 	if(VitalityHPClassFinder.Succeeded())
 	{
 		VitalityHP->SetWorldWidgetClass(VitalityHPClassFinder.Class);

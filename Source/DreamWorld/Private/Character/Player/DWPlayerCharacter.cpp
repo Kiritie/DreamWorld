@@ -42,9 +42,7 @@
 #include "Character/States/DWCharacterState_Swim.h"
 #include "Character/States/DWCharacterState_Walk.h"
 #include "FSM/Components/FSMComponent.h"
-#include "Common/CommonStatics.h"
 #include "Widget/World/WorldWidgetComponent.h"
-#include "Widget/WidgetContextBox.h"
 #include "Ability/Item/Raw/AbilityRawDataBase.h"
 #include "Character/DWCharacterData.h"
 #include "Common/Targeting/TargetingComponent.h"
@@ -53,7 +51,10 @@
 #include "Voxel/Voxels/VoxelInteract.h"
 #include "Voxel/Voxels/Auxiliary/VoxelAuxiliary.h"
 #include "Voxel/Voxels/Auxiliary/VoxelInteractAuxiliary.h"
+#include "Widget/Context/WidgetContextBox.h"
 #include "Widget/Generate/WidgetGeneratePanel.h"
+#include "Widget/Head/WidgetHeadBox.h"
+#include "Widget/Interaction/WidgetInteractionBox.h"
 #include "Widget/Inventory/WidgetInventoryBox.h"
 
 //////////////////////////////////////////////////////////////////////////
@@ -71,25 +72,19 @@ ADWPlayerCharacter::ADWPlayerCharacter()
 	Targeting->TargetableActors = ADWCharacter::StaticClass();
 	Targeting->TargetableCollisionChannel = ECC_GameTraceChannel1;
 	Targeting->LockedOnWidgetParentSocket = FName("LockPoint");
+	Targeting->MinimumDistanceToEnable = 1500.f;
 	Targeting->OnTargetLockedOn.AddDynamic(this, &ADWPlayerCharacter::OnTargetLockedOn);
 	Targeting->OnTargetLockedOff.AddDynamic(this, &ADWPlayerCharacter::OnTargetLockedOff);
 	Targeting->OnTargetSetRotation.AddDynamic(this, &ADWPlayerCharacter::OnTargetSetRotation);
 
 	GetMesh()->SetRelativeLocation(FVector(0, 0, -70));
 
-	PreviewCapture = CreateDefaultSubobject<USceneCaptureComponent2D>(FName("SceneCapture"));
+	PreviewCapture = CreateDefaultSubobject<USceneCaptureComponent2D>(FName("PreviewCapture"));
 	PreviewCapture->ProjectionType = ECameraProjectionMode::Orthographic;
 	PreviewCapture->OrthoWidth = 100;
 	PreviewCapture->PrimitiveRenderMode = ESceneCapturePrimitiveRenderMode::PRM_UseShowOnlyList;
 	PreviewCapture->SetupAttachment(RootComponent);
 	PreviewCapture->SetRelativeLocationAndRotation(FVector(100, 0, 0), FRotator(0, 180, 0));
-	
-	MiniMapCapture = CreateDefaultSubobject<USceneCaptureComponent2D>(FName("MiniMapCapture"));
-	MiniMapCapture->ProjectionType = ECameraProjectionMode::Orthographic;
-	MiniMapCapture->OrthoWidth = 1000;
-	//MiniMapCapture->PrimitiveRenderMode = ESceneCapturePrimitiveRenderMode::PRM_UseShowOnlyList;
-	MiniMapCapture->SetupAttachment(RootComponent);
-	MiniMapCapture->SetRelativeLocationAndRotation(FVector(0, 0, 500), FRotator(0, 90, 0));
 
 	FSM->bShowDebugMessage = true;
 	FSM->DefaultState = UDWCharacterState_Default::StaticClass();
@@ -334,9 +329,9 @@ void ADWPlayerCharacter::OnEnterInteract(IInteractionAgentInterface* InInteracti
 {
 	Super::OnEnterInteract(InInteractionAgent);
 
-	if(UWidgetModuleStatics::GetUserWidget<UWidgetGameHUD>())
+	if(UWidgetModuleStatics::GetUserWidget<UWidgetInteractionBox>())
 	{
-		UWidgetModuleStatics::GetUserWidget<UWidgetGameHUD>()->ShowInteractActions(GetInteractableActions());
+		UWidgetModuleStatics::GetUserWidget<UWidgetInteractionBox>()->ShowInteractActions(GetInteractableActions());
 	}
 }
 
@@ -344,9 +339,9 @@ void ADWPlayerCharacter::OnLeaveInteract(IInteractionAgentInterface* InInteracti
 {
 	Super::OnLeaveInteract(InInteractionAgent);
 
-	if(UWidgetModuleStatics::GetUserWidget<UWidgetGameHUD>())
+	if(UWidgetModuleStatics::GetUserWidget<UWidgetInteractionBox>())
 	{
-		UWidgetModuleStatics::GetUserWidget<UWidgetGameHUD>()->HideInteractActions();
+		UWidgetModuleStatics::GetUserWidget<UWidgetInteractionBox>()->HideInteractActions();
 	}
 }
 
@@ -400,9 +395,9 @@ void ADWPlayerCharacter::OnInteract(EInteractAction InInteractAction, IInteracti
 		}
 		default: break;
 	}
-	if(UWidgetModuleStatics::GetUserWidget<UWidgetGameHUD>())
+	if(UWidgetModuleStatics::GetUserWidget<UWidgetInteractionBox>())
 	{
-		UWidgetModuleStatics::GetUserWidget<UWidgetGameHUD>()->ShowInteractActions(GetInteractableActions());
+		UWidgetModuleStatics::GetUserWidget<UWidgetInteractionBox>()->ShowInteractActions(GetInteractableActions());
 	}
 }
 
@@ -510,9 +505,9 @@ void ADWPlayerCharacter::OnAttributeChange(const FOnAttributeChangeData& InAttri
 	
 	if(InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetHealthAttribute() || InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetMaxHealthAttribute())
 	{
-		if(UWidgetModuleStatics::GetUserWidget<UWidgetGameHUD>())
+		if(UWidgetModuleStatics::GetUserWidget<UWidgetHeadBox>())
 		{
-			UWidgetModuleStatics::GetUserWidget<UWidgetGameHUD>()->SetHealthPercent(GetHealth(), GetMaxHealth());
+			UWidgetModuleStatics::GetUserWidget<UWidgetHeadBox>()->SetHealthPercent(GetHealth(), GetMaxHealth());
 		}
 		if(UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>())
 		{
@@ -532,9 +527,9 @@ void ADWPlayerCharacter::OnAttributeChange(const FOnAttributeChangeData& InAttri
 				UWidgetModuleStatics::GetUserWidget<UWidgetContextBox>()->AddMessage(FString::Printf(TEXT("你已升到 %d 级！"), Level));
 			}
 		}
-		if(UWidgetModuleStatics::GetUserWidget<UWidgetGameHUD>())
+		if(UWidgetModuleStatics::GetUserWidget<UWidgetHeadBox>())
 		{
-			UWidgetModuleStatics::GetUserWidget<UWidgetGameHUD>()->SetHeadInfo(GetHeadInfo());
+			UWidgetModuleStatics::GetUserWidget<UWidgetHeadBox>()->SetHeadInfo(GetHeadInfo());
 		}
 		if(UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>())
 		{
@@ -543,9 +538,9 @@ void ADWPlayerCharacter::OnAttributeChange(const FOnAttributeChangeData& InAttri
 	}
 	else if(InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetMaxExpAttribute())
 	{
-		if(UWidgetModuleStatics::GetUserWidget<UWidgetGameHUD>())
+		if(UWidgetModuleStatics::GetUserWidget<UWidgetHeadBox>())
 		{
-			UWidgetModuleStatics::GetUserWidget<UWidgetGameHUD>()->SetHeadInfo(GetHeadInfo());
+			UWidgetModuleStatics::GetUserWidget<UWidgetHeadBox>()->SetHeadInfo(GetHeadInfo());
 		}
 		if(UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>())
 		{
@@ -554,9 +549,9 @@ void ADWPlayerCharacter::OnAttributeChange(const FOnAttributeChangeData& InAttri
 	}
 	else if(InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetManaAttribute() || InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetMaxManaAttribute())
 	{
-		if(UWidgetModuleStatics::GetUserWidget<UWidgetGameHUD>())
+		if(UWidgetModuleStatics::GetUserWidget<UWidgetHeadBox>())
 		{
-			UWidgetModuleStatics::GetUserWidget<UWidgetGameHUD>()->SetManaPercent(GetMana(), GetMaxMana());
+			UWidgetModuleStatics::GetUserWidget<UWidgetHeadBox>()->SetManaPercent(GetMana(), GetMaxMana());
 		}
 		if(UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>())
 		{
@@ -565,9 +560,9 @@ void ADWPlayerCharacter::OnAttributeChange(const FOnAttributeChangeData& InAttri
 	}
 	else if(InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetStaminaAttribute() || InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetMaxStaminaAttribute())
 	{
-		if(UWidgetModuleStatics::GetUserWidget<UWidgetGameHUD>())
+		if(UWidgetModuleStatics::GetUserWidget<UWidgetHeadBox>())
 		{
-			UWidgetModuleStatics::GetUserWidget<UWidgetGameHUD>()->SetStaminaPercent(GetStamina(), GetMaxStamina());
+			UWidgetModuleStatics::GetUserWidget<UWidgetHeadBox>()->SetStaminaPercent(GetStamina(), GetMaxStamina());
 		}
 		if(UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>())
 		{
@@ -675,9 +670,9 @@ void ADWPlayerCharacter::OnAttributeChange(const FOnAttributeChangeData& InAttri
 void ADWPlayerCharacter::SetNameV(FName InName)
 {
 	Super::SetNameV(InName);
-	if(UWidgetModuleStatics::GetUserWidget<UWidgetGameHUD>())
+	if(UWidgetModuleStatics::GetUserWidget<UWidgetHeadBox>())
 	{
-		UWidgetModuleStatics::GetUserWidget<UWidgetGameHUD>()->SetHeadInfo(GetHeadInfo());
+		UWidgetModuleStatics::GetUserWidget<UWidgetHeadBox>()->SetHeadInfo(GetHeadInfo());
 	}
 	if(UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>())
 	{
@@ -688,9 +683,9 @@ void ADWPlayerCharacter::SetNameV(FName InName)
 void ADWPlayerCharacter::SetRaceID(FName InRaceID)
 {
 	Super::SetRaceID(InRaceID);
-	if(UWidgetModuleStatics::GetUserWidget<UWidgetGameHUD>())
+	if(UWidgetModuleStatics::GetUserWidget<UWidgetHeadBox>())
 	{
-		UWidgetModuleStatics::GetUserWidget<UWidgetGameHUD>()->SetHeadInfo(GetHeadInfo());
+		UWidgetModuleStatics::GetUserWidget<UWidgetHeadBox>()->SetHeadInfo(GetHeadInfo());
 	}
 	if(UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>())
 	{
@@ -702,9 +697,9 @@ bool ADWPlayerCharacter::SetLevelV(int32 InLevel)
 {
 	if(!Super::SetLevelV(InLevel)) return false;
 
-	if(UWidgetModuleStatics::GetUserWidget<UWidgetGameHUD>())
+	if(UWidgetModuleStatics::GetUserWidget<UWidgetHeadBox>())
 	{
-		UWidgetModuleStatics::GetUserWidget<UWidgetGameHUD>()->SetHeadInfo(GetHeadInfo());
+		UWidgetModuleStatics::GetUserWidget<UWidgetHeadBox>()->SetHeadInfo(GetHeadInfo());
 	}
 	if(UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>())
 	{
@@ -716,9 +711,9 @@ bool ADWPlayerCharacter::SetLevelV(int32 InLevel)
 void ADWPlayerCharacter::SetTeamID(FName InTeamID)
 {
 	Super::SetTeamID(InTeamID);
-	if(UWidgetModuleStatics::GetUserWidget<UWidgetGameHUD>())
+	if(UWidgetModuleStatics::GetUserWidget<UWidgetHeadBox>())
 	{
-		UWidgetModuleStatics::GetUserWidget<UWidgetGameHUD>()->SetHeadInfo(GetHeadInfo());
+		UWidgetModuleStatics::GetUserWidget<UWidgetHeadBox>()->SetHeadInfo(GetHeadInfo());
 	}
 	if(UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>())
 	{
