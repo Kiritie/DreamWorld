@@ -13,6 +13,7 @@
 	"IsBetaVersion": false,
 	"IsExperimentalVersion": false,
 	"Installed": false,
+	"EditorCustomVirtualPath": "Marketplace",
 	"Modules": [
 		{
 			"Name": "UltraDynamicSky",

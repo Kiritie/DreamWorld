@@ -12,6 +12,7 @@
 	"SupportURL": "",
 	"CanContainContent": true,
 	"Installed": true,
+	"EditorCustomVirtualPath": "Marketplace",
 	"SupportedTargetPlatforms": [
 		"Mac",
 		"Win64",
@@ -30,6 +31,5 @@
 				"IOS"
 			]
 		}
-	],
-	"EditorCustomVirtualPath": "Marketplace/DBTween"
+	]
 }
