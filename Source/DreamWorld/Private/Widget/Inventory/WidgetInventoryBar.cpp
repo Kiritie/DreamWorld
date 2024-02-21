@@ -11,10 +11,10 @@
 #include "Components/GridPanel.h"
 #include "Components/GridSlot.h"
 #include "Components/SizeBox.h"
-#include "Common/CommonStatics.h"
 #include "Widget/Inventory/WidgetInventoryPanel.h"
 #include "Ability/Inventory/Slot/AbilityInventorySlot.h"
 #include "Asset/AssetModuleStatics.h"
+#include "Input/InputModuleStatics.h"
 #include "Procedure/ProcedureModuleStatics.h"
 #include "Procedure/Procedure_Playing.h"
 #include "Widget/WidgetModuleStatics.h"
@@ -63,8 +63,8 @@ void UWidgetInventoryBar::OnInitialize(UObject* InOwner, const TArray<FParameter
 			{
 				if(UWidgetInventoryShortcutSlot* ShortcutSlot = CreateSubWidget<UWidgetInventoryShortcutSlot>({ ShortcutSlots[i] }, UAssetModuleStatics::GetStaticClass(FName("InventoryShortcutSlot"))))
 				{
-					//ShortcutSlot->SetKeyCode(UDWHelper::GetInputActionKeyCodeByName(FString::Printf(TEXT("SelectInventorySlot%d"), i + 1)));
-					ShortcutSlot->SetKeyCode(FText::FromString(FString::FromInt(i < 9 ? i + 1 : 0)));
+					ShortcutSlot->SetKeyCode(UInputModuleStatics::GetPlayerKeyMappingInfoByName(*FString::Printf(TEXT("SelectInventorySlot%d"), i + 1)).KeyCode);
+					// ShortcutSlot->SetKeyCode(FText::FromString(FString::FromInt(i < 9 ? i + 1 : 0)));
 					if(UGridSlot* GridSlot = ShortcutContent->AddChildToGrid(ShortcutSlot))
 					{
 						GridSlot->SetPadding(FMargin(0.f, 0.f, 5.f, 0.f));
@@ -93,8 +93,8 @@ void UWidgetInventoryBar::OnInitialize(UObject* InOwner, const TArray<FParameter
 			{
 				if(UWidgetInventoryAuxiliarySlot* AuxiliarySlot = CreateSubWidget<UWidgetInventoryAuxiliarySlot>({ AuxiliarySlots[i] }, UAssetModuleStatics::GetStaticClass(FName("InventoryAuxiliarySlot"))))
 				{
-					//AuxiliarySlot->SetKeyCode(UCommonStatics::GetInputActionKeyCodeByName(FString::Printf(TEXT("ReleaseAuxiliaryAbility%d"), i + 1)));
-					AuxiliarySlot->SetKeyCode(FText::FromString(TEXT("X")));
+					AuxiliarySlot->SetKeyCode(UInputModuleStatics::GetPlayerKeyMappingInfoByName(*FString::Printf(TEXT("ReleaseAuxiliaryAbility%d"), i + 1)).KeyCode);
+					// AuxiliarySlot->SetKeyCode(FText::FromString(TEXT("X")));
 					if(UGridSlot* GridSlot = AuxiliaryContent->AddChildToGrid(AuxiliarySlot))
 					{
 						GridSlot->SetPadding(FMargin(0.f, 0.f, 5.f, 0.f));
@@ -124,7 +124,7 @@ void UWidgetInventoryBar::OnInitialize(UObject* InOwner, const TArray<FParameter
 			{
 				if(UWidgetInventorySkillSlot* SkillSlot = CreateSubWidget<UWidgetInventorySkillSlot>({ SkillSlots[i] }, UAssetModuleStatics::GetStaticClass(FName("InventorySkillSlot"))))
 				{
-					SkillSlot->SetKeyCode(UCommonStatics::GetInputActionKeyCodeByName(FString::Printf(TEXT("ReleaseSkillAbility%d"), i + 1)));
+					SkillSlot->SetKeyCode(UInputModuleStatics::GetPlayerKeyMappingInfoByName(*FString::Printf(TEXT("ReleaseSkillAbility%d"), i + 1)).KeyCode);
 					if(UGridSlot* GridSlot = i < SkillSlots.Num() / 2 ? LeftSkillContent->AddChildToGrid(SkillSlot) : RightSkillContent->AddChildToGrid(SkillSlot))
 					{
 						GridSlot->SetPadding(FMargin(0.f, 0.f, 5.f, 0.f));

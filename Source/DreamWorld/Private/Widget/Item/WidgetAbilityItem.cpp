@@ -7,7 +7,6 @@
 #include "Blueprint/WidgetLayoutLibrary.h"
 #include "Components/CanvasPanelSlot.h"
 #include "Ability/Item/AbilityItemDataBase.h"
-#include "Common/CommonStatics.h"
 #include "Widget/Item/WidgetAbilityItemInfoBox.h"
 
 class UWidgetAbilityItemInfoBox;
@@ -40,13 +39,13 @@ FReply UWidgetAbilityItem::NativeOnFocusReceived(const FGeometry& InGeometry, co
 
 FReply UWidgetAbilityItem::NativeOnMouseMove(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
 {
-	if(const auto ItemInfoBoxSlot = Cast<UCanvasPanelSlot>(UWidgetModuleStatics::GetUserWidget<UWidgetAbilityItemInfoBox>()->Slot))
+	if(const UWidgetAbilityItemInfoBox* ItemInfoBox = UWidgetModuleStatics::GetUserWidget<UWidgetAbilityItemInfoBox>())
 	{
-		float PosX, PosY;
-		UWidgetLayoutLibrary::GetMousePositionScaledByDPI(UCommonStatics::GetPlayerController(), PosX, PosY);
-		ItemInfoBoxSlot->SetPosition(FVector2D(PosX, PosY));
+		if(const auto ItemInfoBoxSlot = Cast<UCanvasPanelSlot>(ItemInfoBox->Slot))
+		{
+			ItemInfoBoxSlot->SetPosition(UWidgetLayoutLibrary::GetMousePositionOnViewport(this));
+		}
 	}
-
 	return Super::NativeOnMouseMove(InGeometry, InMouseEvent);
 }
 

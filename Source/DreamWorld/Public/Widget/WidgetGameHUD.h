@@ -28,7 +28,8 @@ public:
 	virtual void OnRefresh() override;
 
 	virtual void OnClose(bool bInstant) override;
-	
+
+protected:
 	virtual FReply NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent) override;
 
 public:

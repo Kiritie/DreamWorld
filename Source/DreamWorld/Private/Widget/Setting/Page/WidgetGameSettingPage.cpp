@@ -3,13 +3,13 @@
 
 #include "Widget/Setting/Page/WidgetGameSettingPage.h"
 
+#include "ObjectPool/ObjectPoolModuleStatics.h"
 #include "SaveGame/SaveGameModuleStatics.h"
 #include "SaveGame/Setting/DWSettingSaveGame.h"
 #include "Setting/DWSettingModule.h"
 #include "Setting/SettingModule.h"
 #include "Setting/Widget/Item/WidgetBoolSettingItemBase.h"
 #include "Setting/Widget/Item/WidgetEnumSettingItemBase.h"
-#include "Widget/WidgetModuleStatics.h"
 
 UWidgetGameSettingPage::UWidgetGameSettingPage(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -27,10 +27,10 @@ void UWidgetGameSettingPage::OnCreate(UObject* InOwner, const TArray<FParameter>
 {
 	Super::OnCreate(InOwner, InParams);
 
-	SettingItem_GameLevel = CreateSubWidget<UWidgetEnumSettingItemBase>({ FText::FromString(TEXT("游戏难度")), FString("/Script/DreamWorld.EDWGameLevel") }, USettingModule::Get().GetEnumSettingItemClass());
+	SettingItem_GameLevel = UObjectPoolModuleStatics::SpawnObject<UWidgetEnumSettingItemBase>(nullptr, { FText::FromString(TEXT("游戏难度")), FString("/Script/DreamWorld.EDWGameLevel") }, USettingModule::Get().GetEnumSettingItemClass());
 	AddSettingItem(FName("GameLevel"), SettingItem_GameLevel, FText::FromString(TEXT("游戏")));
 
-	SettingItem_AutoJump = CreateSubWidget<UWidgetBoolSettingItemBase>({ FText::FromString(TEXT("自动跳跃")) }, USettingModule::Get().GetBoolSettingItemClass());
+	SettingItem_AutoJump = UObjectPoolModuleStatics::SpawnObject<UWidgetBoolSettingItemBase>(nullptr, { FText::FromString(TEXT("自动跳跃")) }, USettingModule::Get().GetBoolSettingItemClass());
 	AddSettingItem(FName("AutoJump"), SettingItem_AutoJump, FText::FromString(TEXT("控制")));
 }
 

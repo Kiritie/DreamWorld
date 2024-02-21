@@ -4,7 +4,6 @@
 #include "Procedure/Procedure_Pausing.h"
 
 #include "Common/CommonStatics.h"
-#include "Main/MainModuleStatics.h"
 #include "Procedure/Procedure_Starting.h"
 #include "Widget/WidgetGameHUD.h"
 #include "Widget/WidgetModuleStatics.h"
@@ -38,8 +37,7 @@ void UProcedure_Pausing::OnEnter(UProcedureBase* InLastProcedure)
 {
 	Super::OnEnter(InLastProcedure);
 
-	UGameplayStatics::SetGamePaused(this, true);
-	UMainModuleStatics::PauseAllModule();
+	UCommonStatics::PauseGame();
 
 	UWidgetModuleStatics::OpenUserWidget<UWidgetPausingMenu>();
 }
@@ -58,8 +56,7 @@ void UProcedure_Pausing::OnLeave(UProcedureBase* InNextProcedure)
 {
 	Super::OnLeave(InNextProcedure);
 
-	UGameplayStatics::SetGamePaused(this, false);
-	UMainModuleStatics::UnPauseAllModule();
+	UCommonStatics::UnPauseGame();
 
 	if(InNextProcedure->IsA<UProcedure_Starting>())
 	{

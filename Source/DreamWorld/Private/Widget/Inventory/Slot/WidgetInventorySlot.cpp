@@ -15,7 +15,6 @@
 #include "Blueprint/WidgetLayoutLibrary.h"
 #include "Components/CanvasPanelSlot.h"
 #include "Widget/WidgetModuleStatics.h"
-#include "Common/CommonStatics.h"
 #include "Widget/Item/WidgetAbilityItemInfoBox.h"
 
 UWidgetInventorySlot::UWidgetInventorySlot(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
@@ -92,11 +91,12 @@ FReply UWidgetInventorySlot::NativeOnMouseMove(const FGeometry& InGeometry, cons
 {
 	if(!IsEmpty())
 	{
-		if(const auto ItemInfoBoxSlot = Cast<UCanvasPanelSlot>(UWidgetModuleStatics::GetUserWidget<UWidgetAbilityItemInfoBox>()->Slot))
+		if(const UWidgetAbilityItemInfoBox* ItemInfoBox = UWidgetModuleStatics::GetUserWidget<UWidgetAbilityItemInfoBox>())
 		{
-			float PosX, PosY;
-			UWidgetLayoutLibrary::GetMousePositionScaledByDPI(UCommonStatics::GetPlayerController(), PosX, PosY);
-			ItemInfoBoxSlot->SetPosition(FVector2D(PosX, PosY));
+			if(const auto ItemInfoBoxSlot = Cast<UCanvasPanelSlot>(ItemInfoBox->Slot))
+			{
+				ItemInfoBoxSlot->SetPosition(UWidgetLayoutLibrary::GetMousePositionOnViewport(this));
+			}
 		}
 	}
 	return Super::NativeOnMouseMove(InGeometry, InMouseEvent);

@@ -28,7 +28,7 @@ void UWidgetGenerateItem::OnSelected()
 {
 	Super::OnSelected();
 
-	if(UWidgetGeneratePanel* GeneratePanel = Cast<UWidgetGeneratePanel>(Owner))
+	if(UWidgetGeneratePanel* GeneratePanel = Cast<UWidgetGeneratePanel>(OwnerWidget))
 	{
 		GeneratePanel->OnGenerateSlotSelected(this);
 	}

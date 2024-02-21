@@ -6,6 +6,7 @@
 #include "Character/DWCharacter.h"
 #include "Event/EventModuleStatics.h"
 #include "Event/Handle/Input/EventHandle_InputModeChanged.h"
+#include "Input/InputModuleStatics.h"
 #include "Widget/WidgetModule.h"
 
 
@@ -45,7 +46,7 @@ void UWidgetGameHUD::OnRefresh()
 
 FReply UWidgetGameHUD::NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent)
 {
-	if(InKeyEvent.GetKey() == FKey("Escape"))
+	if(UInputModuleStatics::IsPlayerMappedKeyByName(FName("SystemOperation"), InKeyEvent.GetKey()))
 	{
 		if(TemporaryChild)
 		{

@@ -3,6 +3,7 @@
 
 #include "Widget/Menu/WidgetPausingMenu.h"
 
+#include "Input/InputModuleStatics.h"
 #include "Procedure/ProcedureModuleStatics.h"
 #include "Procedure/Procedure_Pausing.h"
 #include "Procedure/Procedure_Playing.h"
@@ -35,7 +36,7 @@ void UWidgetPausingMenu::OnClose(bool bInstant)
 
 FReply UWidgetPausingMenu::NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent)
 {
-	if(InKeyEvent.GetKey() == FKey("Escape"))
+	if(UInputModuleStatics::IsPlayerMappedKeyByName(FName("SystemOperation"), InKeyEvent.GetKey()))
 	{
 		if(UProcedureModuleStatics::IsCurrentProcedureClass<UProcedure_Pausing>())
 		{

@@ -3,6 +3,7 @@
 
 #include "Widget/Setting/WidgetSettingPanel.h"
 
+#include "Input/InputModuleStatics.h"
 #include "Widget/WidgetModuleStatics.h"
 
 UWidgetSettingPanel::UWidgetSettingPanel(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
@@ -27,7 +28,7 @@ void UWidgetSettingPanel::OnClose(bool bInstant)
 
 FReply UWidgetSettingPanel::NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent)
 {
-	if(InKeyEvent.GetKey() == FKey("Escape"))
+	if(UInputModuleStatics::IsPlayerMappedKeyByName(FName("SystemOperation"), InKeyEvent.GetKey()))
 	{
 		Close();
 		return FReply::Handled();

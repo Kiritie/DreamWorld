@@ -10,11 +10,11 @@
 #include "Common/CommonStatics.h"
 #include "Procedure/ProcedureModuleStatics.h"
 #include "SaveGame/SaveGameModuleStatics.h"
-#include "Widget/WidgetModuleStatics.h"
 #include "ObjectPool/ObjectPoolModuleStatics.h"
 #include "Voxel/Chunks/VoxelChunk.h"
 #include "Procedure/Archive/Procedure_ArchiveCreating.h"
 #include "Character/CharacterModuleStatics.h"
+#include "Input/InputModule.h"
 #include "Main/MainModule.h"
 
 ADWPlayerController::ADWPlayerController()

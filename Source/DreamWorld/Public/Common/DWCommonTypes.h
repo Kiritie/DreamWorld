@@ -921,6 +921,12 @@ public:
 namespace GameplayTags
 {
 	////////////////////////////////////////////////////
+	// Input_Shortcut
+	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(InputTag_InventoryAll);
+	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(InputTag_InventorySingle);
+	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(InputTag_InventorySplit);
+
+	////////////////////////////////////////////////////
 	// Input_Player
 	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(InputTag_Sprint);
 	
@@ -965,9 +971,9 @@ namespace GameplayTags
 	// Input_System
 	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(InputTag_ZoomInMiniMap);
 	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(InputTag_ZoomOutMiniMap);
+	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(InputTag_OpenMaxMapBox);
 	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(InputTag_OpenInventoryPanel);
 	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(InputTag_OpenGeneratePanel);
-	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(InputTag_PauseGame);
 
 	////////////////////////////////////////////////////
 	// State_Character

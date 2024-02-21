@@ -84,6 +84,12 @@ void UDWDamageHandle::HandleDamage(AActor* SourceActor, AActor* TargetActor, flo
 namespace GameplayTags
 {
 	////////////////////////////////////////////////////
+	// Input_Shortcut
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(InputTag_InventoryAll, "Input.Shortcut.InventoryAll", "Inventory All");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(InputTag_InventorySingle, "Input.Shortcut.InventorySingle", "Inventory Single");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(InputTag_InventorySplit, "Input.Shortcut.InventorySplit", "Inventory Split");
+	
+	////////////////////////////////////////////////////
 	// Input_Player
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(InputTag_Sprint, "Input.Player.Sprint", "Sprint");
 	
@@ -128,9 +134,9 @@ namespace GameplayTags
 	// Input_System
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(InputTag_ZoomInMiniMap, "Input.System.MiniMap.ZoomIn", "ZoomIn MiniMap");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(InputTag_ZoomOutMiniMap, "Input.System.MiniMap.ZoomOut", "ZoomOut MiniMap");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(InputTag_OpenMaxMapBox, "Input.System.OpenMaxMapBox", "Open MaxMap Box");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(InputTag_OpenInventoryPanel, "Input.System.OpenInventoryPanel", "Open Inventory Panel");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(InputTag_OpenGeneratePanel, "Input.System.OpenGeneratePanel", "Open Generate Panel");
-	UE_DEFINE_GAMEPLAY_TAG_COMMENT(InputTag_PauseGame, "Input.System.PauseGame", "Pause Game");
 
 	////////////////////////////////////////////////////
 	// State_Character
