@@ -108,7 +108,7 @@ void UDWInputManager::OnBindAction(UInputComponentBase* InInputComponent)
 	InInputComponent->BindInputAction(GameplayTags::InputTag_Dodge, ETriggerEvent::Started, this, &UDWInputManager::OnDodgePressed);
 	InInputComponent->BindInputAction(GameplayTags::InputTag_Dodge, ETriggerEvent::Completed, this, &UDWInputManager::OnDodgeReleased);
 	
-	InInputComponent->BindInputAction(GameplayTags::InputTag_ToggleCrouch, ETriggerEvent::Started, this, &UDWInputManager::ToggleCrouch);
+	// InInputComponent->BindInputAction(GameplayTags::InputTag_ToggleCrouch, ETriggerEvent::Started, this, &UDWInputManager::ToggleCrouch);
 	InInputComponent->BindInputAction(GameplayTags::InputTag_ToggleControlMode, ETriggerEvent::Started, this, &UDWInputManager::ToggleControlMode);
 	InInputComponent->BindInputAction(GameplayTags::InputTag_ToggleLockSightTarget, ETriggerEvent::Started, this, &UDWInputManager::ToggleLockTarget);
 	InInputComponent->BindInputAction(GameplayTags::InputTag_ChangeHand, ETriggerEvent::Started, this, &UDWInputManager::ChangeHand);
