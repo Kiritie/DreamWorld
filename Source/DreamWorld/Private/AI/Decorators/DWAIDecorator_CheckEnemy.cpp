@@ -4,9 +4,8 @@
 #include "AI/Decorators/DWAIDecorator_CheckEnemy.h"
 
 #include "Character/DWCharacter.h"
-#include "AIModule/Classes/BehaviorTree/BehaviorTreeComponent.h"
-#include "AIModule/Classes/BehaviorTree/BlackboardComponent.h"
 #include "AI/DWAIController.h"
+#include "BehaviorTree/BlackboardComponent.h"
 
 UDWAIDecorator_CheckEnemy::UDWAIDecorator_CheckEnemy(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {

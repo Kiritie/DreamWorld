@@ -244,26 +244,20 @@ void ADWCharacter::LoadData(FSaveData* InSaveData, EPhase InPhase)
 			const UDWCharacterData& CharacterData = GetCharacterData<UDWCharacterData>();
 			if(CharacterData.IsValid())
 			{
-				TArray<FDWCharacterAttackAbilityData> attackAbilities;
-				UAssetModuleStatics::ReadDataTable(CharacterData.AttackAbilityTable, attackAbilities);
-				for(auto& Iter : attackAbilities)
+				for(auto Iter : CharacterData.AttackAbilities)
 				{
 					Iter.AbilityHandle = AbilitySystem->K2_GiveAbility(Iter.AbilityClass, Iter.AbilityLevel);
 					if(!AttackAbilities.Contains(Iter.WeaponType)) AttackAbilities.Add(Iter.WeaponType);
 					AttackAbilities[Iter.WeaponType].Array.Add(Iter);
 				}
 
-				TArray<FDWCharacterSkillAbilityData> skillAbilities;
-				UAssetModuleStatics::ReadDataTable(CharacterData.SkillAbilityTable, skillAbilities);
-				for(auto& Iter : skillAbilities)
+				for(auto Iter : CharacterData.SkillAbilities)
 				{
 					Iter.AbilityHandle = AbilitySystem->K2_GiveAbility(Iter.AbilityClass, Iter.AbilityLevel);
 					SkillAbilities.Add(Iter.AbilityID, Iter);
 				}
 
-				TArray<FDWCharacterActionAbilityData> actionAbilities;
-				UAssetModuleStatics::ReadDataTable(CharacterData.ActionAbilityTable, actionAbilities);
-				for(auto& Iter : actionAbilities)
+				for(auto Iter : CharacterData.ActionAbilities)
 				{
 					Iter.AbilityHandle = AbilitySystem->K2_GiveAbility(Iter.AbilityClass, Iter.AbilityLevel);
 					ActionAbilities.Add(Iter.ActionType, Iter);
@@ -1216,7 +1210,7 @@ void ADWCharacter::ClearAttackHitTargets()
 bool ADWCharacter::RaycastStep(FHitResult& OutHitResult)
 {
 	const FVector rayStart = GetActorLocation() + FVector::DownVector * (GetHalfHeight() - GetCharacterMovement()->MaxStepHeight);
-	const FVector rayEnd = rayStart + GetMoveDirection() * (GetRadius() + UVoxelModule::Get().GetWorldData().BlockSize * FMath::Clamp(GetMoveDirection().Size() * 0.005f, 0.5f, 1.3f));
+	const FVector rayEnd = rayStart + GetMoveDirection() * (GetRadius() + UVoxelModule::Get().GetWorldData().BlockSize * FMath::Lerp(0.4f, 1.3f, GetMoveVelocity().Size() / 500.f));
 	return UKismetSystemLibrary::LineTraceSingle(this, rayStart, rayEnd, UCommonStatics::GetGameTraceType((ECollisionChannel)EDWGameTraceChannel::Step), false, {}, EDrawDebugTrace::None, OutHitResult, true);
 }
 

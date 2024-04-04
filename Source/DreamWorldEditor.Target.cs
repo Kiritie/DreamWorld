@@ -8,7 +8,8 @@ public class DreamWorldEditorTarget : TargetRules
 	public DreamWorldEditorTarget(TargetInfo InTarget) : base(InTarget)
 	{
 		Type = TargetType.Editor;
-		DefaultBuildSettings = BuildSettingsVersion.V2;
-		ExtraModuleNames.AddRange(new string[] { "DreamWorld" });
+		DefaultBuildSettings = BuildSettingsVersion.V4;
+		IncludeOrderVersion = EngineIncludeOrderVersion.Unreal5_3;
+		ExtraModuleNames.Add("DreamWorld");
 	}
 }

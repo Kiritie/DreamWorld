@@ -3,9 +3,8 @@
 
 #include "AI/Tasks/DWAITask_AIFollow.h"
 #include "BehaviorTree/BehaviorTreeTypes.h"
+#include "BehaviorTree/BlackboardComponent.h"
 #include "Character/DWCharacter.h"
-#include "AIModule/Classes/BehaviorTree/BehaviorTreeComponent.h"
-#include "AIModule/Classes/BehaviorTree/BlackboardComponent.h"
 
 UDWAITask_AIFollow::UDWAITask_AIFollow(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {

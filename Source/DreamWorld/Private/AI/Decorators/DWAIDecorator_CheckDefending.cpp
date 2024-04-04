@@ -3,9 +3,8 @@
 
 #include "AI/Decorators/DWAIDecorator_CheckDefending.h"
 
+#include "BehaviorTree/BlackboardComponent.h"
 #include "Character/DWCharacter.h"
-#include "AIModule/Classes/BehaviorTree/BehaviorTreeComponent.h"
-#include "AIModule/Classes/BehaviorTree/BlackboardComponent.h"
 
 UDWAIDecorator_CheckDefending::UDWAIDecorator_CheckDefending(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {

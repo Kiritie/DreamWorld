@@ -6,9 +6,8 @@
 #include "BehaviorTree/BehaviorTreeTypes.h"
 #include "Character/DWCharacter.h"
 #include "BehaviorTree/BlackboardComponent.h"
-#include "AIModule/Classes/BehaviorTree/Blackboard/BlackboardKeyType_Object.h"
-#include "AIModule/Classes/BehaviorTree/Blackboard/BlackboardKeyType_Vector.h"
 #include "BehaviorTree/BehaviorTree.h"
+#include "BehaviorTree/Blackboard/BlackboardKeyType_Vector.h"
 
 UDWAITask_AIMoveTo::UDWAITask_AIMoveTo(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {

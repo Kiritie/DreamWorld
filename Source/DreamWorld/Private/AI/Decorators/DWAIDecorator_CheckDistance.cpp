@@ -4,9 +4,8 @@
 #include "AI/Decorators/DWAIDecorator_CheckDistance.h"
 
 #include "Character/DWCharacter.h"
-#include "AIModule/Classes/BehaviorTree/BehaviorTreeComponent.h"
-#include "AIModule/Classes/BehaviorTree/BlackboardComponent.h"
 #include "AI/DWAIController.h"
+#include "BehaviorTree/BlackboardComponent.h"
 
 UDWAIDecorator_CheckDistance::UDWAIDecorator_CheckDistance(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {

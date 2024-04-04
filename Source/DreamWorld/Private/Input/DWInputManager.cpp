@@ -717,7 +717,7 @@ void UDWInputManager::OpenInventoryPanel()
 	
 	if(UProcedureModuleStatics::IsCurrentProcedureClass<UProcedure_Playing>())
 	{
-		UWidgetModuleStatics::OpenUserWidget<UWidgetInventoryPanel>(false);
+		UWidgetModuleStatics::OpenUserWidget<UWidgetInventoryPanel>();
 	}
 }
 

@@ -33,14 +33,14 @@ public:
 	float PatrolDuration;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	UDataTable* AttackAbilityTable;
+	TArray<FDWCharacterAttackAbilityData> AttackAbilities;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	UDataTable* SkillAbilityTable;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	UDataTable* ActionAbilityTable;
+	TArray<FDWCharacterSkillAbilityData> SkillAbilities;
 		
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TArray<FDWCharacterActionAbilityData> ActionAbilities;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UBehaviorTree* BehaviorTreeAsset;
 

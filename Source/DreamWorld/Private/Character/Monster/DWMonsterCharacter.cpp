@@ -25,7 +25,7 @@ bool ADWMonsterCharacter::CanInteract(EInteractAction InInteractAction, IInterac
 {
 	switch (InInteractAction)
 	{
-		case EDWInteractAction::Feed:
+		case (EInteractAction)EDWInteractAction::Feed:
 		{
 			if(ADWCharacter* InInteractionCharacter = Cast<ADWCharacter>(InInteractionAgent))
 			{
@@ -34,7 +34,7 @@ bool ADWMonsterCharacter::CanInteract(EInteractAction InInteractAction, IInterac
 			}
 			break;
 		}
-		case EDWInteractAction::Ride:
+		case (EInteractAction)EDWInteractAction::Ride:
 		{
 			if(ADWCharacter* InInteractionCharacter = Cast<ADWCharacter>(InInteractionAgent))
 			{
@@ -42,7 +42,7 @@ bool ADWMonsterCharacter::CanInteract(EInteractAction InInteractAction, IInterac
 			}
 			break;
 		}
-		case EDWInteractAction::UnRide:
+		case (EInteractAction)EDWInteractAction::UnRide:
 		{
 			if(ADWCharacter* InInteractionCharacter = Cast<ADWCharacter>(InInteractionAgent))
 			{
@@ -63,7 +63,7 @@ void ADWMonsterCharacter::OnInteract(EInteractAction InInteractAction, IInteract
 	
 	switch (InInteractAction)
 	{
-		case EDWInteractAction::Feed:
+		case (EInteractAction)EDWInteractAction::Feed:
 		{
 			if(ADWCharacter* TriggerCharacter = Cast<ADWCharacter>(InInteractionAgent))
 			{
@@ -73,7 +73,7 @@ void ADWMonsterCharacter::OnInteract(EInteractAction InInteractAction, IInteract
 			}
 			break;
 		}
-		case EDWInteractAction::Ride:
+		case (EInteractAction)EDWInteractAction::Ride:
 		{
 			if(ADWCharacter* TriggerCharacter = Cast<ADWCharacter>(InInteractionAgent))
 			{
@@ -81,7 +81,7 @@ void ADWMonsterCharacter::OnInteract(EInteractAction InInteractAction, IInteract
 			}
 			break;
 		}
-		case EDWInteractAction::UnRide:
+		case (EInteractAction)EDWInteractAction::UnRide:
 		{
 			if(ADWCharacter* TriggerCharacter = Cast<ADWCharacter>(InInteractionAgent))
 			{

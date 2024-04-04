@@ -3,8 +3,8 @@
 
 #include "AI/Tasks/DWAITask_AIPatrol.h"
 #include "BehaviorTree/BehaviorTreeTypes.h"
+#include "BehaviorTree/BlackboardComponent.h"
 #include "Character/DWCharacter.h"
-#include "AIModule/Classes/BehaviorTree/BlackboardComponent.h"
 #include "Common/CommonTypes.h"
 #include "Voxel/VoxelModuleStatics.h"
 

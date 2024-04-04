@@ -3,8 +3,8 @@
 
 #include "AI/Tasks/DWAITask_AIDefend.h"
 #include "BehaviorTree/BehaviorTreeTypes.h"
+#include "BehaviorTree/BlackboardComponent.h"
 #include "Character/DWCharacter.h"
-#include "AIModule/Classes/BehaviorTree/BlackboardComponent.h"
 
 UDWAITask_AIDefend::UDWAITask_AIDefend(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {

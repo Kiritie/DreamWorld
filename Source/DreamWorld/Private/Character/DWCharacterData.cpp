@@ -1,5 +1,7 @@
 #include "Character/DWCharacterData.h"
 
+#include "Asset/AssetModuleStatics.h"
+
 UDWCharacterData::UDWCharacterData()
 {
 	MaxLevel = 50;
@@ -10,9 +12,6 @@ UDWCharacterData::UDWCharacterData()
 	FollowDistance = 500.f;
 	PatrolDistance = 1000.f;
 	PatrolDuration = 10.f;
-	AttackAbilityTable = nullptr;
-	SkillAbilityTable = nullptr;
-	ActionAbilityTable = nullptr;
 	BehaviorTreeAsset = nullptr;
 	FallingAttackAbility = FDWCharacterAttackAbilityData();
 }

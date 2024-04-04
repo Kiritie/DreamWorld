@@ -353,7 +353,7 @@ void ADWPlayerCharacter::OnInteract(EInteractAction InInteractAction, IInteracti
 
 	switch(InInteractAction)
 	{
-		case EVoxelInteractAction::Open:
+		case (EInteractAction)EVoxelInteractAction::Open:
 		{
 			if(AVoxelInteractAuxiliary* InteractionAgent = Cast<AVoxelInteractAuxiliary>(InInteractionAgent))
 			{
@@ -385,7 +385,7 @@ void ADWPlayerCharacter::OnInteract(EInteractAction InInteractAction, IInteracti
 			}
 			break;
 		}
-		case EVoxelInteractAction::Close:
+		case (EInteractAction)EVoxelInteractAction::Close:
 		{
 			if(!IsOverlapping(InInteractionAgent))
 			{
