@@ -43,9 +43,9 @@ void UDWAudioModule::OnPreparatory(EPhase InPhase)
 	Super::OnPreparatory(InPhase);
 }
 
-void UDWAudioModule::OnRefresh(float DeltaSeconds)
+void UDWAudioModule::OnRefresh(float DeltaSeconds, bool bInEditor)
 {
-	Super::OnRefresh(DeltaSeconds);
+	Super::OnRefresh(DeltaSeconds, bInEditor);
 }
 
 void UDWAudioModule::OnPause()

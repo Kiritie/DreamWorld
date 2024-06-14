@@ -10,23 +10,23 @@ UDWCharacterState_Crouch::UDWCharacterState_Crouch()
 	StateName = FName("Crouch");
 }
 
-void UDWCharacterState_Crouch::OnInitialize(UFSMComponent* InFSMComponent, int32 InStateIndex)
+void UDWCharacterState_Crouch::OnInitialize(UFSMComponent* InFSM, int32 InStateIndex)
 {
-	Super::OnInitialize(InFSMComponent, InStateIndex);
+	Super::OnInitialize(InFSM, InStateIndex);
 }
 
-bool UDWCharacterState_Crouch::OnEnterValidate(UFiniteStateBase* InLastFiniteState)
+bool UDWCharacterState_Crouch::OnEnterValidate(UFiniteStateBase* InLastState, const TArray<FParameter>& InParams)
 {
-	if(!Super::OnEnterValidate(InLastFiniteState)) return false;
+	if(!Super::OnEnterValidate(InLastState, InParams)) return false;
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 
 	return Character->DoAction(EDWCharacterActionType::Crouch);
 }
 
-void UDWCharacterState_Crouch::OnEnter(UFiniteStateBase* InLastFiniteState)
+void UDWCharacterState_Crouch::OnEnter(UFiniteStateBase* InLastState, const TArray<FParameter>& InParams)
 {
-	Super::OnEnter(InLastFiniteState);
+	Super::OnEnter(InLastState, InParams);
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 	
@@ -35,14 +35,14 @@ void UDWCharacterState_Crouch::OnEnter(UFiniteStateBase* InLastFiniteState)
 	Character->LimitToAnim();
 }
 
-void UDWCharacterState_Crouch::OnRefresh()
+void UDWCharacterState_Crouch::OnRefresh(float DeltaSeconds)
 {
-	Super::OnRefresh();
+	Super::OnRefresh(DeltaSeconds);
 }
 
-void UDWCharacterState_Crouch::OnLeave(UFiniteStateBase* InNextFiniteState)
+void UDWCharacterState_Crouch::OnLeave(UFiniteStateBase* InNextState)
 {
-	Super::OnLeave(InNextFiniteState);
+	Super::OnLeave(InNextState);
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 

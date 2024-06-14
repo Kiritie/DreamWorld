@@ -13,5 +13,7 @@ UCLASS()
 class DREAMWORLD_API UDWEventManager : public UEventManagerBase
 {
 	GENERATED_BODY()
-	
+
+public:
+	virtual void OnInitialize() override;
 };

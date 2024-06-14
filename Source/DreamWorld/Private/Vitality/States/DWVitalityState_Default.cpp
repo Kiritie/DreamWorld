@@ -7,24 +7,24 @@ UDWVitalityState_Default::UDWVitalityState_Default()
 	
 }
 
-void UDWVitalityState_Default::OnInitialize(UFSMComponent* InFSMComponent, int32 InStateIndex)
+void UDWVitalityState_Default::OnInitialize(UFSMComponent* InFSM, int32 InStateIndex)
 {
-	Super::OnInitialize(InFSMComponent, InStateIndex);
+	Super::OnInitialize(InFSM, InStateIndex);
 }
 
-void UDWVitalityState_Default::OnEnter(UFiniteStateBase* InLastFiniteState)
+void UDWVitalityState_Default::OnEnter(UFiniteStateBase* InLastState, const TArray<FParameter>& InParams)
 {
-	Super::OnEnter(InLastFiniteState);
+	Super::OnEnter(InLastState, InParams);
 }
 
-void UDWVitalityState_Default::OnRefresh()
+void UDWVitalityState_Default::OnRefresh(float DeltaSeconds)
 {
-	Super::OnRefresh();
+	Super::OnRefresh(DeltaSeconds);
 }
 
-void UDWVitalityState_Default::OnLeave(UFiniteStateBase* InNextFiniteState)
+void UDWVitalityState_Default::OnLeave(UFiniteStateBase* InNextState)
 {
-	Super::OnLeave(InNextFiniteState);
+	Super::OnLeave(InNextState);
 }
 
 void UDWVitalityState_Default::OnTermination()

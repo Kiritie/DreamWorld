@@ -43,9 +43,9 @@ void UDWAchievementModule::OnPreparatory(EPhase InPhase)
 	Super::OnPreparatory(InPhase);
 }
 
-void UDWAchievementModule::OnRefresh(float DeltaSeconds)
+void UDWAchievementModule::OnRefresh(float DeltaSeconds, bool bInEditor)
 {
-	Super::OnRefresh(DeltaSeconds);
+	Super::OnRefresh(DeltaSeconds, bInEditor);
 }
 
 void UDWAchievementModule::OnPause()

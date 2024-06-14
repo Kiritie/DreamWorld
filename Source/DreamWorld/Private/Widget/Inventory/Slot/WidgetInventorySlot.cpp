@@ -104,13 +104,17 @@ FReply UWidgetInventorySlot::NativeOnMouseMove(const FGeometry& InGeometry, cons
 
 FReply UWidgetInventorySlot::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
 {
-	if(InMouseEvent.GetEffectingButton() == FKey("RightMouseButton"))
+	if(InMouseEvent.GetEffectingButton() == FKey("LeftMouseButton"))
 	{
-		if(InMouseEvent.IsLeftControlDown())
+		if(InMouseEvent.IsLeftShiftDown())
 		{
 			MoveItem(-1);
 		}
-		else if(InMouseEvent.IsLeftShiftDown())
+		return FReply::Handled();
+	}
+	else if(InMouseEvent.GetEffectingButton() == FKey("RightMouseButton"))
+	{
+		if(InMouseEvent.IsLeftShiftDown())
 		{
 			UseItem(-1);
 		}

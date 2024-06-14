@@ -42,9 +42,9 @@ void UDWCharacterModule::OnPreparatory(EPhase InPhase)
 	Super::OnPreparatory(InPhase);
 }
 
-void UDWCharacterModule::OnRefresh(float DeltaSeconds)
+void UDWCharacterModule::OnRefresh(float DeltaSeconds, bool bInEditor)
 {
-	Super::OnRefresh(DeltaSeconds);
+	Super::OnRefresh(DeltaSeconds, bInEditor);
 }
 
 void UDWCharacterModule::OnPause()

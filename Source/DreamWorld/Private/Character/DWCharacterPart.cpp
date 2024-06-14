@@ -27,6 +27,11 @@ void UDWCharacterPart::OnHitVoxel(UVoxel& InVoxel, const FVoxelHitResult& InHitR
 void UDWCharacterPart::OnEnterVoxel(UVoxel& InVoxel, const FVoxelHitResult& InHitResult)
 {
 	Super::OnEnterVoxel(InVoxel, InHitResult);
+}
+
+void UDWCharacterPart::OnStayVoxel(UVoxel& InVoxel, const FVoxelHitResult& InHitResult)
+{
+	Super::OnStayVoxel(InVoxel, InHitResult);
 
 	const auto OwnerCharacter = Cast<ADWCharacter>(GetOwnerCharacter());
 
@@ -38,9 +43,19 @@ void UDWCharacterPart::OnEnterVoxel(UVoxel& InVoxel, const FVoxelHitResult& InHi
 			switch (CharacterPartType)
 			{
 				case EDWCharacterPartType::Chest:
+				{
+					if(OwnerCharacter->IsFreeToAnim() && !OwnerCharacter->IsSwimming())
+					{
+						OwnerCharacter->Float(InVoxel.GetOwner()->IndexToLocation(InVoxel.GetIndex()).Z + UVoxelModule::Get().GetWorldData().BlockSize);
+					}
+					break;
+				}
 				case EDWCharacterPartType::Neck:
 				{
-					OwnerCharacter->Swim();
+					if(OwnerCharacter->IsFreeToAnim())
+					{
+						OwnerCharacter->Swim();
+					}
 					break;
 				}
 				default: break;
@@ -49,11 +64,6 @@ void UDWCharacterPart::OnEnterVoxel(UVoxel& InVoxel, const FVoxelHitResult& InHi
 		}
 		default: break;
 	}
-}
-
-void UDWCharacterPart::OnStayVoxel(UVoxel& InVoxel, const FVoxelHitResult& InHitResult)
-{
-	Super::OnStayVoxel(InVoxel, InHitResult);
 }
 
 void UDWCharacterPart::OnExitVoxel(UVoxel& InVoxel, const FVoxelHitResult& InHitResult)
@@ -82,10 +92,6 @@ void UDWCharacterPart::OnExitVoxel(UVoxel& InVoxel, const FVoxelHitResult& InHit
 					if(!InHitResult.IsValid() || InHitResult.VoxelItem.GetVoxelType() != EVoxelType::Water)
 					{
 						OwnerCharacter->Float(InVoxel.GetOwner()->IndexToLocation(InVoxel.GetIndex()).Z + UVoxelModule::Get().GetWorldData().BlockSize);
-					}
-					else if(InHitResult.VoxelItem.GetVoxelType() == EVoxelType::Water)
-					{
-						OwnerCharacter->Swim();
 					}
 					break;
 				}

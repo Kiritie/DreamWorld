@@ -48,9 +48,9 @@ void UDWVoxelModule::OnPreparatory(EPhase InPhase)
 	Super::OnPreparatory(InPhase);
 }
 
-void UDWVoxelModule::OnRefresh(float DeltaSeconds)
+void UDWVoxelModule::OnRefresh(float DeltaSeconds, bool bInEditor)
 {
-	Super::OnRefresh(DeltaSeconds);
+	Super::OnRefresh(DeltaSeconds, bInEditor);
 }
 
 void UDWVoxelModule::OnPause()

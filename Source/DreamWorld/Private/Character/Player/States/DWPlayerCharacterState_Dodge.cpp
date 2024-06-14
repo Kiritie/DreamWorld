@@ -9,33 +9,33 @@ UDWPlayerCharacterState_Dodge::UDWPlayerCharacterState_Dodge()
 	StateName = FName("Dodge");
 }
 
-void UDWPlayerCharacterState_Dodge::OnInitialize(UFSMComponent* InFSMComponent, int32 InStateIndex)
+void UDWPlayerCharacterState_Dodge::OnInitialize(UFSMComponent* InFSM, int32 InStateIndex)
 {
-	Super::OnInitialize(InFSMComponent, InStateIndex);
+	Super::OnInitialize(InFSM, InStateIndex);
 }
 
-bool UDWPlayerCharacterState_Dodge::OnEnterValidate(UFiniteStateBase* InLastFiniteState)
+bool UDWPlayerCharacterState_Dodge::OnEnterValidate(UFiniteStateBase* InLastState, const TArray<FParameter>& InParams)
 {
-	return Super::OnEnterValidate(InLastFiniteState);
+	return Super::OnEnterValidate(InLastState, InParams);
 }
 
-void UDWPlayerCharacterState_Dodge::OnEnter(UFiniteStateBase* InLastFiniteState)
+void UDWPlayerCharacterState_Dodge::OnEnter(UFiniteStateBase* InLastState, const TArray<FParameter>& InParams)
 {
-	Super::OnEnter(InLastFiniteState);
+	Super::OnEnter(InLastState, InParams);
 
 	ADWPlayerCharacter* PlayerCharacter = GetAgent<ADWPlayerCharacter>();
 
 	// PlayerCharacter->GetTargeting()->SetShouldControlRotation(false);
 }
 
-void UDWPlayerCharacterState_Dodge::OnRefresh()
+void UDWPlayerCharacterState_Dodge::OnRefresh(float DeltaSeconds)
 {
-	Super::OnRefresh();
+	Super::OnRefresh(DeltaSeconds);
 }
 
-void UDWPlayerCharacterState_Dodge::OnLeave(UFiniteStateBase* InNextFiniteState)
+void UDWPlayerCharacterState_Dodge::OnLeave(UFiniteStateBase* InNextState)
 {
-	Super::OnLeave(InNextFiniteState);
+	Super::OnLeave(InNextState);
 
 	ADWPlayerCharacter* PlayerCharacter = GetAgent<ADWPlayerCharacter>();
 

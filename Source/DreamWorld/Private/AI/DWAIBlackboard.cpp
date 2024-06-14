@@ -3,30 +3,34 @@
 
 #include "AI/DWAIBlackboard.h"
 
+#include "AI/Base/AIControllerBase.h"
 #include "Character/DWCharacter.h"
 
 void UDWAIBlackboard::PostLoad()
 {
 	Super::PostLoad();
-
-	// BLACKBOARD_VALUE_GENERATE_ENUM(CharacterNature, EDWCharacterNature);
+	
+	// BLACKBOARD_VALUE_GENERATE_BOOL(IsExcessived);
 	// BLACKBOARD_VALUE_GENERATE_FLOAT(AttackDistance);
 	// BLACKBOARD_VALUE_GENERATE_FLOAT(FollowDistance);
 	// BLACKBOARD_VALUE_GENERATE_FLOAT(PatrolDistance);
 	// BLACKBOARD_VALUE_GENERATE_FLOAT(PatrolDuration);
 }
 
-void UDWAIBlackboard::Initialize(UBlackboardComponent* InComponent, IAIAgentInterface* InAgent)
+void UDWAIBlackboard::Initialize(UBlackboardComponent* InComponent)
 {
-	Super::Initialize(InComponent, InAgent);
+	Super::Initialize(InComponent);
+}
 
-	if(!GetAgent<ADWCharacter>()) return;
+void UDWAIBlackboard::OnReset()
+{
+	Super::OnReset();
 
-	SetCharacterNature((uint8)GetAgent<ADWCharacter>()->GetNature());
-	SetAttackDistance(GetAgent<ADWCharacter>()->GetAttackDistance());
-	SetFollowDistance(GetAgent<ADWCharacter>()->GetFollowDistance());
-	SetPatrolDistance(GetAgent<ADWCharacter>()->GetPatrolDistance());
-	SetPatrolDuration(GetAgent<ADWCharacter>()->GetPatrolDuration());
+	ResetIsExcessived();
+	ResetAttackDistance();
+	ResetFollowDistance();
+	ResetPatrolDistance();
+	ResetPatrolDuration();
 }
 
 void UDWAIBlackboard::OnRefresh()
@@ -41,6 +45,32 @@ void UDWAIBlackboard::OnRefresh()
 	}
 }
 
+void UDWAIBlackboard::OnValueReset(FName InValueName)
+{
+	Super::OnValueReset(InValueName);
+
+	if(InValueName.IsEqual(NAME_IsExcessived))
+	{
+		SetIsExcessived(false);
+	}
+	else if(InValueName.IsEqual(NAME_AttackDistance))
+	{
+		SetAttackDistance(GetAgent<ADWCharacter>()->GetAttackDistance());
+	}
+	else if(InValueName.IsEqual(NAME_FollowDistance))
+	{
+		SetFollowDistance(GetAgent<ADWCharacter>()->GetFollowDistance());
+	}
+	else if(InValueName.IsEqual(NAME_PatrolDistance))
+	{
+		SetPatrolDistance(GetAgent<ADWCharacter>()->GetPatrolDistance());
+	}
+	else if(InValueName.IsEqual(NAME_PatrolDuration))
+	{
+		SetPatrolDuration(GetAgent<ADWCharacter>()->GetPatrolDuration());
+	}
+}
+
 void UDWAIBlackboard::OnValuePreChange(FName InValueName)
 {
 	Super::OnValuePreChange(InValueName);
@@ -49,4 +79,9 @@ void UDWAIBlackboard::OnValuePreChange(FName InValueName)
 void UDWAIBlackboard::OnValueChanged(FName InValueName)
 {
 	Super::OnValueChanged(InValueName);
+
+	if(InValueName.IsEqual(NAME_IsExcessived))
+	{
+		GetController()->InitBehaviorTree(true);
+	}
 }

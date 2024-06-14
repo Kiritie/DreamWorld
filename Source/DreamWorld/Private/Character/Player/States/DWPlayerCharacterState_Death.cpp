@@ -14,19 +14,19 @@ UDWPlayerCharacterState_Death::UDWPlayerCharacterState_Death()
 	
 }
 
-void UDWPlayerCharacterState_Death::OnInitialize(UFSMComponent* InFSMComponent, int32 InStateIndex)
+void UDWPlayerCharacterState_Death::OnInitialize(UFSMComponent* InFSM, int32 InStateIndex)
 {
-	Super::OnInitialize(InFSMComponent, InStateIndex);
+	Super::OnInitialize(InFSM, InStateIndex);
 }
 
-bool UDWPlayerCharacterState_Death::OnEnterValidate(UFiniteStateBase* InLastFiniteState)
+bool UDWPlayerCharacterState_Death::OnEnterValidate(UFiniteStateBase* InLastState, const TArray<FParameter>& InParams)
 {
-	return Super::OnEnterValidate(InLastFiniteState);
+	return Super::OnEnterValidate(InLastState, InParams);
 }
 
-void UDWPlayerCharacterState_Death::OnEnter(UFiniteStateBase* InLastFiniteState)
+void UDWPlayerCharacterState_Death::OnEnter(UFiniteStateBase* InLastState, const TArray<FParameter>& InParams)
 {
-	Super::OnEnter(InLastFiniteState);
+	Super::OnEnter(InLastState, InParams);
 
 	ADWPlayerCharacter* PlayerCharacter = GetAgent<ADWPlayerCharacter>();
 
@@ -37,14 +37,14 @@ void UDWPlayerCharacterState_Death::OnEnter(UFiniteStateBase* InLastFiniteState)
 	UAchievementModuleStatics::UnlockAchievement(FName("FirstDeath"));
 }
 
-void UDWPlayerCharacterState_Death::OnRefresh()
+void UDWPlayerCharacterState_Death::OnRefresh(float DeltaSeconds)
 {
-	Super::OnRefresh();
+	Super::OnRefresh(DeltaSeconds);
 }
 
-void UDWPlayerCharacterState_Death::OnLeave(UFiniteStateBase* InNextFiniteState)
+void UDWPlayerCharacterState_Death::OnLeave(UFiniteStateBase* InNextState)
 {
-	Super::OnLeave(InNextFiniteState);
+	Super::OnLeave(InNextState);
 
 	ADWPlayerCharacter* PlayerCharacter = GetAgent<ADWPlayerCharacter>();
 

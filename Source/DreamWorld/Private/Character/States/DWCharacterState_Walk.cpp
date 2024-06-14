@@ -10,33 +10,33 @@ UDWCharacterState_Walk::UDWCharacterState_Walk()
 	StateName = FName("Walk");
 }
 
-void UDWCharacterState_Walk::OnInitialize(UFSMComponent* InFSMComponent, int32 InStateIndex)
+void UDWCharacterState_Walk::OnInitialize(UFSMComponent* InFSM, int32 InStateIndex)
 {
-	Super::OnInitialize(InFSMComponent, InStateIndex);
+	Super::OnInitialize(InFSM, InStateIndex);
 }
 
-bool UDWCharacterState_Walk::OnEnterValidate(UFiniteStateBase* InLastFiniteState)
+bool UDWCharacterState_Walk::OnEnterValidate(UFiniteStateBase* InLastState, const TArray<FParameter>& InParams)
 {
-	if(!Super::OnEnterValidate(InLastFiniteState)) return false;
+	if(!Super::OnEnterValidate(InLastState, InParams)) return false;
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 
 	return Character->DoAction(EDWCharacterActionType::Walk);
 }
 
-void UDWCharacterState_Walk::OnEnter(UFiniteStateBase* InLastFiniteState)
+void UDWCharacterState_Walk::OnEnter(UFiniteStateBase* InLastState, const TArray<FParameter>& InParams)
 {
-	Super::OnEnter(InLastFiniteState);
+	Super::OnEnter(InLastState, InParams);
 }
 
-void UDWCharacterState_Walk::OnRefresh()
+void UDWCharacterState_Walk::OnRefresh(float DeltaSeconds)
 {
-	Super::OnRefresh();
+	Super::OnRefresh(DeltaSeconds);
 }
 
-void UDWCharacterState_Walk::OnLeave(UFiniteStateBase* InNextFiniteState)
+void UDWCharacterState_Walk::OnLeave(UFiniteStateBase* InNextState)
 {
-	Super::OnLeave(InNextFiniteState);
+	Super::OnLeave(InNextState);
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 	

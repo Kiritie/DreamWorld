@@ -7,29 +7,30 @@
 #include "Character/DWCharacterData.h"
 #include "FSM/Components/FSMComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Scene/SceneModuleStatics.h"
 
 UDWCharacterState_Fly::UDWCharacterState_Fly()
 {
 	StateName = FName("Fly");
 }
 
-void UDWCharacterState_Fly::OnInitialize(UFSMComponent* InFSMComponent, int32 InStateIndex)
+void UDWCharacterState_Fly::OnInitialize(UFSMComponent* InFSM, int32 InStateIndex)
 {
-	Super::OnInitialize(InFSMComponent, InStateIndex);
+	Super::OnInitialize(InFSM, InStateIndex);
 }
 
-bool UDWCharacterState_Fly::OnEnterValidate(UFiniteStateBase* InLastFiniteState)
+bool UDWCharacterState_Fly::OnEnterValidate(UFiniteStateBase* InLastState, const TArray<FParameter>& InParams)
 {
-	if(!Super::OnEnterValidate(InLastFiniteState)) return false;
+	if(!Super::OnEnterValidate(InLastState, InParams)) return false;
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 
 	return Character->DoAction(EDWCharacterActionType::Fly);
 }
 
-void UDWCharacterState_Fly::OnEnter(UFiniteStateBase* InLastFiniteState)
+void UDWCharacterState_Fly::OnEnter(UFiniteStateBase* InLastState, const TArray<FParameter>& InParams)
 {
-	Super::OnEnter(InLastFiniteState);
+	Super::OnEnter(InLastState, InParams);
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 	
@@ -37,14 +38,19 @@ void UDWCharacterState_Fly::OnEnter(UFiniteStateBase* InLastFiniteState)
 
 	Character->LimitToAnim();
 	Character->GetCharacterMovement()->SetMovementMode(MOVE_Flying);
-	Character->GetCharacterMovement()->Velocity = FVector(Character->GetCharacterMovement()->Velocity.X, Character->GetCharacterMovement()->Velocity.Y, 100.f);
+	Character->GetCharacterMovement()->Velocity.Z = 100.f;
 	// Character->GetCharacterMovement()->GravityScale = 0.f;
 	// Character->GetCharacterMovement()->AirControl = 1.f;
+
+	if(Character->GetCharacterMovement()->MovementMode != MOVE_Flying)
+	{
+		Character->GetCharacterMovement()->SetMovementMode(MOVE_Flying);
+	}
 }
 
-void UDWCharacterState_Fly::OnRefresh()
+void UDWCharacterState_Fly::OnRefresh(float DeltaSeconds)
 {
-	Super::OnRefresh();
+	Super::OnRefresh(DeltaSeconds);
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 
@@ -59,9 +65,9 @@ void UDWCharacterState_Fly::OnRefresh()
 	}
 }
 
-void UDWCharacterState_Fly::OnLeave(UFiniteStateBase* InNextFiniteState)
+void UDWCharacterState_Fly::OnLeave(UFiniteStateBase* InNextState)
 {
-	Super::OnLeave(InNextFiniteState);
+	Super::OnLeave(InNextState);
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 

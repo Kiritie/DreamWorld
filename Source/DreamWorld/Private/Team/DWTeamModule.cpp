@@ -45,9 +45,9 @@ void UDWTeamModule::OnPreparatory(EPhase InPhase)
 	Super::OnPreparatory(InPhase);
 }
 
-void UDWTeamModule::OnRefresh(float DeltaSeconds)
+void UDWTeamModule::OnRefresh(float DeltaSeconds, bool bInEditor)
 {
-	Super::OnRefresh(DeltaSeconds);
+	Super::OnRefresh(DeltaSeconds, bInEditor);
 }
 
 void UDWTeamModule::OnPause()

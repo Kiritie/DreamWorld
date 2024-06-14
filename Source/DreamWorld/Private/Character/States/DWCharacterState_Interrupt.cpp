@@ -15,25 +15,29 @@ UDWCharacterState_Interrupt::UDWCharacterState_Interrupt()
 	RemainTime = 0.f;
 }
 
-void UDWCharacterState_Interrupt::OnInitialize(UFSMComponent* InFSMComponent, int32 InStateIndex)
+void UDWCharacterState_Interrupt::OnInitialize(UFSMComponent* InFSM, int32 InStateIndex)
 {
-	Super::OnInitialize(InFSMComponent, InStateIndex);
+	Super::OnInitialize(InFSM, InStateIndex);
 }
 
-bool UDWCharacterState_Interrupt::OnEnterValidate(UFiniteStateBase* InLastFiniteState)
+bool UDWCharacterState_Interrupt::OnEnterValidate(UFiniteStateBase* InLastState, const TArray<FParameter>& InParams)
 {
-	if(!Super::OnEnterValidate(InLastFiniteState)) return false;
+	if(!Super::OnEnterValidate(InLastState, InParams)) return false;
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 
 	return Character->DoAction(EDWCharacterActionType::Interrupt);
 }
 
-void UDWCharacterState_Interrupt::OnEnter(UFiniteStateBase* InLastFiniteState)
+void UDWCharacterState_Interrupt::OnEnter(UFiniteStateBase* InLastState, const TArray<FParameter>& InParams)
 {
-	Super::OnEnter(InLastFiniteState);
+	Super::OnEnter(InLastState, InParams);
 
-	RemainTime = Duration;
+	if(InParams.IsValidIndex(0))
+	{
+		Duration = InParams[0].GetFloatValue();
+		RemainTime = Duration;
+	}
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 	
@@ -42,9 +46,9 @@ void UDWCharacterState_Interrupt::OnEnter(UFiniteStateBase* InLastFiniteState)
 	Character->LimitToAnim();
 }
 
-void UDWCharacterState_Interrupt::OnRefresh()
+void UDWCharacterState_Interrupt::OnRefresh(float DeltaSeconds)
 {
-	Super::OnRefresh();
+	Super::OnRefresh(DeltaSeconds);
 
 	if (RemainTime != -1)
 	{
@@ -56,9 +60,9 @@ void UDWCharacterState_Interrupt::OnRefresh()
 	}
 }
 
-void UDWCharacterState_Interrupt::OnLeave(UFiniteStateBase* InNextFiniteState)
+void UDWCharacterState_Interrupt::OnLeave(UFiniteStateBase* InNextState)
 {
-	Super::OnLeave(InNextFiniteState);
+	Super::OnLeave(InNextState);
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 

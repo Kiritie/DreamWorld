@@ -10,23 +10,23 @@ UDWCharacterState_Defend::UDWCharacterState_Defend()
 	StateName = FName("Defend");
 }
 
-void UDWCharacterState_Defend::OnInitialize(UFSMComponent* InFSMComponent, int32 InStateIndex)
+void UDWCharacterState_Defend::OnInitialize(UFSMComponent* InFSM, int32 InStateIndex)
 {
-	Super::OnInitialize(InFSMComponent, InStateIndex);
+	Super::OnInitialize(InFSM, InStateIndex);
 }
 
-bool UDWCharacterState_Defend::OnEnterValidate(UFiniteStateBase* InLastFiniteState)
+bool UDWCharacterState_Defend::OnEnterValidate(UFiniteStateBase* InLastState, const TArray<FParameter>& InParams)
 {
-	if(!Super::OnEnterValidate(InLastFiniteState)) return false;
+	if(!Super::OnEnterValidate(InLastState, InParams)) return false;
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 
 	return Character->ControlMode == EDWCharacterControlMode::Fighting && Character->DoAction(EDWCharacterActionType::Defend);
 }
 
-void UDWCharacterState_Defend::OnEnter(UFiniteStateBase* InLastFiniteState)
+void UDWCharacterState_Defend::OnEnter(UFiniteStateBase* InLastState, const TArray<FParameter>& InParams)
 {
-	Super::OnEnter(InLastFiniteState);
+	Super::OnEnter(InLastState, InParams);
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 	
@@ -36,14 +36,14 @@ void UDWCharacterState_Defend::OnEnter(UFiniteStateBase* InLastFiniteState)
 	Character->LimitToAnim();
 }
 
-void UDWCharacterState_Defend::OnRefresh()
+void UDWCharacterState_Defend::OnRefresh(float DeltaSeconds)
 {
-	Super::OnRefresh();
+	Super::OnRefresh(DeltaSeconds);
 }
 
-void UDWCharacterState_Defend::OnLeave(UFiniteStateBase* InNextFiniteState)
+void UDWCharacterState_Defend::OnLeave(UFiniteStateBase* InNextState)
 {
-	Super::OnLeave(InNextFiniteState);
+	Super::OnLeave(InNextState);
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 

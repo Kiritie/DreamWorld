@@ -99,11 +99,11 @@ void UDWInputManager::OnBindAction(UInputComponentBase* InInputComponent)
 	InInputComponent->BindInputAction(GameplayTags::InputTag_Sprint, ETriggerEvent::Started, this, &UDWInputManager::OnSprintPressed);
 	InInputComponent->BindInputAction(GameplayTags::InputTag_Sprint, ETriggerEvent::Completed, this, &UDWInputManager::OnSprintReleased);
 	
-	InInputComponent->BindInputAction(GameplayTags::InputTag_Interact1, ETriggerEvent::Started, this, &UDWInputManager::DoInteractAction1);
-	InInputComponent->BindInputAction(GameplayTags::InputTag_Interact2, ETriggerEvent::Started, this, &UDWInputManager::DoInteractAction2);
-	InInputComponent->BindInputAction(GameplayTags::InputTag_Interact3, ETriggerEvent::Started, this, &UDWInputManager::DoInteractAction3);
-	InInputComponent->BindInputAction(GameplayTags::InputTag_Interact4, ETriggerEvent::Started, this, &UDWInputManager::DoInteractAction4);
-	InInputComponent->BindInputAction(GameplayTags::InputTag_Interact5, ETriggerEvent::Started, this, &UDWInputManager::DoInteractAction5);
+	InInputComponent->BindInputAction(GameplayTags::InputTag_Interact1, ETriggerEvent::Started, this, &UDWInputManager::DoInteract1);
+	InInputComponent->BindInputAction(GameplayTags::InputTag_Interact2, ETriggerEvent::Started, this, &UDWInputManager::DoInteract2);
+	InInputComponent->BindInputAction(GameplayTags::InputTag_Interact3, ETriggerEvent::Started, this, &UDWInputManager::DoInteract3);
+	InInputComponent->BindInputAction(GameplayTags::InputTag_Interact4, ETriggerEvent::Started, this, &UDWInputManager::DoInteract4);
+	InInputComponent->BindInputAction(GameplayTags::InputTag_Interact5, ETriggerEvent::Started, this, &UDWInputManager::DoInteract5);
 	
 	InInputComponent->BindInputAction(GameplayTags::InputTag_Dodge, ETriggerEvent::Started, this, &UDWInputManager::OnDodgePressed);
 	InInputComponent->BindInputAction(GameplayTags::InputTag_Dodge, ETriggerEvent::Completed, this, &UDWInputManager::OnDodgeReleased);
@@ -113,11 +113,11 @@ void UDWInputManager::OnBindAction(UInputComponentBase* InInputComponent)
 	InInputComponent->BindInputAction(GameplayTags::InputTag_ToggleLockSightTarget, ETriggerEvent::Started, this, &UDWInputManager::ToggleLockTarget);
 	InInputComponent->BindInputAction(GameplayTags::InputTag_ChangeHand, ETriggerEvent::Started, this, &UDWInputManager::ChangeHand);
 	
-	InInputComponent->BindInputAction(GameplayTags::InputTag_Primary, ETriggerEvent::Started, this, &UDWInputManager::OnAttackDestroyPressed);
-	InInputComponent->BindInputAction(GameplayTags::InputTag_Primary, ETriggerEvent::Completed, this, &UDWInputManager::OnAttackDestroyReleased);
+	InInputComponent->BindInputAction(GameplayTags::InputTag_Primary, ETriggerEvent::Started, this, &UDWInputManager::OnPrimaryPressed);
+	InInputComponent->BindInputAction(GameplayTags::InputTag_Primary, ETriggerEvent::Completed, this, &UDWInputManager::OnPrimaryReleased);
 	
-	InInputComponent->BindInputAction(GameplayTags::InputTag_Minor, ETriggerEvent::Started, this, &UDWInputManager::OnDefendGeneratePressed);
-	InInputComponent->BindInputAction(GameplayTags::InputTag_Minor, ETriggerEvent::Completed, this, &UDWInputManager::OnDefendGenerateReleased);
+	InInputComponent->BindInputAction(GameplayTags::InputTag_Secondary, ETriggerEvent::Started, this, &UDWInputManager::OnSecondaryPressed);
+	InInputComponent->BindInputAction(GameplayTags::InputTag_Secondary, ETriggerEvent::Completed, this, &UDWInputManager::OnSecondaryReleased);
 	
 	InInputComponent->BindInputAction(GameplayTags::InputTag_ReleaseSkillAbility1, ETriggerEvent::Started, this, &UDWInputManager::ReleaseSkillAbility1);
 	InInputComponent->BindInputAction(GameplayTags::InputTag_ReleaseSkillAbility2, ETriggerEvent::Started, this, &UDWInputManager::ReleaseSkillAbility2);
@@ -209,17 +209,20 @@ void UDWInputManager::MoveUpPlayer_Implementation(const FInputActionValue& InVal
 
 	if(!PossessedCharacter || PossessedCharacter->IsBreakAllInput()) return;
 
-	if(PossessedCharacter->IsWalking())
+	if(InValue.Get<float>() > 0.f)
 	{
-		if(InValue.Get<float>() > 0.f)
+		if(PossessedCharacter->IsWalking() || PossessedCharacter->IsFloating())
 		{
 			PossessedCharacter->Jump();
+			return;
+		}
+		else if(PossessedCharacter->IsFalling())
+		{
+			PossessedCharacter->Fly();
+			return;
 		}
 	}
-	else
-	{
-		IWHPlayerInterface::Execute_MoveUp(PossessedCharacter, InValue.Get<float>());
-	}
+	IWHPlayerInterface::Execute_MoveUp(PossessedCharacter, InValue.Get<float>());
 }
 
 void UDWInputManager::SystemOperation_Implementation()
@@ -262,7 +265,7 @@ void UDWInputManager::OnDodgeReleased()
 	// PossessedCharacter->UnDodge();
 }
 
-void UDWInputManager::OnAttackDestroyPressed()
+void UDWInputManager::OnPrimaryPressed()
 {
 	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
 
@@ -287,14 +290,14 @@ void UDWInputManager::OnAttackDestroyPressed()
 			FVoxelHitResult voxelHitResult;
 			if(UVoxelModuleStatics::VoxelRaycastSinge(EVoxelRaycastType::FromAimPoint, PlayerCharacter->GetInteractDistance(), {}, voxelHitResult))
 			{
-				PlayerCharacter->OnInteractVoxel(voxelHitResult, EInputInteractAction::Action1);
+				PlayerCharacter->OnInteractVoxel(voxelHitResult, EInputInteractAction::Primary);
 			}
 			break;
 		}
 	}
 }
 
-void UDWInputManager::OnAttackDestroyReleased()
+void UDWInputManager::OnPrimaryReleased()
 {
 	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
 
@@ -314,7 +317,7 @@ void UDWInputManager::OnAttackDestroyReleased()
 	}
 }
 
-void UDWInputManager::OnDefendGeneratePressed()
+void UDWInputManager::OnSecondaryPressed()
 {
 	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
 
@@ -332,14 +335,14 @@ void UDWInputManager::OnDefendGeneratePressed()
 			FVoxelHitResult voxelHitResult;
 			if(UVoxelModuleStatics::VoxelRaycastSinge(EVoxelRaycastType::FromAimPoint, PlayerCharacter->GetInteractDistance(), {}, voxelHitResult))
 			{
-				PlayerCharacter->OnInteractVoxel(voxelHitResult, EInputInteractAction::Action2);
+				PlayerCharacter->OnInteractVoxel(voxelHitResult, EInputInteractAction::Secondary);
 			}
 			break;
 		}
 	}
 }
 
-void UDWInputManager::OnDefendGenerateReleased()
+void UDWInputManager::OnSecondaryReleased()
 {
 	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
 
@@ -457,7 +460,7 @@ void UDWInputManager::ReleaseSkillAbility4()
 	}
 }
 
-void UDWInputManager::DoInteractAction1()
+void UDWInputManager::DoInteract1()
 {
 	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
 	
@@ -469,7 +472,7 @@ void UDWInputManager::DoInteractAction1()
 	}
 }
 
-void UDWInputManager::DoInteractAction2()
+void UDWInputManager::DoInteract2()
 {
 	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
 	
@@ -481,7 +484,7 @@ void UDWInputManager::DoInteractAction2()
 	}
 }
 
-void UDWInputManager::DoInteractAction3()
+void UDWInputManager::DoInteract3()
 {
 	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
 	
@@ -493,7 +496,7 @@ void UDWInputManager::DoInteractAction3()
 	}
 }
 
-void UDWInputManager::DoInteractAction4()
+void UDWInputManager::DoInteract4()
 {
 	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
 	
@@ -505,7 +508,7 @@ void UDWInputManager::DoInteractAction4()
 	}
 }
 
-void UDWInputManager::DoInteractAction5()
+void UDWInputManager::DoInteract5()
 {
 	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
 	

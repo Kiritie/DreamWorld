@@ -47,6 +47,7 @@
 #include "Character/States/DWCharacterState_Walk.h"
 #include "FSM/Components/FSMComponent.h"
 #include "Ability/Inventory/Slot/AbilityInventorySkillSlot.h"
+#include "Common/Looking/LookingComponent.h"
 #include "Voxel/VoxelModuleStatics.h"
 #include "Widget/WidgetModuleStatics.h"
 #include "Widget/World/WorldWidgetComponent.h"
@@ -96,7 +97,6 @@ ADWCharacter::ADWCharacter(const FObjectInitializer& ObjectInitializer) :
 	Equips = TMap<EDWEquipPartType, AAbilityEquipBase*>();
 
 	RidingTarget = nullptr;
-	LockedTarget = nullptr;
 
 	// local
 	AttackAbilityIndex = 0;
@@ -106,6 +106,10 @@ ADWCharacter::ADWCharacter(const FObjectInitializer& ObjectInitializer) :
 	BirthLocation = FVector(0, 0, 0);
 	AIMoveLocation = EMPTY_Vector;
 	AIMoveStopDistance = 0;
+
+	CameraDoRotationTime = 0.f;
+	CameraDoRotationDuration = 0.f;
+	CameraDoRotationRotation = EMPTY_Rotator;
 
 	AttackAbilities = TMap<EDWWeaponType, FDWCharacterAttackAbilityDatas>();
 	SkillAbilities = TMap<FPrimaryAssetId, FDWCharacterSkillAbilityData>();
@@ -122,18 +126,6 @@ void ADWCharacter::OnRefresh_Implementation(float DeltaSeconds)
 
 	if (IsActive())
 	{
-		if (LockedTarget)
-		{
-			if (CanLookAtTarget(LockedTarget))
-			{
-				DoLookAtTarget(LockedTarget);
-			}
-			else
-			{
-				SetLockedTarget(nullptr);
-			}
-		}
-
 		if (AIMoveLocation != EMPTY_Vector)
 		{
 			if (DoAIMove(AIMoveLocation, AIMoveStopDistance))
@@ -308,23 +300,26 @@ void ADWCharacter::SetActorVisible_Implementation(bool bInVisible)
 	SetControlMode(ControlMode);
 }
 
-void ADWCharacter::RefreshState()
+void ADWCharacter::OnFiniteStateRefresh(UFiniteStateBase* InCurrentState)
 {
 	switch (GetCharacterMovement()->MovementMode)
 	{
-		case EMovementMode::MOVE_Flying:
+		case MOVE_Flying:
 		{
 			FSM->SwitchStateByClass<UDWCharacterState_Fly>();
 			break;
 		}
-		case EMovementMode::MOVE_Swimming:
+		case MOVE_Swimming:
 		{
-			FSM->SwitchStateByClass<UDWCharacterState_Swim>();
+			if(!InCurrentState)
+			{
+				FSM->SwitchStateByClass<UDWCharacterState_Walk>();
+			}
 			break;
 		}
 		default:
 		{
-			Super::RefreshState();
+			Super::OnFiniteStateRefresh(InCurrentState);
 		}
 	}
 }
@@ -439,8 +434,7 @@ void ADWCharacter::LimitToAnim(bool bLockRotation /*= false*/)
 
 void ADWCharacter::Interrupt(float InDuration /*= -1*/)
 {
-	FSM->GetStateByClass<UDWCharacterState_Interrupt>()->Duration = InDuration;
-	FSM->SwitchStateByClass<UDWCharacterState_Interrupt>();
+	FSM->SwitchStateByClass<UDWCharacterState_Interrupt>({ InDuration });
 }
 
 void ADWCharacter::UnInterrupt()
@@ -529,8 +523,7 @@ void ADWCharacter::UnSwim()
 
 void ADWCharacter::Float(float InWaterPosZ)
 {
-	FSM->GetStateByClass<UDWCharacterState_Float>()->WaterPosZ = InWaterPosZ;
-	FSM->SwitchStateByClass<UDWCharacterState_Float>();
+	FSM->SwitchStateByClass<UDWCharacterState_Float>({ InWaterPosZ });
 }
 
 void ADWCharacter::UnFloat()
@@ -819,20 +812,6 @@ void ADWCharacter::EndAction(EDWCharacterActionType InActionType, bool bWasCance
 	}
 }
 
-bool ADWCharacter::CanLookAtTarget(ADWCharacter* InTargetCharacter)
-{
-	return !InTargetCharacter->IsDead() && FVector::Distance(GetActorLocation(), InTargetCharacter->GetActorLocation()) <= 1000.f;
-}
-
-void ADWCharacter::DoLookAtTarget(ADWCharacter* InTargetCharacter)
-{
-	if(!IsDodging())
-	{
-		const FVector tmpDirection = InTargetCharacter->GetActorLocation() - GetActorLocation();
-		SetActorRotation(FRotator(0, tmpDirection.ToOrientationRotator().Yaw, 0));
-	}
-}
-
 void ADWCharacter::AIMoveTo(FVector InTargetLocation, float InMoveStopDistance /*= 10*/, bool bMulticast /*= false*/)
 {
 	AIMoveLocation = InTargetLocation;
@@ -856,10 +835,10 @@ bool ADWCharacter::DoAIMove(ADWCharacter* InTargetCharacter, float InMoveStopDis
 	if (GetDistance(InTargetCharacter, false, false) > InMoveStopDistance)
 	{
 		AddMovementInput(InTargetCharacter->GetActorLocation() - GetActorLocation());
-		if (bLookAtTarget) SetLockedTarget(InTargetCharacter);
+		if (bLookAtTarget) Looking->TargetLookingOn(InTargetCharacter);
 		return false;
 	}
-	if (bLookAtTarget) SetLockedTarget(nullptr);
+	if (bLookAtTarget) Looking->TargetLookingOff();
 	return true;
 }
 
@@ -877,10 +856,6 @@ void ADWCharacter::AddMovementInput(FVector WorldDirection, float ScaleValue, bo
 		if(WorldDirection.Z > -0.5f)
 		{
 			WorldDirection.Z = 0;
-		}
-		if(ScaleValue < 0.f)
-		{
-			ScaleValue = 0.f;
 		}
 	}
 
@@ -925,14 +900,14 @@ bool ADWCharacter::IsSprinting() const
 	return AbilitySystem->HasMatchingGameplayTag(GameplayTags::StateTag_Character_Sprinting);
 }
 
-bool ADWCharacter::IsCrouching(bool bMovementMode) const
+bool ADWCharacter::IsCrouching() const
 {
-	return !bMovementMode ? AbilitySystem->HasMatchingGameplayTag(GameplayTags::StateTag_Character_Crouching) : GetCharacterMovement()->IsFlying();
+	return AbilitySystem->HasMatchingGameplayTag(GameplayTags::StateTag_Character_Crouching);
 }
 
-bool ADWCharacter::IsSwimming(bool bMovementMode) const
+bool ADWCharacter::IsSwimming() const
 {
-	return !bMovementMode ? AbilitySystem->HasMatchingGameplayTag(GameplayTags::StateTag_Character_Swimming) : GetCharacterMovement()->IsFlying();
+	return AbilitySystem->HasMatchingGameplayTag(GameplayTags::StateTag_Character_Swimming);
 }
 
 bool ADWCharacter::IsFloating() const
@@ -960,9 +935,9 @@ bool ADWCharacter::IsRiding() const
 	return AbilitySystem->HasMatchingGameplayTag(GameplayTags::StateTag_Character_Riding);
 }
 
-bool ADWCharacter::IsFlying(bool bMovementMode) const
+bool ADWCharacter::IsFlying() const
 {
-	return !bMovementMode ? AbilitySystem->HasMatchingGameplayTag(GameplayTags::StateTag_Character_Flying) : GetCharacterMovement()->IsFlying();
+	return AbilitySystem->HasMatchingGameplayTag(GameplayTags::StateTag_Character_Flying);
 }
 
 bool ADWCharacter::IsInterrupting() const
@@ -987,11 +962,6 @@ UWidgetCharacterHP* ADWCharacter::GetCharacterHPWidget() const
 		return Cast<UWidgetCharacterHP>(CharacterHP->GetWorldWidget());
 	}
 	return nullptr;
-}
-
-bool ADWCharacter::IsTargetable_Implementation() const
-{
-	return Super::IsTargetable_Implementation();
 }
 
 void ADWCharacter::SetNameV(FName InName)
@@ -1084,11 +1054,6 @@ float ADWCharacter::GetPatrolDistance() const
 float ADWCharacter::GetPatrolDuration() const
 {
 	return GetCharacterData<UDWCharacterData>().PatrolDuration;
-}
-
-void ADWCharacter::SetLockedTarget(ADWCharacter* InTargetCharacter)
-{
-	LockedTarget = InTargetCharacter;
 }
 
 AAbilityEquipBase* ADWCharacter::GetEquip(EDWEquipPartType InPartType) const
@@ -1214,6 +1179,21 @@ bool ADWCharacter::RaycastStep(FHitResult& OutHitResult)
 	return UKismetSystemLibrary::LineTraceSingle(this, rayStart, rayEnd, UCommonStatics::GetGameTraceType((ECollisionChannel)EDWGameTraceChannel::Step), false, {}, EDrawDebugTrace::None, OutHitResult, true);
 }
 
+bool ADWCharacter::IsTargetAble_Implementation(APawn* InPlayerPawn) const
+{
+	return Super::IsTargetAble_Implementation(InPlayerPawn) && GetOwnerRider() != InPlayerPawn;
+}
+
+bool ADWCharacter::IsLookAtAble_Implementation(AActor* InLookerActor) const
+{
+	return Super::IsLookAtAble_Implementation(InLookerActor) && GetOwnerRider() != InLookerActor;
+}
+
+bool ADWCharacter::CanLookAtTarget()
+{
+	return Super::CanLookAtTarget() && !IsDodging();
+}
+
 bool ADWCharacter::HasAttackAbility(int32 InAbilityIndex) const
 {
 	if(AttackAbilities.Contains(GetWeaponType()))
@@ -1282,15 +1262,12 @@ bool ADWCharacter::IsEnemy(IAbilityPawnInterface* InTarget) const
 			break;
 		}
 	}
+	
 	if(IsTeamMate(TargetCharacter))
 	{
 		return false;
 	}
-	else if(TargetCharacter->GetRaceID().IsEqual(RaceID))
-	{
-		return false;
-	}
-	return true;
+	return Super::IsEnemy(InTarget);
 }
 
 UDWCharacterPart* ADWCharacter::GetCharacterPart(EDWCharacterPartType InCharacterPartType) const
@@ -1309,7 +1286,24 @@ UDWCharacterPart* ADWCharacter::GetCharacterPart(EDWCharacterPartType InCharacte
 
 UBehaviorTree* ADWCharacter::GetBehaviorTreeAsset() const
 {
-	return GetCharacterData<UDWCharacterData>().BehaviorTreeAsset;
+	const UDWCharacterData& CharacterData = GetCharacterData<UDWCharacterData>();
+	switch(CharacterData.Nature)
+	{
+		case EDWCharacterNature::AINeutral:
+		{
+			if(UDWAIBlackboard* Blackboard = GetController<ADWAIController>()->GetBlackboard<UDWAIBlackboard>())
+			{
+				return !Blackboard->GetIsExcessived() ? CharacterData.DefaultBehaviorTree : CharacterData.ExcessiveBehaviorTree;
+			}
+		}
+		case EDWCharacterNature::AIFriendly:
+		case EDWCharacterNature::AIHostile:
+		{
+			return CharacterData.DefaultBehaviorTree;
+		}
+		default: break;
+	}
+	return nullptr;
 }
 
 void ADWCharacter::OnAttributeChange(const FOnAttributeChangeData& InAttributeChangeData)
@@ -1404,9 +1398,13 @@ void ADWCharacter::HandleDamage(EDamageType DamageType, const float LocalDamageD
 			{
 				SourceCharacter->ModifyHealth(LocalDamageDone * SourceCharacter->GetAttackStealRate());
 			}
-			if(!IsPlayer() && !GetController<ADWAIController>()->GetBlackboard()->GetTargetAgent())
+			if(ADWAIController* AIController = GetController<ADWAIController>())
 			{
-				GetController<ADWAIController>()->GetBlackboard()->SetTargetAgent(SourceCharacter);
+				if(UDWAIBlackboard* Blackboard = AIController->GetBlackboard<UDWAIBlackboard>())
+				{
+					Blackboard->SetTargetAgent(SourceCharacter);
+					Blackboard->SetIsExcessived(true);
+				}
 			}
 			if(!bHasDefend)
 			{

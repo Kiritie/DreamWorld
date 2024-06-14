@@ -8,42 +8,43 @@
 #include "ObjectPool/ObjectPoolModuleStatics.h"
 #include "Ability/Character/AbilityCharacterDataBase.h"
 #include "Ability/Character/AbilityCharacterInventoryBase.h"
+#include "Common/Looking/LookingComponent.h"
 
 UDWCharacterState_Death::UDWCharacterState_Death()
 {
 	
 }
 
-void UDWCharacterState_Death::OnInitialize(UFSMComponent* InFSMComponent, int32 InStateIndex)
+void UDWCharacterState_Death::OnInitialize(UFSMComponent* InFSM, int32 InStateIndex)
 {
-	Super::OnInitialize(InFSMComponent, InStateIndex);
+	Super::OnInitialize(InFSM, InStateIndex);
 }
 
-bool UDWCharacterState_Death::OnEnterValidate(UFiniteStateBase* InLastFiniteState)
+bool UDWCharacterState_Death::OnEnterValidate(UFiniteStateBase* InLastState, const TArray<FParameter>& InParams)
 {
-	return Super::OnEnterValidate(InLastFiniteState);
+	return Super::OnEnterValidate(InLastState, InParams);
 }
 
-void UDWCharacterState_Death::OnEnter(UFiniteStateBase* InLastFiniteState)
+void UDWCharacterState_Death::OnEnter(UFiniteStateBase* InLastState, const TArray<FParameter>& InParams)
 {
-	Super::OnEnter(InLastFiniteState);
+	Super::OnEnter(InLastState, InParams);
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 
 	Character->SetMana(0.f);
 	Character->SetStamina(0.f);
-	Character->SetLockedTarget(nullptr);
+	Character->GetLooking()->TargetLookingOff();
 	Character->LimitToAnim();
 }
 
-void UDWCharacterState_Death::OnRefresh()
+void UDWCharacterState_Death::OnRefresh(float DeltaSeconds)
 {
-	Super::OnRefresh();
+	Super::OnRefresh(DeltaSeconds);
 }
 
-void UDWCharacterState_Death::OnLeave(UFiniteStateBase* InNextFiniteState)
+void UDWCharacterState_Death::OnLeave(UFiniteStateBase* InNextState)
 {
-	Super::OnLeave(InNextFiniteState);
+	Super::OnLeave(InNextState);
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 

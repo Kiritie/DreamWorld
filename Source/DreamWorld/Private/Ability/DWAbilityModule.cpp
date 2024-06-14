@@ -41,16 +41,11 @@ void UDWAbilityModule::OnInitialize()
 void UDWAbilityModule::OnPreparatory(EPhase InPhase)
 {
 	Super::OnPreparatory(InPhase);
-
-	if(PHASEC(InPhase, EPhase::Primary))
-	{
-		UAssetModuleStatics::AddEnumMapping(TEXT("/Script/WHFramework.EInteractAction"), TEXT("/Script/WHFramework.EDWInteractAction"));
-	}
 }
 
-void UDWAbilityModule::OnRefresh(float DeltaSeconds)
+void UDWAbilityModule::OnRefresh(float DeltaSeconds, bool bInEditor)
 {
-	Super::OnRefresh(DeltaSeconds);
+	Super::OnRefresh(DeltaSeconds, bInEditor);
 }
 
 void UDWAbilityModule::OnPause()

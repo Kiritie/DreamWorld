@@ -60,7 +60,7 @@ void ADWHumanCharacter::OnAssembleItem(const FAbilityItem& InItem)
 		case EAbilityItemType::Equip:
 		{
 			const auto& EquipData = InItem.GetData<UDWEquipData>();
-			if(AAbilityEquipBase* Equip = UObjectPoolModuleStatics::SpawnObject<AAbilityEquipBase>(nullptr, nullptr, InItem.GetData<UAbilityEquipDataBase>().EquipClass))
+			if(AAbilityEquipBase* Equip = UObjectPoolModuleStatics::SpawnObject<AAbilityEquipBase>(nullptr, nullptr, false, InItem.GetData<UAbilityEquipDataBase>().EquipClass))
 			{
 				Equip->Initialize(this, InItem);
 				Equip->OnAssemble();

@@ -45,6 +45,7 @@
 #include "Widget/World/WorldWidgetComponent.h"
 #include "Ability/Item/Raw/AbilityRawDataBase.h"
 #include "Character/DWCharacterData.h"
+#include "Common/Looking/LookingComponent.h"
 #include "Common/Targeting/TargetingComponent.h"
 #include "Item/Equip/DWEquipData.h"
 #include "Vitality/DWVitality.h"
@@ -65,6 +66,10 @@ ADWPlayerCharacter::ADWPlayerCharacter()
 	GetCapsuleComponent()->SetCapsuleHalfHeight(69.f);
 	GetCapsuleComponent()->SetCapsuleRadius(24.f);
 
+	GetMesh()->SetRelativeLocation(FVector(0, 0, -70));
+
+	Looking->LookingMaxDistance = 1500.f;
+
 	CharacterHP->SetAutoCreate(false);
 
 	Targeting = CreateDefaultSubobject<UTargetingComponent>(FName("Targeting"));
@@ -76,8 +81,6 @@ ADWPlayerCharacter::ADWPlayerCharacter()
 	Targeting->OnTargetLockedOn.AddDynamic(this, &ADWPlayerCharacter::OnTargetLockedOn);
 	Targeting->OnTargetLockedOff.AddDynamic(this, &ADWPlayerCharacter::OnTargetLockedOff);
 	Targeting->OnTargetSetRotation.AddDynamic(this, &ADWPlayerCharacter::OnTargetSetRotation);
-
-	GetMesh()->SetRelativeLocation(FVector(0, 0, -70));
 
 	PreviewCapture = CreateDefaultSubobject<USceneCaptureComponent2D>(FName("PreviewCapture"));
 	PreviewCapture->ProjectionType = ECameraProjectionMode::Orthographic;
@@ -231,20 +234,6 @@ void ADWPlayerCharacter::Kill(IAbilityVitalityInterface* InTarget)
 	}
 }
 
-bool ADWPlayerCharacter::CanLookAtTarget(ADWCharacter* InTargetCharacter)
-{
-	return true;
-}
-
-void ADWPlayerCharacter::DoLookAtTarget(ADWCharacter* InTargetCharacter)
-{
-	if(IsAttacking() || IsDefending())
-	{
-		const FVector tmpDirection = InTargetCharacter->GetActorLocation() - GetActorLocation();
-		SetActorRotation(FRotator(0, tmpDirection.ToOrientationRotator().Yaw, 0));
-	}
-}
-
 void ADWPlayerCharacter::ChangeHand()
 {
 	TArray<UAbilityInventorySlot*> AuxiliarySlots = Inventory->GetSlotsBySplitType(ESlotSplitType::Auxiliary);
@@ -254,59 +243,9 @@ void ADWPlayerCharacter::ChangeHand()
 	}
 }
 
-FString ADWPlayerCharacter::GetHeadInfo() const
+bool ADWPlayerCharacter::CanLookAtTarget()
 {
-	return FString::Printf(TEXT("Lv.%d \"%s\" (Exp: %d/%d)"), Level, *Name.ToString(), (int32)GetExp(), (int32)GetMaxExp());
-}
-
-void ADWPlayerCharacter::SetActorVisible_Implementation(bool bInVisible)
-{
-	Super::SetActorVisible_Implementation(bInVisible);
-}
-
-void ADWPlayerCharacter::SetControlMode_Implementation(EDWCharacterControlMode InControlMode)
-{
-	Super::SetControlMode_Implementation(InControlMode);
-
-	switch (ControlMode)
-	{
-		case EDWCharacterControlMode::Fighting:
-		{
-			if(UWidgetModuleStatics::GetUserWidget<UWidgetInventoryBar>())
-			{
-				UWidgetModuleStatics::GetUserWidget<UWidgetInventoryBar>()->SetSkillBoxVisible(true);
-			}
-			break;
-		}
-		case EDWCharacterControlMode::Creating:
-		{
-			if(UWidgetModuleStatics::GetUserWidget<UWidgetInventoryBar>())
-			{
-				UWidgetModuleStatics::GetUserWidget<UWidgetInventoryBar>()->SetSkillBoxVisible(false);
-			}
-			break;
-		}
-	}
-}
-
-void ADWPlayerCharacter::SetGenerateVoxelID(const FPrimaryAssetId& InGenerateVoxelID)
-{
-	Super::SetGenerateVoxelID(InGenerateVoxelID);
-}
-
-void ADWPlayerCharacter::OnTargetLockedOn(AActor* InTargetActor)
-{
-	SetLockedTarget(Cast<ADWCharacter>(InTargetActor));
-}
-
-void ADWPlayerCharacter::OnTargetLockedOff(AActor* InTargetActor)
-{
-	SetLockedTarget(nullptr);
-}
-
-void ADWPlayerCharacter::OnTargetSetRotation(AActor* InTargetActor, FRotator InControlRotation)
-{
-	UCameraModuleStatics::SetCameraRotation(InControlRotation.Yaw, InControlRotation.Pitch);
+	return Super::CanLookAtTarget() && (IsAttacking() || IsDefending());
 }
 
 bool ADWPlayerCharacter::CanInteract(EInteractAction InInteractAction, IInteractionAgentInterface* InInteractionAgent)
@@ -667,6 +606,61 @@ void ADWPlayerCharacter::OnAttributeChange(const FOnAttributeChangeData& InAttri
 	Super::OnAttributeChange(InAttributeChangeData);
 }
 
+FString ADWPlayerCharacter::GetHeadInfo() const
+{
+	return FString::Printf(TEXT("Lv.%d \"%s\" (Exp: %d/%d)"), Level, *Name.ToString(), (int32)GetExp(), (int32)GetMaxExp());
+}
+
+void ADWPlayerCharacter::SetActorVisible_Implementation(bool bInVisible)
+{
+	Super::SetActorVisible_Implementation(bInVisible);
+}
+
+void ADWPlayerCharacter::SetControlMode_Implementation(EDWCharacterControlMode InControlMode)
+{
+	Super::SetControlMode_Implementation(InControlMode);
+
+	switch (ControlMode)
+	{
+		case EDWCharacterControlMode::Fighting:
+		{
+			if(UWidgetModuleStatics::GetUserWidget<UWidgetInventoryBar>())
+			{
+				UWidgetModuleStatics::GetUserWidget<UWidgetInventoryBar>()->SetSkillBoxVisible(true);
+			}
+			break;
+		}
+		case EDWCharacterControlMode::Creating:
+		{
+			if(UWidgetModuleStatics::GetUserWidget<UWidgetInventoryBar>())
+			{
+				UWidgetModuleStatics::GetUserWidget<UWidgetInventoryBar>()->SetSkillBoxVisible(false);
+			}
+			break;
+		}
+	}
+}
+
+void ADWPlayerCharacter::SetGenerateVoxelID(const FPrimaryAssetId& InGenerateVoxelID)
+{
+	Super::SetGenerateVoxelID(InGenerateVoxelID);
+}
+
+void ADWPlayerCharacter::OnTargetLockedOn(AActor* InTargetActor)
+{
+	Looking->TargetLookingOn(InTargetActor);
+}
+
+void ADWPlayerCharacter::OnTargetLockedOff(AActor* InTargetActor)
+{
+	Looking->TargetLookingOff();
+}
+
+void ADWPlayerCharacter::OnTargetSetRotation(AActor* InTargetActor, FRotator InControlRotation)
+{
+	UCameraModuleStatics::SetCameraRotation(InControlRotation.Yaw, InControlRotation.Pitch);
+}
+
 void ADWPlayerCharacter::SetNameV(FName InName)
 {
 	Super::SetNameV(InName);
@@ -711,6 +705,7 @@ bool ADWPlayerCharacter::SetLevelV(int32 InLevel)
 void ADWPlayerCharacter::SetTeamID(FName InTeamID)
 {
 	Super::SetTeamID(InTeamID);
+	
 	if(UWidgetModuleStatics::GetUserWidget<UWidgetHeadBox>())
 	{
 		UWidgetModuleStatics::GetUserWidget<UWidgetHeadBox>()->SetHeadInfo(GetHeadInfo());

@@ -20,7 +20,9 @@ public class DreamWorld : ModuleRules
 				"Core",
 				"CoreUObject",
 				"Engine",
-				"WHFramework"
+				"WHFramework",
+				"WHFrameworkCore",
+				"WHFrameworkSlate"
 			}
 		);
 

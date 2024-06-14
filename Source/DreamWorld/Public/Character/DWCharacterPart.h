@@ -10,7 +10,7 @@
 /**
  * 角色部位组件
  */
-UCLASS()
+UCLASS(ClassGroup="Collision", editinlinenew, meta=(DisplayName="DW Character Part", BlueprintSpawnableComponent))
 class DREAMWORLD_API UDWCharacterPart : public UAbilityCharacterPartBase
 {
 	GENERATED_BODY()

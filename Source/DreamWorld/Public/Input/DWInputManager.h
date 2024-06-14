@@ -62,16 +62,16 @@ protected:
 	virtual void OnDodgeReleased();
 
 	UFUNCTION()
-	virtual void OnAttackDestroyPressed();
+	virtual void OnPrimaryPressed();
 
 	UFUNCTION()
-	virtual void OnAttackDestroyReleased();
+	virtual void OnPrimaryReleased();
 
 	UFUNCTION()
-	virtual void OnDefendGeneratePressed();
+	virtual void OnSecondaryPressed();
 
 	UFUNCTION()
-	virtual void OnDefendGenerateReleased();
+	virtual void OnSecondaryReleased();
 
 public:
 	UFUNCTION(BlueprintCallable)
@@ -99,19 +99,19 @@ public:
 	virtual void ReleaseSkillAbility4();
 
 	UFUNCTION(BlueprintCallable)
-	virtual void DoInteractAction1();
+	virtual void DoInteract1();
 
 	UFUNCTION(BlueprintCallable)
-	virtual void DoInteractAction2();
+	virtual void DoInteract2();
 
 	UFUNCTION(BlueprintCallable)
-	virtual void DoInteractAction3();
+	virtual void DoInteract3();
 
 	UFUNCTION(BlueprintCallable)
-	virtual void DoInteractAction4();
+	virtual void DoInteract4();
 
 	UFUNCTION(BlueprintCallable)
-	virtual void DoInteractAction5();
+	virtual void DoInteract5();
 
 	UFUNCTION(BlueprintCallable)
 	virtual void UseInventoryItem();

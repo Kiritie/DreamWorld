@@ -76,7 +76,7 @@ protected:
 
 	virtual void SetActorVisible_Implementation(bool bInVisible) override;
 
-	virtual void RefreshState() override;
+	virtual void OnFiniteStateRefresh(UFiniteStateBase* InCurrentState) override;
 	
 public:
 	virtual void Serialize(FArchive& Ar) override;
@@ -201,12 +201,6 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	virtual void EndAction(EDWCharacterActionType InActionType, bool bWasCancelled);
-				
-	UFUNCTION(BlueprintPure)
-	virtual bool CanLookAtTarget(ADWCharacter* InTargetCharacter);
-
-	UFUNCTION(BlueprintCallable)
-	virtual void DoLookAtTarget(ADWCharacter* InTargetCharacter);
 
 	UFUNCTION(BlueprintCallable)
 	virtual void AIMoveTo(FVector InTargetLocation, float InMoveStopDistance = 10.f, bool bMulticast = false) override;
@@ -229,6 +223,12 @@ public:
 	virtual void ClearAttackHitTargets();
 
 	virtual bool RaycastStep(FHitResult& OutHitResult);
+	
+	virtual bool IsTargetAble_Implementation(APawn* InPlayerPawn) const override;
+
+	virtual bool IsLookAtAble_Implementation(AActor* InLookerActor) const override;
+
+	virtual bool CanLookAtTarget() override;
 
 public:
 	UFUNCTION(BlueprintPure)
@@ -258,10 +258,10 @@ public:
 	virtual bool IsSprinting() const;
 
 	UFUNCTION(BlueprintPure)
-	virtual bool IsCrouching(bool bMovementMode = false) const;
+	virtual bool IsCrouching() const;
 
 	UFUNCTION(BlueprintPure)
-	virtual bool IsSwimming(bool bMovementMode = false) const;
+	virtual bool IsSwimming() const;
 
 	UFUNCTION(BlueprintPure)
 	virtual bool IsFloating() const;
@@ -279,7 +279,7 @@ public:
 	virtual bool IsRiding() const;
 
 	UFUNCTION(BlueprintPure)
-	virtual bool IsFlying(bool bMovementMode = false) const;
+	virtual bool IsFlying() const;
 
 	UFUNCTION(BlueprintPure)
 	virtual bool IsInterrupting() const;
@@ -289,8 +289,6 @@ public:
 
 	UFUNCTION(BlueprintPure)
 	virtual bool IsBreakAllInput() const;
-	
-	virtual bool IsTargetable_Implementation() const override;
 	
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
@@ -310,9 +308,6 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "CharacterStats")
 	ADWCharacter* RidingTarget;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "CharacterStats")
-	ADWCharacter* LockedTarget;
-
 protected:
 	FVector BirthLocation;
 
@@ -321,6 +316,10 @@ protected:
 	float AIMoveStopDistance;
 
 	FVector AIMoveLocation;
+	
+	float CameraDoRotationTime;
+	float CameraDoRotationDuration;
+	FRotator CameraDoRotationRotation;
 
 	int32 AttackAbilityIndex;
 		
@@ -395,12 +394,6 @@ public:
 
 	UFUNCTION(BlueprintPure)
 	ADWCharacter* GetRidingTarget() const { return RidingTarget; }
-
-	UFUNCTION(BlueprintPure)
-	ADWCharacter* GetLockedTarget() const { return LockedTarget; }
-
-	UFUNCTION(BlueprintCallable)
-	void SetLockedTarget(ADWCharacter* InTargetCharacter);
 
 	UFUNCTION(BlueprintPure)
 	FVector GetBirthLocation() const { return BirthLocation; }

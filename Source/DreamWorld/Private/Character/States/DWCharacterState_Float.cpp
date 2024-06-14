@@ -7,66 +7,75 @@
 #include "Character/DWCharacterPart.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Character/States/DWCharacterState_Swim.h"
-#include <Scene/SceneModuleStatics.h>
-#include "Scene/Actor/PhysicsVolume/PhysicsVolumeBase.h"
+#include "FSM/Components/FSMComponent.h"
 
 UDWCharacterState_Float::UDWCharacterState_Float()
 {
 	StateName = FName("Float");
 
-	WaterPosZ = 0.f;
+	WaterPosZ = -1.f;
 }
 
-void UDWCharacterState_Float::OnInitialize(UFSMComponent* InFSMComponent, int32 InStateIndex)
+void UDWCharacterState_Float::OnInitialize(UFSMComponent* InFSM, int32 InStateIndex)
 {
-	Super::OnInitialize(InFSMComponent, InStateIndex);
+	Super::OnInitialize(InFSM, InStateIndex);
 }
 
-bool UDWCharacterState_Float::OnEnterValidate(UFiniteStateBase* InLastFiniteState)
+bool UDWCharacterState_Float::OnEnterValidate(UFiniteStateBase* InLastState, const TArray<FParameter>& InParams)
 {
-	if(!Super::OnEnterValidate(InLastFiniteState)) return false;
+	if(!Super::OnEnterValidate(InLastState, InParams)) return false;
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 
 	return Character->DoAction(EDWCharacterActionType::Float);
 }
 
-void UDWCharacterState_Float::OnEnter(UFiniteStateBase* InLastFiniteState)
+void UDWCharacterState_Float::OnEnter(UFiniteStateBase* InLastState, const TArray<FParameter>& InParams)
 {
-	Super::OnEnter(InLastFiniteState);
+	Super::OnEnter(InLastState, InParams);
+
+	if(InParams.IsValidIndex(0))
+	{
+		WaterPosZ = InParams[0].GetFloatValue();
+	}
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 	
 	Character->GetAbilitySystemComponent()->AddLooseGameplayTag(GameplayTags::StateTag_Character_Floating);
 
-	Character->LimitToAnim();
+	// Character->LimitToAnim();
 
-	if(!InLastFiniteState || !InLastFiniteState->IsA<UDWCharacterState_Swim>())
+	if(Character->GetCharacterMovement()->MovementMode != MOVE_Swimming)
 	{
-		if(USceneModuleStatics::HasPhysicsVolumeByName(FName("Water")))
+		Character->GetCharacterMovement()->SetMovementMode(MOVE_Swimming);
+	}
+
+	Character->GetCharacterMovement()->Velocity.Z = 0;
+}
+
+void UDWCharacterState_Float::OnRefresh(float DeltaSeconds)
+{
+	Super::OnRefresh(DeltaSeconds);
+
+	ADWCharacter* Character = GetAgent<ADWCharacter>();
+
+	if(WaterPosZ != -1.f)
+	{
+		const float NeckPosZ = Character->GetCharacterPart(EDWCharacterPartType::Neck)->GetComponentLocation().Z;
+		const float ChestPosZ = Character->GetCharacterPart(EDWCharacterPartType::Chest)->GetComponentLocation().Z;
+		const float OffsetZ = ChestPosZ + (NeckPosZ - ChestPosZ) * 0.5f - Character->GetActorLocation().Z;
+		const float TargetPosZ = WaterPosZ - OffsetZ;
+		Character->SetActorLocation(FVector(Character->GetActorLocation().X, Character->GetActorLocation().Y, FMath::FInterpConstantTo(Character->GetActorLocation().Z, TargetPosZ, DeltaSeconds, Character->GetSwimSpeed())));
+		if(FMath::IsNearlyEqual(Character->GetActorLocation().Z, TargetPosZ, 0.2f))
 		{
-			Character->GetCharacterMovement()->SetMovementMode(MOVE_Swimming);
-			if(Character->GetCharacterMovement()->UpdatedComponent)
-			{
-				Character->GetCharacterMovement()->UpdatedComponent->SetPhysicsVolume(USceneModuleStatics::GetPhysicsVolumeByName(FName("Water")), true);
-			}
+			WaterPosZ = -1.f;
 		}
 	}
-	Character->GetCharacterMovement()->Velocity = FVector(Character->GetCharacterMovement()->Velocity.X, Character->GetCharacterMovement()->Velocity.Y, 0);
-	const float NeckPosZ = Character->GetCharacterPart(EDWCharacterPartType::Neck)->GetComponentLocation().Z;
-	const float ChestPosZ = Character->GetCharacterPart(EDWCharacterPartType::Chest)->GetComponentLocation().Z;
-	const float OffsetZ = ChestPosZ + (NeckPosZ - ChestPosZ) * 0.35f - Character->GetActorLocation().Z;
-	Character->SetActorLocation(FVector(Character->GetActorLocation().X, Character->GetActorLocation().Y, WaterPosZ - OffsetZ));
 }
 
-void UDWCharacterState_Float::OnRefresh()
+void UDWCharacterState_Float::OnLeave(UFiniteStateBase* InNextState)
 {
-	Super::OnRefresh();
-}
-
-void UDWCharacterState_Float::OnLeave(UFiniteStateBase* InNextFiniteState)
-{
-	Super::OnLeave(InNextFiniteState);
+	Super::OnLeave(InNextState);
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 
@@ -74,17 +83,14 @@ void UDWCharacterState_Float::OnLeave(UFiniteStateBase* InNextFiniteState)
 	
 	Character->GetAbilitySystemComponent()->RemoveLooseGameplayTag(GameplayTags::StateTag_Character_Floating);
 
-	Character->FreeToAnim();
+	// Character->FreeToAnim();
 
-	if(!InNextFiniteState || !InNextFiniteState->IsA<UDWCharacterState_Swim>())
-	{
-		Character->GetCharacterMovement()->SetMovementMode(MOVE_Walking);
-		if(Character->GetCharacterMovement()->UpdatedComponent)
-		{
-			Character->GetCharacterMovement()->UpdatedComponent->SetPhysicsVolume(USceneModuleStatics::GetDefaultPhysicsVolume(), true);
-		}
-		Character->GetCharacterMovement()->Velocity = FVector(Character->GetCharacterMovement()->Velocity.X, Character->GetCharacterMovement()->Velocity.Y, Character->GetCharacterMovement()->Velocity.Z * 0.5f);
-	}
+	// const FVoxelItem& ChestOverlappingVoxel = Character->GetCharacterPart(EDWCharacterPartType::Chest)->GetOverlappingVoxel();
+	//
+	// if(!ChestOverlappingVoxel.IsValid() || ChestOverlappingVoxel.GetVoxelType() != EVoxelType::Water || (InNextState && InNextState->IsA<UDWCharacterState_Jump>()))
+	// {
+	// 	Character->GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+	// }
 }
 
 void UDWCharacterState_Float::OnTermination()

@@ -11,23 +11,23 @@ UDWCharacterState_Dodge::UDWCharacterState_Dodge()
 	StateName = FName("Dodge");
 }
 
-void UDWCharacterState_Dodge::OnInitialize(UFSMComponent* InFSMComponent, int32 InStateIndex)
+void UDWCharacterState_Dodge::OnInitialize(UFSMComponent* InFSM, int32 InStateIndex)
 {
-	Super::OnInitialize(InFSMComponent, InStateIndex);
+	Super::OnInitialize(InFSM, InStateIndex);
 }
 
-bool UDWCharacterState_Dodge::OnEnterValidate(UFiniteStateBase* InLastFiniteState)
+bool UDWCharacterState_Dodge::OnEnterValidate(UFiniteStateBase* InLastState, const TArray<FParameter>& InParams)
 {
-	if(!Super::OnEnterValidate(InLastFiniteState)) return false;
+	if(!Super::OnEnterValidate(InLastState, InParams)) return false;
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 
 	return Character->GetMoveDirection() != FVector::ZeroVector && Character->DoAction(EDWCharacterActionType::Dodge);
 }
 
-void UDWCharacterState_Dodge::OnEnter(UFiniteStateBase* InLastFiniteState)
+void UDWCharacterState_Dodge::OnEnter(UFiniteStateBase* InLastState, const TArray<FParameter>& InParams)
 {
-	Super::OnEnter(InLastFiniteState);
+	Super::OnEnter(InLastState, InParams);
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 	
@@ -38,14 +38,14 @@ void UDWCharacterState_Dodge::OnEnter(UFiniteStateBase* InLastFiniteState)
 	Character->SetActorRotation(FRotator(0.f, Character->GetMoveDirection().ToOrientationRotator().Yaw, 0.f));
 }
 
-void UDWCharacterState_Dodge::OnRefresh()
+void UDWCharacterState_Dodge::OnRefresh(float DeltaSeconds)
 {
-	Super::OnRefresh();
+	Super::OnRefresh(DeltaSeconds);
 }
 
-void UDWCharacterState_Dodge::OnLeave(UFiniteStateBase* InNextFiniteState)
+void UDWCharacterState_Dodge::OnLeave(UFiniteStateBase* InNextState)
 {
-	Super::OnLeave(InNextFiniteState);
+	Super::OnLeave(InNextState);
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 

@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "Widget/Screen/UMG/SubWidgetBase.h"
+#include "Widget/Screen/SubWidgetBase.h"
 #include "WidgetTaskInfoItem.generated.h"
 
 class UTaskBase;

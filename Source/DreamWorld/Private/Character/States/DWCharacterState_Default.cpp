@@ -5,32 +5,31 @@
 #include "Ability/Character/AbilityCharacterDataBase.h"
 #include "Character/DWCharacter.h"
 #include "Character/States/DWCharacterState_Walk.h"
+#include "Common/Looking/LookingComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "FSM/Components/FSMComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Voxel/VoxelModule.h"
 #include "Voxel/VoxelModuleStatics.h"
-#include "Voxel/Chunks/VoxelChunk.h"
-#include "Voxel/Voxels/Voxel.h"
 
 UDWCharacterState_Default::UDWCharacterState_Default()
 {
 	
 }
 
-void UDWCharacterState_Default::OnInitialize(UFSMComponent* InFSMComponent, int32 InStateIndex)
+void UDWCharacterState_Default::OnInitialize(UFSMComponent* InFSM, int32 InStateIndex)
 {
-	Super::OnInitialize(InFSMComponent, InStateIndex);
+	Super::OnInitialize(InFSM, InStateIndex);
 }
 
-bool UDWCharacterState_Default::OnEnterValidate(UFiniteStateBase* InLastFiniteState)
+bool UDWCharacterState_Default::OnEnterValidate(UFiniteStateBase* InLastState, const TArray<FParameter>& InParams)
 {
-	return Super::OnEnterValidate(InLastFiniteState);
+	return Super::OnEnterValidate(InLastState, InParams);
 }
 
-void UDWCharacterState_Default::OnEnter(UFiniteStateBase* InLastFiniteState)
+void UDWCharacterState_Default::OnEnter(UFiniteStateBase* InLastState, const TArray<FParameter>& InParams)
 {
-	Super::OnEnter(InLastFiniteState);
+	Super::OnEnter(InLastState, InParams);
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 
@@ -40,7 +39,7 @@ void UDWCharacterState_Default::OnEnter(UFiniteStateBase* InLastFiniteState)
 	
 	// stats
 	Character->SetControlMode(Character->ControlMode);
-	Character->SetLockedTarget(nullptr);
+	Character->GetLooking()->TargetLookingOff();
 	Character->RidingTarget = nullptr;
 	Character->OwnerRider = nullptr;
 	
@@ -53,14 +52,14 @@ void UDWCharacterState_Default::OnEnter(UFiniteStateBase* InLastFiniteState)
 	Character->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
-void UDWCharacterState_Default::OnRefresh()
+void UDWCharacterState_Default::OnRefresh(float DeltaSeconds)
 {
-	Super::OnRefresh();
+	Super::OnRefresh(DeltaSeconds);
 }
 
-void UDWCharacterState_Default::OnLeave(UFiniteStateBase* InNextFiniteState)
+void UDWCharacterState_Default::OnLeave(UFiniteStateBase* InNextState)
 {
-	Super::OnLeave(InNextFiniteState);
+	Super::OnLeave(InNextState);
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 
@@ -76,27 +75,5 @@ void UDWCharacterState_Default::OnTermination()
 
 void UDWCharacterState_Default::TrySwitchToWalk()
 {
-	ADWCharacter* Character = GetAgent<ADWCharacter>();
-
-	if(!Character->IsPlayer())
-	{
-		FSM->SwitchStateByClass<UDWCharacterState_Walk>();
-	}
-	else if(UVoxelModule::Get().IsBasicGenerated())
-	{
-		if(Character->GetActorLocation().IsNearlyZero())
-		{
-			const auto& characterData = Character->GetCharacterData<UAbilityCharacterDataBase>();
-			FHitResult hitResult;
-			if(UVoxelModuleStatics::VoxelAgentTraceSingle(Character->GetActorLocation(), FVector2D(1000.f), characterData.Radius, characterData.HalfHeight, {}, hitResult, true, 10, true))
-			{
-				Character->SetActorLocationAndRotation(hitResult.Location, FRotator::ZeroRotator);
-				FSM->SwitchStateByClass<UDWCharacterState_Walk>();
-			}
-		}
-		else
-		{
-			FSM->SwitchStateByClass<UDWCharacterState_Walk>();
-		}
-	}
+	FSM->SwitchStateByClass<UDWCharacterState_Walk>();
 }

@@ -4,26 +4,35 @@
 #include "AI/Decorators/DWAIDecorator_CheckDistance.h"
 
 #include "Character/DWCharacter.h"
-#include "AI/DWAIController.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "Debug/DebugTypes.h"
 
 UDWAIDecorator_CheckDistance::UDWAIDecorator_CheckDistance(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
-	bNotifyTick = false;
+	CheckTargetKey.AddObjectFilter(this, GET_MEMBER_NAME_CHECKED(UDWAIDecorator_CheckDistance, CheckTargetKey), ADWCharacter::StaticClass());
+	CheckDistanceKey.AddFloatFilter(this, GET_MEMBER_NAME_CHECKED(UDWAIDecorator_CheckDistance, CheckDistanceKey));
+}
+
+bool UDWAIDecorator_CheckDistance::InitDecorator(UBehaviorTreeComponent& OwnerComp)
+{
+	if(!Super::InitDecorator(OwnerComp)) return false;
+
+	CheckTarget = Cast<ADWCharacter>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(CheckTargetKey.SelectedKeyName));
+	CheckDistance = OwnerComp.GetBlackboardComponent()->GetValueAsFloat(CheckDistanceKey.SelectedKeyName);
 	
-	TargetCharacterKey.AddObjectFilter(this, GET_MEMBER_NAME_CHECKED(UDWAIDecorator_CheckDistance, TargetCharacterKey), ADWCharacter::StaticClass());
-	TargetDistanceKey.AddFloatFilter(this, GET_MEMBER_NAME_CHECKED(UDWAIDecorator_CheckDistance, TargetDistanceKey));
+	return CheckTarget && CheckTarget->IsValidLowLevel();
+}
+
+bool UDWAIDecorator_CheckDistance::InitDecorator(UBehaviorTreeComponent& OwnerComp) const
+{
+	return Super::InitDecorator(OwnerComp);
 }
 
 bool UDWAIDecorator_CheckDistance::CalculateRawConditionValue(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) const
 {
-	ADWAIController* OwnerController = Cast<ADWAIController>(OwnerComp.GetOwner());
-	ADWCharacter* OwnerCharacter = Cast<ADWCharacter>(OwnerController->GetPawn());
-	ADWCharacter* TargetCharacter = Cast<ADWCharacter>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(TargetCharacterKey.SelectedKeyName));
-	const float TargetDistance = OwnerComp.GetBlackboardComponent()->GetValueAsFloat(TargetDistanceKey.SelectedKeyName);
-	if(OwnerCharacter && TargetCharacter)
-	{
-		return OwnerCharacter->GetDistance(TargetCharacter, false, false) <= TargetDistance;
-	}
-	return false;
+	if(!InitDecorator(OwnerComp)) return false;
+
+	WHDebug(FString::Printf(TEXT("%f__%f"), GetAgent<ADWCharacter>()->GetDistance(CheckTarget, false, false), CheckDistance));
+	
+	return GetAgent<ADWCharacter>()->GetDistance(CheckTarget, false, false) <= CheckDistance;
 }

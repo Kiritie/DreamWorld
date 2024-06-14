@@ -3,21 +3,30 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "AI/DWAIDecorator.h"
+#include "AI/Base/AIDecoratorBase.h"
 #include "DWAIDecorator_CheckAttacking.generated.h"
 
+class ADWCharacter;
 /**
  * 
  */
 UCLASS()
-class DREAMWORLD_API UDWAIDecorator_CheckAttacking : public UDWAIDecorator
+class DREAMWORLD_API UDWAIDecorator_CheckAttacking : public UAIDecoratorBase
 {
 	GENERATED_UCLASS_BODY()
 
 protected:
-	UPROPERTY(EditAnywhere, Category = "Blackboard")
-	FBlackboardKeySelector TargetCharacterKey;
+	virtual bool InitDecorator(UBehaviorTreeComponent& OwnerComp) override;
+
+	virtual bool InitDecorator(UBehaviorTreeComponent& OwnerComp) const override;
+	
+	virtual bool CalculateRawConditionValue(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) const override;
 
 protected:
-	virtual bool CalculateRawConditionValue(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) const override;
+	UPROPERTY(EditAnywhere, Category = "Blackboard")
+	FBlackboardKeySelector CheckTargetKey;
+
+private:
+	UPROPERTY()
+	ADWCharacter* CheckTarget;
 };

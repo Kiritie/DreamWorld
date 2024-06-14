@@ -2,7 +2,7 @@
 
 #pragma once
 #include "Setting/Widget/WidgetSettingPanelBase.h"
-#include "Widget/Screen/UMG/UserWidgetBase.h"
+#include "Widget/Screen/UserWidgetBase.h"
 
 #include "WidgetSettingPanel.generated.h"
 

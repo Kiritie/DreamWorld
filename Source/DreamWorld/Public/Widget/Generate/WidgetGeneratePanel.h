@@ -3,7 +3,7 @@
 #pragma once
 
 #include "Common/DWCommonTypes.h"
-#include "Widget/Screen/UMG/UserWidgetBase.h"
+#include "Widget/Screen/UserWidgetBase.h"
 #include "WidgetGeneratePanel.generated.h"
 
 class UScrollBox;

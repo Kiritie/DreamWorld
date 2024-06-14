@@ -12,7 +12,7 @@ ADWAIController::ADWAIController()
 void ADWAIController::OnRefresh_Implementation(float DeltaSeconds)
 {
 	Super::OnRefresh_Implementation(DeltaSeconds);
-
+	
 	ADWCharacter* OwnerCharacter = GetPawn<ADWCharacter>();
 
 	if(!OwnerCharacter) return;

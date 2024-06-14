@@ -49,9 +49,9 @@ void UDWCameraModule::OnPreparatory(EPhase InPhase)
 	Super::OnPreparatory(InPhase);
 }
 
-void UDWCameraModule::OnRefresh(float DeltaSeconds)
+void UDWCameraModule::OnRefresh(float DeltaSeconds, bool bInEditor)
 {
-	Super::OnRefresh(DeltaSeconds);
+	Super::OnRefresh(DeltaSeconds, bInEditor);
 }
 
 void UDWCameraModule::OnPause()

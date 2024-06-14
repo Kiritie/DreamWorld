@@ -52,9 +52,9 @@ void UDWInputModule::OnPreparatory(EPhase InPhase)
 	Super::OnPreparatory(InPhase);
 }
 
-void UDWInputModule::OnRefresh(float DeltaSeconds)
+void UDWInputModule::OnRefresh(float DeltaSeconds, bool bInEditor)
 {
-	Super::OnRefresh(DeltaSeconds);
+	Super::OnRefresh(DeltaSeconds, bInEditor);
 }
 
 void UDWInputModule::OnReset()

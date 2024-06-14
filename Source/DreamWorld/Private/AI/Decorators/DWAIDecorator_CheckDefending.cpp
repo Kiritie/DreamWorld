@@ -8,16 +8,26 @@
 
 UDWAIDecorator_CheckDefending::UDWAIDecorator_CheckDefending(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
-	bNotifyTick = false;
+	CheckTargetKey.AddObjectFilter(this, GET_MEMBER_NAME_CHECKED(UDWAIDecorator_CheckDefending, CheckTargetKey), ADWCharacter::StaticClass());
+}
+
+bool UDWAIDecorator_CheckDefending::InitDecorator(UBehaviorTreeComponent& OwnerComp)
+{
+	if(!Super::InitDecorator(OwnerComp)) return false;
+
+	CheckTarget = Cast<ADWCharacter>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(CheckTargetKey.SelectedKeyName));
 	
-	TargetCharacterKey.AddObjectFilter(this, GET_MEMBER_NAME_CHECKED(UDWAIDecorator_CheckDefending, TargetCharacterKey), ADWCharacter::StaticClass());
+	return CheckTarget && CheckTarget->IsValidLowLevel();
+}
+
+bool UDWAIDecorator_CheckDefending::InitDecorator(UBehaviorTreeComponent& OwnerComp) const
+{
+	return Super::InitDecorator(OwnerComp);
 }
 
 bool UDWAIDecorator_CheckDefending::CalculateRawConditionValue(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) const
 {
-	if(ADWCharacter* TargetCharacter = Cast<ADWCharacter>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(TargetCharacterKey.SelectedKeyName)))
-	{
-		return TargetCharacter->IsDefending();
-	}
-	return false;
+	if(!InitDecorator(OwnerComp)) return false;
+	
+	return GetAgent<ADWCharacter>()->IsDefending();
 }

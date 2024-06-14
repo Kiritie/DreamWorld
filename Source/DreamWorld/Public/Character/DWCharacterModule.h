@@ -34,7 +34,7 @@ public:
 
 	virtual void OnPreparatory(EPhase InPhase) override;
 
-	virtual void OnRefresh(float DeltaSeconds) override;
+	virtual void OnRefresh(float DeltaSeconds, bool bInEditor) override;
 
 	virtual void OnPause() override;
 

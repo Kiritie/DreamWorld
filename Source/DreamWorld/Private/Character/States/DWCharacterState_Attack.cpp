@@ -15,37 +15,37 @@ UDWCharacterState_Attack::UDWCharacterState_Attack()
 	StateName = FName("Attack");
 }
 
-void UDWCharacterState_Attack::OnInitialize(UFSMComponent* InFSMComponent, int32 InStateIndex)
+void UDWCharacterState_Attack::OnInitialize(UFSMComponent* InFSM, int32 InStateIndex)
 {
-	Super::OnInitialize(InFSMComponent, InStateIndex);
+	Super::OnInitialize(InFSM, InStateIndex);
 }
 
-bool UDWCharacterState_Attack::OnEnterValidate(UFiniteStateBase* InLastFiniteState)
+bool UDWCharacterState_Attack::OnEnterValidate(UFiniteStateBase* InLastState, const TArray<FParameter>& InParams)
 {
-	if(!Super::OnEnterValidate(InLastFiniteState)) return false;
+	if(!Super::OnEnterValidate(InLastState, InParams)) return false;
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 
 	return Character->ControlMode == EDWCharacterControlMode::Fighting && Character->DoAction(EDWCharacterActionType::Attack);
 }
 
-void UDWCharacterState_Attack::OnEnter(UFiniteStateBase* InLastFiniteState)
+void UDWCharacterState_Attack::OnEnter(UFiniteStateBase* InLastState, const TArray<FParameter>& InParams)
 {
-	Super::OnEnter(InLastFiniteState);
+	Super::OnEnter(InLastState, InParams);
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 
 	Character->GetAbilitySystemComponent()->AddLooseGameplayTag(GameplayTags::StateTag_Character_Attacking);
 }
 
-void UDWCharacterState_Attack::OnRefresh()
+void UDWCharacterState_Attack::OnRefresh(float DeltaSeconds)
 {
-	Super::OnRefresh();
+	Super::OnRefresh(DeltaSeconds);
 }
 
-void UDWCharacterState_Attack::OnLeave(UFiniteStateBase* InNextFiniteState)
+void UDWCharacterState_Attack::OnLeave(UFiniteStateBase* InNextState)
 {
-	Super::OnLeave(InNextFiniteState);
+	Super::OnLeave(InNextState);
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 
@@ -71,7 +71,7 @@ void UDWCharacterState_Attack::OnTermination()
 
 void UDWCharacterState_Attack::AttackStart()
 {
-	if (!IsCurrentState()) return;
+	if (!IsCurrent()) return;
 	
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 
@@ -95,7 +95,7 @@ void UDWCharacterState_Attack::AttackStart()
 			const auto SkillAbilityData = Character->GetSkillAbility(Character->SkillAbilityID);
 			if(const auto SkillClass = SkillAbilityData.GetItemData<UAbilitySkillDataBase>().SkillClass)
 			{
-				if(AAbilitySkillBase* Skill = UObjectPoolModuleStatics::SpawnObject<AAbilitySkillBase>(nullptr, nullptr, SkillClass))
+				if(AAbilitySkillBase* Skill = UObjectPoolModuleStatics::SpawnObject<AAbilitySkillBase>(nullptr, nullptr, false, SkillClass))
 				{
 					Skill->Initialize(Character, FAbilityItem(SkillAbilityData.AbilityID));
 				}
@@ -113,7 +113,7 @@ void UDWCharacterState_Attack::AttackStart()
 
 void UDWCharacterState_Attack::AttackStep()
 {
-	if (!IsCurrentState()) return;
+	if (!IsCurrent()) return;
 	
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 
@@ -124,7 +124,7 @@ void UDWCharacterState_Attack::AttackStep()
 
 void UDWCharacterState_Attack::AttackEnd()
 {
-	if (!IsCurrentState()) return;
+	if (!IsCurrent()) return;
 	
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 

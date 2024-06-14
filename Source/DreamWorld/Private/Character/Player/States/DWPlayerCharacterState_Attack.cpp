@@ -9,29 +9,29 @@ UDWPlayerCharacterState_Attack::UDWPlayerCharacterState_Attack()
 	StateName = FName("Attack");
 }
 
-void UDWPlayerCharacterState_Attack::OnInitialize(UFSMComponent* InFSMComponent, int32 InStateIndex)
+void UDWPlayerCharacterState_Attack::OnInitialize(UFSMComponent* InFSM, int32 InStateIndex)
 {
-	Super::OnInitialize(InFSMComponent, InStateIndex);
+	Super::OnInitialize(InFSM, InStateIndex);
 }
 
-bool UDWPlayerCharacterState_Attack::OnEnterValidate(UFiniteStateBase* InLastFiniteState)
+bool UDWPlayerCharacterState_Attack::OnEnterValidate(UFiniteStateBase* InLastState, const TArray<FParameter>& InParams)
 {
-	return Super::OnEnterValidate(InLastFiniteState);
+	return Super::OnEnterValidate(InLastState, InParams);
 }
 
-void UDWPlayerCharacterState_Attack::OnEnter(UFiniteStateBase* InLastFiniteState)
+void UDWPlayerCharacterState_Attack::OnEnter(UFiniteStateBase* InLastState, const TArray<FParameter>& InParams)
 {
-	Super::OnEnter(InLastFiniteState);
+	Super::OnEnter(InLastState, InParams);
 }
 
-void UDWPlayerCharacterState_Attack::OnRefresh()
+void UDWPlayerCharacterState_Attack::OnRefresh(float DeltaSeconds)
 {
-	Super::OnRefresh();
+	Super::OnRefresh(DeltaSeconds);
 }
 
-void UDWPlayerCharacterState_Attack::OnLeave(UFiniteStateBase* InNextFiniteState)
+void UDWPlayerCharacterState_Attack::OnLeave(UFiniteStateBase* InNextState)
 {
-	Super::OnLeave(InNextFiniteState);
+	Super::OnLeave(InNextState);
 }
 
 void UDWPlayerCharacterState_Attack::OnTermination()

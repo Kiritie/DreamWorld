@@ -76,6 +76,8 @@ enum class EDWCharacterNature : uint8
 	None,
 	// ???????
 	NPC,
+	// ???????
+	Player,
 	// ????AI
 	AIFriendly,
 	// ??????AI
@@ -945,7 +947,7 @@ namespace GameplayTags
 	
 	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(InputTag_Primary);
 	
-	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(InputTag_Minor);
+	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(InputTag_Secondary);
 	
 	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(InputTag_ReleaseSkillAbility1);
 	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(InputTag_ReleaseSkillAbility2);

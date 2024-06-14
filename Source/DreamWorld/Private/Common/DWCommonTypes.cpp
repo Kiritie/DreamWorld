@@ -107,8 +107,8 @@ namespace GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(InputTag_ChangeHand, "Input.Player.ChangeHand", "ChangeHand");
 	
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(InputTag_Primary, "Input.Player.Primary", "PrimaryAction");
-	
-	UE_DEFINE_GAMEPLAY_TAG_COMMENT(InputTag_Minor, "Input.Player.Minor", "Minor");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(InputTag_Secondary, "Input.Player.Secondary", "Secondary");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(InputTag_Third, "Input.Player.Third", "Third");
 	
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(InputTag_ReleaseSkillAbility1, "Input.Player.ReleaseSkillAbility1", "Release Skill Ability1");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(InputTag_ReleaseSkillAbility2, "Input.Player.ReleaseSkillAbility2", "Release Skill Ability2");

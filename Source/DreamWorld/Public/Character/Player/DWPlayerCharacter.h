@@ -61,11 +61,9 @@ public:
 
 	virtual void Kill(IAbilityVitalityInterface* InTarget) override;
 
-	virtual bool CanLookAtTarget(ADWCharacter* InTargetCharacter) override;
-
-	virtual void DoLookAtTarget(ADWCharacter* InTargetCharacter) override;
-
 	virtual void ChangeHand();
+	
+	virtual bool CanLookAtTarget() override;
 
 	virtual bool CanInteract(EInteractAction InInteractAction, IInteractionAgentInterface* InInteractionAgent) override;
 

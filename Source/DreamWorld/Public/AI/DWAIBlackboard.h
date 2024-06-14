@@ -16,17 +16,21 @@ class DREAMWORLD_API UDWAIBlackboard : public UAIBlackboardBase
 public:
 	virtual void PostLoad() override;
 
-	virtual void Initialize(UBlackboardComponent* InComponent, IAIAgentInterface* InAgent) override;
+	virtual void Initialize(UBlackboardComponent* InComponent) override;
 
 protected:
+	virtual void OnReset() override;
+	
 	virtual void OnRefresh() override;
+
+	virtual void OnValueReset(FName InValueName) override;
 
 	virtual void OnValuePreChange(FName InValueName) override;
 
 	virtual void OnValueChanged(FName InValueName) override;
 
 public:
-	BLACKBOARD_VALUE_ACCESSORS_ENUM(CharacterNature);
+	BLACKBOARD_VALUE_ACCESSORS_BOOL(IsExcessived);
 	BLACKBOARD_VALUE_ACCESSORS_FLOAT(AttackDistance);
 	BLACKBOARD_VALUE_ACCESSORS_FLOAT(FollowDistance);
 	BLACKBOARD_VALUE_ACCESSORS_FLOAT(PatrolDistance);

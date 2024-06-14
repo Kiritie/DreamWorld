@@ -41,9 +41,9 @@ void UDWSaveGameModule::OnPreparatory(EPhase InPhase)
 	Super::OnPreparatory(InPhase);
 }
 
-void UDWSaveGameModule::OnRefresh(float DeltaSeconds)
+void UDWSaveGameModule::OnRefresh(float DeltaSeconds, bool bInEditor)
 {
-	Super::OnRefresh(DeltaSeconds);
+	Super::OnRefresh(DeltaSeconds, bInEditor);
 }
 
 void UDWSaveGameModule::OnPause()
