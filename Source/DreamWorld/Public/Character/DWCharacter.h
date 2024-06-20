@@ -258,10 +258,10 @@ public:
 	virtual bool IsSprinting() const;
 
 	UFUNCTION(BlueprintPure)
-	virtual bool IsCrouching() const;
+	virtual bool IsCrouching(bool bReally = false) const;
 
 	UFUNCTION(BlueprintPure)
-	virtual bool IsSwimming() const;
+	virtual bool IsSwimming(bool bReally = false) const;
 
 	UFUNCTION(BlueprintPure)
 	virtual bool IsFloating() const;
@@ -279,7 +279,7 @@ public:
 	virtual bool IsRiding() const;
 
 	UFUNCTION(BlueprintPure)
-	virtual bool IsFlying() const;
+	virtual bool IsFlying(bool bReally = false) const;
 
 	UFUNCTION(BlueprintPure)
 	virtual bool IsInterrupting() const;
@@ -351,7 +351,7 @@ public:
 
 	virtual void SetRaceID(FName InRaceID) override;
 
-	virtual bool SetLevelV(int32 InLevel) override;
+	virtual bool SetLevelA(int32 InLevel) override;
 
 	UFUNCTION(BlueprintNativeEvent)
 	void SetControlMode(EDWCharacterControlMode InControlMode);

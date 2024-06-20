@@ -442,7 +442,7 @@ void ADWPlayerCharacter::OnAttributeChange(const FOnAttributeChangeData& InAttri
 {
 	const float DeltaValue = InAttributeChangeData.NewValue - InAttributeChangeData.OldValue;
 	
-	if(InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetHealthAttribute() || InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetMaxHealthAttribute())
+	if(InAttributeChangeData.Attribute == GetHealthAttribute() || InAttributeChangeData.Attribute == GetMaxHealthAttribute())
 	{
 		if(UWidgetModuleStatics::GetUserWidget<UWidgetHeadBox>())
 		{
@@ -453,7 +453,7 @@ void ADWPlayerCharacter::OnAttributeChange(const FOnAttributeChangeData& InAttri
 			UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>()->SetHealthInfo(FString::Printf(TEXT("%d/%d"), (int32)GetHealth(), (int32)GetMaxHealth()));
 		}
 	}
-	else if(InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetExpAttribute())
+	else if(InAttributeChangeData.Attribute == GetExpAttribute())
 	{
 		if(UWidgetModuleStatics::GetUserWidget<UWidgetContextBox>())
 		{
@@ -461,7 +461,7 @@ void ADWPlayerCharacter::OnAttributeChange(const FOnAttributeChangeData& InAttri
 			{
 				UWidgetModuleStatics::GetUserWidget<UWidgetContextBox>()->AddMessage(FString::Printf(TEXT("获得: %d点经验值"), (int32)DeltaValue));
 			}
-			if(InAttributeChangeData.NewValue >= GetAttributeSet<UDWCharacterAttributeSet>()->GetMaxExp())
+			if(InAttributeChangeData.NewValue >= GetMaxExp())
 			{
 				UWidgetModuleStatics::GetUserWidget<UWidgetContextBox>()->AddMessage(FString::Printf(TEXT("你已升到 %d 级！"), Level));
 			}
@@ -475,7 +475,7 @@ void ADWPlayerCharacter::OnAttributeChange(const FOnAttributeChangeData& InAttri
 			UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>()->SetHeadInfo(GetHeadInfo());
 		}
 	}
-	else if(InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetMaxExpAttribute())
+	else if(InAttributeChangeData.Attribute == GetMaxExpAttribute())
 	{
 		if(UWidgetModuleStatics::GetUserWidget<UWidgetHeadBox>())
 		{
@@ -486,7 +486,7 @@ void ADWPlayerCharacter::OnAttributeChange(const FOnAttributeChangeData& InAttri
 			UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>()->SetHeadInfo(GetHeadInfo());
 		}
 	}
-	else if(InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetManaAttribute() || InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetMaxManaAttribute())
+	else if(InAttributeChangeData.Attribute == GetManaAttribute() || InAttributeChangeData.Attribute == GetMaxManaAttribute())
 	{
 		if(UWidgetModuleStatics::GetUserWidget<UWidgetHeadBox>())
 		{
@@ -497,7 +497,7 @@ void ADWPlayerCharacter::OnAttributeChange(const FOnAttributeChangeData& InAttri
 			UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>()->SetManaInfo(FString::Printf(TEXT("%d/%d"), (int32)GetMana(), (int32)GetMaxMana()));
 		}
 	}
-	else if(InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetStaminaAttribute() || InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetMaxStaminaAttribute())
+	else if(InAttributeChangeData.Attribute == GetStaminaAttribute() || InAttributeChangeData.Attribute == GetMaxStaminaAttribute())
 	{
 		if(UWidgetModuleStatics::GetUserWidget<UWidgetHeadBox>())
 		{
@@ -508,95 +508,95 @@ void ADWPlayerCharacter::OnAttributeChange(const FOnAttributeChangeData& InAttri
 			UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>()->SetStaminaInfo(FString::Printf(TEXT("%d/%d"), (int32)GetStamina(), (int32)GetMaxStamina()));
 		}
 	}
-	else if(InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetMoveSpeedAttribute())
+	else if(InAttributeChangeData.Attribute == GetMoveSpeedAttribute())
 	{
 		if(UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>())
 		{
 			UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>()->SetMoveSpeed(FString::FromInt(InAttributeChangeData.NewValue));
 		}
 	}
-	else if(InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetSwimSpeedAttribute())
+	else if(InAttributeChangeData.Attribute == GetSwimSpeedAttribute())
 	{
 		if(UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>())
 		{
 			UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>()->SetSwimSpeed(FString::FromInt(InAttributeChangeData.NewValue));
 		}
 	}
-	else if(InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetRideSpeedAttribute())
+	else if(InAttributeChangeData.Attribute == GetRideSpeedAttribute())
 	{
 		if(UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>())
 		{
 			UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>()->SetRideSpeed(FString::FromInt(InAttributeChangeData.NewValue));
 		}
 	}
-	else if(InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetFlySpeedAttribute())
+	else if(InAttributeChangeData.Attribute == GetFlySpeedAttribute())
 	{
 		if(UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>())
 		{
 			UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>()->SetFlySpeed(FString::FromInt(InAttributeChangeData.NewValue));
 		}
 	}
-	else if(InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetRotationSpeedAttribute())
+	else if(InAttributeChangeData.Attribute == GetRotationSpeedAttribute())
 	{
 		GetCharacterMovement()->RotationRate = FRotator(0, InAttributeChangeData.NewValue * (IsSprinting() ? 1.5f : 1), 0) * RotationRate;
 	}
-	else if(InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetAttackForceAttribute())
+	else if(InAttributeChangeData.Attribute == GetAttackForceAttribute())
 	{
 		if(UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>())
 		{
 			UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>()->SetAttackForce(FString::FromInt(InAttributeChangeData.NewValue));
 		}
 	}
-	else if(InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetRepulseForceAttribute())
+	else if(InAttributeChangeData.Attribute == GetRepulseForceAttribute())
 	{
 		if(UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>())
 		{
 			UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>()->SetRepulseForce(FString::FromInt(InAttributeChangeData.NewValue));
 		}
 	}
-	else if(InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetAttackSpeedAttribute())
+	else if(InAttributeChangeData.Attribute == GetAttackSpeedAttribute())
 	{
 		if(UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>())
 		{
 			UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>()->SetAttackSpeed(FString::SanitizeFloat(InAttributeChangeData.NewValue, 1));
 		}
 	}
-	else if(InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetAttackCritRateAttribute())
+	else if(InAttributeChangeData.Attribute == GetAttackCritRateAttribute())
 	{
 		if(UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>())
 		{
 			UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>()->SetAttackCritRate(FString::Printf(TEXT("%d%%"), (int32)(InAttributeChangeData.NewValue * 100)));
 		}
 	}
-	else if(InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetAttackStealRateAttribute())
+	else if(InAttributeChangeData.Attribute == GetAttackStealRateAttribute())
 	{
 		if(UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>())
 		{
 			UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>()->SetAttackStealRate(FString::Printf(TEXT("%d%%"), (int32)(InAttributeChangeData.NewValue * 100)));
 		}
 	}
-	else if(InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetDefendRateAttribute())
+	else if(InAttributeChangeData.Attribute == GetDefendRateAttribute())
 	{
 		if(UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>())
 		{
 			UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>()->SetDefendRate(FString::Printf(TEXT("%d%%"), (int32)(InAttributeChangeData.NewValue * 100)));
 		}
 	}
-	else if(InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetPhysicsDefRateAttribute())
+	else if(InAttributeChangeData.Attribute == GetPhysicsDefRateAttribute())
 	{
 		if(UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>())
 		{
 			UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>()->SetPhysicsDefRate(FString::Printf(TEXT("%d%%"), (int32)(InAttributeChangeData.NewValue * 100)));
 		}
 	}
-	else if(InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetMagicDefRateAttribute())
+	else if(InAttributeChangeData.Attribute == GetMagicDefRateAttribute())
 	{
 		if(UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>())
 		{
 			UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>()->SetMagicDefRate(FString::Printf(TEXT("%d%%"), (int32)(InAttributeChangeData.NewValue * 100)));
 		}
 	}
-	else if(InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetToughnessRateAttribute())
+	else if(InAttributeChangeData.Attribute == GetToughnessRateAttribute())
 	{
 		if(UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>())
 		{
@@ -687,9 +687,9 @@ void ADWPlayerCharacter::SetRaceID(FName InRaceID)
 	}
 }
 
-bool ADWPlayerCharacter::SetLevelV(int32 InLevel)
+bool ADWPlayerCharacter::SetLevelA(int32 InLevel)
 {
-	if(!Super::SetLevelV(InLevel)) return false;
+	if(!Super::SetLevelA(InLevel)) return false;
 
 	if(UWidgetModuleStatics::GetUserWidget<UWidgetHeadBox>())
 	{

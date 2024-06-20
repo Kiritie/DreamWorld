@@ -209,20 +209,26 @@ void UDWInputManager::MoveUpPlayer_Implementation(const FInputActionValue& InVal
 
 	if(!PossessedCharacter || PossessedCharacter->IsBreakAllInput()) return;
 
+	IWHPlayerInterface::Execute_MoveUp(PossessedCharacter, InValue.Get<float>());
+}
+
+void UDWInputManager::ActionUpPlayer_Implementation(const FInputActionValue& InValue)
+{
+	ADWCharacter* PossessedCharacter = UCommonStatics::GetPossessedPawn<ADWCharacter>();
+
+	if(!PossessedCharacter || PossessedCharacter->IsBreakAllInput()) return;
+
 	if(InValue.Get<float>() > 0.f)
 	{
 		if(PossessedCharacter->IsWalking() || PossessedCharacter->IsFloating())
 		{
 			PossessedCharacter->Jump();
-			return;
 		}
 		else if(PossessedCharacter->IsFalling())
 		{
 			PossessedCharacter->Fly();
-			return;
 		}
 	}
-	IWHPlayerInterface::Execute_MoveUp(PossessedCharacter, InValue.Get<float>());
 }
 
 void UDWInputManager::SystemOperation_Implementation()

@@ -54,6 +54,8 @@ void UDWCharacterState_Fly::OnRefresh(float DeltaSeconds)
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 
+	Character->ModifyStamina(ATTRIBUTE_DELTAVALUE_CLAMP(Character, Stamina, -Character->GetStaminaExpendSpeed() * DeltaSeconds));
+
 	if(Character->GetVelocity().Z < 0.f)
 	{
 		FFindFloorResult FindFloorResult;

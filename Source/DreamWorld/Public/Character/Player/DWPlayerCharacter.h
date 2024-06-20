@@ -98,7 +98,7 @@ public:
 
 	virtual void SetRaceID(FName InRaceID) override;
 
-	virtual bool SetLevelV(int32 InLevel) override;
+	virtual bool SetLevelA(int32 InLevel) override;
 
 	virtual void SetTeamID(FName InTeamID) override;
 	

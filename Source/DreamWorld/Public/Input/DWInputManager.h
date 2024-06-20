@@ -46,6 +46,8 @@ protected:
 	
 	virtual void MoveUpPlayer_Implementation(const FInputActionValue& InValue) override;
 
+	virtual void ActionUpPlayer_Implementation(const FInputActionValue& InValue) override;
+
 	virtual void SystemOperation_Implementation() override;
 	
 protected:

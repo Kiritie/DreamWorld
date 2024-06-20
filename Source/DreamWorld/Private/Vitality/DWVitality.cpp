@@ -201,9 +201,9 @@ void ADWVitality::SetRaceID(FName InRaceID)
 	}
 }
 
-bool ADWVitality::SetLevelV(int32 InLevel)
+bool ADWVitality::SetLevelA(int32 InLevel)
 {
-	if(!Super::SetLevelV(InLevel)) return false;
+	if(!Super::SetLevelA(InLevel)) return false;
 
 	if (GetVitalityHPWidget())
 	{

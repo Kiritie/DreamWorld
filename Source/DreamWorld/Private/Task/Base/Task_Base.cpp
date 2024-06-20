@@ -69,7 +69,7 @@ bool UTask_Base::CheckTaskCondition_Implementation(FString& OutInfo) const
 {
 	if(const ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>())
 	{
-		if(PlayerCharacter->GetLevelV() < NeedLevel)
+		if(PlayerCharacter->GetLevelA() < NeedLevel)
 		{
 			OutInfo = FString::Printf(TEXT("角色等级未达到[%d]级"), NeedLevel);
 			return false;

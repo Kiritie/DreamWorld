@@ -122,13 +122,13 @@ void ADWCharacter::OnRefresh_Implementation(float DeltaSeconds)
 {
 	Super::OnRefresh_Implementation(DeltaSeconds);
 
-	if (IsDead()) return;
+	if(IsDead()) return;
 
-	if (IsActive())
+	if(IsActive())
 	{
-		if (AIMoveLocation != EMPTY_Vector)
+		if(AIMoveLocation != EMPTY_Vector)
 		{
-			if (DoAIMove(AIMoveLocation, AIMoveStopDistance))
+			if(DoAIMove(AIMoveLocation, AIMoveStopDistance))
 			{
 				StopAIMove();
 			}
@@ -136,9 +136,9 @@ void ADWCharacter::OnRefresh_Implementation(float DeltaSeconds)
 
 		if(IsSprinting())
 		{
-			if(GetMoveDirection().Size() > 0.2f)
+			if(IsMoving())
 			{
-				ModifyStamina(ATTRIBUTE_DELTAVALUE_CLAMP(Stamina, -GetStaminaExpendSpeed() * DeltaSeconds));
+				ModifyStamina(ATTRIBUTE_DELTAVALUE_CLAMP(this, Stamina, -GetStaminaExpendSpeed() * DeltaSeconds));
 			}
 			else
 			{
@@ -147,10 +147,10 @@ void ADWCharacter::OnRefresh_Implementation(float DeltaSeconds)
 		}
 		else if(IsFreeToAnim())
 		{
-			ModifyStamina(ATTRIBUTE_DELTAVALUE_CLAMP(Stamina, GetStaminaRegenSpeed() * DeltaSeconds));
+			ModifyStamina(ATTRIBUTE_DELTAVALUE_CLAMP(this, Stamina, GetStaminaRegenSpeed() * DeltaSeconds));
 		}
 
-		if (GetActorLocation().Z < 0)
+		if(GetActorLocation().Z < 0)
 		{
 			Death();
 		}
@@ -224,7 +224,7 @@ void ADWCharacter::LoadData(FSaveData* InSaveData, EPhase InPhase)
 				Iter.Value.AbilityHandle = AbilitySystem->K2_GiveAbility(Iter.Value.AbilityClass, Iter.Value.AbilityLevel);
 			}
 
-			if (FallingAttackAbility.AbilityClass)
+			if(FallingAttackAbility.AbilityClass)
 			{
 				FallingAttackAbility.AbilityHandle = AbilitySystem->K2_GiveAbility(FallingAttackAbility.AbilityClass, FallingAttackAbility.AbilityLevel);
 			}
@@ -255,12 +255,11 @@ void ADWCharacter::LoadData(FSaveData* InSaveData, EPhase InPhase)
 					ActionAbilities.Add(Iter.ActionType, Iter);
 				}
 
-				if (CharacterData.FallingAttackAbility.AbilityClass)
+				if(CharacterData.FallingAttackAbility.AbilityClass)
 				{
 					FallingAttackAbility = CharacterData.FallingAttackAbility;
 					FallingAttackAbility.AbilityHandle = AbilitySystem->K2_GiveAbility(FallingAttackAbility.AbilityClass, FallingAttackAbility.AbilityLevel);
 				}
-			
 			}
 		}
 	}
@@ -410,11 +409,11 @@ void ADWCharacter::OnAuxiliaryItem(const FAbilityItem& InItem)
 
 void ADWCharacter::FreeToAnim(bool bUnLockRotation /*= true*/)
 {
-	if (!IsFreeToAnim()/* && !IsFlying() && !IsFalling() && !IsRiding() && !IsClimbing() && !IsDodging() && !IsDefending() && !IsInterrupting()*/)
+	if(!IsFreeToAnim())
 	{
 		AbilitySystem->AddLooseGameplayTag(GameplayTags::StateTag_Character_FreeToAnim);
 	}
-	if (bUnLockRotation && IsLockRotation())
+	if(bUnLockRotation && IsLockRotation())
 	{
 		AbilitySystem->RemoveLooseGameplayTag(GameplayTags::StateTag_Character_LockRotation);
 	}
@@ -422,11 +421,11 @@ void ADWCharacter::FreeToAnim(bool bUnLockRotation /*= true*/)
 
 void ADWCharacter::LimitToAnim(bool bLockRotation /*= false*/)
 {
-	if (IsFreeToAnim())
+	if(IsFreeToAnim())
 	{
 		AbilitySystem->RemoveLooseGameplayTag(GameplayTags::StateTag_Character_FreeToAnim);
 	}
-	if (bLockRotation && !IsLockRotation())
+	if(bLockRotation && !IsLockRotation())
 	{
 		AbilitySystem->AddLooseGameplayTag(GameplayTags::StateTag_Character_LockRotation);
 	}
@@ -470,7 +469,7 @@ void ADWCharacter::UnDodge()
 
 void ADWCharacter::Sprint()
 {
-	if (!IsSprinting() && GetStamina() > 0.f && GetMoveVelocity().Size() > 0.2f)
+	if(!IsSprinting())
 	{
 		DoAction(EDWCharacterActionType::Sprint);
 	}
@@ -478,7 +477,7 @@ void ADWCharacter::Sprint()
 
 void ADWCharacter::UnSprint()
 {
-	if (IsSprinting())
+	if(IsSprinting())
 	{
 		StopAction(EDWCharacterActionType::Sprint);
 	}
@@ -488,7 +487,7 @@ void ADWCharacter::Crouch(bool bClientSimulation)
 {
 	if(!FSM->IsCurrentStateClass<UDWCharacterState_Crouch>())
 	{
-		FSM->SwitchStateByClass<UDWCharacterState_Crouch>();
+		FSM->SwitchStateByClass<UDWCharacterState_Crouch>({ bClientSimulation });
 	}
 	else
 	{
@@ -578,7 +577,7 @@ bool ADWCharacter::Attack(int32 InAbilityIndex /*= -1*/)
 {
 	if(InAbilityIndex == -1) InAbilityIndex = AttackAbilityIndex;
 
-	if(!IsFalling(true))
+	if(!IsFalling() && !IsFlying())
 	{
 		if(HasAttackAbility(InAbilityIndex))
 		{
@@ -587,7 +586,7 @@ bool ADWCharacter::Attack(int32 InAbilityIndex /*= -1*/)
 			{
 				if(FSM->SwitchStateByClass<UDWCharacterState_Attack>())
 				{
-					if (AbilitySystem->TryActivateAbility(AbilityData.AbilityHandle))
+					if(AbilitySystem->TryActivateAbility(AbilityData.AbilityHandle))
 					{
 						AttackType = EDWCharacterAttackType::NormalAttack;
 						AttackAbilityIndex = InAbilityIndex;
@@ -717,7 +716,7 @@ bool ADWCharacter::OnDestroyVoxel(const FVoxelHitResult& InVoxelHitResult)
 
 bool ADWCharacter::DoAction(EDWCharacterActionType InActionType)
 {
-	if (!HasActionAbility(InActionType)) return false;
+	if(!HasActionAbility(InActionType)) return false;
 
 	const FDWCharacterActionAbilityData AbilityData = GetActionAbility(InActionType);
 	const bool bSuccess = AbilitySystem->TryActivateAbility(AbilityData.AbilityHandle);
@@ -732,7 +731,7 @@ bool ADWCharacter::DoAction(EDWCharacterActionType InActionType)
 
 bool ADWCharacter::StopAction(EDWCharacterActionType InActionType)
 {
-	if (!HasActionAbility(InActionType)) return false;
+	if(!HasActionAbility(InActionType)) return false;
 
 	const FDWCharacterActionAbilityData AbilityData = GetActionAbility(InActionType);
 	const FGameplayAbilitySpec Spec = AbilitySystem->FindAbilitySpecForHandle(AbilityData.AbilityHandle);
@@ -746,7 +745,7 @@ bool ADWCharacter::StopAction(EDWCharacterActionType InActionType)
 
 void ADWCharacter::EndAction(EDWCharacterActionType InActionType, bool bWasCancelled)
 {
-	if (!HasActionAbility(InActionType)) return;
+	if(!HasActionAbility(InActionType)) return;
 
 	switch(InActionType)
 	{
@@ -820,7 +819,7 @@ void ADWCharacter::AIMoveTo(FVector InTargetLocation, float InMoveStopDistance /
 
 bool ADWCharacter::DoAIMove(FVector InTargetLocation, float InMoveStopDistance /*= 10*/)
 {
-	if (FVector::Distance(FVector(GetActorLocation().X, GetActorLocation().Y, 0), FVector(InTargetLocation.X, InTargetLocation.Y, 0)) > InMoveStopDistance)
+	if(FVector::Distance(FVector(GetActorLocation().X, GetActorLocation().Y, 0), FVector(InTargetLocation.X, InTargetLocation.Y, 0)) > InMoveStopDistance)
 	{
 		AddMovementInput(InTargetLocation - GetActorLocation());
 		return false;
@@ -832,13 +831,13 @@ bool ADWCharacter::DoAIMove(ADWCharacter* InTargetCharacter, float InMoveStopDis
 {
 	if(!InTargetCharacter || !InTargetCharacter->IsValidLowLevel()) return false;
 
-	if (GetDistance(InTargetCharacter, false, false) > InMoveStopDistance)
+	if(GetDistance(InTargetCharacter, false, false) > InMoveStopDistance)
 	{
 		AddMovementInput(InTargetCharacter->GetActorLocation() - GetActorLocation());
-		if (bLookAtTarget) Looking->TargetLookingOn(InTargetCharacter);
+		if(bLookAtTarget) Looking->TargetLookingOn(InTargetCharacter);
 		return false;
 	}
-	if (bLookAtTarget) Looking->TargetLookingOff();
+	if(bLookAtTarget) Looking->TargetLookingOff();
 	return true;
 }
 
@@ -849,7 +848,7 @@ void ADWCharacter::StopAIMove(bool bMulticast /*= false*/)
 
 void ADWCharacter::AddMovementInput(FVector WorldDirection, float ScaleValue, bool bForce)
 {
-	if (IsBreakAllInput()) return;
+	if(IsBreakAllInput()) return;
 
 	if(IsFloating())
 	{
@@ -861,10 +860,10 @@ void ADWCharacter::AddMovementInput(FVector WorldDirection, float ScaleValue, bo
 
 	Super::AddMovementInput(WorldDirection, ScaleValue, bForce);
 
-	if (!IsPlayer() || UDWSettingModule::Get().IsAutoJump())
+	if(!IsPlayer() || UDWSettingModule::Get().IsAutoJump())
 	{
 		FHitResult hitResult;
-		if (RaycastStep(hitResult))
+		if(RaycastStep(hitResult))
 		{
 			Jump();
 		}
@@ -875,9 +874,10 @@ void ADWCharacter::SetMotionRate_Implementation(float InMovementRate, float InRo
 {
 	MovementRate = InMovementRate;
 	RotationRate = InRotationRate;
-	GetCharacterMovement()->MaxWalkSpeed = GetMoveSpeed() * (IsSprinting() ? 1.5f : 1) * MovementRate;
-	GetCharacterMovement()->MaxSwimSpeed = GetSwimSpeed() * (IsSprinting() ? 1.5f : 1) * MovementRate;
-	GetCharacterMovement()->RotationRate = FRotator(0, GetRotationSpeed() * (IsSprinting() ? 1.5f : 1) * RotationRate, 0);
+	GetCharacterMovement()->MaxWalkSpeed = GetMoveSpeed() * (IsSprinting() ? 1.5f : 1.f) * MovementRate;
+	GetCharacterMovement()->MaxSwimSpeed = GetSwimSpeed() * (IsSprinting() ? 1.5f : 1.f) * MovementRate;
+	GetCharacterMovement()->MaxFlySpeed = GetFlySpeed() * (IsSprinting() ? 1.5f : 1.f) * MovementRate;
+	GetCharacterMovement()->RotationRate = FRotator(0, GetRotationSpeed() * (IsSprinting() ? 1.5f : 1.f) * RotationRate, 0.f);
 }
 
 bool ADWCharacter::IsExhausted() const
@@ -900,14 +900,14 @@ bool ADWCharacter::IsSprinting() const
 	return AbilitySystem->HasMatchingGameplayTag(GameplayTags::StateTag_Character_Sprinting);
 }
 
-bool ADWCharacter::IsCrouching() const
+bool ADWCharacter::IsCrouching(bool bReally) const
 {
-	return AbilitySystem->HasMatchingGameplayTag(GameplayTags::StateTag_Character_Crouching);
+	return !bReally ? AbilitySystem->HasMatchingGameplayTag(GameplayTags::StateTag_Character_Crouching) : GetCharacterMovement()->IsCrouching();
 }
 
-bool ADWCharacter::IsSwimming() const
+bool ADWCharacter::IsSwimming(bool bReally) const
 {
-	return AbilitySystem->HasMatchingGameplayTag(GameplayTags::StateTag_Character_Swimming);
+	return !bReally ? AbilitySystem->HasMatchingGameplayTag(GameplayTags::StateTag_Character_Swimming) : GetCharacterMovement()->IsSwimming();
 }
 
 bool ADWCharacter::IsFloating() const
@@ -935,9 +935,9 @@ bool ADWCharacter::IsRiding() const
 	return AbilitySystem->HasMatchingGameplayTag(GameplayTags::StateTag_Character_Riding);
 }
 
-bool ADWCharacter::IsFlying() const
+bool ADWCharacter::IsFlying(bool bReally) const
 {
-	return AbilitySystem->HasMatchingGameplayTag(GameplayTags::StateTag_Character_Flying);
+	return !bReally ? AbilitySystem->HasMatchingGameplayTag(GameplayTags::StateTag_Character_Flying) : GetCharacterMovement()->IsFlying();
 }
 
 bool ADWCharacter::IsInterrupting() const
@@ -957,7 +957,7 @@ bool ADWCharacter::IsBreakAllInput() const
 
 UWidgetCharacterHP* ADWCharacter::GetCharacterHPWidget() const
 {
-	if (CharacterHP->GetWorldWidget())
+	if(CharacterHP->GetWorldWidget())
 	{
 		return Cast<UWidgetCharacterHP>(CharacterHP->GetWorldWidget());
 	}
@@ -968,7 +968,7 @@ void ADWCharacter::SetNameV(FName InName)
 {
 	Super::SetNameV(InName);
 
-	if (GetCharacterHPWidget())
+	if(GetCharacterHPWidget())
 	{
 		GetCharacterHPWidget()->SetHeadInfo(GetHeadInfo());
 	}
@@ -978,17 +978,17 @@ void ADWCharacter::SetRaceID(FName InRaceID)
 {
 	Super::SetRaceID(InRaceID);
 	
-	if (GetCharacterHPWidget())
+	if(GetCharacterHPWidget())
 	{
 		GetCharacterHPWidget()->SetHeadInfo(GetHeadInfo());
 	}
 }
 
-bool ADWCharacter::SetLevelV(int32 InLevel)
+bool ADWCharacter::SetLevelA(int32 InLevel)
 {
-	if(!Super::SetLevelV(InLevel)) return false;
+	if(!Super::SetLevelA(InLevel)) return false;
 
-	if (GetCharacterHPWidget())
+	if(GetCharacterHPWidget())
 	{
 		GetCharacterHPWidget()->SetHeadInfo(GetHeadInfo());
 	}
@@ -1020,7 +1020,7 @@ void ADWCharacter::SetTeamID(FName InTeamID)
 {
 	TeamID = InTeamID;
 
-	if (GetCharacterHPWidget())
+	if(GetCharacterHPWidget())
 	{
 		GetCharacterHPWidget()->SetHeadInfo(GetHeadInfo());
 	}
@@ -1058,7 +1058,7 @@ float ADWCharacter::GetPatrolDuration() const
 
 AAbilityEquipBase* ADWCharacter::GetEquip(EDWEquipPartType InPartType) const
 {
-	if (Equips.Contains(InPartType))
+	if(Equips.Contains(InPartType))
 	{
 		return Equips[InPartType];
 	}
@@ -1141,7 +1141,7 @@ FDWCharacterSkillAbilityData ADWCharacter::GetSkillAbility(ESkillType InSkillTyp
 
 FDWCharacterActionAbilityData ADWCharacter::GetActionAbility(EDWCharacterActionType InActionType)
 {
-	if (HasActionAbility(InActionType))
+	if(HasActionAbility(InActionType))
 	{
 		return ActionAbilities[InActionType];
 	}
@@ -1310,28 +1310,28 @@ void ADWCharacter::OnAttributeChange(const FOnAttributeChangeData& InAttributeCh
 {
 	const float DeltaValue = InAttributeChangeData.NewValue - InAttributeChangeData.OldValue;
 
-	if(InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetExpAttribute() || InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetMaxExpAttribute())
+	if(InAttributeChangeData.Attribute == GetExpAttribute() || InAttributeChangeData.Attribute == GetMaxExpAttribute())
 	{
-		if (GetCharacterHPWidget())
+		if(GetCharacterHPWidget())
 		{
 			GetCharacterHPWidget()->SetHeadInfo(GetHeadInfo());
 		}
 	}
-	else if(InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetHealthAttribute() || InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetMaxHealthAttribute())
+	else if(InAttributeChangeData.Attribute == GetHealthAttribute() || InAttributeChangeData.Attribute == GetMaxHealthAttribute())
 	{
-		if (GetCharacterHPWidget())
+		if(GetCharacterHPWidget())
 		{
 			GetCharacterHPWidget()->SetHealthPercent(GetHealth(), GetMaxHealth());
 		}
 	}
-	else if(InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetManaAttribute() || InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetMaxManaAttribute())
+	else if(InAttributeChangeData.Attribute == GetManaAttribute() || InAttributeChangeData.Attribute == GetMaxManaAttribute())
 	{
 		if(GetCharacterHPWidget())
 		{
 			GetCharacterHPWidget()->SetManaPercent(GetMana(), GetMaxMana());
 		}
 	}
-	else if(InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetStaminaAttribute())
+	else if(InAttributeChangeData.Attribute == GetStaminaAttribute())
 	{
 		if(GetCharacterHPWidget())
 		{
@@ -1342,10 +1342,11 @@ void ADWCharacter::OnAttributeChange(const FOnAttributeChangeData& InAttributeCh
 			if(!IsExhausted())
 			{
 				UnSprint();
+				UnFly();
 				AbilitySystem->AddLooseGameplayTag(GameplayTags::StateTag_Character_Exhausted);
 			}
 		}
-		else if(GetStamina() >= 10.f)
+		else if(GetStamina() >= GetMaxStamina() * 0.1f)
 		{
 			if(IsExhausted())
 			{
@@ -1353,35 +1354,35 @@ void ADWCharacter::OnAttributeChange(const FOnAttributeChangeData& InAttributeCh
 			}
 		}
 	}
-	else if(InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetMaxStaminaAttribute())
+	else if(InAttributeChangeData.Attribute == GetMaxStaminaAttribute())
 	{
 		if(GetCharacterHPWidget())
 		{
 			GetCharacterHPWidget()->SetStaminaPercent(GetStamina(), GetMaxStamina());
 		}
 	}
-	else if(InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetMoveSpeedAttribute())
+	else if(InAttributeChangeData.Attribute == GetMoveSpeedAttribute())
 	{
-		GetCharacterMovement()->MaxWalkSpeed = InAttributeChangeData.NewValue * (IsSprinting() ? 1.5f : 1) * MovementRate;
+		GetCharacterMovement()->MaxWalkSpeed = InAttributeChangeData.NewValue * (IsSprinting() ? 1.5f : 1.f) * MovementRate;
 	}
-	else if(InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetSwimSpeedAttribute())
+	else if(InAttributeChangeData.Attribute == GetSwimSpeedAttribute())
 	{
-		GetCharacterMovement()->MaxSwimSpeed = InAttributeChangeData.NewValue * (IsSprinting() ? 1.5f : 1) * MovementRate;
+		GetCharacterMovement()->MaxSwimSpeed = InAttributeChangeData.NewValue * (IsSprinting() ? 1.5f : 1.f) * MovementRate;
 	}
-	else if(InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetRideSpeedAttribute())
+	else if(InAttributeChangeData.Attribute == GetRideSpeedAttribute())
 	{
 		if(RidingTarget)
 		{
-			RidingTarget->GetCharacterMovement()->MaxWalkSpeed = InAttributeChangeData.NewValue * (IsSprinting() ? 1.5f : 1) * MovementRate;
+			RidingTarget->GetCharacterMovement()->MaxWalkSpeed = InAttributeChangeData.NewValue * (IsSprinting() ? 1.5f : 1.f) * MovementRate;
 		}
 	}
-	else if(InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetFlySpeedAttribute())
+	else if(InAttributeChangeData.Attribute == GetFlySpeedAttribute())
 	{
-		GetCharacterMovement()->MaxFlySpeed = InAttributeChangeData.NewValue * (IsSprinting() ? 1.5f : 1) * MovementRate;
+		GetCharacterMovement()->MaxFlySpeed = InAttributeChangeData.NewValue * (IsSprinting() ? 1.5f : 1.f) * MovementRate;
 	}
-	else if(InAttributeChangeData.Attribute == GetAttributeSet<UDWCharacterAttributeSet>()->GetRotationSpeedAttribute())
+	else if(InAttributeChangeData.Attribute == GetRotationSpeedAttribute())
 	{
-		GetCharacterMovement()->RotationRate = FRotator(0, InAttributeChangeData.NewValue * (IsSprinting() ? 1.5f : 1) * RotationRate, 0);
+		GetCharacterMovement()->RotationRate = FRotator(0, InAttributeChangeData.NewValue * (IsSprinting() ? 1.5f : 1.f) * RotationRate, 0);
 	}
 	Super::OnAttributeChange(InAttributeChangeData);
 }
@@ -1416,7 +1417,7 @@ void ADWCharacter::HandleDamage(EDamageType DamageType, const float LocalDamageD
 
 void ADWCharacter::HandleInterrupt(float InterruptDuration)
 {
-	if (!FMath::IsNearlyZero(InterruptDuration))
+	if(!FMath::IsNearlyZero(InterruptDuration))
 	{
 		Interrupt(InterruptDuration * (1 - GetToughnessRate()));
 	}
