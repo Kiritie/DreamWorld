@@ -5,7 +5,11 @@
 #include "Character/CharacterModuleStatics.h"
 #include "Character/DWCharacter.h"
 #include "Character/DWCharacterData.h"
+#include "Common/Interaction/InteractionComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "GameFramework/PawnMovementComponent.h"
+#include "Kismet/KismetSystemLibrary.h"
+#include "Scene/SceneModuleStatics.h"
 #include "Voxel/VoxelModule.h"
 #include "Voxel/VoxelModuleStatics.h"
 
@@ -34,16 +38,27 @@ void UDWCharacterState_Ride::OnEnter(UFiniteStateBase* InLastState, const TArray
 	Super::OnEnter(InLastState, InParams);
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
-	ADWCharacter* RidingTarget = Character->GetRidingTarget();
+	ADWCharacter* RidingTarget = nullptr;
+
+	if(InParams.IsValidIndex(0))
+	{
+		RidingTarget = InParams[0].GetObjectValue<ADWCharacter>();
+	}
+
+	Character->RidingTarget = RidingTarget;
 
 	Character->GetAbilitySystemComponent()->AddLooseGameplayTag(GameplayTags::StateTag_Character_Riding);
 
 	UCharacterModuleStatics::SwitchCharacter(RidingTarget);
+	
+	Character->GetMovementComponent()->SetActive(false);
 	Character->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	Character->AttachToComponent(RidingTarget->GetMesh(), FAttachmentTransformRules::KeepWorldTransform, FName("RiderPoint"));
-	Character->SetActorRelativeLocation(FVector::ZeroVector);
-	Character->SetActorRotation(RidingTarget->GetActorRotation());
+	Character->AttachToComponent(RidingTarget->GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("RiderPoint"));
+	Character->SetInteractingAgent(RidingTarget, true);
 	Character->LimitToAnim();
+	
+	RidingTarget->SetMotionRate(1.f, 1.f);
+	RidingTarget->SetMoveSpeed(Character->GetRideSpeed());
 }
 
 void UDWCharacterState_Ride::OnRefresh(float DeltaSeconds)
@@ -62,21 +77,42 @@ void UDWCharacterState_Ride::OnLeave(UFiniteStateBase* InNextState)
 
 	Character->GetAbilitySystemComponent()->RemoveLooseGameplayTag(GameplayTags::StateTag_Character_Riding);
 
-	Character->FreeToAnim();
-	if(Character->IsActive()) Character->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	Character->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+
+	UCharacterModuleStatics::SwitchCharacter(Character);
+
+	if(Character->IsActive())
+	{
+		Character->FreeToAnim();
+		Character->GetMovementComponent()->SetActive(true);
+		Character->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	}
+	
 	if(RidingTarget)
 	{
-		UCharacterModuleStatics::SwitchCharacter(Character);
-		FHitResult hitResult;
+		RidingTarget->SetMoveSpeed(RidingTarget->GetBaseMoveSpeed());
+
 		const FVector offset = Character->GetActorRightVector() * (Character->GetRadius() + RidingTarget->GetRadius());
-		const FVector rayStart = FVector(Character->GetActorLocation().X, Character->GetActorLocation().Y, UVoxelModule::Get().GetWorldData().GetWorldRealSize().Z) + offset;
-		const FVector rayEnd = FVector(Character->GetActorLocation().X, Character->GetActorLocation().Y, 0) + offset;
-		if (UVoxelModuleStatics::VoxelAgentTraceSingle(rayStart, rayEnd, Character->GetRadius(), Character->GetHalfHeight(), {}, hitResult))
+		FVector rayStart = Character->GetActorLocation() + offset;
+		const FVector rayEnd = FVector(rayStart.X, rayStart.Y, 0);
+
+		FHitResult hitResult;
+		if(UVoxelModule::IsExist())
+		{
+			rayStart.Z = UVoxelModuleStatics::GetWorldData().GetWorldRealSize().Z;
+			UVoxelModuleStatics::VoxelAgentTraceSingle(rayStart, rayEnd, Character->GetRadius(), Character->GetHalfHeight(), {}, hitResult);
+		}
+		else
+		{
+			rayStart.Z = 10000.f;
+			UKismetSystemLibrary::CapsuleTraceSingle(GetWorldContext(), rayStart, rayEnd, Character->GetRadius(), Character->GetHalfHeight(), USceneModuleStatics::GetTraceMapping(FName("Chunk")).GetTraceType(), false, {}, EDrawDebugTrace::None, hitResult, true);
+		}
+		if (hitResult.bBlockingHit)
 		{
 			Character->SetActorLocation(hitResult.Location);
 		}
 	}
+	
 	Character->RidingTarget = nullptr;
 }
 

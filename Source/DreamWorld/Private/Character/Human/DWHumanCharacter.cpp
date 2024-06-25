@@ -3,6 +3,7 @@
 
 #include "Character/Human/DWHumanCharacter.h"
 
+#include "Ability/AbilityModuleStatics.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/StaticMeshComponent.h"
@@ -60,9 +61,8 @@ void ADWHumanCharacter::OnAssembleItem(const FAbilityItem& InItem)
 		case EAbilityItemType::Equip:
 		{
 			const auto& EquipData = InItem.GetData<UDWEquipData>();
-			if(AAbilityEquipBase* Equip = UObjectPoolModuleStatics::SpawnObject<AAbilityEquipBase>(nullptr, nullptr, false, InItem.GetData<UAbilityEquipDataBase>().EquipClass))
+			if(AAbilityEquipBase* Equip = Cast<AAbilityEquipBase>(UAbilityModuleStatics::SpawnAbilityItem(InItem, this)))
 			{
-				Equip->Initialize(this, InItem);
 				Equip->OnAssemble();
 				Equip->Execute_SetActorVisible(Equip, Execute_IsVisible(this) && ControlMode == EDWCharacterControlMode::Fighting);
 				Equips.Emplace(EquipData.PartType, Equip);

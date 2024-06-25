@@ -8,7 +8,7 @@
 #include "Voxel/DWVoxelChunk.h"
 #include "Voxel/VoxelModuleStatics.h"
 #include "SaveGame/SaveGameModuleStatics.h"
-	
+
 IMPLEMENTATION_MODULE(UDWVoxelModule)
 
 // Sets default values
@@ -129,14 +129,4 @@ void UDWVoxelModule::DestroyChunk(FIndex InIndex)
 AVoxelChunk* UDWVoxelModule::SpawnChunk(FIndex InIndex, bool bAddToQueue)
 {
 	return Super::SpawnChunk(InIndex, bAddToQueue);
-}
-
-ECollisionChannel UDWVoxelModule::GetChunkTraceChannel() const
-{
-	return (ECollisionChannel)EDWGameTraceChannel::Chunk;
-}
-
-ECollisionChannel UDWVoxelModule::GetVoxelTraceChannel() const
-{
-	return (ECollisionChannel)EDWGameTraceChannel::Voxel;
 }

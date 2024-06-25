@@ -3,6 +3,7 @@
 #include "Character/States/DWCharacterState_Attack.h"
 
 #include "TimerManager.h"
+#include "Ability/AbilityModuleStatics.h"
 #include "Ability/Item/Skill/AbilitySkillBase.h"
 #include "Ability/Item/Skill/AbilitySkillDataBase.h"
 #include "Character/DWCharacter.h"
@@ -93,12 +94,9 @@ void UDWCharacterState_Attack::AttackStart()
 		case EDWCharacterAttackType::SkillAttack:
 		{
 			const auto SkillAbilityData = Character->GetSkillAbility(Character->SkillAbilityID);
-			if(const auto SkillClass = SkillAbilityData.GetItemData<UAbilitySkillDataBase>().SkillClass)
+			if(SkillAbilityData.GetItemData<UAbilitySkillDataBase>().SkillClass)
 			{
-				if(AAbilitySkillBase* Skill = UObjectPoolModuleStatics::SpawnObject<AAbilitySkillBase>(nullptr, nullptr, false, SkillClass))
-				{
-					Skill->Initialize(Character, FAbilityItem(SkillAbilityData.AbilityID));
-				}
+				UAbilityModuleStatics::SpawnAbilityItem(FAbilityItem(SkillAbilityData.AbilityID, 1, SkillAbilityData.AbilityLevel), Character);
 			}
 			else
 			{

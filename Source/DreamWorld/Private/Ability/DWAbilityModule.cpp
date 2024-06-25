@@ -5,6 +5,7 @@
 
 #include "Ability/AbilityModuleStatics.h"
 #include "Common/DWCommonTypes.h"
+#include "Scene/SceneModuleStatics.h"
 
 IMPLEMENTATION_MODULE(UDWAbilityModule)
 
@@ -36,6 +37,8 @@ void UDWAbilityModule::OnDestroy()
 void UDWAbilityModule::OnInitialize()
 {
 	Super::OnInitialize();
+	
+	USceneModuleStatics::AddTraceMapping(FName("PickUp"), (ECollisionChannel)EDWGameTraceChannel::Chunk);
 }
 
 void UDWAbilityModule::OnPreparatory(EPhase InPhase)
@@ -56,9 +59,4 @@ void UDWAbilityModule::OnPause()
 void UDWAbilityModule::OnUnPause()
 {
 	Super::OnUnPause();
-}
-
-ECollisionChannel UDWAbilityModule::GetPickUpTraceChannel() const
-{
-	return (ECollisionChannel)EDWGameTraceChannel::Chunk;
 }

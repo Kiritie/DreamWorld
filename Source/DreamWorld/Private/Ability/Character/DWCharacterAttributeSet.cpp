@@ -11,7 +11,7 @@ UDWCharacterAttributeSet::UDWCharacterAttributeSet()
 	MaxStamina(100.f),
 	SwimSpeed(350.f),
 	RideSpeed(350.f),
-	FlySpeed(700.f),
+	FlySpeed(350.f),
 	DodgeForce(500.f),
 	AttackForce(10.f),
 	RepulseForce(0.f),

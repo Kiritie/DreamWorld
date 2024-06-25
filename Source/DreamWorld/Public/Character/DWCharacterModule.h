@@ -47,6 +47,7 @@ public:
 protected:
 	UPROPERTY(EditAnywhere, Category = "Player")
 	FDWPlayerBasicSaveData PlayerBasicData;
+	
 public:
 	UFUNCTION(BlueprintPure)
 	FDWPlayerBasicSaveData& GetPlayerBasicData();

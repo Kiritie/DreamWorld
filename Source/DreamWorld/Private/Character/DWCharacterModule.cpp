@@ -4,6 +4,7 @@
 #include "Character/DWCharacterModule.h"
 #include "Asset/AssetModuleStatics.h"
 #include "Character/Player/DWPlayerCharacterData.h"
+#include "Common/CommonStatics.h"
 
 IMPLEMENTATION_MODULE(UDWCharacterModule)
 

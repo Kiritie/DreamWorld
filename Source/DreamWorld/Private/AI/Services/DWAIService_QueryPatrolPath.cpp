@@ -6,6 +6,9 @@
 #include "BehaviorTree/BehaviorTreeTypes.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Character/DWCharacter.h"
+#include "Kismet/KismetSystemLibrary.h"
+#include "Scene/SceneModuleStatics.h"
+#include "Voxel/VoxelModule.h"
 #include "Voxel/VoxelModuleStatics.h"
 
 UDWAIService_QueryPatrolPath::UDWAIService_QueryPatrolPath(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
@@ -44,10 +47,19 @@ void UDWAIService_QueryPatrolPath::TickNode(UBehaviorTreeComponent& OwnerComp, u
 	FVector PatrolLocation = GetAgent<ADWCharacter>()->GetActorLocation();
 	DON(10,
 		FVector rayStart = GetAgent<ADWCharacter>()->GetBirthLocation() + FRotator(0.f, FMath::RandRange(0.f, 360.f), 0.f).Vector() * FMath::FRandRange(0.f, PatrolDistance);
-		rayStart.Z = UVoxelModuleStatics::GetWorldData().GetWorldRealSize().Z;
 		const FVector rayEnd = FVector(rayStart.X, rayStart.Y, 0.f);
 		FHitResult hitResult;
-		if(UVoxelModuleStatics::VoxelAgentTraceSingle(rayStart, rayEnd, GetAgent<ADWCharacter>()->GetRadius(), GetAgent<ADWCharacter>()->GetHalfHeight(), {}, hitResult))
+		if(UVoxelModule::IsExist())
+		{
+			rayStart.Z = UVoxelModuleStatics::GetWorldData().GetWorldRealSize().Z;
+			UVoxelModuleStatics::VoxelAgentTraceSingle(rayStart, rayEnd, GetAgent<ADWCharacter>()->GetRadius(), GetAgent<ADWCharacter>()->GetHalfHeight(), {}, hitResult);
+		}
+		else
+		{
+			rayStart.Z = 10000.f;
+			UKismetSystemLibrary::CapsuleTraceSingle(GetWorldContext(), rayStart, rayEnd, GetAgent<ADWCharacter>()->GetRadius(), GetAgent<ADWCharacter>()->GetHalfHeight(), USceneModuleStatics::GetTraceMapping(FName("Chunk")).GetTraceType(), false, {}, EDrawDebugTrace::None, hitResult, true);
+		}
+		if(hitResult.bBlockingHit)
 		{
 			PatrolLocation = hitResult.Location;
 			break;

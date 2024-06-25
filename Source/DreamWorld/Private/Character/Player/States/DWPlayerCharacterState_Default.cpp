@@ -50,7 +50,11 @@ void UDWPlayerCharacterState_Default::TrySwitchToWalk()
 {
 	ADWPlayerCharacter* PlayerCharacter = GetAgent<ADWPlayerCharacter>();
 	
-	if(UVoxelModule::Get().IsBasicGenerated())
+	if(!UVoxelModule::IsExist())
+	{
+		FSM->SwitchStateByClass<UDWCharacterState_Walk>();
+	}
+	else if(UVoxelModule::Get().IsBasicGenerated())
 	{
 		if(PlayerCharacter->GetActorLocation().IsNearlyZero())
 		{

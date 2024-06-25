@@ -42,13 +42,18 @@ void UProcedure_Playing::OnEnter(UProcedureBase* InLastProcedure)
 {
 	Super::OnEnter(InLastProcedure);
 
-	if(InLastProcedure->IsA<UProcedure_Loading>())
+	if(!InLastProcedure || InLastProcedure->IsA<UProcedure_Loading>())
 	{
 		AMainModule::UnPauseModuleByClass<USceneModule>();
 		
 		AMainModule::UnPauseModuleByClass<UCameraModule>();
 
 		ISceneActorInterface::Execute_SetActorVisible(UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>(), true);
+
+		if(!UWidgetModuleStatics::HasUserWidget<UWidgetGameHUD>())
+		{
+			UWidgetModuleStatics::CreateUserWidget<UWidgetGameHUD>(UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>());
+		}
 
 		UWidgetModuleStatics::OpenUserWidget<UWidgetGameHUD>();
 	}
@@ -69,7 +74,8 @@ void UProcedure_Playing::OnGuide()
 void UProcedure_Playing::OnLeave(UProcedureBase* InNextProcedure)
 {
 	Super::OnLeave(InNextProcedure);
-	if(InNextProcedure->IsA<UProcedure_Starting>())
+	
+	if(InNextProcedure && InNextProcedure->IsA<UProcedure_Starting>())
 	{
 		UWidgetModuleStatics::GetUserWidget<UWidgetContextBox>()->ClearContext();
 	}

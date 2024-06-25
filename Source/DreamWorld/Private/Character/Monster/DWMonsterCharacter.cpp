@@ -18,6 +18,7 @@ ADWMonsterCharacter::ADWMonsterCharacter()
 
 	Interaction->SetRelativeLocation(FVector(0.f, 0.f, 0.f));
 	Interaction->AddInteractAction((EInteractAction)EDWInteractAction::Ride);
+	Interaction->AddInteractAction((EInteractAction)EDWInteractAction::UnRide);
 	Interaction->AddInteractAction((EInteractAction)EDWInteractAction::Feed);
 }
 

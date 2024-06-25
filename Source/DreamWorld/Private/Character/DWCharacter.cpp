@@ -52,6 +52,7 @@
 #include "Widget/WidgetModuleStatics.h"
 #include "Widget/World/WorldWidgetComponent.h"
 #include "Inventory/DWCharacterInventory.h"
+#include "Scene/SceneModuleStatics.h"
 #include "Setting/DWSettingModule.h"
 #include "Widget/Message/WidgetMessageBox.h"
 
@@ -548,8 +549,7 @@ void ADWCharacter::UnClimb()
 
 void ADWCharacter::Ride(ADWCharacter* InTarget)
 {
-	RidingTarget = InTarget;
-	FSM->SwitchStateByClass<UDWCharacterState_Ride>();
+	FSM->SwitchStateByClass<UDWCharacterState_Ride>({ InTarget });
 }
 
 void ADWCharacter::UnRide()
@@ -860,7 +860,7 @@ void ADWCharacter::AddMovementInput(FVector WorldDirection, float ScaleValue, bo
 
 	Super::AddMovementInput(WorldDirection, ScaleValue, bForce);
 
-	if(!IsPlayer() || UDWSettingModule::Get().IsAutoJump())
+	if(!IsPlayer() || UDWSettingModule::IsExist() && UDWSettingModule::Get().IsAutoJump())
 	{
 		FHitResult hitResult;
 		if(RaycastStep(hitResult))
@@ -1175,8 +1175,8 @@ void ADWCharacter::ClearAttackHitTargets()
 bool ADWCharacter::RaycastStep(FHitResult& OutHitResult)
 {
 	const FVector rayStart = GetActorLocation() + FVector::DownVector * (GetHalfHeight() - GetCharacterMovement()->MaxStepHeight);
-	const FVector rayEnd = rayStart + GetMoveDirection() * (GetRadius() + UVoxelModule::Get().GetWorldData().BlockSize * FMath::Lerp(0.4f, 1.3f, GetMoveVelocity().Size() / 500.f));
-	return UKismetSystemLibrary::LineTraceSingle(this, rayStart, rayEnd, UCommonStatics::GetGameTraceType((ECollisionChannel)EDWGameTraceChannel::Step), false, {}, EDrawDebugTrace::None, OutHitResult, true);
+	const FVector rayEnd = rayStart + GetMoveDirection() * (GetRadius() + 100.f * FMath::Lerp(0.35f, 1.25f, GetMoveVelocity().Size() / 500.f));
+	return UKismetSystemLibrary::LineTraceSingle(this, rayStart, rayEnd, USceneModuleStatics::GetTraceMapping(FName("Step")).GetTraceType(), false, {}, EDrawDebugTrace::None, OutHitResult, true);
 }
 
 bool ADWCharacter::IsTargetAble_Implementation(APawn* InPlayerPawn) const
@@ -1373,7 +1373,7 @@ void ADWCharacter::OnAttributeChange(const FOnAttributeChangeData& InAttributeCh
 	{
 		if(RidingTarget)
 		{
-			RidingTarget->GetCharacterMovement()->MaxWalkSpeed = InAttributeChangeData.NewValue * (IsSprinting() ? 1.5f : 1.f) * MovementRate;
+			RidingTarget->SetMoveSpeed(InAttributeChangeData.NewValue * (IsSprinting() ? 1.5f : 1.f) * MovementRate);
 		}
 	}
 	else if(InAttributeChangeData.Attribute == GetFlySpeedAttribute())
