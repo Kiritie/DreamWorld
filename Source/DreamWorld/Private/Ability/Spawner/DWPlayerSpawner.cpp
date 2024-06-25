@@ -22,7 +22,7 @@ AActor* ADWPlayerSpawner::SpawnImpl_Implementation(const FAbilityItem& InAbility
 	auto SaveData = FDWPlayerSaveData();
 	SaveData.AssetID = CharacterData.GetPrimaryAssetId();
 	SaveData.Name = *CharacterData.Name.ToString();
-	SaveData.RaceID = NAME_None;
+	SaveData.RaceID = CharacterData.RaceID;
 	SaveData.Level = InAbilityItem.Level;
 	SaveData.SpawnLocation = GetActorLocation();
 	SaveData.SpawnRotation = GetActorRotation();

@@ -22,15 +22,18 @@ ADWHumanCharacter::ADWHumanCharacter()
 {
 	Interaction->SetRelativeLocation(FVector(0.f, 0.f, -19.f));
 
-	// Set size for collision capsule
 	GetCapsuleComponent()->SetCapsuleHalfHeight(69.f);
 	GetCapsuleComponent()->SetCapsuleRadius(24.f);
 
-	// Configure character movement
 	GetCharacterMovement()->bOrientRotationToMovement = true; // Character moves in the direction of input...	
 	GetCharacterMovement()->AirControl = 0.3f;
 
 	GetMesh()->SetRelativeLocation(FVector(0.f, 0.f, -70.f));
+
+	GenerateHammerMesh = CreateDefaultSubobject<UStaticMeshComponent>(FName("HammerMesh"));
+	GenerateHammerMesh->SetupAttachment(GetMesh(), TEXT("HammerMesh"));
+	GenerateHammerMesh->SetRelativeLocation(FVector::ZeroVector);
+	GenerateHammerMesh->SetRelativeRotation(FRotator::ZeroRotator);
 
 	GenerateVoxelEntity = nullptr;
 	AuxiliaryVoxelEntity = nullptr;
@@ -149,11 +152,13 @@ void ADWHumanCharacter::SetControlMode_Implementation(EDWCharacterControlMode In
 	{
 		case EDWCharacterControlMode::Fighting:
 		{
+			GenerateHammerMesh->SetVisibility(false);
 			if(GenerateVoxelEntity) GenerateVoxelEntity->Execute_SetActorVisible(GenerateVoxelEntity, false);
 			break;
 		}
 		case EDWCharacterControlMode::Creating:
 		{
+			GenerateHammerMesh->SetVisibility(Execute_IsVisible(this));
 			if(GenerateVoxelEntity) GenerateVoxelEntity->Execute_SetActorVisible(GenerateVoxelEntity, Execute_IsVisible(this));
 			break;
 		}

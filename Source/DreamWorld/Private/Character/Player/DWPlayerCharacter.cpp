@@ -619,26 +619,6 @@ void ADWPlayerCharacter::SetActorVisible_Implementation(bool bInVisible)
 void ADWPlayerCharacter::SetControlMode_Implementation(EDWCharacterControlMode InControlMode)
 {
 	Super::SetControlMode_Implementation(InControlMode);
-
-	switch (ControlMode)
-	{
-		case EDWCharacterControlMode::Fighting:
-		{
-			if(UWidgetModuleStatics::GetUserWidget<UWidgetInventoryBar>())
-			{
-				UWidgetModuleStatics::GetUserWidget<UWidgetInventoryBar>()->SetSkillBoxVisible(true);
-			}
-			break;
-		}
-		case EDWCharacterControlMode::Creating:
-		{
-			if(UWidgetModuleStatics::GetUserWidget<UWidgetInventoryBar>())
-			{
-				UWidgetModuleStatics::GetUserWidget<UWidgetInventoryBar>()->SetSkillBoxVisible(false);
-			}
-			break;
-		}
-	}
 }
 
 void ADWPlayerCharacter::SetGenerateVoxelID(const FPrimaryAssetId& InGenerateVoxelID)

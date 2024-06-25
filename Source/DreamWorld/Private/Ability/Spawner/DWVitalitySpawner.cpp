@@ -20,15 +20,13 @@ AActor* ADWVitalitySpawner::SpawnImpl_Implementation(const FAbilityItem& InAbili
 	auto SaveData = FDWVitalitySaveData();
 	SaveData.AssetID = VitalityData.GetPrimaryAssetId();
 	SaveData.Name = *VitalityData.Name.ToString();
-	SaveData.RaceID = NAME_None;
+	SaveData.RaceID = VitalityData.RaceID;
 	SaveData.Level = InAbilityItem.Level;
 	SaveData.SpawnLocation = GetActorLocation();
 	SaveData.SpawnRotation = GetActorRotation();
 	SaveData.InventoryData = VitalityData.InventoryData;
 
-	AAbilityVitalityBase* Vitality = UAbilityModuleStatics::SpawnAbilityVitality(&SaveData);
-
-	return Vitality;
+	return UAbilityModuleStatics::SpawnAbilityActor(&SaveData);
 }
 
 void ADWVitalitySpawner::DestroyImpl_Implementation(AActor* InAbilityActor)

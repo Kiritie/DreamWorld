@@ -4,7 +4,7 @@
 
 #include "Ability/AbilityModuleStatics.h"
 #include "Ability/AbilityModuleTypes.h"
-#include "Ability/Character/AbilityCharacterBase.h"
+#include "Ability/Actor/AbilityActorBase.h"
 #include "Character/DWCharacterData.h"
 #include "Common/DWCommonTypes.h"
 
@@ -20,15 +20,13 @@ AActor* ADWCharacterSpawner::SpawnImpl_Implementation(const FAbilityItem& InAbil
 	auto SaveData = FDWCharacterSaveData();
 	SaveData.AssetID = CharacterData.GetPrimaryAssetId();
 	SaveData.Name = *CharacterData.Name.ToString();
-	SaveData.RaceID = NAME_None;
+	SaveData.RaceID = CharacterData.RaceID;
 	SaveData.Level = InAbilityItem.Level;
 	SaveData.SpawnLocation = GetActorLocation();
 	SaveData.SpawnRotation = GetActorRotation();
 	SaveData.InventoryData = CharacterData.InventoryData;
 
-	AAbilityCharacterBase* Character = UAbilityModuleStatics::SpawnAbilityCharacter(&SaveData);
-
-	return Character;
+	return UAbilityModuleStatics::SpawnAbilityActor(&SaveData);
 }
 
 void ADWCharacterSpawner::DestroyImpl_Implementation(AActor* InAbilityActor)

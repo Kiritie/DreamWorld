@@ -163,11 +163,11 @@ void ADWVoxelChunk::LoadSceneActors(FSaveData* InSaveData)
 	auto& SaveData = InSaveData->CastRef<FDWVoxelChunkSaveData>();
 	for(auto& Iter : SaveData.VitalityDatas)
 	{
-		UAbilityModuleStatics::SpawnAbilityVitality(&Iter, this);
+		UAbilityModuleStatics::SpawnAbilityActor(&Iter, this);
 	}
 	for(auto& Iter : SaveData.CharacterDatas)
 	{
-		UAbilityModuleStatics::SpawnAbilityCharacter(&Iter, this);
+		UAbilityModuleStatics::SpawnAbilityActor(&Iter, this);
 	}
 }
 
@@ -199,7 +199,7 @@ void ADWVoxelChunk::SpawnSceneActors()
 						SaveData.SpawnLocation = HitResult.Location;
 						SaveData.SpawnRotation = FRotator(0.f, FMath::RandRange(0.f, 360.f), 0.f);
 						SaveData.InventoryData = VitalityData.InventoryData;
-						UAbilityModuleStatics::SpawnAbilityVitality(&SaveData, UVoxelModuleStatics::FindChunkByLocation(SaveData.SpawnLocation));
+						UAbilityModuleStatics::SpawnAbilityActor(&SaveData, UVoxelModuleStatics::FindChunkByLocation(SaveData.SpawnLocation));
 					}
 				)
 			}
@@ -227,7 +227,7 @@ void ADWVoxelChunk::SpawnSceneActors()
 						SaveData.SpawnLocation = HitResult.Location;
 						SaveData.SpawnRotation = FRotator(0.f, FMath::RandRange(0.f, 360.f), 0.f);
 						SaveData.InventoryData = CharacterData.InventoryData;
-						if(ADWCharacter* Character = Cast<ADWCharacter>(UAbilityModuleStatics::SpawnAbilityCharacter(&SaveData, UVoxelModuleStatics::FindChunkByLocation(SaveData.SpawnLocation))))
+						if(ADWCharacter* Character = Cast<ADWCharacter>(UAbilityModuleStatics::SpawnAbilityActor(&SaveData, UVoxelModuleStatics::FindChunkByLocation(SaveData.SpawnLocation))))
 						{
 							if(!Captain)
 							{

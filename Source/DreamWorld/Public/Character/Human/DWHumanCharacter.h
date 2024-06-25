@@ -39,6 +39,9 @@ public:
 	virtual void OnAuxiliaryItem(const FAbilityItem& InItem) override;
 
 protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	UStaticMeshComponent* GenerateHammerMesh;
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	AVoxelEntity* GenerateVoxelEntity;
 	
