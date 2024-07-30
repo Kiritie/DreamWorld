@@ -63,6 +63,8 @@
 
 ADWPlayerCharacter::ADWPlayerCharacter()
 {
+	AIControllerClass = nullptr;
+	
 	GetCapsuleComponent()->SetCapsuleHalfHeight(69.f);
 	GetCapsuleComponent()->SetCapsuleRadius(24.f);
 
@@ -108,8 +110,6 @@ ADWPlayerCharacter::ADWPlayerCharacter()
 	FSM->States.Add(UDWCharacterState_Static::StaticClass());
 	FSM->States.Add(UDWCharacterState_Swim::StaticClass());
 	FSM->States.Add(UDWCharacterState_Walk::StaticClass());
-
-	AutoPossessAI = EAutoPossessAI::Disabled;
 }
 
 void ADWPlayerCharacter::OnInitialize_Implementation()

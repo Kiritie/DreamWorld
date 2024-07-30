@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "AI/Base/Tasks/AITask_Duration.h"
+#include "DWAITask_Fight.h"
 #include "DWAITask_Defend.generated.h"
 
 class ADWCharacter;
@@ -10,7 +10,7 @@ class ADWCharacter;
  * AI任务_防御
  */
 UCLASS()
-class DREAMWORLD_API UDWAITask_Defend : public UAITask_Duration
+class DREAMWORLD_API UDWAITask_Defend : public UDWAITask_Fight
 {
 	GENERATED_UCLASS_BODY()
 
@@ -26,20 +26,4 @@ protected:
 	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
 
 	virtual void OnTaskFinished(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, EBTNodeResult::Type TaskResult) override;
-
-protected:
-	virtual FVector GetAIMoveLocation() const;
-
-protected:
-	UPROPERTY(EditAnywhere, Category = "Blackboard")
-	FBlackboardKeySelector DefendTargetKey;
-	
-	UPROPERTY(EditAnywhere, Category = "Blackboard")
-	FBlackboardKeySelector DefendDistanceKey;
-
-private:
-	UPROPERTY()
-	ADWCharacter* DefendTarget;
-
-	float DefendDistance;
 };

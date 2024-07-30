@@ -60,21 +60,21 @@ void UTask_GenerateVoxel::OnExecute()
 {
 	Super::OnExecute();
 	
-	UEventModuleStatics::SubscribeEvent<UEventHandle_VoxelGenerated>(this, FName("OnVoxelGenerated"));
+	UEventModuleStatics::SubscribeEvent<UEventHandle_VoxelGenerated>(this, GET_FUNCTION_NAME_THISCLASS(OnVoxelGenerated));
 }
 
 void UTask_GenerateVoxel::OnComplete(ETaskExecuteResult InTaskExecuteResult)
 {
 	Super::OnComplete(InTaskExecuteResult);
 
-	UEventModuleStatics::UnsubscribeEvent<UEventHandle_VoxelGenerated>(this, FName("OnVoxelGenerated"));
+	UEventModuleStatics::UnsubscribeEvent<UEventHandle_VoxelGenerated>(this, GET_FUNCTION_NAME_THISCLASS(OnVoxelGenerated));
 }
 
 void UTask_GenerateVoxel::OnLeave()
 {
 	Super::OnLeave();
 
-	UEventModuleStatics::UnsubscribeEvent<UEventHandle_VoxelGenerated>(this, FName("OnVoxelGenerated"));
+	UEventModuleStatics::UnsubscribeEvent<UEventHandle_VoxelGenerated>(this, GET_FUNCTION_NAME_CHECKED(UTask_GenerateVoxel, OnVoxelGenerated));
 }
 
 void UTask_GenerateVoxel::Serialize(FArchive& Ar)

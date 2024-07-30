@@ -1,9 +1,10 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
-#include "DWAITask_Fight.h"
 
-#include "DWAITask_Attack.generated.h"
+#include "Ability/AbilityModuleTypes.h"
+#include "AI/Base/Tasks/AITask_Duration.h"
+#include "DWAITask_SkillAttack.generated.h"
 
 class ADWCharacter;
 
@@ -11,7 +12,7 @@ class ADWCharacter;
  * AI任务_攻击
  */
 UCLASS()
-class DREAMWORLD_API UDWAITask_Attack : public UDWAITask_Fight
+class DREAMWORLD_API UDWAITask_SkillAttack : public UAITask_Duration
 {
 	GENERATED_UCLASS_BODY()
 
@@ -30,5 +31,15 @@ protected:
 
 protected:
 	UPROPERTY(EditAnywhere, Category = "Blackboard")
-	int32 AttackAbilityIndex;
+	FBlackboardKeySelector AttackTargetKey;
+
+	UPROPERTY(EditAnywhere, Category = "Blackboard")
+	ESkillType SkillType;
+
+	UPROPERTY(EditAnywhere, Category = "Blackboard")
+	int32 SkillAbilityIndex;
+
+private:
+	UPROPERTY()
+	ADWCharacter* AttackTarget;
 };

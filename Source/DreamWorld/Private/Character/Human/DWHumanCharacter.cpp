@@ -20,7 +20,7 @@
 
 ADWHumanCharacter::ADWHumanCharacter()
 {
-	Interaction->SetRelativeLocation(FVector(0.f, 0.f, -19.f));
+	Interaction->SetRelativeLocation(FVector(0.f, 0.f, 0.f));
 
 	GetCapsuleComponent()->SetCapsuleHalfHeight(69.f);
 	GetCapsuleComponent()->SetCapsuleRadius(24.f);

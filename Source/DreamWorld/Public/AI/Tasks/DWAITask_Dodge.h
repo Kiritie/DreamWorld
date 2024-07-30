@@ -1,17 +1,16 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
-#include "DWAITask_Fight.h"
 
-#include "DWAITask_Attack.generated.h"
+#include "DWAITask_Fight.h"
+#include "DWAITask_Dodge.generated.h"
 
 class ADWCharacter;
-
 /**
- * AI任务_攻击
+ * AI任务_防御
  */
 UCLASS()
-class DREAMWORLD_API UDWAITask_Attack : public UDWAITask_Fight
+class DREAMWORLD_API UDWAITask_Dodge : public UDWAITask_Fight
 {
 	GENERATED_UCLASS_BODY()
 
@@ -27,8 +26,4 @@ protected:
 	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
 
 	virtual void OnTaskFinished(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, EBTNodeResult::Type TaskResult) override;
-
-protected:
-	UPROPERTY(EditAnywhere, Category = "Blackboard")
-	int32 AttackAbilityIndex;
 };

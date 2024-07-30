@@ -267,7 +267,7 @@ public:
 	virtual bool IsFloating() const;
 
 	UFUNCTION(BlueprintPure)
-	virtual bool IsAttacking(bool bCheckAttacked = false) const;
+	virtual bool IsAttacking(bool bCheckAttackType = false) const;
 
 	UFUNCTION(BlueprintPure)
 	virtual bool IsDefending() const;

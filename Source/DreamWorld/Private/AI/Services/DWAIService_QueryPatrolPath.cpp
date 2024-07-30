@@ -13,13 +13,14 @@
 
 UDWAIService_QueryPatrolPath::UDWAIService_QueryPatrolPath(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
+	bCallTickOnSearchStart = true;
+	bRestartTimerOnEachActivation = true;
+
+	Interval = -1.f;
+
 	PatrolDistanceKey.AddFloatFilter(this, GET_MEMBER_NAME_CHECKED(UDWAIService_QueryPatrolPath, PatrolDistanceKey));
 	PatrolDurationKey.AddFloatFilter(this, GET_MEMBER_NAME_CHECKED(UDWAIService_QueryPatrolPath, PatrolDurationKey));
 	PatrolLocationKey.AddVectorFilter(this, GET_MEMBER_NAME_CHECKED(UDWAIService_QueryPatrolPath, PatrolLocationKey));
-	
-	Interval = -1.f;
-	bCallTickOnSearchStart = true;
-	bRestartTimerOnEachActivation = true;
 }
 
 void UDWAIService_QueryPatrolPath::InitializeFromAsset(UBehaviorTree& Asset)

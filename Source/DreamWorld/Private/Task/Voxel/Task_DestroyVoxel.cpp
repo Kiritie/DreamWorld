@@ -60,21 +60,21 @@ void UTask_DestroyVoxel::OnExecute()
 {
 	Super::OnExecute();
 	
-	UEventModuleStatics::SubscribeEvent<UEventHandle_VoxelDestroyed>(this, FName("OnVoxelDestroyed"));
+	UEventModuleStatics::SubscribeEvent<UEventHandle_VoxelDestroyed>(this, GET_FUNCTION_NAME_THISCLASS(OnVoxelDestroyed));
 }
 
 void UTask_DestroyVoxel::OnComplete(ETaskExecuteResult InTaskExecuteResult)
 {
 	Super::OnComplete(InTaskExecuteResult);
 
-	UEventModuleStatics::UnsubscribeEvent<UEventHandle_VoxelDestroyed>(this, FName("OnVoxelDestroyed"));
+	UEventModuleStatics::UnsubscribeEvent<UEventHandle_VoxelDestroyed>(this, GET_FUNCTION_NAME_THISCLASS(OnVoxelDestroyed));
 }
 
 void UTask_DestroyVoxel::OnLeave()
 {
 	Super::OnLeave();
 
-	UEventModuleStatics::UnsubscribeEvent<UEventHandle_VoxelDestroyed>(this, FName("OnVoxelDestroyed"));
+	UEventModuleStatics::UnsubscribeEvent<UEventHandle_VoxelDestroyed>(this, GET_FUNCTION_NAME_THISCLASS(OnVoxelDestroyed));
 }
 
 void UTask_DestroyVoxel::Serialize(FArchive& Ar)

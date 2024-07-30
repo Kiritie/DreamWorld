@@ -57,8 +57,6 @@ EBTNodeResult::Type UDWAITask_LookAt::ExecuteTask(UBehaviorTreeComponent& OwnerC
 	Super::ExecuteTask(OwnerComp, NodeMemory);
 
 	if (!InitTask(OwnerComp)) return EBTNodeResult::Failed;
-
-	// GetAgent<ADWCharacter>()->SetLockedTarget(LookAtTarget);
 	
 	return EBTNodeResult::InProgress;
 }
@@ -68,6 +66,4 @@ void UDWAITask_LookAt::OnTaskFinished(UBehaviorTreeComponent& OwnerComp, uint8* 
 	Super::OnTaskFinished(OwnerComp, NodeMemory, TaskResult);
 
 	if (!InitTask(OwnerComp)) return;
-
-	// GetAgent<ADWCharacter>()->SetLockedTarget(nullptr);
 }

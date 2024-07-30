@@ -55,7 +55,7 @@ void UDWCharacterState_Ride::OnEnter(UFiniteStateBase* InLastState, const TArray
 	Character->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	Character->AttachToComponent(RidingTarget->GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("RiderPoint"));
 	Character->SetInteractingAgent(RidingTarget, true);
-	Character->LimitToAnim();
+	// Character->LimitToAnim();
 	
 	RidingTarget->SetMotionRate(1.f, 1.f);
 	RidingTarget->SetMoveSpeed(Character->GetRideSpeed());
@@ -83,7 +83,7 @@ void UDWCharacterState_Ride::OnLeave(UFiniteStateBase* InNextState)
 
 	if(Character->IsActive())
 	{
-		Character->FreeToAnim();
+		// Character->FreeToAnim();
 		Character->GetMovementComponent()->SetActive(true);
 		Character->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	}

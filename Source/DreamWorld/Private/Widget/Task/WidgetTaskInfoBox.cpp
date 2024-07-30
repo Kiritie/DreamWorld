@@ -37,14 +37,14 @@ void UWidgetTaskInfoBox::OnOpen(const TArray<FParameter>& InParams, bool bInstan
 {
 	Super::OnOpen(InParams, bInstant);
 
-	UEventModuleStatics::SubscribeEvent<UEventHandle_TaskEntered>(this, FName("Refresh"));
+	UEventModuleStatics::SubscribeEvent<UEventHandle_TaskEntered>(this, GET_FUNCTION_NAME_THISCLASS(Refresh));
 }
 
 void UWidgetTaskInfoBox::OnClose(bool bInstant)
 {
 	Super::OnClose(bInstant);
 
-	UEventModuleStatics::UnsubscribeEvent<UEventHandle_TaskEntered>(this, FName("Refresh"));
+	UEventModuleStatics::UnsubscribeEvent<UEventHandle_TaskEntered>(this, GET_FUNCTION_NAME_THISCLASS(Refresh));
 }
 
 void UWidgetTaskInfoBox::OnRefresh()
@@ -64,7 +64,7 @@ void UWidgetTaskInfoBox::CreateTaskInfoItem(UTaskBase* InTask)
 	{
 		if(const auto TempSlot = ContentBox->AddChildToVerticalBox(TaskInfoItem))
 		{
-			TempSlot->SetHorizontalAlignment(EHorizontalAlignment::HAlign_Left);
+			TempSlot->SetHorizontalAlignment(HAlign_Left);
 			TempSlot->SetPadding(FMargin(InTask->TaskHierarchy * 50.f, 0.f, 0.f, 0.f));
 		}
 	}

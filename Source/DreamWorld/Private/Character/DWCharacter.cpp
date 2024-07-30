@@ -915,9 +915,9 @@ bool ADWCharacter::IsFloating() const
 	return AbilitySystem->HasMatchingGameplayTag(GameplayTags::StateTag_Character_Floating);
 }
 
-bool ADWCharacter::IsAttacking(bool bCheckAttacked) const
+bool ADWCharacter::IsAttacking(bool bCheckAttackType) const
 {
-	return !bCheckAttacked ? AbilitySystem->HasMatchingGameplayTag(GameplayTags::StateTag_Character_Attacking) : (AttackType != EDWCharacterAttackType::None);
+	return !bCheckAttackType ? AbilitySystem->HasMatchingGameplayTag(GameplayTags::StateTag_Character_Attacking) : (AttackType != EDWCharacterAttackType::None);
 }
 
 bool ADWCharacter::IsDefending() const
@@ -1124,6 +1124,7 @@ FDWCharacterSkillAbilityData ADWCharacter::GetSkillAbility(const FPrimaryAssetId
 
 FDWCharacterSkillAbilityData ADWCharacter::GetSkillAbility(ESkillType InSkillType, int32 InAbilityIndex, bool bNeedAssembled)
 {
+	if(InAbilityIndex == -1) InAbilityIndex = FMath::RandRange(0, SkillAbilities.Num() -1);
 	if(HasSkillAbility(InSkillType, InAbilityIndex, bNeedAssembled))
 	{
 		TArray<FDWCharacterSkillAbilityData> Abilities = TArray<FDWCharacterSkillAbilityData>();
@@ -1134,7 +1135,7 @@ FDWCharacterSkillAbilityData ADWCharacter::GetSkillAbility(ESkillType InSkillTyp
 				Abilities.Add(Iter.Value);
 			}
 		}
-		return InAbilityIndex != -1 ? Abilities[InAbilityIndex] : Abilities[0];
+		return Abilities[InAbilityIndex];
 	}
 	return FDWCharacterSkillAbilityData();
 }

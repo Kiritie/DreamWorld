@@ -3,37 +3,22 @@
 
 #include "AI/Tasks/DWAITask_Attack.h"
 
-#include "BehaviorTree/BehaviorTree.h"
 #include "BehaviorTree/BehaviorTreeTypes.h"
 #include "Character/DWCharacter.h"
-#include "BehaviorTree/BlackboardComponent.h"
-#include "Common/Looking/LookingComponent.h"
 
 UDWAITask_Attack::UDWAITask_Attack(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
-	AttackTargetKey.AddObjectFilter(this, GET_MEMBER_NAME_CHECKED(UDWAITask_Attack, AttackTargetKey), ADWCharacter::StaticClass());
-	AttackDistanceKey.AddFloatFilter(this, GET_MEMBER_NAME_CHECKED(UDWAITask_Attack, AttackDistanceKey));
-
-	AttackTarget = nullptr;
-	AttackDistance = 0.f;
+	AttackAbilityIndex = -1;
 }
 
 void UDWAITask_Attack::InitializeFromAsset(UBehaviorTree& Asset)
 {
 	Super::InitializeFromAsset(Asset);
-	
-	AttackTargetKey.ResolveSelectedKey(*Asset.BlackboardAsset);
-	AttackTargetKey.ResolveSelectedKey(*Asset.BlackboardAsset);
 }
 
 bool UDWAITask_Attack::InitTask(UBehaviorTreeComponent& OwnerComp)
 {
-	if(!Super::InitTask(OwnerComp)) return false;
-
-	AttackTarget = Cast<ADWCharacter>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(AttackTargetKey.SelectedKeyName));
-	AttackDistance = OwnerComp.GetBlackboardComponent()->GetValueAsFloat(AttackDistanceKey.SelectedKeyName);
-
-	return AttackTarget && AttackTarget->IsValidLowLevel();
+	return Super::InitTask(OwnerComp);
 }
 
 void UDWAITask_Attack::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
@@ -42,21 +27,7 @@ void UDWAITask_Attack::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMe
 
 	if (!InitTask(OwnerComp)) return;
 
-	if(GetAgent<ADWCharacter>()->GetDistance(AttackTarget, false, false) <= AttackDistance)
-	{
-		if(!AttackTarget->IsDead())
-		{
-			GetAgent<ADWCharacter>()->Attack();
-		}
-		else
-		{
-			FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
-		}
-	}
-	else if(GetAgent<ADWCharacter>()->IsFreeToAnim())
-	{
-		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
-	}
+	GetAgent<ADWCharacter>()->Attack(AttackAbilityIndex);
 }
 
 EBTNodeResult::Type UDWAITask_Attack::AbortTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
@@ -65,8 +36,7 @@ EBTNodeResult::Type UDWAITask_Attack::AbortTask(UBehaviorTreeComponent& OwnerCom
 
 	if (!InitTask(OwnerComp)) return EBTNodeResult::Failed;
 
-	//GetAgent<ADWCharacter>()->UnAttack();
-	//GetAgent<ADWCharacter>()->SetLockedTarget(nullptr);
+	GetAgent<ADWCharacter>()->UnAttack();
 
 	return EBTNodeResult::Aborted;
 }
@@ -76,8 +46,6 @@ EBTNodeResult::Type UDWAITask_Attack::ExecuteTask(UBehaviorTreeComponent& OwnerC
 	Super::ExecuteTask(OwnerComp, NodeMemory);
 
 	if (!InitTask(OwnerComp)) return EBTNodeResult::Failed;
-
-	GetAgent<ADWCharacter>()->GetLooking()->TargetLookingOn(AttackTarget);
 
 	return EBTNodeResult::InProgress;
 }
@@ -89,5 +57,4 @@ void UDWAITask_Attack::OnTaskFinished(UBehaviorTreeComponent& OwnerComp, uint8* 
 	if (!InitTask(OwnerComp)) return;
 
 	GetAgent<ADWCharacter>()->UnAttack();
-	GetAgent<ADWCharacter>()->GetLooking()->TargetLookingOff();
 }
