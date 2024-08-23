@@ -42,7 +42,7 @@ void UDWCharacterState_Ride::OnEnter(UFiniteStateBase* InLastState, const TArray
 
 	if(InParams.IsValidIndex(0))
 	{
-		RidingTarget = InParams[0].GetObjectValue<ADWCharacter>();
+		RidingTarget = InParams[0];
 	}
 
 	Character->RidingTarget = RidingTarget;
@@ -97,7 +97,7 @@ void UDWCharacterState_Ride::OnLeave(UFiniteStateBase* InNextState)
 		const FVector rayEnd = FVector(rayStart.X, rayStart.Y, 0);
 
 		FHitResult hitResult;
-		if(UVoxelModule::IsExist())
+		if(UVoxelModule::IsValid())
 		{
 			rayStart.Z = UVoxelModuleStatics::GetWorldData().GetWorldRealSize().Z;
 			UVoxelModuleStatics::VoxelAgentTraceSingle(rayStart, rayEnd, Character->GetRadius(), Character->GetHalfHeight(), {}, hitResult);

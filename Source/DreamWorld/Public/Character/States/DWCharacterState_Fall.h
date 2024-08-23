@@ -32,4 +32,10 @@ public:
 	virtual void OnLeave(UFiniteStateBase* InNextState) override;
 
 	virtual void OnTermination() override;
+
+protected:
+	float MaxPosZ;
+
+public:
+	float GetFallHeight() const;
 };

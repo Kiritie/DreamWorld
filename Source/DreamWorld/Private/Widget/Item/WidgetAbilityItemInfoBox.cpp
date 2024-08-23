@@ -30,7 +30,7 @@ void UWidgetAbilityItemInfoBox::OnOpen(const TArray<FParameter>& InParams, bool 
 
 	if(TextBlock_ItemName && InParams.IsValidIndex(0))
 	{
-		TextBlock_ItemName->SetText(InParams[0].GetTextValue());
+		TextBlock_ItemName->SetText(InParams[0]);
 	}
 
 	if(TextBlock_ItemDetail && InParams.IsValidIndex(1))

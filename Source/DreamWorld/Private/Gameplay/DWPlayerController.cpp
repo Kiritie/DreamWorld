@@ -3,6 +3,7 @@
 
 #include "Gameplay/DWPlayerController.h"
 
+#include "Ability/Actor/AbilityActorBase.h"
 #include "Ability/Character/AbilityCharacterDataBase.h"
 #include "Camera/CameraModuleStatics.h"
 #include "Character/Player/DWPlayerCharacter.h"

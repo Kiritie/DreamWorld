@@ -3,10 +3,8 @@
 #include "Character/States/DWCharacterState_Death.h"
 
 #include "Character/DWCharacter.h"
-#include "Voxel/Chunks/VoxelChunk.h"
 #include "Ability/Character/AbilityCharacterBase.h"
 #include "ObjectPool/ObjectPoolModuleStatics.h"
-#include "Ability/Character/AbilityCharacterDataBase.h"
 #include "Ability/Character/AbilityCharacterInventoryBase.h"
 #include "Common/Looking/LookingComponent.h"
 

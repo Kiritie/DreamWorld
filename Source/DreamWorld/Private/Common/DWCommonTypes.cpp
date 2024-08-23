@@ -3,6 +3,8 @@
 #include "Ability/Vitality/AbilityVitalityBase.h"
 #include "Character/DWCharacter.h"
 #include "Ability/Vitality/AbilityVitalityInterface.h"
+#include "Character/States/DWCharacterState_Fall.h"
+#include "FSM/Components/FSMComponent.h"
 #include "Scene/SceneModuleStatics.h"
 
 void UDWDamageHandle::HandleDamage(AActor* SourceActor, AActor* TargetActor, float DamageValue, EDamageType DamageType, const FHitResult& HitResult, const FGameplayTagContainer& SourceTags)
@@ -59,6 +61,15 @@ void UDWDamageHandle::HandleDamage(AActor* SourceActor, AActor* TargetActor, flo
 		case EDamageType::Magic:
 		{
 			LocalDamageDone = DamageValue * (1.f - SourceMagicDefRate);
+			break;
+		}
+		case EDamageType::Fall:
+		{
+			const float FallHeight = SourceCharacter->GetFSMComponent()->GetStateByClass<UDWCharacterState_Fall>()->GetFallHeight();
+			if(FallHeight > 350.f)
+			{
+				LocalDamageDone = DamageValue * (FallHeight / 10.f);
+			}
 			break;
 		}
 	}

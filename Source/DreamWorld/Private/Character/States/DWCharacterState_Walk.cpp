@@ -3,7 +3,9 @@
 #include "Character/States/DWCharacterState_Walk.h"
 
 #include "Character/DWCharacter.h"
+#include "Character/DWCharacterData.h"
 #include "Character/States/DWCharacterState_Attack.h"
+#include "Character/States/DWCharacterState_Fall.h"
 
 UDWCharacterState_Walk::UDWCharacterState_Walk()
 {
@@ -27,6 +29,23 @@ bool UDWCharacterState_Walk::OnEnterValidate(UFiniteStateBase* InLastState, cons
 void UDWCharacterState_Walk::OnEnter(UFiniteStateBase* InLastState, const TArray<FParameter>& InParams)
 {
 	Super::OnEnter(InLastState, InParams);
+
+	ADWCharacter* Character = GetAgent<ADWCharacter>();
+
+	if(InLastState && InLastState->IsA<UDWCharacterState_Fall>())
+	{
+		const auto& CharacterData = Character->GetCharacterData<UDWCharacterData>();
+		if(CharacterData.FallDamageClass)
+		{
+			auto EffectContext = Character->GetAbilitySystemComponent()->MakeEffectContext();
+			EffectContext.AddSourceObject(this);
+			auto SpecHandle = Character->GetAbilitySystemComponent()->MakeOutgoingSpec(CharacterData.FallDamageClass, 0, EffectContext);
+			if (SpecHandle.IsValid())
+			{
+				Character->GetAbilitySystemComponent()->BP_ApplyGameplayEffectSpecToSelf(SpecHandle);
+			}
+		}
+	}
 }
 
 void UDWCharacterState_Walk::OnRefresh(float DeltaSeconds)

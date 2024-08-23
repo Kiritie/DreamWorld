@@ -3,7 +3,6 @@
 #include "Character/Player/DWPlayerCharacter.h"
 
 #include "Achievement/AchievementModuleStatics.h"
-#include "Ability/Character/DWCharacterAttributeSet.h"
 #include "Item/Equip/Weapon/DWEquipWeapon.h"
 #include "Asset/AssetModuleStatics.h"
 #include "Ability/Item/AbilityItemDataBase.h"
@@ -13,7 +12,6 @@
 #include "Components/SceneCaptureComponent2D.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Voxel/Components/VoxelMeshComponent.h"
-#include "Widget/Inventory/WidgetInventoryBar.h"
 #include "Widget/Inventory/WidgetInventoryPanel.h"
 #include "Ability/Inventory/Slot/AbilityInventorySlot.h"
 #include "Widget/WidgetGameHUD.h"
@@ -214,23 +212,34 @@ FSaveData* ADWPlayerCharacter::ToData()
 void ADWPlayerCharacter::Death(IAbilityVitalityInterface* InKiller /* = nullptr */)
 {
 	Super::Death(InKiller);
+
 	if(InKiller)
 	{
-		UWidgetModuleStatics::GetUserWidget<UWidgetContextBox>()->AddMessage(FString::Printf(TEXT("你被 %s 杀死了！"), *InKiller->GetNameV().ToString()));
+		if(InKiller != this)
+		{
+			UWidgetModuleStatics::GetUserWidget<UWidgetContextBox>()->AddMessage(FString::Printf(TEXT("你被 %s 杀死了！"), *InKiller->GetNameV().ToString()));
+		}
+		else
+		{
+			UWidgetModuleStatics::GetUserWidget<UWidgetContextBox>()->AddMessage(TEXT("你自杀了！"));
+		}
 	}
 }
 
 void ADWPlayerCharacter::Kill(IAbilityVitalityInterface* InTarget)
 {
 	Super::Kill(InTarget);
-
-	if(Cast<ADWCharacter>(InTarget))
+	
+	if(InTarget != this)
 	{
-		UAchievementModuleStatics::UnlockAchievement(FName("FirstKillMonster"));
-	}
-	else if(Cast<ADWVitality>(InTarget))
-	{
-		UAchievementModuleStatics::UnlockAchievement(FName("FirstKillVitality"));
+		if(Cast<ADWCharacter>(InTarget))
+		{
+			UAchievementModuleStatics::UnlockAchievement(FName("FirstKillMonster"));
+		}
+		else if(Cast<ADWVitality>(InTarget))
+		{
+			UAchievementModuleStatics::UnlockAchievement(FName("FirstKillVitality"));
+		}
 	}
 }
 

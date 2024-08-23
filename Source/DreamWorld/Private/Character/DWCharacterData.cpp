@@ -11,6 +11,8 @@ UDWCharacterData::UDWCharacterData()
 	PatrolDistance = 1000.f;
 	PatrolDuration = 10.f;
 	FallingAttackAbility = FDWCharacterAttackAbilityData();
+	FallDamageClass = nullptr;
+
 	DefaultBehaviorTree = nullptr;
 	ExcessiveBehaviorTree = nullptr;
 }

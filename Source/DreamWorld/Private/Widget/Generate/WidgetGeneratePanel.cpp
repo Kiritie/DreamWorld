@@ -64,7 +64,7 @@ void UWidgetGeneratePanel::OnOpen(const TArray<FParameter>& InParams, bool bInst
 {
 	Super::OnOpen(InParams, bInstant);
 
-	const FPrimaryAssetId GenerateToolID = InParams.IsValidIndex(0) ? InParams[0].GetObjectValue<IPrimaryEntityInterface>()->Execute_GetAssetID(InParams[0].GetObjectValue()) : FPrimaryAssetId();
+	const FPrimaryAssetId GenerateToolID = InParams.IsValidIndex(0) ? InParams[0].GetObjectValue<IPrimaryEntityInterface>()->Execute_GetAssetID(InParams[0]) : FPrimaryAssetId();
 
 	TArray<FDWGenerateItemData> GenerateItemDatas;
 	if(GenerateContent && UAssetModuleStatics::ReadDataTable(GenerateItemDatas))

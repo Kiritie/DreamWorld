@@ -5,10 +5,14 @@
 
 #include "BehaviorTree/BehaviorTreeTypes.h"
 #include "Character/DWCharacter.h"
+#include "Debug/DebugTypes.h"
 
 UDWAITask_Attack::UDWAITask_Attack(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	AttackAbilityIndex = -1;
+
+	bAttackStarted = false;
+	bAttackEnded = false;
 }
 
 void UDWAITask_Attack::InitializeFromAsset(UBehaviorTree& Asset)
@@ -26,8 +30,6 @@ void UDWAITask_Attack::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMe
 	Super::TickTask(OwnerComp, NodeMemory, DeltaSeconds);
 
 	if (!InitTask(OwnerComp)) return;
-
-	GetAgent<ADWCharacter>()->Attack(AttackAbilityIndex);
 }
 
 EBTNodeResult::Type UDWAITask_Attack::AbortTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
@@ -46,6 +48,14 @@ EBTNodeResult::Type UDWAITask_Attack::ExecuteTask(UBehaviorTreeComponent& OwnerC
 	Super::ExecuteTask(OwnerComp, NodeMemory);
 
 	if (!InitTask(OwnerComp)) return EBTNodeResult::Failed;
+
+	if(!GetAgent<ADWCharacter>()->Attack(AttackAbilityIndex, nullptr, FSimpleDelegate::CreateLambda([this, &OwnerComp]()
+	{
+		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
+	})))
+	{
+		return EBTNodeResult::Failed;
+	}
 
 	return EBTNodeResult::InProgress;
 }

@@ -3,10 +3,13 @@
 #include "Character/States/DWCharacterState_Fall.h"
 
 #include "Character/DWCharacter.h"
+#include "Character/DWCharacterData.h"
 
 UDWCharacterState_Fall::UDWCharacterState_Fall()
 {
 	StateName = FName("Fall");
+
+	MaxPosZ = 0.f;
 }
 
 void UDWCharacterState_Fall::OnInitialize(UFSMComponent* InFSM, int32 InStateIndex)
@@ -30,11 +33,17 @@ void UDWCharacterState_Fall::OnEnter(UFiniteStateBase* InLastState, const TArray
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 
 	Character->LimitToAnim();
+
+	MaxPosZ = 0.f;
 }
 
 void UDWCharacterState_Fall::OnRefresh(float DeltaSeconds)
 {
 	Super::OnRefresh(DeltaSeconds);
+
+	ADWCharacter* Character = GetAgent<ADWCharacter>();
+
+	MaxPosZ = FMath::Max(Character->GetActorLocation().Z, MaxPosZ);
 }
 
 void UDWCharacterState_Fall::OnLeave(UFiniteStateBase* InNextState)
@@ -51,4 +60,11 @@ void UDWCharacterState_Fall::OnLeave(UFiniteStateBase* InNextState)
 void UDWCharacterState_Fall::OnTermination()
 {
 	Super::OnTermination();
+}
+
+float UDWCharacterState_Fall::GetFallHeight() const
+{
+	ADWCharacter* Character = GetAgent<ADWCharacter>();
+
+	return MaxPosZ - Character->GetActorLocation().Z;
 }

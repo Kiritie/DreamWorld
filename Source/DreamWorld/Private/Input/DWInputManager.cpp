@@ -228,6 +228,10 @@ void UDWInputManager::ActionUpPlayer_Implementation(const FInputActionValue& InV
 		{
 			PossessedCharacter->Fly();
 		}
+		else if(PossessedCharacter->IsFlying())
+		{
+			PossessedCharacter->UnFly();
+		}
 	}
 }
 

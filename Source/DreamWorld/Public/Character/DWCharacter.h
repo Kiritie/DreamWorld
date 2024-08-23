@@ -166,16 +166,13 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual void UnFly();
 
-	UFUNCTION(BlueprintCallable)
-	virtual bool Attack(int32 InAbilityIndex = -1);
+	virtual bool Attack(int32 InAbilityIndex = -1, const FSimpleDelegate& OnStart = nullptr, const FSimpleDelegate& OnEnd = nullptr);
 
-	UFUNCTION(BlueprintCallable)
-	virtual bool SkillAttack(const FPrimaryAssetId& InSkillID);
+	virtual bool SkillAttack(const FPrimaryAssetId& InSkillID, const FSimpleDelegate& OnStart = nullptr, const FSimpleDelegate& OnEnd = nullptr);
 
-	virtual bool SkillAttack(ESkillType InSkillType, int32 InAbilityIndex = -1);
+	virtual bool SkillAttack(ESkillType InSkillType, int32 InAbilityIndex = -1, const FSimpleDelegate& OnStart = nullptr, const FSimpleDelegate& OnEnd = nullptr);
 	
-	UFUNCTION(BlueprintCallable)
-	virtual bool SkillAttackImpl(const FPrimaryAssetId& InSkillID);
+	virtual bool SkillAttackImpl(const FPrimaryAssetId& InSkillID, const FSimpleDelegate& OnStart = nullptr, const FSimpleDelegate& OnEnd = nullptr);
 
 	UFUNCTION(BlueprintCallable)
 	virtual void UnAttack();

@@ -573,7 +573,7 @@ void ADWCharacter::UnFly()
 	}
 }
 
-bool ADWCharacter::Attack(int32 InAbilityIndex /*= -1*/)
+bool ADWCharacter::Attack(int32 InAbilityIndex /*= -1*/, const FSimpleDelegate& OnStart/* = nullptr*/, const FSimpleDelegate& OnEnd/* = nullptr*/)
 {
 	if(InAbilityIndex == -1) InAbilityIndex = AttackAbilityIndex;
 
@@ -584,7 +584,7 @@ bool ADWCharacter::Attack(int32 InAbilityIndex /*= -1*/)
 			const auto AbilityData = GetAttackAbility(InAbilityIndex);
 			if(CheckWeaponType(AbilityData.WeaponType))
 			{
-				if(FSM->SwitchStateByClass<UDWCharacterState_Attack>())
+				if(FSM->SwitchStateByClass<UDWCharacterState_Attack>({ &OnStart, &OnEnd }))
 				{
 					if(AbilitySystem->TryActivateAbility(AbilityData.AbilityHandle))
 					{
@@ -604,7 +604,7 @@ bool ADWCharacter::Attack(int32 InAbilityIndex /*= -1*/)
 	{
 		if(CheckWeaponType(FallingAttackAbility.WeaponType))
 		{
-			if(FSM->SwitchStateByClass<UDWCharacterState_Attack>())
+			if(FSM->SwitchStateByClass<UDWCharacterState_Attack>({ &OnStart, &OnEnd }))
 			{
 				if(AbilitySystem->TryActivateAbility(FallingAttackAbility.AbilityHandle))
 				{
@@ -622,7 +622,7 @@ bool ADWCharacter::Attack(int32 InAbilityIndex /*= -1*/)
 	return false;
 }
 
-bool ADWCharacter::SkillAttack(const FPrimaryAssetId& InSkillID)
+bool ADWCharacter::SkillAttack(const FPrimaryAssetId& InSkillID, const FSimpleDelegate& OnStart/* = nullptr*/, const FSimpleDelegate& OnEnd/* = nullptr*/)
 {
 	if(const auto SkillSlot = Inventory->GetSlotBySplitTypeAndItemID(ESlotSplitType::Skill, InSkillID))
 	{
@@ -631,7 +631,7 @@ bool ADWCharacter::SkillAttack(const FPrimaryAssetId& InSkillID)
 	return false;
 }
 
-bool ADWCharacter::SkillAttack(ESkillType InSkillType, int32 InAbilityIndex)
+bool ADWCharacter::SkillAttack(ESkillType InSkillType, int32 InAbilityIndex, const FSimpleDelegate& OnStart/* = nullptr*/, const FSimpleDelegate& OnEnd/* = nullptr*/)
 {
 	if(const auto SkillSlot = Inventory->GetSlotBySplitTypeAndItemID(ESlotSplitType::Skill, GetSkillAbility(InSkillType, InAbilityIndex, true).AbilityID))
 	{
@@ -640,12 +640,12 @@ bool ADWCharacter::SkillAttack(ESkillType InSkillType, int32 InAbilityIndex)
 	return false;
 }
 
-bool ADWCharacter::SkillAttackImpl(const FPrimaryAssetId& InSkillID)
+bool ADWCharacter::SkillAttackImpl(const FPrimaryAssetId& InSkillID, const FSimpleDelegate& OnStart/* = nullptr*/, const FSimpleDelegate& OnEnd/* = nullptr*/)
 {
 	const auto AbilityData = GetSkillAbility(InSkillID);
 	if(CheckWeaponType(AbilityData.WeaponType))
 	{
-		if(FSM->SwitchStateByClass<UDWCharacterState_Attack>())
+		if(FSM->SwitchStateByClass<UDWCharacterState_Attack>({ &OnStart, &OnEnd }))
 		{
 			if(AbilitySystem->TryActivateAbility(AbilityData.AbilityHandle))
 			{
@@ -860,7 +860,7 @@ void ADWCharacter::AddMovementInput(FVector WorldDirection, float ScaleValue, bo
 
 	Super::AddMovementInput(WorldDirection, ScaleValue, bForce);
 
-	if(!IsPlayer() || UDWSettingModule::IsExist() && UDWSettingModule::Get().IsAutoJump())
+	if(!IsPlayer() || UDWSettingModule::IsValid() && UDWSettingModule::Get().IsAutoJump())
 	{
 		FHitResult hitResult;
 		if(RaycastStep(hitResult))

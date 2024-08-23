@@ -34,6 +34,15 @@ void UDWCharacterState_Attack::OnEnter(UFiniteStateBase* InLastState, const TArr
 {
 	Super::OnEnter(InLastState, InParams);
 
+	if(InParams.IsValidIndex(0))
+	{
+		OnAttackStart = *InParams[0].GetPointerValue<FSimpleDelegate>();
+	}
+	if(InParams.IsValidIndex(1))
+	{
+		OnAttackEnd = *InParams[1].GetPointerValue<FSimpleDelegate>();
+	}
+
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 
 	Character->GetAbilitySystemComponent()->AddLooseGameplayTag(GameplayTags::StateTag_Character_Attacking);
@@ -56,13 +65,13 @@ void UDWCharacterState_Attack::OnLeave(UFiniteStateBase* InNextState)
 
 	AttackEnd();
 
-	Character->FreeToAnim();
-	Character->SetAttackHitAble(false);
-	Character->StopAnimMontage();
-	Character->AttackAbilityIndex = 0;
-	Character->AttackAbilityQueue = 0;
-	Character->SkillAbilityID = FPrimaryAssetId();
-	Character->AttackType = EDWCharacterAttackType::None;
+	// Character->FreeToAnim();
+	// Character->StopAnimMontage();
+	// Character->AttackAbilityIndex = 0;
+	// Character->AttackAbilityQueue = 0;
+
+	OnAttackStart = nullptr;
+	OnAttackEnd = nullptr;
 }
 
 void UDWCharacterState_Attack::OnTermination()
@@ -72,9 +81,9 @@ void UDWCharacterState_Attack::OnTermination()
 
 void UDWCharacterState_Attack::AttackStart()
 {
-	if (!IsCurrent()) return;
-	
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
+
+	if (Character->AttackType == EDWCharacterAttackType::None) return;
 
 	switch (Character->AttackType)
 	{
@@ -107,14 +116,19 @@ void UDWCharacterState_Attack::AttackStart()
 		}
 		default: break;
 	}
+
+	if(OnAttackStart.IsBound())
+	{
+		OnAttackStart.Execute();
+	}
 }
 
 void UDWCharacterState_Attack::AttackStep()
 {
-	if (!IsCurrent()) return;
-	
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 
+	if (Character->AttackType == EDWCharacterAttackType::None) return;
+	
 	bool bHitAble = !Character->IsAttackHitAble();
 	if(bHitAble) Character->ClearAttackHitTargets();
 	Character->SetAttackHitAble(bHitAble);
@@ -122,9 +136,9 @@ void UDWCharacterState_Attack::AttackStep()
 
 void UDWCharacterState_Attack::AttackEnd()
 {
-	if (!IsCurrent()) return;
-	
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
+
+	if (Character->AttackType == EDWCharacterAttackType::None) return;
 
 	switch (Character->AttackType)
 	{
@@ -157,4 +171,9 @@ void UDWCharacterState_Attack::AttackEnd()
 		default: break;
 	}
 	Character->AttackType = EDWCharacterAttackType::None;
+
+	if(OnAttackEnd.IsBound())
+	{
+		OnAttackEnd.Execute();
+	}
 }

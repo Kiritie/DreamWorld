@@ -54,7 +54,7 @@ void UDWCharacterState_Fly::OnRefresh(float DeltaSeconds)
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 
-	Character->ModifyStamina(ATTRIBUTE_DELTAVALUE_CLAMP(Character, Stamina, -Character->GetStaminaExpendSpeed() * DeltaSeconds));
+	Character->ModifyStamina(ATTRIBUTE_DELTAVALUE_CLAMP(Character, Stamina, -Character->GetStaminaExpendSpeed() * 2.5f * DeltaSeconds));
 
 	if(Character->GetVelocity().Z < 0.f)
 	{

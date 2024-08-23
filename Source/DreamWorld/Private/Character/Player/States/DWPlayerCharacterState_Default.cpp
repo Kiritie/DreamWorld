@@ -50,7 +50,7 @@ void UDWPlayerCharacterState_Default::TrySwitchToWalk()
 {
 	ADWPlayerCharacter* PlayerCharacter = GetAgent<ADWPlayerCharacter>();
 	
-	if(!UVoxelModule::IsExist())
+	if(!UVoxelModule::IsValid())
 	{
 		FSM->SwitchStateByClass<UDWCharacterState_Walk>();
 	}

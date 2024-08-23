@@ -32,7 +32,7 @@ void UDWCharacterState_Crouch::OnEnter(UFiniteStateBase* InLastState, const TArr
 	
 	Character->GetAbilitySystemComponent()->AddLooseGameplayTag(GameplayTags::StateTag_Character_Crouching);
 
-	Character->Crouch(InParams[0].GetBooleanValue());
+	Character->Crouch(InParams[0]);
 }
 
 void UDWCharacterState_Crouch::OnRefresh(float DeltaSeconds)

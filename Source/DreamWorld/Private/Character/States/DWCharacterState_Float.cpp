@@ -36,7 +36,7 @@ void UDWCharacterState_Float::OnEnter(UFiniteStateBase* InLastState, const TArra
 
 	if(InParams.IsValidIndex(0))
 	{
-		WaterPosZ = InParams[0].GetFloatValue();
+		WaterPosZ = InParams[0];
 	}
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();

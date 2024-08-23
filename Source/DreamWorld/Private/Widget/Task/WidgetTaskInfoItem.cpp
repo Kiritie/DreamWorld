@@ -14,7 +14,7 @@ void UWidgetTaskInfoItem::OnInitialize(const TArray<FParameter>& InParams)
 {
 	if(InParams.IsValidIndex(0))
 	{
-		Task = InParams[0].GetObjectValue<UTaskBase>();
+		Task = InParams[0];
 	}
 	Super::OnInitialize(InParams);
 }

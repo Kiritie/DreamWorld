@@ -47,7 +47,7 @@ void UWidgetGameSettingPage::OnApply()
 	Super::OnApply();
 
 	UDWSettingModule::Get().SetGameLevel((EDWGameLevel)SettingItem_GameLevel->GetValue().GetIntegerValue());
-	UDWSettingModule::Get().SetAutoJump(SettingItem_AutoJump->GetValue().GetBooleanValue());
+	UDWSettingModule::Get().SetAutoJump(SettingItem_AutoJump->GetValue());
 }
 
 void UWidgetGameSettingPage::OnReset(bool bForce)
