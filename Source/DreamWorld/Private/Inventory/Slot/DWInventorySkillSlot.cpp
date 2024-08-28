@@ -31,7 +31,7 @@ bool UDWInventorySkillSlot::ActiveItem(bool bPassive /*= false*/)
 	
 	if(ADWCharacter* Character = Inventory->GetOwnerAgent<ADWCharacter>())
 	{
-		return Character->SkillAttackImpl(Item.ID);
+		return Character->SkillAttack(Item);
 	}
 	return false;
 }
@@ -44,7 +44,7 @@ void UDWInventorySkillSlot::CancelItem(bool bPassive /*= false*/)
 	{
 		if(ADWCharacter* Character = Inventory->GetOwnerAgent<ADWCharacter>())
 		{
-			if(Character->GetSkillAbilityID() == Item.ID)
+			if(Character->GetSkillAbilityItem() == Item.ID)
 			{
 				Character->UnAttack();
 			}

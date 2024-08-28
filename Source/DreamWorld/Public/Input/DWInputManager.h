@@ -33,12 +33,11 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = "InputStates|Player")
 	bool bPressedSprint;
 
+	UPROPERTY(VisibleAnywhere, Category = "InputStates|Player")
+	int32 AttackAbilityQueue;
+
 protected:
 	virtual void TurnPlayer_Implementation(const FInputActionValue& InValue) override;
-	
-	virtual void MoveHPlayer_Implementation(const FInputActionValue& InValue) override;
-
-	virtual void MoveVPlayer_Implementation(const FInputActionValue& InValue) override;
 
 	virtual void MoveForwardPlayer_Implementation(const FInputActionValue& InValue) override;
 
@@ -75,15 +74,18 @@ protected:
 	UFUNCTION()
 	virtual void OnSecondaryReleased();
 
+	UFUNCTION()
+	virtual void OnThirdPressed();
+
+	UFUNCTION()
+	virtual void OnThirdReleased();
+
 public:
 	UFUNCTION(BlueprintCallable)
 	virtual void ToggleControlMode();
 
 	UFUNCTION(BlueprintCallable)
 	virtual void ToggleCrouch();
-
-	UFUNCTION(BlueprintCallable)
-	virtual void ToggleLockTarget();
 	
 	UFUNCTION(BlueprintCallable)
 	virtual void ChangeHand();

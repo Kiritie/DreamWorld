@@ -53,13 +53,10 @@ void UDWCharacterState_Interrupt::OnRefresh(float DeltaSeconds)
 {
 	Super::OnRefresh(DeltaSeconds);
 
-	if (RemainTime != -1)
+	RemainTime -= GetWorld()->GetDeltaSeconds();
+	if (RemainTime <= 0.f)
 	{
-		RemainTime -= GetWorld()->GetDeltaSeconds();
-		if (RemainTime <= 0)
-		{
-			FSM->SwitchState(nullptr);
-		}
+		FSM->RefreshState();
 	}
 }
 

@@ -279,7 +279,7 @@ void ADWPlayerCharacter::OnEnterInteract(IInteractionAgentInterface* InInteracti
 
 	if(UWidgetModuleStatics::GetUserWidget<UWidgetInteractionBox>())
 	{
-		UWidgetModuleStatics::GetUserWidget<UWidgetInteractionBox>()->ShowInteractActions(GetInteractableActions());
+		UWidgetModuleStatics::GetUserWidget<UWidgetInteractionBox>()->ShowInteractActions(Cast<UObject>(InInteractionAgent), GetInteractableActions());
 	}
 }
 
@@ -345,7 +345,7 @@ void ADWPlayerCharacter::OnInteract(EInteractAction InInteractAction, IInteracti
 	}
 	if(UWidgetModuleStatics::GetUserWidget<UWidgetInteractionBox>())
 	{
-		UWidgetModuleStatics::GetUserWidget<UWidgetInteractionBox>()->ShowInteractActions(GetInteractableActions());
+		UWidgetModuleStatics::GetUserWidget<UWidgetInteractionBox>()->ShowInteractActions(Cast<UObject>(InInteractionAgent), GetInteractableActions());
 	}
 }
 

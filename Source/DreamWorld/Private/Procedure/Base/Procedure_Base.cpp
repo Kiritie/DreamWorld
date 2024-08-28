@@ -36,14 +36,17 @@ void UProcedure_Base::OnEnter(UProcedureBase* InLastProcedure)
 {
 	Super::OnEnter(InLastProcedure);
 
-	if(BGMHandle.IsValid() && UAudioModuleStatics::GetSingleSoundInfo(BGMHandle).Sound != BGMSound)
+	if(BGMSound)
 	{
-		UAudioModuleStatics::StopSingleSound(BGMHandle);
-		BGMHandle = -1;
-	}
-	if(!BGMHandle.IsValid() && BGMSound)
-	{
-		BGMHandle = UAudioModuleStatics::PlaySingleSound2D(BGMSound);
+		if(BGMHandle.IsValid() && UAudioModuleStatics::GetSingleSoundInfo(BGMHandle).Sound != BGMSound)
+		{
+			UAudioModuleStatics::StopSingleSound(BGMHandle);
+			BGMHandle = -1;
+		}
+		if(!BGMHandle.IsValid())
+		{
+			BGMHandle = UAudioModuleStatics::PlaySingleSound2D(BGMSound);
+		}
 	}
 }
 

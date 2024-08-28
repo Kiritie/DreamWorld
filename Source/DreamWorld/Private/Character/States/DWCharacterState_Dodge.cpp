@@ -22,7 +22,7 @@ bool UDWCharacterState_Dodge::OnEnterValidate(UFiniteStateBase* InLastState, con
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 
-	return Character->GetMoveDirection() != FVector::ZeroVector && Character->DoAction(EDWCharacterActionType::Dodge);
+	return Character->GetMoveDirection(true) != FVector::ZeroVector && Character->DoAction(EDWCharacterActionType::Dodge);
 }
 
 void UDWCharacterState_Dodge::OnEnter(UFiniteStateBase* InLastState, const TArray<FParameter>& InParams)
@@ -35,7 +35,7 @@ void UDWCharacterState_Dodge::OnEnter(UFiniteStateBase* InLastState, const TArra
 
 	Character->LimitToAnim();
 	Character->GetCapsuleComponent()->SetGenerateOverlapEvents(false);
-	Character->SetActorRotation(FRotator(0.f, Character->GetMoveDirection().ToOrientationRotator().Yaw, 0.f));
+	Character->SetActorRotation(FRotator(0.f, Character->GetMoveDirection(true).ToOrientationRotator().Yaw, 0.f));
 }
 
 void UDWCharacterState_Dodge::OnRefresh(float DeltaSeconds)

@@ -79,7 +79,7 @@ void ADWVoxelChunk::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AAc
 	// 		{
 	// 			Debug(FString::Printf(TEXT("%s"), *SweepResult.ImpactPoint.ToString()));
 	// 			Debug(FString::Printf(TEXT("%s"), *SweepResult.ImpactNormal.ToString()));
-	// 			const FVector normal = FVector(FMath::Min((character->GetMoveDirection(false) * 2.5f).X, 1.f), FMath::Min((character->GetMoveDirection(false) * 2.5f).Y, 1.f), FMath::Min((character->GetMoveDirection(false) * 2.5f).Z, 1.f));
+	// 			const FVector normal = FVector(FMath::Min((character->GetMoveDirection() * 2.5f).X, 1.f), FMath::Min((character->GetMoveDirection() * 2.5f).Y, 1.f), FMath::Min((character->GetMoveDirection() * 2.5f).Z, 1.f));
 	// 			const FVector point = characterPart->GetComponentLocation() + characterPart->GetScaledCapsuleRadius() * normal + UVoxelModule::Get().GetWorldData().GetBlockSizedNormal(normal);
 	// 			if(FVector::Distance(character->GetLocation(), point) > 100)
 	// 			{
@@ -112,7 +112,7 @@ void ADWVoxelChunk::OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 	// 	{
 	// 		if(ACharacterBase* character = characterPart->GetOwnerCharacter())
 	// 		{
-	// 			const FVector normal = FVector(FMath::Min((character->GetMoveDirection(false) * 2.5f).X, 1.f), FMath::Min((character->GetMoveDirection(false) * 2.5f).Y, 1.f), FMath::Min((character->GetMoveDirection(false) * 2.5f).Z, 1.f));
+	// 			const FVector normal = FVector(FMath::Min((character->GetMoveDirection() * 2.5f).X, 1.f), FMath::Min((character->GetMoveDirection() * 2.5f).Y, 1.f), FMath::Min((character->GetMoveDirection() * 2.5f).Z, 1.f));
 	// 			const FVector point = characterPart->GetComponentLocation() - characterPart->GetScaledCapsuleRadius() * normal - UVoxelModule::Get().GetWorldData().GetBlockSizedNormal(normal);
 	// 			UKismetSystemLibrary::DrawDebugBox(this, point, FVector(5), FColor::Red, FRotator::ZeroRotator, 100);
 	// 			const FVoxelItem& voxelItem = GetVoxelItem(LocationToIndex(point));

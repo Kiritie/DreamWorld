@@ -61,13 +61,12 @@ void UDWInputManager::OnRefresh(float DeltaSeconds)
 		{
 			case EDWCharacterControlMode::Fighting:
 			{
-				if(bPressedAttackDestroy || PlayerCharacter->AttackAbilityQueue > 0)
+				if(bPressedAttackDestroy || AttackAbilityQueue > 0)
 				{
-					PlayerCharacter->Attack();
-				}
-				else if(!PlayerCharacter->IsAttacking(true))
-				{
-					PlayerCharacter->UnAttack();
+					if(PlayerCharacter->Attack() && AttackAbilityQueue > 0)
+					{
+						AttackAbilityQueue--;
+					}
 				}
 
 				if(bPressedDefendGenerate)
@@ -110,7 +109,6 @@ void UDWInputManager::OnBindAction(UInputComponentBase* InInputComponent)
 	
 	// InInputComponent->BindInputAction(GameplayTags::InputTag_ToggleCrouch, ETriggerEvent::Started, this, &UDWInputManager::ToggleCrouch);
 	InInputComponent->BindInputAction(GameplayTags::InputTag_ToggleControlMode, ETriggerEvent::Started, this, &UDWInputManager::ToggleControlMode);
-	InInputComponent->BindInputAction(GameplayTags::InputTag_ToggleLockSightTarget, ETriggerEvent::Started, this, &UDWInputManager::ToggleLockTarget);
 	InInputComponent->BindInputAction(GameplayTags::InputTag_ChangeHand, ETriggerEvent::Started, this, &UDWInputManager::ChangeHand);
 	
 	InInputComponent->BindInputAction(GameplayTags::InputTag_Primary, ETriggerEvent::Started, this, &UDWInputManager::OnPrimaryPressed);
@@ -118,7 +116,10 @@ void UDWInputManager::OnBindAction(UInputComponentBase* InInputComponent)
 	
 	InInputComponent->BindInputAction(GameplayTags::InputTag_Secondary, ETriggerEvent::Started, this, &UDWInputManager::OnSecondaryPressed);
 	InInputComponent->BindInputAction(GameplayTags::InputTag_Secondary, ETriggerEvent::Completed, this, &UDWInputManager::OnSecondaryReleased);
-	
+		
+	InInputComponent->BindInputAction(GameplayTags::InputTag_Third, ETriggerEvent::Started, this, &UDWInputManager::OnThirdPressed);
+	InInputComponent->BindInputAction(GameplayTags::InputTag_Third, ETriggerEvent::Completed, this, &UDWInputManager::OnThirdReleased);
+
 	InInputComponent->BindInputAction(GameplayTags::InputTag_ReleaseSkillAbility1, ETriggerEvent::Started, this, &UDWInputManager::ReleaseSkillAbility1);
 	InInputComponent->BindInputAction(GameplayTags::InputTag_ReleaseSkillAbility2, ETriggerEvent::Started, this, &UDWInputManager::ReleaseSkillAbility2);
 	InInputComponent->BindInputAction(GameplayTags::InputTag_ReleaseSkillAbility3, ETriggerEvent::Started, this, &UDWInputManager::ReleaseSkillAbility3);
@@ -155,28 +156,6 @@ void UDWInputManager::TurnPlayer_Implementation(const FInputActionValue& InValue
 	if(!PossessedCharacter || PossessedCharacter->IsBreakAllInput()) return;
 
 	IWHPlayerInterface::Execute_Turn(PossessedCharacter, InValue.Get<float>());
-}
-
-void UDWInputManager::MoveHPlayer_Implementation(const FInputActionValue& InValue)
-{
-	if(InValue.Get<float>() == 0.f) return;
-	
-	ADWCharacter* PossessedCharacter = UCommonStatics::GetPossessedPawn<ADWCharacter>();
-
-	if(!PossessedCharacter || PossessedCharacter->IsBreakAllInput()) return;
-
-	IWHPlayerInterface::Execute_MoveH(PossessedCharacter, InValue.Get<float>());
-}
-
-void UDWInputManager::MoveVPlayer_Implementation(const FInputActionValue& InValue)
-{
-	if(InValue.Get<float>() == 0.f) return;
-	
-	ADWCharacter* PossessedCharacter = UCommonStatics::GetPossessedPawn<ADWCharacter>();
-
-	if(!PossessedCharacter || PossessedCharacter->IsBreakAllInput()) return;
-
-	IWHPlayerInterface::Execute_MoveV(PossessedCharacter, InValue.Get<float>());
 }
 
 void UDWInputManager::MoveForwardPlayer_Implementation(const FInputActionValue& InValue)
@@ -224,13 +203,13 @@ void UDWInputManager::ActionUpPlayer_Implementation(const FInputActionValue& InV
 		{
 			PossessedCharacter->Jump();
 		}
-		else if(PossessedCharacter->IsFalling())
+		else if(PossessedCharacter->IsFalling() && PossessedCharacter->GetMoveVelocity().Z < 0.f)
 		{
 			PossessedCharacter->Fly();
 		}
 		else if(PossessedCharacter->IsFlying())
 		{
-			PossessedCharacter->UnFly();
+			// PossessedCharacter->UnFly();
 		}
 	}
 }
@@ -288,10 +267,7 @@ void UDWInputManager::OnPrimaryPressed()
 		{
 			if(PlayerCharacter->IsFreeToAnim() || PlayerCharacter->IsAttacking())
 			{
-				if(PlayerCharacter->AttackAbilityQueue < PlayerCharacter->GetAttackAbilities().Num())
-				{
-					PlayerCharacter->AttackAbilityQueue++; 
-				}
+				AttackAbilityQueue++; 
 			}
 			break;
 		}
@@ -372,6 +348,19 @@ void UDWInputManager::OnSecondaryReleased()
 	}
 }
 
+void UDWInputManager::OnThirdPressed()
+{
+	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
+
+	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput()) return;
+
+	PlayerCharacter->GetTargeting()->TargetActor();
+}
+
+void UDWInputManager::OnThirdReleased()
+{
+}
+
 void UDWInputManager::ToggleControlMode()
 {
 	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
@@ -402,15 +391,6 @@ void UDWInputManager::ToggleCrouch()
 	{
 		PossessedCharacter->UnCrouch(true);
 	}
-}
-
-void UDWInputManager::ToggleLockTarget()
-{
-	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
-
-	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput()) return;
-
-	PlayerCharacter->GetTargeting()->TargetActor();
 }
 
 void UDWInputManager::ChangeHand()

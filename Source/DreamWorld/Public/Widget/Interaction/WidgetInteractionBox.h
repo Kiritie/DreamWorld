@@ -28,9 +28,13 @@ public:
 	virtual void OnClose(bool bInstant) override;
 
 public:
-	UFUNCTION(BlueprintImplementableEvent)
-	void ShowInteractActions(const TArray<EInteractAction>& InActions);
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void ShowInteractActions(const TScriptInterface<IInteractionAgentInterface>& InInteractionAgent, const TArray<EInteractAction>& InActions);
 		
-	UFUNCTION(BlueprintImplementableEvent)
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void HideInteractActions();
+
+protected:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components", meta = (BindWidget, OptionalWidget = false))
+	class UWidgetAbilityPreviewItem* WBP_PreviewItem;
 };

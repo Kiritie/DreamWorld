@@ -172,7 +172,7 @@ public:
 
 	virtual bool SkillAttack(ESkillType InSkillType, int32 InAbilityIndex = -1, const FSimpleDelegate& OnStart = nullptr, const FSimpleDelegate& OnEnd = nullptr);
 	
-	virtual bool SkillAttackImpl(const FPrimaryAssetId& InSkillID, const FSimpleDelegate& OnStart = nullptr, const FSimpleDelegate& OnEnd = nullptr);
+	virtual bool SkillAttack(const FAbilityItem& InAbilityItem, const FSimpleDelegate& OnStart = nullptr, const FSimpleDelegate& OnEnd = nullptr);
 
 	UFUNCTION(BlueprintCallable)
 	virtual void UnAttack();
@@ -264,7 +264,7 @@ public:
 	virtual bool IsFloating() const;
 
 	UFUNCTION(BlueprintPure)
-	virtual bool IsAttacking(bool bCheckAttackType = false) const;
+	virtual bool IsAttacking(EDWCharacterAttackType InAttackType = EDWCharacterAttackType::None) const;
 
 	UFUNCTION(BlueprintPure)
 	virtual bool IsDefending() const;
@@ -319,10 +319,8 @@ protected:
 	FRotator CameraDoRotationRotation;
 
 	int32 AttackAbilityIndex;
-		
-	int32 AttackAbilityQueue;
 
-	FPrimaryAssetId SkillAbilityID;
+	FAbilityItem SkillAbilityItem;
 
 	FTimerHandle AttackHurtTimer;
 
@@ -402,7 +400,7 @@ public:
 	int32 GetAttackAbilityIndex() const { return AttackAbilityIndex; }
 
 	UFUNCTION(BlueprintPure)
-	FPrimaryAssetId GetSkillAbilityID() const { return SkillAbilityID; }
+	FAbilityItem GetSkillAbilityItem() const { return SkillAbilityItem; }
 
 	UFUNCTION(BlueprintPure)
 	EDWCharacterAttackType GetAttackType() const { return AttackType; }

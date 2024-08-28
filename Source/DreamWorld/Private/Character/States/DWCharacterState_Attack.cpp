@@ -68,7 +68,6 @@ void UDWCharacterState_Attack::OnLeave(UFiniteStateBase* InNextState)
 	// Character->FreeToAnim();
 	// Character->StopAnimMontage();
 	// Character->AttackAbilityIndex = 0;
-	// Character->AttackAbilityQueue = 0;
 
 	OnAttackStart = nullptr;
 	OnAttackEnd = nullptr;
@@ -97,15 +96,15 @@ void UDWCharacterState_Attack::AttackStart()
 		{
 			Character->ClearAttackHitTargets();
 			Character->SetAttackHitAble(true);
-			Character->GetCharacterMovement()->GravityScale = 3.f;
+			Character->GetCharacterMovement()->GravityScale = Character->DefaultGravityScale * 1.5f;
 			break;
 		}
 		case EDWCharacterAttackType::SkillAttack:
 		{
-			const auto SkillAbilityData = Character->GetSkillAbility(Character->SkillAbilityID);
+			const auto SkillAbilityData = Character->GetSkillAbility(Character->SkillAbilityItem.ID);
 			if(SkillAbilityData.GetItemData<UAbilitySkillDataBase>().SkillClass)
 			{
-				UAbilityModuleStatics::SpawnAbilityItem(FAbilityItem(SkillAbilityData.AbilityID, 1, SkillAbilityData.AbilityLevel), Character);
+				UAbilityModuleStatics::SpawnAbilityItem(Character->SkillAbilityItem, Character);
 			}
 			else
 			{
@@ -155,17 +154,18 @@ void UDWCharacterState_Attack::AttackEnd()
 		{
 			Character->SetAttackHitAble(false);
 			Character->StopAnimMontage();
+			Character->FreeToAnim();
 			Character->GetCharacterMovement()->GravityScale = Character->GetDefaultGravityScale();
 			break;
 		}
 		case EDWCharacterAttackType::SkillAttack:
 		{
-			const auto AbilityData = Character->GetSkillAbility(Character->SkillAbilityID);
+			const auto AbilityData = Character->GetSkillAbility(Character->SkillAbilityItem.ID);
 			if(!AbilityData.GetItemData<UAbilitySkillDataBase>().SkillClass)
 			{
 				Character->SetAttackHitAble(false);
 			}
-			Character->SkillAbilityID = FPrimaryAssetId();
+			Character->SkillAbilityItem = FAbilityItem();
 			break;
 		}
 		default: break;

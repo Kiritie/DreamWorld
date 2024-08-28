@@ -101,8 +101,7 @@ ADWCharacter::ADWCharacter(const FObjectInitializer& ObjectInitializer) :
 
 	// local
 	AttackAbilityIndex = 0;
-	AttackAbilityQueue = 0;
-	SkillAbilityID = FPrimaryAssetId();
+	SkillAbilityItem = FAbilityItem();
 	AttackType = EDWCharacterAttackType::None;
 	BirthLocation = FVector(0, 0, 0);
 	AIMoveLocation = EMPTY_Vector;
@@ -577,7 +576,7 @@ bool ADWCharacter::Attack(int32 InAbilityIndex /*= -1*/, const FSimpleDelegate& 
 {
 	if(InAbilityIndex == -1) InAbilityIndex = AttackAbilityIndex;
 
-	if(!IsFalling() && !IsFlying())
+	if(!IsFalling())
 	{
 		if(HasAttackAbility(InAbilityIndex))
 		{
@@ -590,12 +589,9 @@ bool ADWCharacter::Attack(int32 InAbilityIndex /*= -1*/, const FSimpleDelegate& 
 					{
 						AttackType = EDWCharacterAttackType::NormalAttack;
 						AttackAbilityIndex = InAbilityIndex;
-						if(AttackAbilityQueue > 0)
-						{
-							AttackAbilityQueue--;
-						}
 						return true;
 					}
+					UnAttack();
 				}
 			}
 		}
@@ -609,16 +605,12 @@ bool ADWCharacter::Attack(int32 InAbilityIndex /*= -1*/, const FSimpleDelegate& 
 				if(AbilitySystem->TryActivateAbility(FallingAttackAbility.AbilityHandle))
 				{
 					AttackType = EDWCharacterAttackType::FallingAttack;
-					if(AttackAbilityQueue > 0)
-					{
-						AttackAbilityQueue--;
-					}
 					return true;
 				}
+				UnAttack();
 			}
 		}
 	}
-	AttackAbilityQueue = 0;
 	return false;
 }
 
@@ -640,9 +632,9 @@ bool ADWCharacter::SkillAttack(ESkillType InSkillType, int32 InAbilityIndex, con
 	return false;
 }
 
-bool ADWCharacter::SkillAttackImpl(const FPrimaryAssetId& InSkillID, const FSimpleDelegate& OnStart/* = nullptr*/, const FSimpleDelegate& OnEnd/* = nullptr*/)
+bool ADWCharacter::SkillAttack(const FAbilityItem& InAbilityItem, const FSimpleDelegate& OnStart/* = nullptr*/, const FSimpleDelegate& OnEnd/* = nullptr*/)
 {
-	const auto AbilityData = GetSkillAbility(InSkillID);
+	const auto AbilityData = GetSkillAbility(InAbilityItem.ID);
 	if(CheckWeaponType(AbilityData.WeaponType))
 	{
 		if(FSM->SwitchStateByClass<UDWCharacterState_Attack>({ &OnStart, &OnEnd }))
@@ -650,9 +642,10 @@ bool ADWCharacter::SkillAttackImpl(const FPrimaryAssetId& InSkillID, const FSimp
 			if(AbilitySystem->TryActivateAbility(AbilityData.AbilityHandle))
 			{
 				AttackType = EDWCharacterAttackType::SkillAttack;
-				SkillAbilityID = InSkillID;
+				SkillAbilityItem = InAbilityItem;
 				return true;
 			}
+			UnAttack();
 		}
 	}
 	return false;
@@ -915,9 +908,9 @@ bool ADWCharacter::IsFloating() const
 	return AbilitySystem->HasMatchingGameplayTag(GameplayTags::StateTag_Character_Floating);
 }
 
-bool ADWCharacter::IsAttacking(bool bCheckAttackType) const
+bool ADWCharacter::IsAttacking(EDWCharacterAttackType InAttackType) const
 {
-	return !bCheckAttackType ? AbilitySystem->HasMatchingGameplayTag(GameplayTags::StateTag_Character_Attacking) : (AttackType != EDWCharacterAttackType::None);
+	return InAttackType == EDWCharacterAttackType::None ? AbilitySystem->HasMatchingGameplayTag(GameplayTags::StateTag_Character_Attacking) : AttackType == InAttackType;
 }
 
 bool ADWCharacter::IsDefending() const
@@ -1176,7 +1169,7 @@ void ADWCharacter::ClearAttackHitTargets()
 bool ADWCharacter::RaycastStep(FHitResult& OutHitResult)
 {
 	const FVector rayStart = GetActorLocation() + FVector::DownVector * (GetHalfHeight() - GetCharacterMovement()->MaxStepHeight);
-	const FVector rayEnd = rayStart + GetMoveDirection() * (GetRadius() + 100.f * FMath::Lerp(0.35f, 1.25f, GetMoveVelocity().Size() / 500.f));
+	const FVector rayEnd = rayStart + GetMoveDirection(true) * (GetRadius() + 100.f * FMath::Lerp(0.35f, 1.25f, GetMoveVelocity(true).Size() / 500.f));
 	return UKismetSystemLibrary::LineTraceSingle(this, rayStart, rayEnd, USceneModuleStatics::GetTraceMapping(FName("Step")).GetTraceType(), false, {}, EDrawDebugTrace::None, OutHitResult, true);
 }
 
@@ -1420,6 +1413,6 @@ void ADWCharacter::HandleInterrupt(float InterruptDuration)
 {
 	if(!FMath::IsNearlyZero(InterruptDuration))
 	{
-		Interrupt(InterruptDuration * (1 - GetToughnessRate()));
+		Interrupt(InterruptDuration * (1.f - GetToughnessRate()));
 	}
 }
