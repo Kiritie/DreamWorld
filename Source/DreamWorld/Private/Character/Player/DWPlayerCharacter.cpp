@@ -402,6 +402,20 @@ void ADWPlayerCharacter::MoveUp_Implementation(float InValue)
 	}
 }
 
+void ADWPlayerCharacter::OnAdditionItem(const FAbilityItem& InItem)
+{
+	Super::OnAdditionItem(InItem);
+
+	if(InItem.Count > 0)
+	{
+		UWidgetModuleStatics::GetUserWidget<UWidgetContextBox>()->AddMessage(FString::Printf(TEXT("获得: %s × %d"), *InItem.GetData().Name.ToString(), InItem.Count));
+	}
+	else
+	{
+		UWidgetModuleStatics::GetUserWidget<UWidgetContextBox>()->AddMessage(FString::Printf(TEXT("无法再获得: %s"), *InItem.GetData().Name.ToString()));
+	}
+}
+
 void ADWPlayerCharacter::OnAssembleItem(const FAbilityItem& InItem)
 {
 	Super::OnAssembleItem(InItem);
@@ -529,13 +543,6 @@ void ADWPlayerCharacter::OnAttributeChange(const FOnAttributeChangeData& InAttri
 		if(UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>())
 		{
 			UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>()->SetSwimSpeed(FString::FromInt(InAttributeChangeData.NewValue));
-		}
-	}
-	else if(InAttributeChangeData.Attribute == GetRideSpeedAttribute())
-	{
-		if(UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>())
-		{
-			UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>()->SetRideSpeed(FString::FromInt(InAttributeChangeData.NewValue));
 		}
 	}
 	else if(InAttributeChangeData.Attribute == GetFlySpeedAttribute())

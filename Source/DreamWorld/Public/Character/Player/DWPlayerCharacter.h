@@ -85,6 +85,8 @@ protected:
 	virtual void MoveUp_Implementation(float InValue) override;
 
 public:
+	virtual void OnAdditionItem(const FAbilityItem& InItem) override;
+	
 	virtual void OnAssembleItem(const FAbilityItem& InItem) override;
 
 	virtual void OnDischargeItem(const FAbilityItem& InItem) override;

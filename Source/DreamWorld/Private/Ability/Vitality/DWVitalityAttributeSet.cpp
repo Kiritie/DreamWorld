@@ -6,7 +6,7 @@
 
 UDWVitalityAttributeSet::UDWVitalityAttributeSet()
 {
-	DamageHandle = UDWDamageHandle::StaticClass();
+	DamageHandleClass = UDWDamageHandle::StaticClass();
 }
 
 void UDWVitalityAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue)

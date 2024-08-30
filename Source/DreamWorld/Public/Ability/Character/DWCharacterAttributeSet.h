@@ -34,10 +34,6 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CharacterAttributes")
 	FGameplayAttributeData SwimSpeed;
 	GAMEPLAYATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, SwimSpeed)
-	
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CharacterAttributes")
-	FGameplayAttributeData RideSpeed;
-	GAMEPLAYATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, RideSpeed)
 		
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CharacterAttributes")
 	FGameplayAttributeData FlySpeed;
@@ -95,11 +91,9 @@ public:
 	FGameplayAttributeData StaminaExpendSpeed;
 	GAMEPLAYATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, StaminaExpendSpeed)
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Interrupt")
-	FGameplayAttributeData Interrupt;
-	GAMEPLAYATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, Interrupt)
-
 public:
+	virtual void PreAttributeBaseChange(const FGameplayAttribute& Attribute, float& NewValue) const override;
+	
 	virtual void PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue) override;
 
 	virtual void PostGameplayEffectExecute(const struct FGameplayEffectModCallbackData &Data) override;

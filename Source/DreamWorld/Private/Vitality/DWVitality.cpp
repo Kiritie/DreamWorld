@@ -5,6 +5,7 @@
 
 #include "Ability/Components/DWAbilitySystemComponent.h"
 #include "Ability/AbilityModuleStatics.h"
+#include "Ability/Effects/EffectBase.h"
 #include "Ability/Vitality/DWVitalityAttributeSet.h"
 #include "Ability/Item/Prop/AbilityPropDataBase.h"
 #include "Character/DWCharacter.h"
@@ -17,6 +18,7 @@
 #include "Widget/World/WidgetVitalityHP.h"
 #include "Widget/World/WorldWidgetComponent.h"
 #include "Inventory/DWVitalityInventory.h"
+#include "ObjectPool/ObjectPoolModuleStatics.h"
 
 // Sets default values
 
@@ -252,8 +254,31 @@ void ADWVitality::HandleDamage(EDamageType DamageType, const float LocalDamageDo
 		{
 			if(DamageType == EDamageType::Physics)
 			{
-				SourceCharacter->ModifyHealth(LocalDamageDone * SourceCharacter->GetAttackStealRate());
+				UEffectBase* Effect = UObjectPoolModuleStatics::SpawnObject<UEffectBase>();
+
+				FGameplayModifierInfo ModifierInfo;
+				ModifierInfo.Attribute = GET_GAMEPLAYATTRIBUTE_PROPERTY(UVitalityAttributeSetBase, Recovery);
+				ModifierInfo.ModifierOp = EGameplayModOp::Override;
+				ModifierInfo.ModifierMagnitude = FGameplayEffectModifierMagnitude(LocalDamageDone * SourceCharacter->GetAttackStealRate());
+
+				Effect->Modifiers.Add(ModifierInfo);
+		
+				FGameplayEffectContextHandle EffectContext = SourceCharacter->GetAbilitySystemComponent()->MakeEffectContext();
+				EffectContext.AddSourceObject(SourceCharacter);
+				SourceCharacter->GetAbilitySystemComponent()->ApplyGameplayEffectToSelf(Effect, 0, EffectContext);
+
+				UObjectPoolModuleStatics::DespawnObject(Effect);
 			}
 		}
 	}
+}
+
+void ADWVitality::HandleRecovery(const float LocalRecoveryDone, FHitResult HitResult, const FGameplayTagContainer& SourceTags, AActor* SourceActor)
+{
+	Super::HandleRecovery(LocalRecoveryDone, HitResult, SourceTags, SourceActor);
+}
+
+void ADWVitality::HandleInterrupt(const float InterruptDuration, FHitResult HitResult, const FGameplayTagContainer& SourceTags, AActor* SourceActor)
+{
+	Super::HandleInterrupt(InterruptDuration, HitResult, SourceTags, SourceActor);
 }

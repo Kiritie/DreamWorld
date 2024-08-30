@@ -2,10 +2,12 @@
 
 #include "Character/States/DWCharacterState_Walk.h"
 
+#include "Ability/Effects/EffectBase.h"
 #include "Character/DWCharacter.h"
 #include "Character/DWCharacterData.h"
 #include "Character/States/DWCharacterState_Attack.h"
 #include "Character/States/DWCharacterState_Fall.h"
+#include "ObjectPool/ObjectPoolModuleStatics.h"
 
 UDWCharacterState_Walk::UDWCharacterState_Walk()
 {
@@ -34,17 +36,20 @@ void UDWCharacterState_Walk::OnEnter(UFiniteStateBase* InLastState, const TArray
 
 	if(InLastState && InLastState->IsA<UDWCharacterState_Fall>())
 	{
-		const auto& CharacterData = Character->GetCharacterData<UDWCharacterData>();
-		if(CharacterData.FallDamageClass)
-		{
-			auto EffectContext = Character->GetAbilitySystemComponent()->MakeEffectContext();
-			EffectContext.AddSourceObject(this);
-			auto SpecHandle = Character->GetAbilitySystemComponent()->MakeOutgoingSpec(CharacterData.FallDamageClass, 0, EffectContext);
-			if (SpecHandle.IsValid())
-			{
-				Character->GetAbilitySystemComponent()->BP_ApplyGameplayEffectSpecToSelf(SpecHandle);
-			}
-		}
+		UEffectBase* Effect = UObjectPoolModuleStatics::SpawnObject<UEffectBase>();
+
+		FGameplayModifierInfo ModifierInfo;
+		ModifierInfo.Attribute = GET_GAMEPLAYATTRIBUTE_PROPERTY(UVitalityAttributeSetBase, FallDamage);
+		ModifierInfo.ModifierOp = EGameplayModOp::Override;
+		ModifierInfo.ModifierMagnitude = FGameplayEffectModifierMagnitude(1.f);
+
+		Effect->Modifiers.Add(ModifierInfo);
+		
+		FGameplayEffectContextHandle EffectContext = Character->GetAbilitySystemComponent()->MakeEffectContext();
+		EffectContext.AddSourceObject(Character);
+		Character->GetAbilitySystemComponent()->ApplyGameplayEffectToSelf(Effect, 0, EffectContext);
+
+		UObjectPoolModuleStatics::DespawnObject(Effect);
 	}
 }
 

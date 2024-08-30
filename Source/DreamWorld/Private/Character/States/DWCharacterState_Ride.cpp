@@ -58,7 +58,6 @@ void UDWCharacterState_Ride::OnEnter(UFiniteStateBase* InLastState, const TArray
 	// Character->LimitToAnim();
 	
 	RidingTarget->SetMotionRate(1.f, 1.f);
-	RidingTarget->SetMoveSpeed(Character->GetRideSpeed());
 }
 
 void UDWCharacterState_Ride::OnRefresh(float DeltaSeconds)
@@ -90,8 +89,6 @@ void UDWCharacterState_Ride::OnLeave(UFiniteStateBase* InNextState)
 	
 	if(RidingTarget)
 	{
-		RidingTarget->SetMoveSpeed(RidingTarget->GetBaseMoveSpeed());
-
 		const FVector offset = Character->GetActorRightVector() * (Character->GetRadius() + RidingTarget->GetRadius());
 		FVector rayStart = Character->GetActorLocation() + offset;
 		const FVector rayEnd = FVector(rayStart.X, rayStart.Y, 0);

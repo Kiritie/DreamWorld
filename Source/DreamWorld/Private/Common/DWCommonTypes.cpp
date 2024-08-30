@@ -117,7 +117,7 @@ namespace GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(InputTag_ToggleLockSightTarget, "Input.Player.ToggleLockSightTarget", "Toggle LockSight Target");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(InputTag_ChangeHand, "Input.Player.ChangeHand", "ChangeHand");
 	
-	UE_DEFINE_GAMEPLAY_TAG_COMMENT(InputTag_Primary, "Input.Player.Primary", "PrimaryAction");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(InputTag_Primary, "Input.Player.Primary", "Primary");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(InputTag_Secondary, "Input.Player.Secondary", "Secondary");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(InputTag_Third, "Input.Player.Third", "Third");
 	

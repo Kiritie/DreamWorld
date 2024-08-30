@@ -460,6 +460,7 @@ public:
 
 	virtual UBehaviorTree* GetBehaviorTreeAsset() const override;
 
+public:
 	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, Mana)
 	
 	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, MaxMana)
@@ -469,8 +470,6 @@ public:
 	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, MaxStamina)
 	
 	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, SwimSpeed)
-	
-	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, RideSpeed)
 		
 	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, FlySpeed)
 
@@ -500,12 +499,12 @@ public:
 			
 	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, StaminaExpendSpeed)
 
-	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, Interrupt)
-
 public:
 	virtual void OnAttributeChange(const FOnAttributeChangeData& InAttributeChangeData) override;
 	
 	virtual void HandleDamage(EDamageType DamageType, const float LocalDamageDone, bool bHasCrited, bool bHasDefend, FHitResult HitResult, const FGameplayTagContainer& SourceTags, AActor* SourceActor) override;
-	
-	virtual void HandleInterrupt(float InterruptDuration);
+
+	virtual void HandleRecovery(const float LocalRecoveryDone, FHitResult HitResult, const FGameplayTagContainer& SourceTags, AActor* SourceActor) override;
+
+	virtual void HandleInterrupt(const float InterruptDuration, FHitResult HitResult, const FGameplayTagContainer& SourceTags, AActor* SourceActor) override;
 };

@@ -29,7 +29,7 @@ protected:
 public:
 	virtual FItemQueryInfo QueryItemByRange(EItemQueryType InActionType, FAbilityItem InItem, int32 InStartIndex = 0, int32 InEndIndex = -1) override;
 
-	virtual void AddItemBySlots(FAbilityItem& InItem, const TArray<UAbilityInventorySlot *>& InSlots) override;
+	virtual void AddItemBySlots(FAbilityItem& InItem, const TArray<UAbilityInventorySlot*>& InSlots, bool bAddition) override;
 
 	virtual void RemoveItemBySlots(FAbilityItem& InItem, const TArray<UAbilityInventorySlot *>& InSlots) override;
 

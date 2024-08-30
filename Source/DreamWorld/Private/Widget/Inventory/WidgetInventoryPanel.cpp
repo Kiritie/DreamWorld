@@ -115,4 +115,9 @@ void UWidgetInventoryPanel::OnClose(bool bInstant)
 void UWidgetInventoryPanel::OnRefresh()
 {
 	Super::OnRefresh();
+
+	if(IAbilityActorInterface* AbilityActor = GetOwnerObject<IAbilityActorInterface>())
+	{
+		AbilityActor->RefreshAttributes();
+	}
 }

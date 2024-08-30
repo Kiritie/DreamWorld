@@ -18,6 +18,7 @@
 #include "Ability/Character/DWCharacterAttackAbility.h"
 #include "Ability/Character/DWCharacterAttributeSet.h"
 #include "Ability/Character/DWCharacterSkillAbility.h"
+#include "Ability/Effects/EffectBase.h"
 #include "Ability/Item/Equip/AbilityEquipDataBase.h"
 #include "Item/Equip/Shield/DWEquipShield.h"
 #include "Item/Equip/Shield/DWEquipShieldData.h"
@@ -371,8 +372,7 @@ void ADWCharacter::OnActiveItem(const FAbilityItem& InItem, bool bPassive, bool 
 		}
 		else if(IsPlayer())
 		{
-			UWidgetModuleStatics::OpenUserWidget<UWidgetMessageBox>({ FString::Printf(TEXT("该%s还未准备好！"),
-				*UCommonStatics::GetEnumValueDisplayName(TEXT("/Script/WHFramework.EAbilityItemType"), (int32)InItem.GetType()).ToString()) });
+			UWidgetModuleStatics::OpenUserWidget<UWidgetMessageBox>({ FString::Printf(TEXT("该%s还未准备好！"), *UCommonStatics::GetEnumValueDisplayName(TEXT("/Script/WHFramework.EAbilityItemType"), (int32)InItem.GetType()).ToString()) });
 		}
 	}
 }
@@ -1363,13 +1363,6 @@ void ADWCharacter::OnAttributeChange(const FOnAttributeChangeData& InAttributeCh
 	{
 		GetCharacterMovement()->MaxSwimSpeed = InAttributeChangeData.NewValue * (IsSprinting() ? 1.5f : 1.f) * MovementRate;
 	}
-	else if(InAttributeChangeData.Attribute == GetRideSpeedAttribute())
-	{
-		if(RidingTarget)
-		{
-			RidingTarget->SetMoveSpeed(InAttributeChangeData.NewValue * (IsSprinting() ? 1.5f : 1.f) * MovementRate);
-		}
-	}
 	else if(InAttributeChangeData.Attribute == GetFlySpeedAttribute())
 	{
 		GetCharacterMovement()->MaxFlySpeed = InAttributeChangeData.NewValue * (IsSprinting() ? 1.5f : 1.f) * MovementRate;
@@ -1391,7 +1384,20 @@ void ADWCharacter::HandleDamage(EDamageType DamageType, const float LocalDamageD
 		{
 			if(DamageType == EDamageType::Physics)
 			{
-				SourceCharacter->ModifyHealth(LocalDamageDone * SourceCharacter->GetAttackStealRate());
+				UEffectBase* Effect = UObjectPoolModuleStatics::SpawnObject<UEffectBase>();
+
+				FGameplayModifierInfo ModifierInfo;
+				ModifierInfo.Attribute = GET_GAMEPLAYATTRIBUTE_PROPERTY(UVitalityAttributeSetBase, Recovery);
+				ModifierInfo.ModifierOp = EGameplayModOp::Override;
+				ModifierInfo.ModifierMagnitude = FGameplayEffectModifierMagnitude(LocalDamageDone * SourceCharacter->GetAttackStealRate());
+
+				Effect->Modifiers.Add(ModifierInfo);
+		
+				FGameplayEffectContextHandle EffectContext = SourceCharacter->GetAbilitySystemComponent()->MakeEffectContext();
+				EffectContext.AddSourceObject(SourceCharacter);
+				SourceCharacter->GetAbilitySystemComponent()->ApplyGameplayEffectToSelf(Effect, 0, EffectContext);
+
+				UObjectPoolModuleStatics::DespawnObject(Effect);
 			}
 			if(ADWAIController* AIController = GetController<ADWAIController>())
 			{
@@ -1409,9 +1415,16 @@ void ADWCharacter::HandleDamage(EDamageType DamageType, const float LocalDamageD
 	}
 }
 
-void ADWCharacter::HandleInterrupt(float InterruptDuration)
+void ADWCharacter::HandleRecovery(const float LocalRecoveryDone, FHitResult HitResult, const FGameplayTagContainer& SourceTags, AActor* SourceActor)
 {
-	if(!FMath::IsNearlyZero(InterruptDuration))
+	Super::HandleRecovery(LocalRecoveryDone, HitResult, SourceTags, SourceActor);
+}
+
+void ADWCharacter::HandleInterrupt(const float InterruptDuration, FHitResult HitResult, const FGameplayTagContainer& SourceTags, AActor* SourceActor)
+{
+	Super::HandleInterrupt(InterruptDuration, HitResult, SourceTags, SourceActor);
+
+	if(InterruptDuration > 0.f)
 	{
 		Interrupt(InterruptDuration * (1.f - GetToughnessRate()));
 	}

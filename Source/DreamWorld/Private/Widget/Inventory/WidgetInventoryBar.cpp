@@ -64,7 +64,6 @@ void UWidgetInventoryBar::OnInitialize(UObject* InOwner, const TArray<FParameter
 				if(UWidgetInventoryShortcutSlot* ShortcutSlot = CreateSubWidget<UWidgetInventoryShortcutSlot>({ ShortcutSlots[i] }, UAssetModuleStatics::GetStaticClass(FName("InventoryShortcutSlot"))))
 				{
 					ShortcutSlot->SetKeyCode(UInputModuleStatics::GetPlayerKeyMappingInfoByName(*FString::Printf(TEXT("SelectInventorySlot%d"), i + 1)).KeyCode);
-					// ShortcutSlot->SetKeyCode(FText::FromString(FString::FromInt(i < 9 ? i + 1 : 0)));
 					if(UGridSlot* GridSlot = ShortcutContent->AddChildToGrid(ShortcutSlot))
 					{
 						GridSlot->SetPadding(FMargin(0.f, 0.f, 5.f, 0.f));
@@ -93,8 +92,7 @@ void UWidgetInventoryBar::OnInitialize(UObject* InOwner, const TArray<FParameter
 			{
 				if(UWidgetInventoryAuxiliarySlot* AuxiliarySlot = CreateSubWidget<UWidgetInventoryAuxiliarySlot>({ AuxiliarySlots[i] }, UAssetModuleStatics::GetStaticClass(FName("InventoryAuxiliarySlot"))))
 				{
-					AuxiliarySlot->SetKeyCode(UInputModuleStatics::GetPlayerKeyMappingInfoByName(*FString::Printf(TEXT("ReleaseAuxiliaryAbility%d"), i + 1)).KeyCode);
-					// AuxiliarySlot->SetKeyCode(FText::FromString(TEXT("X")));
+					AuxiliarySlot->SetKeyCode(UInputModuleStatics::GetPlayerKeyMappingInfoByName(*FString::Printf(TEXT("ChangeAuxiliarySlot%d"), i + 1)).KeyCode);
 					if(UGridSlot* GridSlot = AuxiliaryContent->AddChildToGrid(AuxiliarySlot))
 					{
 						GridSlot->SetPadding(FMargin(0.f, 0.f, 5.f, 0.f));

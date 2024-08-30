@@ -35,34 +35,13 @@ FItemQueryInfo UDWCharacterInventory::QueryItemByRange(EItemQueryType InActionTy
 	return Super::QueryItemByRange(InActionType, InItem, InStartIndex, InEndIndex);
 }
 
-void UDWCharacterInventory::AddItemBySlots(FAbilityItem& InItem, const TArray<UAbilityInventorySlot*>& InSlots)
+void UDWCharacterInventory::AddItemBySlots(FAbilityItem& InItem, const TArray<UAbilityInventorySlot*>& InSlots, bool bAddition)
 {
-	FAbilityItem tmpItem = InItem;
-
-	Super::AddItemBySlots(InItem, InSlots);
-
-	tmpItem -= InItem;
-
-	if(GetOwnerAgent<ADWCharacter>()->IsPlayer())
-	{
-		if(tmpItem.Count > 0)
-		{
-			UWidgetModuleStatics::GetUserWidget<UWidgetContextBox>()->AddMessage(FString::Printf(TEXT("获得: %s × %d"), *InItem.GetData().Name.ToString(), tmpItem.Count));
-		}
-		else
-		{
-			UWidgetModuleStatics::GetUserWidget<UWidgetContextBox>()->AddMessage(FString::Printf(TEXT("无法再获得: %s"), *InItem.GetData().Name.ToString()));
-		}
-	}
+	Super::AddItemBySlots(InItem, InSlots, bAddition);
 }
 
 void UDWCharacterInventory::RemoveItemBySlots(FAbilityItem& InItem, const TArray<UAbilityInventorySlot*>& InSlots)
 {
-	if(GetOwnerAgent<ADWCharacter>()->IsPlayer())
-	{
-		//UWidgetModuleStatics::GetUserWidget<UWidgetContextBox>()->AddMessage(FString::Printf(TEXT("失去: %s × %d"), *InItem.GetData().Name.ToString(), InItem.Count));
-	}
-
 	Super::RemoveItemBySlots(InItem, InSlots);
 }
 

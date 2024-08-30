@@ -82,9 +82,6 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
 	void SetSwimSpeed(const FString& InValue);
-
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
-	void SetRideSpeed(const FString& InValue);
 	
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
 	void SetFlySpeed(const FString& InValue);
