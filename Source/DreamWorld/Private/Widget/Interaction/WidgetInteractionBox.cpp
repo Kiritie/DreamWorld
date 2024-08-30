@@ -4,6 +4,9 @@
 #include "Widget/Interaction/WidgetInteractionBox.h"
 
 #include "Ability/PickUp/AbilityPickUpBase.h"
+#include "Character/DWCharacter.h"
+#include "Components/HorizontalBox.h"
+#include "Voxel/Voxels/Auxiliary/VoxelInteractAuxiliary.h"
 #include "Widget/WidgetModule.h"
 #include "Widget/Item/WidgetAbilityPreviewItem.h"
 
@@ -16,11 +19,14 @@ UWidgetInteractionBox::UWidgetInteractionBox(const FObjectInitializer& ObjectIni
 	WidgetCreateType = EWidgetCreateType::AutoCreateAndOpen;
 	
 	WBP_PreviewItem = nullptr;
+	HBox_NextKeyTips = nullptr;
 }
 
 void UWidgetInteractionBox::OnCreate(UObject* InOwner, const TArray<FParameter>& InParams)
 {
 	Super::OnCreate(InOwner, InParams);
+
+	HBox_NextKeyTips->VisibilityDelegate.BindDynamic(this, &UWidgetInteractionBox::GetNextKeyTipsVisibility);
 }
 
 void UWidgetInteractionBox::OnInitialize(UObject* InOwner, const TArray<FParameter>& InParams)
@@ -33,6 +39,11 @@ void UWidgetInteractionBox::OnOpen(const TArray<FParameter>& InParams, bool bIns
 	Super::OnOpen(InParams, bInstant);
 }
 
+void UWidgetInteractionBox::OnRefresh()
+{
+	Super::OnRefresh();
+}
+
 void UWidgetInteractionBox::OnClose(bool bInstant)
 {
 	Super::OnClose(bInstant);
@@ -40,21 +51,47 @@ void UWidgetInteractionBox::OnClose(bool bInstant)
 
 void UWidgetInteractionBox::ShowInteractActions_Implementation(const TScriptInterface<IInteractionAgentInterface>& InInteractionAgent, const TArray<EInteractAction>& InActions)
 {
-	if(InActions.IsEmpty()) return;
+	if(!InInteractionAgent || InActions.IsEmpty()) return;
+
+	InteractionAgent = InInteractionAgent;
+
+	FAbilityItem Item;
 	
-	if(AAbilityPickUpBase* PickUp = Cast<AAbilityPickUpBase>(InInteractionAgent.GetObject()))
+	if(AAbilityPickUpBase* PickUp = Cast<AAbilityPickUpBase>(InteractionAgent.GetObject()))
 	{
-		WBP_PreviewItem->Init({ &PickUp->GetItem() });
+		Item = PickUp->GetItem();
+	}
+	else if(AVoxelInteractAuxiliary* Auxiliary = Cast<AVoxelInteractAuxiliary>(InteractionAgent.GetObject()))
+	{
+		Item = FAbilityItem(Auxiliary->GetVoxelItem());
+	}
+	else if(IPrimaryEntityInterface* Entity = Cast<IPrimaryEntityInterface>(InteractionAgent.GetObject()))
+	{
+		Item = FAbilityItem(Entity->GetAssetID());
+	}
+	
+	if(Item.IsValid())
+	{
+		WBP_PreviewItem->Init({ &Item });
 		WBP_PreviewItem->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
 	}
 }
 
 void UWidgetInteractionBox::HideInteractActions_Implementation()
 {
+	InteractionAgent = nullptr;
+
 	WBP_PreviewItem->SetVisibility(ESlateVisibility::Collapsed);
 }
 
-void UWidgetInteractionBox::OnRefresh()
+ESlateVisibility UWidgetInteractionBox::GetNextKeyTipsVisibility()
 {
-	Super::OnRefresh();
+	if(IInteractionAgentInterface* OwnerInteractionAgent = GetOwnerObject<IInteractionAgentInterface>())
+	{
+		if(InteractionAgent && OwnerInteractionAgent->GetOverlappingAgents().Num() > 1)
+		{
+			return ESlateVisibility::SelfHitTestInvisible;
+		}
+	}
+	return ESlateVisibility::Collapsed;
 }

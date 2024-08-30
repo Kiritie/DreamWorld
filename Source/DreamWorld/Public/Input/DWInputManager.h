@@ -118,6 +118,9 @@ public:
 	virtual void DoInteract5();
 
 	UFUNCTION(BlueprintCallable)
+	virtual void NextInteract();
+
+	UFUNCTION(BlueprintCallable)
 	virtual void UseInventoryItem();
 
 	UFUNCTION(BlueprintCallable)

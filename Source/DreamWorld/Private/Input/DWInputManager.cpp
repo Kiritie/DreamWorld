@@ -104,6 +104,8 @@ void UDWInputManager::OnBindAction(UInputComponentBase* InInputComponent)
 	InInputComponent->BindInputAction(GameplayTags::InputTag_Interact4, ETriggerEvent::Started, this, &UDWInputManager::DoInteract4);
 	InInputComponent->BindInputAction(GameplayTags::InputTag_Interact5, ETriggerEvent::Started, this, &UDWInputManager::DoInteract5);
 	
+	InInputComponent->BindInputAction(GameplayTags::InputTag_NextInteract, ETriggerEvent::Started, this, &UDWInputManager::NextInteract);
+	
 	InInputComponent->BindInputAction(GameplayTags::InputTag_Dodge, ETriggerEvent::Started, this, &UDWInputManager::OnDodgePressed);
 	InInputComponent->BindInputAction(GameplayTags::InputTag_Dodge, ETriggerEvent::Completed, this, &UDWInputManager::OnDodgeReleased);
 	
@@ -507,6 +509,18 @@ void UDWInputManager::DoInteract5()
 	if(PlayerCharacter->GetInteractableActions().IsValidIndex(4))
 	{
 		PlayerCharacter->DoInteract(PlayerCharacter->GetInteractableActions()[4]);
+	}
+}
+
+void UDWInputManager::NextInteract()
+{
+	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
+	
+	if(!PlayerCharacter || PlayerCharacter->IsBreakAllInput() || !PlayerCharacter->GetInteractingAgent()) return;
+	
+	if(PlayerCharacter->GetOverlappingAgents().Num() > 1)
+	{
+		PlayerCharacter->GetInteractingAgent()->LeaveInteract(PlayerCharacter);
 	}
 }
 

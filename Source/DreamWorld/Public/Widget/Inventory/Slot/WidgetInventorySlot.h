@@ -2,14 +2,14 @@
 
 #pragma once
 
-#include "Ability/Inventory/Widget/WidgetAbilityInventorySlotBase.h"
+#include "Ability/Inventory/Widget/WidgetInventorySlotBase.h"
 #include "WidgetInventorySlot.generated.h"
 
 /**
  * UI物品槽
  */
 UCLASS(BlueprintType)
-class DREAMWORLD_API UWidgetInventorySlot : public UWidgetAbilityInventorySlotBase
+class DREAMWORLD_API UWidgetInventorySlot : public UWidgetInventorySlotBase
 {
 	GENERATED_BODY()
 

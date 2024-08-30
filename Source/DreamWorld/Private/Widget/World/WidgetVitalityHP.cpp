@@ -10,7 +10,7 @@ UWidgetVitalityHP::UWidgetVitalityHP(const FObjectInitializer& ObjectInitializer
 	WidgetName = FName("VitalityHP");
 
 	WidgetAlignment = FVector2D(0.5f);
-	WidgetVisibility = EWorldWidgetVisibility::RenderAndDistance;
+	WidgetVisibility = EWorldWidgetVisibility::ScreenAndDistance;
 	WidgetShowDistance = 1500.f;
 }
 

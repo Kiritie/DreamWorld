@@ -109,6 +109,8 @@ namespace GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(InputTag_Interact3, "Input.Player.Interact3", "Interact3");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(InputTag_Interact4, "Input.Player.Interact4", "Interact4");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(InputTag_Interact5, "Input.Player.Interact5", "Interact5");
+
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(InputTag_NextInteract, "Input.Player.NextInteract", "NextInteract");
 	
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(InputTag_Dodge, "Input.Player.Dodge", "Dodge");
 	

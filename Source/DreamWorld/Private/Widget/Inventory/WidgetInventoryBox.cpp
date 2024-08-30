@@ -10,6 +10,8 @@
 #include "Character/Player/DWPlayerCharacter.h"
 #include "Components/WrapBox.h"
 #include "Components/WrapBoxSlot.h"
+#include "Widget/WidgetModuleStatics.h"
+#include "Widget/Common/WidgetUIMask.h"
 #include "Widget/Inventory/Slot/WidgetInventorySlot.h"
 
 UWidgetInventoryBox::UWidgetInventoryBox(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
@@ -71,6 +73,8 @@ void UWidgetInventoryBox::OnOpen(const TArray<FParameter>& InParams, bool bInsta
 {
 	Super::OnOpen(InParams, bInstant);
 
+	UWidgetModuleStatics::OpenUserWidget<UWidgetUIMask>();
+
 	UAbilityInventoryBase* TargetInventory = InParams.IsValidIndex(0) ? InParams[0].GetObjectValue<IAbilityInventoryAgentInterface>()->GetInventory() : nullptr;
 
 	if(!TargetInventory) return;
@@ -109,6 +113,8 @@ void UWidgetInventoryBox::OnOpen(const TArray<FParameter>& InParams, bool bInsta
 void UWidgetInventoryBox::OnClose(bool bInstant)
 {
 	Super::OnClose(bInstant);
+	
+	UWidgetModuleStatics::CloseUserWidget<UWidgetUIMask>();
 
 	GetInventory()->SetConnectInventory(nullptr);
 }

@@ -14,7 +14,9 @@
 #include "Ability/Inventory/AbilityInventoryBase.h"
 #include "Achievement/AchievementModuleStatics.h"
 #include "Character/DWCharacter.h"
+#include "Widget/WidgetModuleStatics.h"
 #include "Widget/Common/CommonButton.h"
+#include "Widget/Common/WidgetUIMask.h"
 #include "Widget/Generate/WidgetGenerateItem.h"
 #include "Widget/Item/WidgetAbilityPreviewItem.h"
 
@@ -64,6 +66,8 @@ void UWidgetGeneratePanel::OnOpen(const TArray<FParameter>& InParams, bool bInst
 {
 	Super::OnOpen(InParams, bInstant);
 
+	UWidgetModuleStatics::OpenUserWidget<UWidgetUIMask>();
+
 	const FPrimaryAssetId GenerateToolID = InParams.IsValidIndex(0) ? InParams[0].GetObjectValue<IPrimaryEntityInterface>()->Execute_GetAssetID(InParams[0]) : FPrimaryAssetId();
 
 	TArray<FDWGenerateItemData> GenerateItemDatas;
@@ -96,6 +100,8 @@ void UWidgetGeneratePanel::OnOpen(const TArray<FParameter>& InParams, bool bInst
 void UWidgetGeneratePanel::OnClose(bool bInstant)
 {
 	Super::OnClose(bInstant);
+
+	UWidgetModuleStatics::CloseUserWidget<UWidgetUIMask>();
 
 	PreviewGenerateRawDataIndex = 0;
 	SelectedGenerateRawData = FDWGenerateRawData();

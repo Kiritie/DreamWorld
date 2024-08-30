@@ -5,7 +5,8 @@
 
 #include "Input/InputModuleStatics.h"
 #include "Widget/WidgetModule.h"
-
+#include "Widget/WidgetModuleStatics.h"
+#include "Widget/Common/WidgetUIMask.h"
 
 UWidgetMaxMapBox::UWidgetMaxMapBox(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -31,9 +32,13 @@ void UWidgetMaxMapBox::OnInitialize(UObject* InOwner, const TArray<FParameter>& 
 void UWidgetMaxMapBox::OnOpen(const TArray<FParameter>& InParams, bool bInstant)
 {
 	Super::OnOpen(InParams, bInstant);
+
+	UWidgetModuleStatics::OpenUserWidget<UWidgetUIMask>();
 }
 
 void UWidgetMaxMapBox::OnClose(bool bInstant)
 {
 	Super::OnClose(bInstant);
+
+	UWidgetModuleStatics::CloseUserWidget<UWidgetUIMask>();
 }

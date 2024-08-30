@@ -30,11 +30,21 @@ public:
 public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void ShowInteractActions(const TScriptInterface<IInteractionAgentInterface>& InInteractionAgent, const TArray<EInteractAction>& InActions);
-		
+	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void HideInteractActions();
 
 protected:
+	UFUNCTION()
+	ESlateVisibility GetNextKeyTipsVisibility();
+
+protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components", meta = (BindWidget, OptionalWidget = false))
 	class UWidgetAbilityPreviewItem* WBP_PreviewItem;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components", meta = (BindWidget, OptionalWidget = false))
+	class UHorizontalBox* HBox_NextKeyTips;
+
+private:
+	TScriptInterface<IInteractionAgentInterface> InteractionAgent;
 };

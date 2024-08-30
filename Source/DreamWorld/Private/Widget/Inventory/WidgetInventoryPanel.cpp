@@ -15,6 +15,8 @@
 #include "Ability/Inventory/Slot/AbilityInventorySlot.h"
 #include "Asset/AssetModuleStatics.h"
 #include "ObjectPool/ObjectPoolModuleStatics.h"
+#include "Widget/WidgetModuleStatics.h"
+#include "Widget/Common/WidgetUIMask.h"
 #include "Widget/Inventory/Slot/WidgetInventoryEquipSlot.h"
 
 UWidgetInventoryPanel::UWidgetInventoryPanel(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
@@ -105,11 +107,15 @@ void UWidgetInventoryPanel::OnInitialize(UObject* InOwner, const TArray<FParamet
 void UWidgetInventoryPanel::OnOpen(const TArray<FParameter>& InParams, bool bInstant)
 {
 	Super::OnOpen(InParams, bInstant);
+
+	UWidgetModuleStatics::OpenUserWidget<UWidgetUIMask>();
 }
 
 void UWidgetInventoryPanel::OnClose(bool bInstant)
 {
 	Super::OnClose(bInstant);
+
+	UWidgetModuleStatics::CloseUserWidget<UWidgetUIMask>();
 }
 
 void UWidgetInventoryPanel::OnRefresh()
