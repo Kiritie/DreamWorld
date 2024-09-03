@@ -10,9 +10,6 @@
 UDWAITask_Attack::UDWAITask_Attack(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	AttackAbilityIndex = -1;
-
-	bAttackStarted = false;
-	bAttackEnded = false;
 }
 
 void UDWAITask_Attack::InitializeFromAsset(UBehaviorTree& Asset)
@@ -49,15 +46,16 @@ EBTNodeResult::Type UDWAITask_Attack::ExecuteTask(UBehaviorTreeComponent& OwnerC
 
 	if (!InitTask(OwnerComp)) return EBTNodeResult::Failed;
 
-	if(!GetAgent<ADWCharacter>()->Attack(AttackAbilityIndex, nullptr, FSimpleDelegate::CreateLambda([this, &OwnerComp]()
+	if(GetAgent<ADWCharacter>()->Attack(AttackAbilityIndex, nullptr, FSimpleDelegate::CreateLambda([this, &OwnerComp]()
 	{
+		WHDebug("AAA");
 		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
 	})))
 	{
-		return EBTNodeResult::Failed;
+		return EBTNodeResult::InProgress;
 	}
 
-	return EBTNodeResult::InProgress;
+	return EBTNodeResult::Succeeded;
 }
 
 void UDWAITask_Attack::OnTaskFinished(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, EBTNodeResult::Type TaskResult)

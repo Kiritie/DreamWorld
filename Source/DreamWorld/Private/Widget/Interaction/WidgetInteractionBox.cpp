@@ -67,10 +67,10 @@ void UWidgetInteractionBox::ShowInteractActions_Implementation(const TScriptInte
 	}
 	else if(IPrimaryEntityInterface* Entity = Cast<IPrimaryEntityInterface>(InteractionAgent.GetObject()))
 	{
-		Item = FAbilityItem(Entity->GetAssetID());
+		Item = FAbilityItem(Entity->Execute_GetAssetID(InteractionAgent.GetObject()));
 	}
 	
-	if(Item.IsValid())
+	if(Item.IsValid() && InInteractionAgent.GetObject() != GetOwnerObject())
 	{
 		WBP_PreviewItem->Init({ &Item });
 		WBP_PreviewItem->SetVisibility(ESlateVisibility::SelfHitTestInvisible);

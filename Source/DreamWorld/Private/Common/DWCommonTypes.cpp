@@ -170,5 +170,4 @@ namespace GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(StateTag_Character_Exhausted, "State.Character.Exhausted", "Character Exhausted");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(StateTag_Character_FreeToAnim, "State.Character.FreeToAnim", "Character FreeToAnim");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(StateTag_Character_LockRotation, "State.Character.LockRotation", "Character LockRotation");
-	UE_DEFINE_GAMEPLAY_TAG_COMMENT(StateTag_Character_BreakAllInput, "State.Character.BreakAllInput", "Character BreakAllInput");
 }

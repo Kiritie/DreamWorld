@@ -31,10 +31,4 @@ protected:
 protected:
 	UPROPERTY(EditAnywhere, Category = "Blackboard")
 	int32 AttackAbilityIndex;
-
-	UPROPERTY(VisibleAnywhere, Category = "Blackboard")
-	bool bAttackStarted;
-
-	UPROPERTY(VisibleAnywhere, Category = "Blackboard")
-	bool bAttackEnded;
 };

@@ -841,8 +841,6 @@ void ADWCharacter::StopAIMove(bool bMulticast /*= false*/)
 
 void ADWCharacter::AddMovementInput(FVector WorldDirection, float ScaleValue, bool bForce)
 {
-	if(IsBreakAllInput()) return;
-
 	if(IsFloating())
 	{
 		if(WorldDirection.Z > -0.5f)
@@ -941,11 +939,6 @@ bool ADWCharacter::IsInterrupting() const
 bool ADWCharacter::IsLockRotation() const
 {
 	return AbilitySystem->HasMatchingGameplayTag(GameplayTags::StateTag_Character_LockRotation);
-}
-
-bool ADWCharacter::IsBreakAllInput() const
-{
-	return AbilitySystem->HasMatchingGameplayTag(GameplayTags::StateTag_Character_BreakAllInput);
 }
 
 UWidgetCharacterHP* ADWCharacter::GetCharacterHPWidget() const

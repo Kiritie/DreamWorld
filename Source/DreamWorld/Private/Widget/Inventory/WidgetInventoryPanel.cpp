@@ -124,6 +124,6 @@ void UWidgetInventoryPanel::OnRefresh()
 
 	if(IAbilityActorInterface* AbilityActor = GetOwnerObject<IAbilityActorInterface>())
 	{
-		AbilityActor->RefreshAttributes();
+		// AbilityActor->RefreshAttributes();
 	}
 }

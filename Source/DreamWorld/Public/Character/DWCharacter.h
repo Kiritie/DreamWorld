@@ -283,9 +283,6 @@ public:
 
 	UFUNCTION(BlueprintPure)
 	virtual bool IsLockRotation() const;
-
-	UFUNCTION(BlueprintPure)
-	virtual bool IsBreakAllInput() const;
 	
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")

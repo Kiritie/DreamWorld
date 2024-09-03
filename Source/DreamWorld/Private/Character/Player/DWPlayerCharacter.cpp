@@ -356,15 +356,11 @@ bool ADWPlayerCharacter::OnInteractVoxel(const FVoxelHitResult& InVoxelHitResult
 
 void ADWPlayerCharacter::Turn_Implementation(float InValue)
 {
-	if(IsBreakAllInput()) return;
-
 	Targeting->TargetActorWithAxisInput(InValue);
 }
 
 void ADWPlayerCharacter::MoveForward_Implementation(float InValue)
 {
-	if(IsBreakAllInput()) return;
-
 	FVector Direction;
 	const FRotator Rotation = GetControlRotation();
 	if(IsFlying() || IsSwimming() || IsFloating())
@@ -381,8 +377,6 @@ void ADWPlayerCharacter::MoveForward_Implementation(float InValue)
 
 void ADWPlayerCharacter::MoveRight_Implementation(float InValue)
 {
-	if(IsBreakAllInput()) return;
-	
 	const FRotator Rotation = GetControlRotation();
 	const FRotator YawRotation(0, Rotation.Yaw, 0);
 	const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
@@ -391,8 +385,6 @@ void ADWPlayerCharacter::MoveRight_Implementation(float InValue)
 
 void ADWPlayerCharacter::MoveUp_Implementation(float InValue)
 {
-	if(IsBreakAllInput()) return;
-	
 	if(IsFlying() || IsSwimming() || IsFloating())
 	{
 		const FRotator Rotation = GetControlRotation();

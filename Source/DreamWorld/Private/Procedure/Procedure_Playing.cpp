@@ -50,10 +50,7 @@ void UProcedure_Playing::OnEnter(UProcedureBase* InLastProcedure)
 
 		ISceneActorInterface::Execute_SetActorVisible(UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>(), true);
 
-		if(!UWidgetModuleStatics::HasUserWidget<UWidgetGameHUD>())
-		{
-			UWidgetModuleStatics::CreateUserWidget<UWidgetGameHUD>(UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>());
-		}
+		UWidgetModuleStatics::CreateUserWidget<UWidgetGameHUD>(UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>());
 
 		UWidgetModuleStatics::OpenUserWidget<UWidgetGameHUD>();
 	}

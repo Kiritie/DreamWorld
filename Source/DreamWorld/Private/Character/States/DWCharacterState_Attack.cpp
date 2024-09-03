@@ -65,10 +65,6 @@ void UDWCharacterState_Attack::OnLeave(UFiniteStateBase* InNextState)
 
 	AttackEnd();
 
-	// Character->FreeToAnim();
-	// Character->StopAnimMontage();
-	// Character->AttackAbilityIndex = 0;
-
 	OnAttackStart = nullptr;
 	OnAttackEnd = nullptr;
 }
@@ -144,7 +140,7 @@ void UDWCharacterState_Attack::AttackEnd()
 		case EDWCharacterAttackType::NormalAttack:
 		{
 			Character->SetAttackHitAble(false);
-			if (++Character->AttackAbilityIndex >= Character->GetAttackAbilities().Num())
+			if (++Character->AttackAbilityIndex == Character->GetAttackAbilities().Num())
 			{
 				Character->AttackAbilityIndex = 0;
 			}

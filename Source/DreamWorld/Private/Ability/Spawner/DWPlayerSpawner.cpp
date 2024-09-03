@@ -3,16 +3,14 @@
 #include "Ability/Spawner/DWPlayerSpawner.h"
 
 #include "Ability/AbilityModuleTypes.h"
+#include "Character/Player/DWPlayerCharacter.h"
 #include "Character/Player/DWPlayerCharacterData.h"
 #include "Common/CommonStatics.h"
-#include "Common/DWCommonTypes.h"
 #include "Gameplay/DWPlayerController.h"
-#include "Procedure/ProcedureModuleStatics.h"
-#include "Procedure/Procedure_Playing.h"
 
 ADWPlayerSpawner::ADWPlayerSpawner()
 {
-
+	InventoryInitType = EDWInventoryInitType::Default;
 }
 
 AActor* ADWPlayerSpawner::SpawnImpl_Implementation(const FAbilityItem& InAbilityItem)
@@ -26,13 +24,15 @@ AActor* ADWPlayerSpawner::SpawnImpl_Implementation(const FAbilityItem& InAbility
 	SaveData.Level = InAbilityItem.Level;
 	SaveData.SpawnLocation = GetActorLocation();
 	SaveData.SpawnRotation = GetActorRotation();
-	SaveData.InventoryInitType = EDWInventoryInitType::All;
+	SaveData.InventoryInitType = InventoryInitType;
 
-	UCommonStatics::GetPlayerController<ADWPlayerController>()->LoadSaveData(&SaveData, EPhase::PrimaryAndFinal);
+	ADWPlayerController* PlayerController = UCommonStatics::GetPlayerController<ADWPlayerController>();
+	PlayerController->LoadSaveData(&SaveData, EPhase::PrimaryAndFinal);
 
-	UProcedureModuleStatics::SwitchProcedureByClass<UProcedure_Playing>();
+	ADWPlayerCharacter* PlayerCharacter = PlayerController->GetPlayerPawn<ADWPlayerCharacter>();
+	PlayerCharacter->Execute_SetActorVisible(PlayerCharacter, true);
 
-	return UCommonStatics::GetPlayerPawn();
+	return PlayerCharacter;
 }
 
 void ADWPlayerSpawner::DestroyImpl_Implementation(AActor* InAbilityActor)
