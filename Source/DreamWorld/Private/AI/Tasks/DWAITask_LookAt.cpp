@@ -13,6 +13,8 @@ UDWAITask_LookAt::UDWAITask_LookAt(const FObjectInitializer& ObjectInitializer) 
 {
 	LookAtTargetKey.AddObjectFilter(this, GET_MEMBER_NAME_CHECKED(UDWAITask_LookAt, LookAtTargetKey), ADWCharacter::StaticClass());
 
+	LookAtTargetKey.AllowNoneAsValue(true);
+	
 	LookAtTarget = nullptr;
 }
 
@@ -28,7 +30,7 @@ bool UDWAITask_LookAt::InitTask(UBehaviorTreeComponent& OwnerComp)
 	if (!Super::InitTask(OwnerComp)) return false;
 	
 	LookAtTarget = Cast<ADWCharacter>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(LookAtTargetKey.SelectedKeyName));
-	return LookAtTarget && LookAtTarget->IsValidLowLevel();
+	return true;
 }
 
 void UDWAITask_LookAt::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
@@ -37,9 +39,9 @@ void UDWAITask_LookAt::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMe
 
 	if(!InitTask(OwnerComp)) return;
 
-	if(GetAgent<ADWCharacter>()->GetLooking()->DoLookAtTarget(LookAtTarget))
+	if(LookAtTarget)
 	{
-		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
+		GetAgent<ADWCharacter>()->GetLooking()->DoLookAtTarget(LookAtTarget);
 	}
 }
 

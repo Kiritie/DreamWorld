@@ -11,21 +11,6 @@
 
 UDWAIDecorator_CheckInteresting::UDWAIDecorator_CheckInteresting(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
-	CheckTargetKey.AddObjectFilter(this, GET_MEMBER_NAME_CHECKED(UDWAIDecorator_CheckInteresting, CheckTargetKey), ADWCharacter::StaticClass());
-}
-
-bool UDWAIDecorator_CheckInteresting::InitDecorator(UBehaviorTreeComponent& OwnerComp)
-{
-	if(!Super::InitDecorator(OwnerComp)) return false;
-
-	CheckTarget = Cast<ADWCharacter>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(CheckTargetKey.SelectedKeyName));
-	
-	return CheckTarget && CheckTarget->IsValidLowLevel();
-}
-
-bool UDWAIDecorator_CheckInteresting::InitDecorator(UBehaviorTreeComponent& OwnerComp) const
-{
-	return Super::InitDecorator(OwnerComp);
 }
 
 bool UDWAIDecorator_CheckInteresting::CalculateRawConditionValue(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) const

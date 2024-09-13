@@ -29,9 +29,9 @@
 // ParamSets default values
 UDWInputManager::UDWInputManager()
 {
-	bPressedAttackDestroy = false;
-	bPressedDefendGenerate = false;
-	bPressedSprint = false;
+	bPrimaryPressed = false;
+	bSecondaryPressed = false;
+	bSprintPressed = false;
 	AttackAbilityQueue = 0;
 }
 
@@ -40,15 +40,25 @@ void UDWInputManager::OnInitialize()
 	Super::OnInitialize();
 }
 
+void UDWInputManager::OnReset()
+{
+	Super::OnReset();
+
+	bPrimaryPressed = false;
+	bSecondaryPressed = false;
+	bSprintPressed = false;
+	AttackAbilityQueue = 0;
+}
+
 void UDWInputManager::OnRefresh(float DeltaSeconds)
 {
 	Super::OnRefresh(DeltaSeconds);
 
 	ADWCharacter* PossessedCharacter = UCommonStatics::GetPossessedPawn<ADWCharacter>();
 	
-	if(!PossessedCharacter || !PossessedCharacter->IsActive(true)) return;
+	if(!PossessedCharacter || !PossessedCharacter->IsActive(true) || !PossessedCharacter->InputEnabled()) return;
 
-	if(bPressedSprint)
+	if(bSprintPressed)
 	{
 		PossessedCharacter->Sprint();
 	}
@@ -63,7 +73,7 @@ void UDWInputManager::OnRefresh(float DeltaSeconds)
 		{
 			case EDWCharacterControlMode::Fighting:
 			{
-				if(bPressedAttackDestroy || AttackAbilityQueue > 0)
+				if(bPrimaryPressed || AttackAbilityQueue > 0)
 				{
 					if(PlayerCharacter->Attack() && AttackAbilityQueue > 0)
 					{
@@ -71,7 +81,7 @@ void UDWInputManager::OnRefresh(float DeltaSeconds)
 					}
 				}
 
-				if(bPressedDefendGenerate)
+				if(bSecondaryPressed)
 				{
 					PlayerCharacter->Defend();
 				}
@@ -151,13 +161,26 @@ void UDWInputManager::OnBindAction(UInputComponentBase* InInputComponent)
 	InInputComponent->BindInputAction(GameplayTags::InputTag_OpenGeneratePanel, ETriggerEvent::Started, this, &UDWInputManager::OpenGeneratePanel);
 }
 
+void UDWInputManager::TurnCamera_Implementation(const FInputActionValue& InValue)
+{
+	Super::TurnCamera_Implementation(InValue);
+
+	if(InValue.Get<float>() == 0.f) return;
+
+	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
+	
+	if(!PlayerCharacter || !PlayerCharacter->IsActive(true) || !PlayerCharacter->InputEnabled()) return;
+
+	PlayerCharacter->Targeting->TargetActorWithAxisInput(InValue.Get<float>());
+}
+
 void UDWInputManager::TurnPlayer_Implementation(const FInputActionValue& InValue)
 {
 	if(InValue.Get<float>() == 0.f) return;
 	
 	ADWCharacter* PossessedCharacter = UCommonStatics::GetPossessedPawn<ADWCharacter>();
 
-	if(!PossessedCharacter || !PossessedCharacter->IsActive(true)) return;
+	if(!PossessedCharacter || !PossessedCharacter->IsActive(true) || !PossessedCharacter->InputEnabled()) return;
 
 	IWHPlayerInterface::Execute_Turn(PossessedCharacter, InValue.Get<float>());
 }
@@ -168,7 +191,7 @@ void UDWInputManager::MoveForwardPlayer_Implementation(const FInputActionValue& 
 	
 	ADWCharacter* PossessedCharacter = UCommonStatics::GetPossessedPawn<ADWCharacter>();
 
-	if(!PossessedCharacter || !PossessedCharacter->IsActive(true)) return;
+	if(!PossessedCharacter || !PossessedCharacter->IsActive(true) || !PossessedCharacter->InputEnabled()) return;
 
 	IWHPlayerInterface::Execute_MoveForward(PossessedCharacter, InValue.Get<float>());
 }
@@ -179,7 +202,7 @@ void UDWInputManager::MoveRightPlayer_Implementation(const FInputActionValue& In
 	
 	ADWCharacter* PossessedCharacter = UCommonStatics::GetPossessedPawn<ADWCharacter>();
 
-	if(!PossessedCharacter || !PossessedCharacter->IsActive(true)) return;
+	if(!PossessedCharacter || !PossessedCharacter->IsActive(true) || !PossessedCharacter->InputEnabled()) return;
 
 	IWHPlayerInterface::Execute_MoveRight(PossessedCharacter, InValue.Get<float>());
 }
@@ -190,7 +213,7 @@ void UDWInputManager::MoveUpPlayer_Implementation(const FInputActionValue& InVal
 	
 	ADWCharacter* PossessedCharacter = UCommonStatics::GetPossessedPawn<ADWCharacter>();
 
-	if(!PossessedCharacter || !PossessedCharacter->IsActive(true)) return;
+	if(!PossessedCharacter || !PossessedCharacter->IsActive(true) || !PossessedCharacter->InputEnabled()) return;
 
 	IWHPlayerInterface::Execute_MoveUp(PossessedCharacter, InValue.Get<float>());
 }
@@ -199,7 +222,7 @@ void UDWInputManager::ActionUpPlayer_Implementation(const FInputActionValue& InV
 {
 	ADWCharacter* PossessedCharacter = UCommonStatics::GetPossessedPawn<ADWCharacter>();
 
-	if(!PossessedCharacter || !PossessedCharacter->IsActive(true)) return;
+	if(!PossessedCharacter || !PossessedCharacter->IsActive(true) || !PossessedCharacter->InputEnabled()) return;
 
 	if(InValue.Get<float>() > 0.f)
 	{
@@ -220,7 +243,7 @@ void UDWInputManager::ActionUpPlayer_Implementation(const FInputActionValue& InV
 
 void UDWInputManager::SystemOperation_Implementation()
 {
-	if(UProcedureModuleStatics::IsCurrentProcedureClass<UProcedure_Playing>() || UProcedureModuleStatics::IsCurrentProcedureClass<UProcedure_Testing>())
+	if(UProcedureModuleStatics::IsCurrentProcedureClass<UProcedure_Playing>())
 	{
 		UProcedureModuleStatics::SwitchProcedureByClass<UProcedure_Pausing>();
 	}
@@ -230,21 +253,25 @@ void UDWInputManager::OnSprintPressed()
 {
 	ADWCharacter* PossessedCharacter = UCommonStatics::GetPossessedPawn<ADWCharacter>();
 
-	if(!PossessedCharacter || !PossessedCharacter->IsActive(true)) return;
+	if(!PossessedCharacter || !PossessedCharacter->IsActive(true) || !PossessedCharacter->InputEnabled()) return;
 
-	bPressedSprint = true;
+	bSprintPressed = true;
 }
 
 void UDWInputManager::OnSprintReleased()
 {
-	bPressedSprint = false;
+	ADWCharacter* PossessedCharacter = UCommonStatics::GetPossessedPawn<ADWCharacter>();
+
+	if(!PossessedCharacter) return;
+	
+	bSprintPressed = false;
 }
 
 void UDWInputManager::OnDodgePressed()
 {
 	ADWCharacter* PossessedCharacter = UCommonStatics::GetPossessedPawn<ADWCharacter>();
 
-	if(!PossessedCharacter || !PossessedCharacter->IsActive(true)) return;
+	if(!PossessedCharacter || !PossessedCharacter->IsActive(true) || !PossessedCharacter->InputEnabled()) return;
 
 	PossessedCharacter->Dodge();
 }
@@ -253,7 +280,7 @@ void UDWInputManager::OnDodgeReleased()
 {
 	ADWCharacter* PossessedCharacter = UCommonStatics::GetPossessedPawn<ADWCharacter>();
 
-	if(!PossessedCharacter || !PossessedCharacter->IsActive(true)) return;
+	if(!PossessedCharacter || !PossessedCharacter->IsActive(true) || !PossessedCharacter->InputEnabled()) return;
 
 	// PossessedCharacter->UnDodge();
 }
@@ -262,9 +289,9 @@ void UDWInputManager::OnPrimaryPressed()
 {
 	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
 
-	if(!PlayerCharacter || !PlayerCharacter->IsActive(true)) return;
+	if(!PlayerCharacter || !PlayerCharacter->IsActive(true) || !PlayerCharacter->InputEnabled()) return;
 
-	bPressedAttackDestroy = true;
+	bPrimaryPressed = true;
 	switch (PlayerCharacter->ControlMode)
 	{
 		case EDWCharacterControlMode::Fighting:
@@ -291,9 +318,9 @@ void UDWInputManager::OnPrimaryReleased()
 {
 	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
 
-	if(!PlayerCharacter || !PlayerCharacter->IsActive(true)) return;
+	if(!PlayerCharacter) return;
 
-	bPressedAttackDestroy = false;
+	bPrimaryPressed = false;
 	switch (PlayerCharacter->ControlMode)
 	{
 		case EDWCharacterControlMode::Fighting:
@@ -311,9 +338,9 @@ void UDWInputManager::OnSecondaryPressed()
 {
 	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
 
-	if(!PlayerCharacter || !PlayerCharacter->IsActive(true)) return;
+	if(!PlayerCharacter || !PlayerCharacter->IsActive(true) || !PlayerCharacter->InputEnabled()) return;
 
-	bPressedDefendGenerate = true;
+	bSecondaryPressed = true;
 	switch (PlayerCharacter->ControlMode)
 	{
 		case EDWCharacterControlMode::Fighting:
@@ -336,9 +363,9 @@ void UDWInputManager::OnSecondaryReleased()
 {
 	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
 
-	if(!PlayerCharacter || !PlayerCharacter->IsActive(true)) return;
+	if(!PlayerCharacter) return;
 
-	bPressedDefendGenerate = false;
+	bSecondaryPressed = false;
 	switch (PlayerCharacter->ControlMode)
 	{
 		case EDWCharacterControlMode::Fighting:
@@ -356,7 +383,7 @@ void UDWInputManager::OnThirdPressed()
 {
 	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
 
-	if(!PlayerCharacter || !PlayerCharacter->IsActive(true)) return;
+	if(!PlayerCharacter || !PlayerCharacter->IsActive(true) || !PlayerCharacter->InputEnabled()) return;
 
 	PlayerCharacter->GetTargeting()->TargetActor();
 }
@@ -369,7 +396,7 @@ void UDWInputManager::ToggleControlMode()
 {
 	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
 
-	if(!PlayerCharacter || !PlayerCharacter->IsActive(true)) return;
+	if(!PlayerCharacter || !PlayerCharacter->IsActive(true) || !PlayerCharacter->InputEnabled()) return;
 
 	if(PlayerCharacter->ControlMode == EDWCharacterControlMode::Fighting)
 	{
@@ -385,7 +412,7 @@ void UDWInputManager::ToggleCrouch()
 {
 	ADWCharacter* PossessedCharacter = UCommonStatics::GetPossessedPawn<ADWCharacter>();
 
-	if(!PossessedCharacter || !PossessedCharacter->IsActive(true)) return;
+	if(!PossessedCharacter || !PossessedCharacter->IsActive(true) || !PossessedCharacter->InputEnabled()) return;
 
 	if(!PossessedCharacter->IsCrouching())
 	{
@@ -401,7 +428,7 @@ void UDWInputManager::ChangeHand()
 {
 	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
 
-	if(!PlayerCharacter || !PlayerCharacter->IsActive(true)) return;
+	if(!PlayerCharacter || !PlayerCharacter->IsActive(true) || !PlayerCharacter->InputEnabled()) return;
 
 	PlayerCharacter->ChangeHand();
 }
@@ -410,7 +437,7 @@ void UDWInputManager::ReleaseSkillAbility1()
 {
 	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
 	
-	if(!PlayerCharacter || !PlayerCharacter->IsActive(true)) return;
+	if(!PlayerCharacter || !PlayerCharacter->IsActive(true) || !PlayerCharacter->InputEnabled()) return;
 
 	if(PlayerCharacter->Inventory->GetSlotsBySplitType(ESlotSplitType::Skill).IsValidIndex(0))
 	{
@@ -422,7 +449,7 @@ void UDWInputManager::ReleaseSkillAbility2()
 {
 	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
 	
-	if(!PlayerCharacter || !PlayerCharacter->IsActive(true)) return;
+	if(!PlayerCharacter || !PlayerCharacter->IsActive(true) || !PlayerCharacter->InputEnabled()) return;
 
 	if(PlayerCharacter->Inventory->GetSlotsBySplitType(ESlotSplitType::Skill).IsValidIndex(1))
 	{
@@ -434,7 +461,7 @@ void UDWInputManager::ReleaseSkillAbility3()
 {
 	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
 	
-	if(!PlayerCharacter || !PlayerCharacter->IsActive(true)) return;
+	if(!PlayerCharacter || !PlayerCharacter->IsActive(true) || !PlayerCharacter->InputEnabled()) return;
 
 	if(PlayerCharacter->Inventory->GetSlotsBySplitType(ESlotSplitType::Skill).IsValidIndex(2))
 	{
@@ -446,7 +473,7 @@ void UDWInputManager::ReleaseSkillAbility4()
 {
 	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
 	
-	if(!PlayerCharacter || !PlayerCharacter->IsActive(true)) return;
+	if(!PlayerCharacter || !PlayerCharacter->IsActive(true) || !PlayerCharacter->InputEnabled()) return;
 
 	if(PlayerCharacter->Inventory->GetSlotsBySplitType(ESlotSplitType::Skill).IsValidIndex(3))
 	{
@@ -458,7 +485,7 @@ void UDWInputManager::DoInteract1()
 {
 	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
 	
-	if(!PlayerCharacter) return;
+	if(!PlayerCharacter || !PlayerCharacter->InputEnabled()) return;
 	
 	if(PlayerCharacter->GetInteractableActions().IsValidIndex(0))
 	{
@@ -470,7 +497,7 @@ void UDWInputManager::DoInteract2()
 {
 	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
 	
-	if(!PlayerCharacter) return;
+	if(!PlayerCharacter || !PlayerCharacter->InputEnabled()) return;
 	
 	if(PlayerCharacter->GetInteractableActions().IsValidIndex(1))
 	{
@@ -482,7 +509,7 @@ void UDWInputManager::DoInteract3()
 {
 	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
 	
-	if(!PlayerCharacter) return;
+	if(!PlayerCharacter || !PlayerCharacter->InputEnabled()) return;
 	
 	if(PlayerCharacter->GetInteractableActions().IsValidIndex(2))
 	{
@@ -494,7 +521,7 @@ void UDWInputManager::DoInteract4()
 {
 	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
 	
-	if(!PlayerCharacter) return;
+	if(!PlayerCharacter || !PlayerCharacter->InputEnabled()) return;
 	
 	if(PlayerCharacter->GetInteractableActions().IsValidIndex(3))
 	{
@@ -506,7 +533,7 @@ void UDWInputManager::DoInteract5()
 {
 	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
 	
-	if(!PlayerCharacter) return;
+	if(!PlayerCharacter || !PlayerCharacter->InputEnabled()) return;
 	
 	if(PlayerCharacter->GetInteractableActions().IsValidIndex(4))
 	{
@@ -518,7 +545,7 @@ void UDWInputManager::NextInteract()
 {
 	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
 	
-	if(!PlayerCharacter) return;
+	if(!PlayerCharacter || !PlayerCharacter->InputEnabled()) return;
 	
 	if(PlayerCharacter->GetOverlappingAgents().Num() > 1)
 	{
@@ -530,234 +557,189 @@ void UDWInputManager::UseInventoryItem()
 {
 	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
 	
-	if(!PlayerCharacter || !PlayerCharacter->IsActive(true)) return;
+	if(!PlayerCharacter || !PlayerCharacter->IsActive(true) || !PlayerCharacter->InputEnabled()) return;
 	
-	if(UProcedureModuleStatics::IsCurrentProcedureClass<UProcedure_Playing>() || UProcedureModuleStatics::IsCurrentProcedureClass<UProcedure_Testing>())
-	{
-		UWidgetModuleStatics::GetUserWidget<UWidgetInventoryBar>()->GetSelectedSlot()->UseItem(UInputModuleStatics::GetKeyShortcut(GameplayTags::InputTag_InventoryAll).IsPressing(UCommonStatics::GetPlayerController()) ? -1 : 1);
-	}
+	UWidgetModuleStatics::GetUserWidget<UWidgetInventoryBar>()->GetSelectedSlot()->UseItem(UInputModuleStatics::GetKeyShortcut(GameplayTags::InputTag_InventoryAll).IsPressing(UCommonStatics::GetPlayerController()) ? -1 : 1);
 }
 
 void UDWInputManager::DiscardInventoryItem()
 {
 	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
 	
-	if(!PlayerCharacter || !PlayerCharacter->IsActive(true)) return;
+	if(!PlayerCharacter || !PlayerCharacter->IsActive(true) || !PlayerCharacter->InputEnabled()) return;
 	
-	if(UProcedureModuleStatics::IsCurrentProcedureClass<UProcedure_Playing>() || UProcedureModuleStatics::IsCurrentProcedureClass<UProcedure_Testing>())
-	{
-		UWidgetModuleStatics::GetUserWidget<UWidgetInventoryBar>()->GetSelectedSlot()->DiscardItem(UInputModuleStatics::GetKeyShortcut(GameplayTags::InputTag_InventoryAll).IsPressing(UCommonStatics::GetPlayerController()) ? -1 : 1, false);
-	}
+	UWidgetModuleStatics::GetUserWidget<UWidgetInventoryBar>()->GetSelectedSlot()->DiscardItem(UInputModuleStatics::GetKeyShortcut(GameplayTags::InputTag_InventoryAll).IsPressing(UCommonStatics::GetPlayerController()) ? -1 : 1, false);
 }
 
 void UDWInputManager::PrevInventorySlot()
 {
 	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
 	
-	if(!PlayerCharacter || !PlayerCharacter->IsActive(true) || UInputModuleStatics::GetKeyShortcut(GameplayTags::InputTag_CameraZoom).IsPressing(UCommonStatics::GetPlayerController())) return;
+	if(!PlayerCharacter || !PlayerCharacter->IsActive(true) || !PlayerCharacter->InputEnabled() || UInputModuleStatics::GetKeyShortcut(GameplayTags::InputTag_CameraZoom).IsPressing(UCommonStatics::GetPlayerController())) return;
 	
-	if(UProcedureModuleStatics::IsCurrentProcedureClass<UProcedure_Playing>() || UProcedureModuleStatics::IsCurrentProcedureClass<UProcedure_Testing>())
-	{
-		UWidgetModuleStatics::GetUserWidget<UWidgetInventoryBar>()->PrevInventorySlot();
-	}
+	UWidgetModuleStatics::GetUserWidget<UWidgetInventoryBar>()->PrevInventorySlot();
 }
 
 void UDWInputManager::NextInventorySlot()
 {
 	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
 	
-	if(!PlayerCharacter || !PlayerCharacter->IsActive(true) || UInputModuleStatics::GetKeyShortcut(GameplayTags::InputTag_CameraZoom).IsPressing(UCommonStatics::GetPlayerController())) return;
+	if(!PlayerCharacter || !PlayerCharacter->IsActive(true) || !PlayerCharacter->InputEnabled() || UInputModuleStatics::GetKeyShortcut(GameplayTags::InputTag_CameraZoom).IsPressing(UCommonStatics::GetPlayerController())) return;
 	
-	if(UProcedureModuleStatics::IsCurrentProcedureClass<UProcedure_Playing>() || UProcedureModuleStatics::IsCurrentProcedureClass<UProcedure_Testing>())
-	{
-		UWidgetModuleStatics::GetUserWidget<UWidgetInventoryBar>()->NextInventorySlot();
-	}
+	UWidgetModuleStatics::GetUserWidget<UWidgetInventoryBar>()->NextInventorySlot();
 }
 
 void UDWInputManager::SelectInventorySlot1()
 {
 	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
 	
-	if(!PlayerCharacter || !PlayerCharacter->IsActive(true)) return;
+	if(!PlayerCharacter || !PlayerCharacter->IsActive(true) || !PlayerCharacter->InputEnabled()) return;
 	
-	if(UProcedureModuleStatics::IsCurrentProcedureClass<UProcedure_Playing>() || UProcedureModuleStatics::IsCurrentProcedureClass<UProcedure_Testing>())
-	{
-		UWidgetModuleStatics::GetUserWidget<UWidgetInventoryBar>()->SelectInventorySlot(0);
-	}
+	UWidgetModuleStatics::GetUserWidget<UWidgetInventoryBar>()->SelectInventorySlot(0);
 }
 
 void UDWInputManager::SelectInventorySlot2()
 {
 	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
 	
-	if(!PlayerCharacter || !PlayerCharacter->IsActive(true)) return;
+	if(!PlayerCharacter || !PlayerCharacter->IsActive(true) || !PlayerCharacter->InputEnabled()) return;
 	
-	if(UProcedureModuleStatics::IsCurrentProcedureClass<UProcedure_Playing>() || UProcedureModuleStatics::IsCurrentProcedureClass<UProcedure_Testing>())
-	{
-		UWidgetModuleStatics::GetUserWidget<UWidgetInventoryBar>()->SelectInventorySlot(1);
-	}
+	UWidgetModuleStatics::GetUserWidget<UWidgetInventoryBar>()->SelectInventorySlot(1);
 }
 
 void UDWInputManager::SelectInventorySlot3()
 {
 	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
 	
-	if(!PlayerCharacter || !PlayerCharacter->IsActive(true)) return;
+	if(!PlayerCharacter || !PlayerCharacter->IsActive(true) || !PlayerCharacter->InputEnabled()) return;
 	
-	if(UProcedureModuleStatics::IsCurrentProcedureClass<UProcedure_Playing>() || UProcedureModuleStatics::IsCurrentProcedureClass<UProcedure_Testing>())
-	{
-		UWidgetModuleStatics::GetUserWidget<UWidgetInventoryBar>()->SelectInventorySlot(2);
-	}
+	UWidgetModuleStatics::GetUserWidget<UWidgetInventoryBar>()->SelectInventorySlot(2);
 }
 
 void UDWInputManager::SelectInventorySlot4()
 {
 	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
 	
-	if(!PlayerCharacter || !PlayerCharacter->IsActive(true)) return;
+	if(!PlayerCharacter || !PlayerCharacter->IsActive(true) || !PlayerCharacter->InputEnabled()) return;
 	
-	if(UProcedureModuleStatics::IsCurrentProcedureClass<UProcedure_Playing>() || UProcedureModuleStatics::IsCurrentProcedureClass<UProcedure_Testing>())
-	{
-		UWidgetModuleStatics::GetUserWidget<UWidgetInventoryBar>()->SelectInventorySlot(3);
-	}
+	UWidgetModuleStatics::GetUserWidget<UWidgetInventoryBar>()->SelectInventorySlot(3);
 }
 
 void UDWInputManager::SelectInventorySlot5()
 {
 	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
 	
-	if(!PlayerCharacter || !PlayerCharacter->IsActive(true)) return;
+	if(!PlayerCharacter || !PlayerCharacter->IsActive(true) || !PlayerCharacter->InputEnabled()) return;
 	
-	if(UProcedureModuleStatics::IsCurrentProcedureClass<UProcedure_Playing>() || UProcedureModuleStatics::IsCurrentProcedureClass<UProcedure_Testing>())
-	{
-		UWidgetModuleStatics::GetUserWidget<UWidgetInventoryBar>()->SelectInventorySlot(4);
-	}
+	UWidgetModuleStatics::GetUserWidget<UWidgetInventoryBar>()->SelectInventorySlot(4);
 }
 
 void UDWInputManager::SelectInventorySlot6()
 {
 	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
 	
-	if(!PlayerCharacter || !PlayerCharacter->IsActive(true)) return;
+	if(!PlayerCharacter || !PlayerCharacter->IsActive(true) || !PlayerCharacter->InputEnabled()) return;
 	
-	if(UProcedureModuleStatics::IsCurrentProcedureClass<UProcedure_Playing>() || UProcedureModuleStatics::IsCurrentProcedureClass<UProcedure_Testing>())
-	{
-		UWidgetModuleStatics::GetUserWidget<UWidgetInventoryBar>()->SelectInventorySlot(5);
-	}
+	UWidgetModuleStatics::GetUserWidget<UWidgetInventoryBar>()->SelectInventorySlot(5);
 }
 
 void UDWInputManager::SelectInventorySlot7()
 {
 	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
 	
-	if(!PlayerCharacter || !PlayerCharacter->IsActive(true)) return;
+	if(!PlayerCharacter || !PlayerCharacter->IsActive(true) || !PlayerCharacter->InputEnabled()) return;
 	
-	if(UProcedureModuleStatics::IsCurrentProcedureClass<UProcedure_Playing>() || UProcedureModuleStatics::IsCurrentProcedureClass<UProcedure_Testing>())
-	{
-		UWidgetModuleStatics::GetUserWidget<UWidgetInventoryBar>()->SelectInventorySlot(6);
-	}
+	UWidgetModuleStatics::GetUserWidget<UWidgetInventoryBar>()->SelectInventorySlot(6);
 }
 
 void UDWInputManager::SelectInventorySlot8()
 {
 	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
 	
-	if(!PlayerCharacter || !PlayerCharacter->IsActive(true)) return;
+	if(!PlayerCharacter || !PlayerCharacter->IsActive(true) || !PlayerCharacter->InputEnabled()) return;
 	
-	if(UProcedureModuleStatics::IsCurrentProcedureClass<UProcedure_Playing>() || UProcedureModuleStatics::IsCurrentProcedureClass<UProcedure_Testing>())
-	{
-		UWidgetModuleStatics::GetUserWidget<UWidgetInventoryBar>()->SelectInventorySlot(7);
-	}
+	UWidgetModuleStatics::GetUserWidget<UWidgetInventoryBar>()->SelectInventorySlot(7);
 }
 
 void UDWInputManager::SelectInventorySlot9()
 {
 	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
 	
-	if(!PlayerCharacter || !PlayerCharacter->IsActive(true)) return;
+	if(!PlayerCharacter || !PlayerCharacter->IsActive(true) || !PlayerCharacter->InputEnabled()) return;
 	
-	if(UProcedureModuleStatics::IsCurrentProcedureClass<UProcedure_Playing>() || UProcedureModuleStatics::IsCurrentProcedureClass<UProcedure_Testing>())
-	{
-		UWidgetModuleStatics::GetUserWidget<UWidgetInventoryBar>()->SelectInventorySlot(8);
-	}
+	UWidgetModuleStatics::GetUserWidget<UWidgetInventoryBar>()->SelectInventorySlot(8);
 }
 
 void UDWInputManager::SelectInventorySlot10()
 {
 	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
 	
-	if(!PlayerCharacter || !PlayerCharacter->IsActive(true)) return;
+	if(!PlayerCharacter || !PlayerCharacter->IsActive(true) || !PlayerCharacter->InputEnabled()) return;
 	
-	if(UProcedureModuleStatics::IsCurrentProcedureClass<UProcedure_Playing>() || UProcedureModuleStatics::IsCurrentProcedureClass<UProcedure_Testing>())
-	{
-		UWidgetModuleStatics::GetUserWidget<UWidgetInventoryBar>()->SelectInventorySlot(9);
-	}
+	UWidgetModuleStatics::GetUserWidget<UWidgetInventoryBar>()->SelectInventorySlot(9);
 }
 
 void UDWInputManager::ZoomInMiniMap()
 {
-	if(UProcedureModuleStatics::IsCurrentProcedureClass<UProcedure_Playing>() || UProcedureModuleStatics::IsCurrentProcedureClass<UProcedure_Testing>())
-	{
-		USceneModuleStatics::SetMiniMapRange(USceneModuleStatics::GetMiniMapRange() + 1000.f);
-	}
+	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
+	
+	if(!PlayerCharacter || !PlayerCharacter->InputEnabled()) return;
+	
+	USceneModuleStatics::SetMiniMapRange(USceneModuleStatics::GetMiniMapRange() + 1000.f);
 }
 
 void UDWInputManager::ZoomOutMiniMap()
 {
-	if(UProcedureModuleStatics::IsCurrentProcedureClass<UProcedure_Playing>() || UProcedureModuleStatics::IsCurrentProcedureClass<UProcedure_Testing>())
-	{
-		USceneModuleStatics::SetMiniMapRange(USceneModuleStatics::GetMiniMapRange() - 1000.f);
-	}
+	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
+	
+	if(!PlayerCharacter || !PlayerCharacter->InputEnabled()) return;
+	
+	USceneModuleStatics::SetMiniMapRange(USceneModuleStatics::GetMiniMapRange() - 1000.f);
 }
 
 void UDWInputManager::OpenMaxMapBox()
 {
-	if(UProcedureModuleStatics::IsCurrentProcedureClass<UProcedure_Playing>() || UProcedureModuleStatics::IsCurrentProcedureClass<UProcedure_Testing>())
-	{
-		UWidgetModuleStatics::OpenUserWidget<UWidgetMaxMapBox>();
-	}
+	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
+	
+	if(!PlayerCharacter || !PlayerCharacter->InputEnabled()) return;
+	
+	UWidgetModuleStatics::OpenUserWidget<UWidgetMaxMapBox>();
 }
 
 void UDWInputManager::OpenInventoryPanel()
 {
 	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
 	
-	if(!PlayerCharacter || !PlayerCharacter->IsActive(true)) return;
+	if(!PlayerCharacter || !PlayerCharacter->IsActive(true) || !PlayerCharacter->InputEnabled()) return;
 	
-	if(UProcedureModuleStatics::IsCurrentProcedureClass<UProcedure_Playing>() || UProcedureModuleStatics::IsCurrentProcedureClass<UProcedure_Testing>())
-	{
-		UWidgetModuleStatics::OpenUserWidget<UWidgetInventoryPanel>();
-	}
+	UWidgetModuleStatics::OpenUserWidget<UWidgetInventoryPanel>();
 }
 
 void UDWInputManager::OpenGeneratePanel()
 {
 	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
 	
-	if(!PlayerCharacter || !PlayerCharacter->IsActive(true)) return;
+	if(!PlayerCharacter || !PlayerCharacter->IsActive(true) || !PlayerCharacter->InputEnabled()) return;
 	
-	if(UProcedureModuleStatics::IsCurrentProcedureClass<UProcedure_Playing>() || UProcedureModuleStatics::IsCurrentProcedureClass<UProcedure_Testing>())
+	if(AVoxelInteractAuxiliary* InteractionAgent = PlayerCharacter->GetInteractingAgent<AVoxelInteractAuxiliary>())
 	{
-		if(AVoxelInteractAuxiliary* InteractionAgent = PlayerCharacter->GetInteractingAgent<AVoxelInteractAuxiliary>())
+		switch(InteractionAgent->GetVoxelItem().GetVoxelType())
 		{
-			switch(InteractionAgent->GetVoxelItem().GetVoxelType())
+			case EVoxelType::Furnace:
+			case EVoxelType::Crafting_Table:
 			{
-				case EVoxelType::Furnace:
-				case EVoxelType::Crafting_Table:
-				{
-					PlayerCharacter->DoInteract((EInteractAction)EVoxelInteractAction::Open, InteractionAgent);
-					break;
-				}
-				default:
-				{
-					UWidgetModuleStatics::OpenUserWidget<UWidgetGeneratePanel>();
-					break;
-				}
+				PlayerCharacter->DoInteract((EInteractAction)EVoxelInteractAction::Open, InteractionAgent);
+				break;
+			}
+			default:
+			{
+				UWidgetModuleStatics::OpenUserWidget<UWidgetGeneratePanel>();
+				break;
 			}
 		}
-		else
-		{
-			UWidgetModuleStatics::OpenUserWidget<UWidgetGeneratePanel>();
-		}
+	}
+	else
+	{
+		UWidgetModuleStatics::OpenUserWidget<UWidgetGeneratePanel>();
 	}
 }

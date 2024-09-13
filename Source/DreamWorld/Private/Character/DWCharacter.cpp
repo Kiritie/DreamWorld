@@ -151,6 +151,24 @@ void ADWCharacter::OnRefresh_Implementation(float DeltaSeconds)
 			ModifyStamina(ATTRIBUTE_DELTAVALUE_CLAMP(this, Stamina, GetStaminaRegenSpeed() * DeltaSeconds));
 		}
 
+		if(GetStamina() < FMath::Min(GetMaxStamina() * 0.1f, 10.f))
+		{
+			if(!IsExhausted())
+			{
+				UnSprint();
+				UnFly();
+				UnDefend();
+				AbilitySystem->AddLooseGameplayTag(GameplayTags::StateTag_Character_Exhausted);
+			}
+		}
+		else if(GetStamina() > FMath::Min(GetMaxStamina() * 0.2f, 20.f))
+		{
+			if(IsExhausted())
+			{
+				AbilitySystem->RemoveLooseGameplayTag(GameplayTags::StateTag_Character_Exhausted);
+			}
+		}
+
 		if(GetActorLocation().Z < 0)
 		{
 			Death();
@@ -185,11 +203,14 @@ void ADWCharacter::LoadData(FSaveData* InSaveData, EPhase InPhase)
 			SaveData.InventoryData = SaveData.GetItemData<UDWCharacterData>().InventoryData;
 
 			auto EquipDatas = UAssetModuleStatics::LoadPrimaryAssets<UAbilityEquipDataBase>(FName("Equip"));
-			const int32 EquipNum = FMath::Clamp(FMath::Rand() < 0.2f ? FMath::RandRange(1, 3) : 0, 0, EquipDatas.Num());
+			const int32 EquipNum = FMath::Clamp(FMath::Rand() < 0.3f ? FMath::RandRange(1, 2) : 0, 0, EquipDatas.Num());
 			for (int32 i = 0; i < EquipNum; i++)
 			{
-				FAbilityItem tmpItem = FAbilityItem(EquipDatas[FMath::RandRange(0, EquipDatas.Num() - 1)]->GetPrimaryAssetId(), 1);
+				if(EquipDatas.IsEmpty()) break;
+				const int32 tmpIndex = FMath::RandRange(0, EquipDatas.Num() - 1);
+				FAbilityItem tmpItem = FAbilityItem(EquipDatas[tmpIndex]->GetPrimaryAssetId(), 1);
 				SaveData.InventoryData.AddItem(tmpItem, { ESlotSplitType::Default });
+				EquipDatas.RemoveAt(tmpIndex);
 			}
 		}
 	}
@@ -407,6 +428,41 @@ void ADWCharacter::OnAuxiliaryItem(const FAbilityItem& InItem)
 	Super::OnAuxiliaryItem(InItem);
 }
 
+bool ADWCharacter::OnPickUp(AAbilityPickUpBase* InPickUp)
+{
+	return Super::OnPickUp(InPickUp);
+}
+
+bool ADWCharacter::OnGenerateVoxel(const FVoxelHitResult& InVoxelHitResult)
+{
+	if(!GenerateVoxelID.IsValid()) return false;
+	
+	FItemQueryInfo ItemQueryInfo = Inventory->QueryItemByRange(EItemQueryType::Remove, FAbilityItem(GenerateVoxelID, 1), -1);
+	if(ItemQueryInfo.IsValid() && DoAction(EDWCharacterActionType::Generate))
+	{
+		if(Super::OnGenerateVoxel(InVoxelHitResult))
+		{
+			Inventory->RemoveItemByQueryInfo(ItemQueryInfo);
+			UAchievementModuleStatics::UnlockAchievement(FName("FirstGenerateVoxel"));
+			return true;
+		}
+	}
+	return false;
+}
+
+bool ADWCharacter::OnDestroyVoxel(const FVoxelHitResult& InVoxelHitResult)
+{
+	if(DoAction(EDWCharacterActionType::Destroy))
+	{
+		if(Super::OnDestroyVoxel(InVoxelHitResult))
+		{
+			UAchievementModuleStatics::UnlockAchievement(FName("FirstDestroyVoxel"));
+			return true;
+		}
+	}
+	return false;
+}
+
 void ADWCharacter::FreeToAnim(bool bUnLockRotation /*= true*/)
 {
 	if(!IsFreeToAnim())
@@ -583,31 +639,32 @@ bool ADWCharacter::Attack(int32 InAbilityIndex /*= -1*/, const FSimpleDelegate& 
 			const auto AbilityData = GetAttackAbility(InAbilityIndex);
 			if(CheckWeaponType(AbilityData.WeaponType))
 			{
-				if(FSM->SwitchStateByClass<UDWCharacterState_Attack>({ &OnStart, &OnEnd }))
+				if(FSM->SwitchStateByClass<UDWCharacterState_Attack>({ &AbilityData.AbilityHandle, (uint8)EDWCharacterAttackType::NormalAttack, &OnStart, &OnEnd }))
 				{
-					if(AbilitySystem->TryActivateAbility(AbilityData.AbilityHandle))
-					{
-						AttackType = EDWCharacterAttackType::NormalAttack;
-						AttackAbilityIndex = InAbilityIndex;
-						return true;
-					}
-					UnAttack();
+					AttackAbilityIndex = InAbilityIndex;
+					return true;
 				}
 			}
 		}
 	}
-	else if(FallingAttackAbility.IsValid())
+	else
 	{
+		return FallingAttack(OnStart, OnEnd);
+	}
+	return false;
+}
+
+bool ADWCharacter::FallingAttack(const FSimpleDelegate& OnStart/* = nullptr*/, const FSimpleDelegate& OnEnd/* = nullptr*/)
+{
+	if(FallingAttackAbility.IsValid())
+	{
+		if(!IsFalling()) Jump();
+
 		if(CheckWeaponType(FallingAttackAbility.WeaponType))
 		{
-			if(FSM->SwitchStateByClass<UDWCharacterState_Attack>({ &OnStart, &OnEnd }))
+			if(FSM->SwitchStateByClass<UDWCharacterState_Attack>({ &FallingAttackAbility.AbilityHandle, (uint8)EDWCharacterAttackType::FallingAttack, &OnStart, &OnEnd }))
 			{
-				if(AbilitySystem->TryActivateAbility(FallingAttackAbility.AbilityHandle))
-				{
-					AttackType = EDWCharacterAttackType::FallingAttack;
-					return true;
-				}
-				UnAttack();
+				return true;
 			}
 		}
 	}
@@ -637,15 +694,10 @@ bool ADWCharacter::SkillAttack(const FAbilityItem& InAbilityItem, const FSimpleD
 	const auto AbilityData = GetSkillAbility(InAbilityItem.ID);
 	if(CheckWeaponType(AbilityData.WeaponType))
 	{
-		if(FSM->SwitchStateByClass<UDWCharacterState_Attack>({ &OnStart, &OnEnd }))
+		if(FSM->SwitchStateByClass<UDWCharacterState_Attack>({ &AbilityData.AbilityHandle, (uint8)EDWCharacterAttackType::SkillAttack, &OnStart, &OnEnd }))
 		{
-			if(AbilitySystem->TryActivateAbility(AbilityData.AbilityHandle))
-			{
-				AttackType = EDWCharacterAttackType::SkillAttack;
-				SkillAbilityItem = InAbilityItem;
-				return true;
-			}
-			UnAttack();
+			SkillAbilityItem = InAbilityItem;
+			return true;
 		}
 	}
 	return false;
@@ -670,41 +722,6 @@ void ADWCharacter::UnDefend()
 	{
 		FSM->SwitchState(nullptr);
 	}
-}
-
-bool ADWCharacter::OnPickUp(AAbilityPickUpBase* InPickUp)
-{
-	return Super::OnPickUp(InPickUp);
-}
-
-bool ADWCharacter::OnGenerateVoxel(const FVoxelHitResult& InVoxelHitResult)
-{
-	if(!GenerateVoxelID.IsValid()) return false;
-	
-	FItemQueryInfo ItemQueryInfo = Inventory->QueryItemByRange(EItemQueryType::Remove, FAbilityItem(GenerateVoxelID, 1), -1);
-	if(ItemQueryInfo.IsValid() && DoAction(EDWCharacterActionType::Generate))
-	{
-		if(Super::OnGenerateVoxel(InVoxelHitResult))
-		{
-			Inventory->RemoveItemByQueryInfo(ItemQueryInfo);
-			UAchievementModuleStatics::UnlockAchievement(FName("FirstGenerateVoxel"));
-			return true;
-		}
-	}
-	return false;
-}
-
-bool ADWCharacter::OnDestroyVoxel(const FVoxelHitResult& InVoxelHitResult)
-{
-	if(DoAction(EDWCharacterActionType::Destroy))
-	{
-		if(Super::OnDestroyVoxel(InVoxelHitResult))
-		{
-			UAchievementModuleStatics::UnlockAchievement(FName("FirstDestroyVoxel"));
-			return true;
-		}
-	}
-	return false;
 }
 
 bool ADWCharacter::DoAction(EDWCharacterActionType InActionType)
@@ -1278,7 +1295,7 @@ UBehaviorTree* ADWCharacter::GetBehaviorTreeAsset() const
 	{
 		case EDWCharacterNature::AINeutral:
 		{
-			if(UDWAIBlackboard* Blackboard = GetController<ADWAIController>()->GetBlackboard<UDWAIBlackboard>())
+			if(UDWAIBlackboard* Blackboard = GetBlackboard<UDWAIBlackboard>())
 			{
 				return !Blackboard->GetIsExcessived() ? CharacterData.DefaultBehaviorTree : CharacterData.ExcessiveBehaviorTree;
 			}
@@ -1324,22 +1341,6 @@ void ADWCharacter::OnAttributeChange(const FOnAttributeChangeData& InAttributeCh
 		{
 			GetCharacterHPWidget()->SetStaminaPercent(GetStamina(), GetMaxStamina());
 		}
-		if(GetStamina() <= 0.f)
-		{
-			if(!IsExhausted())
-			{
-				UnSprint();
-				UnFly();
-				AbilitySystem->AddLooseGameplayTag(GameplayTags::StateTag_Character_Exhausted);
-			}
-		}
-		else if(GetStamina() >= GetMaxStamina() * 0.1f)
-		{
-			if(IsExhausted())
-			{
-				AbilitySystem->RemoveLooseGameplayTag(GameplayTags::StateTag_Character_Exhausted);
-			}
-		}
 	}
 	else if(InAttributeChangeData.Attribute == GetMaxStaminaAttribute())
 	{
@@ -1370,39 +1371,22 @@ void ADWCharacter::OnAttributeChange(const FOnAttributeChangeData& InAttributeCh
 void ADWCharacter::HandleDamage(EDamageType DamageType, const float LocalDamageDone, bool bHasCrited, bool bHasDefend, FHitResult HitResult, const FGameplayTagContainer& SourceTags, AActor* SourceActor)
 {
 	Super::HandleDamage(DamageType, LocalDamageDone, bHasCrited, bHasDefend, HitResult, SourceTags, SourceActor);
-	
-	if(SourceActor && SourceActor != this)
+
+	if(!IsDead())
 	{
-		if(ADWCharacter* SourceCharacter = Cast<ADWCharacter>(SourceActor))
+		if(!bHasDefend)
 		{
-			if(DamageType == EDamageType::Physics)
-			{
-				UEffectBase* Effect = UObjectPoolModuleStatics::SpawnObject<UEffectBase>();
+			DoAction(EDWCharacterActionType::GetHit);
+		}
 
-				FGameplayModifierInfo ModifierInfo;
-				ModifierInfo.Attribute = GET_GAMEPLAYATTRIBUTE_PROPERTY(UVitalityAttributeSetBase, Recovery);
-				ModifierInfo.ModifierOp = EGameplayModOp::Override;
-				ModifierInfo.ModifierMagnitude = FGameplayEffectModifierMagnitude(LocalDamageDone * SourceCharacter->GetAttackStealRate());
+		ADWCharacter* SourceCharacter = Cast<ADWCharacter>(SourceActor);
 
-				Effect->Modifiers.Add(ModifierInfo);
-		
-				FGameplayEffectContextHandle EffectContext = SourceCharacter->GetAbilitySystemComponent()->MakeEffectContext();
-				EffectContext.AddSourceObject(SourceCharacter);
-				SourceCharacter->GetAbilitySystemComponent()->ApplyGameplayEffectToSelf(Effect, 0, EffectContext);
-
-				UObjectPoolModuleStatics::DespawnObject(Effect);
-			}
-			if(ADWAIController* AIController = GetController<ADWAIController>())
+		if(SourceCharacter && SourceCharacter != this)
+		{
+			if(UDWAIBlackboard* Blackboard = GetBlackboard<UDWAIBlackboard>())
 			{
-				if(UDWAIBlackboard* Blackboard = AIController->GetBlackboard<UDWAIBlackboard>())
-				{
-					Blackboard->SetTargetAgent(SourceCharacter);
-					Blackboard->SetIsExcessived(true);
-				}
-			}
-			if(!bHasDefend)
-			{
-				DoAction(EDWCharacterActionType::GetHit);
+				Blackboard->SetTargetAgent(SourceCharacter);
+				Blackboard->SetIsExcessived(true);
 			}
 		}
 	}

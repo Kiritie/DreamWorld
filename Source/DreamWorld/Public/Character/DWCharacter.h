@@ -104,6 +104,13 @@ public:
 
 	virtual void OnAuxiliaryItem(const FAbilityItem& InItem) override;
 
+	virtual bool OnPickUp(AAbilityPickUpBase* InPickUp) override;
+
+	virtual bool OnGenerateVoxel(const FVoxelHitResult& InVoxelHitResult) override;
+
+	virtual bool OnDestroyVoxel(const FVoxelHitResult& InVoxelHitResult) override;
+
+public:
 	UFUNCTION(BlueprintCallable)
 	virtual void FreeToAnim(bool bUnLockRotation = true);
 
@@ -168,6 +175,8 @@ public:
 
 	virtual bool Attack(int32 InAbilityIndex = -1, const FSimpleDelegate& OnStart = nullptr, const FSimpleDelegate& OnEnd = nullptr);
 
+	virtual bool FallingAttack(const FSimpleDelegate& OnStart = nullptr, const FSimpleDelegate& OnEnd = nullptr);
+
 	virtual bool SkillAttack(const FPrimaryAssetId& InSkillID, const FSimpleDelegate& OnStart = nullptr, const FSimpleDelegate& OnEnd = nullptr);
 
 	virtual bool SkillAttack(ESkillType InSkillType, int32 InAbilityIndex = -1, const FSimpleDelegate& OnStart = nullptr, const FSimpleDelegate& OnEnd = nullptr);
@@ -183,13 +192,6 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual void UnDefend();
 
-	virtual bool OnPickUp(AAbilityPickUpBase* InPickUp) override;
-
-	virtual bool OnGenerateVoxel(const FVoxelHitResult& InVoxelHitResult) override;
-
-	virtual bool OnDestroyVoxel(const FVoxelHitResult& InVoxelHitResult) override;
-
-public:
 	UFUNCTION(BlueprintCallable)
 	virtual bool DoAction(EDWCharacterActionType InActionType);
 
@@ -199,6 +201,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual void EndAction(EDWCharacterActionType InActionType, bool bWasCancelled);
 
+public:
 	UFUNCTION(BlueprintCallable)
 	virtual void AIMoveTo(FVector InTargetLocation, float InMoveStopDistance = 10.f, bool bMulticast = false) override;
 

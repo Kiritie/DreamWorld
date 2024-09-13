@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "AI/Base/Tasks/AITask_Duration.h"
+#include "DWAITask_LookAt.h"
 #include "DWAITask_MoveTo.generated.h"
 
 class ADWCharacter;
@@ -11,7 +11,7 @@ class ADWCharacter;
  * AI任务_自动寻路
  */
 UCLASS()
-class DREAMWORLD_API UDWAITask_MoveTo : public UAITask_Duration
+class DREAMWORLD_API UDWAITask_MoveTo : public UDWAITask_LookAt
 {
 	GENERATED_UCLASS_BODY()
 

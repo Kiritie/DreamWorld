@@ -5,7 +5,6 @@
 
 #include "Ability/Components/DWAbilitySystemComponent.h"
 #include "Ability/AbilityModuleStatics.h"
-#include "Ability/Effects/EffectBase.h"
 #include "Ability/Vitality/DWVitalityAttributeSet.h"
 #include "Ability/Item/Prop/AbilityPropDataBase.h"
 #include "Character/DWCharacter.h"
@@ -18,7 +17,6 @@
 #include "Widget/World/WidgetVitalityHP.h"
 #include "Widget/World/WorldWidgetComponent.h"
 #include "Inventory/DWVitalityInventory.h"
-#include "ObjectPool/ObjectPoolModuleStatics.h"
 
 // Sets default values
 
@@ -67,11 +65,14 @@ void ADWVitality::LoadData(FSaveData* InSaveData, EPhase InPhase)
 		if(!SaveData.InventoryData.IsSaved())
 		{
 			auto PropDatas = UAssetModuleStatics::LoadPrimaryAssets<UAbilityPropDataBase>(FName("Prop"));
-			const int32 PropNum = FMath::Clamp(FMath::Rand() < 0.2f ? FMath::RandRange(1, 3) : 0, 0, PropDatas.Num());
+			const int32 PropNum = FMath::Clamp(FMath::Rand() < 0.3f ? FMath::RandRange(1, 2) : 0, 0, PropDatas.Num());
 			for (int32 i = 0; i < PropNum; i++)
 			{
-				FAbilityItem tmpItem = FAbilityItem(PropDatas[FMath::RandRange(0, PropDatas.Num() - 1)]->GetPrimaryAssetId(), 1);
+				if(PropDatas.IsEmpty()) break;
+				const int32 tmpIndex = FMath::RandRange(0, PropDatas.Num() - 1);
+				FAbilityItem tmpItem = FAbilityItem(PropDatas[tmpIndex]->GetPrimaryAssetId(), 1);
 				SaveData.InventoryData.AddItem(tmpItem, { ESlotSplitType::Default });
+				PropDatas.RemoveAt(tmpIndex);
 			}
 		}
 	}
@@ -247,30 +248,6 @@ void ADWVitality::OnAttributeChange(const FOnAttributeChangeData& InAttributeCha
 void ADWVitality::HandleDamage(EDamageType DamageType, const float LocalDamageDone, bool bHasCrited, bool bHasDefend, FHitResult HitResult, const FGameplayTagContainer& SourceTags, AActor* SourceActor)
 {
 	Super::HandleDamage(DamageType, LocalDamageDone, bHasCrited, bHasDefend, HitResult, SourceTags, SourceActor);
-	
-	if(SourceActor && SourceActor != this)
-	{
-		if(ADWCharacter* SourceCharacter = Cast<ADWCharacter>(SourceActor))
-		{
-			if(DamageType == EDamageType::Physics)
-			{
-				UEffectBase* Effect = UObjectPoolModuleStatics::SpawnObject<UEffectBase>();
-
-				FGameplayModifierInfo ModifierInfo;
-				ModifierInfo.Attribute = GET_GAMEPLAYATTRIBUTE_PROPERTY(UVitalityAttributeSetBase, Recovery);
-				ModifierInfo.ModifierOp = EGameplayModOp::Override;
-				ModifierInfo.ModifierMagnitude = FGameplayEffectModifierMagnitude(LocalDamageDone * SourceCharacter->GetAttackStealRate());
-
-				Effect->Modifiers.Add(ModifierInfo);
-		
-				FGameplayEffectContextHandle EffectContext = SourceCharacter->GetAbilitySystemComponent()->MakeEffectContext();
-				EffectContext.AddSourceObject(SourceCharacter);
-				SourceCharacter->GetAbilitySystemComponent()->ApplyGameplayEffectToSelf(Effect, 0, EffectContext);
-
-				UObjectPoolModuleStatics::DespawnObject(Effect);
-			}
-		}
-	}
 }
 
 void ADWVitality::HandleRecovery(const float LocalRecoveryDone, FHitResult HitResult, const FGameplayTagContainer& SourceTags, AActor* SourceActor)

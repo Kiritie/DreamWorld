@@ -52,7 +52,7 @@ public:
 		return Members.Num();
 	}
 
-	FORCEINLINE bool IsCaptain(IDWTeamAgentInterface* InMember) const;
+	bool IsCaptain(IDWTeamAgentInterface* InMember) const;
 
 	FORCEINLINE bool IsValid() const override
 	{

@@ -23,7 +23,7 @@ public:
 public:
 	virtual void OnInitialize(UFSMComponent* InFSM, int32 InStateIndex) override;
 
-	virtual bool OnEnterValidate(UFiniteStateBase* InLastState, const TArray<FParameter>& InParams) override;
+	virtual bool OnPreEnter(UFiniteStateBase* InLastState, const TArray<FParameter>& InParams) override;
 
 	virtual void OnEnter(UFiniteStateBase* InLastState, const TArray<FParameter>& InParams) override;
 	
@@ -34,5 +34,5 @@ public:
 	virtual void OnTermination() override;
 
 protected:
-	virtual void TrySwitchToWalk() override;
+	virtual void TryLeave() override;
 };

@@ -12,11 +12,11 @@
 #include "Procedure/ProcedureModuleStatics.h"
 #include "SaveGame/SaveGameModuleStatics.h"
 #include "ObjectPool/ObjectPoolModuleStatics.h"
-#include "Voxel/Chunks/VoxelChunk.h"
 #include "Procedure/Archive/Procedure_ArchiveCreating.h"
 #include "Character/CharacterModuleStatics.h"
 #include "Input/InputModule.h"
 #include "Main/MainModule.h"
+#include "Voxel/VoxelModuleStatics.h"
 
 ADWPlayerController::ADWPlayerController()
 {
@@ -54,11 +54,11 @@ void ADWPlayerController::LoadData(FSaveData* InSaveData, EPhase InPhase)
 		bool bNeedSpawn = true;
 		if(PlayerCharacter)
 		{
+			SaveData.SpawnLocation = PlayerCharacter->GetActorLocation();
 			if(PlayerCharacter->Execute_GetAssetID(PlayerCharacter) == SaveData.AssetID)
 			{
 				bNeedSpawn = false;
 			}
-			SaveData.SpawnLocation = PlayerCharacter->GetActorLocation();
 		}
 		if(bNeedSpawn)
 		{
@@ -67,14 +67,17 @@ void ADWPlayerController::LoadData(FSaveData* InSaveData, EPhase InPhase)
 			SetPlayerPawn(PlayerCharacter);
 			PlayerCharacter->LoadSaveData(&SaveData, EPhase::Primary);
 			PlayerCharacter->Execute_SetActorVisible(PlayerCharacter, UProcedureModuleStatics::IsCurrentProcedureClass<UProcedure_ArchiveCreating>());
+			PlayerCharacter->DisableInput(nullptr);
 		}
 	}
-	if(PHASEC(InPhase, EPhase::LesserAndFinal))
+	if(PHASEC(InPhase, EPhase::Lesser))
 	{
-		PlayerCharacter->LoadSaveData(&SaveData, EPhase::LesserAndFinal);
+		PlayerCharacter->LoadSaveData(&SaveData, EPhase::Lesser);
 	}
 	if(PHASEC(InPhase, EPhase::Final))
 	{
+		PlayerCharacter->LoadSaveData(&SaveData, EPhase::Final);
+		PlayerCharacter->EnableInput(nullptr);
 		UCharacterModuleStatics::SwitchCharacter(PlayerCharacter, true);
 		if(SaveData.IsSaved())
 		{
@@ -99,10 +102,13 @@ void ADWPlayerController::UnloadData(EPhase InPhase)
 		{
 			UObjectPoolModuleStatics::DespawnObject(PlayerCharacter);
 			SetPlayerPawn(nullptr);
+			UCharacterModuleStatics::SwitchCharacter(nullptr);
 		}
 		if(PHASEC(InPhase, EPhase::Lesser))
 		{
 			PlayerCharacter->Execute_SetActorVisible(PlayerCharacter, false);
+			PlayerCharacter->DisableInput(nullptr);
+			UCharacterModuleStatics::SwitchCharacter(nullptr);
 		}
 	}
 }

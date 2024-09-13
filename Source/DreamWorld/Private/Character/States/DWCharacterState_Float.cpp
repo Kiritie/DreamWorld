@@ -21,9 +21,9 @@ void UDWCharacterState_Float::OnInitialize(UFSMComponent* InFSM, int32 InStateIn
 	Super::OnInitialize(InFSM, InStateIndex);
 }
 
-bool UDWCharacterState_Float::OnEnterValidate(UFiniteStateBase* InLastState, const TArray<FParameter>& InParams)
+bool UDWCharacterState_Float::OnPreEnter(UFiniteStateBase* InLastState, const TArray<FParameter>& InParams)
 {
-	if(!Super::OnEnterValidate(InLastState, InParams)) return false;
+	if(!Super::OnPreEnter(InLastState, InParams)) return false;
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 

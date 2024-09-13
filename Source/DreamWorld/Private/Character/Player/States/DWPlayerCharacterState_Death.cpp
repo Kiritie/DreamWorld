@@ -4,10 +4,11 @@
 
 #include "Achievement/AchievementModuleStatics.h"
 #include "Character/Player/DWPlayerCharacter.h"
-#include "Gameplay/WHGameInstance.h"
-#include "Common/CommonStatics.h"
 #include "Common/Interaction/InteractionComponent.h"
 #include "Common/Targeting/TargetingComponent.h"
+#include "Input/InputModule.h"
+#include "Widget/WidgetGameHUD.h"
+#include "Widget/WidgetModuleStatics.h"
 
 UDWPlayerCharacterState_Death::UDWPlayerCharacterState_Death()
 {
@@ -19,9 +20,9 @@ void UDWPlayerCharacterState_Death::OnInitialize(UFSMComponent* InFSM, int32 InS
 	Super::OnInitialize(InFSM, InStateIndex);
 }
 
-bool UDWPlayerCharacterState_Death::OnEnterValidate(UFiniteStateBase* InLastState, const TArray<FParameter>& InParams)
+bool UDWPlayerCharacterState_Death::OnPreEnter(UFiniteStateBase* InLastState, const TArray<FParameter>& InParams)
 {
-	return Super::OnEnterValidate(InLastState, InParams);
+	return Super::OnPreEnter(InLastState, InParams);
 }
 
 void UDWPlayerCharacterState_Death::OnEnter(UFiniteStateBase* InLastState, const TArray<FParameter>& InParams)
@@ -33,8 +34,15 @@ void UDWPlayerCharacterState_Death::OnEnter(UFiniteStateBase* InLastState, const
 	PlayerCharacter->GetTargeting()->TargetLockOff();
 
 	PlayerCharacter->GetInteractionComponent()->SetInteractable(false);
-	
+
 	UAchievementModuleStatics::UnlockAchievement(FName("FirstDeath"));
+	
+	UInputModule::Get().Reset();
+	
+	if(UWidgetModuleStatics::GetUserWidget<UWidgetGameHUD>()->GetTemporaryChild())
+	{
+		UWidgetModuleStatics::GetUserWidget<UWidgetGameHUD>()->GetTemporaryChild()->Close();
+	}
 }
 
 void UDWPlayerCharacterState_Death::OnRefresh(float DeltaSeconds)

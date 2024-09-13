@@ -4,7 +4,6 @@
 #include "Voxel/DWVoxelModule.h"
 
 #include "Components/StaticMeshComponent.h"
-#include "Common/CommonStatics.h"
 #include "Voxel/DWVoxelChunk.h"
 #include "Voxel/VoxelModuleStatics.h"
 #include "SaveGame/SaveGameModuleStatics.h"

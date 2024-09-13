@@ -3,15 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "AI/Base/AIDecoratorBase.h"
+#include "DWAIDecorator_CheckTarget.h"
 #include "DWAIDecorator_CheckDistance.generated.h"
 
-class ADWCharacter;
 /**
  * 
  */
 UCLASS()
-class DREAMWORLD_API UDWAIDecorator_CheckDistance : public UAIDecoratorBase
+class DREAMWORLD_API UDWAIDecorator_CheckDistance : public UDWAIDecorator_CheckTarget
 {
 	GENERATED_UCLASS_BODY()
 
@@ -24,14 +23,8 @@ protected:
 
 protected:
 	UPROPERTY(EditAnywhere, Category = "Blackboard")
-	FBlackboardKeySelector CheckTargetKey;
-
-	UPROPERTY(EditAnywhere, Category = "Blackboard")
 	FBlackboardKeySelector CheckDistanceKey;
 
 private:
-	UPROPERTY()
-	ADWCharacter* CheckTarget;
-
 	float CheckDistance;
 };

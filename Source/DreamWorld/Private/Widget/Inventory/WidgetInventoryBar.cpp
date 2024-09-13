@@ -39,6 +39,8 @@ UWidgetInventoryBar::UWidgetInventoryBar(const FObjectInitializer& ObjectInitial
 	UISlotDatas.Add(ESlotSplitType::Shortcut);
 	UISlotDatas.Add(ESlotSplitType::Auxiliary);
 	UISlotDatas.Add(ESlotSplitType::Skill);
+
+	SetIsFocusable(true);
 }
 
 void UWidgetInventoryBar::OnInitialize(UObject* InOwner, const TArray<FParameter>& InParams)

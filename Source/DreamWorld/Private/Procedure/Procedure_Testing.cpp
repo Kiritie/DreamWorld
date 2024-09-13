@@ -37,11 +37,11 @@ void UProcedure_Testing::OnEnter(UProcedureBase* InLastProcedure)
 
 	UWidgetGameHUD* GameHUD = UWidgetModuleStatics::CreateUserWidget<UWidgetGameHUD>();
 
-	if(ADWPlayerSpawner* _PlayerSpawner = PlayerSpawner.LoadSynchronous())
+	if(ADWPlayerSpawner* Spawner = PlayerSpawner.LoadSynchronous())
 	{
-		_PlayerSpawner->Spawn();
+		Spawner->Spawn();
 
-		GameHUD->Init(_PlayerSpawner->GetAbilityActor());
+		GameHUD->Init(Spawner->GetAbilityActor());
 	}
 
 	GameHUD->Open();

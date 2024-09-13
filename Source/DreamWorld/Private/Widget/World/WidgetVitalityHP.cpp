@@ -21,6 +21,6 @@ void UWidgetVitalityHP::OnTick_Implementation(float DeltaSeconds)
 
 bool UWidgetVitalityHP::IsWidgetVisible_Implementation(bool bRefresh)
 {
-	if(bRefresh) return Super::IsWidgetVisible_Implementation(bRefresh) && GetOwnerObject<ADWVitality>() && !GetOwnerObject<ADWVitality>()->IsDead();
+	if(bRefresh) return Super::IsWidgetVisible_Implementation(bRefresh) && GetOwnerObject<ADWVitality>() && ISceneActorInterface::Execute_IsVisible(GetOwnerObject<ADWVitality>()) && !GetOwnerObject<ADWVitality>()->IsDead();
 	return Super::IsWidgetVisible_Implementation(bRefresh);
 }

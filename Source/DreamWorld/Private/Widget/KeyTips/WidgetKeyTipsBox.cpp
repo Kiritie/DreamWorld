@@ -9,7 +9,6 @@
 UWidgetKeyTipsBox::UWidgetKeyTipsBox(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	WidgetName = FName("KeyTipsBox");
-	ParentName = FName("GameHUD");
 	ParentSlot = FName("Slot_KeyTipsBox");
 	WidgetType = EWidgetType::Permanent;
 	WidgetCreateType = EWidgetCreateType::AutoCreateAndOpen;

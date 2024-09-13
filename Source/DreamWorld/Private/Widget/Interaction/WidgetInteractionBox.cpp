@@ -6,6 +6,7 @@
 #include "Ability/PickUp/AbilityPickUpBase.h"
 #include "Character/DWCharacter.h"
 #include "Components/HorizontalBox.h"
+#include "Input/Widget/WidgetKeyTipsItemBase.h"
 #include "Voxel/Voxels/Auxiliary/VoxelInteractAuxiliary.h"
 #include "Widget/WidgetModule.h"
 #include "Widget/Item/WidgetAbilityPreviewItem.h"
@@ -18,15 +19,15 @@ UWidgetInteractionBox::UWidgetInteractionBox(const FObjectInitializer& ObjectIni
 	WidgetType = EWidgetType::Permanent;
 	WidgetCreateType = EWidgetCreateType::AutoCreateAndOpen;
 	
-	WBP_PreviewItem = nullptr;
-	HBox_NextKeyTips = nullptr;
+	PreviewItem = nullptr;
+	NextKeyTips = nullptr;
 }
 
 void UWidgetInteractionBox::OnCreate(UObject* InOwner, const TArray<FParameter>& InParams)
 {
 	Super::OnCreate(InOwner, InParams);
 
-	HBox_NextKeyTips->VisibilityDelegate.BindDynamic(this, &UWidgetInteractionBox::GetNextKeyTipsVisibility);
+	NextKeyTips->VisibilityDelegate.BindDynamic(this, &UWidgetInteractionBox::GetNextKeyTipsVisibility);
 }
 
 void UWidgetInteractionBox::OnInitialize(UObject* InOwner, const TArray<FParameter>& InParams)
@@ -72,8 +73,8 @@ void UWidgetInteractionBox::ShowInteractActions_Implementation(const TScriptInte
 	
 	if(Item.IsValid() && InInteractionAgent.GetObject() != GetOwnerObject())
 	{
-		WBP_PreviewItem->Init({ &Item });
-		WBP_PreviewItem->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+		PreviewItem->Init({ &Item });
+		PreviewItem->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
 	}
 }
 
@@ -81,7 +82,7 @@ void UWidgetInteractionBox::HideInteractActions_Implementation()
 {
 	InteractionAgent = nullptr;
 
-	WBP_PreviewItem->SetVisibility(ESlateVisibility::Collapsed);
+	PreviewItem->SetVisibility(ESlateVisibility::Collapsed);
 }
 
 ESlateVisibility UWidgetInteractionBox::GetNextKeyTipsVisibility()

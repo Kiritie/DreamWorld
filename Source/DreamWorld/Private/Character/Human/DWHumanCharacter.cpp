@@ -14,7 +14,24 @@
 #include "Voxel/Voxels/Entity/VoxelEntity.h"
 #include "Ability/Item/Equip/AbilityEquipBase.h"
 #include "Ability/Item/Equip/AbilityEquipDataBase.h"
+#include "Character/Human/States/DWHumanCharacterState_Defend.h"
+#include "Character/States/DWCharacterState_Attack.h"
+#include "Character/States/DWCharacterState_Climb.h"
+#include "Character/States/DWCharacterState_Crouch.h"
+#include "Character/States/DWCharacterState_Death.h"
+#include "Character/States/DWCharacterState_Default.h"
+#include "Character/States/DWCharacterState_Dodge.h"
+#include "Character/States/DWCharacterState_Fall.h"
+#include "Character/States/DWCharacterState_Float.h"
+#include "Character/States/DWCharacterState_Fly.h"
+#include "Character/States/DWCharacterState_Interrupt.h"
+#include "Character/States/DWCharacterState_Jump.h"
+#include "Character/States/DWCharacterState_Ride.h"
+#include "Character/States/DWCharacterState_Static.h"
+#include "Character/States/DWCharacterState_Swim.h"
+#include "Character/States/DWCharacterState_Walk.h"
 #include "Common/Interaction/InteractionComponent.h"
+#include "FSM/Components/FSMComponent.h"
 #include "Item/Equip/DWEquipData.h"
 #include "Voxel/Datas/VoxelData.h"
 
@@ -34,6 +51,25 @@ ADWHumanCharacter::ADWHumanCharacter()
 	GenerateHammerMesh->SetupAttachment(GetMesh(), TEXT("HammerMesh"));
 	GenerateHammerMesh->SetRelativeLocation(FVector::ZeroVector);
 	GenerateHammerMesh->SetRelativeRotation(FRotator::ZeroRotator);
+	
+	FSM->DefaultState = UDWCharacterState_Default::StaticClass();
+	FSM->States.Empty();
+	FSM->States.Add(UDWCharacterState_Attack::StaticClass());
+	FSM->States.Add(UDWCharacterState_Climb::StaticClass());
+	FSM->States.Add(UDWCharacterState_Crouch::StaticClass());
+	FSM->States.Add(UDWCharacterState_Death::StaticClass());
+	FSM->States.Add(UDWCharacterState_Default::StaticClass());
+	FSM->States.Add(UDWHumanCharacterState_Defend::StaticClass());
+	FSM->States.Add(UDWCharacterState_Dodge::StaticClass());
+	FSM->States.Add(UDWCharacterState_Fall::StaticClass());
+	FSM->States.Add(UDWCharacterState_Float::StaticClass());
+	FSM->States.Add(UDWCharacterState_Fly::StaticClass());
+	FSM->States.Add(UDWCharacterState_Interrupt::StaticClass());
+	FSM->States.Add(UDWCharacterState_Jump::StaticClass());
+	FSM->States.Add(UDWCharacterState_Ride::StaticClass());
+	FSM->States.Add(UDWCharacterState_Static::StaticClass());
+	FSM->States.Add(UDWCharacterState_Swim::StaticClass());
+	FSM->States.Add(UDWCharacterState_Walk::StaticClass());
 
 	GenerateVoxelEntity = nullptr;
 	AuxiliaryVoxelEntity = nullptr;

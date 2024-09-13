@@ -2,9 +2,7 @@
 
 #include "Character/States/DWCharacterState_Default.h"
 
-#include "Ability/Character/AbilityCharacterDataBase.h"
 #include "Character/DWCharacter.h"
-#include "Character/States/DWCharacterState_Walk.h"
 #include "Common/Looking/LookingComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "FSM/Components/FSMComponent.h"
@@ -22,9 +20,9 @@ void UDWCharacterState_Default::OnInitialize(UFSMComponent* InFSM, int32 InState
 	Super::OnInitialize(InFSM, InStateIndex);
 }
 
-bool UDWCharacterState_Default::OnEnterValidate(UFiniteStateBase* InLastState, const TArray<FParameter>& InParams)
+bool UDWCharacterState_Default::OnPreEnter(UFiniteStateBase* InLastState, const TArray<FParameter>& InParams)
 {
-	return Super::OnEnterValidate(InLastState, InParams);
+	return Super::OnPreEnter(InLastState, InParams);
 }
 
 void UDWCharacterState_Default::OnEnter(UFiniteStateBase* InLastState, const TArray<FParameter>& InParams)
@@ -73,7 +71,7 @@ void UDWCharacterState_Default::OnTermination()
 	Super::OnTermination();
 }
 
-void UDWCharacterState_Default::TrySwitchToWalk()
+void UDWCharacterState_Default::TryLeave()
 {
-	FSM->SwitchStateByClass<UDWCharacterState_Walk>();
+	Super::TryLeave();
 }

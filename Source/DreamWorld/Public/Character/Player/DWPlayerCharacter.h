@@ -76,8 +76,6 @@ public:
 	virtual bool OnInteractVoxel(const FVoxelHitResult& InVoxelHitResult, EInputInteractAction InInteractAction) override;
 
 protected:
-	virtual void Turn_Implementation(float InValue) override;
-
 	virtual void MoveForward_Implementation(float InValue) override;
 
 	virtual void MoveRight_Implementation(float InValue) override;

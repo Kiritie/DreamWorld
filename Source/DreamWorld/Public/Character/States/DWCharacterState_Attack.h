@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayAbilitySpecHandle.h"
 #include "UObject/Object.h"
 #include "Ability/Character/States/AbilityCharacterStateBase.h"
 #include "DWCharacterState_Attack.generated.h"
@@ -23,7 +24,7 @@ public:
 public:
 	virtual void OnInitialize(UFSMComponent* InFSM, int32 InStateIndex) override;
 
-	virtual bool OnEnterValidate(UFiniteStateBase* InLastState, const TArray<FParameter>& InParams) override;
+	virtual bool OnPreEnter(UFiniteStateBase* InLastState, const TArray<FParameter>& InParams) override;
 
 	virtual void OnEnter(UFiniteStateBase* InLastState, const TArray<FParameter>& InParams) override;
 	

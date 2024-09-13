@@ -4,10 +4,12 @@
 
 #include "Ability/Character/AbilityCharacterDataBase.h"
 #include "Character/Player/DWPlayerCharacter.h"
-#include "Character/States/DWCharacterState_Walk.h"
 #include "FSM/Components/FSMComponent.h"
+#include "Procedure/ProcedureModuleStatics.h"
+#include "Procedure/Procedure_Testing.h"
 #include "Voxel/VoxelModule.h"
 #include "Voxel/VoxelModuleStatics.h"
+#include "Voxel/Chunks/VoxelChunk.h"
 
 UDWPlayerCharacterState_Default::UDWPlayerCharacterState_Default()
 {
@@ -19,16 +21,14 @@ void UDWPlayerCharacterState_Default::OnInitialize(UFSMComponent* InFSM, int32 I
 	Super::OnInitialize(InFSM, InStateIndex);
 }
 
-bool UDWPlayerCharacterState_Default::OnEnterValidate(UFiniteStateBase* InLastState, const TArray<FParameter>& InParams)
+bool UDWPlayerCharacterState_Default::OnPreEnter(UFiniteStateBase* InLastState, const TArray<FParameter>& InParams)
 {
-	return Super::OnEnterValidate(InLastState, InParams);
+	return Super::OnPreEnter(InLastState, InParams);
 }
 
 void UDWPlayerCharacterState_Default::OnEnter(UFiniteStateBase* InLastState, const TArray<FParameter>& InParams)
 {
 	Super::OnEnter(InLastState, InParams);
-
-	ADWPlayerCharacter* PlayerCharacter = GetAgent<ADWPlayerCharacter>();
 }
 
 void UDWPlayerCharacterState_Default::OnRefresh(float DeltaSeconds)
@@ -46,29 +46,32 @@ void UDWPlayerCharacterState_Default::OnTermination()
 	Super::OnTermination();
 }
 
-void UDWPlayerCharacterState_Default::TrySwitchToWalk()
+void UDWPlayerCharacterState_Default::TryLeave()
 {
 	ADWPlayerCharacter* PlayerCharacter = GetAgent<ADWPlayerCharacter>();
 	
-	if(!UVoxelModule::IsValid())
+	if(UProcedureModuleStatics::IsCurrentProcedureClass<UProcedure_Testing>())
 	{
-		FSM->SwitchStateByClass<UDWCharacterState_Walk>();
+		Super::TryLeave();
 	}
 	else if(UVoxelModule::Get().IsBasicGenerated())
 	{
 		if(PlayerCharacter->GetActorLocation().IsNearlyZero())
 		{
-			const auto& characterData = PlayerCharacter->GetCharacterData<UAbilityCharacterDataBase>();
-			FHitResult hitResult;
-			if(UVoxelModuleStatics::VoxelAgentTraceSingle(PlayerCharacter->GetActorLocation(), FVector2D(1000.f), characterData.Radius, characterData.HalfHeight, {}, hitResult, true, 100, true))
+			const auto& CharacterData = PlayerCharacter->GetCharacterData<UAbilityCharacterDataBase>();
+			FHitResult HitResult;
+			if(UVoxelModuleStatics::VoxelAgentTraceSingle(PlayerCharacter->GetActorLocation(), FVector2D(1000.f), CharacterData.Radius, CharacterData.HalfHeight, {}, HitResult, true, 100, true))
 			{
-				PlayerCharacter->SetActorLocationAndRotation(hitResult.Location, FRotator::ZeroRotator);
-				FSM->SwitchStateByClass<UDWCharacterState_Walk>();
+				PlayerCharacter->SetActorLocationAndRotation(HitResult.Location, FRotator::ZeroRotator);
+				Super::TryLeave();
 			}
 		}
-		else
+		else if(AVoxelChunk* VoxelChunk = Cast<AVoxelChunk>(ISceneActorInterface::Execute_GetContainer(PlayerCharacter).GetObject()))
 		{
-			FSM->SwitchStateByClass<UDWCharacterState_Walk>();
+			if(VoxelChunk->IsGenerated())
+			{
+				Super::TryLeave();
+			}
 		}
 	}
 }

@@ -1,11 +1,12 @@
 #include "Common/DWCommonTypes.h"
 
+#include "Ability/Effects/EffectBase.h"
 #include "Ability/Vitality/AbilityVitalityBase.h"
 #include "Character/DWCharacter.h"
 #include "Ability/Vitality/AbilityVitalityInterface.h"
 #include "Character/States/DWCharacterState_Fall.h"
 #include "FSM/Components/FSMComponent.h"
-#include "Scene/SceneModuleStatics.h"
+#include "ObjectPool/ObjectPoolModuleStatics.h"
 
 void UDWDamageHandle::HandleDamage(AActor* SourceActor, AActor* TargetActor, float DamageValue, EDamageType DamageType, const FHitResult& HitResult, const FGameplayTagContainer& SourceTags)
 {
@@ -46,6 +47,7 @@ void UDWDamageHandle::HandleDamage(AActor* SourceActor, AActor* TargetActor, flo
 			if(DefendRateDone > 0.f && !TargetCharacter->DoAction(EDWCharacterActionType::DefendBlock))
 			{
 				DefendRateDone = 0.f;
+				TargetCharacter->UnDefend();
 			}
 		}
 	}
@@ -55,32 +57,43 @@ void UDWDamageHandle::HandleDamage(AActor* SourceActor, AActor* TargetActor, flo
 		case EDamageType::Physics:
 		{
 			bAttackCrited = FMath::FRand() <= SourceAttackCritRate;
-			LocalDamageDone = SourceAttackForce * DamageValue * (1.f - SourcePhysicsDefRate) * (bAttackCrited ? 2.f : 1.f);
+			LocalDamageDone = SourceAttackForce * DamageValue * (1.f - SourcePhysicsDefRate) * (bAttackCrited ? 2.f : 1.f) * (1.f - DefendRateDone);
+			if (SourceCharacter)
+			{
+				UEffectBase* Effect = UObjectPoolModuleStatics::SpawnObject<UEffectBase>();
+
+				FGameplayModifierInfo ModifierInfo;
+				ModifierInfo.Attribute = GET_GAMEPLAYATTRIBUTE_PROPERTY(UVitalityAttributeSetBase, Recovery);
+				ModifierInfo.ModifierOp = EGameplayModOp::Override;
+				ModifierInfo.ModifierMagnitude = FGameplayEffectModifierMagnitude(LocalDamageDone * SourceCharacter->GetAttackStealRate());
+
+				Effect->Modifiers.Add(ModifierInfo);
+				
+				FGameplayEffectContextHandle EffectContext = SourceCharacter->GetAbilitySystemComponent()->MakeEffectContext();
+				EffectContext.AddSourceObject(SourceCharacter);
+				SourceCharacter->GetAbilitySystemComponent()->ApplyGameplayEffectToSelf(Effect, 0, EffectContext);
+
+				UObjectPoolModuleStatics::DespawnObject(Effect);
+			}
 			break;
 		}
 		case EDamageType::Magic:
 		{
-			LocalDamageDone = DamageValue * (1.f - SourceMagicDefRate);
+			LocalDamageDone = DamageValue * (1.f - SourceMagicDefRate) * (1.f - DefendRateDone);
 			break;
 		}
 		case EDamageType::Fall:
 		{
-			const float FallHeight = SourceCharacter->GetFSMComponent()->GetStateByClass<UDWCharacterState_Fall>()->GetFallHeight();
-			if(FallHeight > 350.f)
+			if(SourceCharacter)
 			{
-				LocalDamageDone = DamageValue * (FallHeight / 10.f);
+				const float FallHeight = SourceCharacter->GetFSMComponent()->GetStateByClass<UDWCharacterState_Fall>()->GetFallHeight();
+				if(FallHeight > 350.f)
+				{
+					LocalDamageDone = DamageValue * (FallHeight / 10.f);
+				}
 			}
 			break;
 		}
-	}
-
-	if (DefendRateDone > 0.f)
-	{
-		if (TargetCharacter)
-		{
-			USceneModuleStatics::SpawnWorldText(FString::FromInt(LocalDamageDone * DefendRateDone), FColor::Cyan, EWorldTextStyle::Normal, TargetCharacter->GetActorLocation(), FVector(20.f));
-		}
-		LocalDamageDone *= (1.f - DefendRateDone);
 	}
 
 	if (LocalDamageDone > 0.f)

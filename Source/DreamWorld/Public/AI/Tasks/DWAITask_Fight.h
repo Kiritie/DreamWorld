@@ -10,7 +10,7 @@ class ADWCharacter;
 /**
  * AI任务_看向目标
  */
-UCLASS()
+UCLASS(Abstract)
 class DREAMWORLD_API UDWAITask_Fight : public UAITask_Duration
 {
 	GENERATED_UCLASS_BODY()
@@ -35,7 +35,6 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Blackboard")
 	bool bLookingTarget;
 
-private:
 	UPROPERTY()
 	ADWCharacter* FightTarget;
 };

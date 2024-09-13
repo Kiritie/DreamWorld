@@ -15,9 +15,9 @@ void UDWCharacterState_Defend::OnInitialize(UFSMComponent* InFSM, int32 InStateI
 	Super::OnInitialize(InFSM, InStateIndex);
 }
 
-bool UDWCharacterState_Defend::OnEnterValidate(UFiniteStateBase* InLastState, const TArray<FParameter>& InParams)
+bool UDWCharacterState_Defend::OnPreEnter(UFiniteStateBase* InLastState, const TArray<FParameter>& InParams)
 {
-	if(!Super::OnEnterValidate(InLastState, InParams)) return false;
+	if(!Super::OnPreEnter(InLastState, InParams)) return false;
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 
@@ -52,7 +52,7 @@ void UDWCharacterState_Defend::OnLeave(UFiniteStateBase* InNextState)
 	Character->GetAbilitySystemComponent()->RemoveLooseGameplayTag(GameplayTags::StateTag_Character_Defending);
 
 	Character->FreeToAnim();
-	Character->SetMotionRate(1, 1);
+	Character->SetMotionRate(1.f, 1.f);
 }
 
 void UDWCharacterState_Defend::OnTermination()

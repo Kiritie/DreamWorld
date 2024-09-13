@@ -82,7 +82,7 @@ void UProcedure_ArchiveChoosing::CreateArchive()
 {
 	if(USaveGameModuleStatics::GetSaveGame<UDWArchiveSaveGame>()->IsSaved())
 	{
-		USaveGameModuleStatics::CreateSaveGame<UDWArchiveSaveGame>(-1, EPhase::Primary);
+		USaveGameModuleStatics::CreateSaveGame<UDWArchiveSaveGame>(-1, EPhase::PrimaryAndLesser);
 	}
 	UProcedureModuleStatics::SwitchProcedureByClass<UProcedure_ArchiveCreating>();
 }
@@ -91,7 +91,7 @@ void UProcedure_ArchiveChoosing::RemoveArchive(int32 InArchiveID)
 {
 	const bool bNeedCreateArchive = USaveGameModuleStatics::GetSaveGameInfo<UDWArchiveSaveGame>().ActiveIndex == InArchiveID;
 	USaveGameModuleStatics::DestroySaveGame<UDWArchiveSaveGame>(InArchiveID);
-	if(bNeedCreateArchive) USaveGameModuleStatics::CreateSaveGame<UDWArchiveSaveGame>(-1, EPhase::Primary);
+	if(bNeedCreateArchive) USaveGameModuleStatics::CreateSaveGame<UDWArchiveSaveGame>(-1, EPhase::PrimaryAndLesser);
 	UWidgetModuleStatics::GetUserWidget<UWidgetArchiveChoosingPanel>()->Refresh();
 }
 
@@ -99,7 +99,7 @@ void UProcedure_ArchiveChoosing::ChooseArchive(int32 InArchiveID)
 {
 	if(USaveGameModuleStatics::GetSaveGameInfo<UDWArchiveSaveGame>().ActiveIndex != InArchiveID)
 	{
-		USaveGameModuleStatics::LoadSaveGame<UDWArchiveSaveGame>(InArchiveID, EPhase::Primary);
+		USaveGameModuleStatics::LoadSaveGame<UDWArchiveSaveGame>(InArchiveID, EPhase::PrimaryAndLesser);
 	}
 	UProcedureModuleStatics::SwitchProcedureByClass<UProcedure_Loading>();
 }

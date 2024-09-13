@@ -18,9 +18,9 @@ void UDWCharacterState_Death::OnInitialize(UFSMComponent* InFSM, int32 InStateIn
 	Super::OnInitialize(InFSM, InStateIndex);
 }
 
-bool UDWCharacterState_Death::OnEnterValidate(UFiniteStateBase* InLastState, const TArray<FParameter>& InParams)
+bool UDWCharacterState_Death::OnPreEnter(UFiniteStateBase* InLastState, const TArray<FParameter>& InParams)
 {
-	return Super::OnEnterValidate(InLastState, InParams);
+	return Super::OnPreEnter(InLastState, InParams);
 }
 
 void UDWCharacterState_Death::OnEnter(UFiniteStateBase* InLastState, const TArray<FParameter>& InParams)

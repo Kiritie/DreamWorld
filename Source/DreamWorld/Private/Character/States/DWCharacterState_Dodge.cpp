@@ -16,9 +16,9 @@ void UDWCharacterState_Dodge::OnInitialize(UFSMComponent* InFSM, int32 InStateIn
 	Super::OnInitialize(InFSM, InStateIndex);
 }
 
-bool UDWCharacterState_Dodge::OnEnterValidate(UFiniteStateBase* InLastState, const TArray<FParameter>& InParams)
+bool UDWCharacterState_Dodge::OnPreEnter(UFiniteStateBase* InLastState, const TArray<FParameter>& InParams)
 {
-	if(!Super::OnEnterValidate(InLastState, InParams)) return false;
+	if(!Super::OnPreEnter(InLastState, InParams)) return false;
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 

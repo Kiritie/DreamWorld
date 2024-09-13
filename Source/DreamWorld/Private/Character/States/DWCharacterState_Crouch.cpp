@@ -15,9 +15,9 @@ void UDWCharacterState_Crouch::OnInitialize(UFSMComponent* InFSM, int32 InStateI
 	Super::OnInitialize(InFSM, InStateIndex);
 }
 
-bool UDWCharacterState_Crouch::OnEnterValidate(UFiniteStateBase* InLastState, const TArray<FParameter>& InParams)
+bool UDWCharacterState_Crouch::OnPreEnter(UFiniteStateBase* InLastState, const TArray<FParameter>& InParams)
 {
-	if(!Super::OnEnterValidate(InLastState, InParams)) return false;
+	if(!Super::OnPreEnter(InLastState, InParams)) return false;
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 

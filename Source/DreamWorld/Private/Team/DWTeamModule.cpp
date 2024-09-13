@@ -69,7 +69,10 @@ void UDWTeamModule::LoadData(FSaveData* InSaveData, EPhase InPhase)
 {
 	const auto& SaveData = InSaveData->CastRef<FDWTeamModuleSaveData>();
 
-	TeamDatas = SaveData.TeamDatas;
+	if(PHASEC(InPhase, EPhase::Primary))
+	{
+		TeamDatas = SaveData.TeamDatas;
+	}
 }
 
 FSaveData* UDWTeamModule::ToData()

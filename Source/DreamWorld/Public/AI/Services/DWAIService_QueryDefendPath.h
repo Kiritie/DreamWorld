@@ -28,18 +28,19 @@ protected:
 	virtual void OnCeaseRelevant(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
 
 protected:
+	virtual void RefreshDefendLocation(UBehaviorTreeComponent& OwnerComp);
+
+protected:
 	UPROPERTY(EditAnywhere, Category = "Blackboard")
 	FBlackboardKeySelector DefendTargetKey;
-
-	UPROPERTY(EditAnywhere, Category = "Blackboard")
-	FBlackboardKeySelector DefendDistanceKey;
 	
 	UPROPERTY(EditAnywhere, Category = "Blackboard")
 	FBlackboardKeySelector DefendLocationKey;
 
+	UPROPERTY(EditAnywhere, Category = "Blackboard")
+	float DefendDistanceOffset;
+
 private:
 	UPROPERTY()
 	ADWCharacter* DefendTarget;
-
-	float DefendDistance;
 };

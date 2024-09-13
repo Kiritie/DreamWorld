@@ -21,31 +21,28 @@ void UDWCharacterState_Attack::OnInitialize(UFSMComponent* InFSM, int32 InStateI
 	Super::OnInitialize(InFSM, InStateIndex);
 }
 
-bool UDWCharacterState_Attack::OnEnterValidate(UFiniteStateBase* InLastState, const TArray<FParameter>& InParams)
+bool UDWCharacterState_Attack::OnPreEnter(UFiniteStateBase* InLastState, const TArray<FParameter>& InParams)
 {
-	if(!Super::OnEnterValidate(InLastState, InParams)) return false;
+	if(!Super::OnPreEnter(InLastState, InParams)) return false;
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 
-	return Character->ControlMode == EDWCharacterControlMode::Fighting && Character->DoAction(EDWCharacterActionType::Attack);
+	return Character->ControlMode == EDWCharacterControlMode::Fighting && Character->GetAbilitySystemComponent()->TryActivateAbility(InParams[0].GetPointerValueRef<FGameplayAbilitySpecHandle>()) && Character->DoAction(EDWCharacterActionType::Attack);
 }
 
 void UDWCharacterState_Attack::OnEnter(UFiniteStateBase* InLastState, const TArray<FParameter>& InParams)
 {
 	Super::OnEnter(InLastState, InParams);
 
-	if(InParams.IsValidIndex(0))
-	{
-		OnAttackStart = *InParams[0].GetPointerValue<FSimpleDelegate>();
-	}
-	if(InParams.IsValidIndex(1))
-	{
-		OnAttackEnd = *InParams[1].GetPointerValue<FSimpleDelegate>();
-	}
-
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 
 	Character->GetAbilitySystemComponent()->AddLooseGameplayTag(GameplayTags::StateTag_Character_Attacking);
+
+	Character->AttackType = (EDWCharacterAttackType)InParams[1].GetByteValue();
+
+	OnAttackStart = InParams[2].GetPointerValueRef<FSimpleDelegate>();
+
+	OnAttackEnd = InParams[3].GetPointerValueRef<FSimpleDelegate>();
 }
 
 void UDWCharacterState_Attack::OnRefresh(float DeltaSeconds)
@@ -64,9 +61,6 @@ void UDWCharacterState_Attack::OnLeave(UFiniteStateBase* InNextState)
 	Character->GetAbilitySystemComponent()->RemoveLooseGameplayTag(GameplayTags::StateTag_Character_Attacking);
 
 	AttackEnd();
-
-	OnAttackStart = nullptr;
-	OnAttackEnd = nullptr;
 }
 
 void UDWCharacterState_Attack::OnTermination()
@@ -92,7 +86,7 @@ void UDWCharacterState_Attack::AttackStart()
 		{
 			Character->ClearAttackHitTargets();
 			Character->SetAttackHitAble(true);
-			Character->GetCharacterMovement()->GravityScale = Character->DefaultGravityScale * 1.5f;
+			Character->GetCharacterMovement()->GravityScale = Character->GetDefaultGravityScale() * 1.5f;
 			break;
 		}
 		case EDWCharacterAttackType::SkillAttack:
@@ -115,6 +109,7 @@ void UDWCharacterState_Attack::AttackStart()
 	if(OnAttackStart.IsBound())
 	{
 		OnAttackStart.Execute();
+		OnAttackStart = nullptr;
 	}
 }
 
@@ -123,10 +118,16 @@ void UDWCharacterState_Attack::AttackStep()
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 
 	if (Character->AttackType == EDWCharacterAttackType::None) return;
+
+	if (Character->AttackType == EDWCharacterAttackType::SkillAttack)
+	{
+		const auto AbilityData = Character->GetSkillAbility(Character->SkillAbilityItem.ID);
+		if(AbilityData.GetItemData<UAbilitySkillDataBase>().SkillClass) return;
+	}
 	
-	bool bHitAble = !Character->IsAttackHitAble();
-	if(bHitAble) Character->ClearAttackHitTargets();
-	Character->SetAttackHitAble(bHitAble);
+	bool bAttackHitAble = !Character->IsAttackHitAble();
+	if(bAttackHitAble) Character->ClearAttackHitTargets();
+	Character->SetAttackHitAble(bAttackHitAble);
 }
 
 void UDWCharacterState_Attack::AttackEnd()
@@ -148,9 +149,8 @@ void UDWCharacterState_Attack::AttackEnd()
 		}
 		case EDWCharacterAttackType::FallingAttack:
 		{
-			Character->SetAttackHitAble(false);
 			Character->StopAnimMontage();
-			Character->FreeToAnim();
+			Character->SetAttackHitAble(false);
 			Character->GetCharacterMovement()->GravityScale = Character->GetDefaultGravityScale();
 			break;
 		}
@@ -166,10 +166,12 @@ void UDWCharacterState_Attack::AttackEnd()
 		}
 		default: break;
 	}
+
 	Character->AttackType = EDWCharacterAttackType::None;
 
 	if(OnAttackEnd.IsBound())
 	{
 		OnAttackEnd.Execute();
+		OnAttackEnd = nullptr;
 	}
 }

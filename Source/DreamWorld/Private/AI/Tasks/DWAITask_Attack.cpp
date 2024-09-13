@@ -5,7 +5,6 @@
 
 #include "BehaviorTree/BehaviorTreeTypes.h"
 #include "Character/DWCharacter.h"
-#include "Debug/DebugTypes.h"
 
 UDWAITask_Attack::UDWAITask_Attack(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -48,14 +47,13 @@ EBTNodeResult::Type UDWAITask_Attack::ExecuteTask(UBehaviorTreeComponent& OwnerC
 
 	if(GetAgent<ADWCharacter>()->Attack(AttackAbilityIndex, nullptr, FSimpleDelegate::CreateLambda([this, &OwnerComp]()
 	{
-		WHDebug("AAA");
 		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
 	})))
 	{
 		return EBTNodeResult::InProgress;
 	}
 
-	return EBTNodeResult::Succeeded;
+	return EBTNodeResult::Failed;
 }
 
 void UDWAITask_Attack::OnTaskFinished(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, EBTNodeResult::Type TaskResult)

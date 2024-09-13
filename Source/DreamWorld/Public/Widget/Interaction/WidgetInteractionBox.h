@@ -5,6 +5,7 @@
 #include "Widget/Screen/UserWidgetBase.h"
 #include "WidgetInteractionBox.generated.h"
 
+class IInteractionAgentInterface;
 /**
  * 交互框
  */
@@ -40,10 +41,10 @@ protected:
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components", meta = (BindWidget, OptionalWidget = false))
-	class UWidgetAbilityPreviewItem* WBP_PreviewItem;
+	class UWidgetAbilityPreviewItem* PreviewItem;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components", meta = (BindWidget, OptionalWidget = false))
-	class UHorizontalBox* HBox_NextKeyTips;
+	class UWidgetKeyTipsItemBase* NextKeyTips;
 
 private:
 	TScriptInterface<IInteractionAgentInterface> InteractionAgent;

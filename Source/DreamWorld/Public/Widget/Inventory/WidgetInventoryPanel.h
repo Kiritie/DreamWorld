@@ -5,6 +5,8 @@
 #include "Widget/Inventory/WidgetInventory.h"
 #include "WidgetInventoryPanel.generated.h"
 
+class UGridPanel;
+class UWrapBox;
 class UWidgetInventoryEquipSlot;
 
 /**
@@ -29,13 +31,13 @@ public:
 	
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components", meta = (BindWidget, OptionalWidget = false))
-	class UWrapBox* DefaultContent;
+	UWrapBox* DefaultContent;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components", meta = (BindWidget, OptionalWidget = false))
-	class UGridPanel* LeftEquipContent;
+	UGridPanel* LeftEquipContent;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components", meta = (BindWidget, OptionalWidget = false))
-	class UGridPanel* RightEquipContent;
+	UGridPanel* RightEquipContent;
 
 public:
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)

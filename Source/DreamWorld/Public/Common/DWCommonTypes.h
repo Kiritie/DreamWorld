@@ -168,7 +168,7 @@ UENUM(BlueprintType)
 enum class EDWEquipPartType : uint8
 {
 	// 头部
-	Head	UMETA(DisplayName="头部"),
+	Head UMETA(DisplayName="头部"),
 	// 胸部
 	Chest UMETA(DisplayName="胸部"),
 	// 手臂
@@ -872,8 +872,6 @@ enum class EDWCharacterAttackType : uint8
 	NormalAttack,
 	// ??乥??
 	FallingAttack,
-	// ??乥??
-	RemoteAttack,
 	// ???????
 	SkillAttack
 };

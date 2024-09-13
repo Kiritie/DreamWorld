@@ -57,7 +57,7 @@ void UProcedure_Starting::OnEnter(UProcedureBase* InLastProcedure)
 
 	if(!InLastProcedure || InLastProcedure->IsA<UProcedure_Initializing>())
 	{
-		USaveGameModuleStatics::LoadOrCreateSaveGame<UDWArchiveSaveGame>(-1, EPhase::Primary);
+		USaveGameModuleStatics::LoadOrCreateSaveGame<UDWArchiveSaveGame>(-1, EPhase::PrimaryAndLesser);
 	}
 	else
 	{

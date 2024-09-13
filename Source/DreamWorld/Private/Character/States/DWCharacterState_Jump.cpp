@@ -15,9 +15,9 @@ void UDWCharacterState_Jump::OnInitialize(UFSMComponent* InFSM, int32 InStateInd
 	Super::OnInitialize(InFSM, InStateIndex);
 }
 
-bool UDWCharacterState_Jump::OnEnterValidate(UFiniteStateBase* InLastState, const TArray<FParameter>& InParams)
+bool UDWCharacterState_Jump::OnPreEnter(UFiniteStateBase* InLastState, const TArray<FParameter>& InParams)
 {
-	if(!Super::OnEnterValidate(InLastState, InParams)) return false;
+	if(!Super::OnPreEnter(InLastState, InParams)) return false;
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 

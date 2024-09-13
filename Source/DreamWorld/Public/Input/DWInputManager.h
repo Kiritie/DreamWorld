@@ -19,24 +19,28 @@ public:
 public:
 	virtual void OnInitialize() override;
 
+	virtual void OnReset() override;
+
 	virtual void OnRefresh(float DeltaSeconds) override;
 
 	virtual void OnBindAction(UInputComponentBase* InInputComponent) override;
 
 protected:
 	UPROPERTY(VisibleAnywhere, Category = "InputStates|Player")
-	bool bPressedAttackDestroy;
+	bool bPrimaryPressed;
 		
 	UPROPERTY(VisibleAnywhere, Category = "InputStates|Player")
-	bool bPressedDefendGenerate;
+	bool bSecondaryPressed;
 
 	UPROPERTY(VisibleAnywhere, Category = "InputStates|Player")
-	bool bPressedSprint;
+	bool bSprintPressed;
 
 	UPROPERTY(VisibleAnywhere, Category = "InputStates|Player")
 	int32 AttackAbilityQueue;
 
 protected:
+	virtual void TurnCamera_Implementation(const FInputActionValue& InValue) override;
+
 	virtual void TurnPlayer_Implementation(const FInputActionValue& InValue) override;
 
 	virtual void MoveForwardPlayer_Implementation(const FInputActionValue& InValue) override;

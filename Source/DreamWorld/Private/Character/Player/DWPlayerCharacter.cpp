@@ -23,14 +23,10 @@
 #include "Ability/AbilityModuleTypes.h"
 #include "Ability/Character/AbilityCharacterInventoryBase.h"
 #include "Camera/CameraModuleStatics.h"
-#include "Character/Player/States/DWPlayerCharacterState_Attack.h"
 #include "Character/Player/States/DWPlayerCharacterState_Death.h"
 #include "Character/Player/States/DWPlayerCharacterState_Default.h"
-#include "Character/Player/States/DWPlayerCharacterState_Dodge.h"
-#include "Character/Player/States/DWPlayerCharacterState_Interrupt.h"
 #include "Character/States/DWCharacterState_Climb.h"
 #include "Character/States/DWCharacterState_Crouch.h"
-#include "Character/States/DWCharacterState_Defend.h"
 #include "Character/States/DWCharacterState_Fall.h"
 #include "Character/States/DWCharacterState_Float.h"
 #include "Character/States/DWCharacterState_Fly.h"
@@ -43,6 +39,10 @@
 #include "Widget/World/WorldWidgetComponent.h"
 #include "Ability/Item/Raw/AbilityRawDataBase.h"
 #include "Character/DWCharacterData.h"
+#include "Character/Human/States/DWHumanCharacterState_Defend.h"
+#include "Character/States/DWCharacterState_Attack.h"
+#include "Character/States/DWCharacterState_Dodge.h"
+#include "Character/States/DWCharacterState_Interrupt.h"
 #include "Common/Looking/LookingComponent.h"
 #include "Common/Targeting/TargetingComponent.h"
 #include "Item/Equip/DWEquipData.h"
@@ -78,31 +78,34 @@ ADWPlayerCharacter::ADWPlayerCharacter()
 	Targeting->TargetableCollisionChannel = ECC_GameTraceChannel1;
 	Targeting->LockedOnWidgetParentSocket = FName("LockPoint");
 	Targeting->MinimumDistanceToEnable = 1500.f;
+	Targeting->RotatingSmoothnessSpeed = 20.f;
+	Targeting->PitchMin = -20.f;
+	Targeting->PitchMax = -10.f;
 	Targeting->OnTargetLockedOn.AddDynamic(this, &ADWPlayerCharacter::OnTargetLockedOn);
 	Targeting->OnTargetLockedOff.AddDynamic(this, &ADWPlayerCharacter::OnTargetLockedOff);
 	Targeting->OnTargetSetRotation.AddDynamic(this, &ADWPlayerCharacter::OnTargetSetRotation);
 
 	PreviewCapture = CreateDefaultSubobject<USceneCaptureComponent2D>(FName("PreviewCapture"));
 	PreviewCapture->ProjectionType = ECameraProjectionMode::Orthographic;
-	PreviewCapture->OrthoWidth = 100;
+	PreviewCapture->OrthoWidth = 100.f;
 	PreviewCapture->PrimitiveRenderMode = ESceneCapturePrimitiveRenderMode::PRM_UseShowOnlyList;
 	PreviewCapture->SetupAttachment(RootComponent);
-	PreviewCapture->SetRelativeLocationAndRotation(FVector(100, 0, 0), FRotator(0, 180, 0));
+	PreviewCapture->SetRelativeLocationAndRotation(FVector(100.f, 0.f, 0.f), FRotator(0.f, 180.f, 0.f));
 
-	FSM->bShowDebugMessage = true;
+	// FSM->bShowDebugMessage = true;
 	FSM->DefaultState = UDWCharacterState_Default::StaticClass();
 	FSM->States.Empty();
-	FSM->States.Add(UDWPlayerCharacterState_Attack::StaticClass());
+	FSM->States.Add(UDWCharacterState_Attack::StaticClass());
 	FSM->States.Add(UDWCharacterState_Climb::StaticClass());
 	FSM->States.Add(UDWCharacterState_Crouch::StaticClass());
 	FSM->States.Add(UDWPlayerCharacterState_Death::StaticClass());
 	FSM->States.Add(UDWPlayerCharacterState_Default::StaticClass());
-	FSM->States.Add(UDWCharacterState_Defend::StaticClass());
-	FSM->States.Add(UDWPlayerCharacterState_Dodge::StaticClass());
+	FSM->States.Add(UDWHumanCharacterState_Defend::StaticClass());
+	FSM->States.Add(UDWCharacterState_Dodge::StaticClass());
 	FSM->States.Add(UDWCharacterState_Fall::StaticClass());
 	FSM->States.Add(UDWCharacterState_Float::StaticClass());
 	FSM->States.Add(UDWCharacterState_Fly::StaticClass());
-	FSM->States.Add(UDWPlayerCharacterState_Interrupt::StaticClass());
+	FSM->States.Add(UDWCharacterState_Interrupt::StaticClass());
 	FSM->States.Add(UDWCharacterState_Jump::StaticClass());
 	FSM->States.Add(UDWCharacterState_Ride::StaticClass());
 	FSM->States.Add(UDWCharacterState_Static::StaticClass());
@@ -149,7 +152,7 @@ void ADWPlayerCharacter::LoadData(FSaveData* InSaveData, EPhase InPhase)
 					auto VoxelDatas = UAssetModuleStatics::LoadPrimaryAssets<UVoxelData>(FName("Voxel"));
 					for (int32 i = 0; i < VoxelDatas.Num(); i++)
 					{
-						if(VoxelDatas[i]->VoxelType != EVoxelType::Empty && VoxelDatas[i]->VoxelType != EVoxelType::Unknown && VoxelDatas[i]->bMainPart)
+						if(!VoxelDatas[i]->IsEmpty() && !VoxelDatas[i]->IsUnknown() && VoxelDatas[i]->IsMainPart())
 						{
 							FAbilityItem tmpItem = FAbilityItem(VoxelDatas[i]->GetPrimaryAssetId(), VoxelDatas[i]->MaxCount);
 							SaveData.InventoryData.AddItem(tmpItem, { ESlotSplitType::Default, ESlotSplitType::Shortcut });
@@ -352,11 +355,6 @@ void ADWPlayerCharacter::OnInteract(EInteractAction InInteractAction, IInteracti
 bool ADWPlayerCharacter::OnInteractVoxel(const FVoxelHitResult& InVoxelHitResult, EInputInteractAction InInteractAction)
 {
 	return Super::OnInteractVoxel(InVoxelHitResult, InInteractAction);
-}
-
-void ADWPlayerCharacter::Turn_Implementation(float InValue)
-{
-	Targeting->TargetActorWithAxisInput(InValue);
 }
 
 void ADWPlayerCharacter::MoveForward_Implementation(float InValue)
