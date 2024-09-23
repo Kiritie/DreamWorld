@@ -1300,6 +1300,7 @@ UBehaviorTree* ADWCharacter::GetBehaviorTreeAsset() const
 				return !Blackboard->GetIsExcessived() ? CharacterData.DefaultBehaviorTree : CharacterData.ExcessiveBehaviorTree;
 			}
 		}
+		case EDWCharacterNature::NPC:
 		case EDWCharacterNature::AIFriendly:
 		case EDWCharacterNature::AIHostile:
 		{

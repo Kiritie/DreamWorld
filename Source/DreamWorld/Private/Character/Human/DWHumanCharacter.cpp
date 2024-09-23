@@ -37,8 +37,6 @@
 
 ADWHumanCharacter::ADWHumanCharacter()
 {
-	Interaction->SetRelativeLocation(FVector(0.f, 0.f, 0.f));
-
 	GetCapsuleComponent()->SetCapsuleHalfHeight(69.f);
 	GetCapsuleComponent()->SetCapsuleRadius(24.f);
 
@@ -51,6 +49,7 @@ ADWHumanCharacter::ADWHumanCharacter()
 	GenerateHammerMesh->SetupAttachment(GetMesh(), TEXT("HammerMesh"));
 	GenerateHammerMesh->SetRelativeLocation(FVector::ZeroVector);
 	GenerateHammerMesh->SetRelativeRotation(FRotator::ZeroRotator);
+	GenerateHammerMesh->SetVisibility(false);
 	
 	FSM->DefaultState = UDWCharacterState_Default::StaticClass();
 	FSM->States.Empty();

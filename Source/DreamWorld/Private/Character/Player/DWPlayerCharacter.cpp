@@ -22,6 +22,7 @@
 #include "Ability/Item/Skill/AbilitySkillDataBase.h"
 #include "Ability/AbilityModuleTypes.h"
 #include "Ability/Character/AbilityCharacterInventoryBase.h"
+#include "Ability/Item/Coin/AbilityCoinDataBase.h"
 #include "Camera/CameraModuleStatics.h"
 #include "Character/Player/States/DWPlayerCharacterState_Death.h"
 #include "Character/Player/States/DWPlayerCharacterState_Default.h"
@@ -149,6 +150,13 @@ void ADWPlayerCharacter::LoadData(FSaveData* InSaveData, EPhase InPhase)
 				}
 				case EDWInventoryInitType::All:
 				{
+					auto CoinDatas = UAssetModuleStatics::LoadPrimaryAssets<UAbilityCoinDataBase>(FName("Coin"));
+					for (int32 i = 0; i < CoinDatas.Num(); i++)
+					{
+						FAbilityItem tmpItem = FAbilityItem(CoinDatas[i]->GetPrimaryAssetId(), CoinDatas[i]->MaxCount);
+						SaveData.InventoryData.AddItem(tmpItem, { ESlotSplitType::Default, ESlotSplitType::Shortcut });
+					}
+
 					auto VoxelDatas = UAssetModuleStatics::LoadPrimaryAssets<UVoxelData>(FName("Voxel"));
 					for (int32 i = 0; i < VoxelDatas.Num(); i++)
 					{
@@ -300,55 +308,56 @@ void ADWPlayerCharacter::OnInteract(EInteractAction InInteractAction, IInteracti
 {
 	Super::OnInteract(InInteractAction, InInteractionAgent, bPassivity);
 
-	if(bPassivity) return;
-
-	switch(InInteractAction)
+	if(!bPassivity)
 	{
-		case (EInteractAction)EVoxelInteractAction::Open:
+		switch(InInteractAction)
 		{
-			if(AVoxelInteractAuxiliary* InteractionAgent = Cast<AVoxelInteractAuxiliary>(InInteractionAgent))
+			case (EInteractAction)EVoxelInteractAction::Open:
 			{
-				switch(InteractionAgent->GetVoxelItem().GetVoxelType())
+				if(AVoxelInteractAuxiliary* InteractionAgent = Cast<AVoxelInteractAuxiliary>(InInteractionAgent))
 				{
-					case EVoxelType::Chest:
+					switch(InteractionAgent->GetVoxelItem().GetVoxelType())
 					{
-						UWidgetModuleStatics::OpenUserWidget<UWidgetInventoryBox>({ InteractionAgent });
-						FDelegateHandle DelegateHandle = UWidgetModuleStatics::GetUserWidget<UWidgetInventoryBox>()->OnClosed.AddLambda([this, InteractionAgent, DelegateHandle](bool bInstant)
+						case EVoxelType::Chest:
 						{
-							DoInteract((EInteractAction)EVoxelInteractAction::Close, InteractionAgent);
-							UWidgetModuleStatics::GetUserWidget<UWidgetInventoryBox>()->OnClosed.Remove(DelegateHandle);
-						});
-						break;
-					}
-					case EVoxelType::Furnace:
-					case EVoxelType::Crafting_Table:
-					{
-						UWidgetModuleStatics::OpenUserWidget<UWidgetGeneratePanel>({ InteractionAgent });
-						FDelegateHandle DelegateHandle = UWidgetModuleStatics::GetUserWidget<UWidgetGeneratePanel>()->OnClosed.AddLambda([this, InteractionAgent, DelegateHandle](bool bInstant)
+							UWidgetModuleStatics::OpenUserWidget<UWidgetInventoryBox>({ InteractionAgent });
+							FDelegateHandle DelegateHandle = UWidgetModuleStatics::GetUserWidget<UWidgetInventoryBox>()->OnClosed.AddLambda([this, InteractionAgent, DelegateHandle](bool bInstant)
+							{
+								DoInteract((EInteractAction)EVoxelInteractAction::Close, InteractionAgent);
+								UWidgetModuleStatics::GetUserWidget<UWidgetInventoryBox>()->OnClosed.Remove(DelegateHandle);
+							});
+							break;
+						}
+						case EVoxelType::Furnace:
+						case EVoxelType::Crafting_Table:
 						{
-							DoInteract((EInteractAction)EVoxelInteractAction::Close, InteractionAgent);
-							UWidgetModuleStatics::GetUserWidget<UWidgetGeneratePanel>()->OnClosed.Remove(DelegateHandle);
-						});
-						break;
+							UWidgetModuleStatics::OpenUserWidget<UWidgetGeneratePanel>({ InteractionAgent });
+							FDelegateHandle DelegateHandle = UWidgetModuleStatics::GetUserWidget<UWidgetGeneratePanel>()->OnClosed.AddLambda([this, InteractionAgent, DelegateHandle](bool bInstant)
+							{
+								DoInteract((EInteractAction)EVoxelInteractAction::Close, InteractionAgent);
+								UWidgetModuleStatics::GetUserWidget<UWidgetGeneratePanel>()->OnClosed.Remove(DelegateHandle);
+							});
+							break;
+						}
+						default: break;
 					}
-					default: break;
 				}
+				break;
 			}
-			break;
-		}
-		case (EInteractAction)EVoxelInteractAction::Close:
-		{
-			if(!IsOverlapping(InInteractionAgent))
+			case (EInteractAction)EVoxelInteractAction::Close:
 			{
-				SetInteractingAgent(nullptr, true);
+				if(!IsOverlapping(InInteractionAgent))
+				{
+					SetInteractingAgent(nullptr, true);
+				}
+				break;
 			}
-			break;
+			default: break;
 		}
-		default: break;
-	}
-	if(UWidgetModuleStatics::GetUserWidget<UWidgetInteractionBox>())
-	{
-		UWidgetModuleStatics::GetUserWidget<UWidgetInteractionBox>()->ShowInteractActions(Cast<UObject>(InInteractionAgent), GetInteractableActions());
+		if(UWidgetModuleStatics::GetUserWidget<UWidgetInteractionBox>())
+		{
+			UWidgetModuleStatics::GetUserWidget<UWidgetInteractionBox>()->ShowInteractActions(Cast<UObject>(InInteractionAgent), GetInteractableActions());
+		}
 	}
 }
 

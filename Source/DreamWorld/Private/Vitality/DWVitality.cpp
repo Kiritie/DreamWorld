@@ -115,16 +115,17 @@ void ADWVitality::OnInteract(EInteractAction InInteractAction, IInteractionAgent
 {
 	Super::OnInteract(InInteractAction, InInteractionAgent, bPassivity);
 
-	if(!bPassivity) return;
-	
-	switch (InInteractAction)
+	if(bPassivity)
 	{
-		case EInteractAction::Revive:
+		switch (InInteractAction)
 		{
-			Revive();
-			break;
+			case EInteractAction::Revive:
+			{
+				Revive();
+				break;
+			}
+			default: break;
 		}
-		default: break;
 	}
 }
 

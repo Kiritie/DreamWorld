@@ -6,6 +6,7 @@
 #include "Ability/Inventory/AbilityInventoryBase.h"
 #include "Character/DWCharacter.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "Character/Human/DWHumanCharacter.h"
 #include "Character/Monster/DWMonsterCharacter.h"
 #include "Item/Prop/DWPropData.h"
 
@@ -17,7 +18,11 @@ bool UDWAIDecorator_CheckInteresting::CalculateRawConditionValue(UBehaviorTreeCo
 {
 	if(!InitDecorator(OwnerComp)) return false;
 
-	if(GetAgent<ADWMonsterCharacter>())
+	if(ADWHumanCharacter* HumanCharacter = GetAgent<ADWHumanCharacter>())
+	{
+		return HumanCharacter->GetNature() == EDWCharacterNature::NPC && CheckTarget->IsPlayer();
+	}
+	else if(ADWMonsterCharacter* MonsterCharacter = GetAgent<ADWMonsterCharacter>())
 	{
 		const FAbilityItem SelectedItem = CheckTarget->GetInventory()->GetSelectedItem();
 		return SelectedItem.IsValid() && SelectedItem.GetType() == EAbilityItemType::Prop && SelectedItem.GetData<UDWPropData>().PropType == EDWPropType::Food;

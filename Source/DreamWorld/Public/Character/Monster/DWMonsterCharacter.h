@@ -23,6 +23,7 @@ public:
 	
 	virtual void OnInteract(EInteractAction InInteractAction, IInteractionAgentInterface* InInteractionAgent, bool bPassivity) override;
 
+public:
 	virtual void SetAttackHitAble(bool bValue) override;
 
 	virtual void ClearAttackHitTargets() override;

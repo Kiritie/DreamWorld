@@ -16,7 +16,6 @@ ADWMonsterCharacter::ADWMonsterCharacter()
 	AttackPoint = CreateDefaultSubobject<UDWCharacterAttackPoint>(TEXT("AttackPoint"));
 	AttackPoint->SetupAttachment(GetMesh(), TEXT("AttackPoint"));
 
-	Interaction->SetRelativeLocation(FVector(0.f, 0.f, 0.f));
 	Interaction->AddInteractAction((EInteractAction)EDWInteractAction::Ride);
 	Interaction->AddInteractAction((EInteractAction)EDWInteractAction::UnRide);
 	Interaction->AddInteractAction((EInteractAction)EDWInteractAction::Feed);
@@ -28,26 +27,26 @@ bool ADWMonsterCharacter::CanInteract(EInteractAction InInteractAction, IInterac
 	{
 		case (EInteractAction)EDWInteractAction::Feed:
 		{
-			if(ADWCharacter* InInteractionCharacter = Cast<ADWCharacter>(InInteractionAgent))
+			if(ADWCharacter* InteractionCharacter = Cast<ADWCharacter>(InInteractionAgent))
 			{
-				const FAbilityItem SelectedItem = InInteractionCharacter->GetInventory()->GetSelectedItem();
-				return !IsEnemy(InInteractionCharacter) && SelectedItem.IsValid() && SelectedItem.GetType() == EAbilityItemType::Prop && SelectedItem.GetData<UDWPropData>().PropType == EDWPropType::Food;
+				const FAbilityItem SelectedItem = InteractionCharacter->GetInventory()->GetSelectedItem();
+				return !IsEnemy(InteractionCharacter) && SelectedItem.IsValid() && SelectedItem.GetType() == EAbilityItemType::Prop && SelectedItem.GetData<UDWPropData>().PropType == EDWPropType::Food;
 			}
 			break;
 		}
 		case (EInteractAction)EDWInteractAction::Ride:
 		{
-			if(ADWCharacter* InInteractionCharacter = Cast<ADWCharacter>(InInteractionAgent))
+			if(ADWCharacter* InteractionCharacter = Cast<ADWCharacter>(InInteractionAgent))
 			{
-				return !IsEnemy(InInteractionCharacter) && InInteractionCharacter->GetRidingTarget() != this;
+				return !IsEnemy(InteractionCharacter) && InteractionCharacter->GetRidingTarget() != this;
 			}
 			break;
 		}
 		case (EInteractAction)EDWInteractAction::UnRide:
 		{
-			if(ADWCharacter* InInteractionCharacter = Cast<ADWCharacter>(InInteractionAgent))
+			if(ADWCharacter* InteractionCharacter = Cast<ADWCharacter>(InInteractionAgent))
 			{
-				return !IsEnemy(InInteractionCharacter) && InInteractionCharacter->GetRidingTarget() == this;
+				return !IsEnemy(InteractionCharacter) && InteractionCharacter->GetRidingTarget() == this;
 			}
 			break;
 		}
@@ -60,37 +59,38 @@ void ADWMonsterCharacter::OnInteract(EInteractAction InInteractAction, IInteract
 {
 	Super::OnInteract(InInteractAction, InInteractionAgent, bPassivity);
 
-	if(!bPassivity) return;
-	
-	switch (InInteractAction)
+	if(bPassivity)
 	{
-		case (EInteractAction)EDWInteractAction::Feed:
+		switch (InInteractAction)
 		{
-			if(ADWCharacter* TriggerCharacter = Cast<ADWCharacter>(InInteractionAgent))
+			case (EInteractAction)EDWInteractAction::Feed:
 			{
-				TriggerCharacter->GetInventory()->SetConnectInventory(GetInventory());
-				TriggerCharacter->GetInventory()->GetSelectedSlot()->MoveItem(1);
-				TriggerCharacter->GetInventory()->SetConnectInventory(nullptr);
+				if(ADWCharacter* InteractionCharacter = Cast<ADWCharacter>(InInteractionAgent))
+				{
+					InteractionCharacter->GetInventory()->SetConnectInventory(GetInventory());
+					InteractionCharacter->GetInventory()->GetSelectedSlot()->MoveItem(1);
+					InteractionCharacter->GetInventory()->SetConnectInventory(nullptr);
+				}
+				break;
 			}
-			break;
-		}
-		case (EInteractAction)EDWInteractAction::Ride:
-		{
-			if(ADWCharacter* TriggerCharacter = Cast<ADWCharacter>(InInteractionAgent))
+			case (EInteractAction)EDWInteractAction::Ride:
 			{
-				TriggerCharacter->Ride(this);
+				if(ADWCharacter* InteractionCharacter = Cast<ADWCharacter>(InInteractionAgent))
+				{
+					InteractionCharacter->Ride(this);
+				}
+				break;
 			}
-			break;
-		}
-		case (EInteractAction)EDWInteractAction::UnRide:
-		{
-			if(ADWCharacter* TriggerCharacter = Cast<ADWCharacter>(InInteractionAgent))
+			case (EInteractAction)EDWInteractAction::UnRide:
 			{
-				TriggerCharacter->UnRide();
+				if(ADWCharacter* InteractionCharacter = Cast<ADWCharacter>(InInteractionAgent))
+				{
+					InteractionCharacter->UnRide();
+				}
+				break;
 			}
-			break;
+			default: break;
 		}
-		default: break;
 	}
 }
 
