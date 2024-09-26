@@ -41,7 +41,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components", meta = (BindWidget, OptionalWidget = false))
 	class USizeBox* SelectBox;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Default")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	int32 SelectedSlotIndex;
 
 public:

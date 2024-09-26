@@ -65,6 +65,10 @@ public:
 	
 	virtual bool CanLookAtTarget() override;
 
+	virtual void OnTargetLookAtOn(AActor* InTargetActor) override;
+
+	virtual void OnTargetLookAtOff(AActor* InTargetActor) override;
+
 	virtual bool CanInteract(EInteractAction InInteractAction, IInteractionAgentInterface* InInteractionAgent) override;
 
 	virtual void OnEnterInteract(IInteractionAgentInterface* InInteractionAgent) override;

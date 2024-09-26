@@ -27,7 +27,7 @@ bool UDWCharacterState_Float::OnPreEnter(UFiniteStateBase* InLastState, const TA
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 
-	return Character->DoAction(EDWCharacterActionType::Float);
+	return Character->DoAction(GameplayTags::AbilityTag_Character_Action_Float);
 }
 
 void UDWCharacterState_Float::OnEnter(UFiniteStateBase* InLastState, const TArray<FParameter>& InParams)
@@ -79,7 +79,7 @@ void UDWCharacterState_Float::OnLeave(UFiniteStateBase* InNextState)
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 
-	Character->StopAction(EDWCharacterActionType::Float);
+	Character->StopAction(GameplayTags::AbilityTag_Character_Action_Float);
 	
 	Character->GetAbilitySystemComponent()->RemoveLooseGameplayTag(GameplayTags::StateTag_Character_Floating);
 

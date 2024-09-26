@@ -31,6 +31,9 @@ protected:
 		
 	UPROPERTY(VisibleAnywhere, Category = "InputStates|Player")
 	bool bSecondaryPressed;
+		
+	UPROPERTY(VisibleAnywhere, Category = "InputStates|Player")
+	bool bThirdPressed;
 
 	UPROPERTY(VisibleAnywhere, Category = "InputStates|Player")
 	bool bSprintPressed;

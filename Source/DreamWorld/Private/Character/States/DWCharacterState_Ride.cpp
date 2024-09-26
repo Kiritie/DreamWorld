@@ -30,7 +30,7 @@ bool UDWCharacterState_Ride::OnPreEnter(UFiniteStateBase* InLastState, const TAr
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 
-	return Character->DoAction(EDWCharacterActionType::Ride);
+	return Character->DoAction(GameplayTags::AbilityTag_Character_Action_Ride);
 }
 
 void UDWCharacterState_Ride::OnEnter(UFiniteStateBase* InLastState, const TArray<FParameter>& InParams)
@@ -72,7 +72,7 @@ void UDWCharacterState_Ride::OnLeave(UFiniteStateBase* InNextState)
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 	ADWCharacter* RidingTarget = Character->GetRidingTarget();
 
-	Character->StopAction(EDWCharacterActionType::Ride);
+	Character->StopAction(GameplayTags::AbilityTag_Character_Action_Ride);
 
 	Character->GetAbilitySystemComponent()->RemoveLooseGameplayTag(GameplayTags::StateTag_Character_Riding);
 

@@ -25,7 +25,7 @@ bool UDWCharacterState_Walk::OnPreEnter(UFiniteStateBase* InLastState, const TAr
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 
-	return Character->DoAction(EDWCharacterActionType::Walk);
+	return Character->DoAction(GameplayTags::AbilityTag_Character_Action_Walk);
 }
 
 void UDWCharacterState_Walk::OnEnter(UFiniteStateBase* InLastState, const TArray<FParameter>& InParams)
@@ -64,7 +64,7 @@ void UDWCharacterState_Walk::OnLeave(UFiniteStateBase* InNextState)
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 	
-	Character->StopAction(EDWCharacterActionType::Walk);
+	Character->StopAction(GameplayTags::AbilityTag_Character_Action_Walk);
 }
 
 void UDWCharacterState_Walk::OnTermination()

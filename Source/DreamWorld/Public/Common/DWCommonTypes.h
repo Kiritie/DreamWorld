@@ -42,7 +42,7 @@ class UAbilityInventoryBase;
 class UAbilityCharacterInventoryBase;
 class ADWGameState;
 class AAbilityEquipBase;
-class AAbilitySkillBase;
+class AAbilityProjectileBase;
 class UPropEffectBase;
 class UEquipEffectBase;
 class UAbilityBase;
@@ -84,62 +84,6 @@ enum class EDWCharacterNature : uint8
 	AINeutral,
 	// ?ж??AI
 	AIHostile
-};
-
-/**
- * ??????????
- */
-UENUM(BlueprintType)
-enum class EDWCharacterActionType : uint8
-{
-	// ??
-	None,
-	// ????
-	Death,
-	// ????
-	Revive,
-	// ???
-	Jump,
-	// ???
-	Fall,
-	// ???
-	Walk,
-	// ???
-	Crouch,
-	// ????
-	Dodge,
-	// ????
-	Sprint,
-	// ????
-	Climb,
-	// ???
-	Swim,
-	// ???
-	Float,
-	// ???
-	Ride,
-	// ????
-	Fly,
-	// ???
-	Take,
-	// ???
-	Use,
-	// ????
-	Discard,
-	// ????
-	Generate,
-	// ????
-	Destroy,
-	// ???????
-	Attack,
-	// ???????
-	GetHit,
-	// ???????
-	Defend,
-	// ???????
-	DefendBlock,
-	// ???
-	Interrupt
 };
 
 UENUM(BlueprintType)
@@ -225,14 +169,10 @@ struct DREAMWORLD_API FDWCharacterActionAbilityData : public FAbilityData
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	EDWCharacterActionType ActionType;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSubclassOf<UDWCharacterActionAbility> AbilityClass;
 
 	FORCEINLINE FDWCharacterActionAbilityData()
 	{
-		ActionType = EDWCharacterActionType::None;
 		AbilityClass = nullptr;
 	}
 };
@@ -350,7 +290,7 @@ public:
 		FallingAttackAbility = FDWCharacterAttackAbilityData();
 		AttackAbilities = TMap<EDWWeaponType, FDWCharacterAttackAbilityDatas>();
 		SkillAbilities = TMap<FPrimaryAssetId, FDWCharacterSkillAbilityData>();
-		ActionAbilities = TMap<EDWCharacterActionType, FDWCharacterActionAbilityData>();
+		ActionAbilities = TMap<FGameplayTag, FDWCharacterActionAbilityData>();
 	}
 	
 	FORCEINLINE FDWCharacterSaveData(const FCharacterSaveData& InCharacterSaveData) : FCharacterSaveData(InCharacterSaveData)
@@ -361,7 +301,7 @@ public:
 		FallingAttackAbility = FDWCharacterAttackAbilityData();
 		AttackAbilities = TMap<EDWWeaponType, FDWCharacterAttackAbilityDatas>();
 		SkillAbilities = TMap<FPrimaryAssetId, FDWCharacterSkillAbilityData>();
-		ActionAbilities = TMap<EDWCharacterActionType, FDWCharacterActionAbilityData>();
+		ActionAbilities = TMap<FGameplayTag, FDWCharacterActionAbilityData>();
 	}
 	
 	UPROPERTY(BlueprintReadOnly)
@@ -383,7 +323,7 @@ public:
 	TMap<FPrimaryAssetId, FDWCharacterSkillAbilityData> SkillAbilities;
 
 	UPROPERTY()
-	TMap<EDWCharacterActionType, FDWCharacterActionAbilityData> ActionAbilities;
+	TMap<FGameplayTag, FDWCharacterActionAbilityData> ActionAbilities;
 };
 
 USTRUCT(BlueprintType)
@@ -987,6 +927,7 @@ namespace GameplayTags
 	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(StateTag_Character_Climbing);
 	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(StateTag_Character_Riding);
 	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(StateTag_Character_Flying);
+	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(StateTag_Character_Aiming);
 	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(StateTag_Character_Attacking);
 	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(StateTag_Character_NormalAttacking);
 	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(StateTag_Character_FallingAttacking);
@@ -995,5 +936,31 @@ namespace GameplayTags
 	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(StateTag_Character_Interrupting);
 	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(StateTag_Character_Exhausted);
 	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(StateTag_Character_FreeToAnim);
-	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(StateTag_Character_LockRotation);
+
+	////////////////////////////////////////////////////
+	// Ability_Character_Action
+	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(AbilityTag_Character_Action_Death);
+	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(AbilityTag_Character_Action_Revive);
+	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(AbilityTag_Character_Action_Jump);
+	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(AbilityTag_Character_Action_Fall);
+	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(AbilityTag_Character_Action_Walk);
+	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(AbilityTag_Character_Action_Crouch);
+	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(AbilityTag_Character_Action_Dodge);
+	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(AbilityTag_Character_Action_Sprint);
+	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(AbilityTag_Character_Action_Climb);
+	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(AbilityTag_Character_Action_Swim);
+	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(AbilityTag_Character_Action_Float);
+	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(AbilityTag_Character_Action_Ride);
+	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(AbilityTag_Character_Action_Fly);
+	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(AbilityTag_Character_Action_Take);
+	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(AbilityTag_Character_Action_Use);
+	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(AbilityTag_Character_Action_Discard);
+	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(AbilityTag_Character_Action_Generate);
+	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(AbilityTag_Character_Action_Destroy);
+	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(AbilityTag_Character_Action_Attack);
+	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(AbilityTag_Character_Action_GetHit);
+	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(AbilityTag_Character_Action_Aim);
+	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(AbilityTag_Character_Action_Defend);
+	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(AbilityTag_Character_Action_DefendBlock);
+	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(AbilityTag_Character_Action_Interrupt);
 };

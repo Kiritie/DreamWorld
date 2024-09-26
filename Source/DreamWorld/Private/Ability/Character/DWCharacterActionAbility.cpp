@@ -4,7 +4,6 @@
 
 UDWCharacterActionAbility::UDWCharacterActionAbility()
 {
-	ActionType = EDWCharacterActionType::None;
 	bWasStopped = false;
 }
 
@@ -21,8 +20,8 @@ void UDWCharacterActionAbility::EndAbility(const FGameplayAbilitySpecHandle Hand
 
 	if(!OwnerCharacter) return;
 	
-	if(!bWasStopped && ActionType != EDWCharacterActionType::None)
+	if(!bWasStopped)
 	{
-		OwnerCharacter->EndAction(ActionType, bWasCancelled);
+		OwnerCharacter->EndAction(AbilityTags.GetByIndex(0), bWasCancelled);
 	}
 }

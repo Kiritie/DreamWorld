@@ -21,7 +21,7 @@ bool UDWCharacterState_Defend::OnPreEnter(UFiniteStateBase* InLastState, const T
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 
-	return Character->ControlMode == EDWCharacterControlMode::Fighting && Character->DoAction(EDWCharacterActionType::Defend);
+	return Character->ControlMode == EDWCharacterControlMode::Fighting && Character->DoAction(GameplayTags::AbilityTag_Character_Action_Defend);
 }
 
 void UDWCharacterState_Defend::OnEnter(UFiniteStateBase* InLastState, const TArray<FParameter>& InParams)
@@ -47,7 +47,7 @@ void UDWCharacterState_Defend::OnLeave(UFiniteStateBase* InNextState)
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 
-	Character->StopAction(EDWCharacterActionType::Defend);
+	Character->StopAction(GameplayTags::AbilityTag_Character_Action_Defend);
 	
 	Character->GetAbilitySystemComponent()->RemoveLooseGameplayTag(GameplayTags::StateTag_Character_Defending);
 

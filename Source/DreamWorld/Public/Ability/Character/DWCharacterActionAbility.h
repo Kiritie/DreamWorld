@@ -22,16 +22,9 @@ protected:
 
 protected:
 	//UPROPERTY(BlueprintReadWrite)
-	EDWCharacterActionType ActionType;
-
-	//UPROPERTY(BlueprintReadWrite)
 	bool bWasStopped;
 
 public:
-	EDWCharacterActionType GetActionType() const { return ActionType; }
-
-	void SetActionType(EDWCharacterActionType InActionType) { ActionType = InActionType; }
-
 	bool WasStopped() const { return bWasStopped; }
 
 	void SetStopped(bool val) { bWasStopped = val; }

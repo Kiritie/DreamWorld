@@ -31,7 +31,7 @@ void UDWCharacterState_Default::OnEnter(UFiniteStateBase* InLastState, const TAr
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 
-	Character->DoAction(EDWCharacterActionType::Revive);
+	Character->DoAction(GameplayTags::AbilityTag_Character_Action_Revive);
 
 	Character->LimitToAnim();
 	

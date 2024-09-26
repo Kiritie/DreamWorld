@@ -24,7 +24,6 @@
 #include "Item/Equip/Shield/DWEquipShieldData.h"
 #include "Item/Equip/Weapon/DWEquipWeapon.h"
 #include "Item/Equip/Weapon/DWEquipWeaponData.h"
-#include "Ability/Item/Skill/AbilitySkillBase.h"
 #include "Ability/Item/Skill/AbilitySkillDataBase.h"
 #include "Ability/PickUp/AbilityPickUpBase.h"
 #include "AI/DWAIBlackboard.h"
@@ -48,6 +47,7 @@
 #include "Character/States/DWCharacterState_Walk.h"
 #include "FSM/Components/FSMComponent.h"
 #include "Ability/Inventory/Slot/AbilityInventorySkillSlot.h"
+#include "Character/States/DWCharacterState_Aim.h"
 #include "Common/Looking/LookingComponent.h"
 #include "Voxel/VoxelModuleStatics.h"
 #include "Widget/WidgetModuleStatics.h"
@@ -75,6 +75,7 @@ ADWCharacter::ADWCharacter(const FObjectInitializer& ObjectInitializer) :
 
 	FSM->DefaultState = UDWCharacterState_Default::StaticClass();
 	FSM->States.Empty();
+	FSM->States.Add(UDWCharacterState_Aim::StaticClass());
 	FSM->States.Add(UDWCharacterState_Attack::StaticClass());
 	FSM->States.Add(UDWCharacterState_Climb::StaticClass());
 	FSM->States.Add(UDWCharacterState_Crouch::StaticClass());
@@ -114,7 +115,7 @@ ADWCharacter::ADWCharacter(const FObjectInitializer& ObjectInitializer) :
 
 	AttackAbilities = TMap<EDWWeaponType, FDWCharacterAttackAbilityDatas>();
 	SkillAbilities = TMap<FPrimaryAssetId, FDWCharacterSkillAbilityData>();
-	ActionAbilities = TMap<EDWCharacterActionType, FDWCharacterActionAbilityData>();
+	ActionAbilities = TMap<FGameplayTag, FDWCharacterActionAbilityData>();
 
 	AIControllerClass = ADWAIController::StaticClass();
 }
@@ -274,7 +275,7 @@ void ADWCharacter::LoadData(FSaveData* InSaveData, EPhase InPhase)
 				for(auto Iter : CharacterData.ActionAbilities)
 				{
 					Iter.AbilityHandle = AbilitySystem->K2_GiveAbility(Iter.AbilityClass, Iter.AbilityLevel);
-					ActionAbilities.Add(Iter.ActionType, Iter);
+					ActionAbilities.Add(Iter.AbilityClass->GetDefaultObject<UAbilityBase>()->AbilityTags.GetByIndex(0), Iter);
 				}
 
 				if(CharacterData.FallingAttackAbility.AbilityClass)
@@ -388,7 +389,7 @@ void ADWCharacter::OnActiveItem(const FAbilityItem& InItem, bool bPassive, bool 
 		{
 			if(InItem.GetType() == EAbilityItemType::Prop)
 			{
-				DoAction(EDWCharacterActionType::Use);
+				DoAction(GameplayTags::AbilityTag_Character_Action_Use);
 			}
 		}
 		else if(IsPlayer())
@@ -438,7 +439,7 @@ bool ADWCharacter::OnGenerateVoxel(const FVoxelHitResult& InVoxelHitResult)
 	if(!GenerateVoxelID.IsValid()) return false;
 	
 	FItemQueryInfo ItemQueryInfo = Inventory->QueryItemByRange(EItemQueryType::Remove, FAbilityItem(GenerateVoxelID, 1), -1);
-	if(ItemQueryInfo.IsValid() && DoAction(EDWCharacterActionType::Generate))
+	if(ItemQueryInfo.IsValid() && DoAction(GameplayTags::AbilityTag_Character_Action_Generate))
 	{
 		if(Super::OnGenerateVoxel(InVoxelHitResult))
 		{
@@ -452,7 +453,7 @@ bool ADWCharacter::OnGenerateVoxel(const FVoxelHitResult& InVoxelHitResult)
 
 bool ADWCharacter::OnDestroyVoxel(const FVoxelHitResult& InVoxelHitResult)
 {
-	if(DoAction(EDWCharacterActionType::Destroy))
+	if(DoAction(GameplayTags::AbilityTag_Character_Action_Destroy))
 	{
 		if(Super::OnDestroyVoxel(InVoxelHitResult))
 		{
@@ -463,27 +464,19 @@ bool ADWCharacter::OnDestroyVoxel(const FVoxelHitResult& InVoxelHitResult)
 	return false;
 }
 
-void ADWCharacter::FreeToAnim(bool bUnLockRotation /*= true*/)
+void ADWCharacter::FreeToAnim()
 {
 	if(!IsFreeToAnim())
 	{
 		AbilitySystem->AddLooseGameplayTag(GameplayTags::StateTag_Character_FreeToAnim);
 	}
-	if(bUnLockRotation && IsLockRotation())
-	{
-		AbilitySystem->RemoveLooseGameplayTag(GameplayTags::StateTag_Character_LockRotation);
-	}
 }
 
-void ADWCharacter::LimitToAnim(bool bLockRotation /*= false*/)
+void ADWCharacter::LimitToAnim()
 {
 	if(IsFreeToAnim())
 	{
 		AbilitySystem->RemoveLooseGameplayTag(GameplayTags::StateTag_Character_FreeToAnim);
-	}
-	if(bLockRotation && !IsLockRotation())
-	{
-		AbilitySystem->AddLooseGameplayTag(GameplayTags::StateTag_Character_LockRotation);
 	}
 }
 
@@ -527,7 +520,7 @@ void ADWCharacter::Sprint()
 {
 	if(!IsSprinting())
 	{
-		DoAction(EDWCharacterActionType::Sprint);
+		DoAction(GameplayTags::AbilityTag_Character_Action_Sprint);
 	}
 }
 
@@ -535,7 +528,7 @@ void ADWCharacter::UnSprint()
 {
 	if(IsSprinting())
 	{
-		StopAction(EDWCharacterActionType::Sprint);
+		StopAction(GameplayTags::AbilityTag_Character_Action_Sprint);
 	}
 }
 
@@ -628,6 +621,19 @@ void ADWCharacter::UnFly()
 	}
 }
 
+void ADWCharacter::Aim()
+{
+	FSM->SwitchStateByClass<UDWCharacterState_Aim>();
+}
+
+void ADWCharacter::UnAim()
+{
+	if(FSM->IsCurrentStateClass<UDWCharacterState_Aim>())
+	{
+		FSM->SwitchState(nullptr);
+	}
+}
+
 bool ADWCharacter::Attack(int32 InAbilityIndex /*= -1*/, const FSimpleDelegate& OnStart/* = nullptr*/, const FSimpleDelegate& OnEnd/* = nullptr*/)
 {
 	if(InAbilityIndex == -1) InAbilityIndex = AttackAbilityIndex;
@@ -639,11 +645,7 @@ bool ADWCharacter::Attack(int32 InAbilityIndex /*= -1*/, const FSimpleDelegate& 
 			const auto AbilityData = GetAttackAbility(InAbilityIndex);
 			if(CheckWeaponType(AbilityData.WeaponType))
 			{
-				if(FSM->SwitchStateByClass<UDWCharacterState_Attack>({ &AbilityData.AbilityHandle, (uint8)EDWCharacterAttackType::NormalAttack, &OnStart, &OnEnd }))
-				{
-					AttackAbilityIndex = InAbilityIndex;
-					return true;
-				}
+				return FSM->SwitchStateByClass<UDWCharacterState_Attack>({ &AbilityData.AbilityHandle, (uint8)EDWCharacterAttackType::NormalAttack, InAbilityIndex, &OnStart, &OnEnd });
 			}
 		}
 	}
@@ -662,10 +664,7 @@ bool ADWCharacter::FallingAttack(const FSimpleDelegate& OnStart/* = nullptr*/, c
 
 		if(CheckWeaponType(FallingAttackAbility.WeaponType))
 		{
-			if(FSM->SwitchStateByClass<UDWCharacterState_Attack>({ &FallingAttackAbility.AbilityHandle, (uint8)EDWCharacterAttackType::FallingAttack, &OnStart, &OnEnd }))
-			{
-				return true;
-			}
+			return FSM->SwitchStateByClass<UDWCharacterState_Attack>({ &FallingAttackAbility.AbilityHandle, (uint8)EDWCharacterAttackType::FallingAttack, &OnStart, &OnEnd });
 		}
 	}
 	return false;
@@ -694,11 +693,7 @@ bool ADWCharacter::SkillAttack(const FAbilityItem& InAbilityItem, const FSimpleD
 	const auto AbilityData = GetSkillAbility(InAbilityItem.ID);
 	if(CheckWeaponType(AbilityData.WeaponType))
 	{
-		if(FSM->SwitchStateByClass<UDWCharacterState_Attack>({ &AbilityData.AbilityHandle, (uint8)EDWCharacterAttackType::SkillAttack, &OnStart, &OnEnd }))
-		{
-			SkillAbilityItem = InAbilityItem;
-			return true;
-		}
+		return FSM->SwitchStateByClass<UDWCharacterState_Attack>({ &AbilityData.AbilityHandle, (uint8)EDWCharacterAttackType::SkillAttack, &InAbilityItem, &OnStart, &OnEnd });
 	}
 	return false;
 }
@@ -724,26 +719,25 @@ void ADWCharacter::UnDefend()
 	}
 }
 
-bool ADWCharacter::DoAction(EDWCharacterActionType InActionType)
+bool ADWCharacter::DoAction(const FGameplayTag& InActionTag)
 {
-	if(!HasActionAbility(InActionType)) return false;
+	if(!HasActionAbility(InActionTag)) return false;
 
-	const FDWCharacterActionAbilityData AbilityData = GetActionAbility(InActionType);
+	const FDWCharacterActionAbilityData AbilityData = GetActionAbility(InActionTag);
 	const bool bSuccess = AbilitySystem->TryActivateAbility(AbilityData.AbilityHandle);
 	const FGameplayAbilitySpec Spec = AbilitySystem->FindAbilitySpecForHandle(AbilityData.AbilityHandle);
 	if(UDWCharacterActionAbility* Ability = Cast<UDWCharacterActionAbility>(Spec.GetPrimaryInstance()))
 	{
-		Ability->SetActionType(InActionType);
 		Ability->SetStopped(false);
 	}
 	return bSuccess;
 }
 
-bool ADWCharacter::StopAction(EDWCharacterActionType InActionType)
+bool ADWCharacter::StopAction(const FGameplayTag& InActionTag)
 {
-	if(!HasActionAbility(InActionType)) return false;
+	if(!HasActionAbility(InActionTag)) return false;
 
-	const FDWCharacterActionAbilityData AbilityData = GetActionAbility(InActionType);
+	const FDWCharacterActionAbilityData AbilityData = GetActionAbility(InActionTag);
 	const FGameplayAbilitySpec Spec = AbilitySystem->FindAbilitySpecForHandle(AbilityData.AbilityHandle);
 	if(UDWCharacterActionAbility* Ability = Cast<UDWCharacterActionAbility>(Spec.GetPrimaryInstance()))
 	{
@@ -753,71 +747,56 @@ bool ADWCharacter::StopAction(EDWCharacterActionType InActionType)
 	return true;
 }
 
-void ADWCharacter::EndAction(EDWCharacterActionType InActionType, bool bWasCancelled)
+void ADWCharacter::EndAction(const FGameplayTag& InActionTag, bool bWasCancelled)
 {
-	if(!HasActionAbility(InActionType)) return;
+	if(!HasActionAbility(InActionTag)) return;
 
-	switch(InActionType)
+	if(InActionTag.MatchesTag(GameplayTags::AbilityTag_Character_Action_Death))
 	{
-		case EDWCharacterActionType::Death:
+		if(FSM->IsCurrentStateClass<UDWCharacterState_Death>())
 		{
-			if(FSM->IsCurrentStateClass<UDWCharacterState_Death>())
-			{
-				FSM->GetCurrentState<UDWCharacterState_Death>()->DeathEnd();
-			}
-			break;
+			FSM->GetCurrentState<UDWCharacterState_Death>()->DeathEnd();
 		}
-		case EDWCharacterActionType::Crouch:
-		{
-			UnCrouch(false);
-			break;
-		}
-		case EDWCharacterActionType::Dodge:
-		{
-			UnDodge();
-			break;
-		}
-		case EDWCharacterActionType::Sprint:
-		{
-			UnSprint();
-			break;
-		}
-		case EDWCharacterActionType::Climb:
-		{
-			UnClimb();
-			break;
-		}
-		case EDWCharacterActionType::Swim:
-		{
-			UnSwim();
-			break;
-		}
-		case EDWCharacterActionType::Float:
-		{
-			UnFloat();
-			break;
-		}
-		case EDWCharacterActionType::Ride:
-		{
-			UnRide();
-			break;
-		}
-		case EDWCharacterActionType::Fly:
-		{
-			UnFly();
-			break;
-		}
-		case EDWCharacterActionType::Attack:
-		{
-			UnAttack();
-			break;
-		}
-		case EDWCharacterActionType::Defend:
-		{
-			UnDefend();
-			break;
-		}
-		default: break;
+	}
+	else if(InActionTag.MatchesTag(GameplayTags::AbilityTag_Character_Action_Crouch))
+	{
+		UnCrouch(false);
+	}
+	else if(InActionTag.MatchesTag(GameplayTags::AbilityTag_Character_Action_Dodge))
+	{
+		UnDodge();
+	}
+	else if(InActionTag.MatchesTag(GameplayTags::AbilityTag_Character_Action_Sprint))
+	{
+		UnSprint();
+	}
+	else if(InActionTag.MatchesTag(GameplayTags::AbilityTag_Character_Action_Climb))
+	{
+		UnClimb();
+	}
+	else if(InActionTag.MatchesTag(GameplayTags::AbilityTag_Character_Action_Swim))
+	{
+		UnSwim();
+	}
+	else if(InActionTag.MatchesTag(GameplayTags::AbilityTag_Character_Action_Float))
+	{
+		UnFloat();
+	}
+	else if(InActionTag.MatchesTag(GameplayTags::AbilityTag_Character_Action_Ride))
+	{
+		UnRide();
+	}
+	else if(InActionTag.MatchesTag(GameplayTags::AbilityTag_Character_Action_Fly))
+	{
+		UnFly();
+	}
+	else if(InActionTag.MatchesTag(GameplayTags::AbilityTag_Character_Action_Attack))
+	{
+		UnAttack();
+	}
+	else if(InActionTag.MatchesTag(GameplayTags::AbilityTag_Character_Action_Defend))
+	{
+		UnDefend();
 	}
 }
 
@@ -923,6 +902,11 @@ bool ADWCharacter::IsFloating() const
 	return AbilitySystem->HasMatchingGameplayTag(GameplayTags::StateTag_Character_Floating);
 }
 
+bool ADWCharacter::IsAiming() const
+{
+	return AbilitySystem->HasMatchingGameplayTag(GameplayTags::StateTag_Character_Aiming);
+}
+
 bool ADWCharacter::IsAttacking(EDWCharacterAttackType InAttackType) const
 {
 	return InAttackType == EDWCharacterAttackType::None ? AbilitySystem->HasMatchingGameplayTag(GameplayTags::StateTag_Character_Attacking) : AttackType == InAttackType;
@@ -951,11 +935,6 @@ bool ADWCharacter::IsFlying(bool bReally) const
 bool ADWCharacter::IsInterrupting() const
 {
 	return AbilitySystem->HasMatchingGameplayTag(GameplayTags::StateTag_Character_Interrupting);
-}
-
-bool ADWCharacter::IsLockRotation() const
-{
-	return AbilitySystem->HasMatchingGameplayTag(GameplayTags::StateTag_Character_LockRotation);
 }
 
 UWidgetCharacterHP* ADWCharacter::GetCharacterHPWidget() const
@@ -1070,7 +1049,7 @@ AAbilityEquipBase* ADWCharacter::GetEquip(EDWEquipPartType InPartType) const
 
 ADWEquipWeapon* ADWCharacter::GetWeapon() const
 {
-	return GetEquip<ADWEquipWeapon>(EDWEquipPartType::RightHand);
+	return IsAiming() ? GetEquip<ADWEquipWeapon>(EDWEquipPartType::LeftHand) : GetEquip<ADWEquipWeapon>(EDWEquipPartType::RightHand);
 }
 
 ADWEquipShield* ADWCharacter::GetShield() const
@@ -1143,11 +1122,11 @@ FDWCharacterSkillAbilityData ADWCharacter::GetSkillAbility(ESkillType InSkillTyp
 	return FDWCharacterSkillAbilityData();
 }
 
-FDWCharacterActionAbilityData ADWCharacter::GetActionAbility(EDWCharacterActionType InActionType)
+FDWCharacterActionAbilityData ADWCharacter::GetActionAbility(const FGameplayTag& InActionTag)
 {
-	if(HasActionAbility(InActionType))
+	if(HasActionAbility(InActionTag))
 	{
-		return ActionAbilities[InActionType];
+		return ActionAbilities[InActionTag];
 	}
 	return FDWCharacterActionAbilityData();
 }
@@ -1234,11 +1213,9 @@ bool ADWCharacter::HasSkillAbility(ESkillType InSkillType, int32 InAbilityIndex,
 	return false;
 }
 
-bool ADWCharacter::HasActionAbility(EDWCharacterActionType InActionType) const
+bool ADWCharacter::HasActionAbility(const FGameplayTag& InActionTag) const
 {
-	if(InActionType == EDWCharacterActionType::None) return false;
-	
-	return ActionAbilities.Contains(InActionType);
+	return ActionAbilities.Contains(InActionTag);
 }
 
 bool ADWCharacter::IsEnemy(IAbilityPawnInterface* InTarget) const
@@ -1377,7 +1354,7 @@ void ADWCharacter::HandleDamage(EDamageType DamageType, const float LocalDamageD
 	{
 		if(!bHasDefend)
 		{
-			DoAction(EDWCharacterActionType::GetHit);
+			DoAction(GameplayTags::AbilityTag_Character_Action_GetHit);
 		}
 
 		ADWCharacter* SourceCharacter = Cast<ADWCharacter>(SourceActor);

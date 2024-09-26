@@ -22,7 +22,7 @@ bool UDWCharacterState_Dodge::OnPreEnter(UFiniteStateBase* InLastState, const TA
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 
-	return Character->GetMoveDirection(true) != FVector::ZeroVector && Character->DoAction(EDWCharacterActionType::Dodge);
+	return Character->GetMoveDirection(true) != FVector::ZeroVector && Character->DoAction(GameplayTags::AbilityTag_Character_Action_Dodge);
 }
 
 void UDWCharacterState_Dodge::OnEnter(UFiniteStateBase* InLastState, const TArray<FParameter>& InParams)
@@ -49,7 +49,7 @@ void UDWCharacterState_Dodge::OnLeave(UFiniteStateBase* InNextState)
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 
-	Character->StopAction(EDWCharacterActionType::Dodge);
+	Character->StopAction(GameplayTags::AbilityTag_Character_Action_Dodge);
 	
 	Character->GetAbilitySystemComponent()->RemoveLooseGameplayTag(GameplayTags::StateTag_Character_Dodging);
 

@@ -44,7 +44,7 @@ void UDWDamageHandle::HandleDamage(AActor* SourceActor, AActor* TargetActor, flo
 		if (FVector::DotProduct(DamageDirection, TargetActor->GetActorForwardVector())/* / 90.f*/ > (1.f - SourceDefendScope))
 		{
 			DefendRateDone = SourceDefendRate * (TargetCharacter->IsDefending() ? 1.f : 0.f);
-			if(DefendRateDone > 0.f && !TargetCharacter->DoAction(EDWCharacterActionType::DefendBlock))
+			if(DefendRateDone > 0.f && !TargetCharacter->DoAction(GameplayTags::AbilityTag_Character_Action_DefendBlock))
 			{
 				DefendRateDone = 0.f;
 				TargetCharacter->UnDefend();
@@ -174,6 +174,7 @@ namespace GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(StateTag_Character_Climbing, "State.Character.Climbing", "Character Climbing");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(StateTag_Character_Riding, "State.Character.Riding", "Character Riding");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(StateTag_Character_Flying, "State.Character.Flying", "Character Flying");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(StateTag_Character_Aiming, "State.Character.Aiming", "Character Aiming");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(StateTag_Character_Attacking, "State.Character.Attacking", "Character Attacking");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(StateTag_Character_NormalAttacking, "State.Character.NormalAttacking", "Character NormalAttacking");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(StateTag_Character_FallingAttacking, "State.Character.FallingAttacking", "Character FallingAttacking");
@@ -182,5 +183,31 @@ namespace GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(StateTag_Character_Interrupting, "State.Character.Interrupting", "Character Interrupting");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(StateTag_Character_Exhausted, "State.Character.Exhausted", "Character Exhausted");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(StateTag_Character_FreeToAnim, "State.Character.FreeToAnim", "Character FreeToAnim");
-	UE_DEFINE_GAMEPLAY_TAG_COMMENT(StateTag_Character_LockRotation, "State.Character.LockRotation", "Character LockRotation");
+
+	////////////////////////////////////////////////////
+	// Ability_Character_Action
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(AbilityTag_Character_Action_Death, "Ability.Character.Action.Death", "Character Action Death");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(AbilityTag_Character_Action_Revive, "Ability.Character.Action.Revive", "Character Action Revive");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(AbilityTag_Character_Action_Jump, "Ability.Character.Action.Jump", "Character Action Jump");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(AbilityTag_Character_Action_Fall, "Ability.Character.Action.Fall", "Character Action Fall");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(AbilityTag_Character_Action_Walk, "Ability.Character.Action.Walk", "Character Action Walk");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(AbilityTag_Character_Action_Crouch, "Ability.Character.Action.Crouch", "Character Action Crouch");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(AbilityTag_Character_Action_Dodge, "Ability.Character.Action.Dodge", "Character Action Dodge");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(AbilityTag_Character_Action_Sprint, "Ability.Character.Action.Sprint", "Character Action Sprint");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(AbilityTag_Character_Action_Climb, "Ability.Character.Action.Climb", "Character Action Climb");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(AbilityTag_Character_Action_Swim, "Ability.Character.Action.Swim", "Character Action Swim");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(AbilityTag_Character_Action_Float, "Ability.Character.Action.Float", "Character Action Float");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(AbilityTag_Character_Action_Ride, "Ability.Character.Action.Ride", "Character Action Ride");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(AbilityTag_Character_Action_Fly, "Ability.Character.Action.Fly", "Character Action Fly");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(AbilityTag_Character_Action_Take, "Ability.Character.Action.Take", "Character Action Take");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(AbilityTag_Character_Action_Use, "Ability.Character.Action.Use", "Character Action Use");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(AbilityTag_Character_Action_Discard, "Ability.Character.Action.Discard", "Character Action Discard");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(AbilityTag_Character_Action_Generate, "Ability.Character.Action.Generate", "Character Action Generate");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(AbilityTag_Character_Action_Destroy, "Ability.Character.Action.Destroy", "Character Action Destroy");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(AbilityTag_Character_Action_Attack, "Ability.Character.Action.Attack", "Character Action Attack");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(AbilityTag_Character_Action_GetHit, "Ability.Character.Action.GetHit", "Character Action GetHit");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(AbilityTag_Character_Action_Aim, "Ability.Character.Action.Aim", "Character Action Aim");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(AbilityTag_Character_Action_Defend, "Ability.Character.Action.Defend", "Character Action Defend");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(AbilityTag_Character_Action_DefendBlock, "Ability.Character.Action.DefendBlock", "Character Action DefendBlock");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(AbilityTag_Character_Action_Interrupt, "Ability.Character.Action.Interrupt", "Character Action Interrupt");
 }

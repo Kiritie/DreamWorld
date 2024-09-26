@@ -41,6 +41,7 @@
 #include "Ability/Item/Raw/AbilityRawDataBase.h"
 #include "Character/DWCharacterData.h"
 #include "Character/Human/States/DWHumanCharacterState_Defend.h"
+#include "Character/Player/States/DWPlayerCharacterState_Aim.h"
 #include "Character/States/DWCharacterState_Attack.h"
 #include "Character/States/DWCharacterState_Dodge.h"
 #include "Character/States/DWCharacterState_Interrupt.h"
@@ -82,8 +83,8 @@ ADWPlayerCharacter::ADWPlayerCharacter()
 	Targeting->RotatingSmoothnessSpeed = 20.f;
 	Targeting->PitchMin = -20.f;
 	Targeting->PitchMax = -10.f;
-	Targeting->OnTargetLockedOn.AddDynamic(this, &ADWPlayerCharacter::OnTargetLockedOn);
-	Targeting->OnTargetLockedOff.AddDynamic(this, &ADWPlayerCharacter::OnTargetLockedOff);
+	Targeting->OnTargetLockOn.AddDynamic(this, &ADWPlayerCharacter::OnTargetLockedOn);
+	Targeting->OnTargetLockOff.AddDynamic(this, &ADWPlayerCharacter::OnTargetLockedOff);
 	Targeting->OnTargetSetRotation.AddDynamic(this, &ADWPlayerCharacter::OnTargetSetRotation);
 
 	PreviewCapture = CreateDefaultSubobject<USceneCaptureComponent2D>(FName("PreviewCapture"));
@@ -96,6 +97,7 @@ ADWPlayerCharacter::ADWPlayerCharacter()
 	// FSM->bShowDebugMessage = true;
 	FSM->DefaultState = UDWCharacterState_Default::StaticClass();
 	FSM->States.Empty();
+	FSM->States.Add(UDWPlayerCharacterState_Aim::StaticClass());
 	FSM->States.Add(UDWCharacterState_Attack::StaticClass());
 	FSM->States.Add(UDWCharacterState_Climb::StaticClass());
 	FSM->States.Add(UDWCharacterState_Crouch::StaticClass());
@@ -117,6 +119,8 @@ ADWPlayerCharacter::ADWPlayerCharacter()
 void ADWPlayerCharacter::OnInitialize_Implementation()
 {
 	Super::OnInitialize_Implementation();
+
+	Targeting->LocationOffset = FVector(0.f, Execute_GetCameraOffset(this).Y, 0.f);
 
 	PreviewCapture->ShowOnlyActors.Add(this);
 }
@@ -265,7 +269,15 @@ void ADWPlayerCharacter::ChangeHand()
 
 bool ADWPlayerCharacter::CanLookAtTarget()
 {
-	return Super::CanLookAtTarget() && (IsAttacking() || IsDefending());
+	return Super::CanLookAtTarget() && (IsAttacking() || IsDefending() || IsAiming());
+}
+
+void ADWPlayerCharacter::OnTargetLookAtOn(AActor* InTargetActor)
+{
+}
+
+void ADWPlayerCharacter::OnTargetLookAtOff(AActor* InTargetActor)
+{
 }
 
 bool ADWPlayerCharacter::CanInteract(EInteractAction InInteractAction, IInteractionAgentInterface* InInteractionAgent)

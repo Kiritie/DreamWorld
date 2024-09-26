@@ -38,7 +38,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (TitleProperty = "WeaponType"))
 	TArray<FDWCharacterSkillAbilityData> SkillAbilities;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (TitleProperty = "ActionType"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TArray<FDWCharacterActionAbilityData> ActionAbilities;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)

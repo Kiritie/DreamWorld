@@ -3,4 +3,6 @@
 UDWPropData::UDWPropData()
 {
 	MaxCount = 10;
+
+	PropType = EDWPropType::Potion;
 }

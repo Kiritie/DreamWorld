@@ -4,12 +4,16 @@
 
 #include "TimerManager.h"
 #include "Ability/AbilityModuleStatics.h"
-#include "Ability/Item/Skill/AbilitySkillBase.h"
+#include "Ability/Components/AbilitySystemComponentBase.h"
 #include "Ability/Item/Skill/AbilitySkillDataBase.h"
+#include "Ability/Projectile/AbilityProjectileBase.h"
+#include "Camera/CameraModuleStatics.h"
 #include "Character/DWCharacter.h"
 #include "ObjectPool/ObjectPoolModuleStatics.h"
 #include "Character/DWCharacterData.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Item/Equip/Weapon/DWEquipWeaponRemote.h"
+#include "Item/Equip/Weapon/DWEquipWeaponRemoteData.h"
 
 UDWCharacterState_Attack::UDWCharacterState_Attack()
 {
@@ -27,7 +31,7 @@ bool UDWCharacterState_Attack::OnPreEnter(UFiniteStateBase* InLastState, const T
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 
-	return Character->ControlMode == EDWCharacterControlMode::Fighting && Character->GetAbilitySystemComponent()->TryActivateAbility(InParams[0].GetPointerValueRef<FGameplayAbilitySpecHandle>()) && Character->DoAction(EDWCharacterActionType::Attack);
+	return Character->ControlMode == EDWCharacterControlMode::Fighting && Character->GetAbilitySystemComponent()->TryActivateAbility(InParams[0].GetPointerValueRef<FGameplayAbilitySpecHandle>()) && Character->DoAction(GameplayTags::AbilityTag_Character_Action_Attack);
 }
 
 void UDWCharacterState_Attack::OnEnter(UFiniteStateBase* InLastState, const TArray<FParameter>& InParams)
@@ -40,9 +44,39 @@ void UDWCharacterState_Attack::OnEnter(UFiniteStateBase* InLastState, const TArr
 
 	Character->AttackType = (EDWCharacterAttackType)InParams[1].GetByteValue();
 
-	OnAttackStart = InParams[2].GetPointerValueRef<FSimpleDelegate>();
-
-	OnAttackEnd = InParams[3].GetPointerValueRef<FSimpleDelegate>();
+	switch (Character->AttackType)
+	{
+		case EDWCharacterAttackType::NormalAttack:
+		{
+			Character->AttackAbilityIndex = InParams[2];
+			OnAttackStart = InParams[3].GetPointerValueRef<FSimpleDelegate>();
+			OnAttackEnd = InParams[4].GetPointerValueRef<FSimpleDelegate>();
+			if(Character->GetWeapon<ADWEquipWeaponRemote>())
+			{
+				Character->bUseControllerRotationYaw = true;
+			}
+			break;
+		}
+		case EDWCharacterAttackType::FallingAttack:
+		{
+			OnAttackStart = InParams[2].GetPointerValueRef<FSimpleDelegate>();
+			OnAttackEnd = InParams[3].GetPointerValueRef<FSimpleDelegate>();
+			break;
+		}
+		case EDWCharacterAttackType::SkillAttack:
+		{
+			Character->SkillAbilityItem = InParams[2].GetPointerValueRef<FAbilityItem>();
+			OnAttackStart = InParams[3].GetPointerValueRef<FSimpleDelegate>();
+			OnAttackEnd = InParams[4].GetPointerValueRef<FSimpleDelegate>();
+			const auto SkillAbilityData = Character->GetSkillAbility(Character->SkillAbilityItem.ID);
+			if(SkillAbilityData.GetItemData<UAbilitySkillDataBase>().ProjectileClass)
+			{
+				Character->bUseControllerRotationYaw = true;
+			}
+			break;
+		}
+		default: break;
+	}
 }
 
 void UDWCharacterState_Attack::OnRefresh(float DeltaSeconds)
@@ -56,9 +90,19 @@ void UDWCharacterState_Attack::OnLeave(UFiniteStateBase* InNextState)
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 
-	Character->StopAction(EDWCharacterActionType::Attack);
+	Character->StopAction(GameplayTags::AbilityTag_Character_Action_Attack);
 
 	Character->GetAbilitySystemComponent()->RemoveLooseGameplayTag(GameplayTags::StateTag_Character_Attacking);
+
+	if(Character->IsAiming())
+	{
+		Character->GetAbilitySystemComponent()->RemoveLooseGameplayTag(GameplayTags::StateTag_Character_Aiming);
+
+		Character->bUseControllerRotationYaw = false;
+
+		UCameraModuleStatics::DoCameraOffset(FVector(-1.f), 0.5f, EEaseType::InOutSine);
+		UCameraModuleStatics::DoCameraFov(-1.f, 0.5f, EEaseType::InOutSine);
+	}
 
 	AttackEnd();
 }
@@ -78,8 +122,16 @@ void UDWCharacterState_Attack::AttackStart()
 	{
 		case EDWCharacterAttackType::NormalAttack:
 		{
-			Character->ClearAttackHitTargets();
-			Character->SetAttackHitAble(true);
+			if(ADWEquipWeaponRemote* Weapon = Character->GetWeapon<ADWEquipWeaponRemote>())
+			{
+				const auto AttackAbilityData = Character->GetAttackAbility(Character->AttackAbilityIndex);
+				UAbilityModuleStatics::SpawnAbilityProjectile(Weapon->GetItemData<UDWEquipWeaponRemoteData>().ProjectileClass, Character, AttackAbilityData.AbilityHandle);
+			}
+			else
+			{
+				Character->ClearAttackHitTargets();
+				Character->SetAttackHitAble(true);
+			}
 			break;
 		}
 		case EDWCharacterAttackType::FallingAttack:
@@ -92,9 +144,9 @@ void UDWCharacterState_Attack::AttackStart()
 		case EDWCharacterAttackType::SkillAttack:
 		{
 			const auto SkillAbilityData = Character->GetSkillAbility(Character->SkillAbilityItem.ID);
-			if(SkillAbilityData.GetItemData<UAbilitySkillDataBase>().SkillClass)
+			if(SkillAbilityData.GetItemData<UAbilitySkillDataBase>().ProjectileClass)
 			{
-				UAbilityModuleStatics::SpawnAbilityItem(Character->SkillAbilityItem, Character);
+				UAbilityModuleStatics::SpawnAbilityProjectile(SkillAbilityData.GetItemData<UAbilitySkillDataBase>().ProjectileClass, Character, Character->SkillAbilityItem.AbilityHandle);
 			}
 			else
 			{
@@ -122,7 +174,7 @@ void UDWCharacterState_Attack::AttackStep()
 	if (Character->AttackType == EDWCharacterAttackType::SkillAttack)
 	{
 		const auto AbilityData = Character->GetSkillAbility(Character->SkillAbilityItem.ID);
-		if(AbilityData.GetItemData<UAbilitySkillDataBase>().SkillClass) return;
+		if(AbilityData.GetItemData<UAbilitySkillDataBase>().ProjectileClass) return;
 	}
 	
 	bool bAttackHitAble = !Character->IsAttackHitAble();
@@ -140,7 +192,10 @@ void UDWCharacterState_Attack::AttackEnd()
 	{
 		case EDWCharacterAttackType::NormalAttack:
 		{
-			Character->SetAttackHitAble(false);
+			if(!Character->GetWeapon<ADWEquipWeaponRemote>())
+			{
+				Character->SetAttackHitAble(false);
+			}
 			if (++Character->AttackAbilityIndex == Character->GetAttackAbilities().Num())
 			{
 				Character->AttackAbilityIndex = 0;
@@ -157,7 +212,7 @@ void UDWCharacterState_Attack::AttackEnd()
 		case EDWCharacterAttackType::SkillAttack:
 		{
 			const auto AbilityData = Character->GetSkillAbility(Character->SkillAbilityItem.ID);
-			if(!AbilityData.GetItemData<UAbilitySkillDataBase>().SkillClass)
+			if(!AbilityData.GetItemData<UAbilitySkillDataBase>().ProjectileClass)
 			{
 				Character->SetAttackHitAble(false);
 			}

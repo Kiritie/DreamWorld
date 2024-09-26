@@ -8,13 +8,12 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "Item/Equip/Weapon/DWEquipWeapon.h"
 #include "ObjectPool/ObjectPoolModuleStatics.h"
 #include "Voxel/Components/VoxelMeshComponent.h"
 #include "Voxel/Voxels/Entity/VoxelEntity.h"
 #include "Ability/Item/Equip/AbilityEquipBase.h"
-#include "Ability/Item/Equip/AbilityEquipDataBase.h"
 #include "Character/Human/States/DWHumanCharacterState_Defend.h"
+#include "Character/States/DWCharacterState_Aim.h"
 #include "Character/States/DWCharacterState_Attack.h"
 #include "Character/States/DWCharacterState_Climb.h"
 #include "Character/States/DWCharacterState_Crouch.h"
@@ -33,6 +32,7 @@
 #include "Common/Interaction/InteractionComponent.h"
 #include "FSM/Components/FSMComponent.h"
 #include "Item/Equip/DWEquipData.h"
+#include "Item/Equip/Weapon/DWEquipWeaponMelee.h"
 #include "Voxel/Datas/VoxelData.h"
 
 ADWHumanCharacter::ADWHumanCharacter()
@@ -40,7 +40,6 @@ ADWHumanCharacter::ADWHumanCharacter()
 	GetCapsuleComponent()->SetCapsuleHalfHeight(69.f);
 	GetCapsuleComponent()->SetCapsuleRadius(24.f);
 
-	GetCharacterMovement()->bOrientRotationToMovement = true; // Character moves in the direction of input...	
 	GetCharacterMovement()->AirControl = 0.3f;
 
 	GetMesh()->SetRelativeLocation(FVector(0.f, 0.f, -70.f));
@@ -53,6 +52,7 @@ ADWHumanCharacter::ADWHumanCharacter()
 	
 	FSM->DefaultState = UDWCharacterState_Default::StaticClass();
 	FSM->States.Empty();
+	FSM->States.Add(UDWCharacterState_Aim::StaticClass());
 	FSM->States.Add(UDWCharacterState_Attack::StaticClass());
 	FSM->States.Add(UDWCharacterState_Climb::StaticClass());
 	FSM->States.Add(UDWCharacterState_Crouch::StaticClass());
@@ -204,12 +204,18 @@ void ADWHumanCharacter::SetAttackHitAble(bool bValue)
 {
 	Super::SetAttackHitAble(bValue);
 
-	if(GetWeapon()) GetWeapon()->SetHitAble(bValue);
+	if(ADWEquipWeaponMelee* Weapon = GetWeapon<ADWEquipWeaponMelee>())
+	{
+		Weapon->SetHitAble(bValue);
+	}
 }
 
 void ADWHumanCharacter::ClearAttackHitTargets()
 {
 	Super::ClearAttackHitTargets();
 
-	if(GetWeapon()) GetWeapon()->ClearHitTargets();
+	if(ADWEquipWeaponMelee* Weapon = GetWeapon<ADWEquipWeaponMelee>())
+	{
+		Weapon->ClearHitTargets();
+	}
 }

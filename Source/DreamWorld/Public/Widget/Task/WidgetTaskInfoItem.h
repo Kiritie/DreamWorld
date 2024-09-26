@@ -24,6 +24,6 @@ public:
 	virtual void OnRefresh() override;
 
 protected:
-	UPROPERTY(BlueprintReadOnly, Category = "Default")
+	UPROPERTY(BlueprintReadOnly)
 	UTaskBase* Task;
 };

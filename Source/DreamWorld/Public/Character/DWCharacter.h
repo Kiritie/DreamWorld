@@ -29,7 +29,7 @@ class UAbilityCharacterInventoryBase;
 class UBehaviorTree;
 class UDWAIBlackboard;
 class UAbilityInventorySlot;
-class AAbilitySkillBase;
+class AAbilityProjectileBase;
 
 /**
  * 角色
@@ -112,13 +112,13 @@ public:
 
 public:
 	UFUNCTION(BlueprintCallable)
-	virtual void FreeToAnim(bool bUnLockRotation = true);
+	virtual void FreeToAnim();
 
 	UFUNCTION(BlueprintCallable)
-	virtual void LimitToAnim(bool bLockRotation = false);
+	virtual void LimitToAnim();
 
 	UFUNCTION(BlueprintCallable)
-	virtual void Interrupt(float InDuration = -1);
+	virtual void Interrupt(float InDuration = -1.f);
 
 	UFUNCTION(BlueprintCallable)
 	virtual void UnInterrupt();
@@ -173,6 +173,12 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual void UnFly();
 
+	UFUNCTION(BlueprintCallable)
+	virtual void Aim();
+
+	UFUNCTION(BlueprintCallable)
+	virtual void UnAim();
+
 	virtual bool Attack(int32 InAbilityIndex = -1, const FSimpleDelegate& OnStart = nullptr, const FSimpleDelegate& OnEnd = nullptr);
 
 	virtual bool FallingAttack(const FSimpleDelegate& OnStart = nullptr, const FSimpleDelegate& OnEnd = nullptr);
@@ -193,13 +199,13 @@ public:
 	virtual void UnDefend();
 
 	UFUNCTION(BlueprintCallable)
-	virtual bool DoAction(EDWCharacterActionType InActionType);
+	virtual bool DoAction(const FGameplayTag& InActionTag);
 
 	UFUNCTION(BlueprintCallable)
-	virtual bool StopAction(EDWCharacterActionType InActionType);
+	virtual bool StopAction(const FGameplayTag& InActionTag);
 
 	UFUNCTION(BlueprintCallable)
-	virtual void EndAction(EDWCharacterActionType InActionType, bool bWasCancelled);
+	virtual void EndAction(const FGameplayTag& InActionTag, bool bWasCancelled);
 
 public:
 	UFUNCTION(BlueprintCallable)
@@ -240,7 +246,7 @@ public:
 	bool HasSkillAbility(ESkillType InSkillType, int32 InAbilityIndex = 0, bool bNeedAssembled = false) const;
 	
 	UFUNCTION(BlueprintCallable)
-	bool HasActionAbility(EDWCharacterActionType InActionType) const;
+	bool HasActionAbility(const FGameplayTag& InActionTag) const;
 
 public:
 	virtual bool IsEnemy(IAbilityPawnInterface* InTarget) const override;
@@ -267,6 +273,9 @@ public:
 	virtual bool IsFloating() const;
 
 	UFUNCTION(BlueprintPure)
+	virtual bool IsAiming() const;
+
+	UFUNCTION(BlueprintPure)
 	virtual bool IsAttacking(EDWCharacterAttackType InAttackType = EDWCharacterAttackType::None) const;
 
 	UFUNCTION(BlueprintPure)
@@ -283,9 +292,6 @@ public:
 
 	UFUNCTION(BlueprintPure)
 	virtual bool IsInterrupting() const;
-
-	UFUNCTION(BlueprintPure)
-	virtual bool IsLockRotation() const;
 	
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
@@ -335,7 +341,7 @@ protected:
 
 	TMap<FPrimaryAssetId, FDWCharacterSkillAbilityData> SkillAbilities;
 
-	TMap<EDWCharacterActionType, FDWCharacterActionAbilityData> ActionAbilities;
+	TMap<FGameplayTag, FDWCharacterActionAbilityData> ActionAbilities;
 
 public:
 	virtual FGuid GetActorIDT() const override { return ActorID; }
@@ -413,10 +419,22 @@ public:
 
 	UFUNCTION(BlueprintPure)
 	AAbilityEquipBase* GetEquip(EDWEquipPartType InPartType) const;
-			
+					
+	template<class T>
+	T* GetWeapon() const
+	{
+		return Cast<T>(GetWeapon());
+	}
+
 	UFUNCTION(BlueprintPure)
 	ADWEquipWeapon* GetWeapon() const;
-				
+					
+	template<class T>
+	T* GetShield() const
+	{
+		return Cast<T>(GetShield());
+	}
+	
 	UFUNCTION(BlueprintPure)
 	ADWEquipShield* GetShield() const;
 
@@ -444,7 +462,7 @@ public:
 	FDWCharacterSkillAbilityData GetSkillAbility(ESkillType InSkillType, int32 InAbilityIndex = -1, bool bNeedAssembled = false);
 			
 	UFUNCTION(BlueprintPure)
-	FDWCharacterActionAbilityData GetActionAbility(EDWCharacterActionType InActionType);
+	FDWCharacterActionAbilityData GetActionAbility(const FGameplayTag& InActionTag);
 
 	UFUNCTION(BlueprintPure)
 	TArray<FDWCharacterAttackAbilityData> GetAttackAbilities() const;
@@ -453,7 +471,7 @@ public:
 	TMap<FPrimaryAssetId, FDWCharacterSkillAbilityData> GetSkillAbilities() const { return SkillAbilities; }
 
 	UFUNCTION(BlueprintPure)
-	TMap<EDWCharacterActionType, FDWCharacterActionAbilityData> GetActionAbilities() const { return ActionAbilities; }
+	TMap<FGameplayTag, FDWCharacterActionAbilityData> GetActionAbilities() const { return ActionAbilities; }
 
 	UFUNCTION(BlueprintPure)
 	UDWCharacterPart* GetCharacterPart(EDWCharacterPartType InCharacterPartType) const;

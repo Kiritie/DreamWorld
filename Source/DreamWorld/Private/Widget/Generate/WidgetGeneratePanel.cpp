@@ -207,7 +207,7 @@ void UWidgetGeneratePanel::OnPreviewContentRefresh()
 			PreviewItems.Empty();
 			for(auto& Iter : GenerateItemData.RawDatas[PreviewGenerateRawDataIndex].Raws)
 			{
-				if(UWidgetAbilityPreviewItem* PreviewItem = CreateSubWidget<UWidgetAbilityPreviewItem>({ &Iter }, UAssetModuleStatics::GetStaticClass(FName("GeneratePreviewItem"))))
+				if(UWidgetAbilityPreviewItem* PreviewItem = CreateSubWidget<UWidgetAbilityPreviewItem>({ &Iter }, UAssetModuleStatics::GetStaticClass(FName("RequiredPreviewItem"))))
 				{
 					if(UWrapBoxSlot* WrapBoxSlot = PreviewContent->AddChildToWrapBox(PreviewItem))
 					{

@@ -6,6 +6,7 @@
 #include "WidgetInventoryBox.generated.h"
 
 class UWidgetInventorySlot;
+class UWrapBox;
 
 /**
  * ��Ʒ��
@@ -29,10 +30,10 @@ public:
 	
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components", meta = (BindWidget, OptionalWidget = false))
-	class UWrapBox* DefaultContent;
+	UWrapBox* DefaultContent;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components", meta = (BindWidget, OptionalWidget = false))
-	class UWrapBox* TargetContent;
+	UWrapBox* TargetContent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	TMap<ESlotSplitType, FWidgetInventorySlots> TargetUISlotDatas;

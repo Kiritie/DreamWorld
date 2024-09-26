@@ -25,7 +25,7 @@ bool UDWCharacterState_Fly::OnPreEnter(UFiniteStateBase* InLastState, const TArr
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 
-	return Character->DoAction(EDWCharacterActionType::Fly);
+	return Character->DoAction(GameplayTags::AbilityTag_Character_Action_Fly);
 }
 
 void UDWCharacterState_Fly::OnEnter(UFiniteStateBase* InLastState, const TArray<FParameter>& InParams)
@@ -73,7 +73,7 @@ void UDWCharacterState_Fly::OnLeave(UFiniteStateBase* InNextState)
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 
-	Character->StopAction(EDWCharacterActionType::Fly);
+	Character->StopAction(GameplayTags::AbilityTag_Character_Action_Fly);
 	
 	Character->GetAbilitySystemComponent()->RemoveLooseGameplayTag(GameplayTags::StateTag_Character_Flying);
 

@@ -19,5 +19,5 @@ public:
 	ESkillMode SkillMode;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TSubclassOf<AAbilitySkillBase> SkillClass;
+	TSubclassOf<AAbilityProjectileBase> SkillClass;
 };

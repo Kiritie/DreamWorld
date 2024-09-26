@@ -21,7 +21,7 @@ bool UDWCharacterState_Crouch::OnPreEnter(UFiniteStateBase* InLastState, const T
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 
-	return Character->DoAction(EDWCharacterActionType::Crouch);
+	return Character->DoAction(GameplayTags::AbilityTag_Character_Action_Crouch);
 }
 
 void UDWCharacterState_Crouch::OnEnter(UFiniteStateBase* InLastState, const TArray<FParameter>& InParams)
@@ -46,7 +46,7 @@ void UDWCharacterState_Crouch::OnLeave(UFiniteStateBase* InNextState)
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 
-	Character->StopAction(EDWCharacterActionType::Crouch);
+	Character->StopAction(GameplayTags::AbilityTag_Character_Action_Crouch);
 	
 	Character->GetAbilitySystemComponent()->RemoveLooseGameplayTag(GameplayTags::StateTag_Character_Crouching);
 

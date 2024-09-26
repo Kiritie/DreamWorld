@@ -24,7 +24,7 @@ bool UDWCharacterState_Swim::OnPreEnter(UFiniteStateBase* InLastState, const TAr
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 
-	return Character->DoAction(EDWCharacterActionType::Swim);
+	return Character->DoAction(GameplayTags::AbilityTag_Character_Action_Swim);
 }
 
 void UDWCharacterState_Swim::OnEnter(UFiniteStateBase* InLastState, const TArray<FParameter>& InParams)
@@ -56,7 +56,7 @@ void UDWCharacterState_Swim::OnLeave(UFiniteStateBase* InNextState)
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 
-	Character->StopAction(EDWCharacterActionType::Swim);
+	Character->StopAction(GameplayTags::AbilityTag_Character_Action_Swim);
 	
 	Character->GetAbilitySystemComponent()->RemoveLooseGameplayTag(GameplayTags::StateTag_Character_Swimming);
 	

@@ -22,7 +22,7 @@
 #include "Widget/Inventory/WidgetInventoryBar.h"
 #include "Widget/Inventory/WidgetInventoryPanel.h"
 #include "Common/DWCommonTypes.h"
-#include "Procedure/Procedure_Testing.h"
+#include "Item/Equip/Weapon/DWEquipWeaponRemote.h"
 #include "Scene/SceneModuleStatics.h"
 #include "Widget/MaxMap/WidgetMaxMapBox.h"
 
@@ -31,6 +31,7 @@ UDWInputManager::UDWInputManager()
 {
 	bPrimaryPressed = false;
 	bSecondaryPressed = false;
+	bThirdPressed = false;
 	bSprintPressed = false;
 	AttackAbilityQueue = 0;
 }
@@ -46,6 +47,7 @@ void UDWInputManager::OnReset()
 
 	bPrimaryPressed = false;
 	bSecondaryPressed = false;
+	bThirdPressed = false;
 	bSprintPressed = false;
 	AttackAbilityQueue = 0;
 }
@@ -67,20 +69,27 @@ void UDWInputManager::OnRefresh(float DeltaSeconds)
 		PossessedCharacter->UnSprint();
 	}
 
-	if(ADWPlayerCharacter* PlayerCharacter = Cast<ADWPlayerCharacter>(PossessedCharacter))
-	{
-		switch (PlayerCharacter->ControlMode)
-		{
-			case EDWCharacterControlMode::Fighting:
-			{
-				if(bPrimaryPressed || AttackAbilityQueue > 0)
-				{
-					if(PlayerCharacter->Attack() && AttackAbilityQueue > 0)
-					{
-						AttackAbilityQueue--;
-					}
-				}
+	ADWPlayerCharacter* PlayerCharacter = Cast<ADWPlayerCharacter>(PossessedCharacter);
 
+	if(!PlayerCharacter) return;
+
+	switch (PlayerCharacter->ControlMode)
+	{
+		case EDWCharacterControlMode::Fighting:
+		{
+			if(PlayerCharacter->GetEquip<ADWEquipWeaponRemote>(EDWEquipPartType::LeftHand))
+			{
+				if(bSecondaryPressed)
+				{
+					PlayerCharacter->Aim();
+				}
+				else
+				{
+					PlayerCharacter->UnAim();
+				}
+			}
+			else
+			{
 				if(bSecondaryPressed)
 				{
 					PlayerCharacter->Defend();
@@ -90,15 +99,23 @@ void UDWInputManager::OnRefresh(float DeltaSeconds)
 					PlayerCharacter->UnDefend();
 				}
 			}
-			case EDWCharacterControlMode::Creating:
+
+			if(bPrimaryPressed || AttackAbilityQueue > 0)
 			{
-				// FVoxelHitResult voxelHitResult;
-				// if(RaycastVoxel(voxelHitResult))
-				// {
-				// 	voxelHitResult.GetVoxel().OnMouseHover(voxelHitResult);
-				// }
-				break;
+				if(PlayerCharacter->Attack() && AttackAbilityQueue > 0)
+				{
+					AttackAbilityQueue--;
+				}
 			}
+		}
+		case EDWCharacterControlMode::Creating:
+		{
+			// FVoxelHitResult voxelHitResult;
+			// if(RaycastVoxel(voxelHitResult))
+			// {
+			// 	voxelHitResult.GetVoxel().OnMouseHover(voxelHitResult);
+			// }
+			break;
 		}
 	}
 }
@@ -349,10 +366,10 @@ void UDWInputManager::OnSecondaryPressed()
 		}
 		case EDWCharacterControlMode::Creating:
 		{
-			FVoxelHitResult voxelHitResult;
-			if(UVoxelModuleStatics::VoxelRaycastSinge(EVoxelRaycastType::FromAimPoint, PlayerCharacter->GetInteractDistance(), {}, voxelHitResult))
+			FVoxelHitResult VoxelHitResult;
+			if(UVoxelModuleStatics::VoxelRaycastSinge(EVoxelRaycastType::FromAimPoint, PlayerCharacter->GetInteractDistance(), {}, VoxelHitResult))
 			{
-				PlayerCharacter->OnInteractVoxel(voxelHitResult, EInputInteractAction::Secondary);
+				PlayerCharacter->OnInteractVoxel(VoxelHitResult, EInputInteractAction::Secondary);
 			}
 			break;
 		}
@@ -386,10 +403,17 @@ void UDWInputManager::OnThirdPressed()
 	if(!PlayerCharacter || !PlayerCharacter->IsActive(true) || !PlayerCharacter->InputEnabled()) return;
 
 	PlayerCharacter->GetTargeting()->TargetActor();
+
+	bThirdPressed = true;
 }
 
 void UDWInputManager::OnThirdReleased()
 {
+	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
+
+	if(!PlayerCharacter) return;
+
+	bThirdPressed = false;
 }
 
 void UDWInputManager::ToggleControlMode()
