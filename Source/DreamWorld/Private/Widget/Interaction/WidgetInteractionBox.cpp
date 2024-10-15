@@ -9,7 +9,7 @@
 #include "Input/Widget/WidgetKeyTipsItemBase.h"
 #include "Voxel/Voxels/Auxiliary/VoxelInteractAuxiliary.h"
 #include "Widget/WidgetModule.h"
-#include "Widget/Item/WidgetAbilityPreviewItem.h"
+#include "Widget/Item/WidgetAbilityItem.h"
 
 UWidgetInteractionBox::UWidgetInteractionBox(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {

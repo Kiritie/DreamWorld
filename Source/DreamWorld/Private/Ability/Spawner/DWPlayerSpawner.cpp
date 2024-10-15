@@ -24,6 +24,7 @@ AActor* ADWPlayerSpawner::SpawnImpl_Implementation(const FAbilityItem& InAbility
 	SaveData.Level = InAbilityItem.Level;
 	SaveData.SpawnLocation = GetActorLocation();
 	SaveData.SpawnRotation = GetActorRotation();
+	SaveData.InventoryData = CharacterData.InventoryData;
 	SaveData.InventoryInitType = InventoryInitType;
 
 	ADWPlayerController* PlayerController = UCommonStatics::GetPlayerController<ADWPlayerController>();

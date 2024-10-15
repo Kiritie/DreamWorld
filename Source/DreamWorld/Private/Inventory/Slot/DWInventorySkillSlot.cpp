@@ -3,7 +3,7 @@
 #include "Inventory/Slot/DWInventorySkillSlot.h"
 
 #include "Ability/Inventory/AbilityInventoryBase.h"
-#include "Ability/Inventory/Slot/AbilityInventorySlot.h"
+#include "Ability/Inventory/Slot/AbilityInventorySlotBase.h"
 #include "Character/Player/DWPlayerCharacter.h"
 
 UDWInventorySkillSlot::UDWInventorySkillSlot()

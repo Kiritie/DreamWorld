@@ -11,7 +11,7 @@ class UStaticMeshComponent;
 class ADWEquipWeapon;
 class ADWEquipShield;
 class ADWEquipArmor;
-class UAbilityInventoryEquipSlot;
+class UAbilityInventoryEquipSlotBase;
 
 /**
  * 类人角色
@@ -30,9 +30,9 @@ protected:
 	virtual void OnDespawn_Implementation(bool bRecovery) override;
 
 public:
-	virtual void OnAssembleItem(const FAbilityItem& InItem) override;
+	virtual void OnActiveItem(const FAbilityItem& InItem, bool bPassive, bool bSuccess) override;
 
-	virtual void OnDischargeItem(const FAbilityItem& InItem) override;
+	virtual void OnDeactiveItem(const FAbilityItem& InItem, bool bPassive) override;
 	
 	virtual void OnSelectItem(const FAbilityItem& InItem) override;
 

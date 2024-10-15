@@ -2,14 +2,14 @@
 
 #pragma once
 
-#include "Ability/Inventory/Widget/WidgetInventorySlotBase.h"
+#include "Ability/Inventory/Widget/WidgetAbilityInventorySlotBase.h"
 #include "WidgetInventorySlot.generated.h"
 
 /**
  * UI物品槽
  */
 UCLASS(BlueprintType)
-class DREAMWORLD_API UWidgetInventorySlot : public UWidgetInventorySlotBase
+class DREAMWORLD_API UWidgetInventorySlot : public UWidgetAbilityInventorySlotBase
 {
 	GENERATED_BODY()
 
@@ -55,14 +55,7 @@ protected:
 
 	virtual void OnCooldown_Implementation() override;
 
-public:
-	UFUNCTION(BlueprintCallable)
-	virtual void SetBorderColor(FLinearColor InColor);
-
 protected:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components", meta = (BindWidget, OptionalWidget = false))
-	class UBorder* Border;
-
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components", meta = (BindWidget, OptionalWidget = false))
 	class UCanvasPanel* Content;
 

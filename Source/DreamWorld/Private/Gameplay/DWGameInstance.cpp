@@ -4,18 +4,15 @@
 
 UDWGameInstance::UDWGameInstance()
 {
-	// set default pawn class to our Blueprinted character
 
 }
 
 void UDWGameInstance::Init()
 {
 	Super::Init();
-
 }
 
 void UDWGameInstance::Shutdown()
 {
 	Super::Shutdown();
-
 }

@@ -28,7 +28,7 @@ void UDWPlayerCharacterState_Aim::OnEnter(UFiniteStateBase* InLastState, const T
 
 	ADWPlayerCharacter* Character = GetAgent<ADWPlayerCharacter>();
 
-	Character->bUseControllerRotationYaw = true;
+	Character->SetUseControllerRotation(true);
 	
 	UCameraModuleStatics::DoCameraOffset(FVector(0.f, 30.f, 30.f), 0.5f, EEaseType::InOutSine);
 	UCameraModuleStatics::DoCameraFov(60.f, 0.5f, EEaseType::InOutSine);
@@ -47,7 +47,7 @@ void UDWPlayerCharacterState_Aim::OnLeave(UFiniteStateBase* InNextState)
 
 	if(!InNextState || !InNextState->IsA<UDWCharacterState_Attack>())
 	{
-		Character->bUseControllerRotationYaw = false;
+		Character->SetUseControllerRotation(false);
 
 		UCameraModuleStatics::DoCameraOffset(FVector(-1.f), 0.5f, EEaseType::InOutSine);
 		UCameraModuleStatics::DoCameraFov(-1.f, 0.5f, EEaseType::InOutSine);

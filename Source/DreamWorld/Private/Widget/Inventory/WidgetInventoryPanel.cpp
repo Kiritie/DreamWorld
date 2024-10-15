@@ -6,18 +6,16 @@
 #include "Ability/Inventory/AbilityInventoryBase.h"
 #include "Widget/Inventory/WidgetInventoryBar.h"
 #include "Widget/Inventory/Slot/WidgetInventorySlot.h"
-#include "Character/Player/DWPlayerCharacter.h"
 #include "Components/GridPanel.h"
 #include "Components/GridSlot.h"
 #include "Components/WrapBox.h"
 #include "Components/WrapBoxSlot.h"
 #include "Common/CommonStatics.h"
-#include "Ability/Inventory/Slot/AbilityInventorySlot.h"
 #include "Asset/AssetModuleStatics.h"
-#include "ObjectPool/ObjectPoolModuleStatics.h"
 #include "Widget/WidgetModuleStatics.h"
 #include "Widget/Common/WidgetUIMask.h"
 #include "Widget/Inventory/Slot/WidgetInventoryEquipSlot.h"
+#include "Ability/Inventory/Slot/AbilityInventorySlotBase.h"
 
 UWidgetInventoryPanel::UWidgetInventoryPanel(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -84,10 +82,10 @@ void UWidgetInventoryPanel::OnInitialize(UObject* InOwner, const TArray<FParamet
 			{
 				if(UWidgetInventoryEquipSlot* EquipSlot = CreateSubWidget<UWidgetInventoryEquipSlot>({ EquipSlots[i] }, UAssetModuleStatics::GetStaticClass(FName("InventoryEquipSlot"))))
 				{
-					EquipSlot->SetEquipPartType(UCommonStatics::GetEnumValueDisplayName(TEXT("/Script/WHFramework.EEquipPartType"), i));
+					EquipSlot->SetEquipPartType(UCommonStatics::GetEnumValueDisplayName(TEXT("/Script/DreamWorld.EDWEquipPartType"), i));
 					if(UGridSlot* GridSlot = i % 2 == 0 ? LeftEquipContent->AddChildToGrid(EquipSlot) : RightEquipContent->AddChildToGrid(EquipSlot))
 					{
-						GridSlot->SetPadding(FMargin(2.5f, 2.5f, 2.5f, 2.5f));
+						GridSlot->SetPadding(FMargin(2.5f, 20.f, 2.5f, 2.5f));
 						GridSlot->SetRow(i / 2);
 					}
 					UISlotDatas[ESlotSplitType::Equip].Slots.Add(EquipSlot);
@@ -121,9 +119,4 @@ void UWidgetInventoryPanel::OnClose(bool bInstant)
 void UWidgetInventoryPanel::OnRefresh()
 {
 	Super::OnRefresh();
-
-	if(IAbilityActorInterface* AbilityActor = GetOwnerObject<IAbilityActorInterface>())
-	{
-		// AbilityActor->RefreshAttributes();
-	}
 }

@@ -3,14 +3,14 @@
 #pragma once
 
 #include "Common/DWCommonTypes.h"
-#include "Ability/Inventory/Slot/AbilityInventoryEquipSlot.h"
+#include "Ability/Inventory/Slot/AbilityInventoryEquipSlotBase.h"
 #include "DWInventoryEquipSlot.generated.h"
 
 /**
  * װ����
  */
 UCLASS()
-class DREAMWORLD_API UDWInventoryEquipSlot : public UAbilityInventoryEquipSlot
+class DREAMWORLD_API UDWInventoryEquipSlot : public UAbilityInventoryEquipSlotBase
 {
 	GENERATED_BODY()
 

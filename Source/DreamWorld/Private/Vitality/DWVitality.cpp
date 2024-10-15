@@ -36,6 +36,8 @@ ADWVitality::ADWVitality(const FObjectInitializer& ObjectInitializer) :
 	}
 
 	FSM->DefaultState = UDWVitalityState_Default::StaticClass();
+	FSM->FinalState = UDWVitalityState_Death::StaticClass();
+	
 	FSM->States.Empty();
 	FSM->States.Add(UDWVitalityState_Default::StaticClass());
 	FSM->States.Add(UDWVitalityState_Death::StaticClass());
@@ -71,7 +73,7 @@ void ADWVitality::LoadData(FSaveData* InSaveData, EPhase InPhase)
 				if(PropDatas.IsEmpty()) break;
 				const int32 tmpIndex = FMath::RandRange(0, PropDatas.Num() - 1);
 				FAbilityItem tmpItem = FAbilityItem(PropDatas[tmpIndex]->GetPrimaryAssetId(), 1);
-				SaveData.InventoryData.AddItem(tmpItem, { ESlotSplitType::Default });
+				SaveData.InventoryData.AddItem(tmpItem);
 				PropDatas.RemoveAt(tmpIndex);
 			}
 		}
@@ -111,11 +113,11 @@ bool ADWVitality::CanInteract(EInteractAction InInteractAction, IInteractionAgen
 	return Super::CanInteract(InInteractAction, InInteractionAgent);
 }
 
-void ADWVitality::OnInteract(EInteractAction InInteractAction, IInteractionAgentInterface* InInteractionAgent, bool bPassivity)
+void ADWVitality::OnInteract(EInteractAction InInteractAction, IInteractionAgentInterface* InInteractionAgent, bool bPassive)
 {
-	Super::OnInteract(InInteractAction, InInteractionAgent, bPassivity);
+	Super::OnInteract(InInteractAction, InInteractionAgent, bPassive);
 
-	if(bPassivity)
+	if(bPassive)
 	{
 		switch (InInteractAction)
 		{
@@ -134,19 +136,9 @@ void ADWVitality::OnActiveItem(const FAbilityItem& InItem, bool bPassive, bool b
 	Super::OnActiveItem(InItem, bPassive, bSuccess);
 }
 
-void ADWVitality::OnCancelItem(const FAbilityItem& InItem, bool bPassive)
+void ADWVitality::OnDeactiveItem(const FAbilityItem& InItem, bool bPassive)
 {
-	Super::OnCancelItem(InItem, bPassive);
-}
-
-void ADWVitality::OnAssembleItem(const FAbilityItem& InItem)
-{
-	Super::OnAssembleItem(InItem);
-}
-
-void ADWVitality::OnDischargeItem(const FAbilityItem& InItem)
-{
-	Super::OnDischargeItem(InItem);
+	Super::OnDeactiveItem(InItem, bPassive);
 }
 
 void ADWVitality::OnDiscardItem(const FAbilityItem& InItem, bool bInPlace)

@@ -2,14 +2,14 @@
 
 #pragma once
 
-#include "Ability/Inventory/Slot/AbilityInventorySkillSlot.h"
+#include "Ability/Inventory/Slot/AbilityInventorySkillSlotBase.h"
 #include "DWInventorySkillSlot.generated.h"
 
 /**
  * ���ܲ�
  */
 UCLASS(BlueprintType)
-class DREAMWORLD_API UDWInventorySkillSlot : public UAbilityInventorySkillSlot
+class DREAMWORLD_API UDWInventorySkillSlot : public UAbilityInventorySkillSlotBase
 {
 	GENERATED_BODY()
 

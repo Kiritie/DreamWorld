@@ -6,10 +6,11 @@
 #include "Widget/Screen/UserWidgetBase.h"
 #include "WidgetGeneratePanel.generated.h"
 
+class UWidgetAbilityItem;
 class UScrollBox;
 class UWrapBox;
 class UWidgetGenerateItem;
-class UWidgetAbilityPreviewItem;
+class UWidgetAbilityItem;
 class UCommonButton;
 
 /**
@@ -28,6 +29,8 @@ public:
 
 	virtual void OnInitialize(UObject* InOwner, const TArray<FParameter>& InParams) override;
 
+	virtual void OnReset(bool bForce) override;
+
 	virtual void OnOpen(const TArray<FParameter>& InParams, bool bInstant) override;
 
 	virtual void OnClose(bool bInstant) override;
@@ -38,7 +41,10 @@ public:
 
 public:
 	UFUNCTION(BlueprintNativeEvent)
-	void OnGenerateSlotSelected(UWidgetGenerateItem* InSlot);
+	void OnGenerateItemSelected(UWidgetAbilityItem* InItem);
+
+	UFUNCTION(BlueprintNativeEvent)
+	void OnGenerateItemDeselected(UWidgetAbilityItem* InItem);
 
 	UFUNCTION()
 	void OnPreviewContentRefresh();
@@ -61,12 +67,14 @@ protected:
 	UCommonButton* BtnGenerate;
 
 protected:
+	UPROPERTY()
 	TArray<UWidgetGenerateItem*> GenerateItems;
 	
-	TArray<UWidgetAbilityPreviewItem*> PreviewItems;
+	UPROPERTY()
+	TArray<UWidgetAbilityItem*> PreviewItems;
 
 	UPROPERTY()
-	UWidgetGenerateItem* SelectedGenerateSlot;
+	UWidgetGenerateItem* SelectedGenerateItem;
 
 	UPROPERTY()
 	FDWGenerateRawData SelectedGenerateRawData;

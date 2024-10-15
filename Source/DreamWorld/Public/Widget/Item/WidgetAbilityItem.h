@@ -24,13 +24,4 @@ public:
 	virtual FReply NativeOnFocusReceived(const FGeometry& InGeometry, const FFocusEvent& InFocusEvent) override;
 	
 	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
-
-public:
-	UFUNCTION(BlueprintImplementableEvent, DisplayName = "OnSelected")
-	void K2_OnSelected();
-	virtual void OnSelected();
-
-	UFUNCTION(BlueprintImplementableEvent, DisplayName = "OnUnSelected")
-	void K2_OnUnSelected();
-	virtual void OnUnSelected();
 };

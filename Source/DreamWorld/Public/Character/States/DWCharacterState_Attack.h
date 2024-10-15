@@ -3,7 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameplayAbilitySpecHandle.h"
 #include "UObject/Object.h"
 #include "Ability/Character/States/AbilityCharacterStateBase.h"
 #include "DWCharacterState_Attack.generated.h"

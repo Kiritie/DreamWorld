@@ -5,14 +5,14 @@
 #include "CoreMinimal.h"
 #include "UObject/Object.h"
 #include "Ability/Vitality/States/AbilityVitalityStateBase.h"
-#include "Ability/Vitality/States/AbilityVitalityState_Default.h"
+#include "Ability/Vitality/States/AbilityVitalityState_Spawn.h"
 #include "DWVitalityState_Default.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class DREAMWORLD_API UDWVitalityState_Default : public UAbilityVitalityState_Default
+class DREAMWORLD_API UDWVitalityState_Default : public UAbilityVitalityState_Spawn
 {
 	GENERATED_BODY()
 

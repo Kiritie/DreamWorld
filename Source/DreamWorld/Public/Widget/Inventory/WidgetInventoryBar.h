@@ -54,7 +54,7 @@ public:
 	virtual void OnRefresh() override;
 
 	UFUNCTION()
-	virtual void OnInventorySlotSelected(UAbilityInventorySlot* InInventorySlot);
+	virtual void OnInventorySlotSelected(UAbilityInventorySlotBase* InInventorySlot);
 
 public:
 	UFUNCTION(BlueprintCallable)
@@ -71,7 +71,7 @@ public:
 
 public:
 	UFUNCTION(BlueprintPure)
-	UAbilityInventorySlot* GetSelectedSlot() const;
+	UAbilityInventorySlotBase* GetSelectedSlot() const;
 	
 	UFUNCTION(BlueprintPure)
 	FAbilityItem GetSelectedItem() const;

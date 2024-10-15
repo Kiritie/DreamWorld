@@ -24,18 +24,3 @@ void UDWVitalityInventory::UnloadData(EPhase InPhase)
 {
 	Super::UnloadData(InPhase);
 }
-
-void UDWVitalityInventory::DiscardAllItem()
-{
-	Super::DiscardAllItem();
-}
-
-void UDWVitalityInventory::ClearAllItem()
-{
-	Super::ClearAllItem();
-}
-
-FItemQueryInfo UDWVitalityInventory::QueryItemByRange(EItemQueryType InActionType, FAbilityItem InItem, int32 InStartIndex, int32 InEndIndex)
-{
-	return Super::QueryItemByRange(InActionType, InItem, InStartIndex, InEndIndex);
-}

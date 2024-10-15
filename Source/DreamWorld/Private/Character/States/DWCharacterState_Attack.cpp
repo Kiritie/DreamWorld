@@ -9,8 +9,8 @@
 #include "Ability/Projectile/AbilityProjectileBase.h"
 #include "Camera/CameraModuleStatics.h"
 #include "Character/DWCharacter.h"
-#include "ObjectPool/ObjectPoolModuleStatics.h"
 #include "Character/DWCharacterData.h"
+#include "Common/Looking/LookingComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Item/Equip/Weapon/DWEquipWeaponRemote.h"
 #include "Item/Equip/Weapon/DWEquipWeaponRemoteData.h"
@@ -48,12 +48,15 @@ void UDWCharacterState_Attack::OnEnter(UFiniteStateBase* InLastState, const TArr
 	{
 		case EDWCharacterAttackType::NormalAttack:
 		{
-			Character->AttackAbilityIndex = InParams[2];
+			Character->GetAttackAbilityQueue().AbilityIndex = InParams[2];
 			OnAttackStart = InParams[3].GetPointerValueRef<FSimpleDelegate>();
 			OnAttackEnd = InParams[4].GetPointerValueRef<FSimpleDelegate>();
-			if(Character->GetWeapon<ADWEquipWeaponRemote>())
+			if(ADWEquipWeaponRemote* Weapon = Character->GetWeapon<ADWEquipWeaponRemote>())
 			{
-				Character->bUseControllerRotationYaw = true;
+				Character->SetUseControllerRotation(true);
+
+				const auto AttackAbilityData = Character->GetAttackAbility();
+				Character->AttackProjectile = UAbilityModuleStatics::SpawnAbilityProjectile(Weapon->GetItemData<UDWEquipWeaponRemoteData>().ProjectileClass, Character, AttackAbilityData.AbilityHandle);
 			}
 			break;
 		}
@@ -71,7 +74,7 @@ void UDWCharacterState_Attack::OnEnter(UFiniteStateBase* InLastState, const TArr
 			const auto SkillAbilityData = Character->GetSkillAbility(Character->SkillAbilityItem.ID);
 			if(SkillAbilityData.GetItemData<UAbilitySkillDataBase>().ProjectileClass)
 			{
-				Character->bUseControllerRotationYaw = true;
+				Character->SetUseControllerRotation(true);
 			}
 			break;
 		}
@@ -98,7 +101,7 @@ void UDWCharacterState_Attack::OnLeave(UFiniteStateBase* InNextState)
 	{
 		Character->GetAbilitySystemComponent()->RemoveLooseGameplayTag(GameplayTags::StateTag_Character_Aiming);
 
-		Character->bUseControllerRotationYaw = false;
+		Character->SetUseControllerRotation(false);
 
 		UCameraModuleStatics::DoCameraOffset(FVector(-1.f), 0.5f, EEaseType::InOutSine);
 		UCameraModuleStatics::DoCameraFov(-1.f, 0.5f, EEaseType::InOutSine);
@@ -122,10 +125,9 @@ void UDWCharacterState_Attack::AttackStart()
 	{
 		case EDWCharacterAttackType::NormalAttack:
 		{
-			if(ADWEquipWeaponRemote* Weapon = Character->GetWeapon<ADWEquipWeaponRemote>())
+			if(Character->GetWeapon<ADWEquipWeaponRemote>())
 			{
-				const auto AttackAbilityData = Character->GetAttackAbility(Character->AttackAbilityIndex);
-				UAbilityModuleStatics::SpawnAbilityProjectile(Weapon->GetItemData<UDWEquipWeaponRemoteData>().ProjectileClass, Character, AttackAbilityData.AbilityHandle);
+				Character->AttackProjectile->Launch(Character->GetLooking()->GetLookingTarget() ? Character->GetLooking()->GetLookingRotation().Vector() : (Character->IsPlayer() ? UCameraModuleStatics::GetCameraRotation(true).Vector() : FVector::ZeroVector));
 			}
 			else
 			{
@@ -146,7 +148,8 @@ void UDWCharacterState_Attack::AttackStart()
 			const auto SkillAbilityData = Character->GetSkillAbility(Character->SkillAbilityItem.ID);
 			if(SkillAbilityData.GetItemData<UAbilitySkillDataBase>().ProjectileClass)
 			{
-				UAbilityModuleStatics::SpawnAbilityProjectile(SkillAbilityData.GetItemData<UAbilitySkillDataBase>().ProjectileClass, Character, Character->SkillAbilityItem.AbilityHandle);
+				Character->AttackProjectile = UAbilityModuleStatics::SpawnAbilityProjectile(SkillAbilityData.GetItemData<UAbilitySkillDataBase>().ProjectileClass, Character, Character->SkillAbilityItem.AbilityHandle);
+				Character->AttackProjectile->Launch(Character->GetLooking()->GetLookingTarget() ? Character->GetLooking()->GetLookingRotation().Vector() : (Character->IsPlayer() ? UCameraModuleStatics::GetCameraRotation(true).Vector() : FVector::ZeroVector));
 			}
 			else
 			{
@@ -192,14 +195,16 @@ void UDWCharacterState_Attack::AttackEnd()
 	{
 		case EDWCharacterAttackType::NormalAttack:
 		{
-			if(!Character->GetWeapon<ADWEquipWeaponRemote>())
+			if(Character->GetWeapon<ADWEquipWeaponRemote>())
+			{
+				Character->SetUseControllerRotation(false);
+				Character->AttackProjectile = nullptr;
+			}
+			else
 			{
 				Character->SetAttackHitAble(false);
 			}
-			if (++Character->AttackAbilityIndex == Character->GetAttackAbilities().Num())
-			{
-				Character->AttackAbilityIndex = 0;
-			}
+			Character->GetAttackAbilityQueue().Next();
 			break;
 		}
 		case EDWCharacterAttackType::FallingAttack:
@@ -212,7 +217,12 @@ void UDWCharacterState_Attack::AttackEnd()
 		case EDWCharacterAttackType::SkillAttack:
 		{
 			const auto AbilityData = Character->GetSkillAbility(Character->SkillAbilityItem.ID);
-			if(!AbilityData.GetItemData<UAbilitySkillDataBase>().ProjectileClass)
+			if(AbilityData.GetItemData<UAbilitySkillDataBase>().ProjectileClass)
+			{
+				Character->SetUseControllerRotation(false);
+				Character->AttackProjectile = nullptr;
+			}
+			else
 			{
 				Character->SetAttackHitAble(false);
 			}

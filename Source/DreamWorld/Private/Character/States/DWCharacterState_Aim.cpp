@@ -2,10 +2,14 @@
 
 #include "Character/States/DWCharacterState_Aim.h"
 
+#include "Ability/AbilityModuleStatics.h"
+#include "Ability/Projectile/AbilityProjectileBase.h"
 #include "Character/DWCharacter.h"
 #include "Character/DWCharacterData.h"
 #include "Character/States/DWCharacterState_Attack.h"
 #include "FSM/Components/FSMComponent.h"
+#include "Item/Equip/Weapon/DWEquipWeaponRemote.h"
+#include "Item/Equip/Weapon/DWEquipWeaponRemoteData.h"
 
 UDWCharacterState_Aim::UDWCharacterState_Aim()
 {
@@ -35,7 +39,12 @@ void UDWCharacterState_Aim::OnEnter(UFiniteStateBase* InLastState, const TArray<
 	Character->GetAbilitySystemComponent()->AddLooseGameplayTag(GameplayTags::StateTag_Character_Aiming);
 
 	Character->SetMotionRate(0.5f, 0.1f);
-	// Character->LimitToAnim();
+
+	if(ADWEquipWeaponRemote* Weapon = Character->GetWeapon<ADWEquipWeaponRemote>())
+	{
+		const auto AttackAbilityData = Character->GetAttackAbility();
+		Character->AttackProjectile = UAbilityModuleStatics::SpawnAbilityProjectile(Weapon->GetItemData<UDWEquipWeaponRemoteData>().ProjectileClass, Character, AttackAbilityData.AbilityHandle);
+	}
 }
 
 void UDWCharacterState_Aim::OnRefresh(float DeltaSeconds)
@@ -51,8 +60,9 @@ void UDWCharacterState_Aim::OnLeave(UFiniteStateBase* InNextState)
 
 	Character->StopAction(GameplayTags::AbilityTag_Character_Action_Aim);
 
-	// Character->FreeToAnim();
 	Character->SetMotionRate(1.f, 1.f);
+
+	Character->AttackProjectile->Destroy();
 
 	if(!InNextState || !InNextState->IsA<UDWCharacterState_Attack>())
 	{

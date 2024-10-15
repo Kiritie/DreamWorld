@@ -7,7 +7,7 @@
 #include "WidgetGenerateItem.generated.h"
 
 /**
- * UI构建栏
+ * UI构建项
  */
 UCLASS(BlueprintType)
 class DREAMWORLD_API UWidgetGenerateItem : public UWidgetAbilityItem
@@ -23,9 +23,9 @@ public:
 	virtual void OnInitialize(const TArray<FParameter>& InParams) override;
 
 public:
-	virtual void OnSelected() override;
+	virtual void NativeOnSelected(bool bBroadcast) override;
 
-	virtual void OnUnSelected() override;
+	virtual void NativeOnDeselected(bool bBroadcast) override;
 
 public:
 	UPROPERTY(BlueprintReadOnly)

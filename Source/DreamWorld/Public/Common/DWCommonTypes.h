@@ -52,7 +52,7 @@ class UDWCharacterAttackAbility;
 class UDWCharacterActionAbility;
 class UDWCharacterSkillAbility;
 class UTargetType;
-class UAbilityInventorySlot;
+class UAbilityInventorySlotBase;
 
 /**
  * ??????
@@ -197,17 +197,43 @@ public:
 };
 
 USTRUCT(BlueprintType)
-struct DREAMWORLD_API FDWCharacterAttackAbilityDatas
+struct DREAMWORLD_API FDWCharacterAttackAbilityQueue
 {
 	GENERATED_BODY()
 
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	TArray<FDWCharacterAttackAbilityData> Array;
+	int32 AbilityIndex;
 
-	FORCEINLINE FDWCharacterAttackAbilityDatas()
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	TArray<FDWCharacterAttackAbilityData> AbilityDatas;
+
+	FORCEINLINE FDWCharacterAttackAbilityQueue()
 	{
-		Array = TArray<FDWCharacterAttackAbilityData>();
+		AbilityIndex = 0;
+		AbilityDatas = TArray<FDWCharacterAttackAbilityData>();
+	}
+
+public:
+	FORCEINLINE void Reset()
+	{
+		AbilityIndex = 0;
+	}
+
+	FORCEINLINE void Prev()
+	{
+		if (--AbilityIndex < 0)
+		{
+			AbilityIndex = AbilityDatas.Num();
+		}
+	}
+
+	FORCEINLINE void Next()
+	{
+		if (++AbilityIndex == AbilityDatas.Num())
+		{
+			AbilityIndex = 0;
+		}
 	}
 };
 
@@ -288,7 +314,7 @@ public:
 		BirthLocation = FVector::ZeroVector;
 		ControlMode = EDWCharacterControlMode::Fighting;
 		FallingAttackAbility = FDWCharacterAttackAbilityData();
-		AttackAbilities = TMap<EDWWeaponType, FDWCharacterAttackAbilityDatas>();
+		AttackAbilityQueues = TMap<EDWWeaponType, FDWCharacterAttackAbilityQueue>();
 		SkillAbilities = TMap<FPrimaryAssetId, FDWCharacterSkillAbilityData>();
 		ActionAbilities = TMap<FGameplayTag, FDWCharacterActionAbilityData>();
 	}
@@ -299,7 +325,7 @@ public:
 		BirthLocation = FVector::ZeroVector;
 		ControlMode = EDWCharacterControlMode::Fighting;
 		FallingAttackAbility = FDWCharacterAttackAbilityData();
-		AttackAbilities = TMap<EDWWeaponType, FDWCharacterAttackAbilityDatas>();
+		AttackAbilityQueues = TMap<EDWWeaponType, FDWCharacterAttackAbilityQueue>();
 		SkillAbilities = TMap<FPrimaryAssetId, FDWCharacterSkillAbilityData>();
 		ActionAbilities = TMap<FGameplayTag, FDWCharacterActionAbilityData>();
 	}
@@ -317,7 +343,7 @@ public:
 	FDWCharacterAttackAbilityData FallingAttackAbility;
 
 	UPROPERTY()
-	TMap<EDWWeaponType, FDWCharacterAttackAbilityDatas> AttackAbilities;
+	TMap<EDWWeaponType, FDWCharacterAttackAbilityQueue> AttackAbilityQueues;
 
 	UPROPERTY()
 	TMap<FPrimaryAssetId, FDWCharacterSkillAbilityData> SkillAbilities;

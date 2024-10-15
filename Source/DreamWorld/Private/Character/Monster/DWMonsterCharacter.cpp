@@ -8,7 +8,7 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "Character/Human/DWHumanCharacter.h"
 #include "Ability/Inventory/AbilityInventoryBase.h"
-#include "Ability/Inventory/Slot/AbilityInventorySlot.h"
+#include "Ability/Inventory/Slot/AbilityInventorySlotBase.h"
 #include "Item/Prop/DWPropData.h"
 
 ADWMonsterCharacter::ADWMonsterCharacter()
@@ -55,11 +55,11 @@ bool ADWMonsterCharacter::CanInteract(EInteractAction InInteractAction, IInterac
 	return Super::CanInteract(InInteractAction, InInteractionAgent);
 }
 
-void ADWMonsterCharacter::OnInteract(EInteractAction InInteractAction, IInteractionAgentInterface* InInteractionAgent, bool bPassivity)
+void ADWMonsterCharacter::OnInteract(EInteractAction InInteractAction, IInteractionAgentInterface* InInteractionAgent, bool bPassive)
 {
-	Super::OnInteract(InInteractAction, InInteractionAgent, bPassivity);
+	Super::OnInteract(InInteractAction, InInteractionAgent, bPassive);
 
-	if(bPassivity)
+	if(bPassive)
 	{
 		switch (InInteractAction)
 		{

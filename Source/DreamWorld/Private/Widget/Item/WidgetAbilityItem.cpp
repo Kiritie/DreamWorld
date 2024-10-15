@@ -9,8 +9,6 @@
 #include "Ability/Item/AbilityItemDataBase.h"
 #include "Widget/Item/WidgetAbilityItemInfoBox.h"
 
-class UWidgetAbilityItemInfoBox;
-
 UWidgetAbilityItem::UWidgetAbilityItem(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	
@@ -33,7 +31,6 @@ void UWidgetAbilityItem::NativeOnMouseLeave(const FPointerEvent& InMouseEvent)
 
 FReply UWidgetAbilityItem::NativeOnFocusReceived(const FGeometry& InGeometry, const FFocusEvent& InFocusEvent)
 {
-	OnSelected();
 	return Super::NativeOnFocusReceived(InGeometry, InFocusEvent);
 }
 
@@ -52,14 +49,4 @@ FReply UWidgetAbilityItem::NativeOnMouseMove(const FGeometry& InGeometry, const 
 FReply UWidgetAbilityItem::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
 {
 	return Super::NativeOnMouseButtonDown(InGeometry, InMouseEvent);
-}
-
-void UWidgetAbilityItem::OnSelected()
-{
-	K2_OnSelected();
-}
-
-void UWidgetAbilityItem::OnUnSelected()
-{
-	K2_OnUnSelected();
 }

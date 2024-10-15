@@ -5,7 +5,7 @@
 
 #include "Ability/Item/AbilityItemDataBase.h"
 #include "Character/DWCharacter.h"
-#include "Ability/Inventory/Slot/AbilityInventorySlot.h"
+#include "Ability/Inventory/Slot/AbilityInventorySlotBase.h"
 #include "Components/TextBlock.h"
 #include "Ability/Inventory/AbilityInventoryBase.h"
 
@@ -37,16 +37,20 @@ void UWidgetInventorySkillSlot::OnRefresh()
 		TxtName->SetText(GetItem().GetData().Name);
 
 		TxtCost->SetVisibility(ESlateVisibility::Visible);
-		TxtCost->SetText(FText::FromString(FString::FromInt(FMath::Abs(OwnerSlot->GetAbilityInfo().CostValue))));
-		if(OwnerSlot->GetAbilityInfo().CostAttribute == GetInventory()->GetOwnerAgent<ADWCharacter>()->GetHealthAttribute())
+
+		FAbilityInfo AbilityInfo = OwnerSlot->GetAbilityInfo();
+		ADWCharacter* OwnerCharacter = GetInventory()->GetOwnerAgent<ADWCharacter>();
+		
+		TxtCost->SetText(FText::FromString(FString::FromInt(FMath::Abs(AbilityInfo.CostValue))));
+		if(AbilityInfo.CostAttribute == OwnerCharacter->GetHealthAttribute())
 		{
 			TxtCost->SetColorAndOpacity(FLinearColor(1.f, 0.f, 0.f, 1.f));
 		}
-		else if(OwnerSlot->GetAbilityInfo().CostAttribute == GetInventory()->GetOwnerAgent<ADWCharacter>()->GetManaAttribute())
+		else if(AbilityInfo.CostAttribute == OwnerCharacter->GetManaAttribute())
 		{
 			TxtCost->SetColorAndOpacity(FLinearColor(0.f, 0.65f, 1.f, 1.f));
 		}
-		else if(OwnerSlot->GetAbilityInfo().CostAttribute == GetInventory()->GetOwnerAgent<ADWCharacter>()->GetStaminaAttribute())
+		else if(AbilityInfo.CostAttribute == OwnerCharacter->GetStaminaAttribute())
 		{
 			TxtCost->SetColorAndOpacity(FLinearColor(0.f, 0.7f, 0.04f, 1.f));
 		}

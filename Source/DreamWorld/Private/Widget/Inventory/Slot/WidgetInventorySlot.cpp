@@ -4,11 +4,9 @@
 #include "Widget/Inventory/Slot/WidgetInventorySlot.h"
 
 #include "Ability/Item/AbilityItemDataBase.h"
-#include "Blueprint/DragDropOperation.h"
-#include "Components/Border.h"
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
-#include "Ability/Inventory/Slot/AbilityInventorySlot.h"
+#include "Ability/Inventory/Slot/AbilityInventorySlotBase.h"
 #include "Blueprint/WidgetBlueprintLibrary.h"
 #include "Kismet/KismetTextLibrary.h"
 #include "Materials/MaterialInstanceDynamic.h"
@@ -46,15 +44,11 @@ bool UWidgetInventorySlot::NativeOnDrop(const FGeometry& InGeometry, const FDrag
 void UWidgetInventorySlot::NativeOnDragEnter(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
 {
 	Super::NativeOnDragEnter(InGeometry, InDragDropEvent, InOperation);
-
-	SetBorderColor(FLinearColor(1.0f, 0.843f, 0.0f, 1.0f));
 }
 
 void UWidgetInventorySlot::NativeOnDragLeave(const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
 {
 	Super::NativeOnDragLeave(InDragDropEvent, InOperation);
-
-	SetBorderColor(FLinearColor(0.0f, 1.0f, 1.0f, 0.7f));
 }
 
 void UWidgetInventorySlot::NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation)
@@ -66,8 +60,6 @@ void UWidgetInventorySlot::NativeOnMouseEnter(const FGeometry& InGeometry, const
 {
 	Super::NativeOnMouseEnter(InGeometry, InMouseEvent);
 
-	SetBorderColor(FLinearColor(1.0f, 0.843f, 0.0f, 1.0f));
-
 	if(!IsEmpty())
 	{
 		const auto& ItemData = GetItem().GetData();
@@ -78,8 +70,6 @@ void UWidgetInventorySlot::NativeOnMouseEnter(const FGeometry& InGeometry, const
 void UWidgetInventorySlot::NativeOnMouseLeave(const FPointerEvent& InMouseEvent)
 {
 	Super::NativeOnMouseLeave(InMouseEvent);
-
-	SetBorderColor(FLinearColor(0.0f, 1.0f, 1.0f, 0.7f));
 
 	if(!IsEmpty())
 	{
@@ -210,29 +200,39 @@ void UWidgetInventorySlot::StopCooldown_Implementation()
 {
 	Super::StopCooldown_Implementation();
 
-	ImgMask->SetVisibility(ESlateVisibility::Hidden);
-	TxtCooldown->SetVisibility(ESlateVisibility::Hidden);
+	if(ImgMask)
+	{
+		ImgMask->SetVisibility(ESlateVisibility::Hidden);
+	}
+	if(TxtCooldown)
+	{
+		TxtCooldown->SetVisibility(ESlateVisibility::Hidden);
+	}
 }
 
 void UWidgetInventorySlot::OnCooldown_Implementation()
 {
 	if(!OwnerSlot) return;
 
-	const FAbilityInfo CooldownInfo = OwnerSlot->GetAbilityInfo();
-	if(CooldownInfo.IsCooldownning())
+	const FAbilityInfo AbilityInfo = OwnerSlot->GetAbilityInfo();
+	if(AbilityInfo.IsCooldownning())
 	{
-		ImgMask->SetVisibility(ESlateVisibility::Visible);
-		TxtCooldown->SetVisibility(ESlateVisibility::Visible);
-		TxtCooldown->SetText(UKismetTextLibrary::Conv_DoubleToText(CooldownInfo.CooldownRemaining, ERoundingMode::HalfToEven, false, true, 1, 324, 0, 1));
-		MaskMatInst->SetScalarParameterValue(FName("Progress"), 1.f - CooldownInfo.CooldownRemaining / CooldownInfo.CooldownDuration);
+		if(ImgMask)
+		{
+			ImgMask->SetVisibility(ESlateVisibility::Visible);
+		}
+		if(TxtCooldown)
+		{
+			TxtCooldown->SetVisibility(ESlateVisibility::Visible);
+			TxtCooldown->SetText(UKismetTextLibrary::Conv_DoubleToText(AbilityInfo.CooldownRemaining, ERoundingMode::HalfToEven, false, true, 1, 324, 0, 1));
+		}
+		if(MaskMatInst)
+		{
+			MaskMatInst->SetScalarParameterValue(FName("Progress"), 1.f - AbilityInfo.CooldownRemaining / AbilityInfo.CooldownDuration);
+		}
 	}
 	else
 	{
 		StopCooldown();
 	}
-}
-
-void UWidgetInventorySlot::SetBorderColor(FLinearColor InColor)
-{
-	Border->SetBrushColor(InColor);
 }

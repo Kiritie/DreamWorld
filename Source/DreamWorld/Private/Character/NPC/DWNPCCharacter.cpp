@@ -6,7 +6,7 @@
 #include "Character/Player/DWPlayerCharacter.h"
 #include "Common/Interaction/InteractionComponent.h"
 #include "Widget/WidgetModuleStatics.h"
-#include "Widget/Inventory/WidgetInventoryBox.h"
+#include "Widget/Transaction/WidgetTransactionPanel.h"
 
 ADWNPCCharacter::ADWNPCCharacter()
 {
@@ -39,11 +39,11 @@ bool ADWNPCCharacter::CanInteract(EInteractAction InInteractAction, IInteraction
 	return Super::CanInteract(InInteractAction, InInteractionAgent);
 }
 
-void ADWNPCCharacter::OnInteract(EInteractAction InInteractAction, IInteractionAgentInterface* InInteractionAgent, bool bPassivity)
+void ADWNPCCharacter::OnInteract(EInteractAction InInteractAction, IInteractionAgentInterface* InInteractionAgent, bool bPassive)
 {
-	Super::OnInteract(InInteractAction, InInteractionAgent, bPassivity);
+	Super::OnInteract(InInteractAction, InInteractionAgent, bPassive);
 
-	if(bPassivity)
+	if(bPassive)
 	{
 		switch (InInteractAction)
 		{
@@ -58,10 +58,10 @@ void ADWNPCCharacter::OnInteract(EInteractAction InInteractAction, IInteractionA
 			{
 				if(ADWPlayerCharacter* InteractionCharacter = Cast<ADWPlayerCharacter>(InInteractionAgent))
 				{
-					UWidgetModuleStatics::OpenUserWidget<UWidgetInventoryBox>({ this });
-					FDelegateHandle DelegateHandle = UWidgetModuleStatics::GetUserWidget<UWidgetInventoryBox>()->OnClosed.AddLambda([this, DelegateHandle](bool bInstant)
+					UWidgetModuleStatics::OpenUserWidget<UWidgetTransactionPanel>({ this });
+					FDelegateHandle DelegateHandle = UWidgetModuleStatics::GetUserWidget<UWidgetTransactionPanel>()->OnClosed.AddLambda([this, DelegateHandle](bool bInstant)
 					{
-						UWidgetModuleStatics::GetUserWidget<UWidgetInventoryBox>()->OnClosed.Remove(DelegateHandle);
+						UWidgetModuleStatics::GetUserWidget<UWidgetTransactionPanel>()->OnClosed.Remove(DelegateHandle);
 					});
 				}
 				break;

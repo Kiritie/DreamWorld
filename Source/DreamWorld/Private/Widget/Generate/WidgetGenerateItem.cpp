@@ -6,6 +6,8 @@
 
 UWidgetGenerateItem::UWidgetGenerateItem(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
+	bSelectable = true;
+	bToggleable = true;
 }
 
 void UWidgetGenerateItem::OnDespawn_Implementation(bool bRecovery)
@@ -24,17 +26,22 @@ void UWidgetGenerateItem::OnInitialize(const TArray<FParameter>& InParams)
 	Super::OnInitialize(InParams);
 }
 
-void UWidgetGenerateItem::OnSelected()
+void UWidgetGenerateItem::NativeOnSelected(bool bBroadcast)
 {
-	Super::OnSelected();
+	Super::NativeOnSelected(bBroadcast);
 
-	if(UWidgetGeneratePanel* GeneratePanel = Cast<UWidgetGeneratePanel>(OwnerWidget))
+	if(UWidgetGeneratePanel* GeneratePanel = GetOwnerWidget<UWidgetGeneratePanel>())
 	{
-		GeneratePanel->OnGenerateSlotSelected(this);
+		GeneratePanel->OnGenerateItemSelected(this);
 	}
 }
 
-void UWidgetGenerateItem::OnUnSelected()
+void UWidgetGenerateItem::NativeOnDeselected(bool bBroadcast)
 {
-	Super::OnUnSelected();
+	Super::NativeOnDeselected(bBroadcast);
+
+	if(UWidgetGeneratePanel* GeneratePanel = GetOwnerWidget<UWidgetGeneratePanel>())
+	{
+		GeneratePanel->OnGenerateItemDeselected(this);
+	}
 }

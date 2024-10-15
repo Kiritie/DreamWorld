@@ -41,7 +41,7 @@ protected:
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components", meta = (BindWidget, OptionalWidget = false))
-	class UWidgetAbilityPreviewItem* PreviewItem;
+	class UWidgetAbilityItem* PreviewItem;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components", meta = (BindWidget, OptionalWidget = false))
 	class UWidgetKeyTipsItemBase* NextKeyTips;

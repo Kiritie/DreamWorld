@@ -5,9 +5,8 @@
 
 #include "Ability/Inventory/AbilityInventoryBase.h"
 #include "Ability/Inventory/AbilityInventoryAgentInterface.h"
-#include "Ability/Inventory/Slot/AbilityInventorySlot.h"
+#include "Ability/Inventory/Slot/AbilityInventorySlotBase.h"
 #include "Asset/AssetModuleStatics.h"
-#include "Character/Player/DWPlayerCharacter.h"
 #include "Components/WrapBox.h"
 #include "Components/WrapBoxSlot.h"
 #include "Widget/WidgetModuleStatics.h"

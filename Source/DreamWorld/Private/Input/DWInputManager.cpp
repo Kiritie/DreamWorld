@@ -4,7 +4,7 @@
 #include "Input/DWInputManager.h"
 
 #include "Ability/Character/AbilityCharacterInventoryBase.h"
-#include "Ability/Inventory/Slot/AbilityInventorySlot.h"
+#include "Ability/Inventory/Slot/AbilityInventorySlotBase.h"
 #include "Character/DWCharacter.h"
 #include "Character/Player/DWPlayerCharacter.h"
 #include "Common/CommonStatics.h"

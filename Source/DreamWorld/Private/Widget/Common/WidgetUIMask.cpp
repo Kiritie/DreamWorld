@@ -2,7 +2,7 @@
 
 #include "Widget/Common/WidgetUIMask.h"
 
-#include "Ability/Inventory/Widget/WidgetInventorySlotBase.h"
+#include "Ability/Inventory/Widget/WidgetAbilityInventorySlotBase.h"
 #include "Blueprint/DragDropOperation.h"
 
 UWidgetUIMask::UWidgetUIMask(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
@@ -35,7 +35,7 @@ bool UWidgetUIMask::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEve
 {
 	Super::NativeOnDrop(InGeometry, InDragDropEvent, InOperation);
 
-	const auto PayloadSlot = Cast<UWidgetInventorySlotBase>(InOperation->Payload);
+	const auto PayloadSlot = Cast<UWidgetAbilityInventorySlotBase>(InOperation->Payload);
 	if (PayloadSlot && !PayloadSlot->IsEmpty())
 	{
 		PayloadSlot->DiscardItem();

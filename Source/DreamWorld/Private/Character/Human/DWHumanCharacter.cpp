@@ -18,7 +18,7 @@
 #include "Character/States/DWCharacterState_Climb.h"
 #include "Character/States/DWCharacterState_Crouch.h"
 #include "Character/States/DWCharacterState_Death.h"
-#include "Character/States/DWCharacterState_Default.h"
+#include "Character/States/DWCharacterState_Spawn.h"
 #include "Character/States/DWCharacterState_Dodge.h"
 #include "Character/States/DWCharacterState_Fall.h"
 #include "Character/States/DWCharacterState_Float.h"
@@ -50,14 +50,16 @@ ADWHumanCharacter::ADWHumanCharacter()
 	GenerateHammerMesh->SetRelativeRotation(FRotator::ZeroRotator);
 	GenerateHammerMesh->SetVisibility(false);
 	
-	FSM->DefaultState = UDWCharacterState_Default::StaticClass();
+	FSM->DefaultState = UDWCharacterState_Spawn::StaticClass();
+	FSM->FinalState = UDWCharacterState_Death::StaticClass();
+	
 	FSM->States.Empty();
 	FSM->States.Add(UDWCharacterState_Aim::StaticClass());
 	FSM->States.Add(UDWCharacterState_Attack::StaticClass());
 	FSM->States.Add(UDWCharacterState_Climb::StaticClass());
 	FSM->States.Add(UDWCharacterState_Crouch::StaticClass());
 	FSM->States.Add(UDWCharacterState_Death::StaticClass());
-	FSM->States.Add(UDWCharacterState_Default::StaticClass());
+	FSM->States.Add(UDWCharacterState_Spawn::StaticClass());
 	FSM->States.Add(UDWHumanCharacterState_Defend::StaticClass());
 	FSM->States.Add(UDWCharacterState_Dodge::StaticClass());
 	FSM->States.Add(UDWCharacterState_Fall::StaticClass());
@@ -89,9 +91,9 @@ void ADWHumanCharacter::OnDespawn_Implementation(bool bRecovery)
 	AuxiliaryVoxelEntity = nullptr;
 }
 
-void ADWHumanCharacter::OnAssembleItem(const FAbilityItem& InItem)
+void ADWHumanCharacter::OnActiveItem(const FAbilityItem& InItem, bool bPassive, bool bSuccess)
 {
-	Super::OnAssembleItem(InItem);
+	Super::OnActiveItem(InItem, bPassive, bSuccess);
 
 	const auto& ItemData = InItem.GetData<UAbilityItemDataBase>();
 	switch(ItemData.GetItemType())
@@ -111,9 +113,9 @@ void ADWHumanCharacter::OnAssembleItem(const FAbilityItem& InItem)
 	}
 }
 
-void ADWHumanCharacter::OnDischargeItem(const FAbilityItem& InItem)
+void ADWHumanCharacter::OnDeactiveItem(const FAbilityItem& InItem, bool bPassive)
 {
-	Super::OnDischargeItem(InItem);
+	Super::OnDeactiveItem(InItem, bPassive);
 
 	const auto& ItemData = InItem.GetData<UAbilityItemDataBase>();
 	switch(ItemData.GetItemType())

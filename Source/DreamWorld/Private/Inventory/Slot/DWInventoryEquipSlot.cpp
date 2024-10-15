@@ -6,6 +6,7 @@
 #include "Item/Equip/DWEquipData.h"
 #include "Ability/Inventory/AbilityInventoryBase.h"
 #include "Character/DWCharacter.h"
+#include "Item/Equip/Weapon/DWEquipWeaponData.h"
 
 UDWInventoryEquipSlot::UDWInventoryEquipSlot()
 {
@@ -32,7 +33,29 @@ void UDWInventoryEquipSlot::OnDespawn_Implementation(bool bRecovery)
 
 bool UDWInventoryEquipSlot::CheckSlot(FAbilityItem& InItem) const
 {
-	return Super::CheckSlot(InItem) && InItem.GetData<UDWEquipData>().PartType == PartType;
+	if(!Super::CheckSlot(InItem)) return false;
+	
+	bool bReturnValue = InItem.GetData<UDWEquipData>().PartType == PartType;
+	if(InItem.IsDataType<UDWEquipWeaponData>())
+	{
+		UAbilityInventorySlotBase* OtherSlot = Inventory->GetSlotBySplitTypeAndIndex(ESlotSplitType::Equip, PartType == EDWEquipPartType::LeftHand ? (int32)EDWEquipPartType::RightHand : (int32)EDWEquipPartType::LeftHand);
+
+		if(InItem.GetData<UDWEquipWeaponData>().HandType == EDWWeaponHandType::Both)
+		{
+			if(!OtherSlot->IsEmpty())
+			{
+				bReturnValue = false;
+			}
+		}
+		else if(OtherSlot->GetItem().IsDataType<UDWEquipWeaponData>())
+		{
+			if(OtherSlot->GetItem().GetData<UDWEquipWeaponData>().HandType == EDWWeaponHandType::Both)
+			{
+				bReturnValue = false;
+			}
+		}
+	}
+	return bReturnValue;
 }
 
 void UDWInventoryEquipSlot::Refresh()

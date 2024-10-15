@@ -6,7 +6,7 @@
 #include "Common/DWCommonTypes.h"
 #include "DWCharacterInventory.generated.h"
 
-class UAbilityInventoryEquipSlot;
+class UAbilityInventoryEquipSlotBase;
 
 /**
  * ��ɫ��Ʒ��
@@ -27,15 +27,5 @@ protected:
 	virtual void UnloadData(EPhase InPhase) override;
 
 public:
-	virtual FItemQueryInfo QueryItemByRange(EItemQueryType InActionType, FAbilityItem InItem, int32 InStartIndex = 0, int32 InEndIndex = -1) override;
-
-	virtual void AddItemBySlots(FAbilityItem& InItem, const TArray<UAbilityInventorySlot*>& InSlots, bool bAddition) override;
-
-	virtual void RemoveItemBySlots(FAbilityItem& InItem, const TArray<UAbilityInventorySlot *>& InSlots) override;
-
-	virtual void DiscardAllItem() override;
-
-	virtual void ClearAllItem() override;
-
-	virtual UAbilityInventoryEquipSlot* GetEquipSlotByPartType(EDWEquipPartType InPartType);
+	virtual UAbilityInventoryEquipSlotBase* GetEquipSlotByPartType(EDWEquipPartType InPartType);
 };

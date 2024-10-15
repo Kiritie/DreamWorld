@@ -13,7 +13,7 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "Voxel/Components/VoxelMeshComponent.h"
 #include "Widget/Inventory/WidgetInventoryPanel.h"
-#include "Ability/Inventory/Slot/AbilityInventorySlot.h"
+#include "Ability/Inventory/Slot/AbilityInventorySlotBase.h"
 #include "Widget/WidgetGameHUD.h"
 #include "Widget/WidgetModuleStatics.h"
 #include "Voxel/Datas/VoxelData.h"
@@ -25,7 +25,7 @@
 #include "Ability/Item/Coin/AbilityCoinDataBase.h"
 #include "Camera/CameraModuleStatics.h"
 #include "Character/Player/States/DWPlayerCharacterState_Death.h"
-#include "Character/Player/States/DWPlayerCharacterState_Default.h"
+#include "Character/Player/States/DWPlayerCharacterState_Spawn.h"
 #include "Character/States/DWCharacterState_Climb.h"
 #include "Character/States/DWCharacterState_Crouch.h"
 #include "Character/States/DWCharacterState_Fall.h"
@@ -95,14 +95,16 @@ ADWPlayerCharacter::ADWPlayerCharacter()
 	PreviewCapture->SetRelativeLocationAndRotation(FVector(100.f, 0.f, 0.f), FRotator(0.f, 180.f, 0.f));
 
 	// FSM->bShowDebugMessage = true;
-	FSM->DefaultState = UDWCharacterState_Default::StaticClass();
+	FSM->DefaultState = UDWPlayerCharacterState_Spawn::StaticClass();
+	FSM->FinalState = UDWPlayerCharacterState_Death::StaticClass();
+	
 	FSM->States.Empty();
 	FSM->States.Add(UDWPlayerCharacterState_Aim::StaticClass());
 	FSM->States.Add(UDWCharacterState_Attack::StaticClass());
 	FSM->States.Add(UDWCharacterState_Climb::StaticClass());
 	FSM->States.Add(UDWCharacterState_Crouch::StaticClass());
 	FSM->States.Add(UDWPlayerCharacterState_Death::StaticClass());
-	FSM->States.Add(UDWPlayerCharacterState_Default::StaticClass());
+	FSM->States.Add(UDWPlayerCharacterState_Spawn::StaticClass());
 	FSM->States.Add(UDWHumanCharacterState_Defend::StaticClass());
 	FSM->States.Add(UDWCharacterState_Dodge::StaticClass());
 	FSM->States.Add(UDWCharacterState_Fall::StaticClass());
@@ -143,8 +145,6 @@ void ADWPlayerCharacter::LoadData(FSaveData* InSaveData, EPhase InPhase)
 	{
 		if(!SaveData.InventoryData.IsSaved())
 		{
-			SaveData.InventoryData = SaveData.GetItemData<UDWCharacterData>().InventoryData;
-
 			switch (SaveData.InventoryInitType)
 			{
 				case EDWInventoryInitType::Empty:
@@ -152,13 +152,20 @@ void ADWPlayerCharacter::LoadData(FSaveData* InSaveData, EPhase InPhase)
 					SaveData.InventoryData.ClearAllItem();
 					break;
 				}
+				case EDWInventoryInitType::Default:
+				{
+					SaveData.InventoryData.CopyAllItem(SaveData.GetItemData<UDWCharacterData>().InventoryData);
+					break;
+				}
 				case EDWInventoryInitType::All:
 				{
+					SaveData.InventoryData.ClearAllItem();
+					
 					auto CoinDatas = UAssetModuleStatics::LoadPrimaryAssets<UAbilityCoinDataBase>(FName("Coin"));
 					for (int32 i = 0; i < CoinDatas.Num(); i++)
 					{
 						FAbilityItem tmpItem = FAbilityItem(CoinDatas[i]->GetPrimaryAssetId(), CoinDatas[i]->MaxCount);
-						SaveData.InventoryData.AddItem(tmpItem, { ESlotSplitType::Default, ESlotSplitType::Shortcut });
+						SaveData.InventoryData.AddItem(tmpItem);
 					}
 
 					auto VoxelDatas = UAssetModuleStatics::LoadPrimaryAssets<UVoxelData>(FName("Voxel"));
@@ -167,7 +174,7 @@ void ADWPlayerCharacter::LoadData(FSaveData* InSaveData, EPhase InPhase)
 						if(!VoxelDatas[i]->IsEmpty() && !VoxelDatas[i]->IsUnknown() && VoxelDatas[i]->IsMainPart())
 						{
 							FAbilityItem tmpItem = FAbilityItem(VoxelDatas[i]->GetPrimaryAssetId(), VoxelDatas[i]->MaxCount);
-							SaveData.InventoryData.AddItem(tmpItem, { ESlotSplitType::Default, ESlotSplitType::Shortcut });
+							SaveData.InventoryData.AddItem(tmpItem);
 						}
 					}
 
@@ -175,28 +182,28 @@ void ADWPlayerCharacter::LoadData(FSaveData* InSaveData, EPhase InPhase)
 					for (int32 i = 0; i < RawDatas.Num(); i++)
 					{
 						FAbilityItem tmpItem = FAbilityItem(RawDatas[i]->GetPrimaryAssetId(), RawDatas[i]->MaxCount);
-						SaveData.InventoryData.AddItem(tmpItem, { ESlotSplitType::Default, ESlotSplitType::Shortcut });
+						SaveData.InventoryData.AddItem(tmpItem);
 					}
 
 					auto EquipDatas = UAssetModuleStatics::LoadPrimaryAssets<UAbilityEquipDataBase>(FName("Equip"));
 					for (int32 i = 0; i < EquipDatas.Num(); i++)
 					{
 						FAbilityItem tmpItem = FAbilityItem(EquipDatas[i]->GetPrimaryAssetId(), EquipDatas[i]->MaxCount);
-						SaveData.InventoryData.AddItem(tmpItem, { ESlotSplitType::Default, ESlotSplitType::Shortcut });
+						SaveData.InventoryData.AddItem(tmpItem);
 					}
 	
 					auto PropDatas = UAssetModuleStatics::LoadPrimaryAssets<UAbilityPropDataBase>(FName("Prop"));
 					for (int32 i = 0; i < PropDatas.Num(); i++)
 					{
 						FAbilityItem tmpItem = FAbilityItem(PropDatas[i]->GetPrimaryAssetId(), PropDatas[i]->MaxCount);
-						SaveData.InventoryData.AddItem(tmpItem, { ESlotSplitType::Default, ESlotSplitType::Shortcut });
+						SaveData.InventoryData.AddItem(tmpItem);
 					}
 
 					auto SkillDatas = UAssetModuleStatics::LoadPrimaryAssets<UAbilitySkillDataBase>(FName("Skill"));
 					for (int32 i = 0; i < SkillDatas.Num(); i++)
 					{
 						FAbilityItem tmpItem = FAbilityItem(SkillDatas[i]->GetPrimaryAssetId(), SkillDatas[i]->MaxCount);
-						SaveData.InventoryData.AddItem(tmpItem, { ESlotSplitType::Default, ESlotSplitType::Shortcut });
+						SaveData.InventoryData.AddItem(tmpItem);
 					}
 					break;
 				}
@@ -260,7 +267,7 @@ void ADWPlayerCharacter::Kill(IAbilityVitalityInterface* InTarget)
 
 void ADWPlayerCharacter::ChangeHand()
 {
-	TArray<UAbilityInventorySlot*> AuxiliarySlots = Inventory->GetSlotsBySplitType(ESlotSplitType::Auxiliary);
+	TArray<UAbilityInventorySlotBase*> AuxiliarySlots = Inventory->GetSlotsBySplitType(ESlotSplitType::Auxiliary);
 	if(AuxiliarySlots.Num() > 0 && Inventory->GetSelectedSlot())
 	{
 		AuxiliarySlots[0]->Replace(Inventory->GetSelectedSlot());
@@ -316,11 +323,11 @@ void ADWPlayerCharacter::OnLeaveInteract(IInteractionAgentInterface* InInteracti
 	}
 }
 
-void ADWPlayerCharacter::OnInteract(EInteractAction InInteractAction, IInteractionAgentInterface* InInteractionAgent, bool bPassivity)
+void ADWPlayerCharacter::OnInteract(EInteractAction InInteractAction, IInteractionAgentInterface* InInteractionAgent, bool bPassive)
 {
-	Super::OnInteract(InInteractAction, InInteractionAgent, bPassivity);
+	Super::OnInteract(InInteractAction, InInteractionAgent, bPassive);
 
-	if(!bPassivity)
+	if(!bPassive)
 	{
 		switch(InInteractAction)
 		{
@@ -417,20 +424,23 @@ void ADWPlayerCharacter::OnAdditionItem(const FAbilityItem& InItem)
 {
 	Super::OnAdditionItem(InItem);
 
-	if(InItem.Count > 0)
+	if(UWidgetModuleStatics::GetUserWidget<UWidgetContextBox>())
 	{
-		UWidgetModuleStatics::GetUserWidget<UWidgetContextBox>()->AddMessage(FString::Printf(TEXT("获得: %s × %d"), *InItem.GetData().Name.ToString(), InItem.Count));
-	}
-	else
-	{
-		UWidgetModuleStatics::GetUserWidget<UWidgetContextBox>()->AddMessage(FString::Printf(TEXT("无法再获得: %s"), *InItem.GetData().Name.ToString()));
+		if(InItem.Count > 0)
+		{
+			UWidgetModuleStatics::GetUserWidget<UWidgetContextBox>()->AddMessage(FString::Printf(TEXT("获得: %s × %d"), *InItem.GetData().Name.ToString(), InItem.Count));
+		}
+		else
+		{
+			UWidgetModuleStatics::GetUserWidget<UWidgetContextBox>()->AddMessage(FString::Printf(TEXT("无法再获得: %s"), *InItem.GetData().Name.ToString()));
+		}
 	}
 }
 
-void ADWPlayerCharacter::OnAssembleItem(const FAbilityItem& InItem)
+void ADWPlayerCharacter::OnActiveItem(const FAbilityItem& InItem, bool bPassive, bool bSuccess)
 {
-	Super::OnAssembleItem(InItem);
-
+	Super::OnActiveItem(InItem, bPassive, bSuccess);
+	
 	const auto& ItemData = InItem.GetData<UAbilityItemDataBase>();
 	switch(ItemData.GetItemType())
 	{
@@ -447,9 +457,9 @@ void ADWPlayerCharacter::OnAssembleItem(const FAbilityItem& InItem)
 	}
 }
 
-void ADWPlayerCharacter::OnDischargeItem(const FAbilityItem& InItem)
+void ADWPlayerCharacter::OnDeactiveItem(const FAbilityItem& InItem, bool bPassive)
 {
-	Super::OnDischargeItem(InItem);
+	Super::OnDeactiveItem(InItem, bPassive);
 
 	const auto& ItemData = InItem.GetData<UAbilityItemDataBase>();
 	switch(ItemData.GetItemType())

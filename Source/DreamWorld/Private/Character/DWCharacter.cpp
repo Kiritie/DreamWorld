@@ -33,7 +33,7 @@
 #include "Character/States/DWCharacterState_Climb.h"
 #include "Character/States/DWCharacterState_Crouch.h"
 #include "Character/States/DWCharacterState_Death.h"
-#include "Character/States/DWCharacterState_Default.h"
+#include "Character/States/DWCharacterState_Spawn.h"
 #include "Character/States/DWCharacterState_Defend.h"
 #include "Character/States/DWCharacterState_Dodge.h"
 #include "Character/States/DWCharacterState_Fall.h"
@@ -46,7 +46,8 @@
 #include "Character/States/DWCharacterState_Swim.h"
 #include "Character/States/DWCharacterState_Walk.h"
 #include "FSM/Components/FSMComponent.h"
-#include "Ability/Inventory/Slot/AbilityInventorySkillSlot.h"
+#include "Ability/Inventory/Slot/AbilityInventorySkillSlotBase.h"
+#include "Ability/Item/Coin/AbilityCoinDataBase.h"
 #include "Character/States/DWCharacterState_Aim.h"
 #include "Common/Looking/LookingComponent.h"
 #include "Voxel/VoxelModuleStatics.h"
@@ -73,14 +74,16 @@ ADWCharacter::ADWCharacter(const FObjectInitializer& ObjectInitializer) :
 		CharacterHP->SetWorldWidgetClass(CharacterHPClassFinder.Class);
 	}
 
-	FSM->DefaultState = UDWCharacterState_Default::StaticClass();
+	FSM->DefaultState = UDWCharacterState_Spawn::StaticClass();
+	FSM->FinalState = UDWCharacterState_Death::StaticClass();
+	
 	FSM->States.Empty();
 	FSM->States.Add(UDWCharacterState_Aim::StaticClass());
 	FSM->States.Add(UDWCharacterState_Attack::StaticClass());
 	FSM->States.Add(UDWCharacterState_Climb::StaticClass());
 	FSM->States.Add(UDWCharacterState_Crouch::StaticClass());
 	FSM->States.Add(UDWCharacterState_Death::StaticClass());
-	FSM->States.Add(UDWCharacterState_Default::StaticClass());
+	FSM->States.Add(UDWCharacterState_Spawn::StaticClass());
 	FSM->States.Add(UDWCharacterState_Defend::StaticClass());
 	FSM->States.Add(UDWCharacterState_Dodge::StaticClass());
 	FSM->States.Add(UDWCharacterState_Fall::StaticClass());
@@ -102,7 +105,6 @@ ADWCharacter::ADWCharacter(const FObjectInitializer& ObjectInitializer) :
 	RidingTarget = nullptr;
 
 	// local
-	AttackAbilityIndex = 0;
 	SkillAbilityItem = FAbilityItem();
 	AttackType = EDWCharacterAttackType::None;
 	BirthLocation = FVector(0, 0, 0);
@@ -113,7 +115,7 @@ ADWCharacter::ADWCharacter(const FObjectInitializer& ObjectInitializer) :
 	CameraDoRotationDuration = 0.f;
 	CameraDoRotationRotation = EMPTY_Rotator;
 
-	AttackAbilities = TMap<EDWWeaponType, FDWCharacterAttackAbilityDatas>();
+	AttackAbilityQueues = TMap<EDWWeaponType, FDWCharacterAttackAbilityQueue>();
 	SkillAbilities = TMap<FPrimaryAssetId, FDWCharacterSkillAbilityData>();
 	ActionAbilities = TMap<FGameplayTag, FDWCharacterActionAbilityData>();
 
@@ -172,7 +174,7 @@ void ADWCharacter::OnRefresh_Implementation(float DeltaSeconds)
 
 		if(GetActorLocation().Z < 0)
 		{
-			Death();
+			Kill(this);
 		}
 	}
 }
@@ -201,7 +203,14 @@ void ADWCharacter::LoadData(FSaveData* InSaveData, EPhase InPhase)
 	{
 		if(!SaveData.InventoryData.IsSaved() && !IsPlayer())
 		{
-			SaveData.InventoryData = SaveData.GetItemData<UDWCharacterData>().InventoryData;
+			auto CoinDatas = UAssetModuleStatics::LoadPrimaryAssets<UAbilityCoinDataBase>(FName("Coin"));
+			for (int32 i = 0; i < CoinDatas.Num(); i++)
+			{
+				if(CoinDatas.IsEmpty()) break;
+				const int32 CoinNum = FMath::Clamp(FMath::Rand() < 0.3f / CoinDatas[i]->Unit ? FMath::RandRange(0, (int32)(CoinDatas[i]->Unit * 0.1f)) : 0, 0, CoinDatas[i]->MaxCount);
+				FAbilityItem tmpItem = FAbilityItem(CoinDatas[i]->GetPrimaryAssetId(), CoinNum);
+				SaveData.InventoryData.AddItem(tmpItem);
+			}
 
 			auto EquipDatas = UAssetModuleStatics::LoadPrimaryAssets<UAbilityEquipDataBase>(FName("Equip"));
 			const int32 EquipNum = FMath::Clamp(FMath::Rand() < 0.3f ? FMath::RandRange(1, 2) : 0, 0, EquipDatas.Num());
@@ -210,7 +219,7 @@ void ADWCharacter::LoadData(FSaveData* InSaveData, EPhase InPhase)
 				if(EquipDatas.IsEmpty()) break;
 				const int32 tmpIndex = FMath::RandRange(0, EquipDatas.Num() - 1);
 				FAbilityItem tmpItem = FAbilityItem(EquipDatas[tmpIndex]->GetPrimaryAssetId(), 1);
-				SaveData.InventoryData.AddItem(tmpItem, { ESlotSplitType::Default });
+				SaveData.InventoryData.AddItem(tmpItem);
 				EquipDatas.RemoveAt(tmpIndex);
 			}
 		}
@@ -225,13 +234,13 @@ void ADWCharacter::LoadData(FSaveData* InSaveData, EPhase InPhase)
 		{
 			BirthLocation = SaveData.BirthLocation;
 			FallingAttackAbility = SaveData.FallingAttackAbility;
-			AttackAbilities = SaveData.AttackAbilities;
+			AttackAbilityQueues = SaveData.AttackAbilityQueues;
 			SkillAbilities = SaveData.SkillAbilities;
 			ActionAbilities = SaveData.ActionAbilities;
 
-			for(auto& Iter : AttackAbilities)
+			for(auto& Iter : AttackAbilityQueues)
 			{
-				for(auto& Iter1 : Iter.Value.Array)
+				for(auto& Iter1 : Iter.Value.AbilityDatas)
 				{
 					Iter1.AbilityHandle = AbilitySystem->K2_GiveAbility(Iter1.AbilityClass, Iter1.AbilityLevel);
 				}
@@ -262,8 +271,8 @@ void ADWCharacter::LoadData(FSaveData* InSaveData, EPhase InPhase)
 				for(auto Iter : CharacterData.AttackAbilities)
 				{
 					Iter.AbilityHandle = AbilitySystem->K2_GiveAbility(Iter.AbilityClass, Iter.AbilityLevel);
-					if(!AttackAbilities.Contains(Iter.WeaponType)) AttackAbilities.Add(Iter.WeaponType);
-					AttackAbilities[Iter.WeaponType].Array.Add(Iter);
+					if(!AttackAbilityQueues.Contains(Iter.WeaponType)) AttackAbilityQueues.Add(Iter.WeaponType);
+					AttackAbilityQueues[Iter.WeaponType].AbilityDatas.Add(Iter);
 				}
 
 				for(auto Iter : CharacterData.SkillAbilities)
@@ -300,7 +309,7 @@ FSaveData* ADWCharacter::ToData()
 	SaveData.ControlMode = ControlMode;
 
 	SaveData.FallingAttackAbility = FallingAttackAbility;
-	SaveData.AttackAbilities = AttackAbilities;
+	SaveData.AttackAbilityQueues = AttackAbilityQueues;
 	SaveData.SkillAbilities = SkillAbilities;
 	SaveData.ActionAbilities = ActionAbilities;
 
@@ -366,16 +375,20 @@ bool ADWCharacter::CanInteract(EInteractAction InInteractAction, IInteractionAge
 	return Super::CanInteract(InInteractAction, InInteractionAgent);
 }
 
-void ADWCharacter::OnInteract(EInteractAction InInteractAction, IInteractionAgentInterface* InInteractionAgent, bool bPassivity)
+void ADWCharacter::OnInteract(EInteractAction InInteractAction, IInteractionAgentInterface* InInteractionAgent, bool bPassive)
 {
-	Super::OnInteract(InInteractAction, InInteractionAgent, bPassivity);
-	switch (InInteractAction)
+	Super::OnInteract(InInteractAction, InInteractionAgent, bPassive);
+
+	if(bPassive)
 	{
-		case EInteractAction::Revive:
+		switch (InInteractAction)
 		{
-			Revive();
+			case EInteractAction::Revive:
+			{
+				Revive(Cast<IAbilityVitalityInterface>(InInteractionAgent));
+			}
+			default: break;
 		}
-		default: break;
 	}
 }
 
@@ -394,24 +407,14 @@ void ADWCharacter::OnActiveItem(const FAbilityItem& InItem, bool bPassive, bool 
 		}
 		else if(IsPlayer())
 		{
-			UWidgetModuleStatics::OpenUserWidget<UWidgetMessageBox>({ FString::Printf(TEXT("该%s还未准备好！"), *UCommonStatics::GetEnumValueDisplayName(TEXT("/Script/WHFramework.EAbilityItemType"), (int32)InItem.GetType()).ToString()) });
+			UWidgetModuleStatics::OpenUserWidget<UWidgetMessageBox>({ FText::FromString(FString::Printf(TEXT("该%s还未准备好！"), *UCommonStatics::GetEnumValueDisplayName(TEXT("/Script/WHFramework.EAbilityItemType"), (int32)InItem.GetType()).ToString())) });
 		}
 	}
 }
 
-void ADWCharacter::OnCancelItem(const FAbilityItem& InItem, bool bPassive)
+void ADWCharacter::OnDeactiveItem(const FAbilityItem& InItem, bool bPassive)
 {
-	Super::OnCancelItem(InItem, bPassive);
-}
-
-void ADWCharacter::OnAssembleItem(const FAbilityItem& InItem)
-{
-	Super::OnAssembleItem(InItem);
-}
-
-void ADWCharacter::OnDischargeItem(const FAbilityItem& InItem)
-{
-	Super::OnDischargeItem(InItem);
+	Super::OnDeactiveItem(InItem, bPassive);
 }
 
 void ADWCharacter::OnDiscardItem(const FAbilityItem& InItem, bool bInPlace)
@@ -636,7 +639,7 @@ void ADWCharacter::UnAim()
 
 bool ADWCharacter::Attack(int32 InAbilityIndex /*= -1*/, const FSimpleDelegate& OnStart/* = nullptr*/, const FSimpleDelegate& OnEnd/* = nullptr*/)
 {
-	if(InAbilityIndex == -1) InAbilityIndex = AttackAbilityIndex;
+	if(InAbilityIndex == -1) InAbilityIndex = GetAttackAbilityQueue().AbilityIndex;
 
 	if(!IsFalling())
 	{
@@ -1085,14 +1088,24 @@ bool ADWCharacter::CheckShieldType(EDWShieldType InShieldType) const
 	return InShieldType == EDWShieldType::None || GetShieldType() == InShieldType;
 }
 
-FDWCharacterAttackAbilityData ADWCharacter::GetAttackAbility(int32 InAbilityIndex) const
+FDWCharacterAttackAbilityData ADWCharacter::GetAttackAbility(int32 InAbilityIndex)
 {
-	if(InAbilityIndex == -1) InAbilityIndex = AttackAbilityIndex;
+	if(InAbilityIndex == -1) InAbilityIndex = GetAttackAbilityQueue().AbilityIndex;
 	if(HasAttackAbility(InAbilityIndex))
 	{
 		return GetAttackAbilities()[InAbilityIndex];
 	}
 	return FDWCharacterAttackAbilityData();
+}
+
+FDWCharacterAttackAbilityQueue& ADWCharacter::GetAttackAbilityQueue()
+{
+	if(AttackAbilityQueues.Contains(GetWeaponType()))
+	{
+		return AttackAbilityQueues[GetWeaponType()];
+	}
+	static FDWCharacterAttackAbilityQueue Empty;
+	return Empty;
 }
 
 FDWCharacterSkillAbilityData ADWCharacter::GetSkillAbility(const FPrimaryAssetId& InSkillID, bool bNeedAssembled)
@@ -1133,9 +1146,9 @@ FDWCharacterActionAbilityData ADWCharacter::GetActionAbility(const FGameplayTag&
 
 TArray<FDWCharacterAttackAbilityData> ADWCharacter::GetAttackAbilities() const
 {
-	if(AttackAbilities.Contains(GetWeaponType()))
+	if(AttackAbilityQueues.Contains(GetWeaponType()))
 	{
-		return AttackAbilities[GetWeaponType()].Array;
+		return AttackAbilityQueues[GetWeaponType()].AbilityDatas;
 	}
 	return TArray<FDWCharacterAttackAbilityData>();
 }
@@ -1179,9 +1192,9 @@ bool ADWCharacter::CanLookAtTarget()
 
 bool ADWCharacter::HasAttackAbility(int32 InAbilityIndex) const
 {
-	if(AttackAbilities.Contains(GetWeaponType()))
+	if(AttackAbilityQueues.Contains(GetWeaponType()))
 	{
-		return AttackAbilities[GetWeaponType()].Array.IsValidIndex(InAbilityIndex);
+		return AttackAbilityQueues[GetWeaponType()].AbilityDatas.IsValidIndex(InAbilityIndex);
 	}
 	return false;
 }

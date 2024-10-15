@@ -12,11 +12,9 @@
 #include "Components/GridSlot.h"
 #include "Components/SizeBox.h"
 #include "Widget/Inventory/WidgetInventoryPanel.h"
-#include "Ability/Inventory/Slot/AbilityInventorySlot.h"
+#include "Ability/Inventory/Slot/AbilityInventorySlotBase.h"
 #include "Asset/AssetModuleStatics.h"
 #include "Input/InputModuleStatics.h"
-#include "Procedure/ProcedureModuleStatics.h"
-#include "Procedure/Procedure_Playing.h"
 #include "Widget/WidgetModuleStatics.h"
 #include "Widget/WidgetGameHUD.h"
 #include "Widget/Inventory/Slot/WidgetInventoryAuxiliarySlot.h"
@@ -170,7 +168,7 @@ void UWidgetInventoryBar::OnRefresh()
 	Super::OnRefresh();
 }
 
-void UWidgetInventoryBar::OnInventorySlotSelected(UAbilityInventorySlot* InInventorySlot)
+void UWidgetInventoryBar::OnInventorySlotSelected(UAbilityInventorySlotBase* InInventorySlot)
 {
 	if(InInventorySlot)
 	{
@@ -180,30 +178,40 @@ void UWidgetInventoryBar::OnInventorySlotSelected(UAbilityInventorySlot* InInven
 
 void UWidgetInventoryBar::PrevInventorySlot()
 {
+	auto SplitUISlots = GetSplitUISlots(ESlotSplitType::Shortcut);
 	if(SelectedSlotIndex > 0)
+	{
 		SelectInventorySlot(SelectedSlotIndex - 1);
+	}
 	else
-		SelectInventorySlot(9);
+	{
+		SelectInventorySlot(SplitUISlots.Num() - 1);
+	}
 }
 
 void UWidgetInventoryBar::NextInventorySlot()
 {
-	if (SelectedSlotIndex < 9)
+	auto SplitUISlots = GetSplitUISlots(ESlotSplitType::Shortcut);
+	if (SelectedSlotIndex < SplitUISlots.Num() - 1)
+	{
 		SelectInventorySlot(SelectedSlotIndex + 1);
+	}
 	else
+	{
 		SelectInventorySlot(0);
+	}
 }
 
 void UWidgetInventoryBar::SelectInventorySlot(int32 InSlotIndex, bool bRefreshInventory)
 {
 	SelectedSlotIndex = InSlotIndex;
-	if(UAbilityInventorySlot* SelectedSlot = GetSelectedSlot())
+	if(UAbilityInventorySlotBase* SelectedSlot = GetSelectedSlot())
 	{
 		if(bRefreshInventory)
 		{
 			GetInventory()->SetSelectedSlot(SelectedSlot);
 		}
-		if(!SelectedSlot->IsEmpty() && UProcedureModuleStatics::IsCurrentProcedureClass<UProcedure_Playing>())
+		if(!SelectedSlot->IsEmpty())
 		{
 			UWidgetModuleStatics::OpenUserWidget<UWidgetMessageBox>({ SelectedSlot->GetItem().GetData().Name });
 		}
@@ -229,7 +237,7 @@ void UWidgetInventoryBar::SetSkillBoxVisible(bool bValue)
 	}
 }
 
-UAbilityInventorySlot* UWidgetInventoryBar::GetSelectedSlot() const
+UAbilityInventorySlotBase* UWidgetInventoryBar::GetSelectedSlot() const
 {
 	auto SplitUISlots = GetSplitUISlots(ESlotSplitType::Shortcut);
 	if(SplitUISlots.IsValidIndex(SelectedSlotIndex))

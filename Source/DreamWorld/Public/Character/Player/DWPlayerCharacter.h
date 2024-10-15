@@ -30,7 +30,7 @@ class DREAMWORLD_API ADWPlayerCharacter : public ADWHumanCharacter
 
 	friend class UDWPlayerCharacterState_Attack;
 	friend class UDWPlayerCharacterState_Death;
-	friend class UDWPlayerCharacterState_Default;
+	friend class UDWPlayerCharacterState_Spawn;
 	friend class UDWPlayerCharacterState_Dodge;
 	friend class UDWPlayerCharacterState_Interrupt;
 
@@ -75,7 +75,7 @@ public:
 
 	virtual void OnLeaveInteract(IInteractionAgentInterface* InInteractionAgent) override;
 
-	virtual void OnInteract(EInteractAction InInteractAction, IInteractionAgentInterface* InInteractionAgent, bool bPassivity) override;
+	virtual void OnInteract(EInteractAction InInteractAction, IInteractionAgentInterface* InInteractionAgent, bool bPassive) override;
 
 	virtual bool OnInteractVoxel(const FVoxelHitResult& InVoxelHitResult, EInputInteractAction InInteractAction) override;
 
@@ -89,9 +89,9 @@ protected:
 public:
 	virtual void OnAdditionItem(const FAbilityItem& InItem) override;
 	
-	virtual void OnAssembleItem(const FAbilityItem& InItem) override;
+	virtual void OnActiveItem(const FAbilityItem& InItem, bool bPassive, bool bSuccess) override;
 
-	virtual void OnDischargeItem(const FAbilityItem& InItem) override;
+	virtual void OnDeactiveItem(const FAbilityItem& InItem, bool bPassive) override;
 	
 	virtual void OnSelectItem(const FAbilityItem& InItem) override;
 	
