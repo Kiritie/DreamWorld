@@ -31,4 +31,10 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
 	void ClearContext();
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	void ShowBorder();
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	void HideBorder();
 };

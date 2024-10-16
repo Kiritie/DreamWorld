@@ -31,7 +31,7 @@ bool UDWCharacterState_Attack::OnPreEnter(UFiniteStateBase* InLastState, const T
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 
-	return Character->ControlMode == EDWCharacterControlMode::Fighting && Character->GetAbilitySystemComponent()->TryActivateAbility(InParams[0].GetPointerValueRef<FGameplayAbilitySpecHandle>()) && Character->DoAction(GameplayTags::AbilityTag_Character_Action_Attack);
+	return Character->ControlMode == EDWCharacterControlMode::Fighting && Character->GetAbilitySystemComponent()->TryActivateAbility(InParams[0].GetPointerValueRef<FGameplayAbilitySpecHandle>()) && Character->DoAction(GameplayTags::Ability_Character_Action_Attack);
 }
 
 void UDWCharacterState_Attack::OnEnter(UFiniteStateBase* InLastState, const TArray<FParameter>& InParams)
@@ -40,7 +40,7 @@ void UDWCharacterState_Attack::OnEnter(UFiniteStateBase* InLastState, const TArr
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 
-	Character->GetAbilitySystemComponent()->AddLooseGameplayTag(GameplayTags::StateTag_Character_Attacking);
+	Character->GetAbilitySystemComponent()->AddLooseGameplayTag(GameplayTags::State_Character_Attacking);
 
 	Character->AttackType = (EDWCharacterAttackType)InParams[1].GetByteValue();
 
@@ -93,13 +93,13 @@ void UDWCharacterState_Attack::OnLeave(UFiniteStateBase* InNextState)
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 
-	Character->StopAction(GameplayTags::AbilityTag_Character_Action_Attack);
+	Character->StopAction(GameplayTags::Ability_Character_Action_Attack);
 
-	Character->GetAbilitySystemComponent()->RemoveLooseGameplayTag(GameplayTags::StateTag_Character_Attacking);
+	Character->GetAbilitySystemComponent()->RemoveLooseGameplayTag(GameplayTags::State_Character_Attacking);
 
 	if(Character->IsAiming())
 	{
-		Character->GetAbilitySystemComponent()->RemoveLooseGameplayTag(GameplayTags::StateTag_Character_Aiming);
+		Character->GetAbilitySystemComponent()->RemoveLooseGameplayTag(GameplayTags::State_Character_Aiming);
 
 		Character->SetUseControllerRotation(false);
 

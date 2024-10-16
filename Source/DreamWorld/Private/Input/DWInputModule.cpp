@@ -18,9 +18,9 @@ UDWInputModule::UDWInputModule()
 	InputManagers.Empty();
 	InputManagers.Add(UDWInputManager::StaticClass());
 
-	AddKeyShortcut(GameplayTags::InputTag_InventoryAll, FInputKeyShortcut(FText::FromString("Inventory All"), FText::FromString("Inventory")));
-	AddKeyShortcut(GameplayTags::InputTag_InventorySingle, FInputKeyShortcut(FText::FromString("Inventory Single"), FText::FromString("Inventory")));
-	AddKeyShortcut(GameplayTags::InputTag_InventorySplit, FInputKeyShortcut(FText::FromString("Inventory Split"), FText::FromString("Inventory")));
+	AddKeyShortcut(GameplayTags::Input_InventoryAll, FInputKeyShortcut(FText::FromString("Inventory All"), FText::FromString("Inventory")));
+	AddKeyShortcut(GameplayTags::Input_InventorySingle, FInputKeyShortcut(FText::FromString("Inventory Single"), FText::FromString("Inventory")));
+	AddKeyShortcut(GameplayTags::Input_InventorySplit, FInputKeyShortcut(FText::FromString("Inventory Split"), FText::FromString("Inventory")));
 }
 
 UDWInputModule::~UDWInputModule()

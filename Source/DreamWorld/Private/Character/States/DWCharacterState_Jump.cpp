@@ -21,7 +21,7 @@ bool UDWCharacterState_Jump::OnPreEnter(UFiniteStateBase* InLastState, const TAr
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 
-	return !Character->IsSwimming() && Character->DoAction(GameplayTags::AbilityTag_Character_Action_Jump);
+	return !Character->IsSwimming() && Character->DoAction(GameplayTags::Ability_Character_Action_Jump);
 }
 
 void UDWCharacterState_Jump::OnEnter(UFiniteStateBase* InLastState, const TArray<FParameter>& InParams)
@@ -44,7 +44,7 @@ void UDWCharacterState_Jump::OnLeave(UFiniteStateBase* InNextState)
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 
-	Character->StopAction(GameplayTags::AbilityTag_Character_Action_Jump);
+	Character->StopAction(GameplayTags::Ability_Character_Action_Jump);
 
 	Character->FreeToAnim();
 }

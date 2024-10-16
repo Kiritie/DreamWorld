@@ -23,7 +23,7 @@ bool UDWCharacterState_Fall::OnPreEnter(UFiniteStateBase* InLastState, const TAr
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 
-	return Character->DoAction(GameplayTags::AbilityTag_Character_Action_Fall);
+	return Character->DoAction(GameplayTags::Ability_Character_Action_Fall);
 }
 
 void UDWCharacterState_Fall::OnEnter(UFiniteStateBase* InLastState, const TArray<FParameter>& InParams)
@@ -54,7 +54,7 @@ void UDWCharacterState_Fall::OnLeave(UFiniteStateBase* InNextState)
 
 	Character->FreeToAnim();
 
-	Character->StopAction(GameplayTags::AbilityTag_Character_Action_Fall);
+	Character->StopAction(GameplayTags::Ability_Character_Action_Fall);
 }
 
 void UDWCharacterState_Fall::OnTermination()

@@ -12,6 +12,7 @@
 #include "Materials/MaterialInstanceDynamic.h"
 #include "Blueprint/WidgetLayoutLibrary.h"
 #include "Components/CanvasPanelSlot.h"
+#include "Input/Widget/WidgetKeyTipsItemBase.h"
 #include "Widget/WidgetModuleStatics.h"
 #include "Widget/Item/WidgetAbilityItemInfoBox.h"
 
@@ -137,6 +138,14 @@ void UWidgetInventorySlot::OnCreate(UUserWidgetBase* InOwner, const TArray<FPara
 void UWidgetInventorySlot::OnInitialize(const TArray<FParameter>& InParams)
 {
 	Super::OnInitialize(InParams);
+
+	if(InParams.IsValidIndex(1))
+	{
+		if(KeyTipsItem)
+		{
+			KeyTipsItem->SetKeyMappingName(InParams[1]);
+		}
+	}
 }
 
 void UWidgetInventorySlot::OnRefresh()

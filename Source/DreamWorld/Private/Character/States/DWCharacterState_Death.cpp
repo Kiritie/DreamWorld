@@ -46,7 +46,7 @@ void UDWCharacterState_Death::OnLeave(UFiniteStateBase* InNextState)
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 
-	Character->StopAction(GameplayTags::AbilityTag_Character_Action_Death);
+	Character->StopAction(GameplayTags::Ability_Character_Action_Death);
 }
 
 void UDWCharacterState_Death::OnTermination()
@@ -60,17 +60,16 @@ void UDWCharacterState_Death::DeathStart()
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 
-	Character->DoAction(GameplayTags::AbilityTag_Character_Action_Death);
+	Character->DoAction(GameplayTags::Ability_Character_Action_Death);
 }
 
 void UDWCharacterState_Death::DeathEnd()
 {
+	Super::DeathEnd();
+	
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 
-	Character->GetAbilitySystemComponent()->RemoveLooseGameplayTag(GameplayTags::StateTag_Vitality_Dying);
-	Character->GetAbilitySystemComponent()->AddLooseGameplayTag(GameplayTags::StateTag_Vitality_Dead);
-
-	Character->StopAction(GameplayTags::AbilityTag_Character_Action_Death);
+	Character->StopAction(GameplayTags::Ability_Character_Action_Death);
 
 	Character->Inventory->DiscardAllItem();
 

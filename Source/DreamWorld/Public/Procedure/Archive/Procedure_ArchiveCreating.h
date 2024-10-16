@@ -8,7 +8,6 @@
 #include "Procedure_ArchiveCreating.generated.h"
 
 class UFiniteStateBase;
-class UEventHandle_ChangeVoxelWorldState;
 /**
  * 
  */

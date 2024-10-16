@@ -27,7 +27,7 @@ bool UDWCharacterState_Aim::OnPreEnter(UFiniteStateBase* InLastState, const TArr
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 
-	return Character->DoAction(GameplayTags::AbilityTag_Character_Action_Aim);
+	return Character->DoAction(GameplayTags::Ability_Character_Action_Aim);
 }
 
 void UDWCharacterState_Aim::OnEnter(UFiniteStateBase* InLastState, const TArray<FParameter>& InParams)
@@ -36,7 +36,7 @@ void UDWCharacterState_Aim::OnEnter(UFiniteStateBase* InLastState, const TArray<
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 	
-	Character->GetAbilitySystemComponent()->AddLooseGameplayTag(GameplayTags::StateTag_Character_Aiming);
+	Character->GetAbilitySystemComponent()->AddLooseGameplayTag(GameplayTags::State_Character_Aiming);
 
 	Character->SetMotionRate(0.5f, 0.1f);
 
@@ -58,7 +58,7 @@ void UDWCharacterState_Aim::OnLeave(UFiniteStateBase* InNextState)
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 
-	Character->StopAction(GameplayTags::AbilityTag_Character_Action_Aim);
+	Character->StopAction(GameplayTags::Ability_Character_Action_Aim);
 
 	Character->SetMotionRate(1.f, 1.f);
 
@@ -66,7 +66,7 @@ void UDWCharacterState_Aim::OnLeave(UFiniteStateBase* InNextState)
 
 	if(!InNextState || !InNextState->IsA<UDWCharacterState_Attack>())
 	{
-		Character->GetAbilitySystemComponent()->RemoveLooseGameplayTag(GameplayTags::StateTag_Character_Aiming);
+		Character->GetAbilitySystemComponent()->RemoveLooseGameplayTag(GameplayTags::State_Character_Aiming);
 	}
 }
 

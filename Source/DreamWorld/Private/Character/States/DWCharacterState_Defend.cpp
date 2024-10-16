@@ -21,7 +21,7 @@ bool UDWCharacterState_Defend::OnPreEnter(UFiniteStateBase* InLastState, const T
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 
-	return Character->ControlMode == EDWCharacterControlMode::Fighting && Character->DoAction(GameplayTags::AbilityTag_Character_Action_Defend);
+	return Character->ControlMode == EDWCharacterControlMode::Fighting && Character->DoAction(GameplayTags::Ability_Character_Action_Defend);
 }
 
 void UDWCharacterState_Defend::OnEnter(UFiniteStateBase* InLastState, const TArray<FParameter>& InParams)
@@ -30,7 +30,7 @@ void UDWCharacterState_Defend::OnEnter(UFiniteStateBase* InLastState, const TArr
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 	
-	Character->GetAbilitySystemComponent()->AddLooseGameplayTag(GameplayTags::StateTag_Character_Defending);
+	Character->GetAbilitySystemComponent()->AddLooseGameplayTag(GameplayTags::State_Character_Defending);
 
 	Character->SetMotionRate(0.5f, 0.1f);
 	Character->LimitToAnim();
@@ -47,9 +47,9 @@ void UDWCharacterState_Defend::OnLeave(UFiniteStateBase* InNextState)
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 
-	Character->StopAction(GameplayTags::AbilityTag_Character_Action_Defend);
+	Character->StopAction(GameplayTags::Ability_Character_Action_Defend);
 	
-	Character->GetAbilitySystemComponent()->RemoveLooseGameplayTag(GameplayTags::StateTag_Character_Defending);
+	Character->GetAbilitySystemComponent()->RemoveLooseGameplayTag(GameplayTags::State_Character_Defending);
 
 	Character->FreeToAnim();
 	Character->SetMotionRate(1.f, 1.f);

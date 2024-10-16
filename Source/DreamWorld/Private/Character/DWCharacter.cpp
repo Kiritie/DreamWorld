@@ -50,6 +50,8 @@
 #include "Ability/Item/Coin/AbilityCoinDataBase.h"
 #include "Character/States/DWCharacterState_Aim.h"
 #include "Common/Looking/LookingComponent.h"
+#include "Event/EventModuleStatics.h"
+#include "Event/Handle/Voxel/EventHandle_VoxelWorldModeChanged.h"
 #include "Voxel/VoxelModuleStatics.h"
 #include "Widget/WidgetModuleStatics.h"
 #include "Widget/World/WorldWidgetComponent.h"
@@ -122,6 +124,13 @@ ADWCharacter::ADWCharacter(const FObjectInitializer& ObjectInitializer) :
 	AIControllerClass = ADWAIController::StaticClass();
 }
 
+void ADWCharacter::OnInitialize_Implementation()
+{
+	Super::OnInitialize_Implementation();
+
+	UEventModuleStatics::SubscribeEvent<UEventHandle_VoxelWorldModeChanged>(this, GET_FUNCTION_NAME_THISCLASS(OnWorldModeChanged));
+}
+
 void ADWCharacter::OnRefresh_Implementation(float DeltaSeconds)
 {
 	Super::OnRefresh_Implementation(DeltaSeconds);
@@ -161,14 +170,14 @@ void ADWCharacter::OnRefresh_Implementation(float DeltaSeconds)
 				UnSprint();
 				UnFly();
 				UnDefend();
-				AbilitySystem->AddLooseGameplayTag(GameplayTags::StateTag_Character_Exhausted);
+				AbilitySystem->AddLooseGameplayTag(GameplayTags::State_Character_Exhausted);
 			}
 		}
 		else if(GetStamina() > FMath::Min(GetMaxStamina() * 0.2f, 20.f))
 		{
 			if(IsExhausted())
 			{
-				AbilitySystem->RemoveLooseGameplayTag(GameplayTags::StateTag_Character_Exhausted);
+				AbilitySystem->RemoveLooseGameplayTag(GameplayTags::State_Character_Exhausted);
 			}
 		}
 
@@ -402,7 +411,7 @@ void ADWCharacter::OnActiveItem(const FAbilityItem& InItem, bool bPassive, bool 
 		{
 			if(InItem.GetType() == EAbilityItemType::Prop)
 			{
-				DoAction(GameplayTags::AbilityTag_Character_Action_Use);
+				DoAction(GameplayTags::Ability_Character_Action_Use);
 			}
 		}
 		else if(IsPlayer())
@@ -442,7 +451,7 @@ bool ADWCharacter::OnGenerateVoxel(const FVoxelHitResult& InVoxelHitResult)
 	if(!GenerateVoxelID.IsValid()) return false;
 	
 	FItemQueryInfo ItemQueryInfo = Inventory->QueryItemByRange(EItemQueryType::Remove, FAbilityItem(GenerateVoxelID, 1), -1);
-	if(ItemQueryInfo.IsValid() && DoAction(GameplayTags::AbilityTag_Character_Action_Generate))
+	if(ItemQueryInfo.IsValid() && DoAction(GameplayTags::Ability_Character_Action_Generate))
 	{
 		if(Super::OnGenerateVoxel(InVoxelHitResult))
 		{
@@ -456,7 +465,7 @@ bool ADWCharacter::OnGenerateVoxel(const FVoxelHitResult& InVoxelHitResult)
 
 bool ADWCharacter::OnDestroyVoxel(const FVoxelHitResult& InVoxelHitResult)
 {
-	if(DoAction(GameplayTags::AbilityTag_Character_Action_Destroy))
+	if(DoAction(GameplayTags::Ability_Character_Action_Destroy))
 	{
 		if(Super::OnDestroyVoxel(InVoxelHitResult))
 		{
@@ -467,11 +476,29 @@ bool ADWCharacter::OnDestroyVoxel(const FVoxelHitResult& InVoxelHitResult)
 	return false;
 }
 
+void ADWCharacter::OnWorldModeChanged(UObject* InSender, UEventHandle_VoxelWorldModeChanged* InEventHandle)
+{
+	switch(InEventHandle->WorldMode)
+	{
+		case EVoxelWorldMode::Preview:
+		{
+			Static();
+			break;
+		}
+		case EVoxelWorldMode::Default:
+		{
+			UnStatic();
+			break;
+		}
+		default: break;
+	}
+}
+
 void ADWCharacter::FreeToAnim()
 {
 	if(!IsFreeToAnim())
 	{
-		AbilitySystem->AddLooseGameplayTag(GameplayTags::StateTag_Character_FreeToAnim);
+		AbilitySystem->AddLooseGameplayTag(GameplayTags::State_Character_FreeToAnim);
 	}
 }
 
@@ -479,7 +506,7 @@ void ADWCharacter::LimitToAnim()
 {
 	if(IsFreeToAnim())
 	{
-		AbilitySystem->RemoveLooseGameplayTag(GameplayTags::StateTag_Character_FreeToAnim);
+		AbilitySystem->RemoveLooseGameplayTag(GameplayTags::State_Character_FreeToAnim);
 	}
 }
 
@@ -523,7 +550,7 @@ void ADWCharacter::Sprint()
 {
 	if(!IsSprinting())
 	{
-		DoAction(GameplayTags::AbilityTag_Character_Action_Sprint);
+		DoAction(GameplayTags::Ability_Character_Action_Sprint);
 	}
 }
 
@@ -531,7 +558,7 @@ void ADWCharacter::UnSprint()
 {
 	if(IsSprinting())
 	{
-		StopAction(GameplayTags::AbilityTag_Character_Action_Sprint);
+		StopAction(GameplayTags::Ability_Character_Action_Sprint);
 	}
 }
 
@@ -754,50 +781,50 @@ void ADWCharacter::EndAction(const FGameplayTag& InActionTag, bool bWasCancelled
 {
 	if(!HasActionAbility(InActionTag)) return;
 
-	if(InActionTag.MatchesTag(GameplayTags::AbilityTag_Character_Action_Death))
+	if(InActionTag.MatchesTag(GameplayTags::Ability_Character_Action_Death))
 	{
 		if(FSM->IsCurrentStateClass<UDWCharacterState_Death>())
 		{
 			FSM->GetCurrentState<UDWCharacterState_Death>()->DeathEnd();
 		}
 	}
-	else if(InActionTag.MatchesTag(GameplayTags::AbilityTag_Character_Action_Crouch))
+	else if(InActionTag.MatchesTag(GameplayTags::Ability_Character_Action_Crouch))
 	{
 		UnCrouch(false);
 	}
-	else if(InActionTag.MatchesTag(GameplayTags::AbilityTag_Character_Action_Dodge))
+	else if(InActionTag.MatchesTag(GameplayTags::Ability_Character_Action_Dodge))
 	{
 		UnDodge();
 	}
-	else if(InActionTag.MatchesTag(GameplayTags::AbilityTag_Character_Action_Sprint))
+	else if(InActionTag.MatchesTag(GameplayTags::Ability_Character_Action_Sprint))
 	{
 		UnSprint();
 	}
-	else if(InActionTag.MatchesTag(GameplayTags::AbilityTag_Character_Action_Climb))
+	else if(InActionTag.MatchesTag(GameplayTags::Ability_Character_Action_Climb))
 	{
 		UnClimb();
 	}
-	else if(InActionTag.MatchesTag(GameplayTags::AbilityTag_Character_Action_Swim))
+	else if(InActionTag.MatchesTag(GameplayTags::Ability_Character_Action_Swim))
 	{
 		UnSwim();
 	}
-	else if(InActionTag.MatchesTag(GameplayTags::AbilityTag_Character_Action_Float))
+	else if(InActionTag.MatchesTag(GameplayTags::Ability_Character_Action_Float))
 	{
 		UnFloat();
 	}
-	else if(InActionTag.MatchesTag(GameplayTags::AbilityTag_Character_Action_Ride))
+	else if(InActionTag.MatchesTag(GameplayTags::Ability_Character_Action_Ride))
 	{
 		UnRide();
 	}
-	else if(InActionTag.MatchesTag(GameplayTags::AbilityTag_Character_Action_Fly))
+	else if(InActionTag.MatchesTag(GameplayTags::Ability_Character_Action_Fly))
 	{
 		UnFly();
 	}
-	else if(InActionTag.MatchesTag(GameplayTags::AbilityTag_Character_Action_Attack))
+	else if(InActionTag.MatchesTag(GameplayTags::Ability_Character_Action_Attack))
 	{
 		UnAttack();
 	}
-	else if(InActionTag.MatchesTag(GameplayTags::AbilityTag_Character_Action_Defend))
+	else if(InActionTag.MatchesTag(GameplayTags::Ability_Character_Action_Defend))
 	{
 		UnDefend();
 	}
@@ -872,72 +899,72 @@ void ADWCharacter::SetMotionRate_Implementation(float InMovementRate, float InRo
 
 bool ADWCharacter::IsExhausted() const
 {
-	return AbilitySystem->HasMatchingGameplayTag(GameplayTags::StateTag_Character_Exhausted);
+	return AbilitySystem->HasMatchingGameplayTag(GameplayTags::State_Character_Exhausted);
 }
 
 bool ADWCharacter::IsFreeToAnim() const
 {
-	return AbilitySystem->HasMatchingGameplayTag(GameplayTags::StateTag_Character_FreeToAnim);
+	return AbilitySystem->HasMatchingGameplayTag(GameplayTags::State_Character_FreeToAnim);
 }
 
 bool ADWCharacter::IsDodging() const
 {
-	return AbilitySystem->HasMatchingGameplayTag(GameplayTags::StateTag_Character_Dodging);
+	return AbilitySystem->HasMatchingGameplayTag(GameplayTags::State_Character_Dodging);
 }
 
 bool ADWCharacter::IsSprinting() const
 {
-	return AbilitySystem->HasMatchingGameplayTag(GameplayTags::StateTag_Character_Sprinting);
+	return AbilitySystem->HasMatchingGameplayTag(GameplayTags::State_Character_Sprinting);
 }
 
 bool ADWCharacter::IsCrouching(bool bReally) const
 {
-	return !bReally ? AbilitySystem->HasMatchingGameplayTag(GameplayTags::StateTag_Character_Crouching) : GetCharacterMovement()->IsCrouching();
+	return !bReally ? AbilitySystem->HasMatchingGameplayTag(GameplayTags::State_Character_Crouching) : GetCharacterMovement()->IsCrouching();
 }
 
 bool ADWCharacter::IsSwimming(bool bReally) const
 {
-	return !bReally ? AbilitySystem->HasMatchingGameplayTag(GameplayTags::StateTag_Character_Swimming) : GetCharacterMovement()->IsSwimming();
+	return !bReally ? AbilitySystem->HasMatchingGameplayTag(GameplayTags::State_Character_Swimming) : GetCharacterMovement()->IsSwimming();
 }
 
 bool ADWCharacter::IsFloating() const
 {
-	return AbilitySystem->HasMatchingGameplayTag(GameplayTags::StateTag_Character_Floating);
+	return AbilitySystem->HasMatchingGameplayTag(GameplayTags::State_Character_Floating);
 }
 
 bool ADWCharacter::IsAiming() const
 {
-	return AbilitySystem->HasMatchingGameplayTag(GameplayTags::StateTag_Character_Aiming);
+	return AbilitySystem->HasMatchingGameplayTag(GameplayTags::State_Character_Aiming);
 }
 
 bool ADWCharacter::IsAttacking(EDWCharacterAttackType InAttackType) const
 {
-	return InAttackType == EDWCharacterAttackType::None ? AbilitySystem->HasMatchingGameplayTag(GameplayTags::StateTag_Character_Attacking) : AttackType == InAttackType;
+	return InAttackType == EDWCharacterAttackType::None ? AbilitySystem->HasMatchingGameplayTag(GameplayTags::State_Character_Attacking) : AttackType == InAttackType;
 }
 
 bool ADWCharacter::IsDefending() const
 {
-	return AbilitySystem->HasMatchingGameplayTag(GameplayTags::StateTag_Character_Defending);
+	return AbilitySystem->HasMatchingGameplayTag(GameplayTags::State_Character_Defending);
 }
 
 bool ADWCharacter::IsClimbing() const
 {
-	return AbilitySystem->HasMatchingGameplayTag(GameplayTags::StateTag_Character_Climbing);
+	return AbilitySystem->HasMatchingGameplayTag(GameplayTags::State_Character_Climbing);
 }
 
 bool ADWCharacter::IsRiding() const
 {
-	return AbilitySystem->HasMatchingGameplayTag(GameplayTags::StateTag_Character_Riding);
+	return AbilitySystem->HasMatchingGameplayTag(GameplayTags::State_Character_Riding);
 }
 
 bool ADWCharacter::IsFlying(bool bReally) const
 {
-	return !bReally ? AbilitySystem->HasMatchingGameplayTag(GameplayTags::StateTag_Character_Flying) : GetCharacterMovement()->IsFlying();
+	return !bReally ? AbilitySystem->HasMatchingGameplayTag(GameplayTags::State_Character_Flying) : GetCharacterMovement()->IsFlying();
 }
 
 bool ADWCharacter::IsInterrupting() const
 {
-	return AbilitySystem->HasMatchingGameplayTag(GameplayTags::StateTag_Character_Interrupting);
+	return AbilitySystem->HasMatchingGameplayTag(GameplayTags::State_Character_Interrupting);
 }
 
 UWidgetCharacterHP* ADWCharacter::GetCharacterHPWidget() const
@@ -1367,7 +1394,7 @@ void ADWCharacter::HandleDamage(EDamageType DamageType, const float LocalDamageD
 	{
 		if(!bHasDefend)
 		{
-			DoAction(GameplayTags::AbilityTag_Character_Action_GetHit);
+			DoAction(GameplayTags::Ability_Character_Action_GetHit);
 		}
 
 		ADWCharacter* SourceCharacter = Cast<ADWCharacter>(SourceActor);

@@ -183,4 +183,7 @@ public:
 	
 	UFUNCTION(BlueprintCallable)
 	virtual void OpenGeneratePanel();
+	
+	UFUNCTION(BlueprintCallable)
+	virtual void OpenContextInputBox();
 };

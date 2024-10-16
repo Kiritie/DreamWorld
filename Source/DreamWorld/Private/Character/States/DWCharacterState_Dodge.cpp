@@ -22,7 +22,7 @@ bool UDWCharacterState_Dodge::OnPreEnter(UFiniteStateBase* InLastState, const TA
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 
-	return Character->GetMoveDirection(true) != FVector::ZeroVector && Character->DoAction(GameplayTags::AbilityTag_Character_Action_Dodge);
+	return Character->GetMoveDirection(true) != FVector::ZeroVector && Character->DoAction(GameplayTags::Ability_Character_Action_Dodge);
 }
 
 void UDWCharacterState_Dodge::OnEnter(UFiniteStateBase* InLastState, const TArray<FParameter>& InParams)
@@ -31,10 +31,10 @@ void UDWCharacterState_Dodge::OnEnter(UFiniteStateBase* InLastState, const TArra
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 	
-	Character->GetAbilitySystemComponent()->AddLooseGameplayTag(GameplayTags::StateTag_Character_Dodging);
+	Character->GetAbilitySystemComponent()->AddLooseGameplayTag(GameplayTags::State_Character_Dodging);
 
 	Character->LimitToAnim();
-	Character->GetCapsuleComponent()->SetGenerateOverlapEvents(false);
+	Character->GetCollisionComponent()->SetGenerateOverlapEvents(false);
 	Character->SetActorRotation(FRotator(0.f, Character->GetMoveDirection(true).ToOrientationRotator().Yaw, 0.f));
 }
 
@@ -49,12 +49,12 @@ void UDWCharacterState_Dodge::OnLeave(UFiniteStateBase* InNextState)
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 
-	Character->StopAction(GameplayTags::AbilityTag_Character_Action_Dodge);
+	Character->StopAction(GameplayTags::Ability_Character_Action_Dodge);
 	
-	Character->GetAbilitySystemComponent()->RemoveLooseGameplayTag(GameplayTags::StateTag_Character_Dodging);
+	Character->GetAbilitySystemComponent()->RemoveLooseGameplayTag(GameplayTags::State_Character_Dodging);
 
 	Character->FreeToAnim();
-	Character->GetCapsuleComponent()->SetGenerateOverlapEvents(true);
+	Character->GetCollisionComponent()->SetGenerateOverlapEvents(true);
 }
 
 void UDWCharacterState_Dodge::OnTermination()

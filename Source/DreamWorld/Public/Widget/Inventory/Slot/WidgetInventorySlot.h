@@ -72,7 +72,7 @@ protected:
 	class UTextBlock* TxtCooldown;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components", meta = (BindWidget, OptionalWidget = false))
-	class UTextBlock* TxtKeyCode;
+	class UWidgetKeyTipsItemBase* KeyTipsItem;
 
 	UPROPERTY()
 	UMaterialInstanceDynamic* MaskMatInst;

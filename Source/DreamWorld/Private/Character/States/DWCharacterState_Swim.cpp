@@ -24,7 +24,7 @@ bool UDWCharacterState_Swim::OnPreEnter(UFiniteStateBase* InLastState, const TAr
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 
-	return Character->DoAction(GameplayTags::AbilityTag_Character_Action_Swim);
+	return Character->DoAction(GameplayTags::Ability_Character_Action_Swim);
 }
 
 void UDWCharacterState_Swim::OnEnter(UFiniteStateBase* InLastState, const TArray<FParameter>& InParams)
@@ -33,7 +33,7 @@ void UDWCharacterState_Swim::OnEnter(UFiniteStateBase* InLastState, const TArray
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 	
-	Character->GetAbilitySystemComponent()->AddLooseGameplayTag(GameplayTags::StateTag_Character_Swimming);
+	Character->GetAbilitySystemComponent()->AddLooseGameplayTag(GameplayTags::State_Character_Swimming);
 
 	// Character->LimitToAnim();
 
@@ -56,9 +56,9 @@ void UDWCharacterState_Swim::OnLeave(UFiniteStateBase* InNextState)
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 
-	Character->StopAction(GameplayTags::AbilityTag_Character_Action_Swim);
+	Character->StopAction(GameplayTags::Ability_Character_Action_Swim);
 	
-	Character->GetAbilitySystemComponent()->RemoveLooseGameplayTag(GameplayTags::StateTag_Character_Swimming);
+	Character->GetAbilitySystemComponent()->RemoveLooseGameplayTag(GameplayTags::State_Character_Swimming);
 	
 	// Character->FreeToAnim();
 

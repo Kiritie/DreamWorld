@@ -48,14 +48,13 @@ void UDWPlayerCharacterState_Spawn::OnTermination()
 
 void UDWPlayerCharacterState_Spawn::TryLeave()
 {
-	ADWPlayerCharacter* PlayerCharacter = GetAgent<ADWPlayerCharacter>();
-	
 	if(UProcedureModuleStatics::IsCurrentProcedureClass<UProcedure_Testing>())
 	{
 		Super::TryLeave();
 	}
 	else if(UVoxelModule::Get().IsBasicGenerated())
 	{
+		ADWPlayerCharacter* PlayerCharacter = GetAgent<ADWPlayerCharacter>();
 		if(PlayerCharacter->GetActorLocation().IsNearlyZero())
 		{
 			const auto& CharacterData = PlayerCharacter->GetCharacterData<UAbilityCharacterDataBase>();

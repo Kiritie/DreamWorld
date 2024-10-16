@@ -3,10 +3,11 @@
 #include "Character/States/DWCharacterState_Spawn.h"
 
 #include "Character/DWCharacter.h"
+#include "Character/States/DWCharacterState_Static.h"
 #include "Common/Looking/LookingComponent.h"
-#include "Components/CapsuleComponent.h"
 #include "FSM/Components/FSMComponent.h"
-#include "GameFramework/CharacterMovementComponent.h"
+#include "Procedure/ProcedureModuleStatics.h"
+#include "Procedure/Procedure_Testing.h"
 #include "Voxel/VoxelModule.h"
 #include "Voxel/VoxelModuleStatics.h"
 
@@ -31,7 +32,7 @@ void UDWCharacterState_Spawn::OnEnter(UFiniteStateBase* InLastState, const TArra
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 
-	Character->DoAction(GameplayTags::AbilityTag_Character_Action_Revive);
+	Character->DoAction(GameplayTags::Ability_Character_Action_Revive);
 
 	Character->LimitToAnim();
 	
@@ -44,9 +45,6 @@ void UDWCharacterState_Spawn::OnEnter(UFiniteStateBase* InLastState, const TArra
 	// local
 	Character->AIMoveLocation = EMPTY_Vector;
 	Character->AIMoveStopDistance = 0;
-
-	Character->GetCharacterMovement()->SetActive(false);
-	Character->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
 void UDWCharacterState_Spawn::OnRefresh(float DeltaSeconds)
@@ -61,8 +59,6 @@ void UDWCharacterState_Spawn::OnLeave(UFiniteStateBase* InNextState)
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 
 	Character->FreeToAnim();
-	Character->GetCharacterMovement()->SetActive(true);
-	Character->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 }
 
 void UDWCharacterState_Spawn::OnTermination()
@@ -72,5 +68,12 @@ void UDWCharacterState_Spawn::OnTermination()
 
 void UDWCharacterState_Spawn::TryLeave()
 {
-	Super::TryLeave();
+	if(UVoxelModuleStatics::GetWorldMode() == EVoxelWorldMode::Default || UProcedureModuleStatics::IsCurrentProcedureClass<UProcedure_Testing>())
+	{
+		Super::TryLeave();
+	}
+	else
+	{
+		FSM->SwitchStateByClass<UDWCharacterState_Static>();
+	}
 }

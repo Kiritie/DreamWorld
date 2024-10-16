@@ -27,7 +27,7 @@ bool UDWCharacterState_Float::OnPreEnter(UFiniteStateBase* InLastState, const TA
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 
-	return Character->DoAction(GameplayTags::AbilityTag_Character_Action_Float);
+	return Character->DoAction(GameplayTags::Ability_Character_Action_Float);
 }
 
 void UDWCharacterState_Float::OnEnter(UFiniteStateBase* InLastState, const TArray<FParameter>& InParams)
@@ -41,7 +41,7 @@ void UDWCharacterState_Float::OnEnter(UFiniteStateBase* InLastState, const TArra
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 	
-	Character->GetAbilitySystemComponent()->AddLooseGameplayTag(GameplayTags::StateTag_Character_Floating);
+	Character->GetAbilitySystemComponent()->AddLooseGameplayTag(GameplayTags::State_Character_Floating);
 
 	// Character->LimitToAnim();
 
@@ -79,9 +79,9 @@ void UDWCharacterState_Float::OnLeave(UFiniteStateBase* InNextState)
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 
-	Character->StopAction(GameplayTags::AbilityTag_Character_Action_Float);
+	Character->StopAction(GameplayTags::Ability_Character_Action_Float);
 	
-	Character->GetAbilitySystemComponent()->RemoveLooseGameplayTag(GameplayTags::StateTag_Character_Floating);
+	Character->GetAbilitySystemComponent()->RemoveLooseGameplayTag(GameplayTags::State_Character_Floating);
 
 	// Character->FreeToAnim();
 

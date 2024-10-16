@@ -30,7 +30,7 @@ bool UDWCharacterState_Ride::OnPreEnter(UFiniteStateBase* InLastState, const TAr
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 
-	return Character->DoAction(GameplayTags::AbilityTag_Character_Action_Ride);
+	return Character->DoAction(GameplayTags::Ability_Character_Action_Ride);
 }
 
 void UDWCharacterState_Ride::OnEnter(UFiniteStateBase* InLastState, const TArray<FParameter>& InParams)
@@ -47,12 +47,12 @@ void UDWCharacterState_Ride::OnEnter(UFiniteStateBase* InLastState, const TArray
 
 	Character->RidingTarget = RidingTarget;
 
-	Character->GetAbilitySystemComponent()->AddLooseGameplayTag(GameplayTags::StateTag_Character_Riding);
+	Character->GetAbilitySystemComponent()->AddLooseGameplayTag(GameplayTags::State_Character_Riding);
 
 	UCharacterModuleStatics::SwitchCharacter(RidingTarget);
 	
 	Character->GetMovementComponent()->SetActive(false);
-	Character->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	Character->GetCollisionComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	Character->AttachToComponent(RidingTarget->GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("RiderPoint"));
 	Character->SetInteractingAgent(RidingTarget, true);
 	// Character->LimitToAnim();
@@ -72,9 +72,9 @@ void UDWCharacterState_Ride::OnLeave(UFiniteStateBase* InNextState)
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 	ADWCharacter* RidingTarget = Character->GetRidingTarget();
 
-	Character->StopAction(GameplayTags::AbilityTag_Character_Action_Ride);
+	Character->StopAction(GameplayTags::Ability_Character_Action_Ride);
 
-	Character->GetAbilitySystemComponent()->RemoveLooseGameplayTag(GameplayTags::StateTag_Character_Riding);
+	Character->GetAbilitySystemComponent()->RemoveLooseGameplayTag(GameplayTags::State_Character_Riding);
 
 	Character->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 
@@ -84,7 +84,7 @@ void UDWCharacterState_Ride::OnLeave(UFiniteStateBase* InNextState)
 	{
 		// Character->FreeToAnim();
 		Character->GetMovementComponent()->SetActive(true);
-		Character->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		Character->GetCollisionComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	}
 	
 	if(RidingTarget)

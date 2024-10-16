@@ -27,7 +27,7 @@ bool UDWCharacterState_Interrupt::OnPreEnter(UFiniteStateBase* InLastState, cons
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 
-	return Character->DoAction(GameplayTags::AbilityTag_Character_Action_Interrupt);
+	return Character->DoAction(GameplayTags::Ability_Character_Action_Interrupt);
 }
 
 void UDWCharacterState_Interrupt::OnEnter(UFiniteStateBase* InLastState, const TArray<FParameter>& InParams)
@@ -42,7 +42,7 @@ void UDWCharacterState_Interrupt::OnEnter(UFiniteStateBase* InLastState, const T
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 	
-	Character->GetAbilitySystemComponent()->AddLooseGameplayTag(GameplayTags::StateTag_Character_Interrupting);
+	Character->GetAbilitySystemComponent()->AddLooseGameplayTag(GameplayTags::State_Character_Interrupting);
 
 	Character->GetCharacterMovement()->SetActive(false);
 
@@ -66,9 +66,9 @@ void UDWCharacterState_Interrupt::OnLeave(UFiniteStateBase* InNextState)
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 
-	Character->StopAction(GameplayTags::AbilityTag_Character_Action_Interrupt);
+	Character->StopAction(GameplayTags::Ability_Character_Action_Interrupt);
 		
-	Character->GetAbilitySystemComponent()->RemoveLooseGameplayTag(GameplayTags::StateTag_Character_Interrupting);
+	Character->GetAbilitySystemComponent()->RemoveLooseGameplayTag(GameplayTags::State_Character_Interrupting);
 
 	Character->GetCharacterMovement()->SetActive(true);
 

@@ -9,6 +9,7 @@
 
 #include "DWCharacter.generated.h"
 
+class UEventHandle_VoxelWorldModeChanged;
 class UWorldWidgetComponent;
 class UDWCharacterData;
 class ADWVoxelChunk;
@@ -60,6 +61,8 @@ class DREAMWORLD_API ADWCharacter : public AAbilityCharacterBase, public IDWTeam
 	friend class UDWCharacterState_Walk;
 
 public:
+	virtual void OnInitialize_Implementation() override;
+	
 	virtual void OnRefresh_Implementation(float DeltaSeconds) override;
 
 protected:
@@ -106,6 +109,9 @@ public:
 	virtual bool OnGenerateVoxel(const FVoxelHitResult& InVoxelHitResult) override;
 
 	virtual bool OnDestroyVoxel(const FVoxelHitResult& InVoxelHitResult) override;
+
+	UFUNCTION()
+	virtual void OnWorldModeChanged(UObject* InSender, UEventHandle_VoxelWorldModeChanged* InEventHandle);
 
 public:
 	UFUNCTION(BlueprintCallable)

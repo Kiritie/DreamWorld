@@ -61,9 +61,8 @@ void UWidgetInventoryBar::OnInitialize(UObject* InOwner, const TArray<FParameter
 			UISlotDatas[ESlotSplitType::Shortcut].Slots.Empty();
 			for(int32 i = 0; i < ShortcutSlots.Num(); i++)
 			{
-				if(UWidgetInventoryShortcutSlot* ShortcutSlot = CreateSubWidget<UWidgetInventoryShortcutSlot>({ ShortcutSlots[i] }, UAssetModuleStatics::GetStaticClass(FName("InventoryShortcutSlot"))))
+				if(UWidgetInventoryShortcutSlot* ShortcutSlot = CreateSubWidget<UWidgetInventoryShortcutSlot>({ ShortcutSlots[i], FString::Printf(TEXT("SelectInventorySlot%d"), i + 1) }, UAssetModuleStatics::GetStaticClass(FName("InventoryShortcutSlot"))))
 				{
-					ShortcutSlot->SetKeyCode(UInputModuleStatics::GetPlayerKeyMappingInfoByName(*FString::Printf(TEXT("SelectInventorySlot%d"), i + 1)).KeyCode);
 					if(UGridSlot* GridSlot = ShortcutContent->AddChildToGrid(ShortcutSlot))
 					{
 						GridSlot->SetPadding(FMargin(0.f, 0.f, 5.f, 0.f));
@@ -77,7 +76,7 @@ void UWidgetInventoryBar::OnInitialize(UObject* InOwner, const TArray<FParameter
 		{
 			for(int32 i = 0; i < UISlotDatas[ESlotSplitType::Shortcut].Slots.Num(); i++)
 			{
-				UISlotDatas[ESlotSplitType::Shortcut].Slots[i]->OnInitialize({ ShortcutSlots[i] });
+				UISlotDatas[ESlotSplitType::Shortcut].Slots[i]->OnInitialize({ ShortcutSlots[i], FString::Printf(TEXT("SelectInventorySlot%d"), i + 1) });
 			}
 		}
 	}
@@ -90,9 +89,8 @@ void UWidgetInventoryBar::OnInitialize(UObject* InOwner, const TArray<FParameter
 			UISlotDatas[ESlotSplitType::Auxiliary].Slots.Empty();
 			for(int32 i = 0; i < AuxiliarySlots.Num(); i++)
 			{
-				if(UWidgetInventoryAuxiliarySlot* AuxiliarySlot = CreateSubWidget<UWidgetInventoryAuxiliarySlot>({ AuxiliarySlots[i] }, UAssetModuleStatics::GetStaticClass(FName("InventoryAuxiliarySlot"))))
+				if(UWidgetInventoryAuxiliarySlot* AuxiliarySlot = CreateSubWidget<UWidgetInventoryAuxiliarySlot>({ AuxiliarySlots[i], FString::Printf(TEXT("ChangeAuxiliarySlot%d"), i + 1) }, UAssetModuleStatics::GetStaticClass(FName("InventoryAuxiliarySlot"))))
 				{
-					AuxiliarySlot->SetKeyCode(UInputModuleStatics::GetPlayerKeyMappingInfoByName(*FString::Printf(TEXT("ChangeAuxiliarySlot%d"), i + 1)).KeyCode);
 					if(UGridSlot* GridSlot = AuxiliaryContent->AddChildToGrid(AuxiliarySlot))
 					{
 						GridSlot->SetPadding(FMargin(0.f, 0.f, 5.f, 0.f));
@@ -106,7 +104,7 @@ void UWidgetInventoryBar::OnInitialize(UObject* InOwner, const TArray<FParameter
 		{
 			for(int32 i = 0; i < UISlotDatas[ESlotSplitType::Auxiliary].Slots.Num(); i++)
 			{
-				UISlotDatas[ESlotSplitType::Auxiliary].Slots[i]->OnInitialize({ AuxiliarySlots[i] });
+				UISlotDatas[ESlotSplitType::Auxiliary].Slots[i]->OnInitialize({ AuxiliarySlots[i], FString::Printf(TEXT("ChangeAuxiliarySlot%d"), i + 1) });
 			}
 		}
 	}
@@ -120,9 +118,8 @@ void UWidgetInventoryBar::OnInitialize(UObject* InOwner, const TArray<FParameter
 			UISlotDatas[ESlotSplitType::Skill].Slots.Empty();
 			for(int32 i = 0; i < SkillSlots.Num(); i++)
 			{
-				if(UWidgetInventorySkillSlot* SkillSlot = CreateSubWidget<UWidgetInventorySkillSlot>({ SkillSlots[i] }, UAssetModuleStatics::GetStaticClass(FName("InventorySkillSlot"))))
+				if(UWidgetInventorySkillSlot* SkillSlot = CreateSubWidget<UWidgetInventorySkillSlot>({ SkillSlots[i], FString::Printf(TEXT("ReleaseSkillAbility%d"), i + 1) }, UAssetModuleStatics::GetStaticClass(FName("InventorySkillSlot"))))
 				{
-					SkillSlot->SetKeyCode(UInputModuleStatics::GetPlayerKeyMappingInfoByName(*FString::Printf(TEXT("ReleaseSkillAbility%d"), i + 1)).KeyCode);
 					if(UGridSlot* GridSlot = i < SkillSlots.Num() / 2 ? LeftSkillContent->AddChildToGrid(SkillSlot) : RightSkillContent->AddChildToGrid(SkillSlot))
 					{
 						GridSlot->SetPadding(FMargin(0.f, 0.f, 5.f, 0.f));
@@ -136,7 +133,7 @@ void UWidgetInventoryBar::OnInitialize(UObject* InOwner, const TArray<FParameter
 		{
 			for(int32 i = 0; i < UISlotDatas[ESlotSplitType::Skill].Slots.Num(); i++)
 			{
-				UISlotDatas[ESlotSplitType::Skill].Slots[i]->OnInitialize({ SkillSlots[i] });
+				UISlotDatas[ESlotSplitType::Skill].Slots[i]->OnInitialize({ SkillSlots[i], FString::Printf(TEXT("ReleaseSkillAbility%d"), i + 1) });
 			}
 		}
 	}
