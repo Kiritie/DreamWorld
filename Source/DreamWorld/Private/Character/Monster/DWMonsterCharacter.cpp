@@ -29,7 +29,7 @@ bool ADWMonsterCharacter::CanInteract(EInteractAction InInteractAction, IInterac
 		{
 			if(ADWCharacter* InteractionCharacter = Cast<ADWCharacter>(InInteractionAgent))
 			{
-				const FAbilityItem SelectedItem = InteractionCharacter->GetInventory()->GetSelectedItem();
+				const FAbilityItem SelectedItem = InteractionCharacter->GetInventory()->GetSelectedItem(ESlotSplitType::Shortcut);
 				return !IsEnemy(InteractionCharacter) && SelectedItem.IsValid() && SelectedItem.GetType() == EAbilityItemType::Prop && SelectedItem.GetData<UDWPropData>().PropType == EDWPropType::Food;
 			}
 			break;
@@ -68,7 +68,7 @@ void ADWMonsterCharacter::OnInteract(EInteractAction InInteractAction, IInteract
 				if(ADWCharacter* InteractionCharacter = Cast<ADWCharacter>(InInteractionAgent))
 				{
 					InteractionCharacter->GetInventory()->SetConnectInventory(GetInventory());
-					InteractionCharacter->GetInventory()->GetSelectedSlot()->MoveItem(1);
+					InteractionCharacter->GetInventory()->GetSelectedSlot(ESlotSplitType::Shortcut)->MoveItem(1);
 					InteractionCharacter->GetInventory()->SetConnectInventory(nullptr);
 				}
 				break;

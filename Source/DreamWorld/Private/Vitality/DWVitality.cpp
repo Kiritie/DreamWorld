@@ -146,9 +146,9 @@ void ADWVitality::OnDiscardItem(const FAbilityItem& InItem, bool bInPlace)
 	Super::OnDiscardItem(InItem, bInPlace);
 }
 
-void ADWVitality::OnSelectItem(const FAbilityItem& InItem)
+void ADWVitality::OnSelectItem(ESlotSplitType InSplitType, const FAbilityItem& InItem)
 {
-	Super::OnSelectItem(InItem);
+	Super::OnSelectItem(InSplitType, InItem);
 }
 
 void ADWVitality::OnAuxiliaryItem(const FAbilityItem& InItem)

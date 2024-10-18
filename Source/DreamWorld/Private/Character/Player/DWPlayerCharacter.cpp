@@ -268,9 +268,9 @@ void ADWPlayerCharacter::Kill(IAbilityVitalityInterface* InTarget)
 void ADWPlayerCharacter::ChangeHand()
 {
 	TArray<UAbilityInventorySlotBase*> AuxiliarySlots = Inventory->GetSlotsBySplitType(ESlotSplitType::Auxiliary);
-	if(AuxiliarySlots.Num() > 0 && Inventory->GetSelectedSlot())
+	if(AuxiliarySlots.Num() > 0 && Inventory->GetSelectedSlot(ESlotSplitType::Shortcut))
 	{
-		AuxiliarySlots[0]->Replace(Inventory->GetSelectedSlot());
+		AuxiliarySlots[0]->Replace(Inventory->GetSelectedSlot(ESlotSplitType::Shortcut));
 	}
 }
 
@@ -477,9 +477,9 @@ void ADWPlayerCharacter::OnDeactiveItem(const FAbilityItem& InItem, bool bPassiv
 	}
 }
 
-void ADWPlayerCharacter::OnSelectItem(const FAbilityItem& InItem)
+void ADWPlayerCharacter::OnSelectItem(ESlotSplitType InSplitType, const FAbilityItem& InItem)
 {
-	Super::OnSelectItem(InItem);
+	Super::OnSelectItem(InSplitType, InItem);
 }
 
 void ADWPlayerCharacter::OnAttributeChange(const FOnAttributeChangeData& InAttributeChangeData)

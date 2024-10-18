@@ -24,7 +24,7 @@ bool UDWAIDecorator_CheckInteresting::CalculateRawConditionValue(UBehaviorTreeCo
 	}
 	else if(ADWMonsterCharacter* MonsterCharacter = GetAgent<ADWMonsterCharacter>())
 	{
-		const FAbilityItem SelectedItem = CheckTarget->GetInventory()->GetSelectedItem();
+		const FAbilityItem SelectedItem = CheckTarget->GetInventory()->GetSelectedItem(ESlotSplitType::Shortcut);
 		return SelectedItem.IsValid() && SelectedItem.GetType() == EAbilityItemType::Prop && SelectedItem.GetData<UDWPropData>().PropType == EDWPropType::Food;
 	}
 	return false;

@@ -54,7 +54,7 @@ void ADWPlayerController::LoadData(FSaveData* InSaveData, EPhase InPhase)
 		bool bNeedSpawn = true;
 		if(PlayerCharacter)
 		{
-			SaveData.SpawnLocation = PlayerCharacter->GetActorLocation();
+			SaveData.SpawnTransform = PlayerCharacter->GetActorTransform();
 			if(PlayerCharacter->Execute_GetAssetID(PlayerCharacter) == SaveData.AssetID)
 			{
 				bNeedSpawn = false;

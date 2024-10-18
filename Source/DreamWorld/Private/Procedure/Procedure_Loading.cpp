@@ -45,11 +45,13 @@ void UProcedure_Loading::OnEnter(UProcedureBase* InLastProcedure)
 
 	AMainModule::PauseModuleByClass<UCameraModule>();
 
-	UWidgetModuleStatics::CreateUserWidget<UWidgetGameHUD>(UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>());
-
 	UWidgetModuleStatics::OpenUserWidget<UWidgetLoadingPanel>({ FString(TEXT("生成世界中...")) });
 
+	UWidgetGameHUD* GameHUD = UWidgetModuleStatics::CreateUserWidget<UWidgetGameHUD>();
+
 	USaveGameModuleStatics::LoadSaveGame<UDWArchiveSaveGame>(-1, EPhase::Final);
+
+	GameHUD->Init(UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>());
 }
 
 void UProcedure_Loading::OnRefresh()

@@ -177,7 +177,7 @@ void ADWVoxelChunk::SpawnSceneActors()
 
 	const auto& WorldData = UVoxelModule::Get().GetWorldData();
 	const FVector2D WorldLocation = FVector2D(GetChunkLocation().X + WorldData.GetChunkRealSize().X * 0.5f, GetChunkLocation().Y + WorldData.GetChunkRealSize().Y * 0.5f) / WorldData.BlockSize;
-	
+
 	TArray<FVitalityRaceData> VitalityRaceDatas;
 	if(UAbilityModuleStatics::GetNoiseRaceDatas(WorldLocation, WorldData.WorldSeed, VitalityRaceDatas))
 	{
@@ -196,10 +196,9 @@ void ADWVoxelChunk::SpawnSceneActors()
 						SaveData.Name = *VitalityData.Name.ToString();
 						SaveData.RaceID = RaceData.ID;
 						SaveData.Level = VitalityItem.Level;
-						SaveData.SpawnLocation = HitResult.Location;
-						SaveData.SpawnRotation = FRotator(0.f, FMath::RandRange(0.f, 360.f), 0.f);
+						SaveData.SpawnTransform = FTransform(FRotator(0.f, FMath::RandRange(0.f, 360.f), 0.f), HitResult.Location, FVector::OneVector);
 						SaveData.InventoryData = VitalityData.InventoryData;
-						UAbilityModuleStatics::SpawnAbilityActor(&SaveData, UVoxelModuleStatics::FindChunkByLocation(SaveData.SpawnLocation));
+						UAbilityModuleStatics::SpawnAbilityActor(&SaveData, UVoxelModuleStatics::FindChunkByLocation(SaveData.SpawnTransform.GetLocation()));
 					}
 				)
 			}
@@ -224,10 +223,9 @@ void ADWVoxelChunk::SpawnSceneActors()
 						SaveData.Name = *CharacterData.Name.ToString();
 						SaveData.RaceID = RaceData.ID;
 						SaveData.Level = CharacterItem.Level;
-						SaveData.SpawnLocation = HitResult.Location;
-						SaveData.SpawnRotation = FRotator(0.f, FMath::RandRange(0.f, 360.f), 0.f);
+						SaveData.SpawnTransform = FTransform(FRotator(0.f, FMath::RandRange(0.f, 360.f), 0.f), HitResult.Location, FVector::OneVector);
 						SaveData.InventoryData = CharacterData.InventoryData;
-						if(ADWCharacter* Character = Cast<ADWCharacter>(UAbilityModuleStatics::SpawnAbilityActor(&SaveData, UVoxelModuleStatics::FindChunkByLocation(SaveData.SpawnLocation))))
+						if(ADWCharacter* Character = Cast<ADWCharacter>(UAbilityModuleStatics::SpawnAbilityActor(&SaveData, UVoxelModuleStatics::FindChunkByLocation(SaveData.SpawnTransform.GetLocation()))))
 						{
 							if(!Captain)
 							{

@@ -14,7 +14,6 @@
 #include "Widget/Inventory/WidgetInventoryPanel.h"
 #include "Ability/Inventory/Slot/AbilityInventorySlotBase.h"
 #include "Asset/AssetModuleStatics.h"
-#include "Input/InputModuleStatics.h"
 #include "Widget/WidgetModuleStatics.h"
 #include "Widget/WidgetGameHUD.h"
 #include "Widget/Inventory/Slot/WidgetInventoryAuxiliarySlot.h"
@@ -140,9 +139,9 @@ void UWidgetInventoryBar::OnInitialize(UObject* InOwner, const TArray<FParameter
 
 	GetInventory()->OnSlotSelected.AddDynamic(this, &UWidgetInventoryBar::OnInventorySlotSelected);
 
-	if(GetInventory()->GetSelectedSlot())
+	if(UAbilityInventorySlotBase* SelectedSlot = GetInventory()->GetSelectedSlot(ESlotSplitType::Shortcut))
 	{
-		SelectInventorySlot(GetInventory()->GetSelectedSlot()->GetSplitIndex(ESlotSplitType::Shortcut), false);
+		SelectInventorySlot(SelectedSlot->GetSlotIndex(), false);
 	}
 	else
 	{
@@ -169,7 +168,7 @@ void UWidgetInventoryBar::OnInventorySlotSelected(UAbilityInventorySlotBase* InI
 {
 	if(InInventorySlot)
 	{
-		SelectInventorySlot(InInventorySlot->GetSplitIndex(ESlotSplitType::Shortcut), false);
+		SelectInventorySlot(InInventorySlot->GetSlotIndex(), false);
 	}
 }
 
@@ -206,7 +205,7 @@ void UWidgetInventoryBar::SelectInventorySlot(int32 InSlotIndex, bool bRefreshIn
 	{
 		if(bRefreshInventory)
 		{
-			GetInventory()->SetSelectedSlot(SelectedSlot);
+			GetInventory()->SetSelectedSlot(ESlotSplitType::Shortcut, SelectedSlot);
 		}
 		if(!SelectedSlot->IsEmpty())
 		{

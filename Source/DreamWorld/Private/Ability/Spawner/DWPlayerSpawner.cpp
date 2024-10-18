@@ -22,8 +22,7 @@ AActor* ADWPlayerSpawner::SpawnImpl_Implementation(const FAbilityItem& InAbility
 	SaveData.Name = *CharacterData.Name.ToString();
 	SaveData.RaceID = CharacterData.RaceID;
 	SaveData.Level = InAbilityItem.Level;
-	SaveData.SpawnLocation = GetActorLocation();
-	SaveData.SpawnRotation = GetActorRotation();
+	SaveData.SpawnTransform = GetActorTransform();
 	SaveData.InventoryData = CharacterData.InventoryData;
 	SaveData.InventoryInitType = InventoryInitType;
 

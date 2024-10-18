@@ -37,13 +37,13 @@ void UDWCharacterState_Static::OnRefresh(float DeltaSeconds)
 void UDWCharacterState_Static::OnLeave(UFiniteStateBase* InNextState)
 {
 	Super::OnLeave(InNextState);
+
+	ADWCharacter* Character = GetAgent<ADWCharacter>();
+	
+	Character->FreeToAnim();
 }
 
 void UDWCharacterState_Static::OnTermination()
 {
 	Super::OnTermination();
-
-	ADWCharacter* Character = GetAgent<ADWCharacter>();
-	
-	Character->FreeToAnim();
 }

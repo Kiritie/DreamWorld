@@ -22,8 +22,7 @@ AActor* ADWVitalitySpawner::SpawnImpl_Implementation(const FAbilityItem& InAbili
 	SaveData.Name = *VitalityData.Name.ToString();
 	SaveData.RaceID = VitalityData.RaceID;
 	SaveData.Level = InAbilityItem.Level;
-	SaveData.SpawnLocation = GetActorLocation();
-	SaveData.SpawnRotation = GetActorRotation();
+	SaveData.SpawnTransform = GetActorTransform();
 	SaveData.InventoryData = VitalityData.InventoryData;
 
 	return UAbilityModuleStatics::SpawnAbilityActor(&SaveData);

@@ -127,8 +127,6 @@ ADWCharacter::ADWCharacter(const FObjectInitializer& ObjectInitializer) :
 void ADWCharacter::OnInitialize_Implementation()
 {
 	Super::OnInitialize_Implementation();
-
-	UEventModuleStatics::SubscribeEvent<UEventHandle_VoxelWorldModeChanged>(this, GET_FUNCTION_NAME_THISCLASS(OnWorldModeChanged));
 }
 
 void ADWCharacter::OnRefresh_Implementation(float DeltaSeconds)
@@ -191,11 +189,15 @@ void ADWCharacter::OnRefresh_Implementation(float DeltaSeconds)
 void ADWCharacter::OnSpawn_Implementation(UObject* InOwner, const TArray<FParameter>& InParams)
 {
 	Super::OnSpawn_Implementation(InOwner, InParams);
+
+	UEventModuleStatics::SubscribeEvent<UEventHandle_VoxelWorldModeChanged>(this, GET_FUNCTION_NAME_THISCLASS(OnWorldModeChanged));
 }
 
 void ADWCharacter::OnDespawn_Implementation(bool bRecovery)
 {
 	Super::OnDespawn_Implementation(bRecovery);
+
+	UEventModuleStatics::UnsubscribeEvent<UEventHandle_VoxelWorldModeChanged>(this, GET_FUNCTION_NAME_THISCLASS(OnWorldModeChanged));
 
 	for(auto& Iter : Equips)
 	{
@@ -272,7 +274,7 @@ void ADWCharacter::LoadData(FSaveData* InSaveData, EPhase InPhase)
 		}
 		else
 		{
-			BirthLocation = SaveData.SpawnLocation;
+			BirthLocation = SaveData.SpawnTransform.GetLocation();
 
 			const UDWCharacterData& CharacterData = GetCharacterData<UDWCharacterData>();
 			if(CharacterData.IsValid())
@@ -421,6 +423,11 @@ void ADWCharacter::OnActiveItem(const FAbilityItem& InItem, bool bPassive, bool 
 	}
 }
 
+void ADWCharacter::OnRemoveItem(const FAbilityItem& InItem)
+{
+	Super::OnRemoveItem(InItem);
+}
+
 void ADWCharacter::OnDeactiveItem(const FAbilityItem& InItem, bool bPassive)
 {
 	Super::OnDeactiveItem(InItem, bPassive);
@@ -431,9 +438,9 @@ void ADWCharacter::OnDiscardItem(const FAbilityItem& InItem, bool bInPlace)
 	Super::OnDiscardItem(InItem, bInPlace);
 }
 
-void ADWCharacter::OnSelectItem(const FAbilityItem& InItem)
+void ADWCharacter::OnSelectItem(ESlotSplitType InSplitType, const FAbilityItem& InItem)
 {
-	Super::OnSelectItem(InItem);
+	Super::OnSelectItem(InSplitType, InItem);
 }
 
 void ADWCharacter::OnAuxiliaryItem(const FAbilityItem& InItem)

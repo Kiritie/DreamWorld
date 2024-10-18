@@ -3,7 +3,7 @@
 #pragma once
 
 #include "Gameplay/WHPlayerController.h"
-#include "SaveGame/Base/SaveDataInterface.h"
+#include "SaveGame/Base/SaveDataAgentInterface.h"
 
 #include "DWPlayerController.generated.h"
 
@@ -11,7 +11,7 @@
  * 玩家角色控制器
  */
 UCLASS()
-class DREAMWORLD_API ADWPlayerController : public AWHPlayerController, public ISaveDataInterface
+class DREAMWORLD_API ADWPlayerController : public AWHPlayerController, public ISaveDataAgentInterface
 {
 	GENERATED_BODY()
 

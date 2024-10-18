@@ -135,26 +135,29 @@ void ADWHumanCharacter::OnDeactiveItem(const FAbilityItem& InItem, bool bPassive
 	}
 }
 
-void ADWHumanCharacter::OnSelectItem(const FAbilityItem& InItem)
+void ADWHumanCharacter::OnSelectItem(ESlotSplitType InSplitType, const FAbilityItem& InItem)
 {
-	Super::OnSelectItem(InItem);
+	Super::OnSelectItem(InSplitType, InItem);
 
-	if(InItem.IsValid() && InItem.GetType() == EAbilityItemType::Voxel)
+	if(InSplitType == ESlotSplitType::Shortcut)
 	{
-		if(!GenerateVoxelEntity)
+		if(InItem.IsValid() && InItem.GetType() == EAbilityItemType::Voxel)
 		{
-			GenerateVoxelEntity = UObjectPoolModuleStatics::SpawnObject<AVoxelEntity>();
-			GenerateVoxelEntity->Execute_SetActorVisible(GenerateVoxelEntity, Execute_IsVisible(this) && ControlMode == EDWCharacterControlMode::Creating);
-			GenerateVoxelEntity->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("GenerateVoxelMesh"));
-			GenerateVoxelEntity->SetActorScale3D(FVector(0.3f));
+			if(!GenerateVoxelEntity)
+			{
+				GenerateVoxelEntity = UObjectPoolModuleStatics::SpawnObject<AVoxelEntity>();
+				GenerateVoxelEntity->Execute_SetActorVisible(GenerateVoxelEntity, Execute_IsVisible(this) && ControlMode == EDWCharacterControlMode::Creating);
+				GenerateVoxelEntity->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("GenerateVoxelMesh"));
+				GenerateVoxelEntity->SetActorScale3D(FVector(0.3f));
+			}
+			GenerateVoxelEntity->LoadSaveData(new FVoxelItem(InItem));
 		}
-		GenerateVoxelEntity->LoadSaveData(new FVoxelItem(InItem));
-	}
-	else if(GenerateVoxelEntity)
-	{
-		GenerateVoxelEntity->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
-		UObjectPoolModuleStatics::DespawnObject(GenerateVoxelEntity);
-		GenerateVoxelEntity = nullptr;
+		else if(GenerateVoxelEntity)
+		{
+			GenerateVoxelEntity->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+			UObjectPoolModuleStatics::DespawnObject(GenerateVoxelEntity);
+			GenerateVoxelEntity = nullptr;
+		}
 	}
 }
 
