@@ -99,7 +99,7 @@ void UWidgetGeneratePanel::OnOpen(const TArray<FParameter>& InParams, bool bInst
 		{
 			if(Iter.ToolID.IsValid() && Iter.ToolID != GenerateToolID) continue;
 			
-			if(UWidgetGenerateItem* GenerateItem = CreateSubWidget<UWidgetGenerateItem>({ &Iter.Item, &Iter }, UAssetModuleStatics::GetStaticClass(FName("GenerateItem"))))
+			if(UWidgetGenerateItem* GenerateItem = CreateSubWidget<UWidgetGenerateItem>({ &Iter.Item, &Iter }, GenerateItemClass))
 			{
 				if(UScrollBoxSlot* ScrollBoxSlot = Cast<UScrollBoxSlot>(GenerateContent->AddChild(GenerateItem)))
 				{

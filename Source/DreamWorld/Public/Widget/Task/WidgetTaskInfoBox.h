@@ -5,6 +5,7 @@
 #include "Widget/Screen/UserWidgetBase.h"
 #include "WidgetTaskInfoBox.generated.h"
 
+class UWidgetTaskInfoItem;
 class UTaskBase;
 
 /**
@@ -33,6 +34,9 @@ protected:
 	void CreateTaskInfoItem(UTaskBase* InTask);
 
 protected:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components", meta = (BindWidget, OptionalWidget = false))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (BindWidget, OptionalWidget = false), Category = "Components")
 	class UVerticalBox* ContentBox;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TSubclassOf<UWidgetTaskInfoItem> TaskInfoItemClass;
 };

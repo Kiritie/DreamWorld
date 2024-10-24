@@ -3,6 +3,7 @@
 #pragma once
 
 #include "Ability/Inventory/Slot/AbilityInventorySkillSlotBase.h"
+#include "Common/DWCommonTypes.h"
 #include "DWInventorySkillSlot.generated.h"
 
 /**
@@ -31,5 +32,5 @@ public:
 	virtual FAbilityInfo GetAbilityInfo() const override;
 	
 	UFUNCTION(BlueprintPure)
-	FDWCharacterSkillAbilityData GetSkillData() const;
+	virtual FDWCharacterSkillAbilityData GetSkillData() const;
 };

@@ -42,6 +42,8 @@ void UDWCharacterState_Attack::OnEnter(UFiniteStateBase* InLastState, const TArr
 
 	Character->GetAbilitySystemComponent()->AddLooseGameplayTag(GameplayTags::State_Character_Attacking);
 
+	Character->LimitToAnim();
+
 	Character->AttackType = (EDWCharacterAttackType)InParams[1].GetByteValue();
 
 	switch (Character->AttackType)
@@ -49,8 +51,7 @@ void UDWCharacterState_Attack::OnEnter(UFiniteStateBase* InLastState, const TArr
 		case EDWCharacterAttackType::NormalAttack:
 		{
 			Character->GetAttackAbilityQueue().AbilityIndex = InParams[2];
-			OnAttackStart = InParams[3].GetPointerValueRef<FSimpleDelegate>();
-			OnAttackEnd = InParams[4].GetPointerValueRef<FSimpleDelegate>();
+			OnAttackCompleted = InParams[3].GetPointerValueRef<FSimpleDelegate>();
 			if(ADWEquipWeaponRemote* Weapon = Character->GetWeapon<ADWEquipWeaponRemote>())
 			{
 				Character->SetUseControllerRotation(true);
@@ -62,15 +63,13 @@ void UDWCharacterState_Attack::OnEnter(UFiniteStateBase* InLastState, const TArr
 		}
 		case EDWCharacterAttackType::FallingAttack:
 		{
-			OnAttackStart = InParams[2].GetPointerValueRef<FSimpleDelegate>();
-			OnAttackEnd = InParams[3].GetPointerValueRef<FSimpleDelegate>();
+			OnAttackCompleted = InParams[2].GetPointerValueRef<FSimpleDelegate>();
 			break;
 		}
 		case EDWCharacterAttackType::SkillAttack:
 		{
 			Character->SkillAbilityItem = InParams[2].GetPointerValueRef<FAbilityItem>();
-			OnAttackStart = InParams[3].GetPointerValueRef<FSimpleDelegate>();
-			OnAttackEnd = InParams[4].GetPointerValueRef<FSimpleDelegate>();
+			OnAttackCompleted = InParams[3].GetPointerValueRef<FSimpleDelegate>();
 			const auto SkillAbilityData = Character->GetSkillAbility(Character->SkillAbilityItem.ID);
 			if(SkillAbilityData.GetItemData<UAbilitySkillDataBase>().ProjectileClass)
 			{
@@ -97,6 +96,8 @@ void UDWCharacterState_Attack::OnLeave(UFiniteStateBase* InNextState)
 
 	Character->GetAbilitySystemComponent()->RemoveLooseGameplayTag(GameplayTags::State_Character_Attacking);
 
+	Character->FreeToAnim();
+
 	if(Character->IsAiming())
 	{
 		Character->GetAbilitySystemComponent()->RemoveLooseGameplayTag(GameplayTags::State_Character_Aiming);
@@ -108,6 +109,7 @@ void UDWCharacterState_Attack::OnLeave(UFiniteStateBase* InNextState)
 	}
 
 	AttackEnd();
+	AttackComplete();
 }
 
 void UDWCharacterState_Attack::OnTermination()
@@ -160,12 +162,6 @@ void UDWCharacterState_Attack::AttackStart()
 		}
 		default: break;
 	}
-
-	if(OnAttackStart.IsBound())
-	{
-		OnAttackStart.Execute();
-		OnAttackStart = nullptr;
-	}
 }
 
 void UDWCharacterState_Attack::AttackStep()
@@ -195,14 +191,44 @@ void UDWCharacterState_Attack::AttackEnd()
 	{
 		case EDWCharacterAttackType::NormalAttack:
 		{
+			if(!Character->GetWeapon<ADWEquipWeaponRemote>())
+			{
+				Character->SetAttackHitAble(false);
+			}
+			break;
+		}
+		case EDWCharacterAttackType::FallingAttack:
+		{
+			Character->SetAttackHitAble(false);
+			break;
+		}
+		case EDWCharacterAttackType::SkillAttack:
+		{
+			const auto AbilityData = Character->GetSkillAbility(Character->SkillAbilityItem.ID);
+			if(!AbilityData.GetItemData<UAbilitySkillDataBase>().ProjectileClass)
+			{
+				Character->SetAttackHitAble(false);
+			}
+			break;
+		}
+		default: break;
+	}
+}
+
+void UDWCharacterState_Attack::AttackComplete()
+{
+	ADWCharacter* Character = GetAgent<ADWCharacter>();
+
+	if (Character->AttackType == EDWCharacterAttackType::None) return;
+
+	switch (Character->AttackType)
+	{
+		case EDWCharacterAttackType::NormalAttack:
+		{
 			if(Character->GetWeapon<ADWEquipWeaponRemote>())
 			{
 				Character->SetUseControllerRotation(false);
 				Character->AttackProjectile = nullptr;
-			}
-			else
-			{
-				Character->SetAttackHitAble(false);
 			}
 			Character->GetAttackAbilityQueue().Next();
 			break;
@@ -210,7 +236,6 @@ void UDWCharacterState_Attack::AttackEnd()
 		case EDWCharacterAttackType::FallingAttack:
 		{
 			Character->StopAnimMontage();
-			Character->SetAttackHitAble(false);
 			Character->GetCharacterMovement()->GravityScale = Character->GetDefaultGravityScale();
 			break;
 		}
@@ -222,10 +247,6 @@ void UDWCharacterState_Attack::AttackEnd()
 				Character->SetUseControllerRotation(false);
 				Character->AttackProjectile = nullptr;
 			}
-			else
-			{
-				Character->SetAttackHitAble(false);
-			}
 			Character->SkillAbilityItem = FAbilityItem();
 			break;
 		}
@@ -234,9 +255,9 @@ void UDWCharacterState_Attack::AttackEnd()
 
 	Character->AttackType = EDWCharacterAttackType::None;
 
-	if(OnAttackEnd.IsBound())
+	if(OnAttackCompleted.IsBound())
 	{
-		OnAttackEnd.Execute();
-		OnAttackEnd = nullptr;
+		OnAttackCompleted.Execute();
+		OnAttackCompleted = nullptr;
 	}
 }

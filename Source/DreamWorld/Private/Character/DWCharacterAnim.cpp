@@ -30,15 +30,7 @@ void UDWCharacterAnim::NativeHandleNotify(const FString& AnimNotifyName)
 
 	if(!Character) return;
 
-	if(AnimNotifyName.Equals(TEXT("Free to animate")))
-	{
-		Character->FreeToAnim();
-	}
-	else if(AnimNotifyName.Equals(TEXT("Limit to animate")))
-	{
-		Character->LimitToAnim();
-	}
-	else if(AnimNotifyName.Equals(TEXT("Attack start")))
+	if(AnimNotifyName.Equals(TEXT("Attack start")))
 	{
 		Character->GetFSMComponent()->GetStateByClass<UDWCharacterState_Attack>()->AttackStart();
 	}
@@ -49,6 +41,10 @@ void UDWCharacterAnim::NativeHandleNotify(const FString& AnimNotifyName)
 	else if(AnimNotifyName.Equals(TEXT("Attack end")))
 	{
 		Character->GetFSMComponent()->GetStateByClass<UDWCharacterState_Attack>()->AttackEnd();
+	}
+	else if(AnimNotifyName.Equals(TEXT("Attack complete")))
+	{
+		Character->GetFSMComponent()->GetStateByClass<UDWCharacterState_Attack>()->AttackComplete();
 	}
 }
 

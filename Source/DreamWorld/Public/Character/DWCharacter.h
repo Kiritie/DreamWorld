@@ -184,15 +184,15 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual void UnAim();
 
-	virtual bool Attack(int32 InAbilityIndex = -1, const FSimpleDelegate& OnStart = nullptr, const FSimpleDelegate& OnEnd = nullptr);
+	virtual bool Attack(int32 InAbilityIndex = -1, const FSimpleDelegate& OnCompleted = nullptr);
 
-	virtual bool FallingAttack(const FSimpleDelegate& OnStart = nullptr, const FSimpleDelegate& OnEnd = nullptr);
+	virtual bool FallingAttack(const FSimpleDelegate& OnCompleted = nullptr);
 
-	virtual bool SkillAttack(const FPrimaryAssetId& InSkillID, const FSimpleDelegate& OnStart = nullptr, const FSimpleDelegate& OnEnd = nullptr);
+	virtual bool SkillAttack(const FPrimaryAssetId& InSkillID, const FSimpleDelegate& OnCompleted = nullptr);
 
-	virtual bool SkillAttack(ESkillType InSkillType, int32 InAbilityIndex = -1, const FSimpleDelegate& OnStart = nullptr, const FSimpleDelegate& OnEnd = nullptr);
+	virtual bool SkillAttack(ESkillType InSkillType, int32 InAbilityIndex = -1, const FSimpleDelegate& OnCompleted = nullptr);
 	
-	virtual bool SkillAttack(const FAbilityItem& InAbilityItem, const FSimpleDelegate& OnStart = nullptr, const FSimpleDelegate& OnEnd = nullptr);
+	virtual bool SkillAttack(const FAbilityItem& InAbilityItem, const FSimpleDelegate& OnCompleted = nullptr);
 
 	UFUNCTION(BlueprintCallable)
 	virtual void UnAttack();

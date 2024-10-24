@@ -149,23 +149,22 @@ void ADWPlayerCharacter::LoadData(FSaveData* InSaveData, EPhase InPhase)
 			{
 				case EDWInventoryInitType::Empty:
 				{
-					SaveData.InventoryData.ClearAllItem();
+					SaveData.InventoryData.ClearItems();
 					break;
 				}
 				case EDWInventoryInitType::Default:
 				{
-					SaveData.InventoryData.CopyAllItem(SaveData.GetItemData<UDWCharacterData>().InventoryData);
+					SaveData.InventoryData.CopyItems(SaveData.GetItemData<UDWCharacterData>().InventoryData);
 					break;
 				}
 				case EDWInventoryInitType::All:
 				{
-					SaveData.InventoryData.ClearAllItem();
+					SaveData.InventoryData.ClearItems();
 					
 					auto CoinDatas = UAssetModuleStatics::LoadPrimaryAssets<UAbilityCoinDataBase>(FName("Coin"));
 					for (int32 i = 0; i < CoinDatas.Num(); i++)
 					{
-						FAbilityItem tmpItem = FAbilityItem(CoinDatas[i]->GetPrimaryAssetId(), CoinDatas[i]->MaxCount);
-						SaveData.InventoryData.AddItem(tmpItem);
+						SaveData.InventoryData.AddItem(FAbilityItem(CoinDatas[i]->GetPrimaryAssetId(), CoinDatas[i]->MaxCount));
 					}
 
 					auto VoxelDatas = UAssetModuleStatics::LoadPrimaryAssets<UVoxelData>(FName("Voxel"));
@@ -173,37 +172,32 @@ void ADWPlayerCharacter::LoadData(FSaveData* InSaveData, EPhase InPhase)
 					{
 						if(!VoxelDatas[i]->IsEmpty() && !VoxelDatas[i]->IsUnknown() && VoxelDatas[i]->IsMainPart())
 						{
-							FAbilityItem tmpItem = FAbilityItem(VoxelDatas[i]->GetPrimaryAssetId(), VoxelDatas[i]->MaxCount);
-							SaveData.InventoryData.AddItem(tmpItem);
+							SaveData.InventoryData.AddItem(FAbilityItem(VoxelDatas[i]->GetPrimaryAssetId(), VoxelDatas[i]->MaxCount));
 						}
 					}
 
 					auto RawDatas = UAssetModuleStatics::LoadPrimaryAssets<UAbilityRawDataBase>(FName("Raw"));
 					for (int32 i = 0; i < RawDatas.Num(); i++)
 					{
-						FAbilityItem tmpItem = FAbilityItem(RawDatas[i]->GetPrimaryAssetId(), RawDatas[i]->MaxCount);
-						SaveData.InventoryData.AddItem(tmpItem);
+						SaveData.InventoryData.AddItem(FAbilityItem(RawDatas[i]->GetPrimaryAssetId(), RawDatas[i]->MaxCount));
 					}
 
 					auto EquipDatas = UAssetModuleStatics::LoadPrimaryAssets<UAbilityEquipDataBase>(FName("Equip"));
 					for (int32 i = 0; i < EquipDatas.Num(); i++)
 					{
-						FAbilityItem tmpItem = FAbilityItem(EquipDatas[i]->GetPrimaryAssetId(), EquipDatas[i]->MaxCount);
-						SaveData.InventoryData.AddItem(tmpItem);
+						SaveData.InventoryData.AddItem(FAbilityItem(EquipDatas[i]->GetPrimaryAssetId(), EquipDatas[i]->MaxCount));
 					}
 	
 					auto PropDatas = UAssetModuleStatics::LoadPrimaryAssets<UAbilityPropDataBase>(FName("Prop"));
 					for (int32 i = 0; i < PropDatas.Num(); i++)
 					{
-						FAbilityItem tmpItem = FAbilityItem(PropDatas[i]->GetPrimaryAssetId(), PropDatas[i]->MaxCount);
-						SaveData.InventoryData.AddItem(tmpItem);
+						SaveData.InventoryData.AddItem(FAbilityItem(PropDatas[i]->GetPrimaryAssetId(), PropDatas[i]->MaxCount));
 					}
 
 					auto SkillDatas = UAssetModuleStatics::LoadPrimaryAssets<UAbilitySkillDataBase>(FName("Skill"));
 					for (int32 i = 0; i < SkillDatas.Num(); i++)
 					{
-						FAbilityItem tmpItem = FAbilityItem(SkillDatas[i]->GetPrimaryAssetId(), SkillDatas[i]->MaxCount);
-						SaveData.InventoryData.AddItem(tmpItem);
+						SaveData.InventoryData.AddItem(FAbilityItem(SkillDatas[i]->GetPrimaryAssetId(), SkillDatas[i]->MaxCount));
 					}
 					break;
 				}
@@ -237,14 +231,7 @@ void ADWPlayerCharacter::Death(IAbilityVitalityInterface* InKiller /* = nullptr 
 
 	if(InKiller)
 	{
-		if(InKiller != this)
-		{
-			UWidgetModuleStatics::GetUserWidget<UWidgetContextBox>()->AddMessage(FString::Printf(TEXT("你被 %s 杀死了！"), *InKiller->GetNameV().ToString()));
-		}
-		else
-		{
-			UWidgetModuleStatics::GetUserWidget<UWidgetContextBox>()->AddMessage(TEXT("你自杀了！"));
-		}
+		UWidgetModuleStatics::GetUserWidget<UWidgetContextBox>()->AddMessage(InKiller != this ? FString::Printf(TEXT("你被 %s 杀死了！"), *InKiller->GetNameV().ToString()) : TEXT("你自杀了！"));
 	}
 }
 

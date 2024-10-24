@@ -6,14 +6,12 @@
 #include "Ability/Components/DWAbilitySystemComponent.h"
 #include "Ability/AbilityModuleStatics.h"
 #include "Ability/Vitality/DWVitalityAttributeSet.h"
-#include "Ability/Item/Prop/AbilityPropDataBase.h"
 #include "Character/DWCharacter.h"
 #include "FSM/Components/FSMComponent.h"
 #include "UObject/ConstructorHelpers.h"
 #include "Vitality/States/DWVitalityState_Death.h"
 #include "Vitality/States/DWVitalityState_Default.h"
 #include "Voxel/DWVoxelChunk.h"
-#include "Voxel/VoxelModule.h"
 #include "Widget/World/WidgetVitalityHP.h"
 #include "Widget/World/WorldWidgetComponent.h"
 #include "Inventory/DWVitalityInventory.h"
@@ -60,25 +58,6 @@ void ADWVitality::Serialize(FArchive& Ar)
 
 void ADWVitality::LoadData(FSaveData* InSaveData, EPhase InPhase)
 {
-	auto& SaveData = InSaveData->CastRef<FDWVitalitySaveData>();
-
-	if(PHASEC(InPhase, EPhase::PrimaryAndLesser))
-	{
-		if(!SaveData.InventoryData.IsSaved())
-		{
-			auto PropDatas = UAssetModuleStatics::LoadPrimaryAssets<UAbilityPropDataBase>(FName("Prop"));
-			const int32 PropNum = FMath::Clamp(FMath::Rand() < 0.3f ? FMath::RandRange(1, 2) : 0, 0, PropDatas.Num());
-			for (int32 i = 0; i < PropNum; i++)
-			{
-				if(PropDatas.IsEmpty()) break;
-				const int32 tmpIndex = FMath::RandRange(0, PropDatas.Num() - 1);
-				FAbilityItem tmpItem = FAbilityItem(PropDatas[tmpIndex]->GetPrimaryAssetId(), 1);
-				SaveData.InventoryData.AddItem(tmpItem);
-				PropDatas.RemoveAt(tmpIndex);
-			}
-		}
-	}
-
 	Super::LoadData(InSaveData, InPhase);
 }
 

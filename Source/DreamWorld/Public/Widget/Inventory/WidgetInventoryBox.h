@@ -29,12 +29,12 @@ public:
 	virtual void OnRefresh() override;
 	
 protected:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components", meta = (BindWidget, OptionalWidget = false))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (BindWidget, OptionalWidget = false), Category = "Components")
 	UWrapBox* DefaultContent;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components", meta = (BindWidget, OptionalWidget = false))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (BindWidget, OptionalWidget = false), Category = "Components")
 	UWrapBox* TargetContent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	TMap<ESlotSplitType, FWidgetInventorySlots> TargetUISlotDatas;
+	TMap<ESlotSplitType, FWidgetInventorySlotData> TargetUISlotDatas;
 };

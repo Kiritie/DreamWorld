@@ -71,7 +71,7 @@ void UDWCharacterState_Death::DeathEnd()
 
 	Character->StopAction(GameplayTags::Ability_Character_Action_Death);
 
-	Character->Inventory->DiscardAllItem();
+	Character->Inventory->DiscardItems();
 
 	if(!Character->IsPlayer())
 	{

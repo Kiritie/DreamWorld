@@ -24,6 +24,7 @@ AActor* ADWCharacterSpawner::SpawnImpl_Implementation(const FAbilityItem& InAbil
 	SaveData.Level = InAbilityItem.Level;
 	SaveData.SpawnTransform = GetActorTransform();
 	SaveData.InventoryData = CharacterData.InventoryData;
+	SaveData.InventoryData.FillItems();
 
 	return UAbilityModuleStatics::SpawnAbilityActor(&SaveData);
 }

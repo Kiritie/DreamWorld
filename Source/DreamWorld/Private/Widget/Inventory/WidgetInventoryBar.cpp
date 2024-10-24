@@ -60,7 +60,7 @@ void UWidgetInventoryBar::OnInitialize(UObject* InOwner, const TArray<FParameter
 			UISlotDatas[ESlotSplitType::Shortcut].Slots.Empty();
 			for(int32 i = 0; i < ShortcutSlots.Num(); i++)
 			{
-				if(UWidgetInventoryShortcutSlot* ShortcutSlot = CreateSubWidget<UWidgetInventoryShortcutSlot>({ ShortcutSlots[i], FString::Printf(TEXT("SelectInventorySlot%d"), i + 1) }, UAssetModuleStatics::GetStaticClass(FName("InventoryShortcutSlot"))))
+				if(UWidgetInventoryShortcutSlot* ShortcutSlot = CreateSubWidget<UWidgetInventoryShortcutSlot>({ ShortcutSlots[i], FString::Printf(TEXT("SelectInventorySlot%d"), i + 1) }, UISlotDatas[ESlotSplitType::Shortcut].Class))
 				{
 					if(UGridSlot* GridSlot = ShortcutContent->AddChildToGrid(ShortcutSlot))
 					{
@@ -88,7 +88,7 @@ void UWidgetInventoryBar::OnInitialize(UObject* InOwner, const TArray<FParameter
 			UISlotDatas[ESlotSplitType::Auxiliary].Slots.Empty();
 			for(int32 i = 0; i < AuxiliarySlots.Num(); i++)
 			{
-				if(UWidgetInventoryAuxiliarySlot* AuxiliarySlot = CreateSubWidget<UWidgetInventoryAuxiliarySlot>({ AuxiliarySlots[i], FString::Printf(TEXT("ChangeAuxiliarySlot%d"), i + 1) }, UAssetModuleStatics::GetStaticClass(FName("InventoryAuxiliarySlot"))))
+				if(UWidgetInventoryAuxiliarySlot* AuxiliarySlot = CreateSubWidget<UWidgetInventoryAuxiliarySlot>({ AuxiliarySlots[i], FString::Printf(TEXT("ChangeAuxiliarySlot%d"), i + 1) }, UISlotDatas[ESlotSplitType::Auxiliary].Class))
 				{
 					if(UGridSlot* GridSlot = AuxiliaryContent->AddChildToGrid(AuxiliarySlot))
 					{
@@ -117,7 +117,7 @@ void UWidgetInventoryBar::OnInitialize(UObject* InOwner, const TArray<FParameter
 			UISlotDatas[ESlotSplitType::Skill].Slots.Empty();
 			for(int32 i = 0; i < SkillSlots.Num(); i++)
 			{
-				if(UWidgetInventorySkillSlot* SkillSlot = CreateSubWidget<UWidgetInventorySkillSlot>({ SkillSlots[i], FString::Printf(TEXT("ReleaseSkillAbility%d"), i + 1) }, UAssetModuleStatics::GetStaticClass(FName("InventorySkillSlot"))))
+				if(UWidgetInventorySkillSlot* SkillSlot = CreateSubWidget<UWidgetInventorySkillSlot>({ SkillSlots[i], FString::Printf(TEXT("ReleaseSkillAbility%d"), i + 1) }, UISlotDatas[ESlotSplitType::Skill].Class))
 				{
 					if(UGridSlot* GridSlot = i < SkillSlots.Num() / 2 ? LeftSkillContent->AddChildToGrid(SkillSlot) : RightSkillContent->AddChildToGrid(SkillSlot))
 					{

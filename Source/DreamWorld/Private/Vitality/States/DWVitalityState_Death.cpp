@@ -47,5 +47,5 @@ void UDWVitalityState_Death::DeathEnd()
 
 	ADWVitality* Vitality = GetAgent<ADWVitality>();
 	
-	Vitality->Inventory->DiscardAllItem();
+	Vitality->Inventory->DiscardItems();
 }

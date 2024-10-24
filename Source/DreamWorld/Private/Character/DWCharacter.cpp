@@ -10,16 +10,13 @@
 #include "AI/DWAIController.h"
 #include "Character/DWCharacterPart.h"
 #include "Common/CommonStatics.h"
-#include "Scene/Actor/PhysicsVolume/PhysicsVolumeBase.h"
 #include "Voxel/DWVoxelChunk.h"
-#include "Voxel/VoxelModule.h"
 #include "Widget/World/WidgetCharacterHP.h"
 #include "Ability/Character/DWCharacterActionAbility.h"
 #include "Ability/Character/DWCharacterAttackAbility.h"
 #include "Ability/Character/DWCharacterAttributeSet.h"
 #include "Ability/Character/DWCharacterSkillAbility.h"
 #include "Ability/Effects/EffectBase.h"
-#include "Ability/Item/Equip/AbilityEquipDataBase.h"
 #include "Item/Equip/Shield/DWEquipShield.h"
 #include "Item/Equip/Shield/DWEquipShieldData.h"
 #include "Item/Equip/Weapon/DWEquipWeapon.h"
@@ -209,32 +206,6 @@ void ADWCharacter::OnDespawn_Implementation(bool bRecovery)
 void ADWCharacter::LoadData(FSaveData* InSaveData, EPhase InPhase)
 {
 	auto& SaveData = InSaveData->CastRef<FDWCharacterSaveData>();
-
-	if(PHASEC(InPhase, EPhase::PrimaryAndLesser))
-	{
-		if(!SaveData.InventoryData.IsSaved() && !IsPlayer())
-		{
-			auto CoinDatas = UAssetModuleStatics::LoadPrimaryAssets<UAbilityCoinDataBase>(FName("Coin"));
-			for (int32 i = 0; i < CoinDatas.Num(); i++)
-			{
-				if(CoinDatas.IsEmpty()) break;
-				const int32 CoinNum = FMath::Clamp(FMath::Rand() < 0.3f / CoinDatas[i]->Unit ? FMath::RandRange(0, (int32)(CoinDatas[i]->Unit * 0.1f)) : 0, 0, CoinDatas[i]->MaxCount);
-				FAbilityItem tmpItem = FAbilityItem(CoinDatas[i]->GetPrimaryAssetId(), CoinNum);
-				SaveData.InventoryData.AddItem(tmpItem);
-			}
-
-			auto EquipDatas = UAssetModuleStatics::LoadPrimaryAssets<UAbilityEquipDataBase>(FName("Equip"));
-			const int32 EquipNum = FMath::Clamp(FMath::Rand() < 0.3f ? FMath::RandRange(1, 2) : 0, 0, EquipDatas.Num());
-			for (int32 i = 0; i < EquipNum; i++)
-			{
-				if(EquipDatas.IsEmpty()) break;
-				const int32 tmpIndex = FMath::RandRange(0, EquipDatas.Num() - 1);
-				FAbilityItem tmpItem = FAbilityItem(EquipDatas[tmpIndex]->GetPrimaryAssetId(), 1);
-				SaveData.InventoryData.AddItem(tmpItem);
-				EquipDatas.RemoveAt(tmpIndex);
-			}
-		}
-	}
 
 	if(PHASEC(InPhase, EPhase::Primary))
 	{
@@ -671,7 +642,7 @@ void ADWCharacter::UnAim()
 	}
 }
 
-bool ADWCharacter::Attack(int32 InAbilityIndex /*= -1*/, const FSimpleDelegate& OnStart/* = nullptr*/, const FSimpleDelegate& OnEnd/* = nullptr*/)
+bool ADWCharacter::Attack(int32 InAbilityIndex /*= -1*/, const FSimpleDelegate& OnCompleted/* = nullptr*/)
 {
 	if(InAbilityIndex == -1) InAbilityIndex = GetAttackAbilityQueue().AbilityIndex;
 
@@ -682,18 +653,18 @@ bool ADWCharacter::Attack(int32 InAbilityIndex /*= -1*/, const FSimpleDelegate& 
 			const auto AbilityData = GetAttackAbility(InAbilityIndex);
 			if(CheckWeaponType(AbilityData.WeaponType))
 			{
-				return FSM->SwitchStateByClass<UDWCharacterState_Attack>({ &AbilityData.AbilityHandle, (uint8)EDWCharacterAttackType::NormalAttack, InAbilityIndex, &OnStart, &OnEnd });
+				return FSM->SwitchStateByClass<UDWCharacterState_Attack>({ &AbilityData.AbilityHandle, (uint8)EDWCharacterAttackType::NormalAttack, InAbilityIndex, &OnCompleted });
 			}
 		}
 	}
 	else
 	{
-		return FallingAttack(OnStart, OnEnd);
+		return FallingAttack(OnCompleted);
 	}
 	return false;
 }
 
-bool ADWCharacter::FallingAttack(const FSimpleDelegate& OnStart/* = nullptr*/, const FSimpleDelegate& OnEnd/* = nullptr*/)
+bool ADWCharacter::FallingAttack(const FSimpleDelegate& OnCompleted/* = nullptr*/)
 {
 	if(FallingAttackAbility.IsValid())
 	{
@@ -701,13 +672,13 @@ bool ADWCharacter::FallingAttack(const FSimpleDelegate& OnStart/* = nullptr*/, c
 
 		if(CheckWeaponType(FallingAttackAbility.WeaponType))
 		{
-			return FSM->SwitchStateByClass<UDWCharacterState_Attack>({ &FallingAttackAbility.AbilityHandle, (uint8)EDWCharacterAttackType::FallingAttack, &OnStart, &OnEnd });
+			return FSM->SwitchStateByClass<UDWCharacterState_Attack>({ &FallingAttackAbility.AbilityHandle, (uint8)EDWCharacterAttackType::FallingAttack, &OnCompleted });
 		}
 	}
 	return false;
 }
 
-bool ADWCharacter::SkillAttack(const FPrimaryAssetId& InSkillID, const FSimpleDelegate& OnStart/* = nullptr*/, const FSimpleDelegate& OnEnd/* = nullptr*/)
+bool ADWCharacter::SkillAttack(const FPrimaryAssetId& InSkillID, const FSimpleDelegate& OnCompleted/* = nullptr*/)
 {
 	if(const auto SkillSlot = Inventory->GetSlotBySplitTypeAndItemID(ESlotSplitType::Skill, InSkillID))
 	{
@@ -716,7 +687,7 @@ bool ADWCharacter::SkillAttack(const FPrimaryAssetId& InSkillID, const FSimpleDe
 	return false;
 }
 
-bool ADWCharacter::SkillAttack(ESkillType InSkillType, int32 InAbilityIndex, const FSimpleDelegate& OnStart/* = nullptr*/, const FSimpleDelegate& OnEnd/* = nullptr*/)
+bool ADWCharacter::SkillAttack(ESkillType InSkillType, int32 InAbilityIndex, const FSimpleDelegate& OnCompleted/* = nullptr*/)
 {
 	if(const auto SkillSlot = Inventory->GetSlotBySplitTypeAndItemID(ESlotSplitType::Skill, GetSkillAbility(InSkillType, InAbilityIndex, true).AbilityID))
 	{
@@ -725,12 +696,12 @@ bool ADWCharacter::SkillAttack(ESkillType InSkillType, int32 InAbilityIndex, con
 	return false;
 }
 
-bool ADWCharacter::SkillAttack(const FAbilityItem& InAbilityItem, const FSimpleDelegate& OnStart/* = nullptr*/, const FSimpleDelegate& OnEnd/* = nullptr*/)
+bool ADWCharacter::SkillAttack(const FAbilityItem& InAbilityItem, const FSimpleDelegate& OnCompleted/* = nullptr*/)
 {
 	const auto AbilityData = GetSkillAbility(InAbilityItem.ID);
 	if(CheckWeaponType(AbilityData.WeaponType))
 	{
-		return FSM->SwitchStateByClass<UDWCharacterState_Attack>({ &AbilityData.AbilityHandle, (uint8)EDWCharacterAttackType::SkillAttack, &InAbilityItem, &OnStart, &OnEnd });
+		return FSM->SwitchStateByClass<UDWCharacterState_Attack>({ &AbilityData.AbilityHandle, (uint8)EDWCharacterAttackType::SkillAttack, &InAbilityItem, &OnCompleted });
 	}
 	return false;
 }

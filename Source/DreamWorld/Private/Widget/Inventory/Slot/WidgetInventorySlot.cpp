@@ -195,9 +195,9 @@ void UWidgetInventorySlot::OnActivated_Implementation()
 	Super::OnActivated_Implementation();
 }
 
-void UWidgetInventorySlot::OnCanceled_Implementation()
+void UWidgetInventorySlot::OnDeactived_Implementation()
 {
-	Super::OnCanceled_Implementation();
+	Super::OnDeactived_Implementation();
 }
 
 void UWidgetInventorySlot::StartCooldown_Implementation()

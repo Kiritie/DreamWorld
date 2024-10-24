@@ -17,10 +17,6 @@ class DREAMWORLD_API UDWInventoryEquipSlot : public UAbilityInventoryEquipSlotBa
 public:
 	UDWInventoryEquipSlot();
 
-protected:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	EDWEquipPartType PartType;
-
 public:
 	virtual void OnInitialize(UAbilityInventoryBase* InInventory, EAbilityItemType InLimitType, ESlotSplitType InSplitType, int32 InSlotIndex) override;
 
@@ -35,6 +31,10 @@ public:
 	virtual void OnItemPreChange(FAbilityItem& InNewItem) override;
 
 	virtual void OnItemChanged(FAbilityItem& InOldItem) override;
+
+protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	EDWEquipPartType PartType;
 
 public:
 	EDWEquipPartType GetPartType() const { return PartType; }

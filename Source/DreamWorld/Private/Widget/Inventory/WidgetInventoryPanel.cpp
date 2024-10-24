@@ -52,7 +52,7 @@ void UWidgetInventoryPanel::OnInitialize(UObject* InOwner, const TArray<FParamet
 			UISlotDatas[ESlotSplitType::Default].Slots.Empty();
 			for(int32 i = 0; i < DefaultSlots.Num(); i++)
 			{
-				if(UWidgetInventorySlot* DefaultSlot = CreateSubWidget<UWidgetInventorySlot>({ DefaultSlots[i] }, UAssetModuleStatics::GetStaticClass(FName("InventoryDefaultSlot"))))
+				if(UWidgetInventorySlot* DefaultSlot = CreateSubWidget<UWidgetInventorySlot>({ DefaultSlots[i] }, UISlotDatas[ESlotSplitType::Default].Class))
 				{
 					if(UWrapBoxSlot* WrapBoxSlot = DefaultContent->AddChildToWrapBox(DefaultSlot))
 					{
@@ -80,7 +80,7 @@ void UWidgetInventoryPanel::OnInitialize(UObject* InOwner, const TArray<FParamet
 			UISlotDatas[ESlotSplitType::Equip].Slots.Empty();
 			for(int32 i = 0; i < EquipSlots.Num(); i++)
 			{
-				if(UWidgetInventoryEquipSlot* EquipSlot = CreateSubWidget<UWidgetInventoryEquipSlot>({ EquipSlots[i] }, UAssetModuleStatics::GetStaticClass(FName("InventoryEquipSlot"))))
+				if(UWidgetInventoryEquipSlot* EquipSlot = CreateSubWidget<UWidgetInventoryEquipSlot>({ EquipSlots[i] }, UISlotDatas[ESlotSplitType::Equip].Class))
 				{
 					EquipSlot->SetEquipPartType(UCommonStatics::GetEnumValueDisplayName(TEXT("/Script/DreamWorld.EDWEquipPartType"), i));
 					if(UGridSlot* GridSlot = i % 2 == 0 ? LeftEquipContent->AddChildToGrid(EquipSlot) : RightEquipContent->AddChildToGrid(EquipSlot))

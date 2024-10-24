@@ -11,7 +11,7 @@
 #include "CommonButtonBase.h"
 #include "Ability/Inventory/AbilityInventoryAgentInterface.h"
 #include "Ability/Inventory/AbilityInventoryBase.h"
-#include "Ability/Item/AbilityTradableItemDataBase.h"
+#include "Ability/Item/AbilityValueItemDataBase.h"
 #include "Achievement/AchievementModuleStatics.h"
 #include "Widget/WidgetModuleStatics.h"
 #include "Widget/Common/CommonButton.h"
@@ -130,7 +130,7 @@ void UWidgetTransactionPanel::OnRefresh()
 	if(GetSelectedTransactionItem(_SelectedTransactionItem))
 	{
 		UAbilityInventoryBase* Inventory = GetOwnerObject<IAbilityInventoryAgentInterface>()->GetInventory();
-		SelectedPreviewItems = _SelectedTransactionItem.GetData<UAbilityTradableItemDataBase>().Prices;
+		SelectedPreviewItems = _SelectedTransactionItem.GetData<UAbilityValueItemDataBase>().Prices;
 		if(GetTabIndex() == 0)
 		{
 			for(auto& Iter1 : SelectedPreviewItems)
@@ -176,11 +176,11 @@ void UWidgetTransactionPanel::OnTransactionContentRefresh()
 	{
 		IAbilityInventoryAgentInterface* Seller = GetTabIndex() == 0 ? TransactionTarget : GetOwnerObject<IAbilityInventoryAgentInterface>();
 
-		for(auto Iter : Seller->GetInventory()->GetSlots())
+		for(auto Iter : Seller->GetInventory()->GetAllSlots())
 		{
-			if(Iter->IsEmpty() || !Iter->GetItem().IsDataType<UAbilityTradableItemDataBase>() || Iter->GetItem().GetData<UAbilityTradableItemDataBase>().Prices.IsEmpty()) continue;
+			if(Iter->IsEmpty() || !Iter->GetItem().IsDataType<UAbilityValueItemDataBase>() || Iter->GetItem().GetData<UAbilityValueItemDataBase>().Prices.IsEmpty()) continue;
 			
-			if(UWidgetTransactionItem* TransactionItem = CreateSubWidget<UWidgetTransactionItem>({ &Iter->GetItem() }, UAssetModuleStatics::GetStaticClass(FName("TransactionItem"))))
+			if(UWidgetTransactionItem* TransactionItem = CreateSubWidget<UWidgetTransactionItem>({ &Iter->GetItem() }, TransactionItemClass))
 			{
 				if(UScrollBoxSlot* ScrollBoxSlot = Cast<UScrollBoxSlot>(TransactionContent->AddChild(TransactionItem)))
 				{

@@ -177,11 +177,9 @@ namespace GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(State_Character_Flying, "State.Character.Flying", "Character Flying");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(State_Character_Aiming, "State.Character.Aiming", "Character Aiming");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(State_Character_Attacking, "State.Character.Attacking", "Character Attacking");
-	UE_DEFINE_GAMEPLAY_TAG_COMMENT(State_Character_NormalAttacking, "State.Character.NormalAttacking", "Character NormalAttacking");
-	UE_DEFINE_GAMEPLAY_TAG_COMMENT(State_Character_FallingAttacking, "State.Character.FallingAttacking", "Character FallingAttacking");
-	UE_DEFINE_GAMEPLAY_TAG_COMMENT(State_Character_SkillAttacking, "State.Character.SkillAttacking", "Character SkillAttacking");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(State_Character_Defending, "State.Character.Defending", "Character Defending");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(State_Character_Interrupting, "State.Character.Interrupting", "Character Interrupting");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(State_Character_Animating, "State.Character.Animating", "Character Animating");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(State_Character_Exhausted, "State.Character.Exhausted", "Character Exhausted");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(State_Character_FreeToAnim, "State.Character.FreeToAnim", "Character FreeToAnim");
 

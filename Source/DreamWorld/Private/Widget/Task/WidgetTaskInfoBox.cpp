@@ -3,7 +3,6 @@
 
 #include "Widget/Task/WidgetTaskInfoBox.h"
 
-#include "Asset/AssetModuleStatics.h"
 #include "Components/VerticalBox.h"
 #include "Components/VerticalBoxSlot.h"
 #include "Event/EventModuleStatics.h"
@@ -60,7 +59,7 @@ void UWidgetTaskInfoBox::OnRefresh()
 
 void UWidgetTaskInfoBox::CreateTaskInfoItem(UTaskBase* InTask)
 {
-	if(UWidgetTaskInfoItem* TaskInfoItem = CreateSubWidget<UWidgetTaskInfoItem>({ InTask }, UAssetModuleStatics::GetStaticClass(FName("TaskInfoItem"))))
+	if(UWidgetTaskInfoItem* TaskInfoItem = CreateSubWidget<UWidgetTaskInfoItem>({ InTask }, TaskInfoItemClass))
 	{
 		if(const auto TempSlot = ContentBox->AddChildToVerticalBox(TaskInfoItem))
 		{

@@ -43,8 +43,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual void AttackEnd();
 
+	UFUNCTION(BlueprintCallable)
+	virtual void AttackComplete();
+
 protected:
-	FSimpleDelegate OnAttackStart;
-	
-	FSimpleDelegate OnAttackEnd;
+	FSimpleDelegate OnAttackCompleted;
 };
