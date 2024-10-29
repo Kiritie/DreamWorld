@@ -6,6 +6,7 @@
 
 #include "WidgetGenerateItem.generated.h"
 
+class UTextBlock;
 /**
  * UI构建项
  */
@@ -22,10 +23,25 @@ public:
 
 	virtual void OnInitialize(const TArray<FParameter>& InParams) override;
 
+	virtual void OnRefresh() override;
+
 public:
 	virtual void NativeOnSelected(bool bBroadcast) override;
 
 	virtual void NativeOnDeselected(bool bBroadcast) override;
+
+protected:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (BindWidget, OptionalWidget = false), Category = "Components")
+	UImage* ImgIcon;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (BindWidget, OptionalWidget = false), Category = "Components")
+	UTextBlock* TxtName;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (BindWidget, OptionalWidget = false), Category = "Components")
+	UTextBlock* TxtType;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (BindWidget, OptionalWidget = false), Category = "Components")
+	UTextBlock* TxtLevel;
 
 public:
 	UPROPERTY(BlueprintReadOnly)

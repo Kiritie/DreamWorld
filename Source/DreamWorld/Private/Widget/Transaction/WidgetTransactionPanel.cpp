@@ -32,6 +32,8 @@ UWidgetTransactionPanel::UWidgetTransactionPanel(const FObjectInitializer& Objec
 	WidgetOpenFinishType = EWidgetOpenFinishType::Procedure;
 	WidgetCloseFinishType = EWidgetCloseFinishType::Procedure;
 
+	bWidgetAutoFocus = true;
+
 	SetIsFocusable(true);
 }
 

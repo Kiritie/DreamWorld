@@ -12,5 +12,4 @@ UCLASS()
 class DREAMWORLD_API UDWAINPCBlackboard : public UDWAIBlackboard
 {
 	GENERATED_BODY()
-	
 };

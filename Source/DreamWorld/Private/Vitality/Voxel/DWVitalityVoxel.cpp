@@ -12,7 +12,8 @@
 #include "Voxel/Datas/VoxelData.h"
 
 // Sets default values
-ADWVitalityVoxel::ADWVitalityVoxel()
+ADWVitalityVoxel::ADWVitalityVoxel(const FObjectInitializer& ObjectInitializer) :
+	Super(ObjectInitializer)
 {
 	VoxelMesh = CreateDefaultSubobject<UVoxelMeshComponent>(FName("VoxelMesh"));
 	VoxelMesh->SetupAttachment(RootComponent);

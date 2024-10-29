@@ -11,8 +11,11 @@
 UCLASS()
 class DREAMWORLD_API UDWAIService_QueryPatrolPath : public UAIServiceBase
 {
-	GENERATED_UCLASS_BODY()
+	GENERATED_BODY()
 	
+public:
+	UDWAIService_QueryPatrolPath(const FObjectInitializer& ObjectInitializer);
+
 protected:
 	virtual void InitializeFromAsset(UBehaviorTree& Asset) override;
 	

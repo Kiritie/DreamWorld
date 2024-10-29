@@ -16,6 +16,8 @@ UWidgetPausingMenu::UWidgetPausingMenu(const FObjectInitializer& ObjectInitializ
 
 	WidgetZOrder = 10;
 
+	bWidgetAutoFocus = true;
+
 	SetIsFocusable(true);
 }
 

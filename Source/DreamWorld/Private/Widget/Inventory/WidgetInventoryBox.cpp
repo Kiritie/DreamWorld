@@ -27,6 +27,8 @@ UWidgetInventoryBox::UWidgetInventoryBox(const FObjectInitializer& ObjectInitial
 
 	WidgetZOrder = 1;
 
+	bWidgetAutoFocus = true;
+
 	SetIsFocusable(true);
 
 	UISlotDatas.Add(ESlotSplitType::Default);

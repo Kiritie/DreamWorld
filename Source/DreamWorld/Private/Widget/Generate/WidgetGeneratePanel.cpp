@@ -31,6 +31,8 @@ UWidgetGeneratePanel::UWidgetGeneratePanel(const FObjectInitializer& ObjectIniti
 	WidgetOpenFinishType = EWidgetOpenFinishType::Procedure;
 	WidgetCloseFinishType = EWidgetCloseFinishType::Procedure;
 
+	bWidgetAutoFocus = true;
+	
 	SetIsFocusable(true);
 }
 

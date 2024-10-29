@@ -22,7 +22,7 @@ class DREAMWORLD_API ADWHumanCharacter : public ADWCharacter
 	GENERATED_BODY()
 
 public:
-	ADWHumanCharacter();
+	ADWHumanCharacter(const FObjectInitializer& ObjectInitializer);
 
 protected:
 	virtual void OnSpawn_Implementation(UObject* InOwner, const TArray<FParameter>& InParams) override;

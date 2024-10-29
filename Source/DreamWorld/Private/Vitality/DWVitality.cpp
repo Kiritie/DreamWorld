@@ -156,9 +156,9 @@ bool ADWVitality::OnDestroyVoxel(const FVoxelHitResult& InVoxelHitResult)
 	return Super::OnDestroyVoxel(InVoxelHitResult);
 }
 
-void ADWVitality::SetNameV(FName InName)
+void ADWVitality::SetNameA(FName InName)
 {
-	Super::SetNameV(InName);
+	Super::SetNameA(InName);
 
 	if (GetVitalityHPWidget())
 	{

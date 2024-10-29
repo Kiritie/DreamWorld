@@ -14,7 +14,7 @@ class DREAMWORLD_API ADWNPCCharacter : public ADWHumanCharacter
 	GENERATED_BODY()
 
 public:
-	ADWNPCCharacter();
+	ADWNPCCharacter(const FObjectInitializer& ObjectInitializer);
 
 public:
 	virtual bool CanInteract(EInteractAction InInteractAction, IInteractionAgentInterface* InInteractionAgent) override;

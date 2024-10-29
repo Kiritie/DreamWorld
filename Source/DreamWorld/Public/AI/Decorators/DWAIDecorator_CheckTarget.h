@@ -13,7 +13,10 @@ class ADWCharacter;
 UCLASS()
 class DREAMWORLD_API UDWAIDecorator_CheckTarget : public UAIDecoratorBase
 {
-	GENERATED_UCLASS_BODY()
+	GENERATED_BODY()
+
+public:
+	UDWAIDecorator_CheckTarget(const FObjectInitializer& ObjectInitializer);
 
 protected:
 	virtual bool InitDecorator(UBehaviorTreeComponent& OwnerComp) override;

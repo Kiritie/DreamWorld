@@ -19,7 +19,7 @@ class DREAMWORLD_API ADWVitalityVoxel : public ADWVitality
 
 public:
 	// Sets default values for this actor's properties
-	ADWVitalityVoxel();
+	ADWVitalityVoxel(const FObjectInitializer& ObjectInitializer);
 
 protected:
 	UPROPERTY(BlueprintReadOnly, Category = "Components")

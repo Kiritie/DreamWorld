@@ -29,13 +29,13 @@
 #include "Character/States/DWCharacterState_Static.h"
 #include "Character/States/DWCharacterState_Swim.h"
 #include "Character/States/DWCharacterState_Walk.h"
-#include "Common/Interaction/InteractionComponent.h"
 #include "FSM/Components/FSMComponent.h"
 #include "Item/Equip/DWEquipData.h"
 #include "Item/Equip/Weapon/DWEquipWeaponMelee.h"
 #include "Voxel/Datas/VoxelData.h"
 
-ADWHumanCharacter::ADWHumanCharacter()
+ADWHumanCharacter::ADWHumanCharacter(const FObjectInitializer& ObjectInitializer) :
+	Super(ObjectInitializer)
 {
 	GetCapsuleComponent()->SetCapsuleHalfHeight(69.f);
 	GetCapsuleComponent()->SetCapsuleRadius(24.f);

@@ -12,7 +12,10 @@ class ADWCharacter;
 UCLASS()
 class DREAMWORLD_API UDWAIService_QueryDefendPath : public UAIServiceBase
 {
-	GENERATED_UCLASS_BODY()
+	GENERATED_BODY()
+
+public:
+	UDWAIService_QueryDefendPath(const FObjectInitializer& ObjectInitializer);
 	
 protected:
 	virtual void InitializeFromAsset(UBehaviorTree& Asset) override;

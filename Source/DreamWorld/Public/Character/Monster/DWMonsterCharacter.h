@@ -16,7 +16,7 @@ class DREAMWORLD_API ADWMonsterCharacter : public ADWCharacter
 	GENERATED_BODY()
 	
 public:
-	ADWMonsterCharacter();
+	ADWMonsterCharacter(const FObjectInitializer& ObjectInitializer);
 
 public:
 	virtual bool CanInteract(EInteractAction InInteractAction, IInteractionAgentInterface* InInteractionAgent) override;

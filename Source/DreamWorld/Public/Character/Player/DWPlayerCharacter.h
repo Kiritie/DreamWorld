@@ -35,7 +35,7 @@ class DREAMWORLD_API ADWPlayerCharacter : public ADWHumanCharacter
 	friend class UDWPlayerCharacterState_Interrupt;
 
 public:
-	ADWPlayerCharacter();
+	ADWPlayerCharacter(const FObjectInitializer& ObjectInitializer);
 
 public:
 	virtual void OnInitialize_Implementation() override;
@@ -98,7 +98,7 @@ public:
 	virtual void OnAttributeChange(const FOnAttributeChangeData& InAttributeChangeData) override;
 
 public:
-	virtual void SetNameV(FName InName) override;
+	virtual void SetNameA(FName InName) override;
 
 	virtual void SetRaceID(FName InRaceID) override;
 

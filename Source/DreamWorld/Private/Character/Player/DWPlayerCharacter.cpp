@@ -61,7 +61,8 @@
 //////////////////////////////////////////////////////////////////////////
 // ADWPlayerCharacter
 
-ADWPlayerCharacter::ADWPlayerCharacter()
+ADWPlayerCharacter::ADWPlayerCharacter(const FObjectInitializer& ObjectInitializer) :
+	Super(ObjectInitializer)
 {
 	AIControllerClass = nullptr;
 	
@@ -163,7 +164,7 @@ void ADWPlayerCharacter::LoadData(FSaveData* InSaveData, EPhase InPhase)
 					auto CoinDatas = UAssetModuleStatics::LoadPrimaryAssets<UAbilityCoinDataBase>(FName("Coin"));
 					for (int32 i = 0; i < CoinDatas.Num(); i++)
 					{
-						SaveData.InventoryData.AddItem(FAbilityItem(CoinDatas[i]->GetPrimaryAssetId(), CoinDatas[i]->MaxCount, CoinDatas[i]->GetClampedLevel(SaveData.Level)));
+						SaveData.InventoryData.AddItem(FAbilityItem(CoinDatas[i]->GetPrimaryAssetId(), CoinDatas[i]->MaxCount, CoinDatas[i]->ClampLevel(SaveData.Level)));
 					}
 
 					auto VoxelDatas = UAssetModuleStatics::LoadPrimaryAssets<UVoxelData>(FName("Voxel"));
@@ -171,32 +172,32 @@ void ADWPlayerCharacter::LoadData(FSaveData* InSaveData, EPhase InPhase)
 					{
 						if(!VoxelDatas[i]->IsEmpty() && !VoxelDatas[i]->IsUnknown() && VoxelDatas[i]->IsMainPart())
 						{
-							SaveData.InventoryData.AddItem(FAbilityItem(VoxelDatas[i]->GetPrimaryAssetId(), VoxelDatas[i]->MaxCount, VoxelDatas[i]->GetClampedLevel(SaveData.Level)));
+							SaveData.InventoryData.AddItem(FAbilityItem(VoxelDatas[i]->GetPrimaryAssetId(), VoxelDatas[i]->MaxCount, VoxelDatas[i]->ClampLevel(SaveData.Level)));
 						}
 					}
 
 					auto RawDatas = UAssetModuleStatics::LoadPrimaryAssets<UAbilityRawDataBase>(FName("Raw"));
 					for (int32 i = 0; i < RawDatas.Num(); i++)
 					{
-						SaveData.InventoryData.AddItem(FAbilityItem(RawDatas[i]->GetPrimaryAssetId(), RawDatas[i]->MaxCount, RawDatas[i]->GetClampedLevel(SaveData.Level)));
+						SaveData.InventoryData.AddItem(FAbilityItem(RawDatas[i]->GetPrimaryAssetId(), RawDatas[i]->MaxCount, RawDatas[i]->ClampLevel(SaveData.Level)));
 					}
 
 					auto EquipDatas = UAssetModuleStatics::LoadPrimaryAssets<UAbilityEquipDataBase>(FName("Equip"));
 					for (int32 i = 0; i < EquipDatas.Num(); i++)
 					{
-						SaveData.InventoryData.AddItem(FAbilityItem(EquipDatas[i]->GetPrimaryAssetId(), EquipDatas[i]->MaxCount, EquipDatas[i]->GetClampedLevel(SaveData.Level)));
+						SaveData.InventoryData.AddItem(FAbilityItem(EquipDatas[i]->GetPrimaryAssetId(), EquipDatas[i]->MaxCount, EquipDatas[i]->ClampLevel(SaveData.Level)));
 					}
 	
 					auto PropDatas = UAssetModuleStatics::LoadPrimaryAssets<UAbilityPropDataBase>(FName("Prop"));
 					for (int32 i = 0; i < PropDatas.Num(); i++)
 					{
-						SaveData.InventoryData.AddItem(FAbilityItem(PropDatas[i]->GetPrimaryAssetId(), PropDatas[i]->MaxCount, PropDatas[i]->GetClampedLevel(SaveData.Level)));
+						SaveData.InventoryData.AddItem(FAbilityItem(PropDatas[i]->GetPrimaryAssetId(), PropDatas[i]->MaxCount, PropDatas[i]->ClampLevel(SaveData.Level)));
 					}
 
 					auto SkillDatas = UAssetModuleStatics::LoadPrimaryAssets<UAbilitySkillDataBase>(FName("Skill"));
 					for (int32 i = 0; i < SkillDatas.Num(); i++)
 					{
-						SaveData.InventoryData.AddItem(FAbilityItem(SkillDatas[i]->GetPrimaryAssetId(), SkillDatas[i]->MaxCount, SkillDatas[i]->GetClampedLevel(SaveData.Level)));
+						SaveData.InventoryData.AddItem(FAbilityItem(SkillDatas[i]->GetPrimaryAssetId(), SkillDatas[i]->MaxCount, SkillDatas[i]->ClampLevel(SaveData.Level)));
 					}
 					break;
 				}
@@ -230,7 +231,7 @@ void ADWPlayerCharacter::Death(IAbilityVitalityInterface* InKiller /* = nullptr 
 
 	if(InKiller)
 	{
-		UWidgetModuleStatics::GetUserWidget<UWidgetContextBox>()->AddMessage(InKiller != this ? FString::Printf(TEXT("你被 %s 杀死了！"), *InKiller->GetNameV().ToString()) : TEXT("你自杀了！"));
+		UWidgetModuleStatics::GetUserWidget<UWidgetContextBox>()->AddMessage(InKiller != this ? FString::Printf(TEXT("你被 %s 杀死了！"), *InKiller->GetNameA().ToString()) : TEXT("你自杀了！"));
 	}
 }
 
@@ -664,9 +665,9 @@ void ADWPlayerCharacter::OnTargetSetRotation(AActor* InTargetActor, FRotator InC
 	UCameraModuleStatics::SetCameraRotation(InControlRotation.Yaw, InControlRotation.Pitch);
 }
 
-void ADWPlayerCharacter::SetNameV(FName InName)
+void ADWPlayerCharacter::SetNameA(FName InName)
 {
-	Super::SetNameV(InName);
+	Super::SetNameA(InName);
 	if(UWidgetModuleStatics::GetUserWidget<UWidgetHeadBox>())
 	{
 		UWidgetModuleStatics::GetUserWidget<UWidgetHeadBox>()->SetHeadInfo(GetHeadInfo());

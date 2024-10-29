@@ -12,7 +12,10 @@
 UCLASS()
 class DREAMWORLD_API UDWAIDecorator_CheckDistance : public UDWAIDecorator_CheckTarget
 {
-	GENERATED_UCLASS_BODY()
+	GENERATED_BODY()
+
+public:
+	UDWAIDecorator_CheckDistance(const FObjectInitializer& ObjectInitializer);
 
 protected:
 	virtual bool InitDecorator(UBehaviorTreeComponent& OwnerComp) override;

@@ -16,6 +16,8 @@ UWidgetMaxMapBox::UWidgetMaxMapBox(const FObjectInitializer& ObjectInitializer) 
 	WidgetInputMode = EInputMode::UIOnly;
 	WidgetCreateType = EWidgetCreateType::AutoCreate;
 
+	bWidgetAutoFocus = true;
+
 	SetIsFocusable(true);
 }
 

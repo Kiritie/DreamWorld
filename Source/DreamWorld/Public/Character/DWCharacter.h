@@ -38,7 +38,7 @@ class AAbilityProjectileBase;
 UCLASS()
 class DREAMWORLD_API ADWCharacter : public AAbilityCharacterBase, public IDWTeamAgentInterface
 {
-	GENERATED_UCLASS_BODY()
+	GENERATED_BODY()
 
 	friend class ADWPlayerController;
 	
@@ -59,6 +59,9 @@ class DREAMWORLD_API ADWCharacter : public AAbilityCharacterBase, public IDWTeam
 	friend class UDWCharacterState_Static;
 	friend class UDWCharacterState_Swim;
 	friend class UDWCharacterState_Walk;
+
+public:
+	ADWCharacter(const FObjectInitializer& ObjectInitializer);
 
 public:
 	virtual void OnInitialize_Implementation() override;
@@ -352,7 +355,7 @@ public:
 	
 	virtual FName GetNameT() const override { return Name; }
 	
-	virtual void SetNameV(FName InName) override;
+	virtual void SetNameA(FName InName) override;
 
 	virtual void SetRaceID(FName InRaceID) override;
 

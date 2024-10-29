@@ -12,7 +12,10 @@ class ADWCharacter;
 UCLASS()
 class DREAMWORLD_API UDWAITask_Defend : public UDWAITask_Fight
 {
-	GENERATED_UCLASS_BODY()
+	GENERATED_BODY()
+	
+public:
+	UDWAITask_Defend(const FObjectInitializer& ObjectInitializer);
 
 protected:
 	virtual void InitializeFromAsset(UBehaviorTree& Asset) override;

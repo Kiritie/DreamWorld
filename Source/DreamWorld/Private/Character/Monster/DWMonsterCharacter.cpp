@@ -11,7 +11,8 @@
 #include "Ability/Inventory/Slot/AbilityInventorySlotBase.h"
 #include "Item/Prop/DWPropData.h"
 
-ADWMonsterCharacter::ADWMonsterCharacter()
+ADWMonsterCharacter::ADWMonsterCharacter(const FObjectInitializer& ObjectInitializer) :
+	Super(ObjectInitializer)
 {
 	AttackPoint = CreateDefaultSubobject<UDWCharacterAttackPoint>(TEXT("AttackPoint"));
 	AttackPoint->SetupAttachment(GetMesh(), TEXT("AttackPoint"));

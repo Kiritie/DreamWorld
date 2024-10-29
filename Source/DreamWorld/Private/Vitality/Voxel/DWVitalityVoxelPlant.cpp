@@ -4,7 +4,8 @@
 #include "Vitality/Voxel/DWVitalityVoxelPlant.h"
 
 // Sets default values
-ADWVitalityVoxelPlant::ADWVitalityVoxelPlant()
+ADWVitalityVoxelPlant::ADWVitalityVoxelPlant(const FObjectInitializer& ObjectInitializer) :
+	Super(ObjectInitializer)
 {
 
 }

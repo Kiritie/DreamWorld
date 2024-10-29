@@ -17,5 +17,5 @@ class DREAMWORLD_API ADWVitalityVoxelPlant : public ADWVitalityVoxel
 
 public:
 	// Sets default values for this actor's properties
-	ADWVitalityVoxelPlant();
+	ADWVitalityVoxelPlant(const FObjectInitializer& ObjectInitializer);
 };

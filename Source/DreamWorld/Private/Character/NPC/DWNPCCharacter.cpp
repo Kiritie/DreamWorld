@@ -8,7 +8,8 @@
 #include "Widget/WidgetModuleStatics.h"
 #include "Widget/Transaction/WidgetTransactionPanel.h"
 
-ADWNPCCharacter::ADWNPCCharacter()
+ADWNPCCharacter::ADWNPCCharacter(const FObjectInitializer& ObjectInitializer) :
+	Super(ObjectInitializer)
 {
 	Interaction->AddInteractAction(EInteractAction::Dialogue);
 	Interaction->AddInteractAction(EInteractAction::Transaction);

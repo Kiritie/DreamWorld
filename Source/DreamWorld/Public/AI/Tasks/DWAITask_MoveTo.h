@@ -13,7 +13,10 @@ class ADWCharacter;
 UCLASS()
 class DREAMWORLD_API UDWAITask_MoveTo : public UDWAITask_LookAt
 {
-	GENERATED_UCLASS_BODY()
+	GENERATED_BODY()
+	
+public:
+	UDWAITask_MoveTo(const FObjectInitializer& ObjectInitializer);
 
 protected:
 	virtual void InitializeFromAsset(UBehaviorTree& Asset) override;

@@ -12,7 +12,10 @@
 UCLASS()
 class DREAMWORLD_API UDWAIDecorator_CheckFreeToAnim : public UDWAIDecorator_CheckTarget
 {
-	GENERATED_UCLASS_BODY()
+	GENERATED_BODY()
+
+public:
+	UDWAIDecorator_CheckFreeToAnim(const FObjectInitializer& ObjectInitializer);
 
 protected:
 	virtual bool CalculateRawConditionValue(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) const override;

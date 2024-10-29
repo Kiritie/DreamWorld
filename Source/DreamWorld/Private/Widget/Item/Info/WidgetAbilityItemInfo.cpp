@@ -8,10 +8,10 @@
 
 UWidgetAbilityItemInfo::UWidgetAbilityItemInfo(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
-	TxtItemName = nullptr;
-	TxtItemType = nullptr;
-	TxtItemLevel = nullptr;
-	TxtItemDetail = nullptr;
+	TxtName = nullptr;
+	TxtType = nullptr;
+	TxtLevel = nullptr;
+	TxtDetail = nullptr;
 }
 
 void UWidgetAbilityItemInfo::OnCreate(UUserWidgetBase* InOwner, const TArray<FParameter>& InParams)
@@ -22,24 +22,19 @@ void UWidgetAbilityItemInfo::OnCreate(UUserWidgetBase* InOwner, const TArray<FPa
 void UWidgetAbilityItemInfo::OnInitialize(const TArray<FParameter>& InParams)
 {
 	Super::OnInitialize(InParams);
-
-	if(InParams.IsValidIndex(0))
-	{
-		Item = InParams[0].GetPointerValueRef<FAbilityItem>();
-	}
-
-	if(Item.IsValid())
-	{
-		const auto& ItemData = Item.GetData();
-
-		TxtItemName->SetText(ItemData.Name);
-		TxtItemType->SetText(FText::FromString(FString::Printf(TEXT("[%s]"), *UCommonStatics::GetEnumValueDisplayName(TEXT("/Script/WHFramework.EAbilityItemType"), (int32)ItemData.GetItemType()).ToString())));
-		TxtItemLevel->SetText(FText::FromString(Item.Level != 0 ? FString::Printf(TEXT("Lv.%d"), Item.Level) : TEXT("")));
-		TxtItemDetail->SetText(!ItemData.Detail.IsEmpty() ? ItemData.Detail : FText::FromString(TEXT("暂无描述")));
-	}
 }
 
 void UWidgetAbilityItemInfo::OnRefresh()
 {
 	Super::OnRefresh();
+
+	if(Item.IsValid())
+	{
+		const auto& ItemData = Item.GetData();
+
+		TxtName->SetText(ItemData.Name);
+		TxtType->SetText(FText::FromString(FString::Printf(TEXT("[%s]"), *UCommonStatics::GetEnumValueDisplayName(TEXT("/Script/WHFramework.EAbilityItemType"), (int32)ItemData.GetItemType()).ToString())));
+		TxtLevel->SetText(FText::FromString(Item.Level != 0 ? FString::Printf(TEXT("Lv.%d"), Item.Level) : TEXT("")));
+		TxtDetail->SetText(!ItemData.Detail.IsEmpty() ? ItemData.Detail : FText::FromString(TEXT("暂无描述")));
+	}
 }

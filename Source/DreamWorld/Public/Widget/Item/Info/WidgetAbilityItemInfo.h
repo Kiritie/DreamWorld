@@ -2,7 +2,7 @@
 
 #pragma once
 #include "Ability/AbilityModuleTypes.h"
-#include "Widget/Screen/SubWidgetBase.h"
+#include "Widget/Item/WidgetAbilityItem.h"
 
 #include "WidgetAbilityItemInfo.generated.h"
 
@@ -12,7 +12,7 @@ class UTextBlock;
  * ��ɫ���
  */
 UCLASS()
-class DREAMWORLD_API UWidgetAbilityItemInfo : public USubWidgetBase
+class DREAMWORLD_API UWidgetAbilityItemInfo : public UWidgetAbilityItem
 {
 	GENERATED_BODY()
 
@@ -28,22 +28,14 @@ public:
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (BindWidget, OptionalWidget = false), Category = "Components")
-	UTextBlock* TxtItemName;
+	UTextBlock* TxtName;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (BindWidget, OptionalWidget = false), Category = "Components")
-	UTextBlock* TxtItemType;
+	UTextBlock* TxtType;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (BindWidget, OptionalWidget = false), Category = "Components")
-	UTextBlock* TxtItemLevel;
+	UTextBlock* TxtLevel;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (BindWidget, OptionalWidget = false), Category = "Components")
-	UTextBlock* TxtItemDetail;
-
-protected:
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	FAbilityItem Item;
-
-public:
-	UFUNCTION(BlueprintPure)
-	FAbilityItem GetItem() const { return Item; }
+	UTextBlock* TxtDetail;
 };

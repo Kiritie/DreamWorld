@@ -954,9 +954,9 @@ UWidgetCharacterHP* ADWCharacter::GetCharacterHPWidget() const
 	return nullptr;
 }
 
-void ADWCharacter::SetNameV(FName InName)
+void ADWCharacter::SetNameA(FName InName)
 {
-	Super::SetNameV(InName);
+	Super::SetNameA(InName);
 
 	if(GetCharacterHPWidget())
 	{

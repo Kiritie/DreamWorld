@@ -13,7 +13,10 @@ class ADWCharacter;
 UCLASS()
 class DREAMWORLD_API UDWAITask_LookAt : public UAITask_Duration
 {
-	GENERATED_UCLASS_BODY()
+	GENERATED_BODY()
+	
+public:
+	UDWAITask_LookAt(const FObjectInitializer& ObjectInitializer);
 
 protected:
 	virtual void InitializeFromAsset(UBehaviorTree& Asset) override;

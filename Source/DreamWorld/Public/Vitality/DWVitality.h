@@ -3,9 +3,7 @@
 #pragma once
 
 #include "GameFramework/Actor.h"
-#include "AbilitySystemInterface.h"
 #include "Ability/Vitality/AbilityVitalityBase.h"
-#include "Ability/Inventory/AbilityInventoryAgentInterface.h"
 
 #include "DWVitality.generated.h"
 
@@ -25,10 +23,13 @@ class UAttributeSetBase;
 UCLASS()
 class DREAMWORLD_API ADWVitality : public AAbilityVitalityBase
 {
-	GENERATED_UCLASS_BODY()
+	GENERATED_BODY()
 
 	friend class UDWVitalityState_Death;
 	friend class UDWVitalityState_Default;
+
+public:
+	ADWVitality(const FObjectInitializer& ObjectInitializer);
 
 public:
 	virtual int32 GetLimit_Implementation() const override { return -1; }
@@ -70,7 +71,7 @@ protected:
 	UWorldWidgetComponent* VitalityHP;
 
 public:
-	virtual void SetNameV(FName InName) override;
+	virtual void SetNameA(FName InName) override;
 
 	virtual void SetRaceID(FName InRaceID) override;
 
