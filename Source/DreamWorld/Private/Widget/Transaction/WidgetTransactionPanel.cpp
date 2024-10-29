@@ -11,7 +11,7 @@
 #include "CommonButtonBase.h"
 #include "Ability/Inventory/AbilityInventoryAgentInterface.h"
 #include "Ability/Inventory/AbilityInventoryBase.h"
-#include "Ability/Item/AbilityValueItemDataBase.h"
+#include "Ability/Item/AbilityTransactionItemDataBase.h"
 #include "Achievement/AchievementModuleStatics.h"
 #include "Widget/WidgetModuleStatics.h"
 #include "Widget/Common/CommonButton.h"
@@ -130,13 +130,13 @@ void UWidgetTransactionPanel::OnRefresh()
 	if(GetSelectedTransactionItem(_SelectedTransactionItem))
 	{
 		UAbilityInventoryBase* Inventory = GetOwnerObject<IAbilityInventoryAgentInterface>()->GetInventory();
-		SelectedPreviewItems = _SelectedTransactionItem.GetData<UAbilityValueItemDataBase>().Prices;
+		SelectedPreviewItems = _SelectedTransactionItem.GetData<UAbilityTransactionItemDataBase>().Prices;
 		if(GetTabIndex() == 0)
 		{
 			for(auto& Iter1 : SelectedPreviewItems)
 			{
-				const FItemQueryInfo ItemQueryInfo = Inventory->QueryItemByRange(EItemQueryType::Get, Iter1);
-				if(ItemQueryInfo.Item.Count < Iter1.Count)
+				const FItemQueryData ItemQueryData = Inventory->QueryItemByRange(EItemQueryType::Get, Iter1);
+				if(ItemQueryData.Item.Count < Iter1.Count)
 				{
 					bCanTransaction = false;
 					break;
@@ -178,7 +178,7 @@ void UWidgetTransactionPanel::OnTransactionContentRefresh()
 
 		for(auto Iter : Seller->GetInventory()->GetAllSlots())
 		{
-			if(Iter->IsEmpty() || !Iter->GetItem().IsDataType<UAbilityValueItemDataBase>() || Iter->GetItem().GetData<UAbilityValueItemDataBase>().Prices.IsEmpty()) continue;
+			if(Iter->IsEmpty() || !Iter->GetItem().IsDataType<UAbilityTransactionItemDataBase>() || Iter->GetItem().GetData<UAbilityTransactionItemDataBase>().Prices.IsEmpty()) continue;
 			
 			if(UWidgetTransactionItem* TransactionItem = CreateSubWidget<UWidgetTransactionItem>({ &Iter->GetItem() }, TransactionItemClass))
 			{

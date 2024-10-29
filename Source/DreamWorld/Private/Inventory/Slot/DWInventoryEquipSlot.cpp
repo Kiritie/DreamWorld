@@ -31,9 +31,9 @@ void UDWInventoryEquipSlot::OnDespawn_Implementation(bool bRecovery)
 	PartType = EDWEquipPartType::Head;
 }
 
-bool UDWInventoryEquipSlot::CheckSlot(FAbilityItem& InItem) const
+bool UDWInventoryEquipSlot::MatchItemLimit(FAbilityItem InItem) const
 {
-	if(!Super::CheckSlot(InItem)) return false;
+	if(!Super::MatchItemLimit(InItem)) return false;
 	
 	bool bReturnValue = InItem.GetData<UDWEquipData>().PartType == PartType;
 	if(InItem.IsDataType<UDWEquipWeaponData>())

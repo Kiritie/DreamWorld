@@ -3,6 +3,7 @@
 UDWEquipWeaponData::UDWEquipWeaponData()
 {
 	EquipType = EDWEquipType::Weapon;
+	
 	HandType = EDWWeaponHandType::Single;
 	WeaponType = EDWWeaponType::None;
 }

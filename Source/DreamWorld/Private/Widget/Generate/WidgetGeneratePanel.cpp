@@ -138,8 +138,8 @@ void UWidgetGeneratePanel::OnRefresh()
 		{
 			for(auto& Iter2 : Iter1.Raws)
 			{
-				const FItemQueryInfo ItemQueryInfo = Inventory->QueryItemByRange(EItemQueryType::Get, Iter2);
-				if(ItemQueryInfo.Item.Count < Iter2.Count)
+				const FItemQueryData ItemQueryData = Inventory->QueryItemByRange(EItemQueryType::Get, Iter2);
+				if(ItemQueryData.Item.Count < Iter2.Count)
 				{
 					bCanGenerate = false;
 					break;

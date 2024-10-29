@@ -100,11 +100,11 @@ enum class EDWPropType : uint8
 UENUM(BlueprintType)
 enum class EDWEquipType : uint8
 {
-	// ????
+	// 武器
 	Weapon,
-	// ????
+	// 盾牌
 	Shield,
-	// ????
+	// 防具
 	Armor
 };
 

@@ -7,7 +7,7 @@
 #include "Blueprint/WidgetLayoutLibrary.h"
 #include "Components/CanvasPanelSlot.h"
 #include "Ability/Item/AbilityItemDataBase.h"
-#include "Widget/Item/WidgetAbilityItemInfoBox.h"
+#include "Widget/Item/Info/WidgetAbilityItemInfoBox.h"
 
 UWidgetAbilityItem::UWidgetAbilityItem(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -18,8 +18,7 @@ void UWidgetAbilityItem::NativeOnMouseEnter(const FGeometry& InGeometry, const F
 {
 	Super::NativeOnMouseEnter(InGeometry, InMouseEvent);
 
-	const auto& ItemData = Item.GetData();
-	UWidgetModuleStatics::OpenUserWidget<UWidgetAbilityItemInfoBox>({ ItemData.Name, ItemData.Detail });
+	UWidgetModuleStatics::OpenUserWidget<UWidgetAbilityItemInfoBox>({ &Item });
 }
 
 void UWidgetAbilityItem::NativeOnMouseLeave(const FPointerEvent& InMouseEvent)

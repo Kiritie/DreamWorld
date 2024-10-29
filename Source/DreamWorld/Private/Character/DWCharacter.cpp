@@ -428,12 +428,12 @@ bool ADWCharacter::OnGenerateVoxel(const FVoxelHitResult& InVoxelHitResult)
 {
 	if(!GenerateVoxelID.IsValid()) return false;
 	
-	FItemQueryInfo ItemQueryInfo = Inventory->QueryItemByRange(EItemQueryType::Remove, FAbilityItem(GenerateVoxelID, 1), -1);
-	if(ItemQueryInfo.IsValid() && DoAction(GameplayTags::Ability_Character_Action_Generate))
+	FItemQueryData ItemQueryData = Inventory->QueryItemByRange(EItemQueryType::Remove, FAbilityItem(GenerateVoxelID, 1), -1);
+	if(ItemQueryData.IsValid() && DoAction(GameplayTags::Ability_Character_Action_Generate))
 	{
 		if(Super::OnGenerateVoxel(InVoxelHitResult))
 		{
-			Inventory->RemoveItemByQueryInfo(ItemQueryInfo);
+			Inventory->RemoveItemByQueryData(ItemQueryData);
 			UAchievementModuleStatics::UnlockAchievement(FName("FirstGenerateVoxel"));
 			return true;
 		}

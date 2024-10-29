@@ -5,6 +5,9 @@
 #include "Ability/Inventory/Widget/WidgetAbilityInventorySlotBase.h"
 #include "WidgetInventorySlot.generated.h"
 
+class UWidgetKeyTipsItemBase;
+class UTextBlock;
+class UCanvasPanel;
 /**
  * UI物品槽
  */
@@ -57,22 +60,22 @@ protected:
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (BindWidget, OptionalWidget = false), Category = "Components")
-	class UCanvasPanel* Content;
+	UCanvasPanel* Content;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (BindWidget, OptionalWidget = false), Category = "Components")
-	class UImage* ImgIcon;
+	UImage* ImgIcon;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (BindWidget, OptionalWidget = false), Category = "Components")
-	class UImage* ImgMask;
+	UImage* ImgMask;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (BindWidget, OptionalWidget = false), Category = "Components")
-	class UTextBlock* TxtCount;
+	UTextBlock* TxtCount;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (BindWidget, OptionalWidget = false), Category = "Components")
-	class UTextBlock* TxtCooldown;
+	UTextBlock* TxtCooldown;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (BindWidget, OptionalWidget = false), Category = "Components")
-	class UWidgetKeyTipsItemBase* KeyTipsItem;
+	UWidgetKeyTipsItemBase* KeyTipsItem;
 
 	UPROPERTY()
 	UMaterialInstanceDynamic* MaskMatInst;

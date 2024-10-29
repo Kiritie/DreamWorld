@@ -2,6 +2,5 @@
 
 UDWEquipWeaponRemoteData::UDWEquipWeaponRemoteData()
 {
-	EquipType = EDWEquipType::Weapon;
 	ProjectileClass = nullptr;
 }

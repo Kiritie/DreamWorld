@@ -75,7 +75,7 @@ void UWidgetInventoryBar::OnInitialize(UObject* InOwner, const TArray<FParameter
 		{
 			for(int32 i = 0; i < UISlotDatas[ESlotSplitType::Shortcut].Slots.Num(); i++)
 			{
-				UISlotDatas[ESlotSplitType::Shortcut].Slots[i]->OnInitialize({ ShortcutSlots[i], FString::Printf(TEXT("SelectInventorySlot%d"), i + 1) });
+				UISlotDatas[ESlotSplitType::Shortcut].Slots[i]->Init({ ShortcutSlots[i], FString::Printf(TEXT("SelectInventorySlot%d"), i + 1) });
 			}
 		}
 	}
@@ -103,7 +103,7 @@ void UWidgetInventoryBar::OnInitialize(UObject* InOwner, const TArray<FParameter
 		{
 			for(int32 i = 0; i < UISlotDatas[ESlotSplitType::Auxiliary].Slots.Num(); i++)
 			{
-				UISlotDatas[ESlotSplitType::Auxiliary].Slots[i]->OnInitialize({ AuxiliarySlots[i], FString::Printf(TEXT("ChangeAuxiliarySlot%d"), i + 1) });
+				UISlotDatas[ESlotSplitType::Auxiliary].Slots[i]->Init({ AuxiliarySlots[i], FString::Printf(TEXT("ChangeAuxiliarySlot%d"), i + 1) });
 			}
 		}
 	}
@@ -132,7 +132,7 @@ void UWidgetInventoryBar::OnInitialize(UObject* InOwner, const TArray<FParameter
 		{
 			for(int32 i = 0; i < UISlotDatas[ESlotSplitType::Skill].Slots.Num(); i++)
 			{
-				UISlotDatas[ESlotSplitType::Skill].Slots[i]->OnInitialize({ SkillSlots[i], FString::Printf(TEXT("ReleaseSkillAbility%d"), i + 1) });
+				UISlotDatas[ESlotSplitType::Skill].Slots[i]->Init({ SkillSlots[i], FString::Printf(TEXT("ReleaseSkillAbility%d"), i + 1) });
 			}
 		}
 	}
@@ -205,7 +205,7 @@ void UWidgetInventoryBar::SelectInventorySlot(int32 InSlotIndex, bool bRefreshIn
 	{
 		if(bRefreshInventory)
 		{
-			GetInventory()->SetSelectedSlot(ESlotSplitType::Shortcut, SelectedSlot);
+			GetInventory()->SetSelectedSlot(ESlotSplitType::Shortcut, SelectedSlotIndex);
 		}
 		if(!SelectedSlot->IsEmpty())
 		{

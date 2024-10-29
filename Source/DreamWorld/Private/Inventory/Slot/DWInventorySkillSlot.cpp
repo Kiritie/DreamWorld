@@ -36,7 +36,7 @@ bool UDWInventorySkillSlot::ActiveItem(bool bPassive /*= false*/)
 	return false;
 }
 
-void UDWInventorySkillSlot::CancelItem(bool bPassive /*= false*/)
+void UDWInventorySkillSlot::DeactiveItem(bool bPassive /*= false*/)
 {
 	if(IsEmpty()) return;
 	
@@ -49,7 +49,7 @@ void UDWInventorySkillSlot::CancelItem(bool bPassive /*= false*/)
 				Character->UnAttack();
 			}
 		}
-		Super::CancelItem(bPassive);
+		Super::DeactiveItem(bPassive);
 	}
 }
 

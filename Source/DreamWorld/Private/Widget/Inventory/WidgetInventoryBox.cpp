@@ -62,7 +62,7 @@ void UWidgetInventoryBox::OnInitialize(UObject* InOwner, const TArray<FParameter
 		{
 			for(int32 i = 0; i < UISlotDatas[ESlotSplitType::Default].Slots.Num(); i++)
 			{
-				UISlotDatas[ESlotSplitType::Default].Slots[i]->OnInitialize({ DefaultSlots[i] });
+				UISlotDatas[ESlotSplitType::Default].Slots[i]->Init({ DefaultSlots[i] });
 			}
 		}
 	}
@@ -103,7 +103,7 @@ void UWidgetInventoryBox::OnOpen(const TArray<FParameter>& InParams, bool bInsta
 		{
 			for(int32 i = 0; i < TargetUISlotDatas[ESlotSplitType::Default].Slots.Num(); i++)
 			{
-				TargetUISlotDatas[ESlotSplitType::Default].Slots[i]->OnInitialize({ DefaultSlots[i] });
+				TargetUISlotDatas[ESlotSplitType::Default].Slots[i]->Init({ DefaultSlots[i] });
 			}
 		}
 	}

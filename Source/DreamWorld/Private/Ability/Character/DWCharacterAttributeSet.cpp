@@ -32,17 +32,13 @@ void UDWCharacterAttributeSet::PreAttributeBaseChange(const FGameplayAttribute& 
 {
 	Super::PreAttributeBaseChange(Attribute, NewValue);
 
-	UAbilitySystemComponent* AbilityComp = GetOwningAbilitySystemComponent();
-	ADWCharacter* TargetCharacter = Cast<ADWCharacter>(AbilityComp->GetAvatarActor());
-	
-	const float CurrentValue = Attribute.GetGameplayAttributeData(this)->GetCurrentValue();
 	if (Attribute == GetManaAttribute())
 	{
-		NewValue = FMath::Clamp(NewValue, 0.f, GetBaseMaxMana());
+		NewValue = FMath::Clamp(NewValue, 0.f, GetMaxMana());
 	}
 	else if (Attribute == GetStaminaAttribute())
 	{
-		NewValue = FMath::Clamp(NewValue, 0.f, GetBaseMaxStamina());
+		NewValue = FMath::Clamp(NewValue, 0.f, GetMaxStamina());
 	}
 	else if (Attribute == GetSwimSpeedAttribute())
 	{
@@ -110,25 +106,13 @@ void UDWCharacterAttributeSet::PreAttributeChange(const FGameplayAttribute& Attr
 {
 	Super::PreAttributeChange(Attribute, NewValue);
 
-	UAbilitySystemComponent* AbilityComp = GetOwningAbilitySystemComponent();
-	ADWCharacter* TargetCharacter = Cast<ADWCharacter>(AbilityComp->GetAvatarActor());
-	
-	const float CurrentValue = Attribute.GetGameplayAttributeData(this)->GetCurrentValue();
 	if (Attribute == GetManaAttribute())
 	{
-		NewValue = FMath::Clamp(NewValue, 0.f, GetBaseMaxMana());
-	}
-	else if (Attribute == GetMaxManaAttribute())
-	{
-		AdjustAttributeForMaxChange(Mana, MaxMana, NewValue, GetManaAttribute());
+		NewValue = FMath::Clamp(NewValue, 0.f, GetMaxMana());
 	}
 	else if (Attribute == GetStaminaAttribute())
 	{
-		NewValue = FMath::Clamp(NewValue, 0.f, GetBaseMaxStamina());
-	}
-	else if (Attribute == GetMaxStaminaAttribute())
-	{
-		AdjustAttributeForMaxChange(Stamina, MaxStamina, NewValue, GetStaminaAttribute());
+		NewValue = FMath::Clamp(NewValue, 0.f, GetMaxStamina());
 	}
 	else if (Attribute == GetSwimSpeedAttribute())
 	{
@@ -189,6 +173,20 @@ void UDWCharacterAttributeSet::PreAttributeChange(const FGameplayAttribute& Attr
 	else if (Attribute == GetStaminaExpendSpeedAttribute())
 	{
 		NewValue = FMath::Clamp(NewValue, 0.f, NewValue);
+	}
+}
+
+void UDWCharacterAttributeSet::PostAttributeChange(const FGameplayAttribute& Attribute, float OldValue, float NewValue)
+{
+	Super::PostAttributeChange(Attribute, OldValue, NewValue);
+	
+	if (Attribute == GetMaxManaAttribute())
+	{
+		AdjustAttributeForMaxChange(GetManaAttribute(), OldValue, NewValue);
+	}
+	else if (Attribute == GetMaxStaminaAttribute())
+	{
+		AdjustAttributeForMaxChange(GetStaminaAttribute(), OldValue, NewValue);
 	}
 }
 

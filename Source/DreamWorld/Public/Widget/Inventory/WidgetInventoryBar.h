@@ -5,6 +5,8 @@
 #include "Widget/Inventory/WidgetInventory.h"
 #include "WidgetInventoryBar.generated.h"
 
+class USizeBox;
+class UGridPanel;
 class UWidgetInventorySkillSlot;
 class ADWPlayerCharacter;
 
@@ -18,31 +20,6 @@ class DREAMWORLD_API UWidgetInventoryBar : public UWidgetInventory
 
 public:
 	UWidgetInventoryBar(const FObjectInitializer& ObjectInitializer);
-
-protected:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (BindWidget, OptionalWidget = false), Category = "Components")
-	class UGridPanel* ShortcutContent;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (BindWidget, OptionalWidget = false), Category = "Components")
-	class UGridPanel* AuxiliaryContent;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (BindWidget, OptionalWidget = false), Category = "Components")
-	class UGridPanel* LeftSkillContent;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (BindWidget, OptionalWidget = false), Category = "Components")
-	class UGridPanel* RightSkillContent;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (BindWidget, OptionalWidget = false), Category = "Components")
-	class USizeBox* LeftSkillBox;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (BindWidget, OptionalWidget = false), Category = "Components")
-	class USizeBox* RightSkillBox;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (BindWidget, OptionalWidget = false), Category = "Components")
-	class USizeBox* SelectBox;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	int32 SelectedSlotIndex;
 
 public:
 	virtual void OnInitialize(UObject* InOwner, const TArray<FParameter>& InParams) override;
@@ -68,6 +45,31 @@ public:
 	
 	UFUNCTION(BlueprintCallable)
 	void SetSkillBoxVisible(bool bValue);
+
+protected:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (BindWidget, OptionalWidget = false), Category = "Components")
+	UGridPanel* ShortcutContent;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (BindWidget, OptionalWidget = false), Category = "Components")
+	UGridPanel* AuxiliaryContent;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (BindWidget, OptionalWidget = false), Category = "Components")
+	UGridPanel* LeftSkillContent;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (BindWidget, OptionalWidget = false), Category = "Components")
+	UGridPanel* RightSkillContent;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (BindWidget, OptionalWidget = false), Category = "Components")
+	USizeBox* LeftSkillBox;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (BindWidget, OptionalWidget = false), Category = "Components")
+	USizeBox* RightSkillBox;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (BindWidget, OptionalWidget = false), Category = "Components")
+	USizeBox* SelectBox;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	int32 SelectedSlotIndex;
 
 public:
 	UFUNCTION(BlueprintPure)

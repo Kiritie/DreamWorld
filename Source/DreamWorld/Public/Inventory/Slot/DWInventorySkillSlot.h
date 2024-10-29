@@ -26,7 +26,7 @@ public:
 	
 	virtual bool ActiveItem(bool bPassive = false) override;
 	
-	virtual void CancelItem(bool bPassive = false) override;
+	virtual void DeactiveItem(bool bPassive = false) override;
 
 public:
 	virtual FAbilityInfo GetAbilityInfo() const override;

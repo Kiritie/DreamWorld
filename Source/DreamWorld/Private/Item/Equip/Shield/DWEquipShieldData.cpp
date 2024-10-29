@@ -3,5 +3,6 @@
 UDWEquipShieldData::UDWEquipShieldData()
 {
 	EquipType = EDWEquipType::Shield;
+	
 	ShieldType = EDWShieldType::None;
 }

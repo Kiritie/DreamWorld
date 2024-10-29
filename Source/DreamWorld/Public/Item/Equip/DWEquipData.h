@@ -15,7 +15,7 @@ public:
 	UDWEquipData();
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	EDWEquipType EquipType;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)

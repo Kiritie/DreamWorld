@@ -10,14 +10,4 @@ class DREAMWORLD_API UDWEquipArmorData : public UDWEquipData
 
 public:
 	UDWEquipArmorData();
-
-public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	ESkillType SkillType;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	ESkillMode SkillMode;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TSubclassOf<AAbilityProjectileBase> SkillClass;
 };

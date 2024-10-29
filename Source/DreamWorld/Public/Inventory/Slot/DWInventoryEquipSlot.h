@@ -24,7 +24,7 @@ public:
 
 	virtual void OnDespawn_Implementation(bool bRecovery) override;
 
-	virtual bool CheckSlot(FAbilityItem& InItem) const override;
+	virtual bool MatchItemLimit(FAbilityItem InItem) const override;
 	
 	virtual void Refresh() override;
 

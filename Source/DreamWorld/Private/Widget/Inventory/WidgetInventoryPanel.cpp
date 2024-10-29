@@ -66,7 +66,7 @@ void UWidgetInventoryPanel::OnInitialize(UObject* InOwner, const TArray<FParamet
 		{
 			for(int32 i = 0; i < UISlotDatas[ESlotSplitType::Default].Slots.Num(); i++)
 			{
-				UISlotDatas[ESlotSplitType::Default].Slots[i]->OnInitialize({ DefaultSlots[i] });
+				UISlotDatas[ESlotSplitType::Default].Slots[i]->Init({ DefaultSlots[i] });
 			}
 		}
 	}
@@ -96,7 +96,7 @@ void UWidgetInventoryPanel::OnInitialize(UObject* InOwner, const TArray<FParamet
 		{
 			for(int32 i = 0; i < UISlotDatas[ESlotSplitType::Equip].Slots.Num(); i++)
 			{
-				UISlotDatas[ESlotSplitType::Equip].Slots[i]->OnInitialize({ EquipSlots[i] });
+				UISlotDatas[ESlotSplitType::Equip].Slots[i]->Init({ EquipSlots[i] });
 			}
 		}
 	}

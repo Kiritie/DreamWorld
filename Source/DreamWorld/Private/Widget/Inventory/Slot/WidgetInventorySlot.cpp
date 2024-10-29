@@ -3,6 +3,7 @@
 
 #include "Widget/Inventory/Slot/WidgetInventorySlot.h"
 
+#include "Ability/Inventory/AbilityInventoryBase.h"
 #include "Ability/Item/AbilityItemDataBase.h"
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
@@ -14,7 +15,7 @@
 #include "Components/CanvasPanelSlot.h"
 #include "Input/Widget/WidgetKeyTipsItemBase.h"
 #include "Widget/WidgetModuleStatics.h"
-#include "Widget/Item/WidgetAbilityItemInfoBox.h"
+#include "Widget/Item/Info/WidgetAbilityItemInfoBox.h"
 
 UWidgetInventorySlot::UWidgetInventorySlot(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -63,8 +64,17 @@ void UWidgetInventorySlot::NativeOnMouseEnter(const FGeometry& InGeometry, const
 
 	if(!IsEmpty())
 	{
-		const auto& ItemData = GetItem().GetData();
-		UWidgetModuleStatics::OpenUserWidget<UWidgetAbilityItemInfoBox>({ ItemData.Name, ItemData.Detail });
+		TArray<FParameter> Params;
+		Params.Add(&GetItem());
+		if(!OwnerSlot->IsMatched())
+		{
+			auto QueryData = GetInventory()->QueryItemByRange(EItemQueryType::Match, GetItem());
+			for(auto Iter : QueryData.Slots)
+			{
+				Params.Add(&Iter->GetItem());
+			}
+		}
+		UWidgetModuleStatics::OpenUserWidget<UWidgetAbilityItemInfoBox>(Params);
 	}
 }
 
@@ -173,7 +183,7 @@ void UWidgetInventorySlot::OnRefresh()
 		}
 		if(IsHovered())
 		{
-			UWidgetModuleStatics::OpenUserWidget<UWidgetAbilityItemInfoBox>({ ItemData.Name, ItemData.Detail });
+			UWidgetModuleStatics::OpenUserWidget<UWidgetAbilityItemInfoBox>({ &GetItem() });
 		}
 	}
 	else

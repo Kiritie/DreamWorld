@@ -24,5 +24,6 @@ public:
 
 	virtual void OnClose(bool bInstant) override;
 
+public:
 	virtual FReply NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent) override;
 };
