@@ -205,9 +205,9 @@ void ADWHumanCharacter::SetControlMode_Implementation(EDWCharacterControlMode In
 	}
 }
 
-void ADWHumanCharacter::SetAttackHitAble(bool bValue)
+void ADWHumanCharacter::SetHitAble(bool bValue)
 {
-	Super::SetAttackHitAble(bValue);
+	Super::SetHitAble(bValue);
 
 	if(ADWEquipWeaponMelee* Weapon = GetWeapon<ADWEquipWeaponMelee>())
 	{
@@ -215,9 +215,9 @@ void ADWHumanCharacter::SetAttackHitAble(bool bValue)
 	}
 }
 
-void ADWHumanCharacter::ClearAttackHitTargets()
+void ADWHumanCharacter::ClearHitTargets()
 {
-	Super::ClearAttackHitTargets();
+	Super::ClearHitTargets();
 
 	if(ADWEquipWeaponMelee* Weapon = GetWeapon<ADWEquipWeaponMelee>())
 	{

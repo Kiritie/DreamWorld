@@ -57,12 +57,22 @@ void ADWEquipWeaponMelee::OnHitTarget(AActor* InTarget, const FHitResult& InHitR
 	UGameplayStatics::SpawnEmitterAtLocation(this, InTarget->Implements<UAbilityVitalityInterface>() ? WeaponData.AttackHitEffect : WeaponData.AttackMissEffect, HitLocation);
 }
 
-void ADWEquipWeaponMelee::ClearHitTargets()
+bool ADWEquipWeaponMelee::IsHitAble() const
 {
-	HitTargets.Empty();
+	return BoxComponent->GetGenerateOverlapEvents();
 }
 
 void ADWEquipWeaponMelee::SetHitAble(bool bValue)
 {
 	BoxComponent->SetGenerateOverlapEvents(bValue);
+}
+
+void ADWEquipWeaponMelee::ClearHitTargets()
+{
+	HitTargets.Empty();
+}
+
+TArray<AActor*> ADWEquipWeaponMelee::GetHitTargets() const
+{
+	return HitTargets;
 }

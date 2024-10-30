@@ -4,14 +4,14 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Object.h"
-#include "Ability/Character/States/AbilityCharacterStateBase.h"
+#include "Ability/Character/States/AbilityCharacterState_Climb.h"
 #include "DWCharacterState_Climb.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class DREAMWORLD_API UDWCharacterState_Climb : public UAbilityCharacterStateBase
+class DREAMWORLD_API UDWCharacterState_Climb : public UAbilityCharacterState_Climb
 {
 	GENERATED_BODY()
 

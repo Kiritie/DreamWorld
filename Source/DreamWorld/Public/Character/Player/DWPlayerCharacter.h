@@ -41,13 +41,6 @@ public:
 	virtual void OnInitialize_Implementation() override;
 
 protected:
-	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Components")
-	UTargetingComponent* Targeting;
-
-	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Components")
-	USceneCaptureComponent2D* PreviewCapture;
-
-protected:
 	virtual void OnSpawn_Implementation(UObject* InOwner, const TArray<FParameter>& InParams) override;
 
 	virtual void OnDespawn_Implementation(bool bRecovery) override;
@@ -96,6 +89,27 @@ public:
 	virtual void OnSelectItem(ESlotSplitType InSplitType, const FAbilityItem& InItem) override;
 	
 	virtual void OnAttributeChange(const FOnAttributeChangeData& InAttributeChangeData) override;
+	
+public:
+	UFUNCTION()
+	virtual void OnTargetLockedOn(AActor* InTargetActor);
+		
+	UFUNCTION()
+	virtual void OnTargetLockedOff(AActor* InTargetActor);
+
+	UFUNCTION()
+	virtual void OnTargetSetRotation(AActor* InTargetActor, FRotator InControlRotation);
+
+protected:
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Components")
+	UTargetingComponent* Targeting;
+
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Components")
+	USceneCaptureComponent2D* PreviewCapture;
+
+public:
+	UFUNCTION(BlueprintPure)
+	virtual UTargetingComponent* GetTargeting() const { return Targeting; }
 
 public:
 	virtual void SetNameA(FName InName) override;
@@ -113,15 +127,6 @@ public:
 	virtual void SetControlMode_Implementation(EDWCharacterControlMode InControlMode) override;
 
 	virtual void SetGenerateVoxelID(const FPrimaryAssetId& InGenerateVoxelID) override;
-	
-	UFUNCTION()
-	virtual void OnTargetLockedOn(AActor* InTargetActor);
-		
-	UFUNCTION()
-	virtual void OnTargetLockedOff(AActor* InTargetActor);
-
-	UFUNCTION()
-	virtual void OnTargetSetRotation(AActor* InTargetActor, FRotator InControlRotation);
 
 protected:
 	UFUNCTION(BlueprintImplementableEvent, BlueprintPure)
@@ -135,8 +140,4 @@ protected:
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
 	void SetCapeColor(int32 InColorIndex);
-
-public:
-	UFUNCTION(BlueprintPure)
-	virtual UTargetingComponent* GetTargeting() const { return Targeting; }
 };

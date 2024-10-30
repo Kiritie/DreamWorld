@@ -3,7 +3,7 @@
 
 #include "Character/Monster/DWMonsterCharacter.h"
 
-#include "Ability/Character/DWCharacterAttackPoint.h"
+#include "Ability/Hitter/DWAbilityHitterComponent.h"
 #include "Common/Interaction/InteractionComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Character/Human/DWHumanCharacter.h"
@@ -14,7 +14,7 @@
 ADWMonsterCharacter::ADWMonsterCharacter(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
 {
-	AttackPoint = CreateDefaultSubobject<UDWCharacterAttackPoint>(TEXT("AttackPoint"));
+	AttackPoint = CreateDefaultSubobject<UDWAbilityHitterComponent>(TEXT("AttackPoint"));
 	AttackPoint->SetupAttachment(GetMesh(), TEXT("AttackPoint"));
 
 	Interaction->AddInteractAction((EInteractAction)EDWInteractAction::Ride);
@@ -95,9 +95,9 @@ void ADWMonsterCharacter::OnInteract(EInteractAction InInteractAction, IInteract
 	}
 }
 
-void ADWMonsterCharacter::SetAttackHitAble(bool bValue)
+void ADWMonsterCharacter::SetHitAble(bool bValue)
 {
-	Super::SetAttackHitAble(bValue);
+	Super::SetHitAble(bValue);
 
 	for(auto Iter : GetAttackPoints())
 	{
@@ -105,9 +105,9 @@ void ADWMonsterCharacter::SetAttackHitAble(bool bValue)
 	}
 }
 
-void ADWMonsterCharacter::ClearAttackHitTargets()
+void ADWMonsterCharacter::ClearHitTargets()
 {
-	Super::ClearAttackHitTargets();
+	Super::ClearHitTargets();
 
 	for(auto Iter : GetAttackPoints())
 	{
@@ -115,9 +115,9 @@ void ADWMonsterCharacter::ClearAttackHitTargets()
 	}
 }
 
-TArray<UDWCharacterAttackPoint*> ADWMonsterCharacter::GetAttackPoints()
+TArray<UDWAbilityHitterComponent*> ADWMonsterCharacter::GetAttackPoints() const
 {
-	TArray<UDWCharacterAttackPoint*> AttackPoints;
+	TArray<UDWAbilityHitterComponent*> AttackPoints;
 	GetComponents(AttackPoints);
 	return AttackPoints;
 }

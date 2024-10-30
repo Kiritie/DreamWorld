@@ -1,7 +1,6 @@
-#include "Ability/Vitality/DWVitalityAttributeSet.h"
+#include "Ability/Attributes/DWVitalityAttributeSet.h"
 
 #include "GameplayEffectExtension.h"
-#include "Character/DWCharacter.h"
 #include "Common/DWCommonTypes.h"
 
 UDWVitalityAttributeSet::UDWVitalityAttributeSet()

@@ -22,18 +22,18 @@ public:
 	ADWVitalityVoxel(const FObjectInitializer& ObjectInitializer);
 
 protected:
-	UPROPERTY(BlueprintReadOnly, Category = "Components")
-	UVoxelMeshComponent* VoxelMesh;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	FPrimaryAssetId VoxelID;
-
-protected:
 	virtual void OnDespawn_Implementation(bool bRecovery) override;
 
 	virtual void LoadData(FSaveData* InSaveData, EPhase InPhase) override;
 
 	virtual FSaveData* ToData() override;
+
+protected:
+	UPROPERTY(BlueprintReadOnly, Category = "Components")
+	UVoxelMeshComponent* VoxelMesh;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	FPrimaryAssetId VoxelID;
 
 public:
 	template<class T>

@@ -5,13 +5,14 @@
 #include "CoreMinimal.h"
 #include "UObject/Object.h"
 #include "Ability/Character/States/AbilityCharacterStateBase.h"
+#include "Ability/Character/States/AbilityCharacterState_Interrupt.h"
 #include "DWCharacterState_Interrupt.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class DREAMWORLD_API UDWCharacterState_Interrupt : public UAbilityCharacterStateBase
+class DREAMWORLD_API UDWCharacterState_Interrupt : public UAbilityCharacterState_Interrupt
 {
 	GENERATED_BODY()
 
@@ -32,11 +33,4 @@ public:
 	virtual void OnLeave(UFiniteStateBase* InNextState) override;
 
 	virtual void OnTermination() override;
-
-public:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	float Duration;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	float RemainTime;
 };

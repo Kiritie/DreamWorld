@@ -5,7 +5,7 @@
 #include "Character/DWCharacter.h"
 #include "DWMonsterCharacter.generated.h"
 
-class UDWCharacterAttackPoint;
+class UDWAbilityHitterComponent;
 
 /**
  * �����ɫ
@@ -24,15 +24,15 @@ public:
 	virtual void OnInteract(EInteractAction InInteractAction, IInteractionAgentInterface* InInteractionAgent, bool bPassive) override;
 
 public:
-	virtual void SetAttackHitAble(bool bValue) override;
+	virtual void SetHitAble(bool bValue) override;
 
-	virtual void ClearAttackHitTargets() override;
+	virtual void ClearHitTargets() override;
 
 protected:
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Components")
-	UDWCharacterAttackPoint* AttackPoint;
+	UDWAbilityHitterComponent* AttackPoint;
 
 public:
 	UFUNCTION(BlueprintPure)
-	TArray<UDWCharacterAttackPoint*> GetAttackPoints();
+	TArray<UDWAbilityHitterComponent*> GetAttackPoints() const;
 };

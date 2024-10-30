@@ -5,7 +5,7 @@
 
 #include "Ability/Components/DWAbilitySystemComponent.h"
 #include "Ability/AbilityModuleStatics.h"
-#include "Ability/Vitality/DWVitalityAttributeSet.h"
+#include "Ability/Attributes/DWVitalityAttributeSet.h"
 #include "Character/DWCharacter.h"
 #include "FSM/Components/FSMComponent.h"
 #include "UObject/ConstructorHelpers.h"
@@ -156,6 +156,42 @@ bool ADWVitality::OnDestroyVoxel(const FVoxelHitResult& InVoxelHitResult)
 	return Super::OnDestroyVoxel(InVoxelHitResult);
 }
 
+void ADWVitality::OnAttributeChange(const FOnAttributeChangeData& InAttributeChangeData)
+{
+	const float DeltaValue = InAttributeChangeData.NewValue - InAttributeChangeData.OldValue;
+	
+	if(InAttributeChangeData.Attribute == GetAttributeSet<UDWVitalityAttributeSet>()->GetExpAttribute() || InAttributeChangeData.Attribute == GetAttributeSet<UDWVitalityAttributeSet>()->GetMaxExpAttribute())
+	{
+		if (GetVitalityHPWidget())
+		{
+			GetVitalityHPWidget()->SetHeadInfo(GetHeadInfo());
+		}
+	}
+	else if(InAttributeChangeData.Attribute == GetAttributeSet<UDWVitalityAttributeSet>()->GetHealthAttribute() || InAttributeChangeData.Attribute == GetAttributeSet<UDWVitalityAttributeSet>()->GetMaxHealthAttribute())
+	{
+		if (GetVitalityHPWidget())
+		{
+			GetVitalityHPWidget()->SetHealthPercent(GetHealth(), GetMaxHealth());
+		}
+	}
+	Super::OnAttributeChange(InAttributeChangeData);
+}
+
+void ADWVitality::HandleDamage(EDamageType DamageType, const float LocalDamageDone, bool bHasCrited, bool bHasDefend, FHitResult HitResult, const FGameplayTagContainer& SourceTags, AActor* SourceActor)
+{
+	Super::HandleDamage(DamageType, LocalDamageDone, bHasCrited, bHasDefend, HitResult, SourceTags, SourceActor);
+}
+
+void ADWVitality::HandleRecovery(const float LocalRecoveryDone, FHitResult HitResult, const FGameplayTagContainer& SourceTags, AActor* SourceActor)
+{
+	Super::HandleRecovery(LocalRecoveryDone, HitResult, SourceTags, SourceActor);
+}
+
+void ADWVitality::HandleInterrupt(const float InterruptDuration, FHitResult HitResult, const FGameplayTagContainer& SourceTags, AActor* SourceActor)
+{
+	Super::HandleInterrupt(InterruptDuration, HitResult, SourceTags, SourceActor);
+}
+
 void ADWVitality::SetNameA(FName InName)
 {
 	Super::SetNameA(InName);
@@ -194,40 +230,4 @@ UWidgetVitalityHP* ADWVitality::GetVitalityHPWidget() const
 		return Cast<UWidgetVitalityHP>(VitalityHP->GetWorldWidget());
 	}
 	return nullptr;
-}
-
-void ADWVitality::OnAttributeChange(const FOnAttributeChangeData& InAttributeChangeData)
-{
-	const float DeltaValue = InAttributeChangeData.NewValue - InAttributeChangeData.OldValue;
-	
-	if(InAttributeChangeData.Attribute == GetAttributeSet<UDWVitalityAttributeSet>()->GetExpAttribute() || InAttributeChangeData.Attribute == GetAttributeSet<UDWVitalityAttributeSet>()->GetMaxExpAttribute())
-	{
-		if (GetVitalityHPWidget())
-		{
-			GetVitalityHPWidget()->SetHeadInfo(GetHeadInfo());
-		}
-	}
-	else if(InAttributeChangeData.Attribute == GetAttributeSet<UDWVitalityAttributeSet>()->GetHealthAttribute() || InAttributeChangeData.Attribute == GetAttributeSet<UDWVitalityAttributeSet>()->GetMaxHealthAttribute())
-	{
-		if (GetVitalityHPWidget())
-		{
-			GetVitalityHPWidget()->SetHealthPercent(GetHealth(), GetMaxHealth());
-		}
-	}
-	Super::OnAttributeChange(InAttributeChangeData);
-}
-
-void ADWVitality::HandleDamage(EDamageType DamageType, const float LocalDamageDone, bool bHasCrited, bool bHasDefend, FHitResult HitResult, const FGameplayTagContainer& SourceTags, AActor* SourceActor)
-{
-	Super::HandleDamage(DamageType, LocalDamageDone, bHasCrited, bHasDefend, HitResult, SourceTags, SourceActor);
-}
-
-void ADWVitality::HandleRecovery(const float LocalRecoveryDone, FHitResult HitResult, const FGameplayTagContainer& SourceTags, AActor* SourceActor)
-{
-	Super::HandleRecovery(LocalRecoveryDone, HitResult, SourceTags, SourceActor);
-}
-
-void ADWVitality::HandleInterrupt(const float InterruptDuration, FHitResult HitResult, const FGameplayTagContainer& SourceTags, AActor* SourceActor)
-{
-	Super::HandleInterrupt(InterruptDuration, HitResult, SourceTags, SourceActor);
 }

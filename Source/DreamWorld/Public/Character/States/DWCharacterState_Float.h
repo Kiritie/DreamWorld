@@ -5,13 +5,14 @@
 #include "CoreMinimal.h"
 #include "UObject/Object.h"
 #include "Ability/Character/States/AbilityCharacterStateBase.h"
+#include "Ability/Character/States/AbilityCharacterState_Float.h"
 #include "DWCharacterState_Float.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class DREAMWORLD_API UDWCharacterState_Float : public UAbilityCharacterStateBase
+class DREAMWORLD_API UDWCharacterState_Float : public UAbilityCharacterState_Float
 {
 	GENERATED_BODY()
 
@@ -34,6 +35,5 @@ public:
 	virtual void OnTermination() override;
 
 public:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	float WaterPosZ;
+	virtual float GetFloatOffsetPosZ() const override;
 };

@@ -39,14 +39,6 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CharacterAttributes")
 	FGameplayAttributeData MaxStamina;
 	GAMEPLAYATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, MaxStamina)
-	
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CharacterAttributes")
-	FGameplayAttributeData SwimSpeed;
-	GAMEPLAYATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, SwimSpeed)
-		
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CharacterAttributes")
-	FGameplayAttributeData FlySpeed;
-	GAMEPLAYATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, FlySpeed)
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CharacterAttributes")
 	FGameplayAttributeData DodgeForce;

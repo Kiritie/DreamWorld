@@ -2,12 +2,9 @@
 
 #include "Character/States/DWCharacterState_Climb.h"
 
-#include "Character/DWCharacter.h"
-#include "Character/DWCharacterData.h"
-
 UDWCharacterState_Climb::UDWCharacterState_Climb()
 {
-	StateName = FName("Climb");
+	
 }
 
 void UDWCharacterState_Climb::OnInitialize(UFSMComponent* InFSM, int32 InStateIndex)
@@ -17,22 +14,12 @@ void UDWCharacterState_Climb::OnInitialize(UFSMComponent* InFSM, int32 InStateIn
 
 bool UDWCharacterState_Climb::OnPreEnter(UFiniteStateBase* InLastState, const TArray<FParameter>& InParams)
 {
-	if(!Super::OnPreEnter(InLastState, InParams)) return false;
-
-	ADWCharacter* Character = GetAgent<ADWCharacter>();
-
-	return Character->DoAction(GameplayTags::Ability_Character_Action_Climb);
+	return Super::OnPreEnter(InLastState, InParams);
 }
 
 void UDWCharacterState_Climb::OnEnter(UFiniteStateBase* InLastState, const TArray<FParameter>& InParams)
 {
 	Super::OnEnter(InLastState, InParams);
-
-	ADWCharacter* Character = GetAgent<ADWCharacter>();
-	
-	Character->GetAbilitySystemComponent()->AddLooseGameplayTag(GameplayTags::State_Character_Climbing);
-
-	Character->LimitToAnim();
 }
 
 void UDWCharacterState_Climb::OnRefresh(float DeltaSeconds)
@@ -43,14 +30,6 @@ void UDWCharacterState_Climb::OnRefresh(float DeltaSeconds)
 void UDWCharacterState_Climb::OnLeave(UFiniteStateBase* InNextState)
 {
 	Super::OnLeave(InNextState);
-
-	ADWCharacter* Character = GetAgent<ADWCharacter>();
-
-	Character->StopAction(GameplayTags::Ability_Character_Action_Climb);
-		
-	Character->GetAbilitySystemComponent()->RemoveLooseGameplayTag(GameplayTags::State_Character_Climbing);
-
-	Character->FreeToAnim();
 }
 
 void UDWCharacterState_Climb::OnTermination()

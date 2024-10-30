@@ -1,29 +1,27 @@
-#include "Ability/Character/DWCharacterAttributeSet.h"
+#include "Ability/Attributes/DWCharacterAttributeSet.h"
 
 #include "GameplayEffectExtension.h"
 #include "Character/DWCharacter.h"
 #include "Common/DWCommonTypes.h"
 
 UDWCharacterAttributeSet::UDWCharacterAttributeSet()
-:	Mana(100.f),
-	MaxMana(100.f),
-	Stamina(100.f),
-	MaxStamina(100.f),
-	SwimSpeed(350.f),
-	FlySpeed(350.f),
-	DodgeForce(500.f),
-	AttackForce(10.f),
-	RepulseForce(0.f),
-	AttackSpeed(1.f),
-	AttackCritRate(0.f),
-	AttackStealRate(0.f),
-	DefendRate(0.f),
-	DefendScope(0.f),
-	PhysicsDefRate(0.f),
-	MagicDefRate(0.f),
-	ToughnessRate(0.f),
-	StaminaRegenSpeed(10.f),
-	StaminaExpendSpeed(5.f)
+	: Mana(100.f)
+	, MaxMana(100.f)
+	, Stamina(100.f)
+	, MaxStamina(100.f)
+	, DodgeForce(500.f)
+	, AttackForce(10.f)
+	, RepulseForce(0.f)
+	, AttackSpeed(1.f)
+	, AttackCritRate(0.f)
+	, AttackStealRate(0.f)
+	, DefendRate(0.f)
+	, DefendScope(0.f)
+	, PhysicsDefRate(0.f)
+	, MagicDefRate(0.f)
+	, ToughnessRate(0.f)
+	, StaminaRegenSpeed(10.f)
+	, StaminaExpendSpeed(5.f)
 {
 	DamageHandleClass = UDWDamageHandle::StaticClass();
 }
@@ -39,14 +37,6 @@ void UDWCharacterAttributeSet::PreAttributeBaseChange(const FGameplayAttribute& 
 	else if (Attribute == GetStaminaAttribute())
 	{
 		NewValue = FMath::Clamp(NewValue, 0.f, GetMaxStamina());
-	}
-	else if (Attribute == GetSwimSpeedAttribute())
-	{
-		NewValue = FMath::Clamp(NewValue, 0.f, NewValue);
-	}
-	else if (Attribute == GetFlySpeedAttribute())
-	{
-		NewValue = FMath::Clamp(NewValue, 0.f, NewValue);
 	}
 	else if (Attribute == GetDodgeForceAttribute())
 	{
@@ -113,14 +103,6 @@ void UDWCharacterAttributeSet::PreAttributeChange(const FGameplayAttribute& Attr
 	else if (Attribute == GetStaminaAttribute())
 	{
 		NewValue = FMath::Clamp(NewValue, 0.f, GetMaxStamina());
-	}
-	else if (Attribute == GetSwimSpeedAttribute())
-	{
-		NewValue = FMath::Clamp(NewValue, 0.f, NewValue);
-	}
-	else if (Attribute == GetFlySpeedAttribute())
-	{
-		NewValue = FMath::Clamp(NewValue, 0.f, NewValue);
 	}
 	else if (Attribute == GetDodgeForceAttribute())
 	{

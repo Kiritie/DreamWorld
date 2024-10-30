@@ -71,7 +71,7 @@ void UDWCharacterState_Attack::OnEnter(UFiniteStateBase* InLastState, const TArr
 			Character->SkillAbilityItem = InParams[2].GetPointerValueRef<FAbilityItem>();
 			OnAttackCompleted = InParams[3].GetPointerValueRef<FSimpleDelegate>();
 			const auto SkillAbilityData = Character->GetSkillAbility(Character->SkillAbilityItem.ID);
-			if(SkillAbilityData.GetItemData<UAbilitySkillDataBase>().ProjectileClass)
+			if(SkillAbilityData.GetData<UAbilitySkillDataBase>().ProjectileClass)
 			{
 				Character->SetUseControllerRotation(true);
 			}
@@ -133,30 +133,30 @@ void UDWCharacterState_Attack::AttackStart()
 			}
 			else
 			{
-				Character->ClearAttackHitTargets();
-				Character->SetAttackHitAble(true);
+				Character->ClearHitTargets();
+				Character->SetHitAble(true);
 			}
 			break;
 		}
 		case EDWCharacterAttackType::FallingAttack:
 		{
-			Character->ClearAttackHitTargets();
-			Character->SetAttackHitAble(true);
+			Character->ClearHitTargets();
+			Character->SetHitAble(true);
 			Character->GetCharacterMovement()->GravityScale = Character->GetDefaultGravityScale() * 1.5f;
 			break;
 		}
 		case EDWCharacterAttackType::SkillAttack:
 		{
 			const auto SkillAbilityData = Character->GetSkillAbility(Character->SkillAbilityItem.ID);
-			if(SkillAbilityData.GetItemData<UAbilitySkillDataBase>().ProjectileClass)
+			if(SkillAbilityData.GetData<UAbilitySkillDataBase>().ProjectileClass)
 			{
-				Character->AttackProjectile = UAbilityModuleStatics::SpawnAbilityProjectile(SkillAbilityData.GetItemData<UAbilitySkillDataBase>().ProjectileClass, Character, Character->SkillAbilityItem.AbilityHandle);
+				Character->AttackProjectile = UAbilityModuleStatics::SpawnAbilityProjectile(SkillAbilityData.GetData<UAbilitySkillDataBase>().ProjectileClass, Character, Character->SkillAbilityItem.AbilityHandle);
 				Character->AttackProjectile->Launch(Character->GetLooking()->GetLookingTarget() ? Character->GetLooking()->GetLookingRotation().Vector() : (Character->IsPlayer() ? UCameraModuleStatics::GetCameraRotation(true).Vector() : FVector::ZeroVector));
 			}
 			else
 			{
-				Character->ClearAttackHitTargets();
-				Character->SetAttackHitAble(true);
+				Character->ClearHitTargets();
+				Character->SetHitAble(true);
 			}
 			break;
 		}
@@ -173,12 +173,12 @@ void UDWCharacterState_Attack::AttackStep()
 	if (Character->AttackType == EDWCharacterAttackType::SkillAttack)
 	{
 		const auto AbilityData = Character->GetSkillAbility(Character->SkillAbilityItem.ID);
-		if(AbilityData.GetItemData<UAbilitySkillDataBase>().ProjectileClass) return;
+		if(AbilityData.GetData<UAbilitySkillDataBase>().ProjectileClass) return;
 	}
 	
-	bool bAttackHitAble = !Character->IsAttackHitAble();
-	if(bAttackHitAble) Character->ClearAttackHitTargets();
-	Character->SetAttackHitAble(bAttackHitAble);
+	bool bHitAble = !Character->IsHitAble();
+	if(bHitAble) Character->ClearHitTargets();
+	Character->SetHitAble(bHitAble);
 }
 
 void UDWCharacterState_Attack::AttackEnd()
@@ -193,21 +193,21 @@ void UDWCharacterState_Attack::AttackEnd()
 		{
 			if(!Character->GetWeapon<ADWEquipWeaponRemote>())
 			{
-				Character->SetAttackHitAble(false);
+				Character->SetHitAble(false);
 			}
 			break;
 		}
 		case EDWCharacterAttackType::FallingAttack:
 		{
-			Character->SetAttackHitAble(false);
+			Character->SetHitAble(false);
 			break;
 		}
 		case EDWCharacterAttackType::SkillAttack:
 		{
 			const auto AbilityData = Character->GetSkillAbility(Character->SkillAbilityItem.ID);
-			if(!AbilityData.GetItemData<UAbilitySkillDataBase>().ProjectileClass)
+			if(!AbilityData.GetData<UAbilitySkillDataBase>().ProjectileClass)
 			{
-				Character->SetAttackHitAble(false);
+				Character->SetHitAble(false);
 			}
 			break;
 		}
@@ -242,7 +242,7 @@ void UDWCharacterState_Attack::AttackComplete()
 		case EDWCharacterAttackType::SkillAttack:
 		{
 			const auto AbilityData = Character->GetSkillAbility(Character->SkillAbilityItem.ID);
-			if(AbilityData.GetItemData<UAbilitySkillDataBase>().ProjectileClass)
+			if(AbilityData.GetData<UAbilitySkillDataBase>().ProjectileClass)
 			{
 				Character->SetUseControllerRotation(false);
 				Character->AttackProjectile = nullptr;

@@ -7,7 +7,7 @@
 
 UDWCharacterState_Static::UDWCharacterState_Static()
 {
-	StateName = FName("Static");
+	
 }
 
 void UDWCharacterState_Static::OnInitialize(UFSMComponent* InFSM, int32 InStateIndex)
@@ -23,10 +23,6 @@ bool UDWCharacterState_Static::OnPreEnter(UFiniteStateBase* InLastState, const T
 void UDWCharacterState_Static::OnEnter(UFiniteStateBase* InLastState, const TArray<FParameter>& InParams)
 {
 	Super::OnEnter(InLastState, InParams);
-
-	ADWCharacter* Character = GetAgent<ADWCharacter>();
-	
-	Character->LimitToAnim();
 }
 
 void UDWCharacterState_Static::OnRefresh(float DeltaSeconds)
@@ -37,10 +33,6 @@ void UDWCharacterState_Static::OnRefresh(float DeltaSeconds)
 void UDWCharacterState_Static::OnLeave(UFiniteStateBase* InNextState)
 {
 	Super::OnLeave(InNextState);
-
-	ADWCharacter* Character = GetAgent<ADWCharacter>();
-	
-	Character->FreeToAnim();
 }
 
 void UDWCharacterState_Static::OnTermination()

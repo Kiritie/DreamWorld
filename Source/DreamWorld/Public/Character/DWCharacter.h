@@ -3,7 +3,8 @@
 #pragma once
 
 #include "Ability/Character/AbilityCharacterBase.h"
-#include "Ability/Character/DWCharacterAttributeSet.h"
+#include "Ability/Attributes/DWCharacterAttributeSet.h"
+#include "Ability/Hitter/AbilityHitterInterface.h"
 #include "Common/DWCommonTypes.h"
 #include "Team/Agent/DWTeamAgentInterface.h"
 
@@ -36,7 +37,7 @@ class AAbilityProjectileBase;
  * 角色
  */
 UCLASS()
-class DREAMWORLD_API ADWCharacter : public AAbilityCharacterBase, public IDWTeamAgentInterface
+class DREAMWORLD_API ADWCharacter : public AAbilityCharacterBase, public IAbilityHitterInterface, public IDWTeamAgentInterface
 {
 	GENERATED_BODY()
 
@@ -119,21 +120,13 @@ public:
 	virtual void OnWorldModeChanged(UObject* InSender, UEventHandle_VoxelWorldModeChanged* InEventHandle);
 
 public:
-	UFUNCTION(BlueprintCallable)
-	virtual void FreeToAnim();
-
-	UFUNCTION(BlueprintCallable)
-	virtual void LimitToAnim();
-
-	UFUNCTION(BlueprintCallable)
-	virtual void Interrupt(float InDuration = -1.f);
-
-	UFUNCTION(BlueprintCallable)
-	virtual void UnInterrupt();
-
 	virtual void Jump() override;
 
 	virtual void UnJump() override;
+
+	virtual void Crouch(bool bClientSimulation) override;
+
+	virtual void UnCrouch(bool bClientSimulation) override;
 
 	UFUNCTION(BlueprintCallable)
 	virtual void Dodge();
@@ -147,39 +140,11 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual void UnSprint();
 
-	virtual void Crouch(bool bClientSimulation) override;
-
-	virtual void UnCrouch(bool bClientSimulation) override;
-
-	UFUNCTION(BlueprintCallable)
-	virtual void Swim();
-		
-	UFUNCTION(BlueprintCallable)
-	virtual void UnSwim();
-						
-	UFUNCTION(BlueprintCallable)
-	virtual void Float(float InWaterPosZ);
-						
-	UFUNCTION(BlueprintCallable)
-	virtual void UnFloat();
-
-	UFUNCTION(BlueprintCallable)
-	virtual void Climb();
-			
-	UFUNCTION(BlueprintCallable)
-	virtual void UnClimb();
-
 	UFUNCTION(BlueprintCallable)
 	virtual void Ride(ADWCharacter* InTarget);
 
 	UFUNCTION(BlueprintCallable)
 	virtual void UnRide();
-
-	UFUNCTION(BlueprintCallable)
-	virtual void Fly();
-
-	UFUNCTION(BlueprintCallable)
-	virtual void UnFly();
 
 	UFUNCTION(BlueprintCallable)
 	virtual void Aim();
@@ -206,14 +171,11 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual void UnDefend();
 
-	UFUNCTION(BlueprintCallable)
-	virtual bool DoAction(const FGameplayTag& InActionTag);
+	virtual bool DoAction(const FGameplayTag& InActionTag) override;
 
-	UFUNCTION(BlueprintCallable)
-	virtual bool StopAction(const FGameplayTag& InActionTag);
+	virtual bool StopAction(const FGameplayTag& InActionTag) override;
 
-	UFUNCTION(BlueprintCallable)
-	virtual void EndAction(const FGameplayTag& InActionTag, bool bWasCancelled);
+	virtual void EndAction(const FGameplayTag& InActionTag, bool bWasCancelled) override;
 
 public:
 	UFUNCTION(BlueprintCallable)
@@ -222,19 +184,13 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual bool DoAIMove(FVector InTargetLocation, float InMoveStopDistance = 10.f);
 	
-	virtual bool DoAIMove(ADWCharacter* InTargetCharacter, float InMoveStopDistance = 10.f, bool bLookAtTarget = false);
+	virtual bool DoAIMove(AActor* InTargetActor, float InMoveStopDistance = 10.f, bool bLookAtTarget = false);
 
 	virtual void StopAIMove(bool bMulticast = false) override;
 
 	virtual void AddMovementInput(FVector WorldDirection, float ScaleValue = 1.0f, bool bForce = false) override;
 									
-	virtual void SetMotionRate_Implementation(float InMovementRate, float InRotationRate) override;
-				
-	virtual bool IsAttackHitAble() const;
-
-	virtual void SetAttackHitAble(bool bValue);
-		
-	virtual void ClearAttackHitTargets();
+	virtual void SetMotionRate(float InMovementRate, float InRotationRate) override;
 
 	virtual bool RaycastStep(FHitResult& OutHitResult);
 	
@@ -244,62 +200,22 @@ public:
 
 	virtual bool CanLookAtTarget() override;
 
-public:
-	UFUNCTION(BlueprintPure)
-	bool HasAttackAbility(int32 InAbilityIndex = 0) const;
+	virtual bool IsHitAble() const override;
 
-	UFUNCTION(BlueprintCallable)
-	bool HasSkillAbility(const FPrimaryAssetId& InSkillID, bool bNeedAssembled = false) const;
+	virtual void SetHitAble(bool bValue) override;
+		
+	virtual void ClearHitTargets() override;
 
-	bool HasSkillAbility(ESkillType InSkillType, int32 InAbilityIndex = 0, bool bNeedAssembled = false) const;
-	
-	UFUNCTION(BlueprintCallable)
-	bool HasActionAbility(const FGameplayTag& InActionTag) const;
+	virtual TArray<AActor*> GetHitTargets() const override;
 
 public:
-	virtual bool IsEnemy(IAbilityPawnInterface* InTarget) const override;
+	virtual void OnAttributeChange(const FOnAttributeChangeData& InAttributeChangeData) override;
 	
-	UFUNCTION(BlueprintPure)
-	virtual bool IsExhausted() const;
-	
-	UFUNCTION(BlueprintPure)
-	virtual bool IsFreeToAnim() const;
-	
-	UFUNCTION(BlueprintPure)
-	virtual bool IsDodging() const;
+	virtual void HandleDamage(EDamageType DamageType, const float LocalDamageDone, bool bHasCrited, bool bHasDefend, FHitResult HitResult, const FGameplayTagContainer& SourceTags, AActor* SourceActor) override;
 
-	UFUNCTION(BlueprintPure)
-	virtual bool IsSprinting() const;
+	virtual void HandleRecovery(const float LocalRecoveryDone, FHitResult HitResult, const FGameplayTagContainer& SourceTags, AActor* SourceActor) override;
 
-	UFUNCTION(BlueprintPure)
-	virtual bool IsCrouching(bool bReally = false) const;
-
-	UFUNCTION(BlueprintPure)
-	virtual bool IsSwimming(bool bReally = false) const;
-
-	UFUNCTION(BlueprintPure)
-	virtual bool IsFloating() const;
-
-	UFUNCTION(BlueprintPure)
-	virtual bool IsAiming() const;
-
-	UFUNCTION(BlueprintPure)
-	virtual bool IsAttacking(EDWCharacterAttackType InAttackType = EDWCharacterAttackType::None) const;
-
-	UFUNCTION(BlueprintPure)
-	virtual bool IsDefending() const;
-
-	UFUNCTION(BlueprintPure)
-	virtual bool IsClimbing() const;
-
-	UFUNCTION(BlueprintPure)
-	virtual bool IsRiding() const;
-
-	UFUNCTION(BlueprintPure)
-	virtual bool IsFlying(bool bReally = false) const;
-
-	UFUNCTION(BlueprintPure)
-	virtual bool IsInterrupting() const;
+	virtual void HandleInterrupt(const float InterruptDuration, FHitResult HitResult, const FGameplayTagContainer& SourceTags, AActor* SourceActor) override;
 	
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
@@ -319,11 +235,10 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "CharacterStats")
 	ADWCharacter* RidingTarget;
 
-protected:
-	FVector BirthLocation;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "CharacterStats")
+	bool bHitAble;
 
-	bool bAttackHitAble;
-	
+protected:
 	float AIMoveStopDistance;
 
 	FVector AIMoveLocation;
@@ -348,7 +263,64 @@ protected:
 
 	TMap<FPrimaryAssetId, FDWCharacterSkillAbilityData> SkillAbilities;
 
-	TMap<FGameplayTag, FDWCharacterActionAbilityData> ActionAbilities;
+public:
+	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, Mana)
+	
+	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, MaxMana)
+
+	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, Stamina)
+	
+	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, MaxStamina)
+
+	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, DodgeForce)
+
+	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, AttackForce)
+		
+	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, RepulseForce)
+
+	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, AttackSpeed)
+
+	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, AttackCritRate)
+
+	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, AttackStealRate)
+
+	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, DefendRate)
+
+	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, DefendScope)
+
+	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, PhysicsDefRate)
+
+	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, MagicDefRate)
+	
+	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, ToughnessRate)
+			
+	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, StaminaRegenSpeed)
+			
+	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, StaminaExpendSpeed)
+
+public:
+	virtual bool IsEnemy(IAbilityPawnInterface* InTarget) const override;
+	
+	UFUNCTION(BlueprintPure)
+	virtual bool IsExhausted() const;
+
+	UFUNCTION(BlueprintPure)
+	virtual bool IsDodging() const;
+
+	UFUNCTION(BlueprintPure)
+	virtual bool IsSprinting() const;
+
+	UFUNCTION(BlueprintPure)
+	virtual bool IsAiming() const;
+
+	UFUNCTION(BlueprintPure)
+	virtual bool IsAttacking(EDWCharacterAttackType InAttackType = EDWCharacterAttackType::None) const;
+
+	UFUNCTION(BlueprintPure)
+	virtual bool IsDefending() const;
+
+	UFUNCTION(BlueprintPure)
+	virtual bool IsRiding() const;
 
 public:
 	virtual FGuid GetActorIDT() const override { return ActorID; }
@@ -361,11 +333,11 @@ public:
 
 	virtual bool SetLevelA(int32 InLevel) override;
 
-	UFUNCTION(BlueprintNativeEvent)
-	void SetControlMode(EDWCharacterControlMode InControlMode);
-
 	UFUNCTION(BlueprintPure)
 	EDWCharacterControlMode GetControlMode() const { return ControlMode; }
+
+	UFUNCTION(BlueprintNativeEvent)
+	void SetControlMode(EDWCharacterControlMode InControlMode);
 
 	UFUNCTION(BlueprintPure)
 	UWorldWidgetComponent* GetCharacterHP() const { return CharacterHP; }
@@ -402,9 +374,6 @@ public:
 
 	UFUNCTION(BlueprintPure)
 	ADWCharacter* GetRidingTarget() const { return RidingTarget; }
-
-	UFUNCTION(BlueprintPure)
-	FVector GetBirthLocation() const { return BirthLocation; }
 
 	UFUNCTION(BlueprintPure)
 	FVector GetAIMoveLocation() const { return AIMoveLocation; }
@@ -455,6 +424,14 @@ public:
 	EDWCharacterAttackType GetAttackType() const { return AttackType; }
 
 	UFUNCTION(BlueprintPure)
+	bool HasAttackAbility(int32 InAbilityIndex = 0) const;
+
+	UFUNCTION(BlueprintPure)
+	bool HasSkillAbility(const FPrimaryAssetId& InSkillID, bool bNeedAssembled = false) const;
+
+	bool HasSkillAbility(ESkillType InSkillType, int32 InAbilityIndex = 0, bool bNeedAssembled = false) const;
+
+	UFUNCTION(BlueprintPure)
 	FDWCharacterAttackAbilityQueue& GetAttackAbilityQueue();
 
 	UFUNCTION(BlueprintPure)
@@ -467,9 +444,6 @@ public:
 	FDWCharacterSkillAbilityData GetSkillAbility(const FPrimaryAssetId& InSkillID, bool bNeedAssembled = false);
 		
 	FDWCharacterSkillAbilityData GetSkillAbility(ESkillType InSkillType, int32 InAbilityIndex = -1, bool bNeedAssembled = false);
-			
-	UFUNCTION(BlueprintPure)
-	FDWCharacterActionAbilityData GetActionAbility(const FGameplayTag& InActionTag);
 
 	UFUNCTION(BlueprintPure)
 	TMap<EDWWeaponType, FDWCharacterAttackAbilityQueue>& GetAttackAbilityQueues() { return AttackAbilityQueues; }
@@ -481,58 +455,7 @@ public:
 	TMap<FPrimaryAssetId, FDWCharacterSkillAbilityData>& GetSkillAbilities() { return SkillAbilities; }
 
 	UFUNCTION(BlueprintPure)
-	TMap<FGameplayTag, FDWCharacterActionAbilityData>& GetActionAbilities() { return ActionAbilities; }
-
-	UFUNCTION(BlueprintPure)
 	UDWCharacterPart* GetCharacterPart(EDWCharacterPartType InCharacterPartType) const;
 
 	virtual UBehaviorTree* GetBehaviorTreeAsset() const override;
-
-public:
-	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, Mana)
-	
-	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, MaxMana)
-
-	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, Stamina)
-	
-	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, MaxStamina)
-	
-	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, SwimSpeed)
-		
-	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, FlySpeed)
-
-	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, DodgeForce)
-
-	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, AttackForce)
-		
-	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, RepulseForce)
-
-	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, AttackSpeed)
-
-	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, AttackCritRate)
-
-	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, AttackStealRate)
-
-	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, DefendRate)
-
-	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, DefendScope)
-
-	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, PhysicsDefRate)
-
-	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, MagicDefRate)
-	
-	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, ToughnessRate)
-			
-	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, StaminaRegenSpeed)
-			
-	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, StaminaExpendSpeed)
-
-public:
-	virtual void OnAttributeChange(const FOnAttributeChangeData& InAttributeChangeData) override;
-	
-	virtual void HandleDamage(EDamageType DamageType, const float LocalDamageDone, bool bHasCrited, bool bHasDefend, FHitResult HitResult, const FGameplayTagContainer& SourceTags, AActor* SourceActor) override;
-
-	virtual void HandleRecovery(const float LocalRecoveryDone, FHitResult HitResult, const FGameplayTagContainer& SourceTags, AActor* SourceActor) override;
-
-	virtual void HandleInterrupt(const float InterruptDuration, FHitResult HitResult, const FGameplayTagContainer& SourceTags, AActor* SourceActor) override;
 };

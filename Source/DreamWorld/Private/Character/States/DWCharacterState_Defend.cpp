@@ -32,7 +32,7 @@ void UDWCharacterState_Defend::OnEnter(UFiniteStateBase* InLastState, const TArr
 	
 	Character->GetAbilitySystemComponent()->AddLooseGameplayTag(GameplayTags::State_Character_Defending);
 
-	Character->SetMotionRate(0.5f, 0.1f);
+	Character->SetMotionRate(0.5f, 0.5f);
 	Character->LimitToAnim();
 }
 

@@ -17,6 +17,7 @@
 
 #include "DWCommonTypes.generated.h"
 
+class UCharacterAbilityBase;
 class UBehaviorTree;
 class UVoxelModule;
 class ADWPlayerCharacter;
@@ -48,9 +49,6 @@ class UEquipEffectBase;
 class UAbilityBase;
 class UAttributeSetBase;
 class UDWCharacterAttributeSet;
-class UDWCharacterAttackAbility;
-class UDWCharacterActionAbility;
-class UDWCharacterSkillAbility;
 class UTargetType;
 class UAbilityInventorySlotBase;
 
@@ -163,21 +161,6 @@ enum class EDWWeaponHandType : uint8
 };
 
 USTRUCT(BlueprintType)
-struct DREAMWORLD_API FDWCharacterActionAbilityData : public FAbilityData
-{
-	GENERATED_BODY()
-
-public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TSubclassOf<UDWCharacterActionAbility> AbilityClass;
-
-	FORCEINLINE FDWCharacterActionAbilityData()
-	{
-		AbilityClass = nullptr;
-	}
-};
-
-USTRUCT(BlueprintType)
 struct DREAMWORLD_API FDWCharacterAttackAbilityData : public FAbilityData
 {
 	GENERATED_BODY()
@@ -187,7 +170,7 @@ public:
 	EDWWeaponType WeaponType;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TSubclassOf<UDWCharacterAttackAbility> AbilityClass;
+	TSubclassOf<UCharacterAbilityBase> AbilityClass;
 
 	FORCEINLINE FDWCharacterAttackAbilityData()
 	{
@@ -238,7 +221,7 @@ public:
 };
 
 USTRUCT(BlueprintType)
-struct DREAMWORLD_API FDWCharacterSkillAbilityData : public FAbilityItemData
+struct DREAMWORLD_API FDWCharacterSkillAbilityData : public FAbilityData
 {
 	GENERATED_BODY()
 
@@ -250,7 +233,7 @@ public:
 	bool bCancelAble;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TSubclassOf<UDWCharacterSkillAbility> AbilityClass;
+	TSubclassOf<UCharacterAbilityBase> AbilityClass;
 
 	FORCEINLINE FDWCharacterSkillAbilityData()
 	{
@@ -311,30 +294,23 @@ public:
 	FORCEINLINE FDWCharacterSaveData()
 	{
 		TeamID = NAME_None;
-		BirthLocation = FVector::ZeroVector;
 		ControlMode = EDWCharacterControlMode::Fighting;
 		FallingAttackAbility = FDWCharacterAttackAbilityData();
 		AttackAbilityQueues = TMap<EDWWeaponType, FDWCharacterAttackAbilityQueue>();
 		SkillAbilities = TMap<FPrimaryAssetId, FDWCharacterSkillAbilityData>();
-		ActionAbilities = TMap<FGameplayTag, FDWCharacterActionAbilityData>();
 	}
 	
 	FORCEINLINE FDWCharacterSaveData(const FCharacterSaveData& InCharacterSaveData) : FCharacterSaveData(InCharacterSaveData)
 	{
 		TeamID = NAME_None;
-		BirthLocation = FVector::ZeroVector;
 		ControlMode = EDWCharacterControlMode::Fighting;
 		FallingAttackAbility = FDWCharacterAttackAbilityData();
 		AttackAbilityQueues = TMap<EDWWeaponType, FDWCharacterAttackAbilityQueue>();
 		SkillAbilities = TMap<FPrimaryAssetId, FDWCharacterSkillAbilityData>();
-		ActionAbilities = TMap<FGameplayTag, FDWCharacterActionAbilityData>();
 	}
 	
 	UPROPERTY(BlueprintReadOnly)
 	FName TeamID;
-			
-	UPROPERTY()
-	FVector BirthLocation;
 
 	UPROPERTY()
 	EDWCharacterControlMode ControlMode;
@@ -347,9 +323,6 @@ public:
 
 	UPROPERTY()
 	TMap<FPrimaryAssetId, FDWCharacterSkillAbilityData> SkillAbilities;
-
-	UPROPERTY()
-	TMap<FGameplayTag, FDWCharacterActionAbilityData> ActionAbilities;
 };
 
 USTRUCT(BlueprintType)
@@ -888,107 +861,85 @@ namespace GameplayTags
 {
 	////////////////////////////////////////////////////
 	// Input_Shortcut
-	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_InventoryAll);
-	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_InventorySingle);
-	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_InventorySplit);
+	DREAMWORLD_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_InventoryAll);
+	DREAMWORLD_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_InventorySingle);
+	DREAMWORLD_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_InventorySplit);
 
 	////////////////////////////////////////////////////
 	// Input_Player
-	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Sprint);
+	DREAMWORLD_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Sprint);
 	
-	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Interact1);
-	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Interact2);
-	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Interact3);
-	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Interact4);
-	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Interact5);
+	DREAMWORLD_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Interact1);
+	DREAMWORLD_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Interact2);
+	DREAMWORLD_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Interact3);
+	DREAMWORLD_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Interact4);
+	DREAMWORLD_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Interact5);
 	
-	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_NextInteract);
+	DREAMWORLD_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_NextInteract);
 	
-	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Dodge);
+	DREAMWORLD_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Dodge);
 	
-	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_ToggleCrouch);
-	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_ToggleControlMode);
-	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_ToggleLockSightTarget);
-	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_ChangeHand);
+	DREAMWORLD_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_ToggleCrouch);
+	DREAMWORLD_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_ToggleControlMode);
+	DREAMWORLD_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_ToggleLockSightTarget);
+	DREAMWORLD_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_ChangeHand);
 	
-	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Primary);
-	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Secondary);
-	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Third);
+	DREAMWORLD_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Primary);
+	DREAMWORLD_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Secondary);
+	DREAMWORLD_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Third);
 	
-	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_ReleaseSkillAbility1);
-	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_ReleaseSkillAbility2);
-	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_ReleaseSkillAbility3);
-	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_ReleaseSkillAbility4);
+	DREAMWORLD_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_ReleaseSkillAbility1);
+	DREAMWORLD_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_ReleaseSkillAbility2);
+	DREAMWORLD_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_ReleaseSkillAbility3);
+	DREAMWORLD_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_ReleaseSkillAbility4);
 	
-	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_UseInventoryItem);
-	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_DiscardInventoryItem);
-	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_PrevInventorySlot);
-	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_NextInventorySlot);
-	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_SelectInventorySlot1);
-	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_SelectInventorySlot2);
-	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_SelectInventorySlot3);
-	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_SelectInventorySlot4);
-	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_SelectInventorySlot5);
-	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_SelectInventorySlot6);
-	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_SelectInventorySlot7);
-	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_SelectInventorySlot8);
-	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_SelectInventorySlot9);
-	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_SelectInventorySlot10);
+	DREAMWORLD_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_UseInventoryItem);
+	DREAMWORLD_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_DiscardInventoryItem);
+	DREAMWORLD_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_PrevInventorySlot);
+	DREAMWORLD_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_NextInventorySlot);
+	DREAMWORLD_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_SelectInventorySlot1);
+	DREAMWORLD_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_SelectInventorySlot2);
+	DREAMWORLD_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_SelectInventorySlot3);
+	DREAMWORLD_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_SelectInventorySlot4);
+	DREAMWORLD_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_SelectInventorySlot5);
+	DREAMWORLD_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_SelectInventorySlot6);
+	DREAMWORLD_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_SelectInventorySlot7);
+	DREAMWORLD_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_SelectInventorySlot8);
+	DREAMWORLD_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_SelectInventorySlot9);
+	DREAMWORLD_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_SelectInventorySlot10);
 
 	////////////////////////////////////////////////////
 	// Input_System
-	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_ZoomInMiniMap);
-	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_ZoomOutMiniMap);
-	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_OpenMaxMapBox);
-	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_OpenInventoryPanel);
-	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_OpenGeneratePanel);
-	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_OpenContextInputBox);
+	DREAMWORLD_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_ZoomInMiniMap);
+	DREAMWORLD_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_ZoomOutMiniMap);
+	DREAMWORLD_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_OpenMaxMapBox);
+	DREAMWORLD_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_OpenInventoryPanel);
+	DREAMWORLD_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_OpenGeneratePanel);
+	DREAMWORLD_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_OpenContextInputBox);
 
 	////////////////////////////////////////////////////
 	// State_Character
-	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_Character_Dodging);
-	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_Character_Sprinting);
-	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_Character_Crouching);
-	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_Character_Swimming);
-	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_Character_Floating);
-	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_Character_Climbing);
-	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_Character_Riding);
-	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_Character_Flying);
-	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_Character_Aiming);
-	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_Character_Attacking);
-	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_Character_NormalAttacking);
-	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_Character_FallingAttacking);
-	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_Character_SkillAttacking);
-	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_Character_Defending);
-	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_Character_Interrupting);
-	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_Character_Animating);
-	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_Character_Exhausted);
-	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_Character_FreeToAnim);
+	DREAMWORLD_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_Character_Dodging);
+	DREAMWORLD_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_Character_Sprinting);
+	DREAMWORLD_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_Character_Riding);
+	DREAMWORLD_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_Character_Aiming);
+	DREAMWORLD_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_Character_Attacking);
+	DREAMWORLD_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_Character_Defending);
+	DREAMWORLD_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_Character_Exhausted);
 
 	////////////////////////////////////////////////////
 	// Ability_Character_Action
-	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Ability_Character_Action_Death);
-	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Ability_Character_Action_Revive);
-	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Ability_Character_Action_Jump);
-	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Ability_Character_Action_Fall);
-	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Ability_Character_Action_Walk);
-	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Ability_Character_Action_Crouch);
-	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Ability_Character_Action_Dodge);
-	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Ability_Character_Action_Sprint);
-	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Ability_Character_Action_Climb);
-	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Ability_Character_Action_Swim);
-	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Ability_Character_Action_Float);
-	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Ability_Character_Action_Ride);
-	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Ability_Character_Action_Fly);
-	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Ability_Character_Action_Take);
-	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Ability_Character_Action_Use);
-	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Ability_Character_Action_Discard);
-	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Ability_Character_Action_Generate);
-	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Ability_Character_Action_Destroy);
-	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Ability_Character_Action_Attack);
-	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Ability_Character_Action_GetHit);
-	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Ability_Character_Action_Aim);
-	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Ability_Character_Action_Defend);
-	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Ability_Character_Action_DefendBlock);
-	DREAMWORLD_API	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Ability_Character_Action_Interrupt);
+	DREAMWORLD_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Ability_Character_Action_Dodge);
+	DREAMWORLD_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Ability_Character_Action_Sprint);
+	DREAMWORLD_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Ability_Character_Action_Ride);
+	DREAMWORLD_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Ability_Character_Action_Take);
+	DREAMWORLD_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Ability_Character_Action_Use);
+	DREAMWORLD_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Ability_Character_Action_Discard);
+	DREAMWORLD_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Ability_Character_Action_Generate);
+	DREAMWORLD_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Ability_Character_Action_Destroy);
+	DREAMWORLD_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Ability_Character_Action_Aim);
+	DREAMWORLD_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Ability_Character_Action_Attack);
+	DREAMWORLD_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Ability_Character_Action_GetHit);
+	DREAMWORLD_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Ability_Character_Action_Defend);
+	DREAMWORLD_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Ability_Character_Action_DefendBlock);
 };

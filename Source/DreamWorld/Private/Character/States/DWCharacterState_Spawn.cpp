@@ -4,7 +4,6 @@
 
 #include "Character/DWCharacter.h"
 #include "Character/States/DWCharacterState_Static.h"
-#include "Common/Looking/LookingComponent.h"
 #include "FSM/Components/FSMComponent.h"
 #include "Procedure/ProcedureModuleStatics.h"
 #include "Procedure/Procedure_Testing.h"
@@ -31,14 +30,9 @@ void UDWCharacterState_Spawn::OnEnter(UFiniteStateBase* InLastState, const TArra
 	Super::OnEnter(InLastState, InParams);
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
-
-	Character->DoAction(GameplayTags::Ability_Character_Action_Revive);
-
-	Character->LimitToAnim();
 	
 	// stats
 	Character->SetControlMode(Character->ControlMode);
-	Character->GetLooking()->TargetLookingOff();
 	Character->RidingTarget = nullptr;
 	Character->OwnerRider = nullptr;
 	
@@ -55,10 +49,6 @@ void UDWCharacterState_Spawn::OnRefresh(float DeltaSeconds)
 void UDWCharacterState_Spawn::OnLeave(UFiniteStateBase* InNextState)
 {
 	Super::OnLeave(InNextState);
-
-	ADWCharacter* Character = GetAgent<ADWCharacter>();
-
-	Character->FreeToAnim();
 }
 
 void UDWCharacterState_Spawn::OnTermination()

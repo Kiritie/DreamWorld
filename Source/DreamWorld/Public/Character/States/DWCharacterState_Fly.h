@@ -5,13 +5,14 @@
 #include "CoreMinimal.h"
 #include "UObject/Object.h"
 #include "Ability/Character/States/AbilityCharacterStateBase.h"
+#include "Ability/Character/States/AbilityCharacterState_Fly.h"
 #include "DWCharacterState_Fly.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class DREAMWORLD_API UDWCharacterState_Fly : public UAbilityCharacterStateBase
+class DREAMWORLD_API UDWCharacterState_Fly : public UAbilityCharacterState_Fly
 {
 	GENERATED_BODY()
 

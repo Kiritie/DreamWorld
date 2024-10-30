@@ -155,11 +155,11 @@ void ADWPlayerCharacter::LoadData(FSaveData* InSaveData, EPhase InPhase)
 				}
 				case EDWInventoryInitType::Default:
 				{
-					SaveData.InventoryData.CopyItems(SaveData.GetItemData<UDWCharacterData>().InventoryData);
+					SaveData.InventoryData.CopyItems(SaveData.GetData<UDWCharacterData>().InventoryData);
 				}
 				case EDWInventoryInitType::All:
 				{
-					SaveData.InventoryData.CopyItems(SaveData.GetItemData<UDWCharacterData>().InventoryData);
+					SaveData.InventoryData.CopyItems(SaveData.GetData<UDWCharacterData>().InventoryData);
 
 					auto CoinDatas = UAssetModuleStatics::LoadPrimaryAssets<UAbilityCoinDataBase>(FName("Coin"));
 					for (int32 i = 0; i < CoinDatas.Num(); i++)
@@ -630,6 +630,21 @@ void ADWPlayerCharacter::OnAttributeChange(const FOnAttributeChangeData& InAttri
 	Super::OnAttributeChange(InAttributeChangeData);
 }
 
+void ADWPlayerCharacter::OnTargetLockedOn(AActor* InTargetActor)
+{
+	Looking->TargetLookingOn(InTargetActor);
+}
+
+void ADWPlayerCharacter::OnTargetLockedOff(AActor* InTargetActor)
+{
+	Looking->TargetLookingOff();
+}
+
+void ADWPlayerCharacter::OnTargetSetRotation(AActor* InTargetActor, FRotator InControlRotation)
+{
+	UCameraModuleStatics::SetCameraRotation(InControlRotation.Yaw, InControlRotation.Pitch);
+}
+
 FString ADWPlayerCharacter::GetHeadInfo() const
 {
 	return FString::Printf(TEXT("Lv.%d \"%s\" (Exp: %d/%d)"), Level, *Name.ToString(), (int32)GetExp(), (int32)GetMaxExp());
@@ -648,21 +663,6 @@ void ADWPlayerCharacter::SetControlMode_Implementation(EDWCharacterControlMode I
 void ADWPlayerCharacter::SetGenerateVoxelID(const FPrimaryAssetId& InGenerateVoxelID)
 {
 	Super::SetGenerateVoxelID(InGenerateVoxelID);
-}
-
-void ADWPlayerCharacter::OnTargetLockedOn(AActor* InTargetActor)
-{
-	Looking->TargetLookingOn(InTargetActor);
-}
-
-void ADWPlayerCharacter::OnTargetLockedOff(AActor* InTargetActor)
-{
-	Looking->TargetLookingOff();
-}
-
-void ADWPlayerCharacter::OnTargetSetRotation(AActor* InTargetActor, FRotator InControlRotation)
-{
-	UCameraModuleStatics::SetCameraRotation(InControlRotation.Yaw, InControlRotation.Pitch);
 }
 
 void ADWPlayerCharacter::SetNameA(FName InName)

@@ -2,12 +2,9 @@
 
 #include "Character/States/DWCharacterState_Crouch.h"
 
-#include "Character/DWCharacter.h"
-#include "Character/DWCharacterData.h"
-
 UDWCharacterState_Crouch::UDWCharacterState_Crouch()
 {
-	StateName = FName("Crouch");
+	
 }
 
 void UDWCharacterState_Crouch::OnInitialize(UFSMComponent* InFSM, int32 InStateIndex)
@@ -17,22 +14,12 @@ void UDWCharacterState_Crouch::OnInitialize(UFSMComponent* InFSM, int32 InStateI
 
 bool UDWCharacterState_Crouch::OnPreEnter(UFiniteStateBase* InLastState, const TArray<FParameter>& InParams)
 {
-	if(!Super::OnPreEnter(InLastState, InParams)) return false;
-
-	ADWCharacter* Character = GetAgent<ADWCharacter>();
-
-	return Character->DoAction(GameplayTags::Ability_Character_Action_Crouch);
+	return Super::OnPreEnter(InLastState, InParams);
 }
 
 void UDWCharacterState_Crouch::OnEnter(UFiniteStateBase* InLastState, const TArray<FParameter>& InParams)
 {
 	Super::OnEnter(InLastState, InParams);
-
-	ADWCharacter* Character = GetAgent<ADWCharacter>();
-	
-	Character->GetAbilitySystemComponent()->AddLooseGameplayTag(GameplayTags::State_Character_Crouching);
-
-	Character->Crouch(InParams[0]);
 }
 
 void UDWCharacterState_Crouch::OnRefresh(float DeltaSeconds)
@@ -43,14 +30,6 @@ void UDWCharacterState_Crouch::OnRefresh(float DeltaSeconds)
 void UDWCharacterState_Crouch::OnLeave(UFiniteStateBase* InNextState)
 {
 	Super::OnLeave(InNextState);
-
-	ADWCharacter* Character = GetAgent<ADWCharacter>();
-
-	Character->StopAction(GameplayTags::Ability_Character_Action_Crouch);
-	
-	Character->GetAbilitySystemComponent()->RemoveLooseGameplayTag(GameplayTags::State_Character_Crouching);
-
-	Character->FreeToAnim();
 }
 
 void UDWCharacterState_Crouch::OnTermination()

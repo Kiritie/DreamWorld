@@ -10,7 +10,7 @@
 
 UDWCharacterState_Swim::UDWCharacterState_Swim()
 {
-	StateName = FName("Swim");
+	
 }
 
 void UDWCharacterState_Swim::OnInitialize(UFSMComponent* InFSM, int32 InStateIndex)
@@ -20,29 +20,12 @@ void UDWCharacterState_Swim::OnInitialize(UFSMComponent* InFSM, int32 InStateInd
 
 bool UDWCharacterState_Swim::OnPreEnter(UFiniteStateBase* InLastState, const TArray<FParameter>& InParams)
 {
-	if(!Super::OnPreEnter(InLastState, InParams)) return false;
-
-	ADWCharacter* Character = GetAgent<ADWCharacter>();
-
-	return Character->DoAction(GameplayTags::Ability_Character_Action_Swim);
+	return Super::OnPreEnter(InLastState, InParams);
 }
 
 void UDWCharacterState_Swim::OnEnter(UFiniteStateBase* InLastState, const TArray<FParameter>& InParams)
 {
 	Super::OnEnter(InLastState, InParams);
-
-	ADWCharacter* Character = GetAgent<ADWCharacter>();
-	
-	Character->GetAbilitySystemComponent()->AddLooseGameplayTag(GameplayTags::State_Character_Swimming);
-
-	// Character->LimitToAnim();
-
-	if(Character->GetCharacterMovement()->MovementMode != MOVE_Swimming)
-	{
-		Character->GetCharacterMovement()->SetMovementMode(MOVE_Swimming);
-	}
-
-	Character->GetMovementComponent()->Velocity.Z *= 0.2f;
 }
 
 void UDWCharacterState_Swim::OnRefresh(float DeltaSeconds)
@@ -53,21 +36,6 @@ void UDWCharacterState_Swim::OnRefresh(float DeltaSeconds)
 void UDWCharacterState_Swim::OnLeave(UFiniteStateBase* InNextState)
 {
 	Super::OnLeave(InNextState);
-
-	ADWCharacter* Character = GetAgent<ADWCharacter>();
-
-	Character->StopAction(GameplayTags::Ability_Character_Action_Swim);
-	
-	Character->GetAbilitySystemComponent()->RemoveLooseGameplayTag(GameplayTags::State_Character_Swimming);
-	
-	// Character->FreeToAnim();
-
-	// const FVoxelItem& NeckOverlappingVoxel = Character->GetCharacterPart(EDWCharacterPartType::Chest)->GetOverlappingVoxel();
-	//
-	// if(!NeckOverlappingVoxel.IsValid() || NeckOverlappingVoxel.GetVoxelType() != EVoxelType::Water)
-	// {
-	// 	Character->GetCharacterMovement()->SetMovementMode(MOVE_Walking);
-	// }
 }
 
 void UDWCharacterState_Swim::OnTermination()

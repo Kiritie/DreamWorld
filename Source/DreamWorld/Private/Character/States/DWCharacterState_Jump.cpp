@@ -2,12 +2,9 @@
 
 #include "Character/States/DWCharacterState_Jump.h"
 
-#include "Character/DWCharacter.h"
-#include "Character/DWCharacterData.h"
-
 UDWCharacterState_Jump::UDWCharacterState_Jump()
 {
-	StateName = FName("Jump");
+	
 }
 
 void UDWCharacterState_Jump::OnInitialize(UFSMComponent* InFSM, int32 InStateIndex)
@@ -17,20 +14,12 @@ void UDWCharacterState_Jump::OnInitialize(UFSMComponent* InFSM, int32 InStateInd
 
 bool UDWCharacterState_Jump::OnPreEnter(UFiniteStateBase* InLastState, const TArray<FParameter>& InParams)
 {
-	if(!Super::OnPreEnter(InLastState, InParams)) return false;
-
-	ADWCharacter* Character = GetAgent<ADWCharacter>();
-
-	return !Character->IsSwimming() && Character->DoAction(GameplayTags::Ability_Character_Action_Jump);
+	return Super::OnPreEnter(InLastState, InParams);
 }
 
 void UDWCharacterState_Jump::OnEnter(UFiniteStateBase* InLastState, const TArray<FParameter>& InParams)
 {
 	Super::OnEnter(InLastState, InParams);
-
-	ADWCharacter* Character = GetAgent<ADWCharacter>();
-
-	Character->LimitToAnim();
 }
 
 void UDWCharacterState_Jump::OnRefresh(float DeltaSeconds)
@@ -41,12 +30,6 @@ void UDWCharacterState_Jump::OnRefresh(float DeltaSeconds)
 void UDWCharacterState_Jump::OnLeave(UFiniteStateBase* InNextState)
 {
 	Super::OnLeave(InNextState);
-
-	ADWCharacter* Character = GetAgent<ADWCharacter>();
-
-	Character->StopAction(GameplayTags::Ability_Character_Action_Jump);
-
-	Character->FreeToAnim();
 }
 
 void UDWCharacterState_Jump::OnTermination()

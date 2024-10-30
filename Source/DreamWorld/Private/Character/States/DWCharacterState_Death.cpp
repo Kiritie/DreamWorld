@@ -3,10 +3,7 @@
 #include "Character/States/DWCharacterState_Death.h"
 
 #include "Character/DWCharacter.h"
-#include "Ability/Character/AbilityCharacterBase.h"
 #include "ObjectPool/ObjectPoolModuleStatics.h"
-#include "Ability/Character/AbilityCharacterInventoryBase.h"
-#include "Common/Looking/LookingComponent.h"
 
 UDWCharacterState_Death::UDWCharacterState_Death()
 {
@@ -31,8 +28,6 @@ void UDWCharacterState_Death::OnEnter(UFiniteStateBase* InLastState, const TArra
 
 	Character->SetMana(0.f);
 	Character->SetStamina(0.f);
-	Character->GetLooking()->TargetLookingOff();
-	Character->LimitToAnim();
 }
 
 void UDWCharacterState_Death::OnRefresh(float DeltaSeconds)
@@ -43,10 +38,6 @@ void UDWCharacterState_Death::OnRefresh(float DeltaSeconds)
 void UDWCharacterState_Death::OnLeave(UFiniteStateBase* InNextState)
 {
 	Super::OnLeave(InNextState);
-
-	ADWCharacter* Character = GetAgent<ADWCharacter>();
-
-	Character->StopAction(GameplayTags::Ability_Character_Action_Death);
 }
 
 void UDWCharacterState_Death::OnTermination()
@@ -57,28 +48,9 @@ void UDWCharacterState_Death::OnTermination()
 void UDWCharacterState_Death::DeathStart()
 {
 	Super::DeathStart();
-
-	ADWCharacter* Character = GetAgent<ADWCharacter>();
-
-	Character->DoAction(GameplayTags::Ability_Character_Action_Death);
 }
 
 void UDWCharacterState_Death::DeathEnd()
 {
 	Super::DeathEnd();
-	
-	ADWCharacter* Character = GetAgent<ADWCharacter>();
-
-	Character->StopAction(GameplayTags::Ability_Character_Action_Death);
-
-	Character->Inventory->DiscardItems();
-
-	if(!Character->IsPlayer())
-	{
-		UObjectPoolModuleStatics::DespawnObject(Character);
-	}
-	else
-	{
-		Character->Execute_SetActorVisible(Character, false);
-	}
 }

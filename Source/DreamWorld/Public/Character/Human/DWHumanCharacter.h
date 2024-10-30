@@ -6,12 +6,7 @@
 #include "DWHumanCharacter.generated.h"
 
 class AVoxelEntity;
-class UBoxComponent;
 class UStaticMeshComponent;
-class ADWEquipWeapon;
-class ADWEquipShield;
-class ADWEquipArmor;
-class UAbilityInventoryEquipSlotBase;
 
 /**
  * 类人角色
@@ -38,6 +33,13 @@ public:
 
 	virtual void OnAuxiliaryItem(const FAbilityItem& InItem) override;
 
+public:
+	virtual void SetHitAble(bool bValue) override;
+
+	virtual void ClearHitTargets() override;
+
+	virtual void SetControlMode_Implementation(EDWCharacterControlMode InControlMode) override;
+
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	UStaticMeshComponent* GenerateHammerMesh;
@@ -47,11 +49,4 @@ protected:
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	AVoxelEntity* AuxiliaryVoxelEntity;
-
-public:
-	virtual void SetAttackHitAble(bool bValue) override;
-
-	virtual void ClearAttackHitTargets() override;
-
-	virtual void SetControlMode_Implementation(EDWCharacterControlMode InControlMode) override;
 };

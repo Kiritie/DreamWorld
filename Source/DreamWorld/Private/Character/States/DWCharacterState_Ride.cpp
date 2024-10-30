@@ -16,7 +16,6 @@
 UDWCharacterState_Ride::UDWCharacterState_Ride()
 {
 	StateName = FName("Ride");
-
 }
 
 void UDWCharacterState_Ride::OnInitialize(UFSMComponent* InFSM, int32 InStateIndex)

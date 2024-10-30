@@ -3,7 +3,7 @@
 #pragma once
 
 #include "DWEquipWeapon.h"
-#include "Ability/Interfaces/AbilityHitterInterface.h"
+#include "Ability/Hitter/AbilityHitterInterface.h"
 #include "DWEquipWeaponMelee.generated.h"
 
 class UBoxComponent;
@@ -37,11 +37,15 @@ public:
 	virtual bool CanHitTarget(AActor* InTarget) const override;
 
 	virtual void OnHitTarget(AActor* InTarget, const FHitResult& InHitResult) override;
+
+	virtual bool IsHitAble() const override;
 	
+	virtual void SetHitAble(bool bValue) override;
+
 	virtual void ClearHitTargets() override;
 
-	virtual void SetHitAble(bool bValue) override;
-	
+	virtual TArray<AActor*> GetHitTargets() const override;
+
 public:
 	UFUNCTION(BlueprintPure)
 	UBoxComponent* GetBoxComponent() const { return BoxComponent; }
