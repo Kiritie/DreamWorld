@@ -2,6 +2,7 @@
 
 
 #include "Character/DWCharacterModule.h"
+
 #include "Asset/AssetModuleStatics.h"
 #include "Character/Player/DWPlayerCharacterData.h"
 #include "Common/CommonStatics.h"
@@ -73,6 +74,6 @@ FDWPlayerBasicSaveData& UDWCharacterModule::GetPlayerBasicData()
 		PlayerBasicData.AssetID = PlayerRaceData.Items[0].ID;
 		PlayerBasicData.Level = PlayerRaceData.Items[0].Level;
 	}
-	PlayerBasicData.InventoryData = UAssetModuleStatics::LoadPrimaryAssetRef<UDWPlayerCharacterData>(PlayerBasicData.AssetID).InventoryData;
+	PlayerBasicData.InitInventoryData();
 	return PlayerBasicData;
 }

@@ -197,8 +197,7 @@ void ADWVoxelChunk::SpawnSceneActors()
 						SaveData.RaceID = RaceData.ID;
 						SaveData.Level = VitalityItem.Level;
 						SaveData.SpawnTransform = FTransform(FRotator(0.f, FMath::RandRange(0.f, 360.f), 0.f), HitResult.Location, FVector::OneVector);
-						SaveData.InventoryData = VitalityData.InventoryData;
-						SaveData.InventoryData.FillItems(VitalityItem.Level);
+						SaveData.InitInventoryData();
 						UAbilityModuleStatics::SpawnAbilityActor(&SaveData, UVoxelModuleStatics::FindChunkByLocation(SaveData.SpawnTransform.GetLocation()));
 					}
 				)
@@ -225,8 +224,7 @@ void ADWVoxelChunk::SpawnSceneActors()
 						SaveData.RaceID = RaceData.ID;
 						SaveData.Level = CharacterItem.Level;
 						SaveData.SpawnTransform = FTransform(FRotator(0.f, FMath::RandRange(0.f, 360.f), 0.f), HitResult.Location, FVector::OneVector);
-						SaveData.InventoryData = CharacterData.InventoryData;
-						SaveData.InventoryData.FillItems(CharacterItem.Level);
+						SaveData.InitInventoryData();
 						if(ADWCharacter* Character = Cast<ADWCharacter>(UAbilityModuleStatics::SpawnAbilityActor(&SaveData, UVoxelModuleStatics::FindChunkByLocation(SaveData.SpawnTransform.GetLocation()))))
 						{
 							if(!Captain)

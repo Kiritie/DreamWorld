@@ -24,71 +24,75 @@ public:
 	virtual void PostGameplayEffectExecute(const struct FGameplayEffectModCallbackData &Data) override;
 
 public:
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CharacterAttributes")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, SaveGame, Category = "CharacterAttributes")
 	FGameplayAttributeData Mana;
 	GAMEPLAYATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, Mana)
 	
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CharacterAttributes")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, SaveGame, Category = "CharacterAttributes")
 	FGameplayAttributeData MaxMana;
 	GAMEPLAYATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, MaxMana)
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CharacterAttributes")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, SaveGame, Category = "CharacterAttributes")
 	FGameplayAttributeData Stamina;
 	GAMEPLAYATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, Stamina)
 	
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CharacterAttributes")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, SaveGame, Category = "CharacterAttributes")
 	FGameplayAttributeData MaxStamina;
 	GAMEPLAYATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, MaxStamina)
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CharacterAttributes")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, SaveGame, Category = "CharacterAttributes")
 	FGameplayAttributeData DodgeForce;
 	GAMEPLAYATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, DodgeForce)
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CharacterAttributes")
-	FGameplayAttributeData AttackForce;
-	GAMEPLAYATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, AttackForce)
-		
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CharacterAttributes")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, SaveGame, Category = "CharacterAttributes")
 	FGameplayAttributeData RepulseForce;
 	GAMEPLAYATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, RepulseForce)
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CharacterAttributes")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, SaveGame, Category = "CharacterAttributes")
+	FGameplayAttributeData AttackForce;
+	GAMEPLAYATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, AttackForce)
+		
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, SaveGame, Category = "CharacterAttributes")
 	FGameplayAttributeData AttackSpeed;
 	GAMEPLAYATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, AttackSpeed)
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CharacterAttributes")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, SaveGame, Category = "CharacterAttributes")
 	FGameplayAttributeData AttackCritRate;
 	GAMEPLAYATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, AttackCritRate)
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CharacterAttributes")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, SaveGame, Category = "CharacterAttributes")
 	FGameplayAttributeData AttackStealRate;
 	GAMEPLAYATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, AttackStealRate)
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CharacterAttributes")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, SaveGame, Category = "CharacterAttributes")
 	FGameplayAttributeData DefendRate;
 	GAMEPLAYATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, DefendRate)
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CharacterAttributes")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, SaveGame, Category = "CharacterAttributes")
 	FGameplayAttributeData DefendScope;
 	GAMEPLAYATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, DefendScope)
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CharacterAttributes")
-	FGameplayAttributeData PhysicsDefRate;
-	GAMEPLAYATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, PhysicsDefRate)
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, SaveGame, Category = "CharacterAttributes")
+	FGameplayAttributeData PhysicsRes;
+	GAMEPLAYATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, PhysicsRes)
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CharacterAttributes")
-	FGameplayAttributeData MagicDefRate;
-	GAMEPLAYATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, MagicDefRate)
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, SaveGame, Category = "CharacterAttributes")
+	FGameplayAttributeData MagicRes;
+	GAMEPLAYATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, MagicRes)
 	
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CharacterAttributes")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, SaveGame, Category = "CharacterAttributes")
 	FGameplayAttributeData ToughnessRate;
 	GAMEPLAYATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, ToughnessRate)
-			
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CharacterAttributes")
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, SaveGame, Category = "CharacterAttributes")
+	FGameplayAttributeData ManaRegenSpeed;
+	GAMEPLAYATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, ManaRegenSpeed)
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, SaveGame, Category = "CharacterAttributes")
 	FGameplayAttributeData StaminaRegenSpeed;
 	GAMEPLAYATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, StaminaRegenSpeed)
 			
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CharacterAttributes")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, SaveGame, Category = "CharacterAttributes")
 	FGameplayAttributeData StaminaExpendSpeed;
 	GAMEPLAYATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, StaminaExpendSpeed)
 };

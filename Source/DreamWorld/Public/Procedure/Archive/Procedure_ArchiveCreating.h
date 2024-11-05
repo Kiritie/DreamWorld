@@ -59,4 +59,11 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "SaveData")
 	FDWWorldSaveData WorldSaveData;
+
+public:
+	UFUNCTION(BlueprintPure)
+	FDWPlayerSaveData& GetPlayerData() const;
+
+	UFUNCTION(BlueprintPure)
+	FDWWorldSaveData& GetWorldData() const;
 };

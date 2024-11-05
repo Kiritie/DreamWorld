@@ -33,7 +33,7 @@ void UDWCharacterPart::OnStayVoxel(UVoxel& InVoxel, const FVoxelHitResult& InHit
 {
 	Super::OnStayVoxel(InVoxel, InHitResult);
 
-	const auto OwnerCharacter = Cast<ADWCharacter>(GetOwnerCharacter());
+	const auto OwnerCharacter = GetOwnerCharacter<ADWCharacter>();
 
 	const UVoxelData& VoxelData = InVoxel.GetData();
 	switch (VoxelData.VoxelType)
@@ -70,7 +70,7 @@ void UDWCharacterPart::OnExitVoxel(UVoxel& InVoxel, const FVoxelHitResult& InHit
 {
 	Super::OnExitVoxel(InVoxel, InHitResult);
 
-	const auto OwnerCharacter = Cast<ADWCharacter>(GetOwnerCharacter());
+	const auto OwnerCharacter = GetOwnerCharacter<ADWCharacter>();
 
 	const UVoxelData& VoxelData = InVoxel.GetData();
 	switch (VoxelData.VoxelType)

@@ -2,4 +2,5 @@
 
 UDWSkillData::UDWSkillData()
 {
+	MaxLevel = 100;
 }

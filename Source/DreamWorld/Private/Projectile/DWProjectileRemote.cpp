@@ -18,10 +18,9 @@ void ADWProjectileRemote::Initialize_Implementation(AActor* InOwnerActor, const 
 
 void ADWProjectileRemote::OnHitTarget(AActor* InTarget, const FHitResult& InHitResult)
 {
-	const FVector HitLocation = GetActorLocation();
-
 	Super::OnHitTarget(InTarget, InHitResult);
 
+	const FVector HitLocation = GetActorLocation();
 	UAudioModuleStatics::PlaySoundAtLocation(AttackHitSound, HitLocation);
 	UGameplayStatics::SpawnEmitterAtLocation(this, AttackHitEffect, HitLocation);
 }

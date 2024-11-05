@@ -3,16 +3,13 @@
 
 #include "Ability/Hitter/DWAbilityHitterComponent.h"
 
-#include "Ability/Vitality/AbilityVitalityInterface.h"
 #include "Audio/AudioModuleStatics.h"
 #include "Kismet/GameplayStatics.h"
 
 UDWAbilityHitterComponent::UDWAbilityHitterComponent(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	AttackHitSound = nullptr;
-	AttackMissSound = nullptr;
 	AttackHitEffect = nullptr;
-	AttackMissEffect = nullptr;
 }
 
 bool UDWAbilityHitterComponent::CanHitTarget(AActor* InTarget) const
@@ -25,8 +22,8 @@ void UDWAbilityHitterComponent::OnHitTarget(AActor* InTarget, const FHitResult& 
 	Super::OnHitTarget(InTarget, InHitResult);
 
 	const FVector HitLocation = GetComponentLocation();
-	UAudioModuleStatics::PlaySoundAtLocation(InTarget->Implements<UAbilityVitalityInterface>() ? AttackHitSound : AttackMissSound, HitLocation);
-	UGameplayStatics::SpawnEmitterAtLocation(this, InTarget->Implements<UAbilityVitalityInterface>() ? AttackHitEffect : AttackMissEffect, HitLocation);
+	UAudioModuleStatics::PlaySoundAtLocation(AttackHitSound, HitLocation);
+	UGameplayStatics::SpawnEmitterAtLocation(this, AttackHitEffect, HitLocation);
 }
 
 void UDWAbilityHitterComponent::ClearHitTargets()

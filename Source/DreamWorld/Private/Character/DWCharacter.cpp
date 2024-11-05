@@ -21,27 +21,16 @@
 #include "Ability/Item/Skill/AbilitySkillDataBase.h"
 #include "Ability/PickUp/AbilityPickUpBase.h"
 #include "AI/DWAIBlackboard.h"
-#include "Asset/AssetModuleStatics.h"
 #include "Character/DWCharacterData.h"
 #include "Character/States/DWCharacterState_Attack.h"
-#include "Character/States/DWCharacterState_Climb.h"
-#include "Character/States/DWCharacterState_Crouch.h"
 #include "Character/States/DWCharacterState_Death.h"
 #include "Character/States/DWCharacterState_Spawn.h"
 #include "Character/States/DWCharacterState_Defend.h"
 #include "Character/States/DWCharacterState_Dodge.h"
-#include "Character/States/DWCharacterState_Fall.h"
 #include "Character/States/DWCharacterState_Float.h"
-#include "Character/States/DWCharacterState_Fly.h"
-#include "Character/States/DWCharacterState_Interrupt.h"
-#include "Character/States/DWCharacterState_Jump.h"
 #include "Character/States/DWCharacterState_Ride.h"
-#include "Character/States/DWCharacterState_Static.h"
-#include "Character/States/DWCharacterState_Swim.h"
-#include "Character/States/DWCharacterState_Walk.h"
 #include "FSM/Components/FSMComponent.h"
 #include "Ability/Inventory/Slot/AbilityInventorySkillSlotBase.h"
-#include "Ability/Item/Coin/AbilityCoinDataBase.h"
 #include "Character/States/DWCharacterState_Aim.h"
 #include "Common/Looking/LookingComponent.h"
 #include "Event/EventModuleStatics.h"
@@ -54,12 +43,21 @@
 #include "Setting/DWSettingModule.h"
 #include "Widget/Message/WidgetMessageBox.h"
 #include "Ability/Abilities/CharacterAbilityBase.h"
+#include "Ability/Character/States/AbilityCharacterState_Crouch.h"
+#include "Ability/Character/States/AbilityCharacterState_Fall.h"
+#include "Ability/Character/States/AbilityCharacterState_Interrupt.h"
+#include "Ability/Character/States/AbilityCharacterState_Jump.h"
+#include "Ability/Character/States/AbilityCharacterState_Static.h"
+#include "Ability/Character/States/AbilityCharacterState_Swim.h"
+#include "Ability/Character/States/AbilityCharacterState_Walk.h"
+#include "Character/States/DWCharacterState_Climb.h"
+#include "Character/States/DWCharacterState_Fly.h"
 
 // Sets default values
 ADWCharacter::ADWCharacter(const FObjectInitializer& ObjectInitializer) :
-	Super(ObjectInitializer.SetDefaultSubobjectClass<UDWAbilitySystemComponent>("AbilitySystem").
-		SetDefaultSubobjectClass<UDWCharacterAttributeSet>("AttributeSet").
-		SetDefaultSubobjectClass<UDWCharacterInventory>("Inventory"))
+	Super(ObjectInitializer.SetDefaultSubobjectClass<UDWAbilitySystemComponent>(FName("AbilitySystem")).
+		SetDefaultSubobjectClass<UDWCharacterAttributeSet>(FName("AttributeSet")).
+		SetDefaultSubobjectClass<UDWCharacterInventory>(FName("Inventory")))
 {
 	CharacterHP = CreateDefaultSubobject<UWorldWidgetComponent>(FName("CharacterHP"));
 	CharacterHP->SetupAttachment(RootComponent);
@@ -78,20 +76,20 @@ ADWCharacter::ADWCharacter(const FObjectInitializer& ObjectInitializer) :
 	FSM->States.Add(UDWCharacterState_Aim::StaticClass());
 	FSM->States.Add(UDWCharacterState_Attack::StaticClass());
 	FSM->States.Add(UDWCharacterState_Climb::StaticClass());
-	FSM->States.Add(UDWCharacterState_Crouch::StaticClass());
+	FSM->States.Add(UAbilityCharacterState_Crouch::StaticClass());
 	FSM->States.Add(UDWCharacterState_Death::StaticClass());
 	FSM->States.Add(UDWCharacterState_Spawn::StaticClass());
 	FSM->States.Add(UDWCharacterState_Defend::StaticClass());
 	FSM->States.Add(UDWCharacterState_Dodge::StaticClass());
-	FSM->States.Add(UDWCharacterState_Fall::StaticClass());
+	FSM->States.Add(UAbilityCharacterState_Fall::StaticClass());
 	FSM->States.Add(UDWCharacterState_Float::StaticClass());
 	FSM->States.Add(UDWCharacterState_Fly::StaticClass());
-	FSM->States.Add(UDWCharacterState_Interrupt::StaticClass());
-	FSM->States.Add(UDWCharacterState_Jump::StaticClass());
+	FSM->States.Add(UAbilityCharacterState_Interrupt::StaticClass());
+	FSM->States.Add(UAbilityCharacterState_Jump::StaticClass());
 	FSM->States.Add(UDWCharacterState_Ride::StaticClass());
-	FSM->States.Add(UDWCharacterState_Static::StaticClass());
-	FSM->States.Add(UDWCharacterState_Swim::StaticClass());
-	FSM->States.Add(UDWCharacterState_Walk::StaticClass());
+	FSM->States.Add(UAbilityCharacterState_Static::StaticClass());
+	FSM->States.Add(UAbilityCharacterState_Swim::StaticClass());
+	FSM->States.Add(UAbilityCharacterState_Walk::StaticClass());
 
 	// stats
 	ControlMode = EDWCharacterControlMode::Fighting;
@@ -138,6 +136,8 @@ void ADWCharacter::OnRefresh_Implementation(float DeltaSeconds)
 			}
 		}
 
+		ModifyMana(ATTRIBUTE_DELTAVALUE_CLAMP(this, Mana, GetManaRegenSpeed() * DeltaSeconds));
+
 		if(IsSprinting())
 		{
 			if(IsMoving())
@@ -159,6 +159,7 @@ void ADWCharacter::OnRefresh_Implementation(float DeltaSeconds)
 			if(!IsExhausted())
 			{
 				UnSprint();
+				UnClimb();
 				UnFly();
 				UnDefend();
 				AbilitySystem->AddLooseGameplayTag(GameplayTags::State_Character_Exhausted);
@@ -208,12 +209,32 @@ void ADWCharacter::LoadData(FSaveData* InSaveData, EPhase InPhase)
 		SetControlMode(SaveData.ControlMode);
 		SetTeamID(SaveData.TeamID);
 
-		if(SaveData.IsSaved())
+		if(!SaveData.IsSaved())
 		{
-			FallingAttackAbility = SaveData.FallingAttackAbility;
-			AttackAbilityQueues = SaveData.AttackAbilityQueues;
-			SkillAbilities = SaveData.SkillAbilities;
+			const UDWCharacterData& CharacterData = GetCharacterData<UDWCharacterData>();
+			
+			for(auto Iter : CharacterData.AttackAbilities)
+			{
+				Iter.AbilityHandle = AbilitySystem->K2_GiveAbility(Iter.AbilityClass, Iter.Level);
+				if(!AttackAbilityQueues.Contains(Iter.WeaponType)) AttackAbilityQueues.Add(Iter.WeaponType);
+				AttackAbilityQueues[Iter.WeaponType].AbilityDatas.Add(Iter);
+			}
 
+			for(auto Iter : CharacterData.SkillAbilities)
+			{
+				Iter.AbilityHandle = AbilitySystem->K2_GiveAbility(Iter.AbilityClass, Iter.Level);
+				SkillAbilities.Add(Iter.ID, Iter);
+			}
+
+			if(CharacterData.FallingAttackAbility.AbilityClass)
+			{
+				FallingAttackAbility = CharacterData.FallingAttackAbility;
+				FallingAttackAbility.AbilityHandle = AbilitySystem->K2_GiveAbility(FallingAttackAbility.AbilityClass, FallingAttackAbility.Level);
+			}
+		}
+		else
+		{
+			AttackAbilityQueues = SaveData.AttackAbilityQueues;
 			for(auto& Iter : AttackAbilityQueues)
 			{
 				for(auto& Iter1 : Iter.Value.AbilityDatas)
@@ -222,39 +243,16 @@ void ADWCharacter::LoadData(FSaveData* InSaveData, EPhase InPhase)
 				}
 			}
 		
+			SkillAbilities = SaveData.SkillAbilities;
 			for(auto& Iter : SkillAbilities)
 			{
 				Iter.Value.AbilityHandle = AbilitySystem->K2_GiveAbility(Iter.Value.AbilityClass, Iter.Value.Level);
 			}
 
+			FallingAttackAbility = SaveData.FallingAttackAbility;
 			if(FallingAttackAbility.AbilityClass)
 			{
 				FallingAttackAbility.AbilityHandle = AbilitySystem->K2_GiveAbility(FallingAttackAbility.AbilityClass, FallingAttackAbility.Level);
-			}
-		}
-		else
-		{
-			const UDWCharacterData& CharacterData = GetCharacterData<UDWCharacterData>();
-			if(CharacterData.IsValid())
-			{
-				for(auto Iter : CharacterData.AttackAbilities)
-				{
-					Iter.AbilityHandle = AbilitySystem->K2_GiveAbility(Iter.AbilityClass, Iter.Level);
-					if(!AttackAbilityQueues.Contains(Iter.WeaponType)) AttackAbilityQueues.Add(Iter.WeaponType);
-					AttackAbilityQueues[Iter.WeaponType].AbilityDatas.Add(Iter);
-				}
-
-				for(auto Iter : CharacterData.SkillAbilities)
-				{
-					Iter.AbilityHandle = AbilitySystem->K2_GiveAbility(Iter.AbilityClass, Iter.Level);
-					SkillAbilities.Add(Iter.ID, Iter);
-				}
-
-				if(CharacterData.FallingAttackAbility.AbilityClass)
-				{
-					FallingAttackAbility = CharacterData.FallingAttackAbility;
-					FallingAttackAbility.AbilityHandle = AbilitySystem->K2_GiveAbility(FallingAttackAbility.AbilityClass, FallingAttackAbility.Level);
-				}
 			}
 		}
 	}
@@ -305,7 +303,7 @@ void ADWCharacter::OnFiniteStateRefresh(UFiniteStateBase* InCurrentState)
 		{
 			if(!InCurrentState)
 			{
-				FSM->SwitchStateByClass<UDWCharacterState_Walk>();
+				FSM->SwitchStateByClass<UAbilityCharacterState_Walk>();
 			}
 			break;
 		}
@@ -435,6 +433,8 @@ bool ADWCharacter::OnDestroyVoxel(const FVoxelHitResult& InVoxelHitResult)
 
 void ADWCharacter::OnWorldModeChanged(UObject* InSender, UEventHandle_VoxelWorldModeChanged* InEventHandle)
 {
+	if(FSM->IsCurrentStateClass<UDWCharacterState_Spawn>()) return;
+	
 	switch(InEventHandle->WorldMode)
 	{
 		case EVoxelWorldMode::Preview:
@@ -448,40 +448,6 @@ void ADWCharacter::OnWorldModeChanged(UObject* InSender, UEventHandle_VoxelWorld
 			break;
 		}
 		default: break;
-	}
-}
-
-void ADWCharacter::Jump()
-{
-	Super::Jump();
-}
-
-void ADWCharacter::UnJump()
-{
-	Super::UnJump();
-}
-
-void ADWCharacter::Crouch(bool bClientSimulation)
-{
-	if(!FSM->IsCurrentStateClass<UDWCharacterState_Crouch>())
-	{
-		FSM->SwitchStateByClass<UDWCharacterState_Crouch>({ bClientSimulation });
-	}
-	else
-	{
-		Super::Crouch(bClientSimulation);
-	}
-}
-
-void ADWCharacter::UnCrouch(bool bClientSimulation)
-{
-	if(FSM->IsCurrentStateClass<UDWCharacterState_Crouch>())
-	{
-		FSM->SwitchState(nullptr);
-	}
-	else
-	{
-		Super::UnCrouch(bClientSimulation);
 	}
 }
 
@@ -546,13 +512,10 @@ bool ADWCharacter::Attack(int32 InAbilityIndex /*= -1*/, const FSimpleDelegate& 
 
 	if(!IsFalling())
 	{
-		if(HasAttackAbility(InAbilityIndex))
+		const auto AbilityData = GetAttackAbility(InAbilityIndex);
+		if(AbilityData.IsValid() && CheckWeaponType(AbilityData.WeaponType))
 		{
-			const auto AbilityData = GetAttackAbility(InAbilityIndex);
-			if(CheckWeaponType(AbilityData.WeaponType))
-			{
-				return FSM->SwitchStateByClass<UDWCharacterState_Attack>({ &AbilityData.AbilityHandle, (uint8)EDWCharacterAttackType::NormalAttack, InAbilityIndex, &OnCompleted });
-			}
+			return FSM->SwitchStateByClass<UDWCharacterState_Attack>({ &AbilityData.AbilityHandle, (uint8)EDWCharacterAttackType::NormalAttack, InAbilityIndex, &OnCompleted });
 		}
 	}
 	else
@@ -564,14 +527,11 @@ bool ADWCharacter::Attack(int32 InAbilityIndex /*= -1*/, const FSimpleDelegate& 
 
 bool ADWCharacter::FallingAttack(const FSimpleDelegate& OnCompleted/* = nullptr*/)
 {
-	if(FallingAttackAbility.IsValid())
+	if(FallingAttackAbility.IsValid() && CheckWeaponType(FallingAttackAbility.WeaponType))
 	{
 		if(!IsFalling()) Jump();
 
-		if(CheckWeaponType(FallingAttackAbility.WeaponType))
-		{
-			return FSM->SwitchStateByClass<UDWCharacterState_Attack>({ &FallingAttackAbility.AbilityHandle, (uint8)EDWCharacterAttackType::FallingAttack, &OnCompleted });
-		}
+		return FSM->SwitchStateByClass<UDWCharacterState_Attack>({ &FallingAttackAbility.AbilityHandle, (uint8)EDWCharacterAttackType::FallingAttack, &OnCompleted });
 	}
 	return false;
 }
@@ -597,7 +557,7 @@ bool ADWCharacter::SkillAttack(ESkillType InSkillType, int32 InAbilityIndex, con
 bool ADWCharacter::SkillAttack(const FAbilityItem& InAbilityItem, const FSimpleDelegate& OnCompleted/* = nullptr*/)
 {
 	const auto AbilityData = GetSkillAbility(InAbilityItem.ID);
-	if(CheckWeaponType(AbilityData.WeaponType))
+	if(AbilityData.IsValid())
 	{
 		return FSM->SwitchStateByClass<UDWCharacterState_Attack>({ &AbilityData.AbilityHandle, (uint8)EDWCharacterAttackType::SkillAttack, &InAbilityItem, &OnCompleted });
 	}
@@ -651,10 +611,6 @@ void ADWCharacter::EndAction(const FGameplayTag& InActionTag, bool bWasCancelled
 	{
 		UnRide();
 	}
-	else if(InActionTag.MatchesTag(GameplayTags::Ability_Character_Action_Aim))
-	{
-		UnAim();
-	}
 	else if(InActionTag.MatchesTag(GameplayTags::Ability_Character_Action_Attack))
 	{
 		UnAttack();
@@ -706,7 +662,7 @@ void ADWCharacter::AddMovementInput(FVector WorldDirection, float ScaleValue, bo
 	{
 		if(WorldDirection.Z > -0.5f)
 		{
-			WorldDirection.Z = 0;
+			WorldDirection.Z = 0.f;
 		}
 	}
 
@@ -780,14 +736,26 @@ void ADWCharacter::SetControlMode_Implementation(EDWCharacterControlMode InContr
 	{
 		case EDWCharacterControlMode::Fighting:
 		{
-			if(GetWeapon()) GetWeapon()->Execute_SetActorVisible(GetWeapon(), Execute_IsVisible(this));
-			if(GetShield()) GetShield()->Execute_SetActorVisible(GetShield(), Execute_IsVisible(this));
+			if(ADWEquipWeapon* Weapon = GetWeapon())
+			{
+				Execute_SetActorVisible(Weapon, Execute_IsVisible(this));
+			}
+			if(ADWEquipShield* Shield = GetShield())
+			{
+				Execute_SetActorVisible(Shield, Execute_IsVisible(this));
+			}
 			break;
 		}
 		case EDWCharacterControlMode::Creating:
 		{
-			if(GetWeapon()) GetWeapon()->Execute_SetActorVisible(GetWeapon(), false);
-			if(GetShield()) GetShield()->Execute_SetActorVisible(GetShield(), false);
+			if(ADWEquipWeapon* Weapon = GetWeapon())
+			{
+				Execute_SetActorVisible(Weapon, false);
+			}
+			if(ADWEquipShield* Shield = GetShield())
+			{
+				Execute_SetActorVisible(Shield, false);
+			}
 			break;
 		}
 	}
@@ -844,19 +812,21 @@ AAbilityEquipBase* ADWCharacter::GetEquip(EDWEquipPartType InPartType) const
 
 ADWEquipWeapon* ADWCharacter::GetWeapon() const
 {
-	return IsAiming() ? GetEquip<ADWEquipWeapon>(EDWEquipPartType::LeftHand) : GetEquip<ADWEquipWeapon>(EDWEquipPartType::RightHand);
-}
-
-ADWEquipShield* ADWCharacter::GetShield() const
-{
-	return GetEquip<ADWEquipShield>(EDWEquipPartType::LeftHand);
+	for(auto& Iter : Equips)
+	{
+		if(ADWEquipWeapon* Weapon = Cast<ADWEquipWeapon>(Iter.Value))
+		{
+			return Weapon;
+		}
+	}
+	return nullptr;
 }
 
 EDWWeaponType ADWCharacter::GetWeaponType() const
 {
-	if(GetWeapon())
+	if(ADWEquipWeapon* Weapon = GetWeapon())
 	{
-		return GetWeapon()->GetItemData<UDWEquipWeaponData>().WeaponType;
+		return Weapon->GetItemData<UDWEquipWeaponData>().WeaponType;
 	}
 	return EDWWeaponType::None;
 }
@@ -866,11 +836,32 @@ bool ADWCharacter::CheckWeaponType(EDWWeaponType InWeaponType) const
 	return InWeaponType == EDWWeaponType::None || GetWeaponType() == InWeaponType;
 }
 
+TSubclassOf<AAbilityProjectileBase> ADWCharacter::GetWeaponProjectileClass() const
+{
+	if(ADWEquipWeapon* Weapon = GetWeapon())
+	{
+		return Weapon->GetItemData<UDWEquipWeaponData>().ProjectileClass;
+	}
+	return nullptr;
+}
+
+ADWEquipShield* ADWCharacter::GetShield() const
+{
+	for(auto& Iter : Equips)
+	{
+		if(ADWEquipShield* Shield = Cast<ADWEquipShield>(Iter.Value))
+		{
+			return Shield;
+		}
+	}
+	return nullptr;
+}
+
 EDWShieldType ADWCharacter::GetShieldType() const
 {
-	if(GetShield())
+	if(ADWEquipShield* Shield = GetShield())
 	{
-		return GetShield()->GetItemData<UDWEquipShieldData>().ShieldType;
+		return Shield->GetItemData<UDWEquipShieldData>().ShieldType;
 	}
 	return EDWShieldType::None;
 }
@@ -1016,8 +1007,6 @@ bool ADWCharacter::CanLookAtTarget()
 
 void ADWCharacter::OnAttributeChange(const FOnAttributeChangeData& InAttributeChangeData)
 {
-	const float DeltaValue = InAttributeChangeData.NewValue - InAttributeChangeData.OldValue;
-
 	if(InAttributeChangeData.Attribute == GetExpAttribute() || InAttributeChangeData.Attribute == GetMaxExpAttribute())
 	{
 		if(GetCharacterHPWidget())
@@ -1072,9 +1061,9 @@ void ADWCharacter::OnAttributeChange(const FOnAttributeChangeData& InAttributeCh
 	Super::OnAttributeChange(InAttributeChangeData);
 }
 
-void ADWCharacter::HandleDamage(EDamageType DamageType, const float LocalDamageDone, bool bHasCrited, bool bHasDefend, FHitResult HitResult, const FGameplayTagContainer& SourceTags, AActor* SourceActor)
+void ADWCharacter::HandleDamage(EDamageType DamageType, float DamageValue, bool bHasCrited, bool bHasDefend, FHitResult HitResult, const FGameplayTagContainer& SourceTags, AActor* SourceActor)
 {
-	Super::HandleDamage(DamageType, LocalDamageDone, bHasCrited, bHasDefend, HitResult, SourceTags, SourceActor);
+	Super::HandleDamage(DamageType, DamageValue, bHasCrited, bHasDefend, HitResult, SourceTags, SourceActor);
 
 	if(!IsDead())
 	{
@@ -1096,12 +1085,12 @@ void ADWCharacter::HandleDamage(EDamageType DamageType, const float LocalDamageD
 	}
 }
 
-void ADWCharacter::HandleRecovery(const float LocalRecoveryDone, FHitResult HitResult, const FGameplayTagContainer& SourceTags, AActor* SourceActor)
+void ADWCharacter::HandleRecovery(float RecoveryValue, FHitResult HitResult, const FGameplayTagContainer& SourceTags, AActor* SourceActor)
 {
-	Super::HandleRecovery(LocalRecoveryDone, HitResult, SourceTags, SourceActor);
+	Super::HandleRecovery(RecoveryValue, HitResult, SourceTags, SourceActor);
 }
 
-void ADWCharacter::HandleInterrupt(const float InterruptDuration, FHitResult HitResult, const FGameplayTagContainer& SourceTags, AActor* SourceActor)
+void ADWCharacter::HandleInterrupt(float InterruptDuration, FHitResult HitResult, const FGameplayTagContainer& SourceTags, AActor* SourceActor)
 {
 	Super::HandleInterrupt(InterruptDuration, HitResult, SourceTags, SourceActor);
 

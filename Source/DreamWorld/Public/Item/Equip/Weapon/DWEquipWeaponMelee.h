@@ -18,20 +18,15 @@ class DREAMWORLD_API ADWEquipWeaponMelee : public ADWEquipWeapon, public IAbilit
 
 public:
 	ADWEquipWeaponMelee();
-	
+
 protected:
-	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Components")
-	UBoxComponent* BoxComponent;
+	virtual void OnSpawn_Implementation(UObject* InOwner, const TArray<FParameter>& InParams) override;
 	
-	UPROPERTY()
-	TArray<AActor*> HitTargets;
+	virtual void OnDespawn_Implementation(bool bRecovery) override;
 
 protected:
 	UFUNCTION()
 	void OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
-
-protected:
-	virtual void OnDespawn_Implementation(bool bRecovery) override;
 
 public:
 	virtual bool CanHitTarget(AActor* InTarget) const override;
@@ -45,6 +40,19 @@ public:
 	virtual void ClearHitTargets() override;
 
 	virtual TArray<AActor*> GetHitTargets() const override;
+	
+protected:
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Components")
+	UBoxComponent* BoxComponent;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	USoundBase* AttackHitSound;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UParticleSystem* AttackHitEffect;
+	
+	UPROPERTY()
+	TArray<AActor*> HitTargets;
 
 public:
 	UFUNCTION(BlueprintPure)

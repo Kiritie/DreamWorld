@@ -4,8 +4,8 @@
 
 #include "Camera/CameraModuleStatics.h"
 #include "Character/Player/DWPlayerCharacter.h"
-#include "Character/States/DWCharacterState_Attack.h"
 #include "FSM/Components/FSMComponent.h"
+#include "Common/Targeting/TargetingComponent.h"
 
 UDWPlayerCharacterState_Aim::UDWPlayerCharacterState_Aim()
 {
@@ -25,13 +25,6 @@ bool UDWPlayerCharacterState_Aim::OnPreEnter(UFiniteStateBase* InLastState, cons
 void UDWPlayerCharacterState_Aim::OnEnter(UFiniteStateBase* InLastState, const TArray<FParameter>& InParams)
 {
 	Super::OnEnter(InLastState, InParams);
-
-	ADWPlayerCharacter* Character = GetAgent<ADWPlayerCharacter>();
-
-	Character->SetUseControllerRotation(true);
-	
-	UCameraModuleStatics::DoCameraOffset(FVector(0.f, 30.f, 30.f), 0.5f, EEaseType::InOutSine);
-	UCameraModuleStatics::DoCameraFov(60.f, 0.5f, EEaseType::InOutSine);
 }
 
 void UDWPlayerCharacterState_Aim::OnRefresh(float DeltaSeconds)
@@ -42,19 +35,37 @@ void UDWPlayerCharacterState_Aim::OnRefresh(float DeltaSeconds)
 void UDWPlayerCharacterState_Aim::OnLeave(UFiniteStateBase* InNextState)
 {
 	Super::OnLeave(InNextState);
-
-	ADWPlayerCharacter* Character = GetAgent<ADWPlayerCharacter>();
-
-	if(!InNextState || !InNextState->IsA<UDWCharacterState_Attack>())
-	{
-		Character->SetUseControllerRotation(false);
-
-		UCameraModuleStatics::DoCameraOffset(FVector(-1.f), 0.5f, EEaseType::InOutSine);
-		UCameraModuleStatics::DoCameraFov(-1.f, 0.5f, EEaseType::InOutSine);
-	}
 }
 
 void UDWPlayerCharacterState_Aim::OnTermination()
 {
 	Super::OnTermination();
+}
+
+void UDWPlayerCharacterState_Aim::StartAim()
+{
+	Super::StartAim();
+
+	ADWPlayerCharacter* Character = GetAgent<ADWPlayerCharacter>();
+
+	Character->SetUseControllerRotation(true);
+	Character->GetTargeting()->bAdjustPitchBasedOnDistanceToTarget = false;
+	
+	UCameraModuleStatics::DoCameraDistance(0.f, 0.5f, EEaseType::InOutSine);
+	UCameraModuleStatics::DoCameraOffset(FVector(0.f, 30.f, 35.f), 0.5f, EEaseType::InOutSine);
+	UCameraModuleStatics::DoCameraFov(60.f, 0.5f, EEaseType::InOutSine);
+}
+
+void UDWPlayerCharacterState_Aim::EndAim()
+{
+	Super::EndAim();
+
+	ADWPlayerCharacter* Character = GetAgent<ADWPlayerCharacter>();
+
+	Character->SetUseControllerRotation(false);
+	Character->GetTargeting()->bAdjustPitchBasedOnDistanceToTarget = true;
+
+	UCameraModuleStatics::DoCameraDistance(-1.f, 0.5f, EEaseType::InOutSine);
+	UCameraModuleStatics::DoCameraOffset(FVector(-1.f), 0.5f, EEaseType::InOutSine);
+	UCameraModuleStatics::DoCameraFov(-1.f, 0.5f, EEaseType::InOutSine);
 }

@@ -3,25 +3,26 @@
 
 #include "Vitality/DWVitality.h"
 
-#include "Ability/Components/DWAbilitySystemComponent.h"
 #include "Ability/AbilityModuleStatics.h"
 #include "Ability/Attributes/DWVitalityAttributeSet.h"
+#include "Ability/Components/DWAbilitySystemComponent.h"
+#include "Ability/Vitality/States/AbilityVitalityState_Spawn.h"
 #include "Character/DWCharacter.h"
+#include "Event/EventModuleStatics.h"
+#include "Event/Handle/Voxel/EventHandle_VoxelWorldModeChanged.h"
 #include "FSM/Components/FSMComponent.h"
+#include "Inventory/DWVitalityInventory.h"
 #include "UObject/ConstructorHelpers.h"
-#include "Vitality/States/DWVitalityState_Death.h"
-#include "Vitality/States/DWVitalityState_Default.h"
 #include "Voxel/DWVoxelChunk.h"
 #include "Widget/World/WidgetVitalityHP.h"
 #include "Widget/World/WorldWidgetComponent.h"
-#include "Inventory/DWVitalityInventory.h"
 
 // Sets default values
 
 ADWVitality::ADWVitality(const FObjectInitializer& ObjectInitializer) :
-	Super(ObjectInitializer.SetDefaultSubobjectClass<UDWAbilitySystemComponent>("AbilitySystem").
-		SetDefaultSubobjectClass<UDWVitalityAttributeSet>("AttributeSet").
-		SetDefaultSubobjectClass<UDWVitalityInventory>("Inventory"))
+	Super(ObjectInitializer.SetDefaultSubobjectClass<UDWAbilitySystemComponent>(FName("AbilitySystem")).
+		SetDefaultSubobjectClass<UDWVitalityAttributeSet>(FName("AttributeSet")).
+		SetDefaultSubobjectClass<UDWVitalityInventory>(FName("Inventory")))
 {
 	VitalityHP = CreateDefaultSubobject<UWorldWidgetComponent>(FName("VitalityHP"));
 	VitalityHP->SetupAttachment(RootComponent);
@@ -32,23 +33,20 @@ ADWVitality::ADWVitality(const FObjectInitializer& ObjectInitializer) :
 	{
 		VitalityHP->SetWorldWidgetClass(VitalityHPClassFinder.Class);
 	}
-
-	FSM->DefaultState = UDWVitalityState_Default::StaticClass();
-	FSM->FinalState = UDWVitalityState_Death::StaticClass();
-	
-	FSM->States.Empty();
-	FSM->States.Add(UDWVitalityState_Default::StaticClass());
-	FSM->States.Add(UDWVitalityState_Death::StaticClass());
 }
 
 void ADWVitality::OnSpawn_Implementation(UObject* InOwner, const TArray<FParameter>& InParams)
 {
 	Super::OnSpawn_Implementation(InOwner, InParams);
+
+	UEventModuleStatics::SubscribeEvent<UEventHandle_VoxelWorldModeChanged>(this, GET_FUNCTION_NAME_THISCLASS(OnWorldModeChanged));
 }
 
 void ADWVitality::OnDespawn_Implementation(bool bRecovery)
 {
 	Super::OnDespawn_Implementation(bRecovery);
+
+	UEventModuleStatics::UnsubscribeEvent<UEventHandle_VoxelWorldModeChanged>(this, GET_FUNCTION_NAME_THISCLASS(OnWorldModeChanged));
 }
 
 void ADWVitality::Serialize(FArchive& Ar)
@@ -156,10 +154,28 @@ bool ADWVitality::OnDestroyVoxel(const FVoxelHitResult& InVoxelHitResult)
 	return Super::OnDestroyVoxel(InVoxelHitResult);
 }
 
+void ADWVitality::OnWorldModeChanged(UObject* InSender, UEventHandle_VoxelWorldModeChanged* InEventHandle)
+{
+	if(FSM->IsCurrentStateClass<UAbilityVitalityState_Spawn>()) return;
+	
+	switch(InEventHandle->WorldMode)
+	{
+		case EVoxelWorldMode::Preview:
+		{
+			Static();
+			break;
+		}
+		case EVoxelWorldMode::Default:
+		{
+			UnStatic();
+			break;
+		}
+		default: break;
+	}
+}
+
 void ADWVitality::OnAttributeChange(const FOnAttributeChangeData& InAttributeChangeData)
 {
-	const float DeltaValue = InAttributeChangeData.NewValue - InAttributeChangeData.OldValue;
-	
 	if(InAttributeChangeData.Attribute == GetAttributeSet<UDWVitalityAttributeSet>()->GetExpAttribute() || InAttributeChangeData.Attribute == GetAttributeSet<UDWVitalityAttributeSet>()->GetMaxExpAttribute())
 	{
 		if (GetVitalityHPWidget())
@@ -177,17 +193,17 @@ void ADWVitality::OnAttributeChange(const FOnAttributeChangeData& InAttributeCha
 	Super::OnAttributeChange(InAttributeChangeData);
 }
 
-void ADWVitality::HandleDamage(EDamageType DamageType, const float LocalDamageDone, bool bHasCrited, bool bHasDefend, FHitResult HitResult, const FGameplayTagContainer& SourceTags, AActor* SourceActor)
+void ADWVitality::HandleDamage(EDamageType DamageType, float DamageValue, bool bHasCrited, bool bHasDefend, FHitResult HitResult, const FGameplayTagContainer& SourceTags, AActor* SourceActor)
 {
-	Super::HandleDamage(DamageType, LocalDamageDone, bHasCrited, bHasDefend, HitResult, SourceTags, SourceActor);
+	Super::HandleDamage(DamageType, DamageValue, bHasCrited, bHasDefend, HitResult, SourceTags, SourceActor);
 }
 
-void ADWVitality::HandleRecovery(const float LocalRecoveryDone, FHitResult HitResult, const FGameplayTagContainer& SourceTags, AActor* SourceActor)
+void ADWVitality::HandleRecovery(float RecoveryValue, FHitResult HitResult, const FGameplayTagContainer& SourceTags, AActor* SourceActor)
 {
-	Super::HandleRecovery(LocalRecoveryDone, HitResult, SourceTags, SourceActor);
+	Super::HandleRecovery(RecoveryValue, HitResult, SourceTags, SourceActor);
 }
 
-void ADWVitality::HandleInterrupt(const float InterruptDuration, FHitResult HitResult, const FGameplayTagContainer& SourceTags, AActor* SourceActor)
+void ADWVitality::HandleInterrupt(float InterruptDuration, FHitResult HitResult, const FGameplayTagContainer& SourceTags, AActor* SourceActor)
 {
 	Super::HandleInterrupt(InterruptDuration, HitResult, SourceTags, SourceActor);
 }

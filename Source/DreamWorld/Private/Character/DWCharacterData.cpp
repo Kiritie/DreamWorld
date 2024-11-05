@@ -2,7 +2,7 @@
 
 UDWCharacterData::UDWCharacterData()
 {
-	MaxLevel = 50;
+	MaxLevel = 100;
 
 	Nature = EDWCharacterNature::None;
 	AttackDistance = 100.f;

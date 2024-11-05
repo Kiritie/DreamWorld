@@ -10,16 +10,17 @@ UDWCharacterAttributeSet::UDWCharacterAttributeSet()
 	, Stamina(100.f)
 	, MaxStamina(100.f)
 	, DodgeForce(500.f)
-	, AttackForce(10.f)
 	, RepulseForce(0.f)
+	, AttackForce(0.f)
 	, AttackSpeed(1.f)
 	, AttackCritRate(0.f)
 	, AttackStealRate(0.f)
 	, DefendRate(0.f)
 	, DefendScope(0.f)
-	, PhysicsDefRate(0.f)
-	, MagicDefRate(0.f)
+	, PhysicsRes(0.f)
+	, MagicRes(0.f)
 	, ToughnessRate(0.f)
+	, ManaRegenSpeed(1.f)
 	, StaminaRegenSpeed(10.f)
 	, StaminaExpendSpeed(5.f)
 {
@@ -70,13 +71,13 @@ void UDWCharacterAttributeSet::PreAttributeBaseChange(const FGameplayAttribute& 
 	{
 		NewValue = FMath::Clamp(NewValue, 0.f, 1.f);
 	}
-	else if (Attribute == GetPhysicsDefRateAttribute())
+	else if (Attribute == GetPhysicsResAttribute())
 	{
-		NewValue = FMath::Clamp(NewValue, 0.f, 1.f);
+		NewValue = FMath::Clamp(NewValue, 0.f, NewValue);
 	}
-	else if (Attribute == GetMagicDefRateAttribute())
+	else if (Attribute == GetMagicResAttribute())
 	{
-		NewValue = FMath::Clamp(NewValue, 0.f, 1.f);
+		NewValue = FMath::Clamp(NewValue, 0.f, NewValue);
 	}
 	else if (Attribute == GetToughnessRateAttribute())
 	{
@@ -136,13 +137,13 @@ void UDWCharacterAttributeSet::PreAttributeChange(const FGameplayAttribute& Attr
 	{
 		NewValue = FMath::Clamp(NewValue, 0.f, 1.f);
 	}
-	else if (Attribute == GetPhysicsDefRateAttribute())
+	else if (Attribute == GetPhysicsResAttribute())
 	{
-		NewValue = FMath::Clamp(NewValue, 0.f, 1.f);
+		NewValue = FMath::Clamp(NewValue, 0.f, NewValue);
 	}
-	else if (Attribute == GetMagicDefRateAttribute())
+	else if (Attribute == GetMagicResAttribute())
 	{
-		NewValue = FMath::Clamp(NewValue, 0.f, 1.f);
+		NewValue = FMath::Clamp(NewValue, 0.f, NewValue);
 	}
 	else if (Attribute == GetToughnessRateAttribute())
 	{

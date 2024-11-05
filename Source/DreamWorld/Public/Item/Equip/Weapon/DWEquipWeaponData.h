@@ -1,9 +1,10 @@
 #pragma once
 
-#include "Ability/Item/AbilityItemDataBase.h"
 #include "Item/Equip/DWEquipData.h"
 
 #include "DWEquipWeaponData.generated.h"
+
+class AAbilityProjectileBase;
 
 UCLASS(BlueprintType)
 class DREAMWORLD_API UDWEquipWeaponData : public UDWEquipData
@@ -19,4 +20,7 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	EDWWeaponHandType HandType;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSubclassOf<AAbilityProjectileBase> ProjectileClass;
 };

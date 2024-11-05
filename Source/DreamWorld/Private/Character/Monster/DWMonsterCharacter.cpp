@@ -14,7 +14,7 @@
 ADWMonsterCharacter::ADWMonsterCharacter(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
 {
-	AttackPoint = CreateDefaultSubobject<UDWAbilityHitterComponent>(TEXT("AttackPoint"));
+	AttackPoint = CreateDefaultSubobject<UDWAbilityHitterComponent>(FName("AttackPoint"));
 	AttackPoint->SetupAttachment(GetMesh(), TEXT("AttackPoint"));
 
 	Interaction->AddInteractAction((EInteractAction)EDWInteractAction::Ride);

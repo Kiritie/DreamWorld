@@ -32,4 +32,9 @@ public:
 	virtual void OnLeave(UFiniteStateBase* InNextState) override;
 
 	virtual void OnTermination() override;
+
+public:
+	virtual void StartAim();
+	
+	virtual void EndAim();
 };

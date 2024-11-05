@@ -1,7 +1,6 @@
 #include "Vitality/DWVitalityData.h"
 
-#include "Ability/AbilityModuleStatics.h"
-
 UDWVitalityData::UDWVitalityData()
 {
+	MaxLevel = 50;
 }

@@ -25,11 +25,27 @@ void UDWInventorySkillSlot::OnItemChanged(FAbilityItem& InOldItem)
 	Super::OnItemChanged(InOldItem);
 }
 
+bool UDWInventorySkillSlot::MatchItemLimit(FAbilityItem InItem) const
+{
+	if(!Super::MatchItemLimit(InItem)) return false;
+
+	ADWCharacter* Character = Inventory->GetOwnerAgent<ADWCharacter>();
+
+	if(Character && Character->GetLevelA() < InItem.Level) return false;
+
+	return true;
+}
+
 bool UDWInventorySkillSlot::ActiveItem(bool bPassive /*= false*/)
 {
-	if(!Super::ActiveItem(bPassive)) return false;
-	
-	if(ADWCharacter* Character = Inventory->GetOwnerAgent<ADWCharacter>())
+	if(IsEmpty()) return false;
+
+	ADWCharacter* Character = Inventory->GetOwnerAgent<ADWCharacter>();
+
+	if(!Character) return false;
+
+	const auto AbilityData = Character->GetSkillAbility(Item.ID);
+	if(Character->CheckWeaponType(AbilityData.WeaponType) && Super::ActiveItem(bPassive))
 	{
 		return Character->SkillAttack(Item);
 	}
@@ -40,29 +56,17 @@ void UDWInventorySkillSlot::DeactiveItem(bool bPassive /*= false*/)
 {
 	if(IsEmpty()) return;
 	
-	if(GetSkillData().bCancelAble)
+	ADWCharacter* Character = Inventory->GetOwnerAgent<ADWCharacter>();
+
+	if(!Character) return;
+
+	const auto AbilityData = Character->GetSkillAbility(Item.ID);
+	if(AbilityData.bCancelAble)
 	{
-		if(ADWCharacter* Character = Inventory->GetOwnerAgent<ADWCharacter>())
+		if(Character->GetSkillAbilityItem() == Item.ID)
 		{
-			if(Character->GetSkillAbilityItem() == Item.ID)
-			{
-				Character->UnAttack();
-			}
+			Character->UnAttack();
 		}
-		Super::DeactiveItem(bPassive);
 	}
-}
-
-FAbilityInfo UDWInventorySkillSlot::GetAbilityInfo() const
-{
-	return Super::GetAbilityInfo();
-}
-
-FDWCharacterSkillAbilityData UDWInventorySkillSlot::GetSkillData() const
-{
-	if(ADWCharacter* Character = Inventory->GetOwnerAgent<ADWCharacter>())
-	{
-		return Character->GetSkillAbility(Item.ID);
-	}
-	return FDWCharacterSkillAbilityData();
+	Super::DeactiveItem(bPassive);
 }

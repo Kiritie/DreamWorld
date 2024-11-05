@@ -88,24 +88,24 @@ void UDWCharacterState_Ride::OnLeave(UFiniteStateBase* InNextState)
 	
 	if(RidingTarget)
 	{
-		const FVector offset = Character->GetActorRightVector() * (Character->GetRadius() + RidingTarget->GetRadius());
-		FVector rayStart = Character->GetActorLocation() + offset;
-		const FVector rayEnd = FVector(rayStart.X, rayStart.Y, 0);
+		const FVector Offset = Character->GetActorRightVector() * (Character->GetRadius() + RidingTarget->GetRadius());
+		FVector RayStart = Character->GetActorLocation() + Offset;
+		const FVector RayEnd = FVector(RayStart.X, RayStart.Y, 0);
 
-		FHitResult hitResult;
+		FHitResult HitResult;
 		if(UVoxelModule::IsValid())
 		{
-			rayStart.Z = UVoxelModuleStatics::GetWorldData().GetWorldRealSize().Z;
-			UVoxelModuleStatics::VoxelAgentTraceSingle(rayStart, rayEnd, Character->GetRadius(), Character->GetHalfHeight(), {}, hitResult);
+			RayStart.Z = UVoxelModuleStatics::GetWorldData().GetWorldRealSize().Z;
+			UVoxelModuleStatics::VoxelAgentTraceSingle(RayStart, RayEnd, Character->GetRadius(), Character->GetHalfHeight(), {}, HitResult);
 		}
 		else
 		{
-			rayStart.Z = 10000.f;
-			UKismetSystemLibrary::CapsuleTraceSingle(GetWorldContext(), rayStart, rayEnd, Character->GetRadius(), Character->GetHalfHeight(), USceneModuleStatics::GetTraceMapping(FName("Chunk")).GetTraceType(), false, {}, EDrawDebugTrace::None, hitResult, true);
+			RayStart.Z = 10000.f;
+			UKismetSystemLibrary::CapsuleTraceSingle(GetWorldContext(), RayStart, RayEnd, Character->GetRadius(), Character->GetHalfHeight(), USceneModuleStatics::GetTraceMapping(FName("Chunk")).GetTraceType(), false, {}, EDrawDebugTrace::None, HitResult, true);
 		}
-		if (hitResult.bBlockingHit)
+		if (HitResult.bBlockingHit)
 		{
-			Character->SetActorLocation(hitResult.Location);
+			Character->SetActorLocation(HitResult.Location);
 		}
 	}
 	

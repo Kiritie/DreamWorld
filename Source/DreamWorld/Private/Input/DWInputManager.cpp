@@ -5,6 +5,7 @@
 
 #include "Ability/Character/AbilityCharacterInventoryBase.h"
 #include "Ability/Inventory/Slot/AbilityInventorySlotBase.h"
+#include "Ability/Projectile/AbilityProjectileBase.h"
 #include "Character/DWCharacter.h"
 #include "Character/Player/DWPlayerCharacter.h"
 #include "Common/CommonStatics.h"
@@ -22,7 +23,6 @@
 #include "Widget/Inventory/WidgetInventoryBar.h"
 #include "Widget/Inventory/WidgetInventoryPanel.h"
 #include "Common/DWCommonTypes.h"
-#include "Item/Equip/Weapon/DWEquipWeaponRemote.h"
 #include "Scene/SceneModuleStatics.h"
 #include "Widget/Context/WidgetContextInputBox.h"
 #include "Widget/MaxMap/WidgetMaxMapBox.h"
@@ -78,7 +78,7 @@ void UDWInputManager::OnRefresh(float DeltaSeconds)
 	{
 		case EDWCharacterControlMode::Fighting:
 		{
-			if(PlayerCharacter->GetEquip<ADWEquipWeaponRemote>(EDWEquipPartType::LeftHand))
+			if(PlayerCharacter->GetWeaponProjectileClass())
 			{
 				if(bSecondaryPressed)
 				{
@@ -101,16 +101,24 @@ void UDWInputManager::OnRefresh(float DeltaSeconds)
 				}
 			}
 
-			if(bPrimaryPressed || AttackAbilityQueue > 0)
+			if(!PlayerCharacter->IsExhausted())
 			{
-				if(PlayerCharacter->Attack() && AttackAbilityQueue > 0)
+				if(bPrimaryPressed || AttackAbilityQueue > 0)
 				{
-					AttackAbilityQueue--;
+					if(PlayerCharacter->Attack() && AttackAbilityQueue > 0)
+					{
+						AttackAbilityQueue--;
+					}
 				}
+			}
+			else
+			{
+				AttackAbilityQueue = 0;
 			}
 		}
 		case EDWCharacterControlMode::Creating:
 		{
+			AttackAbilityQueue = 0;
 			// FVoxelHitResult voxelHitResult;
 			// if(RaycastVoxel(voxelHitResult))
 			// {

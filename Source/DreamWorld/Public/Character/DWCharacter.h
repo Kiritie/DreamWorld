@@ -45,21 +45,13 @@ class DREAMWORLD_API ADWCharacter : public AAbilityCharacterBase, public IAbilit
 	
 	friend class UDWCharacterState_Aim;
 	friend class UDWCharacterState_Attack;
-	friend class UDWCharacterState_Climb;
-	friend class UDWCharacterState_Crouch;
 	friend class UDWCharacterState_Death;
 	friend class UDWCharacterState_Spawn;
 	friend class UDWCharacterState_Defend;
 	friend class UDWCharacterState_Dodge;
-	friend class UDWCharacterState_Fall;
 	friend class UDWCharacterState_Float;
 	friend class UDWCharacterState_Fly;
-	friend class UDWCharacterState_Interrupt;
-	friend class UDWCharacterState_Jump;
 	friend class UDWCharacterState_Ride;
-	friend class UDWCharacterState_Static;
-	friend class UDWCharacterState_Swim;
-	friend class UDWCharacterState_Walk;
 
 public:
 	ADWCharacter(const FObjectInitializer& ObjectInitializer);
@@ -120,14 +112,6 @@ public:
 	virtual void OnWorldModeChanged(UObject* InSender, UEventHandle_VoxelWorldModeChanged* InEventHandle);
 
 public:
-	virtual void Jump() override;
-
-	virtual void UnJump() override;
-
-	virtual void Crouch(bool bClientSimulation) override;
-
-	virtual void UnCrouch(bool bClientSimulation) override;
-
 	UFUNCTION(BlueprintCallable)
 	virtual void Dodge();
 
@@ -211,11 +195,11 @@ public:
 public:
 	virtual void OnAttributeChange(const FOnAttributeChangeData& InAttributeChangeData) override;
 	
-	virtual void HandleDamage(EDamageType DamageType, const float LocalDamageDone, bool bHasCrited, bool bHasDefend, FHitResult HitResult, const FGameplayTagContainer& SourceTags, AActor* SourceActor) override;
+	virtual void HandleDamage(EDamageType DamageType, float DamageValue, bool bHasCrited, bool bHasDefend, FHitResult HitResult, const FGameplayTagContainer& SourceTags, AActor* SourceActor) override;
 
-	virtual void HandleRecovery(const float LocalRecoveryDone, FHitResult HitResult, const FGameplayTagContainer& SourceTags, AActor* SourceActor) override;
+	virtual void HandleRecovery(float RecoveryValue, FHitResult HitResult, const FGameplayTagContainer& SourceTags, AActor* SourceActor) override;
 
-	virtual void HandleInterrupt(const float InterruptDuration, FHitResult HitResult, const FGameplayTagContainer& SourceTags, AActor* SourceActor) override;
+	virtual void HandleInterrupt(float InterruptDuration, FHitResult HitResult, const FGameplayTagContainer& SourceTags, AActor* SourceActor) override;
 	
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
@@ -288,14 +272,16 @@ public:
 
 	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, DefendScope)
 
-	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, PhysicsDefRate)
+	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, PhysicsRes)
 
-	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, MagicDefRate)
+	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, MagicRes)
 	
 	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, ToughnessRate)
-			
+	
+	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, ManaRegenSpeed)
+	
 	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, StaminaRegenSpeed)
-			
+	
 	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, StaminaExpendSpeed)
 
 public:
@@ -395,7 +381,16 @@ public:
 
 	UFUNCTION(BlueprintPure)
 	ADWEquipWeapon* GetWeapon() const;
-					
+
+	UFUNCTION(BlueprintPure)
+	EDWWeaponType GetWeaponType() const;
+				
+	UFUNCTION(BlueprintPure)
+	bool CheckWeaponType(EDWWeaponType InWeaponType) const;
+
+	UFUNCTION(BlueprintPure)
+	TSubclassOf<AAbilityProjectileBase> GetWeaponProjectileClass() const;
+
 	template<class T>
 	T* GetShield() const
 	{
@@ -404,12 +399,6 @@ public:
 	
 	UFUNCTION(BlueprintPure)
 	ADWEquipShield* GetShield() const;
-
-	UFUNCTION(BlueprintPure)
-	EDWWeaponType GetWeaponType() const;
-				
-	UFUNCTION(BlueprintPure)
-	bool CheckWeaponType(EDWWeaponType InWeaponType) const;
 
 	UFUNCTION(BlueprintPure)
 	EDWShieldType GetShieldType() const;
@@ -442,7 +431,7 @@ public:
 		
 	UFUNCTION(BlueprintPure)
 	FDWCharacterSkillAbilityData GetSkillAbility(const FPrimaryAssetId& InSkillID, bool bNeedAssembled = false);
-		
+	
 	FDWCharacterSkillAbilityData GetSkillAbility(ESkillType InSkillType, int32 InAbilityIndex = -1, bool bNeedAssembled = false);
 
 	UFUNCTION(BlueprintPure)

@@ -26,7 +26,7 @@ void UDWCharacterAnim::NativeHandleNotify(const FString& AnimNotifyName)
 {
 	Super::NativeHandleNotify(AnimNotifyName);
 
-	ADWCharacter* Character = Cast<ADWCharacter>(TryGetPawnOwner());
+	ADWCharacter* Character = GetOwnerCharacter<ADWCharacter>();
 
 	if(!Character) return;
 
@@ -52,7 +52,7 @@ void UDWCharacterAnim::NativeUpdateAnimation(float DeltaSeconds)
 {
 	Super::NativeUpdateAnimation(DeltaSeconds);
 	
-	ADWCharacter* Character = Cast<ADWCharacter>(TryGetPawnOwner());
+	ADWCharacter* Character = GetOwnerCharacter<ADWCharacter>();
 
 	if(!Character || !Character->Execute_GetAssetID(Character).IsValid() || !UCommonStatics::IsPlaying()) return;
 

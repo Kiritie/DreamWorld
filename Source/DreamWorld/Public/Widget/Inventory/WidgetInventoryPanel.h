@@ -71,10 +71,10 @@ public:
 	void SetDefendRate(const FString& InValue);
 	
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
-	void SetPhysicsDefRate(const FString& InValue);
+	void SetPhysicsRes(const FString& InValue);
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
-	void SetMagicDefRate(const FString& InValue);
+	void SetMagicRes(const FString& InValue);
 	
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
 	void SetToughnessRate(const FString& InValue);

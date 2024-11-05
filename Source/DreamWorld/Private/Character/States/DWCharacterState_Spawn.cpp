@@ -2,8 +2,8 @@
 
 #include "Character/States/DWCharacterState_Spawn.h"
 
+#include "Ability/Character/States/AbilityCharacterState_Static.h"
 #include "Character/DWCharacter.h"
-#include "Character/States/DWCharacterState_Static.h"
 #include "FSM/Components/FSMComponent.h"
 #include "Procedure/ProcedureModuleStatics.h"
 #include "Procedure/Procedure_Testing.h"
@@ -64,6 +64,6 @@ void UDWCharacterState_Spawn::TryLeave()
 	}
 	else
 	{
-		FSM->SwitchStateByClass<UDWCharacterState_Static>();
+		FSM->SwitchStateByClass<UAbilityCharacterState_Static>();
 	}
 }

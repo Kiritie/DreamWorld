@@ -154,6 +154,8 @@ enum class EDWShieldType : uint8
 UENUM(BlueprintType)
 enum class EDWWeaponHandType : uint8
 {
+	// 无
+	None,
 	// ????
 	Single,
 	// ???
@@ -170,7 +172,7 @@ public:
 	EDWWeaponType WeaponType;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TSubclassOf<UCharacterAbilityBase> AbilityClass;
+	TSubclassOf<UAbilityBase> AbilityClass;
 
 	FORCEINLINE FDWCharacterAttackAbilityData()
 	{
@@ -233,7 +235,7 @@ public:
 	bool bCancelAble;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TSubclassOf<UCharacterAbilityBase> AbilityClass;
+	TSubclassOf<UAbilityBase> AbilityClass;
 
 	FORCEINLINE FDWCharacterSkillAbilityData()
 	{
@@ -403,6 +405,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	EDWInventoryInitType InventoryInitType;
+
+public:
+	virtual void InitInventoryData() override;
 };
 
 USTRUCT(BlueprintType)

@@ -7,6 +7,7 @@
 
 #include "DWVitality.generated.h"
 
+class UEventHandle_VoxelWorldModeChanged;
 class UWorldWidgetComponent;
 class UAbilityVitalityInventoryBase;
 class ADWVoxelChunk;
@@ -24,9 +25,6 @@ UCLASS()
 class DREAMWORLD_API ADWVitality : public AAbilityVitalityBase
 {
 	GENERATED_BODY()
-
-	friend class UDWVitalityState_Death;
-	friend class UDWVitalityState_Default;
 
 public:
 	ADWVitality(const FObjectInitializer& ObjectInitializer);
@@ -66,14 +64,17 @@ public:
 
 	virtual bool OnDestroyVoxel(const FVoxelHitResult& InVoxelHitResult) override;
 
+	UFUNCTION()
+	virtual void OnWorldModeChanged(UObject* InSender, UEventHandle_VoxelWorldModeChanged* InEventHandle);
+
 public:
 	virtual void OnAttributeChange(const FOnAttributeChangeData& InAttributeChangeData) override;
 	
-	virtual void HandleDamage(EDamageType DamageType, const float LocalDamageDone, bool bHasCrited, bool bHasDefend, FHitResult HitResult, const FGameplayTagContainer& SourceTags, AActor* SourceActor) override;
+	virtual void HandleDamage(EDamageType DamageType, float DamageValue, bool bHasCrited, bool bHasDefend, FHitResult HitResult, const FGameplayTagContainer& SourceTags, AActor* SourceActor) override;
 
-	virtual void HandleRecovery(const float LocalRecoveryDone, FHitResult HitResult, const FGameplayTagContainer& SourceTags, AActor* SourceActor) override;
+	virtual void HandleRecovery(float RecoveryValue, FHitResult HitResult, const FGameplayTagContainer& SourceTags, AActor* SourceActor) override;
 
-	virtual void HandleInterrupt(const float InterruptDuration, FHitResult HitResult, const FGameplayTagContainer& SourceTags, AActor* SourceActor) override;
+	virtual void HandleInterrupt(float InterruptDuration, FHitResult HitResult, const FGameplayTagContainer& SourceTags, AActor* SourceActor) override;
 
 protected:
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Components")

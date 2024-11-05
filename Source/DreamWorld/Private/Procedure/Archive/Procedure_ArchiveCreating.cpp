@@ -17,6 +17,8 @@
 #include "Common/DWCommonTypes.h"
 #include "Procedure/Archive/Procedure_ArchiveChoosing.h"
 
+class UDWPlayerCharacterData;
+
 UProcedure_ArchiveCreating::UProcedure_ArchiveCreating()
 {
 	ProcedureName = FName("ArchiveCreating");
@@ -59,8 +61,8 @@ void UProcedure_ArchiveCreating::OnEnter(UProcedureBase* InLastProcedure)
 		if(USaveGameModuleStatics::GetSaveGameInfo<UDWArchiveSaveGame>().ActiveIndex == -1)
 		{
 			USaveGameModuleStatics::LoadOrCreateSaveGame<UDWArchiveSaveGame>(-1, EPhase::Primary);
-			CreatePlayer(PlayerSaveData, EPhase::Lesser);
-			CreateWorld(WorldSaveData, EPhase::Lesser);
+			CreatePlayer(GetPlayerData(), EPhase::Lesser);
+			CreateWorld(GetWorldData(), EPhase::Lesser);
 			CreateArchive(USaveGameModuleStatics::GetSaveGame<UDWArchiveSaveGame>()->GetSaveDataRef<FDWArchiveSaveData>());
 		}
 		else
@@ -119,4 +121,19 @@ void UProcedure_ArchiveCreating::CreateArchive(FDWArchiveSaveData& InArchiveSave
 {
 	USaveGameModuleStatics::GetSaveGame<UDWArchiveSaveGame>()->SetSaveData(&InArchiveSaveData);
 	UProcedureModuleStatics::SwitchProcedureByClass<UProcedure_Loading>();
+}
+
+FDWPlayerSaveData& UProcedure_ArchiveCreating::GetPlayerData() const
+{
+	static FDWPlayerSaveData SaveData;
+	SaveData = PlayerSaveData;
+	SaveData.InitInventoryData();
+	return SaveData;
+}
+
+FDWWorldSaveData& UProcedure_ArchiveCreating::GetWorldData() const
+{
+	static FDWWorldSaveData SaveData;
+	SaveData = WorldSaveData;
+	return SaveData;
 }

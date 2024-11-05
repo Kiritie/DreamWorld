@@ -4,7 +4,6 @@
 
 #include "Achievement/AchievementModuleStatics.h"
 #include "Item/Equip/Weapon/DWEquipWeapon.h"
-#include "Asset/AssetModuleStatics.h"
 #include "Ability/Item/AbilityItemDataBase.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/InputComponent.h"
@@ -16,35 +15,29 @@
 #include "Ability/Inventory/Slot/AbilityInventorySlotBase.h"
 #include "Widget/WidgetGameHUD.h"
 #include "Widget/WidgetModuleStatics.h"
-#include "Voxel/Datas/VoxelData.h"
-#include "Ability/Item/Equip/AbilityEquipDataBase.h"
-#include "Ability/Item/Prop/AbilityPropDataBase.h"
-#include "Ability/Item/Skill/AbilitySkillDataBase.h"
 #include "Ability/AbilityModuleTypes.h"
 #include "Ability/Character/AbilityCharacterInventoryBase.h"
-#include "Ability/Item/Coin/AbilityCoinDataBase.h"
+#include "Ability/Character/States/AbilityCharacterState_Crouch.h"
+#include "Ability/Character/States/AbilityCharacterState_Fall.h"
+#include "Ability/Character/States/AbilityCharacterState_Interrupt.h"
+#include "Ability/Character/States/AbilityCharacterState_Jump.h"
+#include "Ability/Character/States/AbilityCharacterState_Static.h"
+#include "Ability/Character/States/AbilityCharacterState_Swim.h"
+#include "Ability/Character/States/AbilityCharacterState_Walk.h"
 #include "Camera/CameraModuleStatics.h"
 #include "Character/Player/States/DWPlayerCharacterState_Death.h"
 #include "Character/Player/States/DWPlayerCharacterState_Spawn.h"
-#include "Character/States/DWCharacterState_Climb.h"
-#include "Character/States/DWCharacterState_Crouch.h"
-#include "Character/States/DWCharacterState_Fall.h"
 #include "Character/States/DWCharacterState_Float.h"
 #include "Character/States/DWCharacterState_Fly.h"
-#include "Character/States/DWCharacterState_Jump.h"
 #include "Character/States/DWCharacterState_Ride.h"
-#include "Character/States/DWCharacterState_Static.h"
-#include "Character/States/DWCharacterState_Swim.h"
-#include "Character/States/DWCharacterState_Walk.h"
 #include "FSM/Components/FSMComponent.h"
 #include "Widget/World/WorldWidgetComponent.h"
-#include "Ability/Item/Raw/AbilityRawDataBase.h"
 #include "Character/DWCharacterData.h"
 #include "Character/Human/States/DWHumanCharacterState_Defend.h"
 #include "Character/Player/States/DWPlayerCharacterState_Aim.h"
 #include "Character/States/DWCharacterState_Attack.h"
+#include "Character/States/DWCharacterState_Climb.h"
 #include "Character/States/DWCharacterState_Dodge.h"
-#include "Character/States/DWCharacterState_Interrupt.h"
 #include "Common/Looking/LookingComponent.h"
 #include "Common/Targeting/TargetingComponent.h"
 #include "Item/Equip/DWEquipData.h"
@@ -103,20 +96,20 @@ ADWPlayerCharacter::ADWPlayerCharacter(const FObjectInitializer& ObjectInitializ
 	FSM->States.Add(UDWPlayerCharacterState_Aim::StaticClass());
 	FSM->States.Add(UDWCharacterState_Attack::StaticClass());
 	FSM->States.Add(UDWCharacterState_Climb::StaticClass());
-	FSM->States.Add(UDWCharacterState_Crouch::StaticClass());
+	FSM->States.Add(UAbilityCharacterState_Crouch::StaticClass());
 	FSM->States.Add(UDWPlayerCharacterState_Death::StaticClass());
 	FSM->States.Add(UDWPlayerCharacterState_Spawn::StaticClass());
 	FSM->States.Add(UDWHumanCharacterState_Defend::StaticClass());
 	FSM->States.Add(UDWCharacterState_Dodge::StaticClass());
-	FSM->States.Add(UDWCharacterState_Fall::StaticClass());
+	FSM->States.Add(UAbilityCharacterState_Fall::StaticClass());
 	FSM->States.Add(UDWCharacterState_Float::StaticClass());
 	FSM->States.Add(UDWCharacterState_Fly::StaticClass());
-	FSM->States.Add(UDWCharacterState_Interrupt::StaticClass());
-	FSM->States.Add(UDWCharacterState_Jump::StaticClass());
+	FSM->States.Add(UAbilityCharacterState_Interrupt::StaticClass());
+	FSM->States.Add(UAbilityCharacterState_Jump::StaticClass());
 	FSM->States.Add(UDWCharacterState_Ride::StaticClass());
-	FSM->States.Add(UDWCharacterState_Static::StaticClass());
-	FSM->States.Add(UDWCharacterState_Swim::StaticClass());
-	FSM->States.Add(UDWCharacterState_Walk::StaticClass());
+	FSM->States.Add(UAbilityCharacterState_Static::StaticClass());
+	FSM->States.Add(UAbilityCharacterState_Swim::StaticClass());
+	FSM->States.Add(UAbilityCharacterState_Walk::StaticClass());
 }
 
 void ADWPlayerCharacter::OnInitialize_Implementation()
@@ -146,63 +139,7 @@ void ADWPlayerCharacter::LoadData(FSaveData* InSaveData, EPhase InPhase)
 	{
 		if(!SaveData.InventoryData.IsSaved())
 		{
-			switch (SaveData.InventoryInitType)
-			{
-				case EDWInventoryInitType::Empty:
-				{
-					SaveData.InventoryData.ClearItems();
-					break;
-				}
-				case EDWInventoryInitType::Default:
-				{
-					SaveData.InventoryData.CopyItems(SaveData.GetData<UDWCharacterData>().InventoryData);
-				}
-				case EDWInventoryInitType::All:
-				{
-					SaveData.InventoryData.CopyItems(SaveData.GetData<UDWCharacterData>().InventoryData);
-
-					auto CoinDatas = UAssetModuleStatics::LoadPrimaryAssets<UAbilityCoinDataBase>(FName("Coin"));
-					for (int32 i = 0; i < CoinDatas.Num(); i++)
-					{
-						SaveData.InventoryData.AddItem(FAbilityItem(CoinDatas[i]->GetPrimaryAssetId(), CoinDatas[i]->MaxCount, CoinDatas[i]->ClampLevel(SaveData.Level)));
-					}
-
-					auto VoxelDatas = UAssetModuleStatics::LoadPrimaryAssets<UVoxelData>(FName("Voxel"));
-					for (int32 i = 0; i < VoxelDatas.Num(); i++)
-					{
-						if(!VoxelDatas[i]->IsEmpty() && !VoxelDatas[i]->IsUnknown() && VoxelDatas[i]->IsMainPart())
-						{
-							SaveData.InventoryData.AddItem(FAbilityItem(VoxelDatas[i]->GetPrimaryAssetId(), VoxelDatas[i]->MaxCount, VoxelDatas[i]->ClampLevel(SaveData.Level)));
-						}
-					}
-
-					auto RawDatas = UAssetModuleStatics::LoadPrimaryAssets<UAbilityRawDataBase>(FName("Raw"));
-					for (int32 i = 0; i < RawDatas.Num(); i++)
-					{
-						SaveData.InventoryData.AddItem(FAbilityItem(RawDatas[i]->GetPrimaryAssetId(), RawDatas[i]->MaxCount, RawDatas[i]->ClampLevel(SaveData.Level)));
-					}
-
-					auto EquipDatas = UAssetModuleStatics::LoadPrimaryAssets<UAbilityEquipDataBase>(FName("Equip"));
-					for (int32 i = 0; i < EquipDatas.Num(); i++)
-					{
-						SaveData.InventoryData.AddItem(FAbilityItem(EquipDatas[i]->GetPrimaryAssetId(), EquipDatas[i]->MaxCount, EquipDatas[i]->ClampLevel(SaveData.Level)));
-					}
-	
-					auto PropDatas = UAssetModuleStatics::LoadPrimaryAssets<UAbilityPropDataBase>(FName("Prop"));
-					for (int32 i = 0; i < PropDatas.Num(); i++)
-					{
-						SaveData.InventoryData.AddItem(FAbilityItem(PropDatas[i]->GetPrimaryAssetId(), PropDatas[i]->MaxCount, PropDatas[i]->ClampLevel(SaveData.Level)));
-					}
-
-					auto SkillDatas = UAssetModuleStatics::LoadPrimaryAssets<UAbilitySkillDataBase>(FName("Skill"));
-					for (int32 i = 0; i < SkillDatas.Num(); i++)
-					{
-						SaveData.InventoryData.AddItem(FAbilityItem(SkillDatas[i]->GetPrimaryAssetId(), SkillDatas[i]->MaxCount, SkillDatas[i]->ClampLevel(SaveData.Level)));
-					}
-					break;
-				}
-				default: break;
-			}
+			SaveData.InitInventoryData();
 		}
 	}
 
@@ -589,42 +526,42 @@ void ADWPlayerCharacter::OnAttributeChange(const FOnAttributeChangeData& InAttri
 	{
 		if(UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>())
 		{
-			UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>()->SetAttackCritRate(FString::Printf(TEXT("%d%%"), (int32)(InAttributeChangeData.NewValue * 100)));
+			UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>()->SetAttackCritRate(FString::Printf(TEXT("%d%%"), (int32)(InAttributeChangeData.NewValue * 100.f)));
 		}
 	}
 	else if(InAttributeChangeData.Attribute == GetAttackStealRateAttribute())
 	{
 		if(UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>())
 		{
-			UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>()->SetAttackStealRate(FString::Printf(TEXT("%d%%"), (int32)(InAttributeChangeData.NewValue * 100)));
+			UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>()->SetAttackStealRate(FString::Printf(TEXT("%d%%"), (int32)(InAttributeChangeData.NewValue * 100.f)));
 		}
 	}
 	else if(InAttributeChangeData.Attribute == GetDefendRateAttribute())
 	{
 		if(UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>())
 		{
-			UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>()->SetDefendRate(FString::Printf(TEXT("%d%%"), (int32)(InAttributeChangeData.NewValue * 100)));
+			UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>()->SetDefendRate(FString::Printf(TEXT("%d%%"), (int32)(InAttributeChangeData.NewValue * 100.f)));
 		}
 	}
-	else if(InAttributeChangeData.Attribute == GetPhysicsDefRateAttribute())
+	else if(InAttributeChangeData.Attribute == GetPhysicsResAttribute())
 	{
 		if(UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>())
 		{
-			UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>()->SetPhysicsDefRate(FString::Printf(TEXT("%d%%"), (int32)(InAttributeChangeData.NewValue * 100)));
+			UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>()->SetPhysicsRes(FString::Printf(TEXT("%d(%d%%)"), (int32)InAttributeChangeData.NewValue, (int32)(InAttributeChangeData.NewValue / (100.f + InAttributeChangeData.NewValue) * 100.f)));
 		}
 	}
-	else if(InAttributeChangeData.Attribute == GetMagicDefRateAttribute())
+	else if(InAttributeChangeData.Attribute == GetMagicResAttribute())
 	{
 		if(UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>())
 		{
-			UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>()->SetMagicDefRate(FString::Printf(TEXT("%d%%"), (int32)(InAttributeChangeData.NewValue * 100)));
+			UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>()->SetMagicRes(FString::Printf(TEXT("%d(%d%%)"), (int32)InAttributeChangeData.NewValue, (int32)(InAttributeChangeData.NewValue / (100.f + InAttributeChangeData.NewValue) * 100.f)));
 		}
 	}
 	else if(InAttributeChangeData.Attribute == GetToughnessRateAttribute())
 	{
 		if(UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>())
 		{
-			UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>()->SetToughnessRate(FString::Printf(TEXT("%d%%"), (int32)(InAttributeChangeData.NewValue * 100)));
+			UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>()->SetToughnessRate(FString::Printf(TEXT("%d%%"), (int32)(InAttributeChangeData.NewValue * 100.f)));
 		}
 	}
 	Super::OnAttributeChange(InAttributeChangeData);

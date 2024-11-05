@@ -23,14 +23,10 @@ public:
 	virtual void OnItemPreChange(FAbilityItem& InNewItem) override;
 
 	virtual void OnItemChanged(FAbilityItem& InOldItem) override;
+
+	virtual bool MatchItemLimit(FAbilityItem InItem) const override;
 	
 	virtual bool ActiveItem(bool bPassive = false) override;
 	
 	virtual void DeactiveItem(bool bPassive = false) override;
-
-public:
-	virtual FAbilityInfo GetAbilityInfo() const override;
-	
-	UFUNCTION(BlueprintPure)
-	virtual FDWCharacterSkillAbilityData GetSkillData() const;
 };

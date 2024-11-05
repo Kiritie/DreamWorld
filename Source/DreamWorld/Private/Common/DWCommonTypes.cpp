@@ -1,54 +1,138 @@
 #include "Common/DWCommonTypes.h"
 
+#include "Ability/Character/States/AbilityCharacterState_Fall.h"
 #include "Ability/Effects/EffectBase.h"
-#include "Ability/Vitality/AbilityVitalityBase.h"
+#include "Ability/Item/Coin/AbilityCoinDataBase.h"
+#include "Ability/Item/Equip/AbilityEquipDataBase.h"
+#include "Ability/Item/Prop/AbilityPropDataBase.h"
+#include "Ability/Item/Raw/AbilityRawDataBase.h"
+#include "Ability/Item/Skill/AbilitySkillDataBase.h"
 #include "Character/DWCharacter.h"
 #include "Ability/Vitality/AbilityVitalityInterface.h"
-#include "Character/States/DWCharacterState_Fall.h"
+#include "Asset/AssetModuleStatics.h"
 #include "FSM/Components/FSMComponent.h"
 #include "ObjectPool/ObjectPoolModuleStatics.h"
+#include "Voxel/Datas/VoxelData.h"
+
+void FDWPlayerSaveData::InitInventoryData()
+{
+	switch (InventoryInitType)
+	{
+		case EDWInventoryInitType::Empty:
+		{
+			InventoryData.ClearItems();
+			break;
+		}
+		case EDWInventoryInitType::Default:
+		{
+			FDWPlayerBasicSaveData::InitInventoryData();
+			break;
+		}
+		case EDWInventoryInitType::All:
+		{
+			FDWPlayerBasicSaveData::InitInventoryData();
+
+			auto CoinDatas = UAssetModuleStatics::LoadPrimaryAssets<UAbilityCoinDataBase>(FName("Coin"));
+			for (int32 i = 0; i < CoinDatas.Num(); i++)
+			{
+				InventoryData.AddItem(FAbilityItem(CoinDatas[i]->GetPrimaryAssetId(), CoinDatas[i]->MaxCount, CoinDatas[i]->ClampLevel(Level)), true);
+			}
+
+			auto VoxelDatas = UAssetModuleStatics::LoadPrimaryAssets<UVoxelData>(FName("Voxel"));
+			for (int32 i = 0; i < VoxelDatas.Num(); i++)
+			{
+				if(!VoxelDatas[i]->IsEmpty() && !VoxelDatas[i]->IsUnknown() && VoxelDatas[i]->IsMainPart())
+				{
+					InventoryData.AddItem(FAbilityItem(VoxelDatas[i]->GetPrimaryAssetId(), VoxelDatas[i]->MaxCount, VoxelDatas[i]->ClampLevel(Level)), true);
+				}
+			}
+
+			auto RawDatas = UAssetModuleStatics::LoadPrimaryAssets<UAbilityRawDataBase>(FName("Raw"));
+			for (int32 i = 0; i < RawDatas.Num(); i++)
+			{
+				InventoryData.AddItem(FAbilityItem(RawDatas[i]->GetPrimaryAssetId(), RawDatas[i]->MaxCount, RawDatas[i]->ClampLevel(Level)), true);
+			}
+
+			auto EquipDatas = UAssetModuleStatics::LoadPrimaryAssets<UAbilityEquipDataBase>(FName("Equip"));
+			for (int32 i = 0; i < EquipDatas.Num(); i++)
+			{
+				InventoryData.AddItem(FAbilityItem(EquipDatas[i]->GetPrimaryAssetId(), EquipDatas[i]->MaxCount, EquipDatas[i]->ClampLevel(Level)), true);
+			}
+
+			auto PropDatas = UAssetModuleStatics::LoadPrimaryAssets<UAbilityPropDataBase>(FName("Prop"));
+			for (int32 i = 0; i < PropDatas.Num(); i++)
+			{
+				InventoryData.AddItem(FAbilityItem(PropDatas[i]->GetPrimaryAssetId(), PropDatas[i]->MaxCount, PropDatas[i]->ClampLevel(Level)), true);
+			}
+
+			auto SkillDatas = UAssetModuleStatics::LoadPrimaryAssets<UAbilitySkillDataBase>(FName("Skill"));
+			for (int32 i = 0; i < SkillDatas.Num(); i++)
+			{
+				InventoryData.AddItem(FAbilityItem(SkillDatas[i]->GetPrimaryAssetId(), SkillDatas[i]->MaxCount, SkillDatas[i]->ClampLevel(Level)), true);
+			}
+			break;
+		}
+		default: break;
+	}
+}
 
 void UDWDamageHandle::HandleDamage(AActor* SourceActor, AActor* TargetActor, float DamageValue, EDamageType DamageType, const FHitResult& HitResult, const FGameplayTagContainer& SourceTags)
 {
+	IAbilityVitalityInterface* SourceVitality = Cast<IAbilityVitalityInterface>(SourceActor);
+	
+	IAbilityVitalityInterface* TargetVitality = Cast<IAbilityVitalityInterface>(TargetActor);
+
+	if(!SourceVitality || !TargetVitality) return;
+	
 	ADWCharacter* SourceCharacter = Cast<ADWCharacter>(SourceActor);
 
 	ADWCharacter* TargetCharacter = Cast<ADWCharacter>(TargetActor);
 
-	IAbilityVitalityInterface* TargetVitality = Cast<IAbilityVitalityInterface>(TargetActor);
-	
-	float SourceAttackForce = 0.f;
 	float SourceAttackCritRate = 0.f;
-	float SourceDefendRate = 0.f;
-	float SourceDefendScope = 0.f;
-	float SourcePhysicsDefRate = 0.f;
-	float SourceMagicDefRate = 0.f;
+	float SourceAttackStealRate = 0.f;
 
-	float LocalDamageDone = 0.f;
-	float DefendRateDone = 0.f;
-	bool bAttackCrited = false;
-		
-	if (SourceCharacter)
+	float TargetDefendRate = 0.f; 
+	float TargetDefendScope = 0.f;
+	float TargetPhysicsRes = 0.f;
+	float TargetMagicRes = 0.f;
+	
+	if(SourceCharacter)
 	{
-		SourceAttackForce = SourceCharacter->GetAttackForce();
 		SourceAttackCritRate = SourceCharacter->GetAttackCritRate();
+		SourceAttackStealRate = SourceCharacter->GetAttackStealRate();
 	}
-	if (TargetCharacter)
+	
+	if(TargetCharacter)
 	{
-		SourceDefendRate = TargetCharacter->GetDefendRate();
-		SourceDefendScope = TargetCharacter->GetDefendScope();
-		SourcePhysicsDefRate = TargetCharacter->GetPhysicsDefRate();
-		SourceMagicDefRate = TargetCharacter->GetMagicDefRate();
+		TargetDefendRate = TargetCharacter->GetDefendRate();
+		TargetDefendScope = TargetCharacter->GetDefendScope();
+		
+		TargetPhysicsRes = TargetCharacter->GetPhysicsRes();
+		TargetMagicRes = TargetCharacter->GetMagicRes();
+	}
 
-		FVector DamageDirection = SourceActor->GetActorLocation() - TargetActor->GetActorLocation();
-		DamageDirection.Normalize();
-		if (FVector::DotProduct(DamageDirection, TargetActor->GetActorForwardVector())/* / 90.f*/ > (1.f - SourceDefendScope))
+	bool bAttackHasCrited = FMath::FRand() <= SourceAttackCritRate;
+
+	float PhysicsDefendRate = TargetPhysicsRes / (100.f + TargetPhysicsRes);
+	float MagicDefendRate = TargetMagicRes / (100.f + TargetMagicRes);
+
+	float LocalDamageValue = 0.f;
+	float LocalDefendRate = 0.f;
+
+	FVector DamageDirection = SourceActor->GetActorLocation() - TargetActor->GetActorLocation();
+	DamageDirection.Normalize();
+	if(FVector::DotProduct(DamageDirection, TargetActor->GetActorForwardVector()) > (1.f - TargetDefendScope))
+	{
+		if(TargetCharacter)
 		{
-			DefendRateDone = SourceDefendRate * (TargetCharacter->IsDefending() ? 1.f : 0.f);
-			if(DefendRateDone > 0.f && !TargetCharacter->DoAction(GameplayTags::Ability_Character_Action_DefendBlock))
+			if(TargetCharacter->IsDefending() && TargetCharacter->DoAction(GameplayTags::Ability_Character_Action_DefendBlock))
 			{
-				DefendRateDone = 0.f;
-				TargetCharacter->UnDefend();
+				LocalDefendRate = TargetDefendRate;
 			}
+		}
+		else
+		{
+			LocalDefendRate = TargetDefendRate;
 		}
 	}
 
@@ -56,51 +140,50 @@ void UDWDamageHandle::HandleDamage(AActor* SourceActor, AActor* TargetActor, flo
 	{
 		case EDamageType::Physics:
 		{
-			bAttackCrited = FMath::FRand() <= SourceAttackCritRate;
-			LocalDamageDone = SourceAttackForce * DamageValue * (1.f - SourcePhysicsDefRate) * (bAttackCrited ? 2.f : 1.f) * (1.f - DefendRateDone);
-			if (SourceCharacter)
-			{
-				UEffectBase* Effect = UObjectPoolModuleStatics::SpawnObject<UEffectBase>();
-
-				FGameplayModifierInfo ModifierInfo;
-				ModifierInfo.Attribute = GET_GAMEPLAYATTRIBUTE_PROPERTY(UVitalityAttributeSetBase, Recovery);
-				ModifierInfo.ModifierOp = EGameplayModOp::Override;
-				ModifierInfo.ModifierMagnitude = FGameplayEffectModifierMagnitude(LocalDamageDone * SourceCharacter->GetAttackStealRate());
-
-				Effect->Modifiers.Add(ModifierInfo);
-				
-				FGameplayEffectContextHandle EffectContext = SourceCharacter->GetAbilitySystemComponent()->MakeEffectContext();
-				EffectContext.AddSourceObject(SourceCharacter);
-				SourceCharacter->GetAbilitySystemComponent()->ApplyGameplayEffectToSelf(Effect, 0, EffectContext);
-
-				UObjectPoolModuleStatics::DespawnObject(Effect);
-			}
+			LocalDamageValue = DamageValue * (1.f - PhysicsDefendRate) * (bAttackHasCrited ? 2.f : 1.f) * (1.f - LocalDefendRate);
 			break;
 		}
 		case EDamageType::Magic:
 		{
-			LocalDamageDone = DamageValue * (1.f - SourceMagicDefRate) * (1.f - DefendRateDone);
+			LocalDamageValue = DamageValue * (1.f - MagicDefendRate) * (bAttackHasCrited ? 2.f : 1.f) * (1.f - LocalDefendRate);
 			break;
 		}
 		case EDamageType::Fall:
 		{
 			if(SourceCharacter)
 			{
-				const float FallHeight = SourceCharacter->GetFSMComponent()->GetStateByClass<UDWCharacterState_Fall>()->GetFallHeight();
+				const float FallHeight = SourceCharacter->GetFSMComponent()->GetStateByClass<UAbilityCharacterState_Fall>()->GetFallHeight();
 				if(FallHeight > 350.f)
 				{
-					LocalDamageDone = DamageValue * (FallHeight / 10.f);
+					LocalDamageValue = DamageValue * (1.f - PhysicsDefendRate) * (FallHeight / 10.f);
 				}
 			}
 			break;
 		}
 	}
 
-	if (LocalDamageDone > 0.f)
+	LocalDamageValue = FMath::Clamp(LocalDamageValue, 0.f, TargetVitality->GetHealth());
+
+	if(LocalDamageValue > 0.f)
 	{
-		if (TargetVitality && !TargetVitality->IsDead())
+		TargetVitality->HandleDamage(DamageType, LocalDamageValue, bAttackHasCrited, LocalDefendRate > 0.f, HitResult, SourceTags, SourceActor);
+
+		if(SourceAttackStealRate > 0.f && SourceVitality != TargetVitality)
 		{
-			TargetVitality->HandleDamage(DamageType, LocalDamageDone, bAttackCrited, DefendRateDone > 0.f, HitResult, SourceTags, SourceActor);
+			UEffectBase* Effect = UObjectPoolModuleStatics::SpawnObject<UEffectBase>();
+
+			FGameplayModifierInfo ModifierInfo;
+			ModifierInfo.Attribute = GET_GAMEPLAYATTRIBUTE_PROPERTY(UVitalityAttributeSetBase, Recovery);
+			ModifierInfo.ModifierOp = EGameplayModOp::Override;
+			ModifierInfo.ModifierMagnitude = FGameplayEffectModifierMagnitude(LocalDamageValue * SourceAttackStealRate);
+
+			Effect->Modifiers.Add(ModifierInfo);
+		
+			FGameplayEffectContextHandle EffectContext = SourceVitality->GetAbilitySystemComponent()->MakeEffectContext();
+			EffectContext.AddSourceObject(SourceActor);
+			SourceVitality->GetAbilitySystemComponent()->ApplyGameplayEffectToSelf(Effect, 0, EffectContext);
+
+			UObjectPoolModuleStatics::DespawnObject(Effect);
 		}
 	}
 }

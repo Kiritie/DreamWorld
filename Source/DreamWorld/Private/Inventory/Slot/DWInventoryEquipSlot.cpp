@@ -12,13 +12,6 @@ UDWInventoryEquipSlot::UDWInventoryEquipSlot()
 {
 }
 
-void UDWInventoryEquipSlot::OnInitialize(UAbilityInventoryBase* InInventory, EAbilityItemType InLimitType, ESlotSplitType InSplitType, int32 InSlotIndex)
-{
-	Super::OnInitialize(InInventory, InLimitType, InSplitType, InSlotIndex);
-
-	PartType = (EDWEquipPartType)InSlotIndex;
-}
-
 void UDWInventoryEquipSlot::OnSpawn_Implementation(UObject* InOwner, const TArray<FParameter>& InParams)
 {
 	Super::OnSpawn_Implementation(InOwner, InParams);
@@ -31,9 +24,30 @@ void UDWInventoryEquipSlot::OnDespawn_Implementation(bool bRecovery)
 	PartType = EDWEquipPartType::Head;
 }
 
+void UDWInventoryEquipSlot::OnInitialize(UAbilityInventoryBase* InInventory, EAbilityItemType InLimitType, ESlotSplitType InSplitType, int32 InSlotIndex)
+{
+	Super::OnInitialize(InInventory, InLimitType, InSplitType, InSlotIndex);
+
+	PartType = (EDWEquipPartType)InSlotIndex;
+}
+
+void UDWInventoryEquipSlot::OnItemPreChange(FAbilityItem& InNewItem)
+{
+	Super::OnItemPreChange(InNewItem);
+}
+
+void UDWInventoryEquipSlot::OnItemChanged(FAbilityItem& InOldItem)
+{
+	Super::OnItemChanged(InOldItem);
+}
+
 bool UDWInventoryEquipSlot::MatchItemLimit(FAbilityItem InItem) const
 {
 	if(!Super::MatchItemLimit(InItem)) return false;
+
+	ADWCharacter* Character = Inventory->GetOwnerAgent<ADWCharacter>();
+
+	if(Character && Character->GetLevelA() < InItem.Level) return false;
 	
 	bool bReturnValue = InItem.GetData<UDWEquipData>().PartType == PartType;
 	if(InItem.IsDataType<UDWEquipWeaponData>())
@@ -61,14 +75,4 @@ bool UDWInventoryEquipSlot::MatchItemLimit(FAbilityItem InItem) const
 void UDWInventoryEquipSlot::Refresh()
 {
 	Super::Refresh();
-}
-
-void UDWInventoryEquipSlot::OnItemPreChange(FAbilityItem& InNewItem)
-{
-	Super::OnItemPreChange(InNewItem);
-}
-
-void UDWInventoryEquipSlot::OnItemChanged(FAbilityItem& InOldItem)
-{
-	Super::OnItemChanged(InOldItem);
 }

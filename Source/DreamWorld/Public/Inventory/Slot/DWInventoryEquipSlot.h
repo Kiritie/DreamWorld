@@ -18,19 +18,19 @@ public:
 	UDWInventoryEquipSlot();
 
 public:
-	virtual void OnInitialize(UAbilityInventoryBase* InInventory, EAbilityItemType InLimitType, ESlotSplitType InSplitType, int32 InSlotIndex) override;
-
 	virtual void OnSpawn_Implementation(UObject* InOwner, const TArray<FParameter>& InParams) override;
 
 	virtual void OnDespawn_Implementation(bool bRecovery) override;
 
-	virtual bool MatchItemLimit(FAbilityItem InItem) const override;
-	
-	virtual void Refresh() override;
+	virtual void OnInitialize(UAbilityInventoryBase* InInventory, EAbilityItemType InLimitType, ESlotSplitType InSplitType, int32 InSlotIndex) override;
 
 	virtual void OnItemPreChange(FAbilityItem& InNewItem) override;
 
 	virtual void OnItemChanged(FAbilityItem& InOldItem) override;
+
+	virtual bool MatchItemLimit(FAbilityItem InItem) const override;
+	
+	virtual void Refresh() override;
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
