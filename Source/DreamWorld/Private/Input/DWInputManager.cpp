@@ -3,7 +3,6 @@
 
 #include "Input/DWInputManager.h"
 
-#include "Ability/Character/AbilityCharacterInventoryBase.h"
 #include "Ability/Inventory/Slot/AbilityInventorySlotBase.h"
 #include "Ability/Projectile/AbilityProjectileBase.h"
 #include "Character/DWCharacter.h"
@@ -34,7 +33,8 @@ UDWInputManager::UDWInputManager()
 	bSecondaryPressed = false;
 	bThirdPressed = false;
 	bSprintPressed = false;
-	AttackAbilityQueue = 0;
+	AttackAbilityQueue.Add(EDWWeaponPart::Primary, 0);
+	AttackAbilityQueue.Add(EDWWeaponPart::Secondary, 0);
 }
 
 void UDWInputManager::OnInitialize()
@@ -50,7 +50,7 @@ void UDWInputManager::OnReset()
 	bSecondaryPressed = false;
 	bThirdPressed = false;
 	bSprintPressed = false;
-	AttackAbilityQueue = 0;
+	ITER_MAP(AttackAbilityQueue, Item, Item.Value = 0;)
 }
 
 void UDWInputManager::OnRefresh(float DeltaSeconds)
@@ -78,51 +78,54 @@ void UDWInputManager::OnRefresh(float DeltaSeconds)
 	{
 		case EDWCharacterControlMode::Fighting:
 		{
-			if(PlayerCharacter->GetWeaponProjectileClass())
+			if(PlayerCharacter->IsExhausted())
 			{
-				if(bSecondaryPressed)
+				ITER_MAP(AttackAbilityQueue, Item, Item.Value = 0;)
+			}
+
+			if(bSecondaryPressed)
+			{
+				if(PlayerCharacter->GetWeaponProjectile(EDWWeaponPart::Secondary))
 				{
 					PlayerCharacter->Aim();
 				}
 				else
 				{
-					PlayerCharacter->UnAim();
+					PlayerCharacter->Defend();
 				}
 			}
 			else
 			{
-				if(bSecondaryPressed)
+				if(AttackAbilityQueue[EDWWeaponPart::Secondary] > 0)
 				{
-					PlayerCharacter->Defend();
+					if(PlayerCharacter->Attack(EDWWeaponPart::Secondary))
+					{
+						AttackAbilityQueue[EDWWeaponPart::Secondary]--;
+					}
 				}
 				else
 				{
-					PlayerCharacter->UnDefend();
+					PlayerCharacter->UnAim();
 				}
+				PlayerCharacter->UnDefend();
 			}
 
-			if(!PlayerCharacter->IsExhausted())
+			if(bPrimaryPressed || AttackAbilityQueue[EDWWeaponPart::Primary] > 0)
 			{
-				if(bPrimaryPressed || AttackAbilityQueue > 0)
+				if(PlayerCharacter->Attack(EDWWeaponPart::Primary) && AttackAbilityQueue[EDWWeaponPart::Primary] > 0)
 				{
-					if(PlayerCharacter->Attack() && AttackAbilityQueue > 0)
-					{
-						AttackAbilityQueue--;
-					}
+					AttackAbilityQueue[EDWWeaponPart::Primary]--;
 				}
 			}
-			else
-			{
-				AttackAbilityQueue = 0;
-			}
+			break;
 		}
 		case EDWCharacterControlMode::Creating:
 		{
-			AttackAbilityQueue = 0;
-			// FVoxelHitResult voxelHitResult;
-			// if(RaycastVoxel(voxelHitResult))
+			ITER_MAP(AttackAbilityQueue, Item, Item.Value = 0;)
+			// FVoxelHitResult VoxelHitResult;
+			// if(RaycastVoxel(VoxelHitResult))
 			// {
-			// 	voxelHitResult.GetVoxel().OnMouseHover(voxelHitResult);
+			// 	VoxelHitResult.GetVoxel().OnMouseHover(VoxelHitResult);
 			// }
 			break;
 		}
@@ -325,16 +328,16 @@ void UDWInputManager::OnPrimaryPressed()
 		{
 			if(PlayerCharacter->IsFreeToAnim() || PlayerCharacter->IsAttacking())
 			{
-				AttackAbilityQueue++; 
+				AttackAbilityQueue[EDWWeaponPart::Primary]++; 
 			}
 			break;
 		}
 		case EDWCharacterControlMode::Creating:
 		{
-			FVoxelHitResult voxelHitResult;
-			if(UVoxelModuleStatics::VoxelRaycastSinge(EVoxelRaycastType::FromAimPoint, PlayerCharacter->GetInteractDistance(), {}, voxelHitResult))
+			FVoxelHitResult VoxelHitResult;
+			if(UVoxelModuleStatics::VoxelRaycastSinge(EVoxelRaycastType::FromAimPoint, PlayerCharacter->GetInteractDistance(), {}, VoxelHitResult))
 			{
-				PlayerCharacter->OnInteractVoxel(voxelHitResult, EInputInteractAction::Primary);
+				PlayerCharacter->OnInteractVoxel(VoxelHitResult, EInputInteractAction::Primary);
 			}
 			break;
 		}
@@ -372,6 +375,10 @@ void UDWInputManager::OnSecondaryPressed()
 	{
 		case EDWCharacterControlMode::Fighting:
 		{
+			if(PlayerCharacter->IsFreeToAnim() || PlayerCharacter->IsAttacking())
+			{
+				AttackAbilityQueue[EDWWeaponPart::Secondary]++; 
+			}
 			break;
 		}
 		case EDWCharacterControlMode::Creating:
@@ -473,10 +480,7 @@ void UDWInputManager::ReleaseSkillAbility1()
 	
 	if(!PlayerCharacter || !PlayerCharacter->IsActive(true) || !PlayerCharacter->InputEnabled()) return;
 
-	if(PlayerCharacter->Inventory->GetSlotsBySplitType(ESlotSplitType::Skill).IsValidIndex(0))
-	{
-		PlayerCharacter->Inventory->GetSlotsBySplitType(ESlotSplitType::Skill)[0]->ActiveItem();
-	}
+	PlayerCharacter->SkillAttack(0);
 }
 
 void UDWInputManager::ReleaseSkillAbility2()
@@ -485,10 +489,7 @@ void UDWInputManager::ReleaseSkillAbility2()
 	
 	if(!PlayerCharacter || !PlayerCharacter->IsActive(true) || !PlayerCharacter->InputEnabled()) return;
 
-	if(PlayerCharacter->Inventory->GetSlotsBySplitType(ESlotSplitType::Skill).IsValidIndex(1))
-	{
-		PlayerCharacter->Inventory->GetSlotsBySplitType(ESlotSplitType::Skill)[1]->ActiveItem();
-	}
+	PlayerCharacter->SkillAttack(1);
 }
 
 void UDWInputManager::ReleaseSkillAbility3()
@@ -497,10 +498,7 @@ void UDWInputManager::ReleaseSkillAbility3()
 	
 	if(!PlayerCharacter || !PlayerCharacter->IsActive(true) || !PlayerCharacter->InputEnabled()) return;
 
-	if(PlayerCharacter->Inventory->GetSlotsBySplitType(ESlotSplitType::Skill).IsValidIndex(2))
-	{
-		PlayerCharacter->Inventory->GetSlotsBySplitType(ESlotSplitType::Skill)[2]->ActiveItem();
-	}
+	PlayerCharacter->SkillAttack(2);
 }
 
 void UDWInputManager::ReleaseSkillAbility4()
@@ -509,10 +507,7 @@ void UDWInputManager::ReleaseSkillAbility4()
 	
 	if(!PlayerCharacter || !PlayerCharacter->IsActive(true) || !PlayerCharacter->InputEnabled()) return;
 
-	if(PlayerCharacter->Inventory->GetSlotsBySplitType(ESlotSplitType::Skill).IsValidIndex(3))
-	{
-		PlayerCharacter->Inventory->GetSlotsBySplitType(ESlotSplitType::Skill)[3]->ActiveItem();
-	}
+	PlayerCharacter->SkillAttack(3);
 }
 
 void UDWInputManager::DoInteract1()

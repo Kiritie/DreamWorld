@@ -19,5 +19,5 @@ public:
 	EDWEquipType EquipType;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	EDWEquipPartType PartType;
+	EDWEquipPart EquipPart;
 };

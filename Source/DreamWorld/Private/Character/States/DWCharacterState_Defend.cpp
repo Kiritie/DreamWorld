@@ -21,7 +21,7 @@ bool UDWCharacterState_Defend::OnPreEnter(UFiniteStateBase* InLastState, const T
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 
-	return Character->ControlMode == EDWCharacterControlMode::Fighting && Character->DoAction(GameplayTags::Ability_Character_Action_Defend);
+	return Character->DoAction(GameplayTags::Ability_Character_Action_Defend);
 }
 
 void UDWCharacterState_Defend::OnEnter(UFiniteStateBase* InLastState, const TArray<FParameter>& InParams)

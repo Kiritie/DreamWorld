@@ -128,7 +128,7 @@ void UWidgetGeneratePanel::OnRefresh()
 
 	for(auto Iter : PreviewItems)
 	{
-		Iter->OnRefresh();
+		Iter->Refresh();
 	}
 
 	bool bCanGenerate = true;

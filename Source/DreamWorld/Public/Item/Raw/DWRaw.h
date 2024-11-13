@@ -15,7 +15,4 @@ class DREAMWORLD_API ADWRaw : public AAbilityRawBase
 	
 public:	
 	ADWRaw();
-
-public:
-	virtual void Initialize_Implementation(AActor* InOwnerActor, const FAbilityItem& InItem = FAbilityItem::Empty) override;
 };

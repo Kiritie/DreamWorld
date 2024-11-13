@@ -32,14 +32,14 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float PatrolDuration;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (TitleProperty = "WeaponType"))
-	TArray<FDWCharacterAttackAbilityData> AttackAbilities;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (TitleProperty = "WeaponType"))
-	TArray<FDWCharacterSkillAbilityData> SkillAbilities;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TMap<EDWWeaponType, FDWCharacterAttackAbilities> AttackAbilities;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	FDWCharacterAttackAbilityData FallingAttackAbility;
+	TMap<EDWWeaponType, FDWCharacterFallingAttackAbilityData> FallingAttackAbilities;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TArray<FDWCharacterSkillAttackAbilityData> SkillAttackAbilities;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (EditConditionHides, EditCondition = "(int32)Nature > 2"))
 	UBehaviorTree* DefaultBehaviorTree;

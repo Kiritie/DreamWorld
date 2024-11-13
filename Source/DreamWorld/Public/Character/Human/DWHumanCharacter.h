@@ -25,11 +25,15 @@ protected:
 	virtual void OnDespawn_Implementation(bool bRecovery) override;
 
 public:
+	virtual void OnPreChangeItem(const FAbilityItem& InOldItem) override;
+	
+	virtual void OnChangeItem(const FAbilityItem& InNewItem) override;
+	
 	virtual void OnActiveItem(const FAbilityItem& InItem, bool bPassive, bool bSuccess) override;
 
 	virtual void OnDeactiveItem(const FAbilityItem& InItem, bool bPassive) override;
 
-	virtual void OnSelectItem(ESlotSplitType InSplitType, const FAbilityItem& InItem) override;
+	virtual void OnSelectItem(const FAbilityItem& InItem) override;
 
 	virtual void OnAuxiliaryItem(const FAbilityItem& InItem) override;
 

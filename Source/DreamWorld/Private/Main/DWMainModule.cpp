@@ -21,7 +21,7 @@ void ADWMainModule::OnInitialize_Implementation()
 {
 	Super::OnInitialize_Implementation();
 
-	UAssetModuleStatics::AddStaticObject(FName("EDWEquipPartType"), FStaticObject(UEnum::StaticClass(), TEXT("/Script/DreamWorld.EDWEquipPartType")));
+	UAssetModuleStatics::AddStaticObject(FName("EDWEquipPart"), FStaticObject(UEnum::StaticClass(), TEXT("/Script/DreamWorld.EDWEquipPart")));
 	UAssetModuleStatics::AddStaticObject(FName("EDWGameLevel"), FStaticObject(UEnum::StaticClass(), TEXT("/Script/DreamWorld.EDWGameLevel")));
 	UAssetModuleStatics::AddStaticObject(FName("EDWInventoryInitType"), FStaticObject(UEnum::StaticClass(), TEXT("/Script/DreamWorld.EDWInventoryInitType")));
 }

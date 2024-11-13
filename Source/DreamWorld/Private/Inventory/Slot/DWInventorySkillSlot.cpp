@@ -25,29 +25,34 @@ void UDWInventorySkillSlot::OnItemChanged(FAbilityItem& InOldItem)
 	Super::OnItemChanged(InOldItem);
 }
 
-bool UDWInventorySkillSlot::MatchItemLimit(FAbilityItem InItem) const
+bool UDWInventorySkillSlot::MatchItemLimit(FAbilityItem InItem, bool bForce) const
 {
-	if(!Super::MatchItemLimit(InItem)) return false;
-
-	ADWCharacter* Character = Inventory->GetOwnerAgent<ADWCharacter>();
-
-	if(Character && Character->GetLevelA() < InItem.Level) return false;
-
-	return true;
+	return Super::MatchItemLimit(InItem, bForce);
 }
 
 bool UDWInventorySkillSlot::ActiveItem(bool bPassive /*= false*/)
 {
 	if(IsEmpty()) return false;
-
-	ADWCharacter* Character = Inventory->GetOwnerAgent<ADWCharacter>();
-
-	if(!Character) return false;
-
-	const auto AbilityData = Character->GetSkillAbility(Item.ID);
-	if(Character->CheckWeaponType(AbilityData.WeaponType) && Super::ActiveItem(bPassive))
+	
+	if(!bPassive)
 	{
-		return Character->SkillAttack(Item);
+		ADWCharacter* Character = Inventory->GetOwnerAgent<ADWCharacter>();
+
+		if(!Character || Character->GetControlMode() != EDWCharacterControlMode::Fighting) return false;
+
+		const auto AbilityData = Character->GetSkillAbility(Item.ID);
+		if(Character->CheckWeaponType(EDWWeaponPart::None, AbilityData.WeaponType))
+		{
+			if(Super::ActiveItem(bPassive))
+			{
+				if(Character->SkillAttack(Item)) return true;
+				DeactiveItem(bPassive);
+			}
+		}
+	}
+	else
+	{
+		return Super::ActiveItem(bPassive);
 	}
 	return false;
 }
@@ -56,16 +61,19 @@ void UDWInventorySkillSlot::DeactiveItem(bool bPassive /*= false*/)
 {
 	if(IsEmpty()) return;
 	
-	ADWCharacter* Character = Inventory->GetOwnerAgent<ADWCharacter>();
-
-	if(!Character) return;
-
-	const auto AbilityData = Character->GetSkillAbility(Item.ID);
-	if(AbilityData.bCancelAble)
+	if(!bPassive)
 	{
-		if(Character->GetSkillAbilityItem() == Item.ID)
+		ADWCharacter* Character = Inventory->GetOwnerAgent<ADWCharacter>();
+
+		if(!Character) return;
+
+		const auto AbilityData = Character->GetSkillAbility(Item.ID);
+		if(AbilityData.bCancelAble)
 		{
-			Character->UnAttack();
+			if(Character->GetSkillAbilityItem() == Item.ID)
+			{
+				Character->UnAttack();
+			}
 		}
 	}
 	Super::DeactiveItem(bPassive);

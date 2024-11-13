@@ -15,7 +15,4 @@ class DREAMWORLD_API ADWProp : public AAbilityPropBase
 	
 public:	
 	ADWProp();
-
-public:
-	virtual void Initialize_Implementation(AActor* InOwnerActor, const FAbilityItem& InItem = FAbilityItem::Empty) override;
 };

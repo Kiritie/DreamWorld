@@ -7,7 +7,6 @@
 #include "Components/StaticMeshComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Common/CommonStatics.h"
-#include "Ability/Inventory/AbilityInventoryBase.h"
 #include "Character/DWCharacter.h"
 
 ADWEquip::ADWEquip()
@@ -15,21 +14,20 @@ ADWEquip::ADWEquip()
 
 }
 
-void ADWEquip::Initialize_Implementation(AActor* InOwnerActor, const FAbilityItem& InItem)
-{
-	Super::Initialize_Implementation(InOwnerActor, InItem);
-}
-
 void ADWEquip::OnAssemble_Implementation()
 {
 	Super::OnAssemble_Implementation();
 
-	AttachToComponent(GetOwnerActor<ADWCharacter>()->GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, *UCommonStatics::GetEnumValueAuthoredName(TEXT("/Script/DreamWorld.EDWEquipPartType"), (int32)GetItemData<UDWEquipData>().PartType));
+	ADWCharacter* Character = GetOwnerActor<ADWCharacter>();
+
+	Character->AttachActor(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale, *UCommonStatics::GetEnumValueAuthoredName(TEXT("/Script/DreamWorld.EDWEquipPart"), (int32)GetItemData<UDWEquipData>().EquipPart));
 }
 
-void ADWEquip::OnDischarge_Implementation()
+void ADWEquip::OnDisassemble_Implementation()
 {
-	Super::OnDischarge_Implementation();
+	Super::OnDisassemble_Implementation();
 
-	DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+	ADWCharacter* Character = GetOwnerActor<ADWCharacter>();
+	
+	Character->DetachActor(this, FDetachmentTransformRules::KeepWorldTransform);
 }

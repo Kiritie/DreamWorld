@@ -55,6 +55,8 @@ void ADWEquipWeaponMelee::OnHitTarget(AActor* InTarget, const FHitResult& InHitR
 	FGameplayEventData EventData;
 	EventData.Instigator = GetOwnerActor();
 	EventData.Target = InTarget;
+	EventData.OptionalObject = this;
+	EventData.ContextHandle.AddHitResult(InHitResult);
 	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(GetOwnerActor(), GameplayTags::Event_Hit_Attack, EventData);
 
 	const FVector HitLocation = GetMeshComponent()->GetSocketLocation(FName("HitPoint"));

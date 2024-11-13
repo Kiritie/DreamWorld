@@ -31,6 +31,14 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, SaveGame, Category = "CharacterAttributes")
 	FGameplayAttributeData MaxMana;
 	GAMEPLAYATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, MaxMana)
+		
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, SaveGame, Category = "CharacterAttributes")
+	FGameplayAttributeData ManaRecovery;
+	GAMEPLAYATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, ManaRecovery)
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, SaveGame, Category = "CharacterAttributes")
+	FGameplayAttributeData ManaRegenSpeed;
+	GAMEPLAYATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, ManaRegenSpeed)
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, SaveGame, Category = "CharacterAttributes")
 	FGameplayAttributeData Stamina;
@@ -39,6 +47,18 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, SaveGame, Category = "CharacterAttributes")
 	FGameplayAttributeData MaxStamina;
 	GAMEPLAYATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, MaxStamina)
+			
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, SaveGame, Category = "CharacterAttributes")
+	FGameplayAttributeData StaminaRecovery;
+	GAMEPLAYATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, StaminaRecovery)
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, SaveGame, Category = "CharacterAttributes")
+	FGameplayAttributeData StaminaRegenSpeed;
+	GAMEPLAYATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, StaminaRegenSpeed)
+			
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, SaveGame, Category = "CharacterAttributes")
+	FGameplayAttributeData StaminaExpendSpeed;
+	GAMEPLAYATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, StaminaExpendSpeed)
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, SaveGame, Category = "CharacterAttributes")
 	FGameplayAttributeData DodgeForce;
@@ -69,8 +89,8 @@ public:
 	GAMEPLAYATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, DefendRate)
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, SaveGame, Category = "CharacterAttributes")
-	FGameplayAttributeData DefendScope;
-	GAMEPLAYATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, DefendScope)
+	FGameplayAttributeData DefendScopeRate;
+	GAMEPLAYATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, DefendScopeRate)
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, SaveGame, Category = "CharacterAttributes")
 	FGameplayAttributeData PhysicsRes;
@@ -83,16 +103,4 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, SaveGame, Category = "CharacterAttributes")
 	FGameplayAttributeData ToughnessRate;
 	GAMEPLAYATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, ToughnessRate)
-	
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, SaveGame, Category = "CharacterAttributes")
-	FGameplayAttributeData ManaRegenSpeed;
-	GAMEPLAYATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, ManaRegenSpeed)
-	
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, SaveGame, Category = "CharacterAttributes")
-	FGameplayAttributeData StaminaRegenSpeed;
-	GAMEPLAYATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, StaminaRegenSpeed)
-			
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, SaveGame, Category = "CharacterAttributes")
-	FGameplayAttributeData StaminaExpendSpeed;
-	GAMEPLAYATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, StaminaExpendSpeed)
 };

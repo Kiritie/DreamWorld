@@ -52,7 +52,7 @@ void UDWCharacterState_Ride::OnEnter(UFiniteStateBase* InLastState, const TArray
 	
 	Character->GetMovementComponent()->SetActive(false);
 	Character->GetCollisionComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	Character->AttachToComponent(RidingTarget->GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("RiderPoint"));
+	RidingTarget->AttachActor(Character, FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("RiderPoint"));
 	Character->SetInteractingAgent(RidingTarget, true);
 	// Character->LimitToAnim();
 	
@@ -75,7 +75,7 @@ void UDWCharacterState_Ride::OnLeave(UFiniteStateBase* InNextState)
 
 	Character->GetAbilitySystemComponent()->RemoveLooseGameplayTag(GameplayTags::State_Character_Riding);
 
-	Character->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+	RidingTarget->DetachActor(Character, FDetachmentTransformRules::KeepWorldTransform);
 
 	UCharacterModuleStatics::SwitchCharacter(Character);
 

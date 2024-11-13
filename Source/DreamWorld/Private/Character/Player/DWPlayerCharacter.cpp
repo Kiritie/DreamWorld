@@ -3,7 +3,6 @@
 #include "Character/Player/DWPlayerCharacter.h"
 
 #include "Achievement/AchievementModuleStatics.h"
-#include "Item/Equip/Weapon/DWEquipWeapon.h"
 #include "Ability/Item/AbilityItemDataBase.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/InputComponent.h"
@@ -31,16 +30,15 @@
 #include "Character/States/DWCharacterState_Fly.h"
 #include "Character/States/DWCharacterState_Ride.h"
 #include "FSM/Components/FSMComponent.h"
-#include "Widget/World/WorldWidgetComponent.h"
 #include "Character/DWCharacterData.h"
 #include "Character/Human/States/DWHumanCharacterState_Defend.h"
 #include "Character/Player/States/DWPlayerCharacterState_Aim.h"
 #include "Character/States/DWCharacterState_Attack.h"
 #include "Character/States/DWCharacterState_Climb.h"
 #include "Character/States/DWCharacterState_Dodge.h"
+#include "Common/CommonStatics.h"
 #include "Common/Looking/LookingComponent.h"
 #include "Common/Targeting/TargetingComponent.h"
-#include "Item/Equip/DWEquipData.h"
 #include "Vitality/DWVitality.h"
 #include "Voxel/Voxels/VoxelInteract.h"
 #include "Voxel/Voxels/Auxiliary/VoxelAuxiliary.h"
@@ -50,6 +48,7 @@
 #include "Widget/Head/WidgetHeadBox.h"
 #include "Widget/Interaction/WidgetInteractionBox.h"
 #include "Widget/Inventory/WidgetInventoryBox.h"
+#include "Widget/Message/WidgetMessageBox.h"
 
 //////////////////////////////////////////////////////////////////////////
 // ADWPlayerCharacter
@@ -65,8 +64,6 @@ ADWPlayerCharacter::ADWPlayerCharacter(const FObjectInitializer& ObjectInitializ
 	GetMesh()->SetRelativeLocation(FVector(0, 0, -70));
 
 	Looking->LookingMaxDistance = 1500.f;
-
-	CharacterHP->SetAutoCreate(false);
 
 	Targeting = CreateDefaultSubobject<UTargetingComponent>(FName("Targeting"));
 	Targeting->bShouldControlRotation = false;
@@ -191,10 +188,10 @@ void ADWPlayerCharacter::Kill(IAbilityVitalityInterface* InTarget)
 
 void ADWPlayerCharacter::ChangeHand()
 {
-	TArray<UAbilityInventorySlotBase*> AuxiliarySlots = Inventory->GetSlotsBySplitType(ESlotSplitType::Auxiliary);
-	if(AuxiliarySlots.Num() > 0 && Inventory->GetSelectedSlot(ESlotSplitType::Shortcut))
+	auto AuxiliarySlot = Inventory->GetSlotBySplitTypeAndIndex(ESlotSplitType::Auxiliary, 0);
+	if(AuxiliarySlot && Inventory->GetSelectedSlot(ESlotSplitType::Shortcut))
 	{
-		AuxiliarySlots[0]->Replace(Inventory->GetSelectedSlot(ESlotSplitType::Shortcut));
+		AuxiliarySlot->Replace(Inventory->GetSelectedSlot(ESlotSplitType::Shortcut));
 	}
 }
 
@@ -205,10 +202,12 @@ bool ADWPlayerCharacter::CanLookAtTarget()
 
 void ADWPlayerCharacter::OnTargetLookAtOn(AActor* InTargetActor)
 {
+	Super::OnTargetLookAtOn(InTargetActor);
 }
 
 void ADWPlayerCharacter::OnTargetLookAtOff(AActor* InTargetActor)
 {
+	Super::OnTargetLookAtOff(InTargetActor);
 }
 
 bool ADWPlayerCharacter::CanInteract(EInteractAction InInteractAction, IInteractionAgentInterface* InInteractionAgent)
@@ -219,7 +218,7 @@ bool ADWPlayerCharacter::CanInteract(EInteractAction InInteractAction, IInteract
 		{
 			if(InInteractionAgent == this)
 			{
-				return IsDead(false);
+				return IsDead();
 			}
 		}
 		default: break;
@@ -361,49 +360,29 @@ void ADWPlayerCharacter::OnAdditionItem(const FAbilityItem& InItem)
 	}
 }
 
+void ADWPlayerCharacter::OnChangeItem(const FAbilityItem& InNewItem)
+{
+	Super::OnChangeItem(InNewItem);
+}
+
 void ADWPlayerCharacter::OnActiveItem(const FAbilityItem& InItem, bool bPassive, bool bSuccess)
 {
 	Super::OnActiveItem(InItem, bPassive, bSuccess);
-	
-	const auto& ItemData = InItem.GetData<UAbilityItemDataBase>();
-	switch(ItemData.GetItemType())
+
+	if(!bPassive && !bSuccess)
 	{
-		case EAbilityItemType::Equip:
-		{
-			const auto& EquipData = InItem.GetData<UDWEquipData>();
-			if(AAbilityEquipBase* Equip = GetEquip(EquipData.PartType))
-			{
-				PreviewCapture->ShowOnlyActors.Add(Equip);
-			}
-			break;
-		}
-		default: break;
+		UWidgetModuleStatics::OpenUserWidget<UWidgetMessageBox>({ FText::FromString(FString::Printf(TEXT("暂时无法使用该%s！"), *UCommonStatics::GetEnumValueDisplayName(TEXT("/Script/WHFramework.EAbilityItemType"), (int32)InItem.GetType()).ToString())) });
 	}
 }
 
 void ADWPlayerCharacter::OnDeactiveItem(const FAbilityItem& InItem, bool bPassive)
 {
 	Super::OnDeactiveItem(InItem, bPassive);
-
-	const auto& ItemData = InItem.GetData<UAbilityItemDataBase>();
-	switch(ItemData.GetItemType())
-	{
-		case EAbilityItemType::Equip:
-		{
-			const auto& EquipData = InItem.GetData<UDWEquipData>();
-			if(AAbilityEquipBase* Equip = GetEquip(EquipData.PartType))
-			{
-				PreviewCapture->ShowOnlyActors.Remove(Equip);
-			}
-			break;
-		}
-		default: break;
-	}
 }
 
-void ADWPlayerCharacter::OnSelectItem(ESlotSplitType InSplitType, const FAbilityItem& InItem)
+void ADWPlayerCharacter::OnSelectItem(const FAbilityItem& InItem)
 {
-	Super::OnSelectItem(InSplitType, InItem);
+	Super::OnSelectItem(InItem);
 }
 
 void ADWPlayerCharacter::OnAttributeChange(const FOnAttributeChangeData& InAttributeChangeData)
@@ -431,7 +410,7 @@ void ADWPlayerCharacter::OnAttributeChange(const FOnAttributeChangeData& InAttri
 			}
 			if(InAttributeChangeData.NewValue >= GetMaxExp())
 			{
-				UWidgetModuleStatics::GetUserWidget<UWidgetContextBox>()->AddMessage(FString::Printf(TEXT("你已升到 %d 级！"), Level));
+				UWidgetModuleStatics::GetUserWidget<UWidgetContextBox>()->AddMessage(FString::Printf(TEXT("等级提升！")));
 			}
 		}
 		if(UWidgetModuleStatics::GetUserWidget<UWidgetHeadBox>())
@@ -519,52 +498,66 @@ void ADWPlayerCharacter::OnAttributeChange(const FOnAttributeChangeData& InAttri
 	{
 		if(UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>())
 		{
-			UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>()->SetAttackSpeed(FString::SanitizeFloat(InAttributeChangeData.NewValue, 1));
+			UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>()->SetAttackSpeed(FString::SanitizeFloat(InAttributeChangeData.NewValue, 0));
 		}
 	}
 	else if(InAttributeChangeData.Attribute == GetAttackCritRateAttribute())
 	{
 		if(UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>())
 		{
-			UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>()->SetAttackCritRate(FString::Printf(TEXT("%d%%"), (int32)(InAttributeChangeData.NewValue * 100.f)));
+			UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>()->SetAttackCritRate(FString::Printf(TEXT("%s%%"), *FString::SanitizeFloat(InAttributeChangeData.NewValue * 100.f, 0)));
 		}
 	}
 	else if(InAttributeChangeData.Attribute == GetAttackStealRateAttribute())
 	{
 		if(UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>())
 		{
-			UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>()->SetAttackStealRate(FString::Printf(TEXT("%d%%"), (int32)(InAttributeChangeData.NewValue * 100.f)));
+			UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>()->SetAttackStealRate(FString::Printf(TEXT("%s%%"), *FString::SanitizeFloat(InAttributeChangeData.NewValue * 100.f, 0)));
 		}
 	}
-	else if(InAttributeChangeData.Attribute == GetDefendRateAttribute())
+	else if(InAttributeChangeData.Attribute == GetDefendRateAttribute() || InAttributeChangeData.Attribute == GetDefendScopeRateAttribute())
 	{
 		if(UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>())
 		{
-			UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>()->SetDefendRate(FString::Printf(TEXT("%d%%"), (int32)(InAttributeChangeData.NewValue * 100.f)));
+			UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>()->SetDefendRate(FString::Printf(TEXT("%s%%|%s%%"), *FString::SanitizeFloat(GetDefendRate() * 100.f, 0), *FString::SanitizeFloat(GetDefendScopeRate() * 100.f, 0)));
 		}
 	}
 	else if(InAttributeChangeData.Attribute == GetPhysicsResAttribute())
 	{
 		if(UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>())
 		{
-			UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>()->SetPhysicsRes(FString::Printf(TEXT("%d(%d%%)"), (int32)InAttributeChangeData.NewValue, (int32)(InAttributeChangeData.NewValue / (100.f + InAttributeChangeData.NewValue) * 100.f)));
+			UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>()->SetPhysicsRes(FString::Printf(TEXT("%s(%s%%)"), *FString::SanitizeFloat(InAttributeChangeData.NewValue, 0), *FString::SanitizeFloat(InAttributeChangeData.NewValue / (100.f + InAttributeChangeData.NewValue) * 100.f, 0)));
 		}
 	}
 	else if(InAttributeChangeData.Attribute == GetMagicResAttribute())
 	{
 		if(UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>())
 		{
-			UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>()->SetMagicRes(FString::Printf(TEXT("%d(%d%%)"), (int32)InAttributeChangeData.NewValue, (int32)(InAttributeChangeData.NewValue / (100.f + InAttributeChangeData.NewValue) * 100.f)));
+			UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>()->SetMagicRes(FString::Printf(TEXT("%s(%s%%)"), *FString::SanitizeFloat(InAttributeChangeData.NewValue, 0), *FString::SanitizeFloat(InAttributeChangeData.NewValue / (100.f + InAttributeChangeData.NewValue) * 100.f, 0)));
 		}
 	}
 	else if(InAttributeChangeData.Attribute == GetToughnessRateAttribute())
 	{
 		if(UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>())
 		{
-			UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>()->SetToughnessRate(FString::Printf(TEXT("%d%%"), (int32)(InAttributeChangeData.NewValue * 100.f)));
+			UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>()->SetToughnessRate(FString::Printf(TEXT("%s%%"), *FString::SanitizeFloat(InAttributeChangeData.NewValue * 100.f, 0)));
 		}
 	}
 	Super::OnAttributeChange(InAttributeChangeData);
+}
+
+void ADWPlayerCharacter::OnActorAttached(AActor* InActor)
+{
+	Super::OnActorAttached(InActor);
+
+	PreviewCapture->ShowOnlyActors.Add(InActor);
+}
+
+void ADWPlayerCharacter::OnActorDetached(AActor* InActor)
+{
+	Super::OnActorDetached(InActor);
+
+	PreviewCapture->ShowOnlyActors.Remove(InActor);
 }
 
 void ADWPlayerCharacter::OnTargetLockedOn(AActor* InTargetActor)

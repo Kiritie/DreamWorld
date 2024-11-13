@@ -28,6 +28,7 @@ ADWVitality::ADWVitality(const FObjectInitializer& ObjectInitializer) :
 	VitalityHP->SetupAttachment(RootComponent);
 	VitalityHP->SetRelativeLocation(FVector(0, 0, 50));
 	VitalityHP->SetWidgetSpace(EWidgetSpace::Screen);
+	VitalityHP->SetAutoCreate(false);
 	static ConstructorHelpers::FClassFinder<UWidgetVitalityHP> VitalityHPClassFinder(TEXT("WidgetBlueprint'/Game/Blueprints/Widget/World/WBP_VitalityHP.WBP_VitalityHP_C'"));
 	if(VitalityHPClassFinder.Succeeded())
 	{
@@ -40,6 +41,8 @@ void ADWVitality::OnSpawn_Implementation(UObject* InOwner, const TArray<FParamet
 	Super::OnSpawn_Implementation(InOwner, InParams);
 
 	UEventModuleStatics::SubscribeEvent<UEventHandle_VoxelWorldModeChanged>(this, GET_FUNCTION_NAME_THISCLASS(OnWorldModeChanged));
+
+	VitalityHP->CreateWorldWidget();
 }
 
 void ADWVitality::OnDespawn_Implementation(bool bRecovery)
@@ -47,6 +50,8 @@ void ADWVitality::OnDespawn_Implementation(bool bRecovery)
 	Super::OnDespawn_Implementation(bRecovery);
 
 	UEventModuleStatics::UnsubscribeEvent<UEventHandle_VoxelWorldModeChanged>(this, GET_FUNCTION_NAME_THISCLASS(OnWorldModeChanged));
+
+	VitalityHP->DestroyWorldWidget();
 }
 
 void ADWVitality::Serialize(FArchive& Ar)
@@ -57,6 +62,14 @@ void ADWVitality::Serialize(FArchive& Ar)
 void ADWVitality::LoadData(FSaveData* InSaveData, EPhase InPhase)
 {
 	Super::LoadData(InSaveData, InPhase);
+
+	if(PHASEC(InPhase, EPhase::Final))
+	{
+		if(GetVitalityHPWidget())
+		{
+			GetVitalityHPWidget()->OnRefresh();
+		}
+	}
 }
 
 FSaveData* ADWVitality::ToData()
@@ -83,7 +96,7 @@ bool ADWVitality::CanInteract(EInteractAction InInteractAction, IInteractionAgen
 	{
 		case EInteractAction::Revive:
 		{
-			return !IsDead(true);
+			return IsDead();
 		}
 		default: break;
 	}
@@ -100,7 +113,7 @@ void ADWVitality::OnInteract(EInteractAction InInteractAction, IInteractionAgent
 		{
 			case EInteractAction::Revive:
 			{
-				Revive();
+				Revive(Cast<IAbilityVitalityInterface>(InInteractionAgent));
 				break;
 			}
 			default: break;
@@ -123,9 +136,9 @@ void ADWVitality::OnDiscardItem(const FAbilityItem& InItem, bool bInPlace)
 	Super::OnDiscardItem(InItem, bInPlace);
 }
 
-void ADWVitality::OnSelectItem(ESlotSplitType InSplitType, const FAbilityItem& InItem)
+void ADWVitality::OnSelectItem(const FAbilityItem& InItem)
 {
-	Super::OnSelectItem(InSplitType, InItem);
+	Super::OnSelectItem(InItem);
 }
 
 void ADWVitality::OnAuxiliaryItem(const FAbilityItem& InItem)
@@ -154,6 +167,25 @@ bool ADWVitality::OnDestroyVoxel(const FVoxelHitResult& InVoxelHitResult)
 	return Super::OnDestroyVoxel(InVoxelHitResult);
 }
 
+void ADWVitality::OnAttributeChange(const FOnAttributeChangeData& InAttributeChangeData)
+{
+	if(InAttributeChangeData.Attribute == GetAttributeSet<UDWVitalityAttributeSet>()->GetExpAttribute() || InAttributeChangeData.Attribute == GetAttributeSet<UDWVitalityAttributeSet>()->GetMaxExpAttribute())
+	{
+		if (GetVitalityHPWidget())
+		{
+			GetVitalityHPWidget()->SetHeadInfo(GetHeadInfo());
+		}
+	}
+	else if(InAttributeChangeData.Attribute == GetAttributeSet<UDWVitalityAttributeSet>()->GetHealthAttribute() || InAttributeChangeData.Attribute == GetAttributeSet<UDWVitalityAttributeSet>()->GetMaxHealthAttribute())
+	{
+		if (GetVitalityHPWidget())
+		{
+			GetVitalityHPWidget()->SetHealthPercent(GetHealth(), GetMaxHealth());
+		}
+	}
+	Super::OnAttributeChange(InAttributeChangeData);
+}
+
 void ADWVitality::OnWorldModeChanged(UObject* InSender, UEventHandle_VoxelWorldModeChanged* InEventHandle)
 {
 	if(FSM->IsCurrentStateClass<UAbilityVitalityState_Spawn>()) return;
@@ -174,38 +206,19 @@ void ADWVitality::OnWorldModeChanged(UObject* InSender, UEventHandle_VoxelWorldM
 	}
 }
 
-void ADWVitality::OnAttributeChange(const FOnAttributeChangeData& InAttributeChangeData)
+void ADWVitality::HandleDamage(const FGameplayAttribute& DamageAttribute, float DamageValue, float DefendValue, bool bHasCrited, const FHitResult& HitResult, const FGameplayTagContainer& SourceTags, AActor* SourceActor)
 {
-	if(InAttributeChangeData.Attribute == GetAttributeSet<UDWVitalityAttributeSet>()->GetExpAttribute() || InAttributeChangeData.Attribute == GetAttributeSet<UDWVitalityAttributeSet>()->GetMaxExpAttribute())
-	{
-		if (GetVitalityHPWidget())
-		{
-			GetVitalityHPWidget()->SetHeadInfo(GetHeadInfo());
-		}
-	}
-	else if(InAttributeChangeData.Attribute == GetAttributeSet<UDWVitalityAttributeSet>()->GetHealthAttribute() || InAttributeChangeData.Attribute == GetAttributeSet<UDWVitalityAttributeSet>()->GetMaxHealthAttribute())
-	{
-		if (GetVitalityHPWidget())
-		{
-			GetVitalityHPWidget()->SetHealthPercent(GetHealth(), GetMaxHealth());
-		}
-	}
-	Super::OnAttributeChange(InAttributeChangeData);
+	Super::HandleDamage(DamageAttribute, DamageValue, DefendValue, bHasCrited, HitResult, SourceTags, SourceActor);
 }
 
-void ADWVitality::HandleDamage(EDamageType DamageType, float DamageValue, bool bHasCrited, bool bHasDefend, FHitResult HitResult, const FGameplayTagContainer& SourceTags, AActor* SourceActor)
+void ADWVitality::HandleRecovery(const FGameplayAttribute& RecoveryAttribute, float RecoveryValue, const FHitResult& HitResult, const FGameplayTagContainer& SourceTags, AActor* SourceActor)
 {
-	Super::HandleDamage(DamageType, DamageValue, bHasCrited, bHasDefend, HitResult, SourceTags, SourceActor);
+	Super::HandleRecovery(RecoveryAttribute, RecoveryValue, HitResult, SourceTags, SourceActor);
 }
 
-void ADWVitality::HandleRecovery(float RecoveryValue, FHitResult HitResult, const FGameplayTagContainer& SourceTags, AActor* SourceActor)
+void ADWVitality::HandleInterrupt(const FGameplayAttribute& InterruptAttribute, float InterruptDuration, const FHitResult& HitResult, const FGameplayTagContainer& SourceTags, AActor* SourceActor)
 {
-	Super::HandleRecovery(RecoveryValue, HitResult, SourceTags, SourceActor);
-}
-
-void ADWVitality::HandleInterrupt(float InterruptDuration, FHitResult HitResult, const FGameplayTagContainer& SourceTags, AActor* SourceActor)
-{
-	Super::HandleInterrupt(InterruptDuration, HitResult, SourceTags, SourceActor);
+	Super::HandleInterrupt(InterruptAttribute, InterruptDuration, HitResult, SourceTags, SourceActor);
 }
 
 void ADWVitality::SetNameA(FName InName)

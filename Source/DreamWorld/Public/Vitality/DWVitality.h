@@ -56,7 +56,7 @@ public:
 
 	virtual void OnDiscardItem(const FAbilityItem& InItem, bool bInPlace) override;
 
-	virtual void OnSelectItem(ESlotSplitType InSplitType, const FAbilityItem& InItem) override;
+	virtual void OnSelectItem(const FAbilityItem& InItem) override;
 
 	virtual void OnAuxiliaryItem(const FAbilityItem& InItem) override;
 
@@ -64,17 +64,18 @@ public:
 
 	virtual bool OnDestroyVoxel(const FVoxelHitResult& InVoxelHitResult) override;
 
+protected:
+	virtual void OnAttributeChange(const FOnAttributeChangeData& InAttributeChangeData) override;
+
 	UFUNCTION()
 	virtual void OnWorldModeChanged(UObject* InSender, UEventHandle_VoxelWorldModeChanged* InEventHandle);
 
 public:
-	virtual void OnAttributeChange(const FOnAttributeChangeData& InAttributeChangeData) override;
-	
-	virtual void HandleDamage(EDamageType DamageType, float DamageValue, bool bHasCrited, bool bHasDefend, FHitResult HitResult, const FGameplayTagContainer& SourceTags, AActor* SourceActor) override;
+	virtual void HandleDamage(const FGameplayAttribute& DamageAttribute, float DamageValue, float DefendValue, bool bHasCrited, const FHitResult& HitResult, const FGameplayTagContainer& SourceTags, AActor* SourceActor) override;
 
-	virtual void HandleRecovery(float RecoveryValue, FHitResult HitResult, const FGameplayTagContainer& SourceTags, AActor* SourceActor) override;
+	virtual void HandleRecovery(const FGameplayAttribute& RecoveryAttribute, float RecoveryValue, const FHitResult& HitResult, const FGameplayTagContainer& SourceTags, AActor* SourceActor) override;
 
-	virtual void HandleInterrupt(float InterruptDuration, FHitResult HitResult, const FGameplayTagContainer& SourceTags, AActor* SourceActor) override;
+	virtual void HandleInterrupt(const FGameplayAttribute& InterruptAttribute, float InterruptDuration, const FHitResult& HitResult, const FGameplayTagContainer& SourceTags, AActor* SourceActor) override;
 
 protected:
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Components")

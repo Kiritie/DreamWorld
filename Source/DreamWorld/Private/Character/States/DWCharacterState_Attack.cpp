@@ -4,12 +4,10 @@
 
 #include "TimerManager.h"
 #include "Ability/AbilityModuleStatics.h"
-#include "Ability/Components/AbilitySystemComponentBase.h"
 #include "Ability/Item/Skill/AbilitySkillDataBase.h"
 #include "Ability/Projectile/AbilityProjectileBase.h"
 #include "Camera/CameraModuleStatics.h"
 #include "Character/DWCharacter.h"
-#include "Character/DWCharacterData.h"
 #include "Character/States/DWCharacterState_Aim.h"
 #include "Common/Looking/LookingComponent.h"
 #include "FSM/Components/FSMComponent.h"
@@ -32,7 +30,7 @@ bool UDWCharacterState_Attack::OnPreEnter(UFiniteStateBase* InLastState, const T
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 
-	return Character->ControlMode == EDWCharacterControlMode::Fighting && Character->GetAbilitySystemComponent()->TryActivateAbility(InParams[0].GetPointerValueRef<FGameplayAbilitySpecHandle>()) && Character->DoAction(GameplayTags::Ability_Character_Action_Attack);
+	return Character->GetAbilitySystemComponent()->TryActivateAbility(InParams[0].GetPointerValueRef<FGameplayAbilitySpecHandle>()) && Character->DoAction(GameplayTags::Ability_Character_Action_Attack);
 }
 
 void UDWCharacterState_Attack::OnEnter(UFiniteStateBase* InLastState, const TArray<FParameter>& InParams)
@@ -51,27 +49,30 @@ void UDWCharacterState_Attack::OnEnter(UFiniteStateBase* InLastState, const TArr
 	{
 		case EDWCharacterAttackType::NormalAttack:
 		{
-			Character->GetAttackAbilityQueue().AbilityIndex = InParams[2];
-			OnAttackCompleted = InParams[3].GetPointerValueRef<FSimpleDelegate>();
-			if(Character->GetWeaponProjectileClass())
+			Character->AttackWeaponPart = (EDWWeaponPart)InParams[2].GetByteValue();
+			EDWWeaponType WeaponType = Character->GetWeaponType(Character->AttackWeaponPart);
+			Character->GetAttackAbilityQueue(WeaponType).Index = InParams[3];
+			OnAttackCompleted = InParams[4].GetPointerValueRef<FSimpleDelegate>();
+			if(Character->GetWeaponProjectile(Character->AttackWeaponPart))
 			{
 				Character->SetUseControllerRotation(true);
 
-				const auto AttackAbilityData = Character->GetAttackAbility();
-				Character->AttackProjectile = UAbilityModuleStatics::SpawnAbilityProjectile(Character->GetWeaponProjectileClass(), Character, AttackAbilityData.AbilityHandle);
+				const auto AttackAbilityData = Character->GetAttackAbility(WeaponType);
+				Character->AttackProjectile = UAbilityModuleStatics::SpawnAbilityProjectile(Character->GetWeaponProjectile(Character->AttackWeaponPart), Character, AttackAbilityData.AbilityHandle);
 			}
 			break;
 		}
 		case EDWCharacterAttackType::FallingAttack:
 		{
-			OnAttackCompleted = InParams[2].GetPointerValueRef<FSimpleDelegate>();
+			Character->AttackWeaponPart = (EDWWeaponPart)InParams[2].GetByteValue();
+			OnAttackCompleted = InParams[3].GetPointerValueRef<FSimpleDelegate>();
 			break;
 		}
 		case EDWCharacterAttackType::SkillAttack:
 		{
-			Character->SkillAbilityItem = InParams[2].GetPointerValueRef<FAbilityItem>();
+			Character->SkillAttackAbilityItem = InParams[2].GetPointerValueRef<FAbilityItem>();
 			OnAttackCompleted = InParams[3].GetPointerValueRef<FSimpleDelegate>();
-			const auto SkillAbilityData = Character->GetSkillAbility(Character->SkillAbilityItem.ID);
+			const auto SkillAbilityData = Character->GetSkillAbility(Character->SkillAttackAbilityItem.ID);
 			if(SkillAbilityData.GetData<UAbilitySkillDataBase>().ProjectileClass)
 			{
 				Character->SetUseControllerRotation(true);
@@ -123,7 +124,7 @@ void UDWCharacterState_Attack::AttackStart()
 	{
 		case EDWCharacterAttackType::NormalAttack:
 		{
-			if(Character->GetWeaponProjectileClass())
+			if(Character->GetWeaponProjectile(Character->AttackWeaponPart))
 			{
 				Character->AttackProjectile->Launch(Character->GetLooking()->GetLookingTarget() ? Character->GetLooking()->GetLookingRotation().Vector() :
 					(Character->IsPlayer() ? UCameraModuleStatics::GetCameraRotation(true).Vector() : FVector::ZeroVector));
@@ -144,10 +145,10 @@ void UDWCharacterState_Attack::AttackStart()
 		}
 		case EDWCharacterAttackType::SkillAttack:
 		{
-			const auto SkillAbilityData = Character->GetSkillAbility(Character->SkillAbilityItem.ID);
+			const auto SkillAbilityData = Character->GetSkillAbility(Character->SkillAttackAbilityItem.ID);
 			if(SkillAbilityData.GetData<UAbilitySkillDataBase>().ProjectileClass)
 			{
-				Character->AttackProjectile = UAbilityModuleStatics::SpawnAbilityProjectile(SkillAbilityData.GetData<UAbilitySkillDataBase>().ProjectileClass, Character, Character->SkillAbilityItem.AbilityHandle);
+				Character->AttackProjectile = UAbilityModuleStatics::SpawnAbilityProjectile(SkillAbilityData.GetData<UAbilitySkillDataBase>().ProjectileClass, Character, Character->SkillAttackAbilityItem.AbilityHandle);
 				Character->AttackProjectile->Launch(Character->GetLooking()->GetLookingTarget() ? Character->GetLooking()->GetLookingRotation().Vector() :
 					(Character->IsPlayer() ? UCameraModuleStatics::GetCameraRotation(true).Vector() : FVector::ZeroVector));
 			}
@@ -183,7 +184,7 @@ void UDWCharacterState_Attack::AttackEnd()
 	{
 		case EDWCharacterAttackType::NormalAttack:
 		{
-			if(!Character->GetWeapon<ADWEquipWeaponRemote>())
+			if(!Character->GetWeapon<ADWEquipWeaponRemote>(Character->AttackWeaponPart))
 			{
 				Character->SetHitAble(false);
 			}
@@ -196,7 +197,7 @@ void UDWCharacterState_Attack::AttackEnd()
 		}
 		case EDWCharacterAttackType::SkillAttack:
 		{
-			const auto AbilityData = Character->GetSkillAbility(Character->SkillAbilityItem.ID);
+			const auto AbilityData = Character->GetSkillAbility(Character->SkillAttackAbilityItem.ID);
 			if(!AbilityData.GetData<UAbilitySkillDataBase>().ProjectileClass)
 			{
 				Character->SetHitAble(false);
@@ -217,7 +218,7 @@ void UDWCharacterState_Attack::AttackComplete()
 	{
 		case EDWCharacterAttackType::NormalAttack:
 		{
-			if(Character->GetWeaponProjectileClass())
+			if(Character->GetWeaponProjectile(Character->AttackWeaponPart))
 			{
 				Character->SetUseControllerRotation(false);
 				if(!Character->AttackProjectile->IsLaunched())
@@ -226,18 +227,20 @@ void UDWCharacterState_Attack::AttackComplete()
 				}
 				Character->AttackProjectile = nullptr;
 			}
-			Character->GetAttackAbilityQueue().Next();
+			Character->GetAttackAbilityQueue(Character->GetWeaponType(Character->AttackWeaponPart)).Next();
+			Character->AttackWeaponPart = EDWWeaponPart::None;
 			break;
 		}
 		case EDWCharacterAttackType::FallingAttack:
 		{
 			Character->StopAnimMontage();
 			Character->GetCharacterMovement()->GravityScale = Character->GetDefaultGravityScale();
+			Character->AttackWeaponPart = EDWWeaponPart::None;
 			break;
 		}
 		case EDWCharacterAttackType::SkillAttack:
 		{
-			const auto AbilityData = Character->GetSkillAbility(Character->SkillAbilityItem.ID);
+			const auto AbilityData = Character->GetSkillAbility(Character->SkillAttackAbilityItem.ID);
 			if(AbilityData.GetData<UAbilitySkillDataBase>().ProjectileClass)
 			{
 				Character->SetUseControllerRotation(false);
@@ -247,7 +250,7 @@ void UDWCharacterState_Attack::AttackComplete()
 				}
 				Character->AttackProjectile = nullptr;
 			}
-			Character->SkillAbilityItem = FAbilityItem();
+			Character->SkillAttackAbilityItem = FAbilityItem();
 			break;
 		}
 		default: break;

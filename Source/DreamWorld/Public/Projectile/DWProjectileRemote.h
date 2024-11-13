@@ -17,9 +17,6 @@ public:
 	ADWProjectileRemote();
 
 public:
-	virtual void Initialize_Implementation(AActor* InOwnerActor, const FGameplayAbilitySpecHandle& InAbilityHandle) override;
-
-public:
 	virtual void OnHitTarget(AActor* InTarget, const FHitResult& InHitResult) override;
 
 protected:

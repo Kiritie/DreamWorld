@@ -15,7 +15,4 @@ class DREAMWORLD_API ADWProjectileMelee : public AAbilityProjectileMeleeBase
 	
 public:	
 	ADWProjectileMelee();
-
-public:
-	virtual void Initialize_Implementation(AActor* InOwnerActor, const FGameplayAbilitySpecHandle& InAbilityHandle) override;
 };

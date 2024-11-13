@@ -33,12 +33,12 @@ public:
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	EDWCharacterPartType CharacterPartType;
+	EDWCharacterPart CharacterPart;
 
 public:
 	UFUNCTION(BlueprintPure)
-	EDWCharacterPartType GetCharacterPartType() const { return CharacterPartType; }
+	EDWCharacterPart GetCharacterPart() const { return CharacterPart; }
 
 	UFUNCTION(BlueprintCallable)
-	void SetCharacterPartType(EDWCharacterPartType InCharacterPartType) { this->CharacterPartType = InCharacterPartType; }
+	void SetCharacterPart(EDWCharacterPart InCharacterPart) { this->CharacterPart = InCharacterPart; }
 };

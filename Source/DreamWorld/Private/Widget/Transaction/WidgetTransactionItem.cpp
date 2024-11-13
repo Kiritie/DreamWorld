@@ -42,7 +42,7 @@ void UWidgetTransactionItem::OnRefresh()
 		TxtName->SetText(ItemData.Name);
 		TxtType->SetText(FText::FromString(FString::Printf(TEXT("[%s]"), *UCommonStatics::GetEnumValueDisplayName(TEXT("/Script/WHFramework.EAbilityItemType"), (int32)ItemData.GetItemType()).ToString())));
 		TxtLevel->SetText(FText::FromString(Item.Level != 0 ? FString::Printf(TEXT("Lv.%d"), Item.Level) : TEXT("")));
-		TxtCount->SetText(FText::FromString(FString::FromInt(Item.Count)));
+		TxtCount->SetText(FText::FromString(Item.Count > 1 ? FString::FromInt(Item.Count) : TEXT("")));
 	}
 }
 

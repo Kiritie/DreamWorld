@@ -51,7 +51,7 @@ void UDWPlayerCharacterState_Aim::StartAim()
 	Character->SetUseControllerRotation(true);
 	Character->GetTargeting()->bAdjustPitchBasedOnDistanceToTarget = false;
 	
-	UCameraModuleStatics::DoCameraDistance(0.f, 0.5f, EEaseType::InOutSine);
+	UCameraModuleStatics::DoCameraDistance(50.f, 0.5f, EEaseType::InOutSine);
 	UCameraModuleStatics::DoCameraOffset(FVector(0.f, 30.f, 35.f), 0.5f, EEaseType::InOutSine);
 	UCameraModuleStatics::DoCameraFov(60.f, 0.5f, EEaseType::InOutSine);
 }

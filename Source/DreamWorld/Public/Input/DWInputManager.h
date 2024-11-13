@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Common/DWCommonTypes.h"
 #include "Input/Manager/DefaultInputManagerBase.h"
 
 #include "DWInputManager.generated.h"
@@ -24,22 +25,6 @@ public:
 	virtual void OnRefresh(float DeltaSeconds) override;
 
 	virtual void OnBindAction(UInputComponentBase* InInputComponent) override;
-
-protected:
-	UPROPERTY(VisibleAnywhere, Category = "InputStates|Player")
-	bool bPrimaryPressed;
-		
-	UPROPERTY(VisibleAnywhere, Category = "InputStates|Player")
-	bool bSecondaryPressed;
-		
-	UPROPERTY(VisibleAnywhere, Category = "InputStates|Player")
-	bool bThirdPressed;
-
-	UPROPERTY(VisibleAnywhere, Category = "InputStates|Player")
-	bool bSprintPressed;
-
-	UPROPERTY(VisibleAnywhere, Category = "InputStates|Player")
-	int32 AttackAbilityQueue;
 
 protected:
 	virtual void TurnCamera_Implementation(const FInputActionValue& InValue) override;
@@ -186,4 +171,20 @@ public:
 	
 	UFUNCTION(BlueprintCallable)
 	virtual void OpenContextInputBox();
+
+protected:
+	UPROPERTY(VisibleAnywhere, Category = "InputStates|Player")
+	bool bPrimaryPressed;
+		
+	UPROPERTY(VisibleAnywhere, Category = "InputStates|Player")
+	bool bSecondaryPressed;
+		
+	UPROPERTY(VisibleAnywhere, Category = "InputStates|Player")
+	bool bThirdPressed;
+
+	UPROPERTY(VisibleAnywhere, Category = "InputStates|Player")
+	bool bSprintPressed;
+
+	UPROPERTY(VisibleAnywhere, Category = "InputStates|Player")
+	TMap<EDWWeaponPart, int32> AttackAbilityQueue;
 };

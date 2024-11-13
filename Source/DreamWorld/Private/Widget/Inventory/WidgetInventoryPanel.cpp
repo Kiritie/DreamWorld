@@ -11,7 +11,6 @@
 #include "Components/WrapBox.h"
 #include "Components/WrapBoxSlot.h"
 #include "Common/CommonStatics.h"
-#include "Asset/AssetModuleStatics.h"
 #include "Widget/WidgetModuleStatics.h"
 #include "Widget/Common/WidgetUIMask.h"
 #include "Widget/Inventory/Slot/WidgetInventoryEquipSlot.h"
@@ -84,8 +83,8 @@ void UWidgetInventoryPanel::OnInitialize(UObject* InOwner, const TArray<FParamet
 			{
 				if(UWidgetInventoryEquipSlot* EquipSlot = CreateSubWidget<UWidgetInventoryEquipSlot>({ EquipSlots[i] }, UISlotDatas[ESlotSplitType::Equip].Class))
 				{
-					EquipSlot->SetEquipPartType(UCommonStatics::GetEnumValueDisplayName(TEXT("/Script/DreamWorld.EDWEquipPartType"), i));
-					if(UGridSlot* GridSlot = i % 2 == 0 ? LeftEquipContent->AddChildToGrid(EquipSlot) : RightEquipContent->AddChildToGrid(EquipSlot))
+					EquipSlot->SetEquipPart(UCommonStatics::GetEnumValueDisplayName(TEXT("/Script/DreamWorld.EDWEquipPart"), i));
+					if(UGridSlot* GridSlot = (i % 2 == 0 ? LeftEquipContent->AddChildToGrid(EquipSlot) : RightEquipContent->AddChildToGrid(EquipSlot)))
 					{
 						GridSlot->SetPadding(FMargin(2.5f, 20.f, 2.5f, 2.5f));
 						GridSlot->SetRow(i / 2);

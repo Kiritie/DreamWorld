@@ -46,8 +46,8 @@ float UDWCharacterState_Float::GetFloatOffsetPosZ() const
 {
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 
-	const float NeckPosZ = Character->GetCharacterPart(EDWCharacterPartType::Neck)->GetComponentLocation().Z;
-	const float ChestPosZ = Character->GetCharacterPart(EDWCharacterPartType::Chest)->GetComponentLocation().Z;
+	const float NeckPosZ = Character->GetCharacterPart(EDWCharacterPart::Neck)->GetComponentLocation().Z;
+	const float ChestPosZ = Character->GetCharacterPart(EDWCharacterPart::Chest)->GetComponentLocation().Z;
 	const float OffsetZ = ChestPosZ + (NeckPosZ - ChestPosZ) * 0.5f - Character->GetActorLocation().Z;
 	return OffsetZ;
 }

@@ -11,6 +11,7 @@
 #include "Ability/Character/States/AbilityCharacterState_Static.h"
 #include "Ability/Character/States/AbilityCharacterState_Swim.h"
 #include "Ability/Character/States/AbilityCharacterState_Walk.h"
+#include "Ability/Inventory/Slot/AbilityInventorySlotBase.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/StaticMeshComponent.h"
@@ -91,55 +92,71 @@ void ADWHumanCharacter::OnDespawn_Implementation(bool bRecovery)
 	AuxiliaryVoxelEntity = nullptr;
 }
 
+void ADWHumanCharacter::OnPreChangeItem(const FAbilityItem& InOldItem)
+{
+	Super::OnPreChangeItem(InOldItem);
+
+	if(InOldItem.IsValid() && InOldItem.InventorySlot->IsMatched())
+	{
+		const auto& ItemData = InOldItem.GetData<UAbilityItemDataBase>();
+		switch(ItemData.GetItemType())
+		{
+			case EAbilityItemType::Equip:
+			{
+				const auto& EquipData = InOldItem.GetData<UDWEquipData>();
+				if(ADWEquip* Equip = GetEquip(EquipData.EquipPart))
+				{
+					Equip->OnDisassemble();
+					UObjectPoolModuleStatics::DespawnObject(Equip);
+					Equips.Remove(EquipData.EquipPart);
+				}
+				break;
+			}
+			default: break;
+		}
+	}
+}
+
+void ADWHumanCharacter::OnChangeItem(const FAbilityItem& InNewItem)
+{
+	Super::OnChangeItem(InNewItem);
+
+	if(InNewItem.IsValid() && InNewItem.InventorySlot->IsMatched())
+	{
+		const auto& ItemData = InNewItem.GetData<UAbilityItemDataBase>();
+		switch(ItemData.GetItemType())
+		{
+			case EAbilityItemType::Equip:
+			{
+				const auto& EquipData = InNewItem.GetData<UDWEquipData>();
+				if(ADWEquip* Equip = Cast<ADWEquip>(UAbilityModuleStatics::SpawnAbilityItem(InNewItem, this)))
+				{
+					Equip->OnAssemble();
+					Equip->Execute_SetActorVisible(Equip, Execute_IsVisible(this) && ControlMode == EDWCharacterControlMode::Fighting);
+					Equips.Emplace(EquipData.EquipPart, Equip);
+				}
+				break;
+			}
+			default: break;
+		}
+	}
+}
+
 void ADWHumanCharacter::OnActiveItem(const FAbilityItem& InItem, bool bPassive, bool bSuccess)
 {
 	Super::OnActiveItem(InItem, bPassive, bSuccess);
-
-	const auto& ItemData = InItem.GetData<UAbilityItemDataBase>();
-	switch(ItemData.GetItemType())
-	{
-		case EAbilityItemType::Equip:
-		{
-			const auto& EquipData = InItem.GetData<UDWEquipData>();
-			if(AAbilityEquipBase* Equip = Cast<AAbilityEquipBase>(UAbilityModuleStatics::SpawnAbilityItem(InItem, this)))
-			{
-				Equip->OnAssemble();
-				Equip->Execute_SetActorVisible(Equip, Execute_IsVisible(this) && ControlMode == EDWCharacterControlMode::Fighting);
-				Equips.Emplace(EquipData.PartType, Equip);
-			}
-			break;
-		}
-		default: break;
-	}
 }
 
 void ADWHumanCharacter::OnDeactiveItem(const FAbilityItem& InItem, bool bPassive)
 {
 	Super::OnDeactiveItem(InItem, bPassive);
-
-	const auto& ItemData = InItem.GetData<UAbilityItemDataBase>();
-	switch(ItemData.GetItemType())
-	{
-		case EAbilityItemType::Equip:
-		{
-			const auto& EquipData = InItem.GetData<UDWEquipData>();
-			if(AAbilityEquipBase* Equip = GetEquip(EquipData.PartType))
-			{
-				Equip->OnDischarge();
-				UObjectPoolModuleStatics::DespawnObject(Equip);
-				Equips.Emplace(EquipData.PartType, nullptr);
-			}
-			break;
-		}
-		default: break;
-	}
 }
 
-void ADWHumanCharacter::OnSelectItem(ESlotSplitType InSplitType, const FAbilityItem& InItem)
+void ADWHumanCharacter::OnSelectItem(const FAbilityItem& InItem)
 {
-	Super::OnSelectItem(InSplitType, InItem);
+	Super::OnSelectItem(InItem);
 
-	if(InSplitType == ESlotSplitType::Shortcut)
+	if(InItem.InventorySlot->GetSplitType() == ESlotSplitType::Shortcut)
 	{
 		if(InItem.IsValid() && InItem.GetType() == EAbilityItemType::Voxel)
 		{
@@ -147,14 +164,14 @@ void ADWHumanCharacter::OnSelectItem(ESlotSplitType InSplitType, const FAbilityI
 			{
 				GenerateVoxelEntity = UObjectPoolModuleStatics::SpawnObject<AVoxelEntity>();
 				GenerateVoxelEntity->Execute_SetActorVisible(GenerateVoxelEntity, Execute_IsVisible(this) && ControlMode == EDWCharacterControlMode::Creating);
-				GenerateVoxelEntity->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("GenerateVoxelMesh"));
+				AttachActor(GenerateVoxelEntity, FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("GenerateVoxelMesh"));
 				GenerateVoxelEntity->SetActorScale3D(FVector(0.3f));
 			}
 			GenerateVoxelEntity->LoadSaveData(new FVoxelItem(InItem));
 		}
 		else if(GenerateVoxelEntity)
 		{
-			GenerateVoxelEntity->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+			DetachActor(GenerateVoxelEntity, FDetachmentTransformRules::KeepWorldTransform);
 			UObjectPoolModuleStatics::DespawnObject(GenerateVoxelEntity);
 			GenerateVoxelEntity = nullptr;
 		}
@@ -170,7 +187,7 @@ void ADWHumanCharacter::OnAuxiliaryItem(const FAbilityItem& InItem)
 		if(!AuxiliaryVoxelEntity)
 		{
 			AuxiliaryVoxelEntity = UObjectPoolModuleStatics::SpawnObject<AVoxelEntity>();
-			AuxiliaryVoxelEntity->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("AuxiliaryVoxelMesh"));
+			AttachActor(AuxiliaryVoxelEntity, FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("AuxiliaryVoxelMesh"));
 			AuxiliaryVoxelEntity->SetActorScale3D(FVector(0.3f));
 			AuxiliaryVoxelEntity->GetMeshComponent()->SetCastShadow(false);
 		}
@@ -178,7 +195,7 @@ void ADWHumanCharacter::OnAuxiliaryItem(const FAbilityItem& InItem)
 	}
 	else if(AuxiliaryVoxelEntity)
 	{
-		AuxiliaryVoxelEntity->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+		DetachActor(AuxiliaryVoxelEntity, FDetachmentTransformRules::KeepWorldTransform);
 		UObjectPoolModuleStatics::DespawnObject(AuxiliaryVoxelEntity);
 		AuxiliaryVoxelEntity = nullptr;
 	}
@@ -209,7 +226,7 @@ void ADWHumanCharacter::SetHitAble(bool bValue)
 {
 	Super::SetHitAble(bValue);
 
-	if(ADWEquipWeaponMelee* Weapon = GetWeapon<ADWEquipWeaponMelee>())
+	if(ADWEquipWeaponMelee* Weapon = GetWeapon<ADWEquipWeaponMelee>(AttackWeaponPart))
 	{
 		Weapon->SetHitAble(bValue);
 	}
@@ -219,7 +236,7 @@ void ADWHumanCharacter::ClearHitTargets()
 {
 	Super::ClearHitTargets();
 
-	if(ADWEquipWeaponMelee* Weapon = GetWeapon<ADWEquipWeaponMelee>())
+	if(ADWEquipWeaponMelee* Weapon = GetWeapon<ADWEquipWeaponMelee>(AttackWeaponPart))
 	{
 		Weapon->ClearHitTargets();
 	}

@@ -3,7 +3,7 @@
 #include "Character/Human/States/DWHumanCharacterState_Defend.h"
 
 #include "Character/DWCharacter.h"
-#include "Item/Equip/Shield/DWEquipShield.h"
+#include "Item/Equip/Weapon/DWEquipWeapon.h"
 
 UDWHumanCharacterState_Defend::UDWHumanCharacterState_Defend()
 {
@@ -18,12 +18,16 @@ bool UDWHumanCharacterState_Defend::OnPreEnter(UFiniteStateBase* InLastState, co
 {
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 
-	return Character->GetShield() && Super::OnPreEnter(InLastState, InParams);
+	return Character->CheckWeaponType(EDWWeaponPart::Secondary, EDWWeaponType::Shield) && Super::OnPreEnter(InLastState, InParams);
 }
 
 void UDWHumanCharacterState_Defend::OnEnter(UFiniteStateBase* InLastState, const TArray<FParameter>& InParams)
 {
 	Super::OnEnter(InLastState, InParams);
+
+	ADWCharacter* Character = GetAgent<ADWCharacter>();
+
+	Character->GetWeapon(EDWWeaponPart::Secondary)->Active();
 }
 
 void UDWHumanCharacterState_Defend::OnRefresh(float DeltaSeconds)
@@ -34,6 +38,10 @@ void UDWHumanCharacterState_Defend::OnRefresh(float DeltaSeconds)
 void UDWHumanCharacterState_Defend::OnLeave(UFiniteStateBase* InNextState)
 {
 	Super::OnLeave(InNextState);
+
+	ADWCharacter* Character = GetAgent<ADWCharacter>();
+
+	Character->GetWeapon(EDWWeaponPart::Secondary)->Deactive();
 }
 
 void UDWHumanCharacterState_Defend::OnTermination()

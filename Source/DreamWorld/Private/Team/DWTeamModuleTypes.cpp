@@ -44,15 +44,15 @@ void FDWTeamSaveData::DissolveTeam()
 
 TArray<IDWTeamAgentInterface*> FDWTeamSaveData::GetMembers(IDWTeamAgentInterface* InMember)
 {
-	auto tmpArr = TArray<IDWTeamAgentInterface*>();
+	auto Arr = TArray<IDWTeamAgentInterface*>();
 	for (int i = 0; i < Members.Num(); i++)
 	{
 		if (Members[i] != InMember->GetActorIDT())
 		{
-			tmpArr.Add(USceneModuleStatics::GetSceneActor<IDWTeamAgentInterface>(Members[i].ToString()));
+			Arr.Add(USceneModuleStatics::GetSceneActor<IDWTeamAgentInterface>(Members[i].ToString()));
 		}
 	}
-	return tmpArr;
+	return Arr;
 }
 
 bool FDWTeamSaveData::IsCaptain(IDWTeamAgentInterface* InMember) const

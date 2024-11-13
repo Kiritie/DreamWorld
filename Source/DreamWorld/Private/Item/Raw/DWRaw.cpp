@@ -7,8 +7,3 @@ ADWRaw::ADWRaw()
 {
 
 }
-
-void ADWRaw::Initialize_Implementation(AActor* InOwnerActor, const FAbilityItem& InItem)
-{
-	Super::Initialize_Implementation(InOwnerActor, InItem);
-}

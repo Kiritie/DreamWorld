@@ -18,10 +18,10 @@ public:
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	FText EquipPartType;
+	FText EquipPart;
 
 public:
-	FText GetEquipPartType() const { return EquipPartType; }
+	FText GetEquipPart() const { return EquipPart; }
 
-	void SetEquipPartType(const FText& InEquipPartType) { this->EquipPartType = InEquipPartType; }
+	void SetEquipPart(const FText& InEquipPart) { this->EquipPart = InEquipPart; }
 };

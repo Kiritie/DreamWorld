@@ -42,4 +42,6 @@ public:
 		return static_cast<T&>(GetVoxelData());
 	}
 	UVoxelData& GetVoxelData() const;
+
+	virtual UMeshComponent* GetMeshComponent() const override;
 };

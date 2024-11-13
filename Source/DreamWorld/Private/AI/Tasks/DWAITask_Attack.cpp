@@ -45,7 +45,7 @@ EBTNodeResult::Type UDWAITask_Attack::ExecuteTask(UBehaviorTreeComponent& OwnerC
 
 	if (!InitTask(OwnerComp)) return EBTNodeResult::Failed;
 
-	if(GetAgent<ADWCharacter>()->Attack(AttackAbilityIndex, FSimpleDelegate::CreateLambda([this, &OwnerComp]()
+	if(GetAgent<ADWCharacter>()->Attack(EDWWeaponPart::None, AttackAbilityIndex, FSimpleDelegate::CreateLambda([this, &OwnerComp]()
 	{
 		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
 	})))

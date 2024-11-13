@@ -53,3 +53,8 @@ UVoxelData& ADWVitalityVoxel::GetVoxelData() const
 {
 	return UAssetModuleStatics::LoadPrimaryAssetRef<UVoxelData>(VoxelID);
 }
+
+UMeshComponent* ADWVitalityVoxel::GetMeshComponent() const
+{
+	return VoxelMesh;
+}

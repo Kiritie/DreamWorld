@@ -100,27 +100,25 @@ enum class EDWEquipType : uint8
 {
 	// 武器
 	Weapon,
-	// 盾牌
-	Shield,
 	// 防具
 	Armor
 };
 
 UENUM(BlueprintType)
-enum class EDWEquipPartType : uint8
+enum class EDWEquipPart : uint8
 {
 	// 头部
-	Head UMETA(DisplayName="头部"),
+	Head,
 	// 胸部
-	Chest UMETA(DisplayName="胸部"),
+	Chest,
 	// 手臂
-	Arm UMETA(DisplayName="手臂"),
+	Arm,
 	// 腿部
-	Leg UMETA(DisplayName="腿部"),
-	// 左手
-	LeftHand UMETA(DisplayName="左手"),
-	// 右手
-	RightHand UMETA(DisplayName="右手")
+	Leg,
+	// 主武器
+	Primary,
+	// 次武器
+	Secondary
 };
 
 UENUM(BlueprintType)
@@ -137,22 +135,24 @@ enum class EDWWeaponType : uint8
 	// 弩
 	Crossbow,
 	// 法杖
-	Wand
+	Wand,
+	// 盾牌
+	Shield
 };
 
 UENUM(BlueprintType)
-enum class EDWShieldType : uint8
+enum class EDWWeaponPart : uint8
 {
 	// 无
 	None,
-	// 物理
-	Physics,
-	// 魔法
-	Magic
+	// 主要
+	Primary = EDWEquipPart::Primary,
+	// 次要
+	Secondary = EDWEquipPart::Secondary
 };
 
 UENUM(BlueprintType)
-enum class EDWWeaponHandType : uint8
+enum class EDWWeaponHand : uint8
 {
 	// 无
 	None,
@@ -169,15 +169,26 @@ struct DREAMWORLD_API FDWCharacterAttackAbilityData : public FAbilityData
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	EDWWeaponType WeaponType;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSubclassOf<UAbilityBase> AbilityClass;
 
 	FORCEINLINE FDWCharacterAttackAbilityData()
 	{
-		WeaponType = EDWWeaponType::None;
 		AbilityClass = nullptr;
+	}
+};
+
+USTRUCT(BlueprintType)
+struct DREAMWORLD_API FDWCharacterAttackAbilities
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<FDWCharacterAttackAbilityData> Abilities;
+
+	FORCEINLINE FDWCharacterAttackAbilities()
+	{
+		Abilities = TArray<FDWCharacterAttackAbilityData>();
 	}
 };
 
@@ -188,42 +199,53 @@ struct DREAMWORLD_API FDWCharacterAttackAbilityQueue
 
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	int32 AbilityIndex;
+	int32 Index;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	TArray<FDWCharacterAttackAbilityData> AbilityDatas;
+	TArray<FDWCharacterAttackAbilityData> Abilities;
 
 	FORCEINLINE FDWCharacterAttackAbilityQueue()
 	{
-		AbilityIndex = 0;
-		AbilityDatas = TArray<FDWCharacterAttackAbilityData>();
+		Index = 0;
+		Abilities = TArray<FDWCharacterAttackAbilityData>();
 	}
 
 public:
 	FORCEINLINE void Reset()
 	{
-		AbilityIndex = 0;
+		Index = 0;
 	}
 
 	FORCEINLINE void Prev()
 	{
-		if (--AbilityIndex < 0)
+		if (--Index < 0)
 		{
-			AbilityIndex = AbilityDatas.Num();
+			Index = Abilities.Num();
 		}
 	}
 
 	FORCEINLINE void Next()
 	{
-		if (++AbilityIndex == AbilityDatas.Num())
+		if (++Index == Abilities.Num())
 		{
-			AbilityIndex = 0;
+			Index = 0;
 		}
 	}
 };
 
 USTRUCT(BlueprintType)
-struct DREAMWORLD_API FDWCharacterSkillAbilityData : public FAbilityData
+struct DREAMWORLD_API FDWCharacterFallingAttackAbilityData : public FDWCharacterAttackAbilityData
+{
+	GENERATED_BODY()
+
+public:
+	FORCEINLINE FDWCharacterFallingAttackAbilityData()
+	{
+	}
+};
+
+USTRUCT(BlueprintType)
+struct DREAMWORLD_API FDWCharacterSkillAttackAbilityData : public FDWCharacterAttackAbilityData
 {
 	GENERATED_BODY()
 
@@ -234,14 +256,25 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bCancelAble;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TSubclassOf<UAbilityBase> AbilityClass;
-
-	FORCEINLINE FDWCharacterSkillAbilityData()
+	FORCEINLINE FDWCharacterSkillAttackAbilityData()
 	{
 		WeaponType = EDWWeaponType::None;
 		bCancelAble = false;
-		AbilityClass = nullptr;
+	}
+};
+
+USTRUCT(BlueprintType)
+struct DREAMWORLD_API FDWCharacterSkillAttackAbilities
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<FDWCharacterSkillAttackAbilityData> Abilities;
+
+	FORCEINLINE FDWCharacterSkillAttackAbilities()
+	{
+		Abilities = TArray<FDWCharacterSkillAttackAbilityData>();
 	}
 };
 
@@ -297,18 +330,18 @@ public:
 	{
 		TeamID = NAME_None;
 		ControlMode = EDWCharacterControlMode::Fighting;
-		FallingAttackAbility = FDWCharacterAttackAbilityData();
 		AttackAbilityQueues = TMap<EDWWeaponType, FDWCharacterAttackAbilityQueue>();
-		SkillAbilities = TMap<FPrimaryAssetId, FDWCharacterSkillAbilityData>();
+		FallingAttackAbilities = TMap<EDWWeaponType, FDWCharacterFallingAttackAbilityData>();
+		SkillAttackAbilities = TMap<FPrimaryAssetId, FDWCharacterSkillAttackAbilityData>();
 	}
 	
 	FORCEINLINE FDWCharacterSaveData(const FCharacterSaveData& InCharacterSaveData) : FCharacterSaveData(InCharacterSaveData)
 	{
 		TeamID = NAME_None;
 		ControlMode = EDWCharacterControlMode::Fighting;
-		FallingAttackAbility = FDWCharacterAttackAbilityData();
 		AttackAbilityQueues = TMap<EDWWeaponType, FDWCharacterAttackAbilityQueue>();
-		SkillAbilities = TMap<FPrimaryAssetId, FDWCharacterSkillAbilityData>();
+		FallingAttackAbilities = TMap<EDWWeaponType, FDWCharacterFallingAttackAbilityData>();
+		SkillAttackAbilities = TMap<FPrimaryAssetId, FDWCharacterSkillAttackAbilityData>();
 	}
 	
 	UPROPERTY(BlueprintReadOnly)
@@ -318,13 +351,13 @@ public:
 	EDWCharacterControlMode ControlMode;
 
 	UPROPERTY()
-	FDWCharacterAttackAbilityData FallingAttackAbility;
-
-	UPROPERTY()
 	TMap<EDWWeaponType, FDWCharacterAttackAbilityQueue> AttackAbilityQueues;
 
 	UPROPERTY()
-	TMap<FPrimaryAssetId, FDWCharacterSkillAbilityData> SkillAbilities;
+	TMap<EDWWeaponType, FDWCharacterFallingAttackAbilityData> FallingAttackAbilities;
+
+	UPROPERTY()
+	TMap<FPrimaryAssetId, FDWCharacterSkillAttackAbilityData> SkillAttackAbilities;
 };
 
 USTRUCT(BlueprintType)
@@ -821,7 +854,7 @@ enum class EDWCharacterAttackType : uint8
 };
 
 UENUM(BlueprintType)
-enum class EDWCharacterPartType : uint8
+enum class EDWCharacterPart : uint8
 {
 	// 无
 	None,
@@ -859,7 +892,7 @@ class DREAMWORLD_API UDWDamageHandle : public UDamageHandle
 public:
 	UDWDamageHandle() {}
 
-	virtual void HandleDamage(AActor* SourceActor, AActor* TargetActor, float DamageValue, EDamageType DamageType, const FHitResult& HitResult, const FGameplayTagContainer& SourceTags) override;
+	virtual void HandleDamage(AActor* SourceActor, AActor* TargetActor, float DamageValue, const FGameplayAttribute& DamageAttribute, const FHitResult& HitResult, const FGameplayTagContainer& SourceTags) override;
 };
 
 namespace GameplayTags

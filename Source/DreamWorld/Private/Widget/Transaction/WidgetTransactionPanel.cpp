@@ -11,7 +11,7 @@
 #include "CommonButtonBase.h"
 #include "Ability/Inventory/AbilityInventoryAgentInterface.h"
 #include "Ability/Inventory/AbilityInventoryBase.h"
-#include "Ability/Item/AbilityTransactionItemDataBase.h"
+#include "Ability/Item/AbilityTransItemDataBase.h"
 #include "Achievement/AchievementModuleStatics.h"
 #include "Widget/WidgetModuleStatics.h"
 #include "Widget/Common/CommonButton.h"
@@ -100,7 +100,7 @@ void UWidgetTransactionPanel::OnOpen(const TArray<FParameter>& InParams, bool bI
 
 	UWidgetModuleStatics::OpenUserWidget<UWidgetUIMask>();
 
-	TransactionTarget = InParams[0].GetObjectValue<IAbilityInventoryAgentInterface>();
+	TransactionTarget = InParams[0];
 	TransactionTarget->GetInventory()->OnRefresh.AddDynamic(this, &UWidgetTransactionPanel::Refresh);
 
 	TabGroup->SelectButtonAtIndex(0);
@@ -124,7 +124,7 @@ void UWidgetTransactionPanel::OnRefresh()
 
 	for(auto Iter : PreviewItems)
 	{
-		Iter->OnRefresh();
+		Iter->Refresh();
 	}
 
 	bool bCanTransaction = true;
@@ -132,8 +132,8 @@ void UWidgetTransactionPanel::OnRefresh()
 	if(GetSelectedTransactionItem(_SelectedTransactionItem))
 	{
 		UAbilityInventoryBase* Inventory = GetOwnerObject<IAbilityInventoryAgentInterface>()->GetInventory();
-		SelectedPreviewItems = _SelectedTransactionItem.GetData<UAbilityTransactionItemDataBase>().Prices;
-		if(GetTabIndex() == 0)
+		SelectedPreviewItems = GetTabIndex() < 2 ? _SelectedTransactionItem.GetData<UAbilityTransItemDataBase>().Prices : _SelectedTransactionItem.GetData<UAbilityTransItemDataBase>().Upgrades;
+		if(GetTabIndex() != 1)
 		{
 			for(auto& Iter1 : SelectedPreviewItems)
 			{
@@ -176,19 +176,40 @@ void UWidgetTransactionPanel::OnTransactionContentRefresh()
 	
 	if(TransactionContent)
 	{
-		IAbilityInventoryAgentInterface* Seller = GetTabIndex() == 0 ? TransactionTarget : GetOwnerObject<IAbilityInventoryAgentInterface>();
-
-		for(auto Iter : Seller->GetInventory()->GetAllSlots())
+		if(GetTabIndex() < 2)
 		{
-			if(Iter->IsEmpty() || !Iter->GetItem().IsDataType<UAbilityTransactionItemDataBase>() || Iter->GetItem().GetData<UAbilityTransactionItemDataBase>().Prices.IsEmpty()) continue;
-			
-			if(UWidgetTransactionItem* TransactionItem = CreateSubWidget<UWidgetTransactionItem>({ &Iter->GetItem() }, TransactionItemClass))
+			IAbilityInventoryAgentInterface* Seller = GetTabIndex() == 0 ? TransactionTarget : GetOwnerObject<IAbilityInventoryAgentInterface>();
+
+			for(auto& Iter : Seller->GetInventory()->GetAllItems())
 			{
-				if(UScrollBoxSlot* ScrollBoxSlot = Cast<UScrollBoxSlot>(TransactionContent->AddChild(TransactionItem)))
+				if(Iter.IsEmpty() || !Iter.IsDataType<UAbilityTransItemDataBase>() || Iter.GetData<UAbilityTransItemDataBase>().Prices.IsEmpty()) continue;
+
+				if(UWidgetTransactionItem* TransactionItem = CreateSubWidget<UWidgetTransactionItem>({ &Iter }, TransactionItemClass))
 				{
-					ScrollBoxSlot->SetPadding(FMargin(0.f, 0.f, 0.f, 5.f));
+					if(UScrollBoxSlot* ScrollBoxSlot = Cast<UScrollBoxSlot>(TransactionContent->AddChild(TransactionItem)))
+					{
+						ScrollBoxSlot->SetPadding(FMargin(0.f, 0.f, 0.f, 5.f));
+					}
+					TransactionItems.Add(TransactionItem);
 				}
-				TransactionItems.Add(TransactionItem);
+			}
+		}
+		else
+		{
+			IAbilityInventoryAgentInterface* Buyer = GetOwnerObject<IAbilityInventoryAgentInterface>();
+
+			for(auto Iter : Buyer->GetInventory()->GetAllSlots())
+			{
+				if(Iter->IsEmpty() || !Iter->GetItem().IsDataType<UAbilityTransItemDataBase>() || Iter->GetItem().GetData<UAbilityTransItemDataBase>().Upgrades.IsEmpty() || Iter->GetItem().Level == Iter->GetItem().GetData<UAbilityTransItemDataBase>().MaxLevel) continue;
+
+				if(UWidgetTransactionItem* TransactionItem = CreateSubWidget<UWidgetTransactionItem>({ &Iter->GetItem() }, TransactionItemClass))
+				{
+					if(UScrollBoxSlot* ScrollBoxSlot = Cast<UScrollBoxSlot>(TransactionContent->AddChild(TransactionItem)))
+					{
+						ScrollBoxSlot->SetPadding(FMargin(0.f, 0.f, 0.f, 5.f));
+					}
+					TransactionItems.Add(TransactionItem);
+				}
 			}
 		}
 	}
@@ -241,7 +262,7 @@ void UWidgetTransactionPanel::OnPreviewContentRefresh()
 			PreviewItems.Empty();
 			for(auto& Iter : SelectedPreviewItems)
 			{
-				if(UWidgetAbilityItem* PreviewItem = CreateSubWidget<UWidgetAbilityItem>({ &Iter }, UAssetModuleStatics::GetStaticClass(GetTabIndex() == 0 ? FName("RequiredPreviewItem") : FName("SimplePreviewItem"))))
+				if(UWidgetAbilityItem* PreviewItem = CreateSubWidget<UWidgetAbilityItem>({ &Iter }, UAssetModuleStatics::GetStaticClass(GetTabIndex() != 1 ? FName("RequiredPreviewItem") : FName("SimplePreviewItem"))))
 				{
 					if(UWrapBoxSlot* WrapBoxSlot = PreviewContent->AddChildToWrapBox(PreviewItem))
 					{
@@ -259,37 +280,76 @@ void UWidgetTransactionPanel::OnTransactionButtonClicked()
 	FAbilityItem _SelectedTransactionItem;
 	if(GetSelectedTransactionItem(_SelectedTransactionItem))
 	{
-		IAbilityInventoryAgentInterface* Buyer = GetTabIndex() == 0 ? GetOwnerObject<IAbilityInventoryAgentInterface>() : TransactionTarget;
-		IAbilityInventoryAgentInterface* Seller = GetTabIndex() == 0 ? TransactionTarget : GetOwnerObject<IAbilityInventoryAgentInterface>();
+		if(GetTabIndex() < 2)
+		{
+			IAbilityInventoryAgentInterface* Buyer = GetTabIndex() == 0 ? GetOwnerObject<IAbilityInventoryAgentInterface>() : TransactionTarget;
+			IAbilityInventoryAgentInterface* Seller = GetTabIndex() == 0 ? TransactionTarget : GetOwnerObject<IAbilityInventoryAgentInterface>();
 		
-		FAbilityItem _TransactionItem = FAbilityItem(_SelectedTransactionItem, 1);
-		TArray<FAbilityItem> _PreviewItems = SelectedPreviewItems;
+			FAbilityItem _TransactionItem = FAbilityItem(_SelectedTransactionItem, 1);
+			TArray<FAbilityItem> _PreviewItems = SelectedPreviewItems;
 
-		for(auto& Iter : _PreviewItems)
-		{
-			Buyer->GetInventory()->RemoveItemByRange(Iter);
-		}
-		Buyer->GetInventory()->AddItemByRange(_TransactionItem, -1);
-		if(_TransactionItem.Count > 0)
-		{
-			Buyer->OnDiscardItem(_TransactionItem, false);
-		}
+			for(auto Iter : _PreviewItems)
+			{
+				Buyer->GetInventory()->RemoveItemByRange(Iter);
+			}
+			Buyer->GetInventory()->AddItemByRange(_TransactionItem, -1);
+			if(_TransactionItem.Count > 0)
+			{
+				Buyer->OnDiscardItem(_TransactionItem, false);
+			}
 		
-		_TransactionItem = FAbilityItem(_SelectedTransactionItem, 1);
-		_PreviewItems = SelectedPreviewItems;
-		Seller->GetInventory()->RemoveItemByRange(_TransactionItem);
-		for(auto& Iter : _PreviewItems)
-		{
-			Seller->GetInventory()->AddItemByRange(Iter);
-		}
-		if(Seller->GetInventory()->QueryItemByRange(EItemQueryType::Get, _TransactionItem).Item.Count <= 0)
-		{
-			OnTransactionContentRefresh();
+			_TransactionItem = FAbilityItem(_SelectedTransactionItem, 1);
+			Seller->GetInventory()->RemoveItemByRange(_TransactionItem);
+			for(auto Iter : _PreviewItems)
+			{
+				Seller->GetInventory()->AddItemByRange(Iter);
+			}
+		
+			if(Seller->GetInventory()->QueryItemByRange(EItemQueryType::Get, _TransactionItem).Item.Count <= 0)
+			{
+				OnTransactionContentRefresh();
+			}
+			else
+			{
+				_SelectedTransactionItem.Count--;
+				SelectedTransactionItem->Init({ &_SelectedTransactionItem });
+			}
 		}
 		else
 		{
-			_SelectedTransactionItem.Count--;
-			SelectedTransactionItem->Init({ &_SelectedTransactionItem });
+			IAbilityInventoryAgentInterface* Buyer = GetOwnerObject<IAbilityInventoryAgentInterface>();
+			IAbilityInventoryAgentInterface* Seller = TransactionTarget;
+
+			FAbilityItem _TransactionItem = _SelectedTransactionItem;
+			TArray<FAbilityItem> _PreviewItems = SelectedPreviewItems;
+
+			_TransactionItem.Level++;
+			
+			for(auto Iter : _PreviewItems)
+			{
+				Buyer->GetInventory()->RemoveItemByRange(Iter);
+			}
+		
+			for(auto Iter : _PreviewItems)
+			{
+				Seller->GetInventory()->AddItemByRange(Iter);
+			}
+
+			if(_TransactionItem.InventorySlot)
+			{
+				_TransactionItem.InventorySlot->SetItem(_TransactionItem);
+			}
+
+			if(_TransactionItem.Level == _TransactionItem.GetData<UAbilityTransItemDataBase>().MaxLevel)
+			{
+				OnTransactionContentRefresh();
+			}
+			else
+			{
+				SelectedTransactionItem->Init({ &_TransactionItem });
+				Refresh();
+				OnPreviewContentRefresh();
+			}
 		}
 
 		UAchievementModuleStatics::UnlockAchievement(FName("FirstTransactionItem"));

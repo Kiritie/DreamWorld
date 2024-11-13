@@ -28,14 +28,18 @@ public:
 
 	virtual void OnItemChanged(FAbilityItem& InOldItem) override;
 
-	virtual bool MatchItemLimit(FAbilityItem InItem) const override;
+	virtual bool MatchItemLimit(FAbilityItem InItem, bool bForce = false) const override;
 	
 	virtual void Refresh() override;
 
+	virtual bool ActiveItem(bool bPassive) override;
+
+	virtual void DeactiveItem(bool bPassive) override;
+
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	EDWEquipPartType PartType;
+	EDWEquipPart EquipPart;
 
 public:
-	EDWEquipPartType GetPartType() const { return PartType; }
+	EDWEquipPart GetEquipPart() const { return EquipPart; }
 };

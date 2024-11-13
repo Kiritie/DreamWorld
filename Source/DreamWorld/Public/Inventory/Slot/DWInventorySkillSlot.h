@@ -24,7 +24,7 @@ public:
 
 	virtual void OnItemChanged(FAbilityItem& InOldItem) override;
 
-	virtual bool MatchItemLimit(FAbilityItem InItem) const override;
+	virtual bool MatchItemLimit(FAbilityItem InItem, bool bForce = false) const override;
 	
 	virtual bool ActiveItem(bool bPassive = false) override;
 	

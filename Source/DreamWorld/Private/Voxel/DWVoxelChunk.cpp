@@ -119,9 +119,9 @@ void ADWVoxelChunk::OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 	// 			const UVoxelAsset VoxelData = voxelItem.GetData<UVoxelAsset>();
 	// 			if(voxelItem.IsValid() && VoxelData.VoxelType == characterPart->GetLastOverlapVoxel())
 	// 			{
-	// 				const FVoxelItem& tmpVoxelItem = GetVoxelItem(LocationToIndex(characterPart->GetComponentLocation()));
-	// 				const UVoxelAsset tmpVoxelData = tmpVoxelItem.GetData<UVoxelAsset>();
-	// 				if(!tmpVoxelItem.IsValid() || tmpVoxelData.VoxelType != VoxelData.VoxelType)
+	// 				const FVoxelItem& _VoxelItem = GetVoxelItem(LocationToIndex(characterPart->GetComponentLocation()));
+	// 				const UVoxelAsset _VoxelData = _VoxelItem.GetData<UVoxelAsset>();
+	// 				if(!_VoxelItem.IsValid() || _VoxelData.VoxelType != VoxelData.VoxelType)
 	// 				{
 	// 					if(UVoxel& voxel = voxelItem.GetVoxel())
 	// 					{
@@ -186,8 +186,8 @@ void ADWVoxelChunk::SpawnSceneActors()
 			for(auto& VitalityItem : RaceData.Items)
 			{
 				const auto& VitalityData = VitalityItem.GetData<UAbilityVitalityDataBase>();
-				const int32 tmpNum = VitalityItem.Count != 0 ? VitalityItem.Count : WorldData.RandomStream.RandRange(VitalityItem.MinCount, VitalityItem.MaxCount);
-				DON(tmpNum,
+				const int32 Num = VitalityItem.Count != 0 ? VitalityItem.Count : WorldData.RandomStream.RandRange(VitalityItem.MinCount, VitalityItem.MaxCount);
+				DON(Num,
 					FHitResult HitResult;
 					if(UVoxelModuleStatics::VoxelAgentTraceSingle(Index, VitalityData.Radius, VitalityData.HalfHeight, {}, HitResult, true, 10, false))
 					{
@@ -213,8 +213,8 @@ void ADWVoxelChunk::SpawnSceneActors()
 			for(auto& CharacterItem : RaceData.Items)
 			{
 				const auto& CharacterData = CharacterItem.GetData<UAbilityCharacterDataBase>();
-				const int32 tmpNum = CharacterItem.Count != 0 ? CharacterItem.Count : WorldData.RandomStream.RandRange(CharacterItem.MinCount, CharacterItem.MaxCount);
-				DON(tmpNum,
+				const int32 Num = CharacterItem.Count != 0 ? CharacterItem.Count : WorldData.RandomStream.RandRange(CharacterItem.MinCount, CharacterItem.MaxCount);
+				DON(Num,
 					FHitResult HitResult;
 					if(UVoxelModuleStatics::VoxelAgentTraceSingle(Index, CharacterData.Radius, CharacterData.HalfHeight, {}, HitResult, true, 10, false))
 					{

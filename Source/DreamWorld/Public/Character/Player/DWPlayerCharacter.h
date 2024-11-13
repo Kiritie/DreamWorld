@@ -81,14 +81,20 @@ protected:
 
 public:
 	virtual void OnAdditionItem(const FAbilityItem& InItem) override;
+
+	virtual void OnChangeItem(const FAbilityItem& InNewItem) override;
 	
 	virtual void OnActiveItem(const FAbilityItem& InItem, bool bPassive, bool bSuccess) override;
 
 	virtual void OnDeactiveItem(const FAbilityItem& InItem, bool bPassive) override;
 
-	virtual void OnSelectItem(ESlotSplitType InSplitType, const FAbilityItem& InItem) override;
+	virtual void OnSelectItem(const FAbilityItem& InItem) override;
 	
 	virtual void OnAttributeChange(const FOnAttributeChangeData& InAttributeChangeData) override;
+
+	virtual void OnActorAttached(AActor* InActor) override;
+
+	virtual void OnActorDetached(AActor* InActor) override;
 	
 public:
 	UFUNCTION()

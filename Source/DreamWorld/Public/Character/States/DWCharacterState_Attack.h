@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "UObject/Object.h"
 #include "Ability/Character/States/AbilityCharacterStateBase.h"
+#include "Common/DWCommonTypes.h"
 #include "DWCharacterState_Attack.generated.h"
 
 /**

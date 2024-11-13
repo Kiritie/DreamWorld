@@ -34,13 +34,11 @@ void UDWCharacterState_Aim::OnEnter(UFiniteStateBase* InLastState, const TArray<
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 	
-	Character->GetAbilitySystemComponent()->AddLooseGameplayTag(GameplayTags::State_Character_Aiming);
- 
 	Character->SetMotionRate(0.5f, 0.5f);
 
-	if(Character->GetWeaponProjectileClass())
+	if(Character->GetWeaponProjectile(EDWWeaponPart::Secondary))
 	{
-		Character->AttackProjectile = UAbilityModuleStatics::SpawnAbilityProjectile(Character->GetWeaponProjectileClass(), Character);
+		Character->AttackProjectile = UAbilityModuleStatics::SpawnAbilityProjectile(Character->GetWeaponProjectile(EDWWeaponPart::Secondary), Character);
 	}
 
 	StartAim();
@@ -79,6 +77,9 @@ void UDWCharacterState_Aim::OnTermination()
 
 void UDWCharacterState_Aim::StartAim()
 {
+	ADWCharacter* Character = GetAgent<ADWCharacter>();
+	
+	Character->GetAbilitySystemComponent()->AddLooseGameplayTag(GameplayTags::State_Character_Aiming);
 }
 
 void UDWCharacterState_Aim::EndAim()

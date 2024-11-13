@@ -76,7 +76,7 @@ void FDWPlayerSaveData::InitInventoryData()
 	}
 }
 
-void UDWDamageHandle::HandleDamage(AActor* SourceActor, AActor* TargetActor, float DamageValue, EDamageType DamageType, const FHitResult& HitResult, const FGameplayTagContainer& SourceTags)
+void UDWDamageHandle::HandleDamage(AActor* SourceActor, AActor* TargetActor, float DamageValue, const FGameplayAttribute& DamageAttribute, const FHitResult& HitResult, const FGameplayTagContainer& SourceTags)
 {
 	IAbilityVitalityInterface* SourceVitality = Cast<IAbilityVitalityInterface>(SourceActor);
 	
@@ -92,7 +92,7 @@ void UDWDamageHandle::HandleDamage(AActor* SourceActor, AActor* TargetActor, flo
 	float SourceAttackStealRate = 0.f;
 
 	float TargetDefendRate = 0.f; 
-	float TargetDefendScope = 0.f;
+	float TargetDefendScopeRate = 0.f;
 	float TargetPhysicsRes = 0.f;
 	float TargetMagicRes = 0.f;
 	
@@ -105,7 +105,7 @@ void UDWDamageHandle::HandleDamage(AActor* SourceActor, AActor* TargetActor, flo
 	if(TargetCharacter)
 	{
 		TargetDefendRate = TargetCharacter->GetDefendRate();
-		TargetDefendScope = TargetCharacter->GetDefendScope();
+		TargetDefendScopeRate = TargetCharacter->GetDefendScopeRate();
 		
 		TargetPhysicsRes = TargetCharacter->GetPhysicsRes();
 		TargetMagicRes = TargetCharacter->GetMagicRes();
@@ -117,63 +117,52 @@ void UDWDamageHandle::HandleDamage(AActor* SourceActor, AActor* TargetActor, flo
 	float MagicDefendRate = TargetMagicRes / (100.f + TargetMagicRes);
 
 	float LocalDamageValue = 0.f;
+	float LocalDefendValue = 0.f;
 	float LocalDefendRate = 0.f;
 
 	FVector DamageDirection = SourceActor->GetActorLocation() - TargetActor->GetActorLocation();
 	DamageDirection.Normalize();
-	if(FVector::DotProduct(DamageDirection, TargetActor->GetActorForwardVector()) > (1.f - TargetDefendScope))
+	if(FVector::DotProduct(DamageDirection, TargetActor->GetActorForwardVector()) > (1.f - TargetDefendScopeRate))
 	{
-		if(TargetCharacter)
+		LocalDefendRate = TargetDefendRate;
+	}
+
+	if(DamageAttribute == GET_GAMEPLAYATTRIBUTE(UVitalityAttributeSetBase, PhysicsDamage))
+	{
+		LocalDamageValue = DamageValue * (1.f - PhysicsDefendRate) * (bAttackHasCrited ? 2.f : 1.f);
+	}
+	else if(DamageAttribute == GET_GAMEPLAYATTRIBUTE(UVitalityAttributeSetBase, MagicDamage))
+	{
+		LocalDamageValue = DamageValue * (1.f - MagicDefendRate) * (bAttackHasCrited ? 2.f : 1.f);
+	}
+	else if(DamageAttribute == GET_GAMEPLAYATTRIBUTE(UVitalityAttributeSetBase, FallDamage))
+	{
+		if(SourceCharacter)
 		{
-			if(TargetCharacter->IsDefending() && TargetCharacter->DoAction(GameplayTags::Ability_Character_Action_DefendBlock))
+			const float FallHeight = SourceCharacter->GetFSMComponent()->GetStateByClass<UAbilityCharacterState_Fall>()->GetFallHeight();
+			if(FallHeight > 350.f)
 			{
-				LocalDefendRate = TargetDefendRate;
+				LocalDamageValue = DamageValue * (1.f - PhysicsDefendRate) * (FallHeight / 10.f);
 			}
-		}
-		else
-		{
-			LocalDefendRate = TargetDefendRate;
 		}
 	}
 
-	switch(DamageType)
-	{
-		case EDamageType::Physics:
-		{
-			LocalDamageValue = DamageValue * (1.f - PhysicsDefendRate) * (bAttackHasCrited ? 2.f : 1.f) * (1.f - LocalDefendRate);
-			break;
-		}
-		case EDamageType::Magic:
-		{
-			LocalDamageValue = DamageValue * (1.f - MagicDefendRate) * (bAttackHasCrited ? 2.f : 1.f) * (1.f - LocalDefendRate);
-			break;
-		}
-		case EDamageType::Fall:
-		{
-			if(SourceCharacter)
-			{
-				const float FallHeight = SourceCharacter->GetFSMComponent()->GetStateByClass<UAbilityCharacterState_Fall>()->GetFallHeight();
-				if(FallHeight > 350.f)
-				{
-					LocalDamageValue = DamageValue * (1.f - PhysicsDefendRate) * (FallHeight / 10.f);
-				}
-			}
-			break;
-		}
-	}
+	const float _DamageValue = LocalDamageValue;
+	LocalDamageValue *= (1.f - LocalDefendRate);
+	LocalDefendValue = _DamageValue - LocalDamageValue;
 
 	LocalDamageValue = FMath::Clamp(LocalDamageValue, 0.f, TargetVitality->GetHealth());
 
 	if(LocalDamageValue > 0.f)
 	{
-		TargetVitality->HandleDamage(DamageType, LocalDamageValue, bAttackHasCrited, LocalDefendRate > 0.f, HitResult, SourceTags, SourceActor);
+		TargetVitality->HandleDamage(DamageAttribute, LocalDamageValue, LocalDefendValue, bAttackHasCrited, HitResult, SourceTags, SourceActor);
 
 		if(SourceAttackStealRate > 0.f && SourceVitality != TargetVitality)
 		{
 			UEffectBase* Effect = UObjectPoolModuleStatics::SpawnObject<UEffectBase>();
 
 			FGameplayModifierInfo ModifierInfo;
-			ModifierInfo.Attribute = GET_GAMEPLAYATTRIBUTE_PROPERTY(UVitalityAttributeSetBase, Recovery);
+			ModifierInfo.Attribute = GET_GAMEPLAYATTRIBUTE(UVitalityAttributeSetBase, HealthRecovery);
 			ModifierInfo.ModifierOp = EGameplayModOp::Override;
 			ModifierInfo.ModifierMagnitude = FGameplayEffectModifierMagnitude(LocalDamageValue * SourceAttackStealRate);
 

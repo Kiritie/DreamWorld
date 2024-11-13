@@ -10,6 +10,7 @@
 
 #include "DWCharacter.generated.h"
 
+class ADWEquip;
 class UEventHandle_VoxelWorldModeChanged;
 class UWorldWidgetComponent;
 class UDWCharacterData;
@@ -57,17 +58,18 @@ public:
 	ADWCharacter(const FObjectInitializer& ObjectInitializer);
 
 public:
-	virtual void OnInitialize_Implementation() override;
-	
-	virtual void OnRefresh_Implementation(float DeltaSeconds) override;
-
-protected:
 	virtual int32 GetLimit_Implementation() const override { return 0; }
 
 	virtual void OnSpawn_Implementation(UObject* InOwner, const TArray<FParameter>& InParams) override;
 
 	virtual void OnDespawn_Implementation(bool bRecovery) override;
+
+public:
+	virtual void OnInitialize_Implementation() override;
 	
+	virtual void OnRefresh_Implementation(float DeltaSeconds) override;
+
+protected:
 	virtual void LoadData(FSaveData* InSaveData, EPhase InPhase) override;
 
 	virtual FSaveData* ToData() override;
@@ -86,32 +88,6 @@ public:
 			
 	virtual void Revive(IAbilityVitalityInterface* InRescuer) override;
 
-	virtual bool CanInteract(EInteractAction InInteractAction, IInteractionAgentInterface* InInteractionAgent) override;
-
-	virtual void OnInteract(EInteractAction InInteractAction, IInteractionAgentInterface* InInteractionAgent, bool bPassive) override;
-
-	virtual void OnActiveItem(const FAbilityItem& InItem, bool bPassive, bool bSuccess) override;
-
-	virtual void OnRemoveItem(const FAbilityItem& InItem) override;
-		
-	virtual void OnDeactiveItem(const FAbilityItem& InItem, bool bPassive) override;
-
-	virtual void OnDiscardItem(const FAbilityItem& InItem, bool bInPlace) override;
-
-	virtual void OnSelectItem(ESlotSplitType InSplitType, const FAbilityItem& InItem) override;
-
-	virtual void OnAuxiliaryItem(const FAbilityItem& InItem) override;
-
-	virtual bool OnPickUp(AAbilityPickUpBase* InPickUp) override;
-
-	virtual bool OnGenerateVoxel(const FVoxelHitResult& InVoxelHitResult) override;
-
-	virtual bool OnDestroyVoxel(const FVoxelHitResult& InVoxelHitResult) override;
-
-	UFUNCTION()
-	virtual void OnWorldModeChanged(UObject* InSender, UEventHandle_VoxelWorldModeChanged* InEventHandle);
-
-public:
 	UFUNCTION(BlueprintCallable)
 	virtual void Dodge();
 
@@ -136,11 +112,13 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual void UnAim();
 
-	virtual bool Attack(int32 InAbilityIndex = -1, const FSimpleDelegate& OnCompleted = nullptr);
+	virtual bool Attack(EDWWeaponPart InWeaponPart, int32 InAbilityIndex = -1, const FSimpleDelegate& OnCompleted = nullptr);
 
-	virtual bool FallingAttack(const FSimpleDelegate& OnCompleted = nullptr);
+	virtual bool FallingAttack(EDWWeaponPart InWeaponPart, const FSimpleDelegate& OnCompleted = nullptr);
 
 	virtual bool SkillAttack(const FPrimaryAssetId& InSkillID, const FSimpleDelegate& OnCompleted = nullptr);
+
+	virtual bool SkillAttack(int32 InSkillIndex = -1, const FSimpleDelegate& OnCompleted = nullptr);
 
 	virtual bool SkillAttack(ESkillType InSkillType, int32 InAbilityIndex = -1, const FSimpleDelegate& OnCompleted = nullptr);
 	
@@ -177,7 +155,47 @@ public:
 	virtual void SetMotionRate(float InMovementRate, float InRotationRate) override;
 
 	virtual bool RaycastStep(FHitResult& OutHitResult);
-	
+
+	virtual bool CanInteract(EInteractAction InInteractAction, IInteractionAgentInterface* InInteractionAgent) override;
+
+	virtual void OnInteract(EInteractAction InInteractAction, IInteractionAgentInterface* InInteractionAgent, bool bPassive) override;
+
+	virtual void OnPreChangeItem(const FAbilityItem& InOldItem) override;
+
+	virtual void OnChangeItem(const FAbilityItem& InNewItem) override;
+
+	virtual void OnActiveItem(const FAbilityItem& InItem, bool bPassive, bool bSuccess) override;
+
+	virtual void OnRemoveItem(const FAbilityItem& InItem) override;
+		
+	virtual void OnDeactiveItem(const FAbilityItem& InItem, bool bPassive) override;
+
+	virtual void OnDiscardItem(const FAbilityItem& InItem, bool bInPlace) override;
+
+	virtual void OnSelectItem(const FAbilityItem& InItem) override;
+
+	virtual void OnAuxiliaryItem(const FAbilityItem& InItem) override;
+
+	virtual bool OnPickUp(AAbilityPickUpBase* InPickUp) override;
+
+	virtual bool OnGenerateVoxel(const FVoxelHitResult& InVoxelHitResult) override;
+
+	virtual bool OnDestroyVoxel(const FVoxelHitResult& InVoxelHitResult) override;
+
+protected:
+	virtual void OnAttributeChange(const FOnAttributeChangeData& InAttributeChangeData) override;
+
+	UFUNCTION()
+	virtual void OnWorldModeChanged(UObject* InSender, UEventHandle_VoxelWorldModeChanged* InEventHandle);
+
+public:
+	virtual void HandleDamage(const FGameplayAttribute& DamageAttribute, float DamageValue, float DefendValue, bool bHasCrited, const FHitResult& HitResult, const FGameplayTagContainer& SourceTags, AActor* SourceActor) override;
+
+	virtual void HandleRecovery(const FGameplayAttribute& RecoveryAttribute, float RecoveryValue, const FHitResult& HitResult, const FGameplayTagContainer& SourceTags, AActor* SourceActor) override;
+
+	virtual void HandleInterrupt(const FGameplayAttribute& InterruptAttribute, float InterruptDuration, const FHitResult& HitResult, const FGameplayTagContainer& SourceTags, AActor* SourceActor) override;
+
+public:
 	virtual bool IsTargetAble_Implementation(APawn* InPlayerPawn) const override;
 
 	virtual bool IsLookAtAble_Implementation(AActor* InLookerActor) const override;
@@ -191,15 +209,6 @@ public:
 	virtual void ClearHitTargets() override;
 
 	virtual TArray<AActor*> GetHitTargets() const override;
-
-public:
-	virtual void OnAttributeChange(const FOnAttributeChangeData& InAttributeChangeData) override;
-	
-	virtual void HandleDamage(EDamageType DamageType, float DamageValue, bool bHasCrited, bool bHasDefend, FHitResult HitResult, const FGameplayTagContainer& SourceTags, AActor* SourceActor) override;
-
-	virtual void HandleRecovery(float RecoveryValue, FHitResult HitResult, const FGameplayTagContainer& SourceTags, AActor* SourceActor) override;
-
-	virtual void HandleInterrupt(float InterruptDuration, FHitResult HitResult, const FGameplayTagContainer& SourceTags, AActor* SourceActor) override;
 	
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
@@ -233,35 +242,47 @@ protected:
 
 	EDWCharacterAttackType AttackType;
 
-	FAbilityItem SkillAbilityItem;
+	EDWWeaponPart AttackWeaponPart;
+
+	FAbilityItem SkillAttackAbilityItem;
 
 	UPROPERTY()
 	AAbilityProjectileBase* AttackProjectile;
 
 	UPROPERTY()
-	TMap<EDWEquipPartType, AAbilityEquipBase*> Equips;
-	
-	FDWCharacterAttackAbilityData FallingAttackAbility;
+	TMap<EDWEquipPart, ADWEquip*> Equips;
 
 	TMap<EDWWeaponType, FDWCharacterAttackAbilityQueue> AttackAbilityQueues;
+	
+	TMap<EDWWeaponType, FDWCharacterFallingAttackAbilityData> FallingAttackAbilities;
 
-	TMap<FPrimaryAssetId, FDWCharacterSkillAbilityData> SkillAbilities;
+	TMap<FPrimaryAssetId, FDWCharacterSkillAttackAbilityData> SkillAttackAbilities;
 
 public:
 	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, Mana)
 	
 	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, MaxMana)
-
+	
+	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, ManaRecovery)
+	
+	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, ManaRegenSpeed)
+	
 	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, Stamina)
 	
 	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, MaxStamina)
+			
+	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, StaminaRecovery)
+
+	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, StaminaRegenSpeed)
+			
+	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, StaminaExpendSpeed)
 
 	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, DodgeForce)
 
-	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, AttackForce)
-		
 	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, RepulseForce)
 
+	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, AttackForce)
+		
 	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, AttackSpeed)
 
 	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, AttackCritRate)
@@ -270,19 +291,13 @@ public:
 
 	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, DefendRate)
 
-	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, DefendScope)
+	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, DefendScopeRate)
 
 	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, PhysicsRes)
 
 	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, MagicRes)
 	
 	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, ToughnessRate)
-	
-	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, ManaRegenSpeed)
-	
-	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, StaminaRegenSpeed)
-	
-	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, StaminaExpendSpeed)
 
 public:
 	virtual bool IsEnemy(IAbilityPawnInterface* InTarget) const override;
@@ -365,86 +380,88 @@ public:
 	FVector GetAIMoveLocation() const { return AIMoveLocation; }
 		
 	template<class T>
-	T* GetEquip(EDWEquipPartType InPartType) const
+	T* GetEquip(EDWEquipPart InEquipPart) const
 	{
-		return Cast<T>(GetEquip(InPartType));
+		return Cast<T>(GetEquip(InEquipPart));
 	}
 
 	UFUNCTION(BlueprintPure)
-	AAbilityEquipBase* GetEquip(EDWEquipPartType InPartType) const;
+	ADWEquip* GetEquip(EDWEquipPart InEquipPart) const;
 					
+	UFUNCTION(BlueprintPure)
+	TArray<ADWEquip*> GetEquips() const;
+
 	template<class T>
-	T* GetWeapon() const
+	T* GetWeapon(EDWWeaponPart InWeaponPart) const
 	{
-		return Cast<T>(GetWeapon());
+		return Cast<T>(GetWeapon(InWeaponPart));
 	}
 
 	UFUNCTION(BlueprintPure)
-	ADWEquipWeapon* GetWeapon() const;
-
-	UFUNCTION(BlueprintPure)
-	EDWWeaponType GetWeaponType() const;
-				
-	UFUNCTION(BlueprintPure)
-	bool CheckWeaponType(EDWWeaponType InWeaponType) const;
-
-	UFUNCTION(BlueprintPure)
-	TSubclassOf<AAbilityProjectileBase> GetWeaponProjectileClass() const;
-
-	template<class T>
-	T* GetShield() const
-	{
-		return Cast<T>(GetShield());
-	}
+	ADWEquipWeapon* GetWeapon(EDWWeaponPart InWeaponPart) const;
 	
 	UFUNCTION(BlueprintPure)
-	ADWEquipShield* GetShield() const;
+	TArray<ADWEquipWeapon*> GetWeapons() const;
 
 	UFUNCTION(BlueprintPure)
-	EDWShieldType GetShieldType() const;
-				
-	UFUNCTION(BlueprintPure)
-	bool CheckShieldType(EDWShieldType InShieldType) const;
+	EDWWeaponType GetWeaponType(EDWWeaponPart InWeaponPart) const;
 
 	UFUNCTION(BlueprintPure)
-	TMap<EDWEquipPartType, AAbilityEquipBase*> GetEquips() const { return Equips; }
+	bool CheckWeaponType(EDWWeaponPart InWeaponPart, EDWWeaponType InWeaponType) const;
+
+	UFUNCTION(BlueprintPure)
+	TSubclassOf<AAbilityProjectileBase> GetWeaponProjectile(EDWWeaponPart InWeaponPart) const;
 
 	UFUNCTION(BlueprintPure)
 	EDWCharacterAttackType GetAttackType() const { return AttackType; }
 
 	UFUNCTION(BlueprintPure)
-	bool HasAttackAbility(int32 InAbilityIndex = 0) const;
+	bool HasAttackAbility(EDWWeaponType InWeaponType, int32 InAbilityIndex = 0) const;
 
 	UFUNCTION(BlueprintPure)
-	bool HasSkillAbility(const FPrimaryAssetId& InSkillID, bool bNeedAssembled = false) const;
-
-	bool HasSkillAbility(ESkillType InSkillType, int32 InAbilityIndex = 0, bool bNeedAssembled = false) const;
+	FDWCharacterAttackAbilityData GetAttackAbility(EDWWeaponType InWeaponType, int32 InAbilityIndex = -1) const;
 
 	UFUNCTION(BlueprintPure)
-	FDWCharacterAttackAbilityQueue& GetAttackAbilityQueue();
+	FDWCharacterAttackAbilityQueue GetAttackAbilityQueue(EDWWeaponType InWeaponType) const;
+
+	FDWCharacterAttackAbilityQueue& GetAttackAbilityQueue(EDWWeaponType InWeaponType);
 
 	UFUNCTION(BlueprintPure)
-	FAbilityItem& GetSkillAbilityItem() { return SkillAbilityItem; }
+	int32 GetAttackAbilityIndex(EDWWeaponType InWeaponType) const;
 
 	UFUNCTION(BlueprintPure)
-	FDWCharacterAttackAbilityData GetAttackAbility(int32 InAbilityIndex = -1);
-		
-	UFUNCTION(BlueprintPure)
-	FDWCharacterSkillAbilityData GetSkillAbility(const FPrimaryAssetId& InSkillID, bool bNeedAssembled = false);
-	
-	FDWCharacterSkillAbilityData GetSkillAbility(ESkillType InSkillType, int32 InAbilityIndex = -1, bool bNeedAssembled = false);
+	TArray<FDWCharacterAttackAbilityData> GetAttackAbilities(EDWWeaponType InWeaponType) const;
 
 	UFUNCTION(BlueprintPure)
 	TMap<EDWWeaponType, FDWCharacterAttackAbilityQueue>& GetAttackAbilityQueues() { return AttackAbilityQueues; }
 
 	UFUNCTION(BlueprintPure)
-	TArray<FDWCharacterAttackAbilityData> GetAttackAbilities() const;
+	bool HasFallingAttackAbility(EDWWeaponType InWeaponType) const;
 
 	UFUNCTION(BlueprintPure)
-	TMap<FPrimaryAssetId, FDWCharacterSkillAbilityData>& GetSkillAbilities() { return SkillAbilities; }
+	FDWCharacterFallingAttackAbilityData GetFallingAttackAbility(EDWWeaponType InWeaponType);
 
 	UFUNCTION(BlueprintPure)
-	UDWCharacterPart* GetCharacterPart(EDWCharacterPartType InCharacterPartType) const;
+	TMap<EDWWeaponType, FDWCharacterFallingAttackAbilityData>& GetFallingAttackAbilities() { return FallingAttackAbilities; }
+
+	UFUNCTION(BlueprintPure)
+	bool HasSkillAbility(const FPrimaryAssetId& InSkillID, bool bNeedAssembled = false) const;
+
+	bool HasSkillAbility(ESkillType InSkillType, int32 InAbilityIndex = 0, bool bNeedAssembled = false) const;
+		
+	UFUNCTION(BlueprintPure)
+	FDWCharacterSkillAttackAbilityData GetSkillAbility(const FPrimaryAssetId& InSkillID, bool bNeedAssembled = false);
+	
+	FDWCharacterSkillAttackAbilityData GetSkillAbility(ESkillType InSkillType, int32 InAbilityIndex = -1, bool bNeedAssembled = false);
+
+	UFUNCTION(BlueprintPure)
+	FAbilityItem& GetSkillAbilityItem() { return SkillAttackAbilityItem; }
+
+	UFUNCTION(BlueprintPure)
+	TMap<FPrimaryAssetId, FDWCharacterSkillAttackAbilityData>& GetSkillAbilities() { return SkillAttackAbilities; }
+
+	UFUNCTION(BlueprintPure)
+	UDWCharacterPart* GetCharacterPart(EDWCharacterPart InCharacterPart) const;
 
 	virtual UBehaviorTree* GetBehaviorTreeAsset() const override;
 };

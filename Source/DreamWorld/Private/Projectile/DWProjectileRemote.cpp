@@ -11,16 +11,11 @@ ADWProjectileRemote::ADWProjectileRemote()
 	AttackHitEffect = nullptr;
 }
 
-void ADWProjectileRemote::Initialize_Implementation(AActor* InOwnerActor, const FGameplayAbilitySpecHandle& InAbilityHandle)
-{
-	Super::Initialize_Implementation(InOwnerActor, InAbilityHandle);
-}
-
 void ADWProjectileRemote::OnHitTarget(AActor* InTarget, const FHitResult& InHitResult)
 {
-	Super::OnHitTarget(InTarget, InHitResult);
-
 	const FVector HitLocation = GetActorLocation();
 	UAudioModuleStatics::PlaySoundAtLocation(AttackHitSound, HitLocation);
 	UGameplayStatics::SpawnEmitterAtLocation(this, AttackHitEffect, HitLocation);
+
+	Super::OnHitTarget(InTarget, InHitResult);
 }

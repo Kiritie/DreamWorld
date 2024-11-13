@@ -21,14 +21,14 @@ void UDWInventoryEquipSlot::OnDespawn_Implementation(bool bRecovery)
 {
 	Super::OnDespawn_Implementation(bRecovery);
 
-	PartType = EDWEquipPartType::Head;
+	EquipPart = EDWEquipPart::Head;
 }
 
 void UDWInventoryEquipSlot::OnInitialize(UAbilityInventoryBase* InInventory, EAbilityItemType InLimitType, ESlotSplitType InSplitType, int32 InSlotIndex)
 {
 	Super::OnInitialize(InInventory, InLimitType, InSplitType, InSlotIndex);
 
-	PartType = (EDWEquipPartType)InSlotIndex;
+	EquipPart = (EDWEquipPart)InSlotIndex;
 }
 
 void UDWInventoryEquipSlot::OnItemPreChange(FAbilityItem& InNewItem)
@@ -41,38 +41,51 @@ void UDWInventoryEquipSlot::OnItemChanged(FAbilityItem& InOldItem)
 	Super::OnItemChanged(InOldItem);
 }
 
-bool UDWInventoryEquipSlot::MatchItemLimit(FAbilityItem InItem) const
+bool UDWInventoryEquipSlot::MatchItemLimit(FAbilityItem InItem, bool bForce) const
 {
-	if(!Super::MatchItemLimit(InItem)) return false;
-
-	ADWCharacter* Character = Inventory->GetOwnerAgent<ADWCharacter>();
-
-	if(Character && Character->GetLevelA() < InItem.Level) return false;
+	if(!Super::MatchItemLimit(InItem, bForce)) return false;
 	
-	bool bReturnValue = InItem.GetData<UDWEquipData>().PartType == PartType;
+	if(EquipPart < EDWEquipPart::Primary) return InItem.GetData<UDWEquipData>().EquipPart == EquipPart;
+
 	if(InItem.IsDataType<UDWEquipWeaponData>())
 	{
-		UAbilityInventorySlotBase* OtherSlot = Inventory->GetSlotBySplitTypeAndIndex(ESlotSplitType::Equip, PartType == EDWEquipPartType::LeftHand ? (int32)EDWEquipPartType::RightHand : (int32)EDWEquipPartType::LeftHand);
-
-		if(InItem.GetData<UDWEquipWeaponData>().HandType == EDWWeaponHandType::Both)
+		if(bForce)
 		{
-			if(!OtherSlot->IsEmpty())
+			EDWEquipPart OtherPart = EquipPart == EDWEquipPart::Primary ? EDWEquipPart::Secondary : EDWEquipPart::Primary;
+			UAbilityInventorySlotBase* OtherSlot = Inventory->GetSlotBySplitTypeAndIndex(ESlotSplitType::Equip, (int32)OtherPart);
+			if(OtherSlot != InItem.InventorySlot)
 			{
-				bReturnValue = false;
+				if(InItem.GetData<UDWEquipWeaponData>().WeaponHand == EDWWeaponHand::Both)
+				{
+					if(!OtherSlot->IsEmpty()) return false;
+				}
+				else if(!OtherSlot->IsEmpty())
+				{
+					if(OtherSlot->GetItem().GetData<UDWEquipWeaponData>().WeaponHand == EDWWeaponHand::Both) return false;
+				}
 			}
 		}
-		else if(OtherSlot->GetItem().IsDataType<UDWEquipWeaponData>())
-		{
-			if(OtherSlot->GetItem().GetData<UDWEquipWeaponData>().HandType == EDWWeaponHandType::Both)
-			{
-				bReturnValue = false;
-			}
-		}
+		return true;
 	}
-	return bReturnValue;
+	return false;
 }
 
 void UDWInventoryEquipSlot::Refresh()
 {
 	Super::Refresh();
+}
+
+bool UDWInventoryEquipSlot::ActiveItem(bool bPassive)
+{
+	if(!bPassive)
+	{
+		ADWCharacter* Character = Inventory->GetOwnerAgent<ADWCharacter>();
+		if(Character && Character->GetControlMode() != EDWCharacterControlMode::Fighting) return false;
+	}
+	return Super::ActiveItem(bPassive);
+}
+
+void UDWInventoryEquipSlot::DeactiveItem(bool bPassive)
+{
+	Super::DeactiveItem(bPassive);
 }

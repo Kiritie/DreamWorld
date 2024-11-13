@@ -3,12 +3,18 @@
 #include "GameplayEffectExtension.h"
 #include "Character/DWCharacter.h"
 #include "Common/DWCommonTypes.h"
+#include "ReferencePool/ReferencePoolModuleStatics.h"
 
 UDWCharacterAttributeSet::UDWCharacterAttributeSet()
 	: Mana(100.f)
 	, MaxMana(100.f)
+	, ManaRecovery(0.f)
+	, ManaRegenSpeed(1.f)
 	, Stamina(100.f)
 	, MaxStamina(100.f)
+	, StaminaRecovery(0.f)
+	, StaminaRegenSpeed(10.f)
+	, StaminaExpendSpeed(5.f)
 	, DodgeForce(500.f)
 	, RepulseForce(0.f)
 	, AttackForce(0.f)
@@ -16,13 +22,10 @@ UDWCharacterAttributeSet::UDWCharacterAttributeSet()
 	, AttackCritRate(0.f)
 	, AttackStealRate(0.f)
 	, DefendRate(0.f)
-	, DefendScope(0.f)
+	, DefendScopeRate(0.f)
 	, PhysicsRes(0.f)
 	, MagicRes(0.f)
 	, ToughnessRate(0.f)
-	, ManaRegenSpeed(1.f)
-	, StaminaRegenSpeed(10.f)
-	, StaminaExpendSpeed(5.f)
 {
 	DamageHandleClass = UDWDamageHandle::StaticClass();
 }
@@ -35,9 +38,21 @@ void UDWCharacterAttributeSet::PreAttributeBaseChange(const FGameplayAttribute& 
 	{
 		NewValue = FMath::Clamp(NewValue, 0.f, GetMaxMana());
 	}
+	else if (Attribute == GetManaRegenSpeedAttribute())
+	{
+		NewValue = FMath::Clamp(NewValue, 0.f, NewValue);
+	}
 	else if (Attribute == GetStaminaAttribute())
 	{
 		NewValue = FMath::Clamp(NewValue, 0.f, GetMaxStamina());
+	}
+	else if (Attribute == GetStaminaRegenSpeedAttribute())
+	{
+		NewValue = FMath::Clamp(NewValue, 0.f, NewValue);
+	}
+	else if (Attribute == GetStaminaExpendSpeedAttribute())
+	{
+		NewValue = FMath::Clamp(NewValue, 0.f, NewValue);
 	}
 	else if (Attribute == GetDodgeForceAttribute())
 	{
@@ -67,7 +82,7 @@ void UDWCharacterAttributeSet::PreAttributeBaseChange(const FGameplayAttribute& 
 	{
 		NewValue = FMath::Clamp(NewValue, 0.f, 1.f);
 	}
-	else if (Attribute == GetDefendScopeAttribute())
+	else if (Attribute == GetDefendScopeRateAttribute())
 	{
 		NewValue = FMath::Clamp(NewValue, 0.f, 1.f);
 	}
@@ -82,14 +97,6 @@ void UDWCharacterAttributeSet::PreAttributeBaseChange(const FGameplayAttribute& 
 	else if (Attribute == GetToughnessRateAttribute())
 	{
 		NewValue = FMath::Clamp(NewValue, 0.f, 1.f);
-	}
-	else if (Attribute == GetStaminaRegenSpeedAttribute())
-	{
-		NewValue = FMath::Clamp(NewValue, 0.f, NewValue);
-	}
-	else if (Attribute == GetStaminaExpendSpeedAttribute())
-	{
-		NewValue = FMath::Clamp(NewValue, 0.f, NewValue);
 	}
 }
 
@@ -101,9 +108,21 @@ void UDWCharacterAttributeSet::PreAttributeChange(const FGameplayAttribute& Attr
 	{
 		NewValue = FMath::Clamp(NewValue, 0.f, GetMaxMana());
 	}
+	else if (Attribute == GetManaRegenSpeedAttribute())
+	{
+		NewValue = FMath::Clamp(NewValue, 0.f, NewValue);
+	}
 	else if (Attribute == GetStaminaAttribute())
 	{
 		NewValue = FMath::Clamp(NewValue, 0.f, GetMaxStamina());
+	}
+	else if (Attribute == GetStaminaRegenSpeedAttribute())
+	{
+		NewValue = FMath::Clamp(NewValue, 0.f, NewValue);
+	}
+	else if (Attribute == GetStaminaExpendSpeedAttribute())
+	{
+		NewValue = FMath::Clamp(NewValue, 0.f, NewValue);
 	}
 	else if (Attribute == GetDodgeForceAttribute())
 	{
@@ -133,7 +152,7 @@ void UDWCharacterAttributeSet::PreAttributeChange(const FGameplayAttribute& Attr
 	{
 		NewValue = FMath::Clamp(NewValue, 0.f, 1.f);
 	}
-	else if (Attribute == GetDefendScopeAttribute())
+	else if (Attribute == GetDefendScopeRateAttribute())
 	{
 		NewValue = FMath::Clamp(NewValue, 0.f, 1.f);
 	}
@@ -148,14 +167,6 @@ void UDWCharacterAttributeSet::PreAttributeChange(const FGameplayAttribute& Attr
 	else if (Attribute == GetToughnessRateAttribute())
 	{
 		NewValue = FMath::Clamp(NewValue, 0.f, 1.f);
-	}
-	else if (Attribute == GetStaminaRegenSpeedAttribute())
-	{
-		NewValue = FMath::Clamp(NewValue, 0.f, NewValue);
-	}
-	else if (Attribute == GetStaminaExpendSpeedAttribute())
-	{
-		NewValue = FMath::Clamp(NewValue, 0.f, NewValue);
 	}
 }
 
@@ -176,4 +187,36 @@ void UDWCharacterAttributeSet::PostAttributeChange(const FGameplayAttribute& Att
 void UDWCharacterAttributeSet::PostGameplayEffectExecute(const struct FGameplayEffectModCallbackData& Data)
 {
 	Super::PostGameplayEffectExecute(Data);
+	
+	FGameplayEffectContextHandle Context = Data.EffectSpec.GetContext();
+	UAbilitySystemComponent* Source = Context.GetOriginalInstigatorAbilitySystemComponent();
+	const FGameplayTagContainer& SourceTags = *Data.EffectSpec.CapturedSourceTags.GetAggregatedTags();
+
+	AActor* SourceActor = nullptr;
+	if (Source && Source->AbilityActorInfo.IsValid() && Source->AbilityActorInfo->AvatarActor.IsValid())
+	{
+		SourceActor = Source->AbilityActorInfo->AvatarActor.Get();
+	}
+	FHitResult HitResult;
+	if (Context.GetHitResult())
+	{
+		HitResult = *Context.GetHitResult();
+	}
+
+	AActor* TargetActor = nullptr;
+	if (Data.Target.AbilityActorInfo.IsValid() && Data.Target.AbilityActorInfo->AvatarActor.IsValid())
+	{
+		TargetActor = Data.Target.AbilityActorInfo->AvatarActor.Get();
+	}
+
+	if(Data.EvaluatedData.Attribute == GetManaRecoveryAttribute())
+	{
+		UReferencePoolModuleStatics::GetReference<URecoveryHandle>(true, RecoveryHandleClass).HandleRecovery(SourceActor, TargetActor, GetManaRecovery(), GetManaRecoveryAttribute(), HitResult, SourceTags);
+		SetManaRecovery(0.f);
+	}
+	else if(Data.EvaluatedData.Attribute == GetStaminaRecoveryAttribute())
+	{
+		UReferencePoolModuleStatics::GetReference<URecoveryHandle>(true, RecoveryHandleClass).HandleRecovery(SourceActor, TargetActor, GetStaminaRecovery(), GetStaminaRecoveryAttribute(), HitResult, SourceTags);
+		SetStaminaRecovery(0.f);
+	}
 }

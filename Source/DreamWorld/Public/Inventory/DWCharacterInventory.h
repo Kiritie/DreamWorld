@@ -27,5 +27,5 @@ protected:
 	virtual void UnloadData(EPhase InPhase) override;
 
 public:
-	virtual UAbilityInventoryEquipSlotBase* GetEquipSlotByPartType(EDWEquipPartType InPartType);
+	virtual UAbilityInventoryEquipSlotBase* GetEquipSlotByPart(EDWEquipPart InEquipPart);
 };

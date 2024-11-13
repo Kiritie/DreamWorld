@@ -19,7 +19,7 @@ public:
 	EDWWeaponType WeaponType;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	EDWWeaponHandType HandType;
+	EDWWeaponHand WeaponHand;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSubclassOf<AAbilityProjectileBase> ProjectileClass;
