@@ -6,6 +6,7 @@
 #include "Ability/Item/AbilityItemDataBase.h"
 #include "Common/CommonStatics.h"
 #include "Components/TextBlock.h"
+#include "Widget/Screen/UserWidgetBase.h"
 
 UWidgetAbilityItemInfo::UWidgetAbilityItemInfo(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -13,7 +14,8 @@ UWidgetAbilityItemInfo::UWidgetAbilityItemInfo(const FObjectInitializer& ObjectI
 	TxtType = nullptr;
 	TxtLevel = nullptr;
 	TxtDetail = nullptr;
-	TxtAttribute = nullptr;
+	TxtErrorInfo = nullptr;
+	TxtAbilityInfo = nullptr;
 }
 
 void UWidgetAbilityItemInfo::OnCreate(UUserWidgetBase* InOwner, const TArray<FParameter>& InParams)
@@ -37,6 +39,7 @@ void UWidgetAbilityItemInfo::OnRefresh()
 		TxtType->SetText(FText::FromString(FString::Printf(TEXT("[%s]"), *UCommonStatics::GetEnumValueDisplayName(TEXT("/Script/WHFramework.EAbilityItemType"), (int32)ItemData.GetItemType()).ToString())));
 		TxtLevel->SetText(FText::FromString(Item.Level != 0 ? FString::Printf(TEXT("Lv.%d"), Item.Level) : TEXT("")));
 		TxtDetail->SetText(!ItemData.Detail.IsEmpty() ? ItemData.Detail : FText::FromString(TEXT("暂无描述")));
-		TxtAttribute->SetText(ItemData.GetItemAttributeInfo(Item.Level));
+		TxtErrorInfo->SetText(FText::FromString(ItemData.GetItemErrorInfo(GetOwnerWidget()->GetOwnerObject<AActor>(), Item.Level)));
+		TxtAbilityInfo->SetText(FText::FromString(ItemData.GetItemAbilityInfo(Item.Level)));
 	}
 }

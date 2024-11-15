@@ -6,6 +6,7 @@
 #include "Components/VerticalBox.h"
 #include "Components/VerticalBoxSlot.h"
 #include "Event/EventModuleStatics.h"
+#include "Event/Handle/Task/EventHandle_TaskCompleted.h"
 #include "Event/Handle/Task/EventHandle_TaskEntered.h"
 #include "Task/TaskModuleStatics.h"
 #include "Task/Base/TaskBase.h"
@@ -36,39 +37,60 @@ void UWidgetTaskInfoBox::OnOpen(const TArray<FParameter>& InParams, bool bInstan
 {
 	Super::OnOpen(InParams, bInstant);
 
-	UEventModuleStatics::SubscribeEvent<UEventHandle_TaskEntered>(this, GET_FUNCTION_NAME_THISCLASS(Refresh));
+	UEventModuleStatics::SubscribeEvent<UEventHandle_TaskEntered>(this, GET_FUNCTION_NAME_THISCLASS(OnTaskInfoContentRefresh));
+
+	UEventModuleStatics::SubscribeEvent<UEventHandle_TaskCompleted>(this, GET_FUNCTION_NAME_THISCLASS(Refresh));
 }
 
 void UWidgetTaskInfoBox::OnClose(bool bInstant)
 {
 	Super::OnClose(bInstant);
 
-	UEventModuleStatics::UnsubscribeEvent<UEventHandle_TaskEntered>(this, GET_FUNCTION_NAME_THISCLASS(Refresh));
+	UEventModuleStatics::UnsubscribeEvent<UEventHandle_TaskEntered>(this, GET_FUNCTION_NAME_THISCLASS(OnTaskInfoContentRefresh));
+
+	UEventModuleStatics::UnsubscribeEvent<UEventHandle_TaskCompleted>(this, GET_FUNCTION_NAME_THISCLASS(Refresh));
 }
 
 void UWidgetTaskInfoBox::OnRefresh()
 {
 	Super::OnRefresh();
 
-	if(UTaskBase* RootTask = UTaskModuleStatics::GetCurrentRootTask())
+	for(auto Iter : TaskInfoItems)
 	{
-		ContentBox->ClearChildren();
-		CreateTaskInfoItem(RootTask);
+		Iter->Refresh();
 	}
 }
 
-void UWidgetTaskInfoBox::CreateTaskInfoItem(UTaskBase* InTask)
+void UWidgetTaskInfoBox::OnTaskInfoContentRefresh()
 {
-	if(UWidgetTaskInfoItem* TaskInfoItem = CreateSubWidget<UWidgetTaskInfoItem>({ InTask }, TaskInfoItemClass))
+	for(auto Iter : TaskInfoItems)
 	{
-		if(const auto TempSlot = ContentBox->AddChildToVerticalBox(TaskInfoItem))
-		{
-			TempSlot->SetHorizontalAlignment(HAlign_Left);
-			TempSlot->SetPadding(FMargin(InTask->TaskHierarchy * 50.f, 0.f, 0.f, 0.f));
-		}
+		DestroySubWidget(Iter, true);
 	}
-	for(auto Iter : InTask->SubTasks)
+	TaskInfoItems.Empty();
+
+	if(UTaskBase* RootTask = UTaskModuleStatics::GetCurrentRootTask())
 	{
-		CreateTaskInfoItem(Iter);
+		OnCreateTaskInfoItem(RootTask);
+	}
+}
+
+void UWidgetTaskInfoBox::OnCreateTaskInfoItem(UTaskBase* InTask)
+{
+	if(ContentBox)
+	{
+		if(UWidgetTaskInfoItem* TaskInfoItem = CreateSubWidget<UWidgetTaskInfoItem>({ InTask }, TaskInfoItemClass))
+		{
+			TaskInfoItems.Add(TaskInfoItem);
+			if(const auto VerticalBoxSlot = ContentBox->AddChildToVerticalBox(TaskInfoItem))
+			{
+				VerticalBoxSlot->SetHorizontalAlignment(HAlign_Left);
+				VerticalBoxSlot->SetPadding(FMargin(InTask->TaskHierarchy * 30.f, 0.f, 0.f, 0.f));
+			}
+		}
+		for(auto Iter : InTask->SubTasks)
+		{
+			OnCreateTaskInfoItem(Iter);
+		}
 	}
 }

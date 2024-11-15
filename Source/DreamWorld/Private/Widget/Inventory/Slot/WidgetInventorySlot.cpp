@@ -169,6 +169,10 @@ void UWidgetInventorySlot::OnRefresh()
 		const auto& ItemData = GetItem().GetData();
 		ImgIcon->SetVisibility(ESlateVisibility::Visible);
 		ImgIcon->SetBrushResourceObject(ItemData.Icon);
+		if(ImgError)
+		{
+			ImgError->SetVisibility(ItemData.GetItemErrorInfo(GetOwnerWidget()->GetOwnerObject<AActor>()).IsEmpty() ? ESlateVisibility::Hidden : ESlateVisibility::Visible);
+		}
 		if(TxtCount)
 		{
 			if(GetItem().Count > 1)
@@ -189,6 +193,10 @@ void UWidgetInventorySlot::OnRefresh()
 	else
 	{
 		ImgIcon->SetVisibility(ESlateVisibility::Hidden);
+		if(ImgError)
+		{
+			ImgError->SetVisibility(ESlateVisibility::Hidden);
+		}
 		if(TxtCount)
 		{
 			TxtCount->SetVisibility(ESlateVisibility::Hidden);

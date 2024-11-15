@@ -7,10 +7,9 @@
 #include "WidgetGeneratePanel.generated.h"
 
 class UWidgetAbilityItem;
+class UWidgetGenerateItem;
 class UScrollBox;
 class UWrapBox;
-class UWidgetGenerateItem;
-class UWidgetAbilityItem;
 class UCommonButton;
 
 /**
@@ -20,6 +19,8 @@ UCLASS()
 class DREAMWORLD_API UWidgetGeneratePanel : public UUserWidgetBase
 {
 	GENERATED_BODY()
+
+	friend class UWidgetGenerateItem;
 
 public:
 	UWidgetGeneratePanel(const FObjectInitializer& ObjectInitializer);
@@ -39,22 +40,21 @@ public:
 
 	virtual void OnDestroy(bool bRecovery = false) override;
 
-public:
+protected:
 	UFUNCTION(BlueprintNativeEvent)
-	void OnGenerateItemSelected(UWidgetAbilityItem* InItem);
+	void OnGenerateItemSelected(UWidgetGenerateItem* InItem);
 
 	UFUNCTION(BlueprintNativeEvent)
-	void OnGenerateItemDeselected(UWidgetAbilityItem* InItem);
+	void OnGenerateItemDeselected(UWidgetGenerateItem* InItem);
+
+	UFUNCTION()
+	void OnGenerateContentRefresh();
 
 	UFUNCTION()
 	void OnPreviewContentRefresh();
 
 	UFUNCTION()
 	void OnGenerateButtonClicked();
-
-public:
-	UFUNCTION(BlueprintPure)
-	bool GetSelectedGenerateItemData(FDWGenerateItemData& OutItemData) const;
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (BindWidget, OptionalWidget = false), Category = "Components")
@@ -83,8 +83,15 @@ protected:
 	FDWGenerateRawData SelectedGenerateRawData;
 
 	UPROPERTY()
+	FPrimaryAssetId GenerateToolID;
+	
+	UPROPERTY()
 	int32 PreviewGenerateRawDataIndex;
 	
 	UPROPERTY()
 	FTimerHandle PreviewContentRefreshTH;
+
+public:
+	UFUNCTION(BlueprintPure)
+	bool GetSelectedGenerateItemData(FDWGenerateItemData& OutItemData) const;
 };

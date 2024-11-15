@@ -2,7 +2,7 @@
 
 #pragma once
 #include "Ability/AbilityModuleTypes.h"
-#include "Widget/Item/WidgetAbilityItem.h"
+#include "Ability/Item/Widget/WidgetAbilityItemBase.h"
 
 #include "WidgetAbilityItemInfo.generated.h"
 
@@ -12,7 +12,7 @@ class UTextBlock;
  * ��ɫ���
  */
 UCLASS()
-class DREAMWORLD_API UWidgetAbilityItemInfo : public UWidgetAbilityItem
+class DREAMWORLD_API UWidgetAbilityItemInfo : public UWidgetAbilityItemBase
 {
 	GENERATED_BODY()
 
@@ -40,8 +40,8 @@ protected:
 	UTextBlock* TxtDetail;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (BindWidget, OptionalWidget = false), Category = "Components")
-	UTextBlock* TxtAttribute;
+	UTextBlock* TxtErrorInfo;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (BindWidget, OptionalWidget = false), Category = "Components")
-	UTextBlock* Txt;
+	UTextBlock* TxtAbilityInfo;
 };

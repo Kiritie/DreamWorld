@@ -162,6 +162,26 @@ enum class EDWWeaponHand : uint8
 	Both
 };
 
+/**
+* 技能类型
+*/
+UENUM(BlueprintType)
+enum class EDWSkillType : uint8
+{
+	// 无
+	None,
+	// 攻击
+	Attack,
+	// 法术
+	Magic,
+	// 盾
+	Shield,
+	// 传送
+	Teleport,
+	// 隐身
+	Stealth
+};
+
 USTRUCT(BlueprintType)
 struct DREAMWORLD_API FDWCharacterAttackAbilityData : public FAbilityData
 {
@@ -250,16 +270,8 @@ struct DREAMWORLD_API FDWCharacterSkillAttackAbilityData : public FDWCharacterAt
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	EDWWeaponType WeaponType;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	bool bCancelAble;
-	
 	FORCEINLINE FDWCharacterSkillAttackAbilityData()
 	{
-		WeaponType = EDWWeaponType::None;
-		bCancelAble = false;
 	}
 };
 
@@ -953,6 +965,7 @@ namespace GameplayTags
 	DREAMWORLD_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_OpenMaxMapBox);
 	DREAMWORLD_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_OpenInventoryPanel);
 	DREAMWORLD_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_OpenGeneratePanel);
+	DREAMWORLD_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_OpenTaskPanel);
 	DREAMWORLD_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_OpenContextInputBox);
 
 	////////////////////////////////////////////////////

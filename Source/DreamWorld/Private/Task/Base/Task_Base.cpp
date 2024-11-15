@@ -4,13 +4,18 @@
 #include "Task/Base/Task_Base.h"
 
 #include "TimerManager.h"
+#include "Ability/Inventory/AbilityInventoryBase.h"
 #include "Character/Player/DWPlayerCharacter.h"
 #include "Common/CommonStatics.h"
+#include "Widget/WidgetModuleStatics.h"
+#include "Widget/Context/WidgetContextBox.h"
 
 UTask_Base::UTask_Base()
 {
 	TaskDisplayName = FText::FromString(TEXT("根任务"));
-	NeedLevel = 1;
+	
+	Level = 0;
+	Prizes = TArray<FAbilityItem>();
 }
 
 #if WITH_EDITOR
@@ -58,6 +63,26 @@ void UTask_Base::OnExecute()
 void UTask_Base::OnComplete(ETaskExecuteResult InTaskExecuteResult)
 {
 	Super::OnComplete(InTaskExecuteResult);
+
+	if(InTaskExecuteResult != ETaskExecuteResult::Skipped)
+	{
+		if(UWidgetModuleStatics::GetUserWidget<UWidgetContextBox>())
+		{
+			UWidgetModuleStatics::GetUserWidget<UWidgetContextBox>()->AddMessage(FString::Printf(TEXT("任务%s: %s"), TaskExecuteResult != ETaskExecuteResult::Skipped ? TEXT("完成") : TEXT("失败"), *TaskDisplayName.ToString()));
+		}
+	}
+
+	if(InTaskExecuteResult == ETaskExecuteResult::Succeed)
+	{
+		const ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
+		if(PlayerCharacter && Prizes.Num() > 0)
+		{
+			for(auto Iter : Prizes)
+			{
+				PlayerCharacter->GetInventory()->AddItemByRange(Iter);
+			}
+		}
+	}
 }
 
 void UTask_Base::OnLeave()
@@ -69,9 +94,9 @@ bool UTask_Base::CheckTaskCondition_Implementation(FString& OutInfo) const
 {
 	if(const ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>())
 	{
-		if(PlayerCharacter->GetLevelA() < NeedLevel)
+		if(Level > 0 && PlayerCharacter->GetLevelA() < Level)
 		{
-			OutInfo = FString::Printf(TEXT("角色等级未达到[%d]级"), NeedLevel);
+			OutInfo = FString::Printf(TEXT("角色未达到[%d]级"), Level);
 			return false;
 		}
 	}

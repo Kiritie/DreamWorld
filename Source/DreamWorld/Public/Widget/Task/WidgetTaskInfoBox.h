@@ -32,7 +32,11 @@ public:
 	virtual void OnRefresh() override;
 
 protected:
-	void CreateTaskInfoItem(UTaskBase* InTask);
+	UFUNCTION()
+	void OnTaskInfoContentRefresh();
+
+	UFUNCTION()
+	void OnCreateTaskInfoItem(UTaskBase* InTask);
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (BindWidget, OptionalWidget = false), Category = "Components")
@@ -40,4 +44,8 @@ protected:
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TSubclassOf<UWidgetTaskInfoItem> TaskInfoItemClass;
+
+protected:
+	UPROPERTY()
+	TArray<UWidgetTaskInfoItem*> TaskInfoItems;
 };

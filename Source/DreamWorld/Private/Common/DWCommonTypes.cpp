@@ -235,6 +235,7 @@ namespace GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Input_OpenMaxMapBox, "Input.System.OpenMaxMapBox", "Open MaxMap Box");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Input_OpenInventoryPanel, "Input.System.OpenInventoryPanel", "Open Inventory Panel");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Input_OpenGeneratePanel, "Input.System.OpenGeneratePanel", "Open Generate Panel");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Input_OpenTaskPanel, "Input.System.OpenTaskPanel", "Open Task Panel");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Input_OpenContextInputBox, "Input.System.OpenContextInputBox", "Open Context Input Box");
 
 	////////////////////////////////////////////////////

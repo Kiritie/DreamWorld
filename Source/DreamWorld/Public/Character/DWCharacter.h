@@ -116,11 +116,11 @@ public:
 
 	virtual bool FallingAttack(EDWWeaponPart InWeaponPart, const FSimpleDelegate& OnCompleted = nullptr);
 
-	virtual bool SkillAttack(const FPrimaryAssetId& InSkillID, const FSimpleDelegate& OnCompleted = nullptr);
+	virtual bool Skill(const FPrimaryAssetId& InSkillID);
 
-	virtual bool SkillAttack(int32 InSkillIndex = -1, const FSimpleDelegate& OnCompleted = nullptr);
+	virtual bool Skill(int32 InSkillIndex = 0);
 
-	virtual bool SkillAttack(ESkillType InSkillType, int32 InAbilityIndex = -1, const FSimpleDelegate& OnCompleted = nullptr);
+	virtual bool Skill(EDWSkillType InSkillType, int32 InAbilityIndex = -1);
 	
 	virtual bool SkillAttack(const FAbilityItem& InAbilityItem, const FSimpleDelegate& OnCompleted = nullptr);
 
@@ -159,6 +159,8 @@ public:
 	virtual bool CanInteract(EInteractAction InInteractAction, IInteractionAgentInterface* InInteractionAgent) override;
 
 	virtual void OnInteract(EInteractAction InInteractAction, IInteractionAgentInterface* InInteractionAgent, bool bPassive) override;
+
+	virtual void OnAdditionItem(const FAbilityItem& InItem) override;
 
 	virtual void OnPreChangeItem(const FAbilityItem& InOldItem) override;
 
@@ -445,20 +447,16 @@ public:
 	TMap<EDWWeaponType, FDWCharacterFallingAttackAbilityData>& GetFallingAttackAbilities() { return FallingAttackAbilities; }
 
 	UFUNCTION(BlueprintPure)
-	bool HasSkillAbility(const FPrimaryAssetId& InSkillID, bool bNeedAssembled = false) const;
+	bool HasSkillAttackAbility(const FPrimaryAssetId& InSkillID, bool bNeedSlotted = false) const;
 
-	bool HasSkillAbility(ESkillType InSkillType, int32 InAbilityIndex = 0, bool bNeedAssembled = false) const;
-		
 	UFUNCTION(BlueprintPure)
-	FDWCharacterSkillAttackAbilityData GetSkillAbility(const FPrimaryAssetId& InSkillID, bool bNeedAssembled = false);
+	FDWCharacterSkillAttackAbilityData GetSkillAttackAbility(const FPrimaryAssetId& InSkillID, bool bNeedSlotted = false);
 	
-	FDWCharacterSkillAttackAbilityData GetSkillAbility(ESkillType InSkillType, int32 InAbilityIndex = -1, bool bNeedAssembled = false);
+	UFUNCTION(BlueprintPure)
+	FAbilityItem& GetSkillAttackAbilityItem() { return SkillAttackAbilityItem; }
 
 	UFUNCTION(BlueprintPure)
-	FAbilityItem& GetSkillAbilityItem() { return SkillAttackAbilityItem; }
-
-	UFUNCTION(BlueprintPure)
-	TMap<FPrimaryAssetId, FDWCharacterSkillAttackAbilityData>& GetSkillAbilities() { return SkillAttackAbilities; }
+	TMap<FPrimaryAssetId, FDWCharacterSkillAttackAbilityData>& GetSkillAttackAbilities() { return SkillAttackAbilities; }
 
 	UFUNCTION(BlueprintPure)
 	UDWCharacterPart* GetCharacterPart(EDWCharacterPart InCharacterPart) const;

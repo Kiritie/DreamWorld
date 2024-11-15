@@ -43,7 +43,10 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (BindWidget, OptionalWidget = false), Category = "Components")
 	UTextBlock* TxtLevel;
 
-public:
+protected:
 	UPROPERTY(BlueprintReadOnly)
 	FDWGenerateItemData GenerateItemData;
+
+public:
+	FDWGenerateItemData GetGenerateItemData() const { return GenerateItemData; }
 };

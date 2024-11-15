@@ -5,7 +5,6 @@
 #include "Achievement/AchievementModuleStatics.h"
 #include "Ability/Item/AbilityItemDataBase.h"
 #include "Components/CapsuleComponent.h"
-#include "Components/InputComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/SceneCaptureComponent2D.h"
 #include "Components/SkeletalMeshComponent.h"
@@ -349,13 +348,16 @@ void ADWPlayerCharacter::OnAdditionItem(const FAbilityItem& InItem)
 
 	if(UWidgetModuleStatics::GetUserWidget<UWidgetContextBox>())
 	{
-		if(InItem.Count > 0)
+		if(InItem.GetType() != EAbilityItemType::Misc)
 		{
-			UWidgetModuleStatics::GetUserWidget<UWidgetContextBox>()->AddMessage(FString::Printf(TEXT("获得: %s × %d"), *InItem.GetData().Name.ToString(), InItem.Count));
-		}
-		else
-		{
-			UWidgetModuleStatics::GetUserWidget<UWidgetContextBox>()->AddMessage(FString::Printf(TEXT("无法再获得: %s"), *InItem.GetData().Name.ToString()));
+			if(InItem.Count > 0)
+			{
+				UWidgetModuleStatics::GetUserWidget<UWidgetContextBox>()->AddMessage(FString::Printf(TEXT("获得: %s × %d"), *InItem.GetData().Name.ToString(), InItem.Count));
+			}
+			else
+			{
+				UWidgetModuleStatics::GetUserWidget<UWidgetContextBox>()->AddMessage(FString::Printf(TEXT("无法再获得: %s"), *InItem.GetData().Name.ToString()));
+			}
 		}
 	}
 }
@@ -598,6 +600,7 @@ void ADWPlayerCharacter::SetGenerateVoxelID(const FPrimaryAssetId& InGenerateVox
 void ADWPlayerCharacter::SetNameA(FName InName)
 {
 	Super::SetNameA(InName);
+	
 	if(UWidgetModuleStatics::GetUserWidget<UWidgetHeadBox>())
 	{
 		UWidgetModuleStatics::GetUserWidget<UWidgetHeadBox>()->SetHeadInfo(GetHeadInfo());
@@ -611,6 +614,7 @@ void ADWPlayerCharacter::SetNameA(FName InName)
 void ADWPlayerCharacter::SetRaceID(FName InRaceID)
 {
 	Super::SetRaceID(InRaceID);
+	
 	if(UWidgetModuleStatics::GetUserWidget<UWidgetHeadBox>())
 	{
 		UWidgetModuleStatics::GetUserWidget<UWidgetHeadBox>()->SetHeadInfo(GetHeadInfo());

@@ -50,6 +50,8 @@ public:
 
 	virtual void OnInteract(EInteractAction InInteractAction, IInteractionAgentInterface* InInteractionAgent, bool bPassive) override;
 
+	virtual void OnAdditionItem(const FAbilityItem& InItem) override;
+
 	virtual void OnActiveItem(const FAbilityItem& InItem, bool bPassive, bool bSuccess) override;
 		
 	virtual void OnDeactiveItem(const FAbilityItem& InItem, bool bPassive) override;

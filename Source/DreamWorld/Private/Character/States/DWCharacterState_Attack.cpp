@@ -72,8 +72,7 @@ void UDWCharacterState_Attack::OnEnter(UFiniteStateBase* InLastState, const TArr
 		{
 			Character->SkillAttackAbilityItem = InParams[2].GetPointerValueRef<FAbilityItem>();
 			OnAttackCompleted = InParams[3].GetPointerValueRef<FSimpleDelegate>();
-			const auto SkillAbilityData = Character->GetSkillAbility(Character->SkillAttackAbilityItem.ID);
-			if(SkillAbilityData.GetData<UAbilitySkillDataBase>().ProjectileClass)
+			if(Character->SkillAttackAbilityItem.GetData<UAbilitySkillDataBase>().ProjectileClass)
 			{
 				Character->SetUseControllerRotation(true);
 			}
@@ -145,10 +144,9 @@ void UDWCharacterState_Attack::AttackStart()
 		}
 		case EDWCharacterAttackType::SkillAttack:
 		{
-			const auto SkillAbilityData = Character->GetSkillAbility(Character->SkillAttackAbilityItem.ID);
-			if(SkillAbilityData.GetData<UAbilitySkillDataBase>().ProjectileClass)
+			if(Character->SkillAttackAbilityItem.GetData<UAbilitySkillDataBase>().ProjectileClass)
 			{
-				Character->AttackProjectile = UAbilityModuleStatics::SpawnAbilityProjectile(SkillAbilityData.GetData<UAbilitySkillDataBase>().ProjectileClass, Character, Character->SkillAttackAbilityItem.AbilityHandle);
+				Character->AttackProjectile = UAbilityModuleStatics::SpawnAbilityProjectile(Character->SkillAttackAbilityItem.GetData<UAbilitySkillDataBase>().ProjectileClass, Character, Character->SkillAttackAbilityItem.AbilityHandle);
 				Character->AttackProjectile->Launch(Character->GetLooking()->GetLookingTarget() ? Character->GetLooking()->GetLookingRotation().Vector() :
 					(Character->IsPlayer() ? UCameraModuleStatics::GetCameraRotation(true).Vector() : FVector::ZeroVector));
 			}
@@ -197,8 +195,7 @@ void UDWCharacterState_Attack::AttackEnd()
 		}
 		case EDWCharacterAttackType::SkillAttack:
 		{
-			const auto AbilityData = Character->GetSkillAbility(Character->SkillAttackAbilityItem.ID);
-			if(!AbilityData.GetData<UAbilitySkillDataBase>().ProjectileClass)
+			if(!Character->SkillAttackAbilityItem.GetData<UAbilitySkillDataBase>().ProjectileClass)
 			{
 				Character->SetHitAble(false);
 			}
@@ -240,8 +237,7 @@ void UDWCharacterState_Attack::AttackComplete()
 		}
 		case EDWCharacterAttackType::SkillAttack:
 		{
-			const auto AbilityData = Character->GetSkillAbility(Character->SkillAttackAbilityItem.ID);
-			if(AbilityData.GetData<UAbilitySkillDataBase>().ProjectileClass)
+			if(Character->SkillAttackAbilityItem.GetData<UAbilitySkillDataBase>().ProjectileClass)
 			{
 				Character->SetUseControllerRotation(false);
 				if(!Character->AttackProjectile->IsLaunched())

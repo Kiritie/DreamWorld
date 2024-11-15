@@ -11,9 +11,9 @@
 UTask_DestroyVoxel::UTask_DestroyVoxel()
 {
 	TaskDisplayName = FText::FromString(TEXT("破坏"));
-	TaskDescription = FText::FromString(TEXT("破坏5个方块"));
+	TaskDescription = FText::FromString(TEXT("破坏XX个方块"));
 
-	MaxCount = 5;
+	TargetCount = 5;
 	CurrentCount = 0;
 }
 
@@ -106,14 +106,14 @@ FSaveData* UTask_DestroyVoxel::ToData()
 
 float UTask_DestroyVoxel::CheckTaskProgress_Implementation(FString& OutInfo) const
 {
-	OutInfo = FString::Printf(TEXT("%d/%d"), CurrentCount, MaxCount);
-	return (float)CurrentCount / MaxCount;
+	OutInfo = FString::Printf(TEXT("%d/%d"), CurrentCount, TargetCount);
+	return (float)CurrentCount / TargetCount;
 }
 
 void UTask_DestroyVoxel::OnVoxelDestroyed_Implementation(UObject* InSender, UEventHandle_VoxelDestroyed* InEventHandle)
 {
 	CurrentCount++;
-	if(CurrentCount >= MaxCount)
+	if(CurrentCount >= TargetCount)
 	{
 		Complete(ETaskExecuteResult::Succeed);
 	}

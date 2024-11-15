@@ -5,6 +5,7 @@
 #include "Ability/Inventory/AbilityInventoryBase.h"
 #include "Ability/Inventory/Slot/AbilityInventorySlotBase.h"
 #include "Character/Player/DWPlayerCharacter.h"
+#include "Item/Skill/DWSkillData.h"
 
 UDWInventorySkillSlot::UDWInventorySkillSlot()
 {
@@ -40,13 +41,20 @@ bool UDWInventorySkillSlot::ActiveItem(bool bPassive /*= false*/)
 
 		if(!Character || Character->GetControlMode() != EDWCharacterControlMode::Fighting) return false;
 
-		const auto AbilityData = Character->GetSkillAbility(Item.ID);
-		if(Character->CheckWeaponType(EDWWeaponPart::None, AbilityData.WeaponType))
+		const auto& SkillData = Item.GetData<UDWSkillData>();
+		if(Character->CheckWeaponType(EDWWeaponPart::None, SkillData.WeaponType))
 		{
 			if(Super::ActiveItem(bPassive))
 			{
-				if(Character->SkillAttack(Item)) return true;
-				DeactiveItem(bPassive);
+				if(SkillData.SkillType == EDWSkillType::Attack || SkillData.SkillType == EDWSkillType::Magic)
+				{
+					if(!Character->SkillAttack(Item))
+					{
+						DeactiveItem(bPassive);
+						return false;
+					}
+				}
+				return true;
 			}
 		}
 	}
@@ -60,21 +68,21 @@ bool UDWInventorySkillSlot::ActiveItem(bool bPassive /*= false*/)
 void UDWInventorySkillSlot::DeactiveItem(bool bPassive /*= false*/)
 {
 	if(IsEmpty()) return;
-	
+
+	Super::DeactiveItem(bPassive);
+
 	if(!bPassive)
 	{
 		ADWCharacter* Character = Inventory->GetOwnerAgent<ADWCharacter>();
 
 		if(!Character) return;
 
-		const auto AbilityData = Character->GetSkillAbility(Item.ID);
-		if(AbilityData.bCancelAble)
+		if(Item.GetData<UDWSkillData>().bCancelAble)
 		{
-			if(Character->GetSkillAbilityItem() == Item.ID)
+			if(Character->GetSkillAttackAbilityItem() == Item)
 			{
 				Character->UnAttack();
 			}
 		}
 	}
-	Super::DeactiveItem(bPassive);
 }

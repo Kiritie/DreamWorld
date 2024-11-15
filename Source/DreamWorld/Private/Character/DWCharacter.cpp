@@ -49,6 +49,7 @@
 #include "Ability/Character/States/AbilityCharacterState_Walk.h"
 #include "Character/States/DWCharacterState_Climb.h"
 #include "Character/States/DWCharacterState_Fly.h"
+#include "Item/Skill/DWSkillData.h"
 
 // Sets default values
 ADWCharacter::ADWCharacter(const FObjectInitializer& ObjectInitializer) :
@@ -433,7 +434,7 @@ bool ADWCharacter::FallingAttack(EDWWeaponPart InWeaponPart, const FSimpleDelega
 	return false;
 }
 
-bool ADWCharacter::SkillAttack(const FPrimaryAssetId& InSkillID, const FSimpleDelegate& OnCompleted/* = nullptr*/)
+bool ADWCharacter::Skill(const FPrimaryAssetId& InSkillID)
 {
 	if(const auto SkillSlot = Inventory->GetSlotBySplitTypeAndItemID(ESlotSplitType::Skill, InSkillID))
 	{
@@ -442,7 +443,7 @@ bool ADWCharacter::SkillAttack(const FPrimaryAssetId& InSkillID, const FSimpleDe
 	return false;
 }
 
-bool ADWCharacter::SkillAttack(int32 InSkillIndex, const FSimpleDelegate& OnCompleted)
+bool ADWCharacter::Skill(int32 InSkillIndex)
 {
 	if(const auto SkillSlot = Inventory->GetSlotBySplitTypeAndIndex(ESlotSplitType::Skill, InSkillIndex))
 	{
@@ -451,18 +452,28 @@ bool ADWCharacter::SkillAttack(int32 InSkillIndex, const FSimpleDelegate& OnComp
 	return false;
 }
 
-bool ADWCharacter::SkillAttack(ESkillType InSkillType, int32 InAbilityIndex, const FSimpleDelegate& OnCompleted/* = nullptr*/)
+bool ADWCharacter::Skill(EDWSkillType InSkillType, int32 InAbilityIndex)
 {
-	if(const auto SkillSlot = Inventory->GetSlotBySplitTypeAndItemID(ESlotSplitType::Skill, GetSkillAbility(InSkillType, InAbilityIndex, true).ID))
+	TArray<UAbilityInventorySlotBase*> ItemSlots;
+	for (auto Iter : Inventory->GetSlotsBySplitType(ESlotSplitType::Skill))
 	{
-		return SkillSlot->ActiveItem();
+		if(!Iter->IsEmpty() && Iter->GetItem().GetData<UDWSkillData>().SkillType == InSkillType)
+		{
+			ItemSlots.Add(Iter);
+		}
+	}
+	if(InAbilityIndex == -1) InAbilityIndex = FMath::RandRange(0, ItemSlots.Num() -1);
+
+	if(ItemSlots.IsValidIndex(InAbilityIndex))
+	{
+		return ItemSlots[InAbilityIndex]->ActiveItem();
 	}
 	return false;
 }
 
 bool ADWCharacter::SkillAttack(const FAbilityItem& InAbilityItem, const FSimpleDelegate& OnCompleted/* = nullptr*/)
 {
-	const auto AbilityData = GetSkillAbility(InAbilityItem.ID);
+	const auto AbilityData = GetSkillAttackAbility(InAbilityItem.ID);
 	if(AbilityData.IsValid())
 	{
 		return FSM->SwitchStateByClass<UDWCharacterState_Attack>({ &AbilityData.AbilityHandle, (uint8)EDWCharacterAttackType::SkillAttack, &InAbilityItem, &OnCompleted });
@@ -620,6 +631,16 @@ void ADWCharacter::OnInteract(EInteractAction InInteractAction, IInteractionAgen
 			}
 			default: break;
 		}
+	}
+}
+
+void ADWCharacter::OnAdditionItem(const FAbilityItem& InItem)
+{
+	Super::OnAdditionItem(InItem);
+
+	if(InItem.ID.PrimaryAssetName == TEXT("DA_Exp"))
+	{
+		ModifyExp(InItem.Count);
 	}
 }
 
@@ -1119,7 +1140,7 @@ bool ADWCharacter::CheckWeaponType(EDWWeaponPart InWeaponPart, EDWWeaponType InW
 	for(auto Iter : GetWeapons())
 	{
 		const auto& WeaponData = Iter->GetItemData<UDWEquipWeaponData>();
-		if((InWeaponPart == EDWWeaponPart::None || WeaponData.EquipPart == (EDWEquipPart)InWeaponPart || WeaponData.WeaponHand == EDWWeaponHand::Both) && WeaponData.WeaponType == InWeaponType)
+		if((InWeaponPart == EDWWeaponPart::None || WeaponData.WeaponHand == EDWWeaponHand::Both || WeaponData.EquipPart == (EDWEquipPart)InWeaponPart) && WeaponData.WeaponType == InWeaponType)
 		{
 			return true;
 		}
@@ -1190,56 +1211,21 @@ FDWCharacterFallingAttackAbilityData ADWCharacter::GetFallingAttackAbility(EDWWe
 	return FDWCharacterFallingAttackAbilityData();
 }
 
-bool ADWCharacter::HasSkillAbility(const FPrimaryAssetId& InSkillID, bool bNeedAssembled) const
+bool ADWCharacter::HasSkillAttackAbility(const FPrimaryAssetId& InSkillID, bool bNeedSlotted) const
 {
 	if(SkillAttackAbilities.Contains(InSkillID))
 	{
-		if(!bNeedAssembled) return true;
+		if(!bNeedSlotted) return true;
 		return Inventory->QueryItemBySplitType(EItemQueryType::Get, InSkillID, ESlotSplitType::Skill).IsValid();
 	}
 	return false;
 }
 
-bool ADWCharacter::HasSkillAbility(ESkillType InSkillType, int32 InAbilityIndex, bool bNeedAssembled) const
+FDWCharacterSkillAttackAbilityData ADWCharacter::GetSkillAttackAbility(const FPrimaryAssetId& InSkillID, bool bNeedSlotted)
 {
-	TArray<FDWCharacterSkillAttackAbilityData> Abilities = TArray<FDWCharacterSkillAttackAbilityData>();
-	for (auto& Iter : SkillAttackAbilities)
-	{
-		if(Iter.Value.GetData<UAbilitySkillDataBase>().SkillType == InSkillType)
-		{
-			Abilities.Add(Iter.Value);
-		}
-	}
-	if(Abilities.IsValidIndex(InAbilityIndex))
-	{
-		return HasSkillAbility(Abilities[InAbilityIndex].ID, bNeedAssembled);
-	}
-	return false;
-}
-
-FDWCharacterSkillAttackAbilityData ADWCharacter::GetSkillAbility(const FPrimaryAssetId& InSkillID, bool bNeedAssembled)
-{
-	if(HasSkillAbility(InSkillID, bNeedAssembled))
+	if(HasSkillAttackAbility(InSkillID, bNeedSlotted))
 	{
 		return SkillAttackAbilities[InSkillID];
-	}
-	return FDWCharacterSkillAttackAbilityData();
-}
-
-FDWCharacterSkillAttackAbilityData ADWCharacter::GetSkillAbility(ESkillType InSkillType, int32 InAbilityIndex, bool bNeedAssembled)
-{
-	if(InAbilityIndex == -1) InAbilityIndex = FMath::RandRange(0, SkillAttackAbilities.Num() -1);
-	if(HasSkillAbility(InSkillType, InAbilityIndex, bNeedAssembled))
-	{
-		TArray<FDWCharacterSkillAttackAbilityData> Abilities = TArray<FDWCharacterSkillAttackAbilityData>();
-		for (auto& Iter : SkillAttackAbilities)
-		{
-			if(Iter.Value.GetData<UAbilitySkillDataBase>().SkillType == InSkillType)
-			{
-				Abilities.Add(Iter.Value);
-			}
-		}
-		return Abilities[InAbilityIndex];
 	}
 	return FDWCharacterSkillAttackAbilityData();
 }

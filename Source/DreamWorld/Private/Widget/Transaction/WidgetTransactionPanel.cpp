@@ -61,17 +61,7 @@ void UWidgetTransactionPanel::OnCreate(UObject* InOwner, const TArray<FParameter
 
 void UWidgetTransactionPanel::OnInitialize(UObject* InOwner, const TArray<FParameter>& InParams)
 {
-	if(GetOwnerObject<IAbilityInventoryAgentInterface>())
-	{
-		GetOwnerObject<IAbilityInventoryAgentInterface>()->GetInventory()->OnRefresh.RemoveDynamic(this, &UWidgetTransactionPanel::Refresh);
-	}
-
 	Super::OnInitialize(InOwner, InParams);
-
-	if(GetOwnerObject<IAbilityInventoryAgentInterface>())
-	{
-		GetOwnerObject<IAbilityInventoryAgentInterface>()->GetInventory()->OnRefresh.AddDynamic(this, &UWidgetTransactionPanel::Refresh);
-	}
 }
 
 void UWidgetTransactionPanel::OnReset(bool bForce)
@@ -98,6 +88,11 @@ void UWidgetTransactionPanel::OnOpen(const TArray<FParameter>& InParams, bool bI
 {
 	Super::OnOpen(InParams, bInstant);
 
+	if(GetOwnerObject<IAbilityInventoryAgentInterface>())
+	{
+		GetOwnerObject<IAbilityInventoryAgentInterface>()->GetInventory()->OnRefresh.RemoveDynamic(this, &UWidgetTransactionPanel::Refresh);
+	}
+
 	UWidgetModuleStatics::OpenUserWidget<UWidgetUIMask>();
 
 	TransactionTarget = InParams[0];
@@ -111,6 +106,11 @@ void UWidgetTransactionPanel::OnOpen(const TArray<FParameter>& InParams, bool bI
 void UWidgetTransactionPanel::OnClose(bool bInstant)
 {
 	Super::OnClose(bInstant);
+
+	if(GetOwnerObject<IAbilityInventoryAgentInterface>())
+	{
+		GetOwnerObject<IAbilityInventoryAgentInterface>()->GetInventory()->OnRefresh.AddDynamic(this, &UWidgetTransactionPanel::Refresh);
+	}
 
 	UWidgetModuleStatics::CloseUserWidget<UWidgetUIMask>();
 
@@ -170,53 +170,6 @@ void UWidgetTransactionPanel::OnTabButtonSelected_Implementation(UCommonButtonBa
 	}
 }
 
-void UWidgetTransactionPanel::OnTransactionContentRefresh()
-{
-	Reset();
-	
-	if(TransactionContent)
-	{
-		if(GetTabIndex() < 2)
-		{
-			IAbilityInventoryAgentInterface* Seller = GetTabIndex() == 0 ? TransactionTarget : GetOwnerObject<IAbilityInventoryAgentInterface>();
-
-			for(auto& Iter : Seller->GetInventory()->GetAllItems())
-			{
-				if(Iter.IsEmpty() || !Iter.IsDataType<UAbilityTransItemDataBase>() || Iter.GetData<UAbilityTransItemDataBase>().Prices.IsEmpty()) continue;
-
-				if(UWidgetTransactionItem* TransactionItem = CreateSubWidget<UWidgetTransactionItem>({ &Iter }, TransactionItemClass))
-				{
-					if(UScrollBoxSlot* ScrollBoxSlot = Cast<UScrollBoxSlot>(TransactionContent->AddChild(TransactionItem)))
-					{
-						ScrollBoxSlot->SetPadding(FMargin(0.f, 0.f, 0.f, 5.f));
-					}
-					TransactionItems.Add(TransactionItem);
-				}
-			}
-		}
-		else
-		{
-			IAbilityInventoryAgentInterface* Buyer = GetOwnerObject<IAbilityInventoryAgentInterface>();
-
-			for(auto Iter : Buyer->GetInventory()->GetAllSlots())
-			{
-				if(Iter->IsEmpty() || !Iter->GetItem().IsDataType<UAbilityTransItemDataBase>() || Iter->GetItem().GetData<UAbilityTransItemDataBase>().Upgrades.IsEmpty() || Iter->GetItem().Level == Iter->GetItem().GetData<UAbilityTransItemDataBase>().MaxLevel) continue;
-
-				if(UWidgetTransactionItem* TransactionItem = CreateSubWidget<UWidgetTransactionItem>({ &Iter->GetItem() }, TransactionItemClass))
-				{
-					if(UScrollBoxSlot* ScrollBoxSlot = Cast<UScrollBoxSlot>(TransactionContent->AddChild(TransactionItem)))
-					{
-						ScrollBoxSlot->SetPadding(FMargin(0.f, 0.f, 0.f, 5.f));
-					}
-					TransactionItems.Add(TransactionItem);
-				}
-			}
-		}
-	}
-
-	Refresh();
-}
-
 void UWidgetTransactionPanel::OnTransactionItemSelected_Implementation(UWidgetTransactionItem* InItem)
 {
 	if(InItem == SelectedTransactionItem) return;
@@ -248,6 +201,53 @@ void UWidgetTransactionPanel::OnTransactionItemDeselected_Implementation(UWidget
 	PreviewItems.Empty();
 }
 
+void UWidgetTransactionPanel::OnTransactionContentRefresh()
+{
+	Reset();
+	
+	if(TransactionContent)
+	{
+		if(GetTabIndex() < 2)
+		{
+			IAbilityInventoryAgentInterface* Seller = GetTabIndex() == 0 ? TransactionTarget : GetOwnerObject<IAbilityInventoryAgentInterface>();
+
+			for(auto& Iter : Seller->GetInventory()->GetAllItems())
+			{
+				if(Iter.IsEmpty() || !Iter.IsDataType<UAbilityTransItemDataBase>() || Iter.GetData<UAbilityTransItemDataBase>().Prices.IsEmpty()) continue;
+
+				if(UWidgetTransactionItem* TransactionItem = CreateSubWidget<UWidgetTransactionItem>({ &Iter }, TransactionItemClass))
+				{
+					TransactionItems.Add(TransactionItem);
+					if(UScrollBoxSlot* ScrollBoxSlot = Cast<UScrollBoxSlot>(TransactionContent->AddChild(TransactionItem)))
+					{
+						ScrollBoxSlot->SetPadding(FMargin(0.f, 0.f, 0.f, 5.f));
+					}
+				}
+			}
+		}
+		else
+		{
+			IAbilityInventoryAgentInterface* Buyer = GetOwnerObject<IAbilityInventoryAgentInterface>();
+
+			for(auto Iter : Buyer->GetInventory()->GetAllSlots())
+			{
+				if(Iter->IsEmpty() || !Iter->GetItem().IsDataType<UAbilityTransItemDataBase>() || Iter->GetItem().GetData<UAbilityTransItemDataBase>().Upgrades.IsEmpty() || Iter->GetItem().Level == Iter->GetItem().GetData<UAbilityTransItemDataBase>().MaxLevel) continue;
+
+				if(UWidgetTransactionItem* TransactionItem = CreateSubWidget<UWidgetTransactionItem>({ &Iter->GetItem() }, TransactionItemClass))
+				{
+					TransactionItems.Add(TransactionItem);
+					if(UScrollBoxSlot* ScrollBoxSlot = Cast<UScrollBoxSlot>(TransactionContent->AddChild(TransactionItem)))
+					{
+						ScrollBoxSlot->SetPadding(FMargin(0.f, 0.f, 0.f, 5.f));
+					}
+				}
+			}
+		}
+	}
+
+	Refresh();
+}
+
 void UWidgetTransactionPanel::OnPreviewContentRefresh()
 {
 	if(PreviewContent)
@@ -264,11 +264,11 @@ void UWidgetTransactionPanel::OnPreviewContentRefresh()
 			{
 				if(UWidgetAbilityItem* PreviewItem = CreateSubWidget<UWidgetAbilityItem>({ &Iter }, UAssetModuleStatics::GetStaticClass(GetTabIndex() != 1 ? FName("RequiredPreviewItem") : FName("SimplePreviewItem"))))
 				{
+					PreviewItems.Add(PreviewItem);
 					if(UWrapBoxSlot* WrapBoxSlot = PreviewContent->AddChildToWrapBox(PreviewItem))
 					{
 						WrapBoxSlot->SetPadding(FMargin(5.f, 5.f, 5.f, 5.f));
 					}
-					PreviewItems.Add(PreviewItem);
 				}
 			}
 		}

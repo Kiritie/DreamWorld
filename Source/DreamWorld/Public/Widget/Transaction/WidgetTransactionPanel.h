@@ -13,7 +13,6 @@ class IAbilityInventoryAgentInterface;
 class UScrollBox;
 class UWrapBox;
 class UWidgetTransactionItem;
-class UWidgetAbilityItem;
 class UCommonButton;
 
 /**
@@ -23,6 +22,8 @@ UCLASS()
 class DREAMWORLD_API UWidgetTransactionPanel : public UUserWidgetBase
 {
 	GENERATED_BODY()
+
+	friend class UWidgetTransactionItem;
 
 public:
 	UWidgetTransactionPanel(const FObjectInitializer& ObjectInitializer);
@@ -42,12 +43,9 @@ public:
 
 	virtual void OnDestroy(bool bRecovery = false) override;
 
-public:
+protected:
 	UFUNCTION(BlueprintNativeEvent)
 	void OnTabButtonSelected(UCommonButtonBase* SelectedTabButton, int32 ButtonIndex);
-
-	UFUNCTION()
-	void OnTransactionContentRefresh();
 	
 	UFUNCTION(BlueprintNativeEvent)
 	void OnTransactionItemSelected(UWidgetTransactionItem* InItem);
@@ -56,17 +54,13 @@ public:
 	void OnTransactionItemDeselected(UWidgetTransactionItem* InItem);
 
 	UFUNCTION()
+	void OnTransactionContentRefresh();
+
+	UFUNCTION()
 	void OnPreviewContentRefresh();
 
 	UFUNCTION()
 	void OnTransactionButtonClicked();
-
-public:
-	UFUNCTION(BlueprintPure)
-	int32 GetTabIndex() const;
-
-	UFUNCTION(BlueprintPure)
-	bool GetSelectedTransactionItem(FAbilityItem& OutItemData) const;
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (BindWidget, OptionalWidget = false), Category = "Components")
@@ -101,4 +95,11 @@ protected:
 	TArray<FAbilityItem> SelectedPreviewItems;
 
 	IAbilityInventoryAgentInterface* TransactionTarget;
+
+public:
+	UFUNCTION(BlueprintPure)
+	int32 GetTabIndex() const;
+
+	UFUNCTION(BlueprintPure)
+	bool GetSelectedTransactionItem(FAbilityItem& OutItemData) const;
 };

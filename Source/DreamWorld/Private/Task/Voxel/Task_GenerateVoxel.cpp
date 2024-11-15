@@ -11,9 +11,9 @@
 UTask_GenerateVoxel::UTask_GenerateVoxel()
 {
 	TaskDisplayName = FText::FromString(TEXT("建造"));
-	TaskDescription = FText::FromString(TEXT("建造5个方块"));
+	TaskDescription = FText::FromString(TEXT("建造XX个方块"));
 
-	MaxCount = 5;
+	TargetCount = 5;
 	CurrentCount = 0;
 }
 
@@ -106,14 +106,14 @@ FSaveData* UTask_GenerateVoxel::ToData()
 
 float UTask_GenerateVoxel::CheckTaskProgress_Implementation(FString& OutInfo) const
 {
-	OutInfo = FString::Printf(TEXT("%d/%d"), CurrentCount, MaxCount);
-	return (float)CurrentCount / MaxCount;
+	OutInfo = FString::Printf(TEXT("%d/%d"), CurrentCount, TargetCount);
+	return (float)CurrentCount / TargetCount;
 }
 
 void UTask_GenerateVoxel::OnVoxelGenerated_Implementation(UObject* InSender, UEventHandle_VoxelGenerated* InEventHandle)
 {
 	CurrentCount++;
-	if(CurrentCount >= MaxCount)
+	if(CurrentCount >= TargetCount)
 	{
 		Complete(ETaskExecuteResult::Succeed);
 	}

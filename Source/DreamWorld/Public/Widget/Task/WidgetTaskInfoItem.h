@@ -5,6 +5,7 @@
 #include "Widget/Screen/SubWidgetBase.h"
 #include "WidgetTaskInfoItem.generated.h"
 
+class UTextBlock;
 class UTaskBase;
 
 /**
@@ -19,11 +20,26 @@ public:
 	UWidgetTaskInfoItem(const FObjectInitializer& ObjectInitializer);
 
 public:
+	virtual void OnDespawn_Implementation(bool bRecovery) override;
+	
 	virtual void OnInitialize(const TArray<FParameter>& InParams) override;
 
 	virtual void OnRefresh() override;
 
 protected:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (BindWidget, OptionalWidget = false), Category = "Components")
+	UTextBlock* TxtName;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (BindWidget, OptionalWidget = false), Category = "Components")
+	UTextBlock* TxtProgress;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (BindWidget, OptionalWidget = false), Category = "Components")
+	UTextBlock* TxtDetail;
+
+protected:
 	UPROPERTY(BlueprintReadOnly)
 	UTaskBase* Task;
+
+public:
+	UTaskBase* GetTask() const { return Task; }
 };

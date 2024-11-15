@@ -58,9 +58,9 @@ protected:
 	UFUNCTION(BlueprintNativeEvent)
 	void OnVoxelDestroyed(UObject* InSender, UEventHandle_VoxelDestroyed* InEventHandle);
 
-protected:
+public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	int32 MaxCount;
+	int32 TargetCount;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	int32 CurrentCount;

@@ -25,6 +25,7 @@
 #include "Scene/SceneModuleStatics.h"
 #include "Widget/Context/WidgetContextInputBox.h"
 #include "Widget/MaxMap/WidgetMaxMapBox.h"
+#include "Widget/Task/WidgetTaskPanel.h"
 
 // ParamSets default values
 UDWInputManager::UDWInputManager()
@@ -188,6 +189,7 @@ void UDWInputManager::OnBindAction(UInputComponentBase* InInputComponent)
 	InInputComponent->BindInputAction(GameplayTags::Input_OpenMaxMapBox, ETriggerEvent::Started, this, &UDWInputManager::OpenMaxMapBox);
 	InInputComponent->BindInputAction(GameplayTags::Input_OpenInventoryPanel, ETriggerEvent::Started, this, &UDWInputManager::OpenInventoryPanel);
 	InInputComponent->BindInputAction(GameplayTags::Input_OpenGeneratePanel, ETriggerEvent::Started, this, &UDWInputManager::OpenGeneratePanel);
+	InInputComponent->BindInputAction(GameplayTags::Input_OpenTaskPanel, ETriggerEvent::Started, this, &UDWInputManager::OpenTaskPanel);
 	InInputComponent->BindInputAction(GameplayTags::Input_OpenContextInputBox, ETriggerEvent::Started, this, &UDWInputManager::OpenContextInputBox);
 }
 
@@ -480,7 +482,7 @@ void UDWInputManager::ReleaseSkillAbility1()
 	
 	if(!PlayerCharacter || !PlayerCharacter->IsActive(true) || !PlayerCharacter->InputEnabled()) return;
 
-	PlayerCharacter->SkillAttack(0);
+	PlayerCharacter->Skill(0);
 }
 
 void UDWInputManager::ReleaseSkillAbility2()
@@ -489,7 +491,7 @@ void UDWInputManager::ReleaseSkillAbility2()
 	
 	if(!PlayerCharacter || !PlayerCharacter->IsActive(true) || !PlayerCharacter->InputEnabled()) return;
 
-	PlayerCharacter->SkillAttack(1);
+	PlayerCharacter->Skill(1);
 }
 
 void UDWInputManager::ReleaseSkillAbility3()
@@ -498,7 +500,7 @@ void UDWInputManager::ReleaseSkillAbility3()
 	
 	if(!PlayerCharacter || !PlayerCharacter->IsActive(true) || !PlayerCharacter->InputEnabled()) return;
 
-	PlayerCharacter->SkillAttack(2);
+	PlayerCharacter->Skill(2);
 }
 
 void UDWInputManager::ReleaseSkillAbility4()
@@ -507,7 +509,7 @@ void UDWInputManager::ReleaseSkillAbility4()
 	
 	if(!PlayerCharacter || !PlayerCharacter->IsActive(true) || !PlayerCharacter->InputEnabled()) return;
 
-	PlayerCharacter->SkillAttack(3);
+	PlayerCharacter->Skill(3);
 }
 
 void UDWInputManager::DoInteract1()
@@ -771,6 +773,15 @@ void UDWInputManager::OpenGeneratePanel()
 	{
 		UWidgetModuleStatics::OpenUserWidget<UWidgetGeneratePanel>();
 	}
+}
+
+void UDWInputManager::OpenTaskPanel()
+{
+	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
+	
+	if(!PlayerCharacter || !PlayerCharacter->IsActive(true) || !PlayerCharacter->InputEnabled()) return;
+	
+	UWidgetModuleStatics::OpenUserWidget<UWidgetTaskPanel>();
 }
 
 void UDWInputManager::OpenContextInputBox()

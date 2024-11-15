@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Ability/AbilityModuleTypes.h"
 #include "Task/Base/TaskBase.h"
 #include "Task_Base.generated.h"
 
@@ -46,7 +47,10 @@ public:
 public:
 	virtual bool CheckTaskCondition_Implementation(FString& OutInfo) const override;
 
-protected:
+public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	int32 NeedLevel;
+	int32 Level;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TArray<FAbilityItem> Prizes;
 };

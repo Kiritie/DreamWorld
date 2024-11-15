@@ -48,17 +48,7 @@ void UWidgetGeneratePanel::OnCreate(UObject* InOwner, const TArray<FParameter>& 
 
 void UWidgetGeneratePanel::OnInitialize(UObject* InOwner, const TArray<FParameter>& InParams)
 {
-	if(GetOwnerObject<IAbilityInventoryAgentInterface>())
-	{
-		GetOwnerObject<IAbilityInventoryAgentInterface>()->GetInventory()->OnRefresh.RemoveDynamic(this, &UWidgetGeneratePanel::Refresh);
-	}
-
 	Super::OnInitialize(InOwner, InParams);
-
-	if(GetOwnerObject<IAbilityInventoryAgentInterface>())
-	{
-		GetOwnerObject<IAbilityInventoryAgentInterface>()->GetInventory()->OnRefresh.AddDynamic(this, &UWidgetGeneratePanel::Refresh);
-	}
 }
 
 void UWidgetGeneratePanel::OnReset(bool bForce)
@@ -88,36 +78,29 @@ void UWidgetGeneratePanel::OnOpen(const TArray<FParameter>& InParams, bool bInst
 {
 	Super::OnOpen(InParams, bInstant);
 
-	Reset();
+	if(GetOwnerObject<IAbilityInventoryAgentInterface>())
+	{
+		GetOwnerObject<IAbilityInventoryAgentInterface>()->GetInventory()->OnRefresh.AddDynamic(this, &UWidgetGeneratePanel::Refresh);
+	}
 
 	UWidgetModuleStatics::OpenUserWidget<UWidgetUIMask>();
 
-	const FPrimaryAssetId GenerateToolID = InParams.IsValidIndex(0) ? InParams[0].GetObjectValue<IPrimaryEntityInterface>()->Execute_GetAssetID(InParams[0]) : FPrimaryAssetId();
-
-	TArray<FDWGenerateItemData> GenerateItemDatas;
-	if(GenerateContent && UAssetModuleStatics::ReadDataTable(GenerateItemDatas))
+	if(InParams.IsValidIndex(0))
 	{
-		for(auto& Iter : GenerateItemDatas)
-		{
-			if(Iter.ToolID.IsValid() && Iter.ToolID != GenerateToolID) continue;
-			
-			if(UWidgetGenerateItem* GenerateItem = CreateSubWidget<UWidgetGenerateItem>({ &Iter.Item, &Iter }, GenerateItemClass))
-			{
-				if(UScrollBoxSlot* ScrollBoxSlot = Cast<UScrollBoxSlot>(GenerateContent->AddChild(GenerateItem)))
-				{
-					ScrollBoxSlot->SetPadding(FMargin(0.f, 0.f, 0.f, 5.f));
-				}
-				GenerateItems.Add(GenerateItem);
-			}
-		}
+		GenerateToolID = InParams[0].GetObjectValue<IPrimaryEntityInterface>()->Execute_GetAssetID(InParams[0]);
 	}
 
-	Refresh();
+	OnGenerateContentRefresh();
 }
 
 void UWidgetGeneratePanel::OnClose(bool bInstant)
 {
 	Super::OnClose(bInstant);
+
+	if(GetOwnerObject<IAbilityInventoryAgentInterface>())
+	{
+		GetOwnerObject<IAbilityInventoryAgentInterface>()->GetInventory()->OnRefresh.RemoveDynamic(this, &UWidgetGeneratePanel::Refresh);
+	}
 
 	UWidgetModuleStatics::CloseUserWidget<UWidgetUIMask>();
 }
@@ -170,7 +153,7 @@ void UWidgetGeneratePanel::OnDestroy(bool bRecovery)
 	Super::OnDestroy(bRecovery);
 }
 
-void UWidgetGeneratePanel::OnGenerateItemSelected_Implementation(UWidgetAbilityItem* InItem)
+void UWidgetGeneratePanel::OnGenerateItemSelected_Implementation(UWidgetGenerateItem* InItem)
 {
 	if(InItem == SelectedGenerateItem) return;
 
@@ -179,7 +162,7 @@ void UWidgetGeneratePanel::OnGenerateItemSelected_Implementation(UWidgetAbilityI
 		SelectedGenerateItem->SetIsSelected(false, false);
 	}
 
-	SelectedGenerateItem = Cast<UWidgetGenerateItem>(InItem);
+	SelectedGenerateItem = InItem;
 
 	Refresh();
 
@@ -187,7 +170,7 @@ void UWidgetGeneratePanel::OnGenerateItemSelected_Implementation(UWidgetAbilityI
 	GetWorld()->GetTimerManager().SetTimer(PreviewContentRefreshTH, FTimerDelegate::CreateUObject(this, &UWidgetGeneratePanel::OnPreviewContentRefresh), 1.5f, true, 0.f);
 }
 
-void UWidgetGeneratePanel::OnGenerateItemDeselected_Implementation(UWidgetAbilityItem* InItem)
+void UWidgetGeneratePanel::OnGenerateItemDeselected_Implementation(UWidgetGenerateItem* InItem)
 {
 	if(InItem != SelectedGenerateItem) return;
 
@@ -201,6 +184,29 @@ void UWidgetGeneratePanel::OnGenerateItemDeselected_Implementation(UWidgetAbilit
 		DestroySubWidget(Iter, true);
 	}
 	PreviewItems.Empty();
+}
+
+void UWidgetGeneratePanel::OnGenerateContentRefresh()
+{
+	Reset();
+
+	TArray<FDWGenerateItemData> GenerateItemDatas;
+	if(GenerateContent && UAssetModuleStatics::ReadDataTable(GenerateItemDatas))
+	{
+		for(auto& Iter : GenerateItemDatas)
+		{
+			if(Iter.ToolID.IsValid() && Iter.ToolID != GenerateToolID) continue;
+			
+			if(UWidgetGenerateItem* GenerateItem = CreateSubWidget<UWidgetGenerateItem>({ &Iter.Item, &Iter }, GenerateItemClass))
+			{
+				GenerateItems.Add(GenerateItem);
+				if(UScrollBoxSlot* ScrollBoxSlot = Cast<UScrollBoxSlot>(GenerateContent->AddChild(GenerateItem)))
+				{
+					ScrollBoxSlot->SetPadding(FMargin(0.f, 0.f, 0.f, 5.f));
+				}
+			}
+		}
+	}
 }
 
 void UWidgetGeneratePanel::OnPreviewContentRefresh()
@@ -219,11 +225,11 @@ void UWidgetGeneratePanel::OnPreviewContentRefresh()
 			{
 				if(UWidgetAbilityItem* PreviewItem = CreateSubWidget<UWidgetAbilityItem>({ &Iter }, UAssetModuleStatics::GetStaticClass(FName("RequiredPreviewItem"))))
 				{
+					PreviewItems.Add(PreviewItem);
 					if(UWrapBoxSlot* WrapBoxSlot = PreviewContent->AddChildToWrapBox(PreviewItem))
 					{
 						WrapBoxSlot->SetPadding(FMargin(5.f, 5.f, 5.f, 5.f));
 					}
-					PreviewItems.Add(PreviewItem);
 				}
 			}
 			if(_SelectedGenerateItemData.RawDatas.Num() == 1)
@@ -261,7 +267,7 @@ bool UWidgetGeneratePanel::GetSelectedGenerateItemData(FDWGenerateItemData& OutI
 {
 	if(SelectedGenerateItem)
 	{
-		OutItemData = SelectedGenerateItem->GenerateItemData;
+		OutItemData = SelectedGenerateItem->GetGenerateItemData();
 		return true;
 	}
 	return false;
