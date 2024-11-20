@@ -17,7 +17,7 @@ ADWVitalityVoxel::ADWVitalityVoxel(const FObjectInitializer& ObjectInitializer) 
 {
 	VoxelMesh = CreateDefaultSubobject<UVoxelMeshComponent>(FName("VoxelMesh"));
 	VoxelMesh->SetupAttachment(RootComponent);
-	VoxelMesh->Initialize(EVoxelMeshNature::Vitality);
+	VoxelMesh->Initialize(EVoxelScope::Vitality);
 }
 
 void ADWVitalityVoxel::OnDespawn_Implementation(bool bRecovery)

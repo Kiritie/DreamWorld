@@ -1,13 +1,13 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Widget/Task/WidgetTaskInfoItem.h"
+#include "Widget/Task/Info/WidgetTaskInfo.h"
 
 #include "Components/TextBlock.h"
 #include "Task/Base/TaskBase.h"
 
 
-UWidgetTaskInfoItem::UWidgetTaskInfoItem(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
+UWidgetTaskInfo::UWidgetTaskInfo(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	TxtName = nullptr;
 	TxtProgress = nullptr;
@@ -16,14 +16,14 @@ UWidgetTaskInfoItem::UWidgetTaskInfoItem(const FObjectInitializer& ObjectInitial
 	Task = nullptr;
 }
 
-void UWidgetTaskInfoItem::OnDespawn_Implementation(bool bRecovery)
+void UWidgetTaskInfo::OnDespawn_Implementation(bool bRecovery)
 {
 	Super::OnDespawn_Implementation(bRecovery);
 	
 	Task = nullptr;
 }
 
-void UWidgetTaskInfoItem::OnInitialize(const TArray<FParameter>& InParams)
+void UWidgetTaskInfo::OnInitialize(const TArray<FParameter>& InParams)
 {
 	if(InParams.IsValidIndex(0))
 	{
@@ -32,7 +32,7 @@ void UWidgetTaskInfoItem::OnInitialize(const TArray<FParameter>& InParams)
 	Super::OnInitialize(InParams);
 }
 
-void UWidgetTaskInfoItem::OnRefresh()
+void UWidgetTaskInfo::OnRefresh()
 {
 	Super::OnRefresh();
 
@@ -42,12 +42,6 @@ void UWidgetTaskInfoItem::OnRefresh()
 		FString ProgressStr;
 		switch(Task->GetTaskState())
 		{
-			case ETaskState::None:
-			case ETaskState::Entered:
-			{
-				ProgressStr = TEXT("未开始");
-				break;
-			}
 			case ETaskState::Executing:
 			{
 				FString TaskProgressInfo;
@@ -59,6 +53,11 @@ void UWidgetTaskInfoItem::OnRefresh()
 			case ETaskState::Leaved:
 			{
 				ProgressStr = TEXT("已完成");
+				break;
+			}
+			default:
+			{
+				ProgressStr = TEXT("未开始");
 				break;
 			}
 		}

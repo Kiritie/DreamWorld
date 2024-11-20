@@ -8,11 +8,19 @@
 
 UWidgetTaskCategory::UWidgetTaskCategory(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
-	bSelectable = false;
-
 	TxtName = nullptr;
 
 	TaskAsset = nullptr;
+}
+
+void UWidgetTaskCategory::OnSpawn_Implementation(UObject* InOwner, const TArray<FParameter>& InParams)
+{
+	if(InParams.IsValidIndex(0))
+	{
+		TaskAsset = InParams[0];
+	}
+
+	Super::OnSpawn_Implementation(InOwner, InParams);
 }
 
 void UWidgetTaskCategory::OnDespawn_Implementation(bool bRecovery)
@@ -22,14 +30,6 @@ void UWidgetTaskCategory::OnDespawn_Implementation(bool bRecovery)
 	TaskAsset = nullptr;
 }
 
-void UWidgetTaskCategory::OnInitialize(const TArray<FParameter>& InParams)
-{
-	if(InParams.IsValidIndex(0))
-	{
-		TaskAsset = InParams[0];
-	}
-	Super::OnInitialize(InParams);
-}
 
 void UWidgetTaskCategory::OnRefresh()
 {

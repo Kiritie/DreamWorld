@@ -96,7 +96,7 @@ void UDWCharacterState_Ride::OnLeave(UFiniteStateBase* InNextState)
 		if(UVoxelModule::IsValid())
 		{
 			RayStart.Z = UVoxelModuleStatics::GetWorldData().GetWorldRealSize().Z;
-			UVoxelModuleStatics::VoxelAgentTraceSingle(RayStart, RayEnd, Character->GetRadius(), Character->GetHalfHeight(), {}, HitResult);
+			UVoxelModuleStatics::VoxelAgentTraceSingle(RayStart, RayEnd, Character->GetRadius(), Character->GetHalfHeight(), {}, HitResult, false);
 		}
 		else
 		{

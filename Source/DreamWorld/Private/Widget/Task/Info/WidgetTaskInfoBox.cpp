@@ -1,17 +1,18 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Widget/Task/WidgetTaskInfoBox.h"
+#include "Widget/Task/Info/WidgetTaskInfoBox.h"
 
 #include "Components/VerticalBox.h"
 #include "Components/VerticalBoxSlot.h"
 #include "Event/EventModuleStatics.h"
-#include "Event/Handle/Task/EventHandle_TaskCompleted.h"
 #include "Event/Handle/Task/EventHandle_TaskEntered.h"
+#include "Event/Handle/Task/EventHandle_TaskLeaved.h"
+#include "Event/Handle/Task/EventHandle_TaskStateChanged.h"
 #include "Task/TaskModuleStatics.h"
 #include "Task/Base/TaskBase.h"
 #include "Widget/WidgetModule.h"
-#include "Widget/Task/WidgetTaskInfoItem.h"
+#include "Widget/Task/Info/WidgetTaskInfo.h"
 
 
 UWidgetTaskInfoBox::UWidgetTaskInfoBox(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
@@ -38,8 +39,11 @@ void UWidgetTaskInfoBox::OnOpen(const TArray<FParameter>& InParams, bool bInstan
 	Super::OnOpen(InParams, bInstant);
 
 	UEventModuleStatics::SubscribeEvent<UEventHandle_TaskEntered>(this, GET_FUNCTION_NAME_THISCLASS(OnTaskInfoContentRefresh));
+	UEventModuleStatics::SubscribeEvent<UEventHandle_TaskLeaved>(this, GET_FUNCTION_NAME_THISCLASS(OnTaskInfoContentRefresh));
 
-	UEventModuleStatics::SubscribeEvent<UEventHandle_TaskCompleted>(this, GET_FUNCTION_NAME_THISCLASS(Refresh));
+	UEventModuleStatics::SubscribeEvent<UEventHandle_TaskStateChanged>(this, GET_FUNCTION_NAME_THISCLASS(Refresh));
+	
+	OnTaskInfoContentRefresh();
 }
 
 void UWidgetTaskInfoBox::OnClose(bool bInstant)
@@ -47,15 +51,16 @@ void UWidgetTaskInfoBox::OnClose(bool bInstant)
 	Super::OnClose(bInstant);
 
 	UEventModuleStatics::UnsubscribeEvent<UEventHandle_TaskEntered>(this, GET_FUNCTION_NAME_THISCLASS(OnTaskInfoContentRefresh));
+	UEventModuleStatics::UnsubscribeEvent<UEventHandle_TaskLeaved>(this, GET_FUNCTION_NAME_THISCLASS(OnTaskInfoContentRefresh));
 
-	UEventModuleStatics::UnsubscribeEvent<UEventHandle_TaskCompleted>(this, GET_FUNCTION_NAME_THISCLASS(Refresh));
+	UEventModuleStatics::UnsubscribeEvent<UEventHandle_TaskStateChanged>(this, GET_FUNCTION_NAME_THISCLASS(Refresh));
 }
 
 void UWidgetTaskInfoBox::OnRefresh()
 {
 	Super::OnRefresh();
 
-	for(auto Iter : TaskInfoItems)
+	for(auto Iter : TaskInfos)
 	{
 		Iter->Refresh();
 	}
@@ -63,26 +68,26 @@ void UWidgetTaskInfoBox::OnRefresh()
 
 void UWidgetTaskInfoBox::OnTaskInfoContentRefresh()
 {
-	for(auto Iter : TaskInfoItems)
+	for(auto Iter : TaskInfos)
 	{
 		DestroySubWidget(Iter, true);
 	}
-	TaskInfoItems.Empty();
+	TaskInfos.Empty();
 
-	if(UTaskBase* RootTask = UTaskModuleStatics::GetCurrentRootTask())
+	if(UTaskBase* Task = UTaskModuleStatics::GetCurrentTask())
 	{
-		OnCreateTaskInfoItem(RootTask);
+		OnCreateTaskInfo(Task);
 	}
 }
 
-void UWidgetTaskInfoBox::OnCreateTaskInfoItem(UTaskBase* InTask)
+void UWidgetTaskInfoBox::OnCreateTaskInfo(UTaskBase* InTask)
 {
 	if(ContentBox)
 	{
-		if(UWidgetTaskInfoItem* TaskInfoItem = CreateSubWidget<UWidgetTaskInfoItem>({ InTask }, TaskInfoItemClass))
+		if(UWidgetTaskInfo* TaskInfo = CreateSubWidget<UWidgetTaskInfo>({ InTask }, TaskInfoClass))
 		{
-			TaskInfoItems.Add(TaskInfoItem);
-			if(const auto VerticalBoxSlot = ContentBox->AddChildToVerticalBox(TaskInfoItem))
+			TaskInfos.Add(TaskInfo);
+			if(const auto VerticalBoxSlot = ContentBox->AddChildToVerticalBox(TaskInfo))
 			{
 				VerticalBoxSlot->SetHorizontalAlignment(HAlign_Left);
 				VerticalBoxSlot->SetPadding(FMargin(InTask->TaskHierarchy * 30.f, 0.f, 0.f, 0.f));
@@ -90,7 +95,7 @@ void UWidgetTaskInfoBox::OnCreateTaskInfoItem(UTaskBase* InTask)
 		}
 		for(auto Iter : InTask->SubTasks)
 		{
-			OnCreateTaskInfoItem(Iter);
+			OnCreateTaskInfo(Iter);
 		}
 	}
 }

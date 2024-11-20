@@ -2,11 +2,9 @@
 
 #include "Widget/Task/WidgetTaskRootItem.h"
 
-#include "Components/ScrollBoxSlot.h"
 #include "Components/TextBlock.h"
-#include "Components/VerticalBox.h"
-#include "Components/VerticalBoxSlot.h"
 #include "Widget/Task/WidgetTaskCategory.h"
+#include "Widget/Task/WidgetTaskContainer.h"
 #include "Widget/Task/WidgetTaskItem.h"
 #include "Widget/Task/WidgetTaskPanel.h"
 
@@ -19,23 +17,18 @@ UWidgetTaskRootItem::UWidgetTaskRootItem(const FObjectInitializer& ObjectInitial
 	TxtDetail = nullptr;
 
 	Task = nullptr;
-	TaskContent = nullptr;
+	TaskContainer = nullptr;
 	TaskCategory = nullptr;
 }
 
 void UWidgetTaskRootItem::OnDespawn_Implementation(bool bRecovery)
 {
-	Task = nullptr;
-	TaskContent = nullptr;
-	TaskCategory = nullptr;
-	
-	for(auto Iter : TaskItems)
-	{
-		OwnerWidget->DestroySubWidget(Iter, true);
-	}
-	TaskItems.Empty();
-
 	Super::OnDespawn_Implementation(bRecovery);
+
+	Task = nullptr;
+	TaskContainer->Destroy(true);
+	TaskContainer = nullptr;
+	TaskCategory = nullptr;
 }
 
 void UWidgetTaskRootItem::OnInitialize(const TArray<FParameter>& InParams)
@@ -46,7 +39,7 @@ void UWidgetTaskRootItem::OnInitialize(const TArray<FParameter>& InParams)
 	}
 	if(InParams.IsValidIndex(1))
 	{
-		TaskContent = InParams[1];
+		TaskContainer = InParams[1];
 	}
 	if(InParams.IsValidIndex(2))
 	{
@@ -64,6 +57,13 @@ void UWidgetTaskRootItem::OnRefresh()
 		TxtName->SetText(Task->TaskDisplayName);
 		TxtDetail->SetText(Task->TaskDescription);
 	}
+	if(TaskContainer)
+	{
+		for(auto Iter : TaskContainer->GetTaskItems())
+		{
+			Iter->Refresh();
+		}
+	}
 }
 
 void UWidgetTaskRootItem::NativeOnSelected(bool bBroadcast)
@@ -72,18 +72,14 @@ void UWidgetTaskRootItem::NativeOnSelected(bool bBroadcast)
 
 	if(UWidgetTaskPanel* TaskPanel = GetOwnerWidget<UWidgetTaskPanel>())
 	{
+		TaskContainer->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
 		for(auto Iter : Task->SubTasks)
 		{
 			if(UWidgetTaskItem* TaskItem = TaskPanel->CreateSubWidget<UWidgetTaskItem>({ Iter }, TaskPanel->TaskItemClass))
 			{
-				TaskItems.Add(TaskItem);
-				if(UVerticalBoxSlot* VerticalBoxSlot = Cast<UVerticalBoxSlot>(TaskContent->AddChild(TaskItem)))
-				{
-					VerticalBoxSlot->SetPadding(FMargin(0.f, 0.f, 0.f, 5.f));
-				}
+				TaskContainer->AddTaskItem(TaskItem);
 			}
 		}
-		
 		TaskPanel->OnTaskRootItemSelected(this);
 	}
 }
@@ -94,12 +90,8 @@ void UWidgetTaskRootItem::NativeOnDeselected(bool bBroadcast)
 
 	if(UWidgetTaskPanel* TaskPanel = GetOwnerWidget<UWidgetTaskPanel>())
 	{
-		for(auto Iter : TaskItems)
-		{
-			OwnerWidget->DestroySubWidget(Iter, true);
-		}
-		TaskItems.Empty();
-		
+		TaskContainer->SetVisibility(ESlateVisibility::Collapsed);
+		TaskContainer->ClearTaskItem();
 		TaskPanel->OnTaskRootItemDeselected(this);
 	}
 }

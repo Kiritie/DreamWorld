@@ -1,8 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
-#include "Common/DWCommonTypes.h"
-#include "Widget/Screen/SubWidgetBase.h"
+#include "Widget/Pool/PoolWidgetBase.h"
 
 #include "WidgetTaskCategory.generated.h"
 
@@ -12,7 +11,7 @@ class UTextBlock;
  * UI构建项
  */
 UCLASS(BlueprintType)
-class DREAMWORLD_API UWidgetTaskCategory : public USubWidgetBase
+class DREAMWORLD_API UWidgetTaskCategory : public UPoolWidgetBase
 {
 	GENERATED_BODY()
 	
@@ -20,9 +19,9 @@ public:
 	UWidgetTaskCategory(const FObjectInitializer& ObjectInitializer);
 
 public:
+	virtual void OnSpawn_Implementation(UObject* InOwner, const TArray<FParameter>& InParams) override;
+	
 	virtual void OnDespawn_Implementation(bool bRecovery) override;
-
-	virtual void OnInitialize(const TArray<FParameter>& InParams) override;
 
 	virtual void OnRefresh() override;
 

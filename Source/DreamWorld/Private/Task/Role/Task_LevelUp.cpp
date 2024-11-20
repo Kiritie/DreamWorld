@@ -11,6 +11,7 @@ UTask_LevelUp::UTask_LevelUp()
 	TaskDescription = FText::FromString(TEXT("提升角色等级到XX级"));
 
 	TargetLevel = 0;
+	CurrentLevel = 0;
 }
 
 #if WITH_EDITOR
@@ -43,6 +44,17 @@ void UTask_LevelUp::OnEnter(UTaskBase* InLastTask)
 void UTask_LevelUp::OnRefresh()
 {
 	Super::OnRefresh();
+
+	const ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
+	if(PlayerCharacter && CurrentLevel != PlayerCharacter->GetLevelA())
+	{
+		CurrentLevel = PlayerCharacter->GetLevelA();
+		RefreshState();
+		if(CurrentLevel >= TargetLevel)
+		{
+			Complete(ETaskExecuteResult::Succeed);
+		}
+	}
 }
 
 void UTask_LevelUp::OnGuide()
@@ -68,6 +80,18 @@ void UTask_LevelUp::OnLeave()
 void UTask_LevelUp::Serialize(FArchive& Ar)
 {
 	Super::Serialize(Ar);
+
+	if(Ar.ArIsSaveGame)
+	{
+		if(Ar.IsLoading())
+		{
+			Ar << CurrentLevel;
+		}
+		else if(Ar.IsSaving())
+		{
+			Ar << CurrentLevel;
+		}
+	}
 }
 
 void UTask_LevelUp::LoadData(FSaveData* InSaveData, EPhase InPhase)
@@ -82,7 +106,8 @@ FSaveData* UTask_LevelUp::ToData()
 
 float UTask_LevelUp::CheckTaskProgress_Implementation(FString& OutInfo) const
 {
-	if(ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>())
+	const ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
+	if(PlayerCharacter)
 	{
 		OutInfo = FString::Printf(TEXT("%d/%d"), PlayerCharacter->GetLevelA(), TargetLevel);
 		return (float)PlayerCharacter->GetLevelA() / TargetLevel;

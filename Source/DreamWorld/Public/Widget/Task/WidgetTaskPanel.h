@@ -6,10 +6,11 @@
 #include "Widget/Screen/UserWidgetBase.h"
 #include "WidgetTaskPanel.generated.h"
 
+class UWidgetTaskContainer;
 class UWidgetTaskCategory;
 class UWidgetTaskRootItem;
 class UVerticalBox;
-class UWidgetTaskInfoItem;
+class UWidgetTaskInfo;
 class UWidgetTaskItem;
 class UScrollBox;
 class UWrapBox;
@@ -67,7 +68,7 @@ protected:
 	void OnStartTaskButtonClicked();
 
 	UFUNCTION()
-	void OnCreateTaskInfoItem(UTaskBase* InTask);
+	void OnCreateTaskInfo(UTaskBase* InTask);
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (BindWidget, OptionalWidget = false), Category = "Components")
@@ -81,6 +82,9 @@ protected:
 				
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TSubclassOf<UWidgetTaskCategory> TaskCategoryClass;
+				
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TSubclassOf<UWidgetTaskContainer> TaskContainerClass;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TSubclassOf<UWidgetTaskRootItem> TaskRootItemClass;
@@ -89,7 +93,7 @@ protected:
 	TSubclassOf<UWidgetTaskItem> TaskItemClass;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	TSubclassOf<UWidgetTaskInfoItem> TaskInfoItemClass;
+	TSubclassOf<UWidgetTaskInfo> TaskInfoClass;
 
 protected:
 	UPROPERTY()
@@ -99,11 +103,15 @@ protected:
 	TArray<UWidgetTaskRootItem*> TaskRootItems;
 	
 	UPROPERTY()
-	TArray<UWidgetTaskInfoItem*> TaskInfoItems;
+	TArray<UWidgetTaskInfo*> TaskInfos;
 
 	UPROPERTY()
 	UWidgetTaskRootItem* SelectedTaskRootItem;
 
 	UPROPERTY()
 	UWidgetTaskItem* SelectedTaskItem;
+
+public:
+	UFUNCTION(BlueprintPure)
+	bool GetSelectedTask(UTaskBase*& OutTask) const;
 };

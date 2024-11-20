@@ -6,6 +6,7 @@
 
 #include "WidgetTaskRootItem.generated.h"
 
+class UWidgetTaskContainer;
 class UVerticalBox;
 class UWidgetTaskCategory;
 class UWidgetTaskItem;
@@ -46,16 +47,15 @@ protected:
 	UTaskBase* Task;
 
 	UPROPERTY(BlueprintReadOnly)
-	UVerticalBox* TaskContent;
+	UWidgetTaskContainer* TaskContainer;
 
 	UPROPERTY(BlueprintReadOnly)
 	UWidgetTaskCategory* TaskCategory;
-	
-	UPROPERTY()
-	TArray<UWidgetTaskItem*> TaskItems;
 
 public:
 	UTaskBase* GetTask() const { return Task; }
+	
+	UWidgetTaskContainer* GetTaskContainer() const { return TaskContainer; }
 	
 	UWidgetTaskCategory* GetTaskCategory() const { return TaskCategory; }
 };

@@ -12,7 +12,6 @@
 #include "Team/DWTeamModule.h"
 #include "Vitality/DWVitality.h"
 #include "Voxel/VoxelModule.h"
-#include "ObjectPool/ObjectPoolModuleStatics.h"
 #include "SaveGame/SaveGameModuleStatics.h"
 #include "Voxel/VoxelModuleStatics.h"
 
@@ -60,80 +59,6 @@ FSaveData* ADWVoxelChunk::ToData()
 	}
 
 	return &SaveData;
-}
-
-void ADWVoxelChunk::OnCollision(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
-{
-	Super::OnCollision(HitComponent, OtherActor, OtherComp, NormalImpulse, Hit);
-}
-
-void ADWVoxelChunk::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-{
-	Super::OnBeginOverlap(OverlappedComponent, OtherActor, OtherComp, OtherBodyIndex, bFromSweep, SweepResult);
-
-	// if(OtherComp && OtherComp->IsA<UAbilityCharacterPart>())
-	// {
-	// 	if(UAbilityCharacterPart* characterPart = Cast<UAbilityCharacterPart>(OtherComp))
-	// 	{
-	// 		if(ACharacterBase* character = characterPart->GetOwnerCharacter())
-	// 		{
-	// 			Debug(FString::Printf(TEXT("%s"), *SweepResult.ImpactPoint.ToString()));
-	// 			Debug(FString::Printf(TEXT("%s"), *SweepResult.ImpactNormal.ToString()));
-	// 			const FVector normal = FVector(FMath::Min((character->GetMoveDirection() * 2.5f).X, 1.f), FMath::Min((character->GetMoveDirection() * 2.5f).Y, 1.f), FMath::Min((character->GetMoveDirection() * 2.5f).Z, 1.f));
-	// 			const FVector point = characterPart->GetComponentLocation() + characterPart->GetScaledCapsuleRadius() * normal + UVoxelModule::Get().GetWorldData().GetBlockSizedNormal(normal);
-	// 			if(FVector::Distance(character->GetLocation(), point) > 100)
-	// 			{
-	// 				Debug(FString::Printf(TEXT("%f"), FVector::Distance(character->GetLocation(), point)));
-	// 			}
-	// 			UKismetSystemLibrary::DrawDebugBox(this, point, FVector(5), FColor::Green, FRotator::ZeroRotator, 100);
-	// 			const FVoxelItem& voxelItem = GetVoxelItem(LocationToIndex(point));
-	// 			const UVoxelAsset VoxelData = voxelItem.GetData<UVoxelAsset>();
-	// 			if(voxelItem.IsValid() && VoxelData.VoxelType != characterPart->GetLastOverlapVoxel())
-	// 			{
-	// 				if(UVoxel& voxel = voxelItem.GetVoxel())
-	// 				{
-	// 					characterPart->SetLastVoxelType(VoxelData.VoxelType);
-	// 					voxel.OnTargetEnter(characterPart, FVoxelHitResult(voxelItem, point, normal));
-	// 				}
-	// 			}
-	// 			character->OnBeginOverlapVoxel(characterPart, FVoxelHitResult(voxelItem, point, normal));
-	// 		}
-	// 	}
-	// }
-}
-
-void ADWVoxelChunk::OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
-{
-	Super::OnEndOverlap(OverlappedComponent, OtherActor, OtherComp, OtherBodyIndex);
-
-	// if(OtherComp && OtherComp->IsA<UAbilityCharacterPart>())
-	// {
-	// 	if(UAbilityCharacterPart* characterPart = Cast<UAbilityCharacterPart>(OtherComp))
-	// 	{
-	// 		if(ACharacterBase* character = characterPart->GetOwnerCharacter())
-	// 		{
-	// 			const FVector normal = FVector(FMath::Min((character->GetMoveDirection() * 2.5f).X, 1.f), FMath::Min((character->GetMoveDirection() * 2.5f).Y, 1.f), FMath::Min((character->GetMoveDirection() * 2.5f).Z, 1.f));
-	// 			const FVector point = characterPart->GetComponentLocation() - characterPart->GetScaledCapsuleRadius() * normal - UVoxelModule::Get().GetWorldData().GetBlockSizedNormal(normal);
-	// 			UKismetSystemLibrary::DrawDebugBox(this, point, FVector(5), FColor::Red, FRotator::ZeroRotator, 100);
-	// 			const FVoxelItem& voxelItem = GetVoxelItem(LocationToIndex(point));
-	// 			const UVoxelAsset VoxelData = voxelItem.GetData<UVoxelAsset>();
-	// 			if(voxelItem.IsValid() && VoxelData.VoxelType == characterPart->GetLastOverlapVoxel())
-	// 			{
-	// 				const FVoxelItem& _VoxelItem = GetVoxelItem(LocationToIndex(characterPart->GetComponentLocation()));
-	// 				const UVoxelAsset _VoxelData = _VoxelItem.GetData<UVoxelAsset>();
-	// 				if(!_VoxelItem.IsValid() || _VoxelData.VoxelType != VoxelData.VoxelType)
-	// 				{
-	// 					if(UVoxel& voxel = voxelItem.GetVoxel())
-	// 					{
-	// 						characterPart->SetLastVoxelType(EVoxelType::Unknown);
-	// 						voxel.OnTargetExit(characterPart, FVoxelHitResult(voxelItem, point, normal));
-	// 					}
-	// 				}
-	// 			}
-	// 			character->OnEndOverlapVoxel(characterPart, FVoxelHitResult(voxelItem, point, normal));
-	// 		}
-	// 	}
-	// }
 }
 
 void ADWVoxelChunk::Initialize(FIndex InIndex, int32 InBatch)
@@ -189,7 +114,7 @@ void ADWVoxelChunk::SpawnSceneActors()
 				const int32 Num = VitalityItem.Count != 0 ? VitalityItem.Count : WorldData.RandomStream.RandRange(VitalityItem.MinCount, VitalityItem.MaxCount);
 				DON(Num,
 					FHitResult HitResult;
-					if(UVoxelModuleStatics::VoxelAgentTraceSingle(Index, VitalityData.Radius, VitalityData.HalfHeight, {}, HitResult, true, 10, false))
+					if(UVoxelModuleStatics::VoxelAgentTraceSingle(Index, VitalityData.Radius, VitalityData.HalfHeight, {}, HitResult, true, 10, false, false))
 					{
 						auto SaveData = FDWVitalitySaveData();
 						SaveData.AssetID = VitalityData.GetPrimaryAssetId();
@@ -216,7 +141,7 @@ void ADWVoxelChunk::SpawnSceneActors()
 				const int32 Num = CharacterItem.Count != 0 ? CharacterItem.Count : WorldData.RandomStream.RandRange(CharacterItem.MinCount, CharacterItem.MaxCount);
 				DON(Num,
 					FHitResult HitResult;
-					if(UVoxelModuleStatics::VoxelAgentTraceSingle(Index, CharacterData.Radius, CharacterData.HalfHeight, {}, HitResult, true, 10, false))
+					if(UVoxelModuleStatics::VoxelAgentTraceSingle(Index, CharacterData.Radius, CharacterData.HalfHeight, {}, HitResult, true, 10, false, true))
 					{
 						auto SaveData = FDWCharacterSaveData();
 						SaveData.AssetID = CharacterData.GetPrimaryAssetId();

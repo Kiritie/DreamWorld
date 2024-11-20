@@ -6,7 +6,7 @@
 #include "WidgetTaskInfoBox.generated.h"
 
 class UVerticalBox;
-class UWidgetTaskInfoItem;
+class UWidgetTaskInfo;
 class UTaskBase;
 
 /**
@@ -36,16 +36,16 @@ protected:
 	void OnTaskInfoContentRefresh();
 
 	UFUNCTION()
-	void OnCreateTaskInfoItem(UTaskBase* InTask);
+	void OnCreateTaskInfo(UTaskBase* InTask);
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (BindWidget, OptionalWidget = false), Category = "Components")
 	UVerticalBox* ContentBox;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	TSubclassOf<UWidgetTaskInfoItem> TaskInfoItemClass;
+	TSubclassOf<UWidgetTaskInfo> TaskInfoClass;
 
 protected:
 	UPROPERTY()
-	TArray<UWidgetTaskInfoItem*> TaskInfoItems;
+	TArray<UWidgetTaskInfo*> TaskInfos;
 };

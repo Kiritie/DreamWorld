@@ -3,7 +3,7 @@
 #pragma once
 
 #include "Widget/Screen/SubWidgetBase.h"
-#include "WidgetTaskInfoItem.generated.h"
+#include "WidgetTaskInfo.generated.h"
 
 class UTextBlock;
 class UTaskBase;
@@ -12,12 +12,12 @@ class UTaskBase;
  * 任务信息框
  */
 UCLASS()
-class DREAMWORLD_API UWidgetTaskInfoItem : public USubWidgetBase
+class DREAMWORLD_API UWidgetTaskInfo : public USubWidgetBase
 {
 	GENERATED_BODY()
 
 public:
-	UWidgetTaskInfoItem(const FObjectInitializer& ObjectInitializer);
+	UWidgetTaskInfo(const FObjectInitializer& ObjectInitializer);
 
 public:
 	virtual void OnDespawn_Implementation(bool bRecovery) override;

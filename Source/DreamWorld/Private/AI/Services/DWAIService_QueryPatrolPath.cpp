@@ -53,7 +53,7 @@ void UDWAIService_QueryPatrolPath::TickNode(UBehaviorTreeComponent& OwnerComp, u
 		if(UVoxelModule::IsValid())
 		{
 			rayStart.Z = UVoxelModuleStatics::GetWorldData().GetWorldRealSize().Z;
-			UVoxelModuleStatics::VoxelAgentTraceSingle(rayStart, rayEnd, GetAgent<ADWCharacter>()->GetRadius(), GetAgent<ADWCharacter>()->GetHalfHeight(), {}, hitResult);
+			UVoxelModuleStatics::VoxelAgentTraceSingle(rayStart, rayEnd, GetAgent<ADWCharacter>()->GetRadius(), GetAgent<ADWCharacter>()->GetHalfHeight(), {}, hitResult, true);
 		}
 		else
 		{

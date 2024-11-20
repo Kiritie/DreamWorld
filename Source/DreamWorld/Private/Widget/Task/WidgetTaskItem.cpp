@@ -43,32 +43,43 @@ void UWidgetTaskItem::OnRefresh()
 	if(Task)
 	{
 		TxtName->SetText(Task->TaskDisplayName);
-		FString ProgressStr;
-		switch(Task->GetTaskState())
+		if(UTask_Base* TaskBase = Cast<UTask_Base>(Task))
 		{
-			case ETaskState::None:
-			case ETaskState::Entered:
+			if(TaskBase->Level > 0)
 			{
-				ProgressStr = TEXT("未开始");
+				TxtLevel->SetText(FText::FromString(FString::Printf(TEXT("Lv.%d"), TaskBase->Level)));
+			}
+			else
+			{
+				TxtLevel->SetText(FText::FromString(TEXT("无限制")));
+			}
+		}
+		FString ProgressStr;
+		switch(Task->TaskExecuteResult)
+		{
+			case ETaskExecuteResult::None:
+			{
+				switch(Task->GetTaskState())
+				{
+					case ETaskState::Entered:
+					case ETaskState::Executing:
+					{
+						ProgressStr = TEXT("进行中");
+						break;
+					}
+					default:
+					{
+						ProgressStr = TEXT("未开始");
+						break;
+					}
+				}
 				break;
 			}
-			case ETaskState::Executing:
-			{
-				FString TaskProgressInfo;
-				Task->CheckTaskProgress(TaskProgressInfo);
-				ProgressStr = TaskProgressInfo.IsEmpty() ? TEXT("进行中") : TaskProgressInfo;
-				break;
-			}
-			case ETaskState::Completed:
-			case ETaskState::Leaved:
+			default:
 			{
 				ProgressStr = TEXT("已完成");
 				break;
 			}
-		}
-		if(UTask_Base* TaskBase = Cast<UTask_Base>(Task))
-		{
-			TxtLevel->SetText(FText::FromString(FString::Printf(TEXT("Lv.%d"), TaskBase->Level)));
 		}
 		TxtProgress->SetText(FText::FromString(FString::Printf(TEXT("(%s)"), *ProgressStr)));
 		TxtDetail->SetText(Task->TaskDescription);

@@ -113,6 +113,7 @@ float UTask_GenerateVoxel::CheckTaskProgress_Implementation(FString& OutInfo) co
 void UTask_GenerateVoxel::OnVoxelGenerated_Implementation(UObject* InSender, UEventHandle_VoxelGenerated* InEventHandle)
 {
 	CurrentCount++;
+	RefreshState();
 	if(CurrentCount >= TargetCount)
 	{
 		Complete(ETaskExecuteResult::Succeed);

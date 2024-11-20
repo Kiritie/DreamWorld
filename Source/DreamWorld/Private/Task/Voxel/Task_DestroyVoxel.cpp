@@ -113,6 +113,7 @@ float UTask_DestroyVoxel::CheckTaskProgress_Implementation(FString& OutInfo) con
 void UTask_DestroyVoxel::OnVoxelDestroyed_Implementation(UObject* InSender, UEventHandle_VoxelDestroyed* InEventHandle)
 {
 	CurrentCount++;
+	RefreshState();
 	if(CurrentCount >= TargetCount)
 	{
 		Complete(ETaskExecuteResult::Succeed);

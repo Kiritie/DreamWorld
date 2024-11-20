@@ -11,6 +11,7 @@
 #include "Procedure/Procedure_Playing.h"
 #include "SaveGame/Archive/DWArchiveSaveGame.h"
 #include "SaveGame/SaveGameModuleStatics.h"
+#include "Scene/SceneModule.h"
 #include "Voxel/DWVoxelModule.h"
 #include "Widget/WidgetGameHUD.h"
 #include "Widget/WidgetModuleStatics.h"
@@ -43,6 +44,7 @@ void UProcedure_Loading::OnEnter(UProcedureBase* InLastProcedure)
 {
 	Super::OnEnter(InLastProcedure);
 
+	AMainModule::PauseModuleByClass<USceneModule>();
 	AMainModule::PauseModuleByClass<UCameraModule>();
 
 	UWidgetModuleStatics::OpenUserWidget<UWidgetLoadingPanel>({ FString(TEXT("生成世界中...")) });

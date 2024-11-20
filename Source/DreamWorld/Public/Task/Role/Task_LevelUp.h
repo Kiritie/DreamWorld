@@ -57,4 +57,7 @@ public:
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	int32 TargetLevel;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	int32 CurrentLevel;
 };

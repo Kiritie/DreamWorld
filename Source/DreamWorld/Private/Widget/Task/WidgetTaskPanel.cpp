@@ -9,15 +9,15 @@
 #include "Components/VerticalBox.h"
 #include "Components/VerticalBoxSlot.h"
 #include "Event/EventModuleStatics.h"
-#include "Event/Handle/Task/EventHandle_TaskCompleted.h"
-#include "Event/Handle/Task/EventHandle_TaskEntered.h"
+#include "Event/Handle/Task/EventHandle_TaskStateChanged.h"
 #include "Task/TaskModuleStatics.h"
 #include "Task/Base/TaskAsset.h"
 #include "Widget/WidgetModuleStatics.h"
 #include "Widget/Common/CommonButton.h"
 #include "Widget/Common/WidgetUIMask.h"
 #include "Widget/Task/WidgetTaskCategory.h"
-#include "Widget/Task/WidgetTaskInfoItem.h"
+#include "Widget/Task/WidgetTaskContainer.h"
+#include "Widget/Task/Info/WidgetTaskInfo.h"
 #include "Widget/Task/WidgetTaskItem.h"
 #include "Widget/Task/WidgetTaskRootItem.h"
 
@@ -57,17 +57,23 @@ void UWidgetTaskPanel::OnReset(bool bForce)
 {
 	Super::OnReset(bForce);
 
+	for(auto Iter : TaskCategories)
+	{
+		Iter->Destroy(true);
+	}
+	TaskCategories.Empty();
+
 	for(auto Iter : TaskRootItems)
 	{
 		DestroySubWidget(Iter, true);
 	}
 	TaskRootItems.Empty();
 
-	for(auto Iter : TaskInfoItems)
+	for(auto Iter : TaskInfos)
 	{
 		DestroySubWidget(Iter, true);
 	}
-	TaskInfoItems.Empty();
+	TaskInfos.Empty();
 
 	SelectedTaskItem = nullptr;
 }
@@ -76,9 +82,7 @@ void UWidgetTaskPanel::OnOpen(const TArray<FParameter>& InParams, bool bInstant)
 {
 	Super::OnOpen(InParams, bInstant);
 
-	UEventModuleStatics::SubscribeEvent<UEventHandle_TaskEntered>(this, GET_FUNCTION_NAME_THISCLASS(OnTaskContentRefresh));
-
-	UEventModuleStatics::SubscribeEvent<UEventHandle_TaskCompleted>(this, GET_FUNCTION_NAME_THISCLASS(Refresh));
+	UEventModuleStatics::SubscribeEvent<UEventHandle_TaskStateChanged>(this, GET_FUNCTION_NAME_THISCLASS(Refresh));
 
 	UWidgetModuleStatics::OpenUserWidget<UWidgetUIMask>();
 
@@ -89,9 +93,7 @@ void UWidgetTaskPanel::OnClose(bool bInstant)
 {
 	Super::OnClose(bInstant);
 
-	UEventModuleStatics::UnsubscribeEvent<UEventHandle_TaskEntered>(this, GET_FUNCTION_NAME_THISCLASS(OnTaskContentRefresh));
-
-	UEventModuleStatics::UnsubscribeEvent<UEventHandle_TaskCompleted>(this, GET_FUNCTION_NAME_THISCLASS(Refresh));
+	UEventModuleStatics::UnsubscribeEvent<UEventHandle_TaskStateChanged>(this, GET_FUNCTION_NAME_THISCLASS(Refresh));
 
 	UWidgetModuleStatics::CloseUserWidget<UWidgetUIMask>();
 }
@@ -100,18 +102,24 @@ void UWidgetTaskPanel::OnRefresh()
 {
 	Super::OnRefresh();
 
-	for(auto Iter : TaskInfoItems)
+	for(auto Iter : TaskRootItems)
+	{
+		Iter->Refresh();
+	}
+
+	for(auto Iter : TaskInfos)
 	{
 		Iter->Refresh();
 	}
 
 	bool bCanStartTask = true;
-	if(SelectedTaskItem)
+	UTaskBase* SelectedTask;
+	if(GetSelectedTask(SelectedTask))
 	{
 		FString Info;
-		if(SelectedTaskItem->GetTask()->CheckTaskCondition(Info))
+		if(SelectedTask->TaskExecuteResult != ETaskExecuteResult::None || !SelectedTask->CheckTaskCondition(Info))
 		{
-			bCanStartTask = true;
+			bCanStartTask = false;
 		}
 	}
 	else
@@ -173,11 +181,11 @@ void UWidgetTaskPanel::OnTaskItemDeselected_Implementation(UWidgetTaskItem* InIt
 
 	Refresh();
 
-	for(auto Iter : TaskInfoItems)
+	for(auto Iter : TaskInfos)
 	{
 		DestroySubWidget(Iter, true);
 	}
-	TaskInfoItems.Empty();
+	TaskInfos.Empty();
 }
 
 void UWidgetTaskPanel::OnTaskContentRefresh()
@@ -188,7 +196,7 @@ void UWidgetTaskPanel::OnTaskContentRefresh()
 	{
 		for(auto Iter1 : UTaskModuleStatics::GetTaskAssets())
 		{
-			if(UWidgetTaskCategory* TaskCategory = CreateSubWidget<UWidgetTaskCategory>({ Iter1 }, TaskCategoryClass))
+			if(UWidgetTaskCategory* TaskCategory = UObjectPoolModuleStatics::SpawnObject<UWidgetTaskCategory>(this, { Iter1 }, false, TaskCategoryClass))
 			{
 				TaskCategories.Add(TaskCategory);
 				if(UScrollBoxSlot* ScrollBoxSlot = Cast<UScrollBoxSlot>(TaskContent->AddChild(TaskCategory)))
@@ -197,18 +205,21 @@ void UWidgetTaskPanel::OnTaskContentRefresh()
 				}
 				for(auto Iter2 : Iter1->RootTasks)
 				{
-					UVerticalBox* SubTaskContent = NewObject<UVerticalBox>(this);
-					if(UWidgetTaskRootItem* TaskRootItem = CreateSubWidget<UWidgetTaskRootItem>({ Iter2, SubTaskContent, TaskCategory }, TaskRootItemClass))
+					if(UWidgetTaskContainer* TaskContainer = UObjectPoolModuleStatics::SpawnObject<UWidgetTaskContainer>(this, nullptr, false, TaskContainerClass))
 					{
-						TaskRootItems.Add(TaskRootItem);
-						if(UScrollBoxSlot* ScrollBoxSlot = Cast<UScrollBoxSlot>(TaskContent->AddChild(TaskRootItem)))
+						TaskContainer->SetVisibility(ESlateVisibility::Collapsed);
+						if(UWidgetTaskRootItem* TaskRootItem = CreateSubWidget<UWidgetTaskRootItem>({ Iter2, TaskContainer, TaskCategory }, TaskRootItemClass))
 						{
-							ScrollBoxSlot->SetPadding(FMargin(0.f, 0.f, 0.f, 5.f));
+							TaskRootItems.Add(TaskRootItem);
+							if(UScrollBoxSlot* ScrollBoxSlot = Cast<UScrollBoxSlot>(TaskContent->AddChild(TaskRootItem)))
+							{
+								ScrollBoxSlot->SetPadding(FMargin(0.f, 0.f, 0.f, 5.f));
+							}
 						}
-					}
-					if(UScrollBoxSlot* ScrollBoxSlot = Cast<UScrollBoxSlot>(TaskContent->AddChild(SubTaskContent)))
-					{
-						ScrollBoxSlot->SetPadding(FMargin(20.f, 0.f, 0.f, 0.f));
+						if(UScrollBoxSlot* ScrollBoxSlot = Cast<UScrollBoxSlot>(TaskContent->AddChild(TaskContainer)))
+						{
+							ScrollBoxSlot->SetPadding(FMargin(0.f, 0.f, 0.f, 0.f));
+						}
 					}
 				}
 			}
@@ -220,14 +231,15 @@ void UWidgetTaskPanel::OnTaskInfoContentRefresh()
 {
 	if(TaskInfoContent)
 	{
-		if(SelectedTaskItem)
+		UTaskBase* SelectedTask;
+		if(GetSelectedTask(SelectedTask))
 		{
-			for(auto Iter : TaskInfoItems)
+			for(auto Iter : TaskInfos)
 			{
 				DestroySubWidget(Iter, true);
 			}
-			TaskInfoItems.Empty();
-			OnCreateTaskInfoItem(SelectedTaskItem->GetTask());
+			TaskInfos.Empty();
+			OnCreateTaskInfo(SelectedTask);
 		}
 	}
 }
@@ -238,21 +250,30 @@ void UWidgetTaskPanel::OnStartTaskButtonClicked()
 	{
 		UTaskModuleStatics::SwitchTaskAsset(SelectedTaskRootItem->GetTaskCategory()->GetTaskAsset());
 	}
-	if(SelectedTaskItem)
+	UTaskBase* SelectedTask;
+	if(GetSelectedTask(SelectedTask))
 	{
-		UTaskModuleStatics::EnterTask(SelectedTaskItem->GetTask());
-		UAchievementModuleStatics::UnlockAchievement(FName("FirstStartTaskItem"));
+		if(SelectedTask->IsEntered())
+		{
+			UTaskModuleStatics::EnterTask(SelectedTask);
+			UAchievementModuleStatics::UnlockAchievement(FName("FirstStartTaskItem"));
+		}
+		else
+		{
+			UTaskModuleStatics::LeaveTask(SelectedTask);
+		}
 	}
+	Refresh();
 }
 
-void UWidgetTaskPanel::OnCreateTaskInfoItem(UTaskBase* InTask)
+void UWidgetTaskPanel::OnCreateTaskInfo(UTaskBase* InTask)
 {
 	if(TaskInfoContent)
 	{
-		if(UWidgetTaskInfoItem* TaskInfoItem = CreateSubWidget<UWidgetTaskInfoItem>({ InTask }, TaskInfoItemClass))
+		if(UWidgetTaskInfo* TaskInfo = CreateSubWidget<UWidgetTaskInfo>({ InTask }, TaskInfoClass))
 		{
-			TaskInfoItems.Add(TaskInfoItem);
-			if(const auto VerticalBoxSlot = TaskInfoContent->AddChildToVerticalBox(TaskInfoItem))
+			TaskInfos.Add(TaskInfo);
+			if(const auto VerticalBoxSlot = TaskInfoContent->AddChildToVerticalBox(TaskInfo))
 			{
 				VerticalBoxSlot->SetHorizontalAlignment(HAlign_Left);
 				VerticalBoxSlot->SetPadding(FMargin((InTask->TaskHierarchy - 1) * 30.f, 0.f, 0.f, 0.f));
@@ -260,7 +281,17 @@ void UWidgetTaskPanel::OnCreateTaskInfoItem(UTaskBase* InTask)
 		}
 		for(auto Iter : InTask->SubTasks)
 		{
-			OnCreateTaskInfoItem(Iter);
+			OnCreateTaskInfo(Iter);
 		}
 	}
+}
+
+bool UWidgetTaskPanel::GetSelectedTask(UTaskBase*& OutTask) const
+{
+	if(SelectedTaskItem)
+	{
+		OutTask = SelectedTaskItem->GetTask();
+		return true;
+	}
+	return false;
 }
