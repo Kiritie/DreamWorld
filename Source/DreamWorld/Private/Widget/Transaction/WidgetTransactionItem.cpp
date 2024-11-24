@@ -15,6 +15,7 @@ UWidgetTransactionItem::UWidgetTransactionItem(const FObjectInitializer& ObjectI
 
 	ImgIcon = nullptr;
 	TxtName = nullptr;
+	TxtRarity = nullptr;
 	TxtType = nullptr;
 	TxtLevel = nullptr;
 	TxtCount = nullptr;
@@ -40,8 +41,11 @@ void UWidgetTransactionItem::OnRefresh()
 
 		ImgIcon->SetBrushResourceObject(ItemData.Icon);
 		TxtName->SetText(ItemData.Name);
+		TxtRarity->SetText(FText::FromString(FString::Printf(TEXT("[%s]"), *UCommonStatics::GetEnumValueDisplayName(TEXT("/Script/WHFramework.EAbilityItemRarity"), (int32)ItemData.Rarity).ToString())));
+		TxtRarity->SetVisibility(ItemData.Rarity != EAbilityItemRarity::None ? ESlateVisibility::SelfHitTestInvisible : ESlateVisibility::Collapsed);
 		TxtType->SetText(FText::FromString(FString::Printf(TEXT("[%s]"), *UCommonStatics::GetEnumValueDisplayName(TEXT("/Script/WHFramework.EAbilityItemType"), (int32)ItemData.GetItemType()).ToString())));
-		TxtLevel->SetText(FText::FromString(Item.Level != 0 ? FString::Printf(TEXT("Lv.%d"), Item.Level) : TEXT("")));
+		TxtLevel->SetText(FText::FromString(FString::Printf(TEXT("Lv.%d"), Item.Level)));
+		TxtLevel->SetVisibility(Item.Level != 0 ? ESlateVisibility::SelfHitTestInvisible : ESlateVisibility::Collapsed);
 		TxtCount->SetText(FText::FromString(Item.Count > 1 ? FString::FromInt(Item.Count) : TEXT("")));
 	}
 }

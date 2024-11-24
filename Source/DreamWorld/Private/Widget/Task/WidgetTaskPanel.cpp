@@ -196,7 +196,7 @@ void UWidgetTaskPanel::OnTaskContentRefresh()
 	{
 		for(auto Iter1 : UTaskModuleStatics::GetTaskAssets())
 		{
-			if(UWidgetTaskCategory* TaskCategory = UObjectPoolModuleStatics::SpawnObject<UWidgetTaskCategory>(this, { Iter1 }, false, TaskCategoryClass))
+			if(UWidgetTaskCategory* TaskCategory = UObjectPoolModuleStatics::SpawnObject<UWidgetTaskCategory>(this, { Iter1 }, TaskCategoryClass))
 			{
 				TaskCategories.Add(TaskCategory);
 				if(UScrollBoxSlot* ScrollBoxSlot = Cast<UScrollBoxSlot>(TaskContent->AddChild(TaskCategory)))
@@ -205,7 +205,7 @@ void UWidgetTaskPanel::OnTaskContentRefresh()
 				}
 				for(auto Iter2 : Iter1->RootTasks)
 				{
-					if(UWidgetTaskContainer* TaskContainer = UObjectPoolModuleStatics::SpawnObject<UWidgetTaskContainer>(this, nullptr, false, TaskContainerClass))
+					if(UWidgetTaskContainer* TaskContainer = UObjectPoolModuleStatics::SpawnObject<UWidgetTaskContainer>(this, nullptr, TaskContainerClass))
 					{
 						TaskContainer->SetVisibility(ESlateVisibility::Collapsed);
 						if(UWidgetTaskRootItem* TaskRootItem = CreateSubWidget<UWidgetTaskRootItem>({ Iter2, TaskContainer, TaskCategory }, TaskRootItemClass))

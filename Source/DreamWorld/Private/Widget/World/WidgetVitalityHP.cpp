@@ -11,7 +11,7 @@ UWidgetVitalityHP::UWidgetVitalityHP(const FObjectInitializer& ObjectInitializer
 
 	WidgetAlignment = FVector2D(0.5f);
 	WidgetVisibility = EWorldWidgetVisibility::ScreenAndDistance;
-	WidgetShowDistance = 1500.f;
+	WidgetShowDistance = 1800.f;
 }
 
 void UWidgetVitalityHP::OnTick_Implementation(float DeltaSeconds)

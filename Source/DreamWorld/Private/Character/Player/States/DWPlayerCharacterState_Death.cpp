@@ -4,7 +4,6 @@
 
 #include "Achievement/AchievementModuleStatics.h"
 #include "Character/Player/DWPlayerCharacter.h"
-#include "Common/Interaction/InteractionComponent.h"
 #include "Common/Targeting/TargetingComponent.h"
 #include "Input/InputModule.h"
 #include "Widget/WidgetGameHUD.h"
@@ -33,8 +32,6 @@ void UDWPlayerCharacterState_Death::OnEnter(UFiniteStateBase* InLastState, const
 
 	PlayerCharacter->GetTargeting()->TargetLockOff();
 
-	PlayerCharacter->GetInteractionComponent()->SetInteractable(false);
-
 	UAchievementModuleStatics::UnlockAchievement(FName("FirstDeath"));
 	
 	UInputModule::Get().Reset();
@@ -57,8 +54,6 @@ void UDWPlayerCharacterState_Death::OnLeave(UFiniteStateBase* InNextState)
 	ADWPlayerCharacter* PlayerCharacter = GetAgent<ADWPlayerCharacter>();
 
 	PlayerCharacter->SetInteractingAgent(nullptr, true);
-	
-	PlayerCharacter->GetInteractionComponent()->SetInteractable(true);
 }
 
 void UDWPlayerCharacterState_Death::OnTermination()

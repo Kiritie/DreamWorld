@@ -27,10 +27,10 @@ void UWidgetGameSettingPage::OnCreate(UObject* InOwner, const TArray<FParameter>
 {
 	Super::OnCreate(InOwner, InParams);
 
-	SettingItem_GameLevel = UObjectPoolModuleStatics::SpawnObject<UWidgetEnumSettingItemBase>(nullptr, { FText::FromString(TEXT("游戏难度")), FString("/Script/DreamWorld.EDWGameLevel") }, false, USettingModule::Get().GetEnumSettingItemClass());
+	SettingItem_GameLevel = UObjectPoolModuleStatics::SpawnObject<UWidgetEnumSettingItemBase>(nullptr, { FText::FromString(TEXT("游戏难度")), FString("/Script/DreamWorld.EDWGameLevel") }, USettingModule::Get().GetEnumSettingItemClass());
 	AddSettingItem(FName("GameLevel"), SettingItem_GameLevel, FText::FromString(TEXT("游戏")));
 
-	SettingItem_AutoJump = UObjectPoolModuleStatics::SpawnObject<UWidgetBoolSettingItemBase>(nullptr, { FText::FromString(TEXT("自动跳跃")) }, false, USettingModule::Get().GetBoolSettingItemClass());
+	SettingItem_AutoJump = UObjectPoolModuleStatics::SpawnObject<UWidgetBoolSettingItemBase>(nullptr, { FText::FromString(TEXT("自动跳跃")) }, USettingModule::Get().GetBoolSettingItemClass());
 	AddSettingItem(FName("AutoJump"), SettingItem_AutoJump, FText::FromString(TEXT("控制")));
 }
 

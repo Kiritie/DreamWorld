@@ -452,7 +452,7 @@ public:
 	EDWInventoryInitType InventoryInitType;
 
 public:
-	virtual void InitInventoryData() override;
+	virtual void InitInventoryData(FRandomStream InRandomStream = FRandomStream()) override;
 };
 
 USTRUCT(BlueprintType)

@@ -14,7 +14,7 @@
 #include "ObjectPool/ObjectPoolModuleStatics.h"
 #include "Voxel/Datas/VoxelData.h"
 
-void FDWPlayerSaveData::InitInventoryData()
+void FDWPlayerSaveData::InitInventoryData(FRandomStream InRandomStream)
 {
 	switch (InventoryInitType)
 	{
@@ -25,12 +25,12 @@ void FDWPlayerSaveData::InitInventoryData()
 		}
 		case EDWInventoryInitType::Default:
 		{
-			FDWPlayerBasicSaveData::InitInventoryData();
+			FDWPlayerBasicSaveData::InitInventoryData(InRandomStream);
 			break;
 		}
 		case EDWInventoryInitType::All:
 		{
-			FDWPlayerBasicSaveData::InitInventoryData();
+			FDWPlayerBasicSaveData::InitInventoryData(InRandomStream);
 
 			auto CoinDatas = UAssetModuleStatics::LoadPrimaryAssets<UAbilityCoinDataBase>(FName("Coin"));
 			for (int32 i = 0; i < CoinDatas.Num(); i++)
@@ -38,14 +38,14 @@ void FDWPlayerSaveData::InitInventoryData()
 				InventoryData.AddItem(FAbilityItem(CoinDatas[i]->GetPrimaryAssetId(), CoinDatas[i]->MaxCount, CoinDatas[i]->ClampLevel(Level)), true);
 			}
 
-			auto VoxelDatas = UAssetModuleStatics::LoadPrimaryAssets<UVoxelData>(FName("Voxel"));
-			for (int32 i = 0; i < VoxelDatas.Num(); i++)
-			{
-				if(!VoxelDatas[i]->IsEmpty() && !VoxelDatas[i]->IsUnknown() && VoxelDatas[i]->IsMainPart())
-				{
-					InventoryData.AddItem(FAbilityItem(VoxelDatas[i]->GetPrimaryAssetId(), VoxelDatas[i]->MaxCount, VoxelDatas[i]->ClampLevel(Level)), true);
-				}
-			}
+			// auto VoxelDatas = UAssetModuleStatics::LoadPrimaryAssets<UVoxelData>(FName("Voxel"));
+			// for (int32 i = 0; i < VoxelDatas.Num(); i++)
+			// {
+			// 	if(!VoxelDatas[i]->IsEmpty() && !VoxelDatas[i]->IsUnknown() && VoxelDatas[i]->IsMainPart())
+			// 	{
+			// 		InventoryData.AddItem(FAbilityItem(VoxelDatas[i]->GetPrimaryAssetId(), VoxelDatas[i]->MaxCount, VoxelDatas[i]->ClampLevel(Level)), true);
+			// 	}
+			// }
 
 			auto RawDatas = UAssetModuleStatics::LoadPrimaryAssets<UAbilityRawDataBase>(FName("Raw"));
 			for (int32 i = 0; i < RawDatas.Num(); i++)

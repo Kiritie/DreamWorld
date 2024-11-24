@@ -111,7 +111,8 @@ void ADWVoxelChunk::SpawnSceneActors()
 			for(auto& VitalityItem : RaceData.Items)
 			{
 				const auto& VitalityData = VitalityItem.GetData<UAbilityVitalityDataBase>();
-				const int32 Num = VitalityItem.Count != 0 ? VitalityItem.Count : WorldData.RandomStream.RandRange(VitalityItem.MinCount, VitalityItem.MaxCount);
+				const int32 Num = WorldData.RandomStream.RandRange(VitalityItem.MinCount, VitalityItem.MaxCount);
+				const int32 Level = FMath::Clamp(WorldData.RandomStream.RandRange(RaceData.MinLevel, RaceData.MaxLevel), 1, VitalityData.MaxLevel);
 				DON(Num,
 					FHitResult HitResult;
 					if(UVoxelModuleStatics::VoxelAgentTraceSingle(Index, VitalityData.Radius, VitalityData.HalfHeight, {}, HitResult, true, 10, false, false))
@@ -120,9 +121,9 @@ void ADWVoxelChunk::SpawnSceneActors()
 						SaveData.AssetID = VitalityData.GetPrimaryAssetId();
 						SaveData.Name = *VitalityData.Name.ToString();
 						SaveData.RaceID = RaceData.ID;
-						SaveData.Level = VitalityItem.Level;
+						SaveData.Level = Level;
 						SaveData.SpawnTransform = FTransform(FRotator(0.f, FMath::RandRange(0.f, 360.f), 0.f), HitResult.Location, FVector::OneVector);
-						SaveData.InitInventoryData();
+						SaveData.InitInventoryData(WorldData.RandomStream);
 						UAbilityModuleStatics::SpawnAbilityActor(&SaveData, UVoxelModuleStatics::FindChunkByLocation(SaveData.SpawnTransform.GetLocation()));
 					}
 				)
@@ -138,7 +139,8 @@ void ADWVoxelChunk::SpawnSceneActors()
 			for(auto& CharacterItem : RaceData.Items)
 			{
 				const auto& CharacterData = CharacterItem.GetData<UAbilityCharacterDataBase>();
-				const int32 Num = CharacterItem.Count != 0 ? CharacterItem.Count : WorldData.RandomStream.RandRange(CharacterItem.MinCount, CharacterItem.MaxCount);
+				const int32 Num = WorldData.RandomStream.RandRange(CharacterItem.MinCount, CharacterItem.MaxCount);
+				const int32 Level = FMath::Clamp(WorldData.RandomStream.RandRange(RaceData.MinLevel, RaceData.MaxLevel), 1, CharacterData.MaxLevel);
 				DON(Num,
 					FHitResult HitResult;
 					if(UVoxelModuleStatics::VoxelAgentTraceSingle(Index, CharacterData.Radius, CharacterData.HalfHeight, {}, HitResult, true, 10, false, true))
@@ -147,9 +149,9 @@ void ADWVoxelChunk::SpawnSceneActors()
 						SaveData.AssetID = CharacterData.GetPrimaryAssetId();
 						SaveData.Name = *CharacterData.Name.ToString();
 						SaveData.RaceID = RaceData.ID;
-						SaveData.Level = CharacterItem.Level;
+						SaveData.Level = Level;
 						SaveData.SpawnTransform = FTransform(FRotator(0.f, FMath::RandRange(0.f, 360.f), 0.f), HitResult.Location, FVector::OneVector);
-						SaveData.InitInventoryData();
+						SaveData.InitInventoryData(WorldData.RandomStream);
 						if(ADWCharacter* Character = Cast<ADWCharacter>(UAbilityModuleStatics::SpawnAbilityActor(&SaveData, UVoxelModuleStatics::FindChunkByLocation(SaveData.SpawnTransform.GetLocation()))))
 						{
 							if(!Captain)

@@ -63,7 +63,7 @@ void ADWPlayerController::LoadData(FSaveData* InSaveData, EPhase InPhase)
 		if(bNeedSpawn)
 		{
 			UnloadData(EPhase::Primary);
-			PlayerCharacter = UObjectPoolModuleStatics::SpawnObject<ADWPlayerCharacter>(nullptr, { SaveData.ActorID, SaveData.AssetID }, false, SaveData.GetData<UDWCharacterData>().Class);
+			PlayerCharacter = UObjectPoolModuleStatics::SpawnObject<ADWPlayerCharacter>(nullptr, { SaveData.ActorID, SaveData.AssetID }, SaveData.GetData<UDWCharacterData>().Class);
 			SetPlayerPawn(PlayerCharacter);
 			PlayerCharacter->LoadSaveData(&SaveData, EPhase::Primary);
 			PlayerCharacter->Execute_SetActorVisible(PlayerCharacter, UProcedureModuleStatics::IsCurrentProcedureClass<UProcedure_ArchiveCreating>());
