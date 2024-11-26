@@ -64,17 +64,7 @@ void UWidgetInventorySlot::NativeOnMouseEnter(const FGeometry& InGeometry, const
 
 	if(!IsEmpty())
 	{
-		TArray<FParameter> Params;
-		Params.Add(&GetItem());
-		if(!OwnerSlot->IsMatched())
-		{
-			auto QueryData = GetInventory()->QueryItemByRange(EItemQueryType::Match, GetItem());
-			for(auto Iter : QueryData.Slots)
-			{
-				Params.Add(&Iter->GetItem());
-			}
-		}
-		UWidgetModuleStatics::OpenUserWidget<UWidgetAbilityItemInfoBox>(Params);
+		UWidgetModuleStatics::OpenUserWidget<UWidgetAbilityItemInfoBox>({ &GetMatchItems() });
 	}
 }
 
@@ -140,6 +130,20 @@ FReply UWidgetInventorySlot::NativeOnMouseButtonDown(const FGeometry& InGeometry
 	return Super::NativeOnMouseButtonDown(InGeometry, InMouseEvent);
 }
 
+void UWidgetInventorySlot::OnTick_Implementation(float DeltaSeconds)
+{
+	Super::OnTick_Implementation(DeltaSeconds);
+
+	if(!IsEmpty())
+	{
+		const auto& ItemData = GetItem().GetData();
+		if(ImgError)
+		{
+			ImgError->SetVisibility(ItemData.GetItemErrorInfo(GetOwnerWidget()->GetOwnerObject<AActor>()).IsEmpty() ? ESlateVisibility::Hidden : ESlateVisibility::Visible);
+		}
+	}
+}
+
 void UWidgetInventorySlot::OnCreate(UUserWidgetBase* InOwner, const TArray<FParameter>& InParams)
 {
 	Super::OnCreate(InOwner, InParams);
@@ -169,10 +173,6 @@ void UWidgetInventorySlot::OnRefresh()
 		const auto& ItemData = GetItem().GetData();
 		ImgIcon->SetVisibility(ESlateVisibility::Visible);
 		ImgIcon->SetBrushResourceObject(ItemData.Icon);
-		if(ImgError)
-		{
-			ImgError->SetVisibility(ItemData.GetItemErrorInfo(GetOwnerWidget()->GetOwnerObject<AActor>()).IsEmpty() ? ESlateVisibility::Hidden : ESlateVisibility::Visible);
-		}
 		if(TxtCount)
 		{
 			if(GetItem().Count > 1)
@@ -187,7 +187,7 @@ void UWidgetInventorySlot::OnRefresh()
 		}
 		if(IsHovered())
 		{
-			UWidgetModuleStatics::OpenUserWidget<UWidgetAbilityItemInfoBox>({ &GetItem() });
+			UWidgetModuleStatics::OpenUserWidget<UWidgetAbilityItemInfoBox>({ &GetMatchItems() });
 		}
 	}
 	else

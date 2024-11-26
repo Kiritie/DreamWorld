@@ -5,7 +5,7 @@
 
 #include "Ability/PickUp/AbilityPickUpBase.h"
 #include "Character/DWCharacter.h"
-#include "Components/HorizontalBox.h"
+#include "Character/Player/DWPlayerCharacter.h"
 #include "Input/Widget/WidgetKeyTipsItemBase.h"
 #include "Voxel/Voxels/Auxiliary/VoxelInteractAuxiliary.h"
 #include "Widget/WidgetModule.h"
@@ -17,10 +17,12 @@ UWidgetInteractionBox::UWidgetInteractionBox(const FObjectInitializer& ObjectIni
 	ParentName = FName("GameHUD");
 	ParentSlot = FName("Slot_InteractionBox");
 	WidgetType = EWidgetType::Permanent;
-	WidgetCreateType = EWidgetCreateType::AutoCreateAndOpen;
+	WidgetCreateType = EWidgetCreateType::AutoCreate;
 	
 	PreviewItem = nullptr;
 	NextKeyTips = nullptr;
+	
+	InteractionAgent = nullptr;
 }
 
 void UWidgetInteractionBox::OnCreate(UObject* InOwner, const TArray<FParameter>& InParams)
@@ -37,24 +39,12 @@ void UWidgetInteractionBox::OnInitialize(UObject* InOwner, const TArray<FParamet
 
 void UWidgetInteractionBox::OnOpen(const TArray<FParameter>& InParams, bool bInstant)
 {
+	if(InParams.IsValidIndex(0))
+	{
+		InteractionAgent = InParams[0];
+	}
+
 	Super::OnOpen(InParams, bInstant);
-}
-
-void UWidgetInteractionBox::OnRefresh()
-{
-	Super::OnRefresh();
-}
-
-void UWidgetInteractionBox::OnClose(bool bInstant)
-{
-	Super::OnClose(bInstant);
-}
-
-void UWidgetInteractionBox::ShowInteractActions_Implementation(const TScriptInterface<IInteractionAgentInterface>& InInteractionAgent, const TArray<EInteractAction>& InActions)
-{
-	if(!InInteractionAgent || InActions.IsEmpty()) return;
-
-	InteractionAgent = InInteractionAgent;
 
 	FAbilityItem Item;
 	
@@ -71,18 +61,32 @@ void UWidgetInteractionBox::ShowInteractActions_Implementation(const TScriptInte
 		Item = FAbilityItem(Entity->Execute_GetAssetID(InteractionAgent.GetObject()));
 	}
 	
-	if(Item.IsValid() && InInteractionAgent.GetObject() != GetOwnerObject())
+	if(Item.IsValid() && InteractionAgent != GetOwnerObject())
 	{
 		PreviewItem->Init({ &Item });
 		PreviewItem->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
 	}
 }
 
-void UWidgetInteractionBox::HideInteractActions_Implementation()
+void UWidgetInteractionBox::OnRefresh()
 {
-	InteractionAgent = nullptr;
+	Super::OnRefresh();
+}
 
-	PreviewItem->SetVisibility(ESlateVisibility::Collapsed);
+void UWidgetInteractionBox::OnClose(bool bInstant)
+{
+	Super::OnClose(bInstant);
+
+	InteractionAgent = nullptr;
+}
+
+TArray<EInteractAction> UWidgetInteractionBox::GetInteractActions() const
+{
+	if(ADWPlayerCharacter* Character = GetOwnerObject<ADWPlayerCharacter>())
+	{
+		return Character->GetInteractableActions(InteractionAgent.GetInterface());
+	}
+	return TArray<EInteractAction>();
 }
 
 ESlateVisibility UWidgetInteractionBox::GetNextKeyTipsVisibility()

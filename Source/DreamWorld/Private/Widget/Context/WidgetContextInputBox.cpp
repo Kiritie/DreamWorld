@@ -62,7 +62,7 @@ void UWidgetContextInputBox::OnClose(bool bInstant)
 
 void UWidgetContextInputBox::OnTextBoxValueCommitted(const FText& InText, ETextCommit::Type InCommitMethod)
 {
-	if(InCommitMethod == ETextCommit::OnEnter)
+	if(InCommitMethod == ETextCommit::OnEnter || InCommitMethod == ETextCommit::OnCleared)
 	{
 		if(!InText.IsEmpty())
 		{

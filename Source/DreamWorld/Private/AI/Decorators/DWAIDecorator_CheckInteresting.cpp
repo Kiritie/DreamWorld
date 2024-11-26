@@ -18,14 +18,15 @@ bool UDWAIDecorator_CheckInteresting::CalculateRawConditionValue(UBehaviorTreeCo
 {
 	if(!InitDecorator(OwnerComp)) return false;
 
-	if(ADWHumanCharacter* HumanCharacter = GetAgent<ADWHumanCharacter>())
+	const ADWCharacter* Character = GetAgent<ADWCharacter>();
+	if(Character->IsA<ADWHumanCharacter>())
 	{
-		return HumanCharacter->GetNature() == EDWCharacterNature::NPC && CheckTarget->IsPlayer();
+		return CheckTarget->IsPlayer();
 	}
-	else if(ADWMonsterCharacter* MonsterCharacter = GetAgent<ADWMonsterCharacter>())
+	else if(Character->IsA<ADWMonsterCharacter>())
 	{
 		const FAbilityItem SelectedItem = CheckTarget->GetInventory()->GetSelectedItem(ESlotSplitType::Shortcut);
-		return SelectedItem.IsValid() && SelectedItem.GetType() == EAbilityItemType::Prop && SelectedItem.GetData<UDWPropData>().PropType == EDWPropType::Food;
+		return SelectedItem.IsValid() && SelectedItem.IsDataType<UDWPropData>() && SelectedItem.GetData<UDWPropData>(false).PropType == EDWPropType::Food;
 	}
 	return false;
 }

@@ -25,6 +25,10 @@ protected:
 	virtual void OnDespawn_Implementation(bool bRecovery) override;
 
 public:
+	virtual bool CanInteract(EInteractAction InInteractAction, IInteractionAgentInterface* InInteractionAgent) override;
+
+	virtual void OnInteract(EInteractAction InInteractAction, IInteractionAgentInterface* InInteractionAgent, bool bPassive) override;
+
 	virtual void OnPreChangeItem(const FAbilityItem& InOldItem) override;
 	
 	virtual void OnChangeItem(const FAbilityItem& InNewItem) override;
@@ -48,9 +52,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	UStaticMeshComponent* GenerateHammerMesh;
 	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "CharacterStats")
 	AVoxelEntity* GenerateVoxelEntity;
 	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "CharacterStats")
 	AVoxelEntity* AuxiliaryVoxelEntity;
 };

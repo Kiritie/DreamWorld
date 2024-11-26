@@ -6,12 +6,12 @@
 #include "Character/Player/DWPlayerCharacter.h"
 #include "Common/Interaction/InteractionComponent.h"
 #include "Widget/WidgetModuleStatics.h"
+#include "Widget/Interaction/WidgetInteractionBox.h"
 #include "Widget/Transaction/WidgetTransactionPanel.h"
 
 ADWNPCCharacter::ADWNPCCharacter(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
 {
-	Interaction->AddInteractAction(EInteractAction::Dialogue);
 	Interaction->AddInteractAction(EInteractAction::Transaction);
 }
 
@@ -19,19 +19,14 @@ bool ADWNPCCharacter::CanInteract(EInteractAction InInteractAction, IInteraction
 {
 	switch (InInteractAction)
 	{
-		case EInteractAction::Dialogue:
-		{
-			if(ADWPlayerCharacter* InteractionCharacter = Cast<ADWPlayerCharacter>(InInteractionAgent))
-			{
-				return true;
-			}
-			break;
-		}
 		case EInteractAction::Transaction:
 		{
-			if(ADWPlayerCharacter* InteractionCharacter = Cast<ADWPlayerCharacter>(InInteractionAgent))
+			if(Cast<ADWPlayerCharacter>(InInteractionAgent))
 			{
-				return true;
+				if(UWidgetModuleStatics::GetUserWidget<UWidgetTransactionPanel>() && !UWidgetModuleStatics::GetUserWidget<UWidgetTransactionPanel>()->IsWidgetOpened())
+				{
+					return true;
+				}
 			}
 			break;
 		}
@@ -48,22 +43,22 @@ void ADWNPCCharacter::OnInteract(EInteractAction InInteractAction, IInteractionA
 	{
 		switch (InInteractAction)
 		{
-			case EInteractAction::Dialogue:
-			{
-				if(ADWPlayerCharacter* InteractionCharacter = Cast<ADWPlayerCharacter>(InInteractionAgent))
-				{
-				}
-				break;
-			}
 			case EInteractAction::Transaction:
 			{
-				if(ADWPlayerCharacter* InteractionCharacter = Cast<ADWPlayerCharacter>(InInteractionAgent))
+				if(Cast<ADWPlayerCharacter>(InInteractionAgent))
 				{
-					UWidgetModuleStatics::OpenUserWidget<UWidgetTransactionPanel>({ this });
-					FDelegateHandle DelegateHandle = UWidgetModuleStatics::GetUserWidget<UWidgetTransactionPanel>()->OnClosed.AddLambda([this, DelegateHandle](bool bInstant)
+					if(UWidgetTransactionPanel* TransactionPanel = UWidgetModuleStatics::GetUserWidget<UWidgetTransactionPanel>())
 					{
-						UWidgetModuleStatics::GetUserWidget<UWidgetTransactionPanel>()->OnClosed.Remove(DelegateHandle);
-					});
+						FDelegateHandle DelegateHandle = TransactionPanel->OnClosed.AddLambda([this, DelegateHandle, TransactionPanel](bool bInstant)
+						{
+							TransactionPanel->OnClosed.Remove(DelegateHandle);
+							if(UWidgetModuleStatics::GetUserWidget<UWidgetInteractionBox>())
+							{
+								UWidgetModuleStatics::GetUserWidget<UWidgetInteractionBox>()->Refresh();
+							}
+						});
+						TransactionPanel->Open({ this });
+					}
 				}
 				break;
 			}

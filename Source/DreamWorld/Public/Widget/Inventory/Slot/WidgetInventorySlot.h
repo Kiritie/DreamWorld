@@ -41,6 +41,9 @@ protected:
 	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
 
 public:
+	virtual void OnTick_Implementation(float DeltaSeconds) override;
+
+public:
 	virtual void OnCreate(UUserWidgetBase* InOwner, const TArray<FParameter>& InParams) override;
 
 	virtual void OnInitialize(const TArray<FParameter>& InParams) override;

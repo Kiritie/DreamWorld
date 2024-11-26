@@ -39,7 +39,8 @@ public class DreamWorld : ModuleRules
 				"GameplayAbilities",
 				"GameplayTags",
 				"GameplayTasks",
-				"ProceduralMeshComponent"
+				"ProceduralMeshComponent",
+				"DialoguePlugin"
 			}
 		);
 	}

@@ -304,6 +304,9 @@ public:
 public:
 	virtual bool IsEnemy(IAbilityPawnInterface* InTarget) const override;
 	
+	UFUNCTION(BlueprintPure, DisplayName = "IsEnemy")
+	virtual bool IsEnemyN(ADWCharacter* InTarget);
+	
 	UFUNCTION(BlueprintPure)
 	virtual bool IsExhausted() const;
 

@@ -607,9 +607,9 @@ void ADWCharacter::SetMotionRate(float InMovementRate, float InRotationRate)
 
 bool ADWCharacter::RaycastStep(FHitResult& OutHitResult)
 {
-	const FVector rayStart = GetActorLocation() + FVector::DownVector * (GetHalfHeight() - GetCharacterMovement()->MaxStepHeight);
-	const FVector rayEnd = rayStart + GetMoveDirection(true) * (GetRadius() + 100.f * FMath::Lerp(0.35f, 1.25f, GetMoveVelocity(true).Size() / 500.f));
-	return UKismetSystemLibrary::LineTraceSingle(this, rayStart, rayEnd, USceneModuleStatics::GetTraceMapping(FName("Step")).GetTraceType(), false, {}, EDrawDebugTrace::None, OutHitResult, true);
+	const FVector RayStart = GetActorLocation() + FVector::DownVector * (GetHalfHeight() - GetCharacterMovement()->MaxStepHeight);
+	const FVector RayEnd = RayStart + GetMoveDirection(true) * (GetRadius() + 100.f * FMath::Lerp(0.35f, 1.25f, GetMoveVelocity(true).Size() / 500.f));
+	return UKismetSystemLibrary::LineTraceSingle(this, RayStart, RayEnd, USceneModuleStatics::GetTraceMapping(FName("Step")).GetTraceType(), false, {}, EDrawDebugTrace::None, OutHitResult, true);
 }
 
 bool ADWCharacter::CanInteract(EInteractAction InInteractAction, IInteractionAgentInterface* InInteractionAgent)
@@ -896,6 +896,8 @@ TArray<AActor*> ADWCharacter::GetHitTargets() const
 bool ADWCharacter::IsEnemy(IAbilityPawnInterface* InTarget) const
 {
 	ADWCharacter* TargetCharacter = Cast<ADWCharacter>(InTarget);
+
+	if(!TargetCharacter) return false;
 	
 	switch (GetNature())
 	{
@@ -904,14 +906,30 @@ bool ADWCharacter::IsEnemy(IAbilityPawnInterface* InTarget) const
 		{
 			return false;
 		}
+		case EDWCharacterNature::AINeutral:
+		{
+			if(!GetBlackboard<UDWAIBlackboard>()->GetIsExcessived())
+			{
+				return false;
+			}
+			break;
+		}
 		default:
 		{
-			switch (Cast<ADWCharacter>(InTarget)->GetNature())
+			switch (TargetCharacter->GetNature())
 			{
 				case EDWCharacterNature::NPC:
 				case EDWCharacterNature::AIFriendly:
 				{
 					return false;
+				}
+				case EDWCharacterNature::AINeutral:
+				{
+					if(!TargetCharacter->GetBlackboard<UDWAIBlackboard>()->GetIsExcessived())
+					{
+						return false;
+					}
+					break;
 				}
 				default: break;
 			}
@@ -924,6 +942,11 @@ bool ADWCharacter::IsEnemy(IAbilityPawnInterface* InTarget) const
 		return false;
 	}
 	return Super::IsEnemy(InTarget);
+}
+
+bool ADWCharacter::IsEnemyN(ADWCharacter* InTarget)
+{
+	return IsEnemy(InTarget);
 }
 
 bool ADWCharacter::IsExhausted() const
@@ -1029,13 +1052,6 @@ bool ADWCharacter::SetLevelA(int32 InLevel)
 		if(GetCharacterHPWidget())
 		{
 			GetCharacterHPWidget()->Refresh();
-		}
-	}
-	else
-	{
-		for(auto Iter : UWidgetModuleStatics::GetWorldWidgets<UWidgetCharacterHP>())
-		{
-			Iter->Refresh();
 		}
 	}
 	

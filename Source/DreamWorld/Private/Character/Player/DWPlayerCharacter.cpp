@@ -229,20 +229,14 @@ void ADWPlayerCharacter::OnEnterInteract(IInteractionAgentInterface* InInteracti
 {
 	Super::OnEnterInteract(InInteractionAgent);
 
-	if(UWidgetModuleStatics::GetUserWidget<UWidgetInteractionBox>())
-	{
-		UWidgetModuleStatics::GetUserWidget<UWidgetInteractionBox>()->ShowInteractActions(Cast<UObject>(InInteractionAgent), GetInteractableActions());
-	}
+	UWidgetModuleStatics::OpenUserWidget<UWidgetInteractionBox>({ Cast<UObject>(InInteractionAgent) });
 }
 
 void ADWPlayerCharacter::OnLeaveInteract(IInteractionAgentInterface* InInteractionAgent)
 {
 	Super::OnLeaveInteract(InInteractionAgent);
 
-	if(UWidgetModuleStatics::GetUserWidget<UWidgetInteractionBox>())
-	{
-		UWidgetModuleStatics::GetUserWidget<UWidgetInteractionBox>()->HideInteractActions();
-	}
+	UWidgetModuleStatics::CloseUserWidget<UWidgetInteractionBox>();
 }
 
 void ADWPlayerCharacter::OnInteract(EInteractAction InInteractAction, IInteractionAgentInterface* InInteractionAgent, bool bPassive)
@@ -261,23 +255,29 @@ void ADWPlayerCharacter::OnInteract(EInteractAction InInteractAction, IInteracti
 					{
 						case EVoxelType::Chest:
 						{
-							UWidgetModuleStatics::OpenUserWidget<UWidgetInventoryBox>({ InteractionAgent });
-							FDelegateHandle DelegateHandle = UWidgetModuleStatics::GetUserWidget<UWidgetInventoryBox>()->OnClosed.AddLambda([this, InteractionAgent, DelegateHandle](bool bInstant)
+							if(UWidgetInventoryBox* InventoryBox = UWidgetModuleStatics::GetUserWidget<UWidgetInventoryBox>())
 							{
-								DoInteract((EInteractAction)EVoxelInteractAction::Close, InteractionAgent);
-								UWidgetModuleStatics::GetUserWidget<UWidgetInventoryBox>()->OnClosed.Remove(DelegateHandle);
-							});
+								FDelegateHandle DelegateHandle = InventoryBox->OnClosed.AddLambda([this, InteractionAgent, DelegateHandle, InventoryBox](bool bInstant)
+								{
+									InventoryBox->OnClosed.Remove(DelegateHandle);
+									DoInteract((EInteractAction)EVoxelInteractAction::Close, InteractionAgent);
+								});
+								InventoryBox->Open({ InteractionAgent });
+							}
 							break;
 						}
 						case EVoxelType::Furnace:
 						case EVoxelType::Crafting_Table:
 						{
-							UWidgetModuleStatics::OpenUserWidget<UWidgetGeneratePanel>({ InteractionAgent });
-							FDelegateHandle DelegateHandle = UWidgetModuleStatics::GetUserWidget<UWidgetGeneratePanel>()->OnClosed.AddLambda([this, InteractionAgent, DelegateHandle](bool bInstant)
+							if(UWidgetGeneratePanel* GeneratePanel = UWidgetModuleStatics::GetUserWidget<UWidgetGeneratePanel>())
 							{
-								DoInteract((EInteractAction)EVoxelInteractAction::Close, InteractionAgent);
-								UWidgetModuleStatics::GetUserWidget<UWidgetGeneratePanel>()->OnClosed.Remove(DelegateHandle);
-							});
+								FDelegateHandle DelegateHandle = GeneratePanel->OnClosed.AddLambda([this, InteractionAgent, DelegateHandle, GeneratePanel](bool bInstant)
+								{
+									GeneratePanel->OnClosed.Remove(DelegateHandle);
+									DoInteract((EInteractAction)EVoxelInteractAction::Close, InteractionAgent);
+								});
+								GeneratePanel->Open({ InteractionAgent });
+							}
 							break;
 						}
 						default: break;
@@ -297,7 +297,7 @@ void ADWPlayerCharacter::OnInteract(EInteractAction InInteractAction, IInteracti
 		}
 		if(UWidgetModuleStatics::GetUserWidget<UWidgetInteractionBox>())
 		{
-			UWidgetModuleStatics::GetUserWidget<UWidgetInteractionBox>()->ShowInteractActions(Cast<UObject>(InInteractionAgent), GetInteractableActions());
+			UWidgetModuleStatics::GetUserWidget<UWidgetInteractionBox>()->Refresh();
 		}
 	}
 }

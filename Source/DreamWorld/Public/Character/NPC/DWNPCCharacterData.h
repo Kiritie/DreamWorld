@@ -11,4 +11,8 @@ class DREAMWORLD_API UDWNPCCharacterData : public UDWHumanCharacterData
 
 public:
 	UDWNPCCharacterData();
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	EDWCharacterCraft Craft;
 };

@@ -3,6 +3,7 @@
 
 #include "Character/Human/DWHumanCharacter.h"
 
+#include "Dialogue.h"
 #include "Ability/AbilityModuleStatics.h"
 #include "Ability/Character/States/AbilityCharacterState_Crouch.h"
 #include "Ability/Character/States/AbilityCharacterState_Fall.h"
@@ -20,7 +21,9 @@
 #include "Voxel/Components/VoxelMeshComponent.h"
 #include "Voxel/Voxels/Entity/VoxelEntity.h"
 #include "Ability/Item/Equip/AbilityEquipBase.h"
+#include "Character/Human/DWHumanCharacterData.h"
 #include "Character/Human/States/DWHumanCharacterState_Defend.h"
+#include "Character/Player/DWPlayerCharacter.h"
 #include "Character/States/DWCharacterState_Aim.h"
 #include "Character/States/DWCharacterState_Attack.h"
 #include "Character/States/DWCharacterState_Climb.h"
@@ -30,10 +33,14 @@
 #include "Character/States/DWCharacterState_Float.h"
 #include "Character/States/DWCharacterState_Fly.h"
 #include "Character/States/DWCharacterState_Ride.h"
+#include "Common/Interaction/InteractionComponent.h"
 #include "FSM/Components/FSMComponent.h"
 #include "Item/Equip/DWEquipData.h"
 #include "Item/Equip/Weapon/DWEquipWeaponMelee.h"
 #include "Voxel/Datas/VoxelData.h"
+#include "Widget/WidgetModuleStatics.h"
+#include "Widget/Dialogue/WidgetDialogueBox.h"
+#include "Widget/Interaction/WidgetInteractionBox.h"
 
 ADWHumanCharacter::ADWHumanCharacter(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
@@ -46,10 +53,11 @@ ADWHumanCharacter::ADWHumanCharacter(const FObjectInitializer& ObjectInitializer
 	GetMesh()->SetRelativeLocation(FVector(0.f, 0.f, -70.f));
 
 	GenerateHammerMesh = CreateDefaultSubobject<UStaticMeshComponent>(FName("HammerMesh"));
-	GenerateHammerMesh->SetupAttachment(GetMesh(), TEXT("HammerMesh"));
+	GenerateHammerMesh->SetupAttachment(GetMesh(), TEXT("GenerateHammerMesh"));
 	GenerateHammerMesh->SetRelativeLocation(FVector::ZeroVector);
 	GenerateHammerMesh->SetRelativeRotation(FRotator::ZeroRotator);
 	GenerateHammerMesh->SetVisibility(false);
+	GenerateHammerMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	
 	FSM->DefaultState = UDWCharacterState_Spawn::StaticClass();
 	FSM->FinalState = UDWCharacterState_Death::StaticClass();
@@ -73,6 +81,8 @@ ADWHumanCharacter::ADWHumanCharacter(const FObjectInitializer& ObjectInitializer
 	FSM->States.Add(UAbilityCharacterState_Swim::StaticClass());
 	FSM->States.Add(UAbilityCharacterState_Walk::StaticClass());
 
+	Interaction->AddInteractAction(EInteractAction::Dialogue);
+
 	GenerateVoxelEntity = nullptr;
 	AuxiliaryVoxelEntity = nullptr;
 }
@@ -90,6 +100,58 @@ void ADWHumanCharacter::OnDespawn_Implementation(bool bRecovery)
 	UObjectPoolModuleStatics::DespawnObject(AuxiliaryVoxelEntity);
 	GenerateVoxelEntity = nullptr;
 	AuxiliaryVoxelEntity = nullptr;
+}
+
+bool ADWHumanCharacter::CanInteract(EInteractAction InInteractAction, IInteractionAgentInterface* InInteractionAgent)
+{
+	switch (InInteractAction)
+	{
+		case EInteractAction::Dialogue:
+		{
+			if(Cast<ADWPlayerCharacter>(InInteractionAgent))
+			{
+				if(UWidgetModuleStatics::GetUserWidget<UWidgetDialogueBox>() && !UWidgetModuleStatics::GetUserWidget<UWidgetDialogueBox>()->IsWidgetOpened())
+				{
+					return true;
+				}
+			}
+			break;
+		}
+		default: break;
+	}
+	return Super::CanInteract(InInteractAction, InInteractionAgent);
+}
+
+void ADWHumanCharacter::OnInteract(EInteractAction InInteractAction, IInteractionAgentInterface* InInteractionAgent, bool bPassive)
+{
+	Super::OnInteract(InInteractAction, InInteractionAgent, bPassive);
+
+	if(bPassive)
+	{
+		switch (InInteractAction)
+		{
+			case EInteractAction::Dialogue:
+			{
+				if(Cast<ADWPlayerCharacter>(InInteractionAgent))
+				{
+					if(UWidgetDialogueBox* DialogueBox = UWidgetModuleStatics::GetUserWidget<UWidgetDialogueBox>())
+					{
+						FDelegateHandle DelegateHandle = DialogueBox->OnClosed.AddLambda([this, DelegateHandle, DialogueBox](bool bInstant)
+						{
+							DialogueBox->OnClosed.Remove(DelegateHandle);
+							if(UWidgetModuleStatics::GetUserWidget<UWidgetInteractionBox>())
+							{
+								UWidgetModuleStatics::GetUserWidget<UWidgetInteractionBox>()->Refresh();
+							}
+						});
+						DialogueBox->Open({ GetCharacterData<UDWHumanCharacterData>().Dialogue });
+					}
+				}
+				break;
+			}
+			default: break;
+		}
+	}
 }
 
 void ADWHumanCharacter::OnPreChangeItem(const FAbilityItem& InOldItem)

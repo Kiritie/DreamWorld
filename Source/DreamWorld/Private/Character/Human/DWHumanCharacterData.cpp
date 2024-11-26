@@ -12,4 +12,6 @@ UDWHumanCharacterData::UDWHumanCharacterData()
 	InventoryData.SplitItems.Add(ESlotSplitType::Auxiliary).Items.SetNum(1);
 	InventoryData.SplitItems.Add(ESlotSplitType::Equip).Items.SetNum(6);
 	InventoryData.SplitItems.Add(ESlotSplitType::Skill).Items.SetNum(4);
+
+	Dialogue = nullptr;
 }

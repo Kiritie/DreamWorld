@@ -5,6 +5,8 @@
 
 #include "AI/Base/AIControllerBase.h"
 #include "Character/DWCharacter.h"
+#include "Widget/WidgetModuleStatics.h"
+#include "Widget/World/WidgetCharacterHP.h"
 
 void UDWAIBlackboard::PostLoad()
 {
@@ -41,7 +43,10 @@ void UDWAIBlackboard::OnRefresh()
 
 	if(GetTargetAgent<ADWCharacter>() && GetTargetAgent<ADWCharacter>()->IsDead())
 	{
-		SetTargetAgent(nullptr);
+		ResetIsLostTarget();
+		ResetTargetLocation();
+		ResetTargetAgent();
+		ResetIsExcessived();
 	}
 }
 

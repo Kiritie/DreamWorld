@@ -84,6 +84,20 @@ enum class EDWCharacterNature : uint8
 	AIHostile
 };
 
+/**
+ * ???????
+ */
+UENUM(BlueprintType)
+enum class EDWCharacterCraft : uint8
+{
+	// ???
+	None,
+	// ???????
+	Merchant,
+	// ???????
+	Blacksmith
+};
+
 UENUM(BlueprintType)
 enum class EDWPropType : uint8
 {

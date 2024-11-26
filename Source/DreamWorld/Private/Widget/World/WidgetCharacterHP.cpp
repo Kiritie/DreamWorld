@@ -12,6 +12,8 @@ UWidgetCharacterHP::UWidgetCharacterHP(const FObjectInitializer& ObjectInitializ
 	WidgetAlignment = FVector2D(0.5f);
 	WidgetVisibility = EWorldWidgetVisibility::ScreenAndDistance;
 	WidgetShowDistance = 1800.f;
+
+	bWidgetTickAble = true;
 }
 
 void UWidgetCharacterHP::OnTick_Implementation(float DeltaSeconds)

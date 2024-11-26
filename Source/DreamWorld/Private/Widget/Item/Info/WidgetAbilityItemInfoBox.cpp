@@ -28,13 +28,19 @@ void UWidgetAbilityItemInfoBox::OnOpen(const TArray<FParameter>& InParams, bool 
 {
 	Super::OnOpen(InParams, bInstant);
 
+	TArray<FAbilityItem> Items;
+	if(InParams.IsValidIndex(0))
+	{
+		Items = InParams[0].GetPointerValueRef<TArray<FAbilityItem>>();
+	}
+	
 	TArray<UWidgetAbilityItemInfo*> ItemInfos = GetAllSubWidgets<UWidgetAbilityItemInfo>();
 	for(int32 i = 0; i < ItemInfos.Num(); i++)
 	{
 		ItemInfos[i]->SetVisibility(ESlateVisibility::Collapsed);
-		if(InParams.IsValidIndex(i))
+		if(Items.IsValidIndex(i))
 		{
-			ItemInfos[i]->Init(TArray{ InParams[i] });
+			ItemInfos[i]->Init({ &Items[i] });
 			ItemInfos[i]->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
 		}
 	}

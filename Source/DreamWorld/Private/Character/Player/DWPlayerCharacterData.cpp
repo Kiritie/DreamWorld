@@ -5,7 +5,7 @@
 
 UDWPlayerCharacterData::UDWPlayerCharacterData()
 {
-	Nature = EDWCharacterNature::None;
+	Nature = EDWCharacterNature::Player;
 	
 	InventoryData = FInventorySaveData();
 	InventoryData.InventoryClass = UDWCharacterInventory::StaticClass();

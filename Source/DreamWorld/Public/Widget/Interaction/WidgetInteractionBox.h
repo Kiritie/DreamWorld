@@ -31,17 +31,6 @@ public:
 
 	virtual void OnClose(bool bInstant) override;
 
-public:
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	void ShowInteractActions(const TScriptInterface<IInteractionAgentInterface>& InInteractionAgent, const TArray<EInteractAction>& InActions);
-	
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	void HideInteractActions();
-
-protected:
-	UFUNCTION()
-	ESlateVisibility GetNextKeyTipsVisibility();
-
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (BindWidget, OptionalWidget = false), Category = "Components")
 	UWidgetAbilityItem* PreviewItem;
@@ -49,6 +38,13 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (BindWidget, OptionalWidget = false), Category = "Components")
 	UWidgetKeyTipsItemBase* NextKeyTips;
 
-private:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TScriptInterface<IInteractionAgentInterface> InteractionAgent;
+
+protected:
+	UFUNCTION(BlueprintPure)
+	TArray<EInteractAction> GetInteractActions() const;
+	
+	UFUNCTION()
+	ESlateVisibility GetNextKeyTipsVisibility();
 };

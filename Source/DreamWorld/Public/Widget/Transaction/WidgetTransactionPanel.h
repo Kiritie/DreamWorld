@@ -100,6 +100,9 @@ public:
 	UFUNCTION(BlueprintPure)
 	int32 GetTabIndex() const;
 
+	UFUNCTION(BlueprintCallable)
+	void SetTabIndex(int32 InIndex) const;
+
 	UFUNCTION(BlueprintPure)
 	bool GetSelectedTransactionItem(FAbilityItem& OutItemData) const;
 };
