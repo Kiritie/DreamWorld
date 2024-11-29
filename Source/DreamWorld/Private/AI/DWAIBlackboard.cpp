@@ -5,8 +5,6 @@
 
 #include "AI/Base/AIControllerBase.h"
 #include "Character/DWCharacter.h"
-#include "Widget/WidgetModuleStatics.h"
-#include "Widget/World/WidgetCharacterHP.h"
 
 void UDWAIBlackboard::PostLoad()
 {
@@ -88,5 +86,6 @@ void UDWAIBlackboard::OnValueChanged(FName InValueName)
 	if(InValueName.IsEqual(NAME_IsExcessived))
 	{
 		GetController()->InitBehaviorTree(true);
+		GetAgent<ADWCharacter>()->LeaveInteract();
 	}
 }

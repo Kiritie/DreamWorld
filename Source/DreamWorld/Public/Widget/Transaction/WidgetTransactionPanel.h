@@ -54,7 +54,7 @@ protected:
 	void OnTransactionItemDeselected(UWidgetTransactionItem* InItem);
 
 	UFUNCTION()
-	void OnTransactionContentRefresh();
+	void OnTransactionContentRefresh(bool bScrollToStart = false);
 
 	UFUNCTION()
 	void OnPreviewContentRefresh();

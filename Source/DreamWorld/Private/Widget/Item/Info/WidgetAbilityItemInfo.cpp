@@ -17,15 +17,28 @@ UWidgetAbilityItemInfo::UWidgetAbilityItemInfo(const FObjectInitializer& ObjectI
 	TxtDetail = nullptr;
 	TxtErrorInfo = nullptr;
 	TxtAbilityInfo = nullptr;
+	
+	Item = FAbilityItem::Empty;
 }
 
-void UWidgetAbilityItemInfo::OnCreate(UUserWidgetBase* InOwner, const TArray<FParameter>& InParams)
+void UWidgetAbilityItemInfo::OnDespawn_Implementation(bool bRecovery)
+{
+	Super::OnDespawn_Implementation(bRecovery);
+		
+	Item = FAbilityItem::Empty;
+}
+
+void UWidgetAbilityItemInfo::OnCreate(UUserWidget* InOwner, const TArray<FParameter>& InParams)
 {
 	Super::OnCreate(InOwner, InParams);
 }
 
 void UWidgetAbilityItemInfo::OnInitialize(const TArray<FParameter>& InParams)
 {
+	if(InParams.IsValidIndex(0))
+	{
+		Item = InParams[0].GetPointerValueRef<FAbilityItem>();
+	}
 	Super::OnInitialize(InParams);
 }
 
@@ -43,7 +56,7 @@ void UWidgetAbilityItemInfo::OnRefresh()
 		TxtLevel->SetText(FText::FromString(FString::Printf(TEXT("Lv.%d"), Item.Level)));
 		TxtLevel->SetVisibility(Item.Level != 0 ? ESlateVisibility::SelfHitTestInvisible : ESlateVisibility::Collapsed);
 		TxtDetail->SetText(!ItemData.Detail.IsEmpty() ? ItemData.Detail : FText::FromString(TEXT("暂无描述")));
-		TxtErrorInfo->SetText(FText::FromString(ItemData.GetItemErrorInfo(GetOwnerWidget()->GetOwnerObject<AActor>(), Item.Level)));
+		TxtErrorInfo->SetText(FText::FromString(ItemData.GetItemErrorInfo(GetOwnerWidget<UUserWidgetBase>()->GetOwnerObject<AActor>(), Item.Level)));
 		TxtAbilityInfo->SetText(FText::FromString(ItemData.GetItemAbilityInfo(Item.Level)));
 	}
 }

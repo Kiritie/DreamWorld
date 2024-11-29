@@ -10,6 +10,7 @@
 
 #include "DWCharacter.generated.h"
 
+class UDialogue;
 class ADWEquip;
 class UEventHandle_VoxelWorldModeChanged;
 class UWorldWidgetComponent;
@@ -250,6 +251,9 @@ protected:
 
 	UPROPERTY()
 	AAbilityProjectileBase* AttackProjectile;
+
+	UPROPERTY()
+	UDialogue* Dialogue;
 
 	UPROPERTY()
 	TMap<EDWEquipPart, ADWEquip*> Equips;

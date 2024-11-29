@@ -139,12 +139,12 @@ void UWidgetInventorySlot::OnTick_Implementation(float DeltaSeconds)
 		const auto& ItemData = GetItem().GetData();
 		if(ImgError)
 		{
-			ImgError->SetVisibility(ItemData.GetItemErrorInfo(GetOwnerWidget()->GetOwnerObject<AActor>()).IsEmpty() ? ESlateVisibility::Hidden : ESlateVisibility::Visible);
+			ImgError->SetVisibility(ItemData.GetItemErrorInfo(GetOwnerWidget<UUserWidgetBase>()->GetOwnerObject<AActor>()).IsEmpty() ? ESlateVisibility::Hidden : ESlateVisibility::Visible);
 		}
 	}
 }
 
-void UWidgetInventorySlot::OnCreate(UUserWidgetBase* InOwner, const TArray<FParameter>& InParams)
+void UWidgetInventorySlot::OnCreate(UUserWidget* InOwner, const TArray<FParameter>& InParams)
 {
 	Super::OnCreate(InOwner, InParams);
 }

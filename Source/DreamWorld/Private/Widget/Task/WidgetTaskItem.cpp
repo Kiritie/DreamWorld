@@ -3,8 +3,11 @@
 #include "Widget/Task/WidgetTaskItem.h"
 
 #include "Components/TextBlock.h"
+#include "Components/VerticalBox.h"
+#include "Components/VerticalBoxSlot.h"
 #include "Task/Base/TaskBase.h"
-#include "Task/Base/Task_Base.h"
+#include "Task/Base/DWTaskBase.h"
+#include "Widget/Task/WidgetTaskContainer.h"
 #include "Widget/Task/WidgetTaskPanel.h"
 
 UWidgetTaskItem::UWidgetTaskItem(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
@@ -43,46 +46,52 @@ void UWidgetTaskItem::OnRefresh()
 	if(Task)
 	{
 		TxtName->SetText(Task->TaskDisplayName);
-		if(UTask_Base* TaskBase = Cast<UTask_Base>(Task))
+		if(TxtLevel)
 		{
-			if(TaskBase->Level > 0)
+			if(UDWTaskBase* TaskBase = Cast<UDWTaskBase>(Task))
 			{
-				TxtLevel->SetText(FText::FromString(FString::Printf(TEXT("Lv.%d"), TaskBase->Level)));
-			}
-			else
-			{
-				TxtLevel->SetText(FText::FromString(TEXT("无限制")));
-			}
-		}
-		FString ProgressStr;
-		switch(Task->TaskExecuteResult)
-		{
-			case ETaskExecuteResult::None:
-			{
-				switch(Task->GetTaskState())
+				if(TaskBase->Level > 0)
 				{
-					case ETaskState::Entered:
-					case ETaskState::Executing:
-					{
-						ProgressStr = TEXT("进行中");
-						break;
-					}
-					default:
-					{
-						ProgressStr = TEXT("未开始");
-						break;
-					}
+					TxtLevel->SetText(FText::FromString(FString::Printf(TEXT("Lv.%d"), TaskBase->Level)));
 				}
-				break;
-			}
-			default:
-			{
-				ProgressStr = TEXT("已完成");
-				break;
+				else
+				{
+					TxtLevel->SetText(FText::FromString(TEXT("无限制")));
+				}
 			}
 		}
-		TxtProgress->SetText(FText::FromString(FString::Printf(TEXT("(%s)"), *ProgressStr)));
-		TxtDetail->SetText(Task->TaskDescription);
+		if(TxtProgress)
+		{
+			FString ProgressStr;
+			switch(Task->TaskExecuteResult)
+			{
+				case ETaskExecuteResult::None:
+				{
+					switch(Task->GetTaskState())
+					{
+						case ETaskState::Entered:
+						case ETaskState::Executing:
+						{
+							ProgressStr = TEXT("进行中");
+							break;
+						}
+						default:
+						{
+							ProgressStr = TEXT("未开始");
+							break;
+						}
+					}
+					break;
+				}
+				default:
+				{
+					ProgressStr = TEXT("已完成");
+					break;
+				}
+			}
+			TxtProgress->SetText(FText::FromString(FString::Printf(TEXT("(%s)"), *ProgressStr)));
+		}
+		TxtDetail->SetText(!Task->TaskDescription.IsEmpty() ? Task->TaskDescription : FText::FromString(TEXT("暂无描述")));
 	}
 }
 
@@ -103,5 +112,13 @@ void UWidgetTaskItem::NativeOnDeselected(bool bBroadcast)
 	if(UWidgetTaskPanel* TaskPanel = GetOwnerWidget<UWidgetTaskPanel>())
 	{
 		TaskPanel->OnTaskItemDeselected(this);
+	}
+}
+
+void UWidgetTaskItem::OnAddToContainer(UWidgetTaskContainer* InTaskContainer)
+{
+	if(UVerticalBoxSlot* VerticalBoxSlot = Cast<UVerticalBoxSlot>(InTaskContainer->GetTaskContent()->AddChild(this)))
+	{
+		VerticalBoxSlot->SetPadding(FMargin(0.f, 0.f, 0.f, 5.f));
 	}
 }

@@ -106,7 +106,7 @@ bool UDWTeamModule::CreateTeam(IDWTeamAgentInterface* InCaptain, FName InTeamNam
 		Data.ID = *FString::Printf(TEXT("Team_%d"), TeamDatas.Num());
 		if (!IsExistTeam(Data.ID))
 		{
-			Data.Name = !InTeamName.IsNone() ? InTeamName : *FString::Printf(TEXT("%s Team"), *InCaptain->GetNameT().ToString());
+			Data.Name = !InTeamName.IsNone() ? InTeamName : *FString::Printf(TEXT("%s's team"), *InCaptain->GetNameT().ToString());
 			Data.Detail = !InTeamDetail.IsEmpty() ? InTeamDetail : Data.Name.ToString();
 			Data.Captain = InCaptain->GetActorIDT();
 			Data.AddMember(InCaptain);

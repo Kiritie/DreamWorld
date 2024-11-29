@@ -4,7 +4,6 @@
 
 #include "Ability/AbilityModuleStatics.h"
 #include "Ability/AbilityModuleTypes.h"
-#include "Ability/Actor/AbilityActorBase.h"
 #include "Character/DWCharacterData.h"
 #include "Common/DWCommonTypes.h"
 
@@ -24,6 +23,10 @@ AActor* ADWCharacterSpawner::SpawnImpl_Implementation(const FAbilityItem& InAbil
 	SaveData.Level = InAbilityItem.Level;
 	SaveData.SpawnTransform = GetActorTransform();
 	SaveData.InitInventoryData();
+	if(CharacterData.Dialogues.Num() > 0)
+	{
+		SaveData.Dialogue = CharacterData.Dialogues[FMath::RandRange(0, CharacterData.Dialogues.Num() - 1)];
+	}
 
 	return UAbilityModuleStatics::SpawnAbilityActor(&SaveData);
 }

@@ -6,7 +6,7 @@
 #include "Character/Player/DWPlayerCharacter.h"
 #include "FSM/Components/FSMComponent.h"
 #include "Procedure/ProcedureModuleStatics.h"
-#include "Procedure/Procedure_Testing.h"
+#include "Procedure/DWProcedure_Testing.h"
 #include "Voxel/VoxelModule.h"
 #include "Voxel/VoxelModuleStatics.h"
 #include "Voxel/Chunks/VoxelChunk.h"
@@ -48,7 +48,7 @@ void UDWPlayerCharacterState_Spawn::OnTermination()
 
 void UDWPlayerCharacterState_Spawn::TryLeave()
 {
-	if(UProcedureModuleStatics::IsCurrentProcedureClass<UProcedure_Testing>())
+	if(UProcedureModuleStatics::IsCurrentProcedureClass<UDWProcedure_Testing>())
 	{
 		Super::TryLeave();
 	}

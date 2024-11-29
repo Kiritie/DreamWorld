@@ -4,8 +4,6 @@
 
 #include "DWHumanCharacterData.generated.h"
 
-class UDialogue;
-
 UCLASS(BlueprintType)
 class DREAMWORLD_API UDWHumanCharacterData : public UDWCharacterData
 {
@@ -13,8 +11,4 @@ class DREAMWORLD_API UDWHumanCharacterData : public UDWCharacterData
 
 public:
 	UDWHumanCharacterData();
-
-public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	UDialogue* Dialogue;
 };

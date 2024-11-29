@@ -3,6 +3,9 @@
 
 #include "Widget/Archive/WidgetArchiveCreatingPanel.h"
 
+#include "CommonActivatableWidgetSwitcher.h"
+#include "Widget/Archive/WidgetArchiveCreatingPage.h"
+
 UWidgetArchiveCreatingPanel::UWidgetArchiveCreatingPanel(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	WidgetName = FName("ArchiveCreatingPanel");
@@ -28,4 +31,15 @@ void UWidgetArchiveCreatingPanel::OnClose(bool bInstant)
 void UWidgetArchiveCreatingPanel::OnRefresh()
 {
 	Super::OnRefresh();
+}
+
+UWidgetArchiveCreatingPage* UWidgetArchiveCreatingPanel::GetCurrentPage() const
+{
+	return GetSubWidget<UWidgetArchiveCreatingPage>(CurrentPageIndex);
+}
+
+void UWidgetArchiveCreatingPanel::SetCurrentPage_Implementation(int32 InPageIndex)
+{
+	CurrentPageIndex = InPageIndex;
+	Switcher_Page->SetActiveWidgetIndex(InPageIndex);
 }

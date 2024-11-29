@@ -2,17 +2,18 @@
 
 #pragma once
 #include "Common/DWCommonTypes.h"
-#include "Widget/Screen/SubWidgetBase.h"
+#include "Widget/Sub/SubButtonWidgetBase.h"
 
 #include "WidgetTaskItem.generated.h"
 
+class UWidgetTaskContainer;
 class UTaskBase;
 class UTextBlock;
 /**
  * UI构建项
  */
 UCLASS(BlueprintType)
-class DREAMWORLD_API UWidgetTaskItem : public USubWidgetBase
+class DREAMWORLD_API UWidgetTaskItem : public USubButtonWidgetBase
 {
 	GENERATED_BODY()
 	
@@ -30,6 +31,9 @@ public:
 	virtual void NativeOnSelected(bool bBroadcast) override;
 
 	virtual void NativeOnDeselected(bool bBroadcast) override;
+
+public:
+	virtual void OnAddToContainer(UWidgetTaskContainer* InTaskContainer);
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (BindWidget, OptionalWidget = false), Category = "Components")

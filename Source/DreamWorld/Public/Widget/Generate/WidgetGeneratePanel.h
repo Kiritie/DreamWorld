@@ -48,7 +48,7 @@ protected:
 	void OnGenerateItemDeselected(UWidgetGenerateItem* InItem);
 
 	UFUNCTION()
-	void OnGenerateContentRefresh();
+	void OnGenerateContentRefresh(bool bScrollToStart = false);
 
 	UFUNCTION()
 	void OnPreviewContentRefresh();

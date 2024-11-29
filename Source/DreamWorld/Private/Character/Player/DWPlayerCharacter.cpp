@@ -155,6 +155,10 @@ FSaveData* ADWPlayerCharacter::ToData()
 	
 	SaveData.BodyColorIndex = GetBodyColor();
 	SaveData.CapeColorIndex = GetCapeColor();
+	
+	SaveData.CameraRotation = UCameraModuleStatics::GetCameraRotation();
+	SaveData.CameraDistance = UCameraModuleStatics::GetCameraDistance();
+
 	return &SaveData;
 }
 

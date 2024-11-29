@@ -113,9 +113,13 @@ UDialogueEvents::UDialogueEvents()
 
 }
 
+void UDialogueEvents::RecieveEventTriggered_Implementation(APlayerController* ConsideringPlayer, AActor* NPCActor)
+{
+}
+
 bool UDialogueConditions::IsConditionMet_Implementation(APlayerController* ConsideringPlayer, AActor* NPCActor)
 {
-	return IsConditionMet_Internal(ConsideringPlayer, NPCActor);
+	return true;
 }
 
 UWorld* UDialogueEvents::GetWorld() const

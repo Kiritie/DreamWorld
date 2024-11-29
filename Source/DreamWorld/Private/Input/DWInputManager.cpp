@@ -13,8 +13,8 @@
 #include "Input/InputModuleStatics.h"
 #include "Input/Components/InputComponentBase.h"
 #include "Procedure/ProcedureModuleStatics.h"
-#include "Procedure/Procedure_Pausing.h"
-#include "Procedure/Procedure_Playing.h"
+#include "Procedure/DWProcedure_Pausing.h"
+#include "Procedure/DWProcedure_Playing.h"
 #include "Voxel/VoxelModuleStatics.h"
 #include "Voxel/Voxels/Auxiliary/VoxelInteractAuxiliary.h"
 #include "Widget/WidgetModuleStatics.h"
@@ -22,9 +22,11 @@
 #include "Widget/Inventory/WidgetInventoryBar.h"
 #include "Widget/Inventory/WidgetInventoryPanel.h"
 #include "Common/DWCommonTypes.h"
+#include "Procedure/DWProcedure_Testing.h"
 #include "Scene/SceneModuleStatics.h"
 #include "Widget/Context/WidgetContextInputBox.h"
 #include "Widget/MaxMap/WidgetMaxMapBox.h"
+#include "Widget/Setting/WidgetSettingPanel.h"
 #include "Widget/Task/WidgetTaskPanel.h"
 
 // ParamSets default values
@@ -275,9 +277,13 @@ void UDWInputManager::ActionUpPlayer_Implementation(const FInputActionValue& InV
 
 void UDWInputManager::SystemOperation_Implementation()
 {
-	if(UProcedureModuleStatics::IsCurrentProcedureClass<UProcedure_Playing>())
+	if(UProcedureModuleStatics::IsCurrentProcedureClass<UDWProcedure_Playing>())
 	{
-		UProcedureModuleStatics::SwitchProcedureByClass<UProcedure_Pausing>();
+		UProcedureModuleStatics::SwitchProcedureByClass<UDWProcedure_Pausing>();
+	}
+	else if(UProcedureModuleStatics::IsCurrentProcedureClass<UDWProcedure_Testing>())
+	{
+		UWidgetModuleStatics::OpenUserWidget<UWidgetSettingPanel>();
 	}
 }
 

@@ -5,6 +5,8 @@
 #include "Widget/Screen/UserWidgetBase.h"
 #include "WidgetArchiveCreatingPanel.generated.h"
 
+class UWidgetArchiveCreatingPage;
+class UCommonActivatableWidgetSwitcher;
 /**
  * ���紴�����
  */
@@ -24,4 +26,21 @@ public:
 	virtual void OnClose(bool bInstant) override;
 
 	virtual void OnRefresh() override;
+
+protected:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (BindWidget, OptionalWidget = false), Category = "Components")
+	UCommonActivatableWidgetSwitcher* Switcher_Page;
+
+	UPROPERTY(BlueprintReadOnly)
+	int32 CurrentPageIndex;
+
+public:
+	UFUNCTION(BlueprintPure)
+	int32 GetCurrentPageIndex() const { return CurrentPageIndex; }
+
+	UFUNCTION(BlueprintPure)
+	UWidgetArchiveCreatingPage* GetCurrentPage() const;
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void SetCurrentPage(int32 InPageIndex);
 };

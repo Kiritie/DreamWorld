@@ -5,6 +5,8 @@
 #include "Ability/Item/Widget/WidgetAbilityItemBase.h"
 #include "WidgetAbilityItem.generated.h"
 
+class UTextBlock;
+
 UCLASS(BlueprintType)
 class DREAMWORLD_API UWidgetAbilityItem : public UWidgetAbilityItemBase
 {
@@ -12,6 +14,11 @@ class DREAMWORLD_API UWidgetAbilityItem : public UWidgetAbilityItemBase
 	
 public:
 	UWidgetAbilityItem(const FObjectInitializer& ObjectInitializer);
+
+public:
+	virtual void OnInitialize(const TArray<FParameter>& InParams) override;
+
+	virtual void OnRefresh() override;
 
 public:
 	virtual void NativeOnMouseEnter(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
@@ -24,4 +31,11 @@ public:
 	virtual FReply NativeOnFocusReceived(const FGeometry& InGeometry, const FFocusEvent& InFocusEvent) override;
 	
 	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
+
+protected:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (BindWidget, OptionalWidget = false), Category = "Components")
+	UImage* ImgIcon;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (BindWidget, OptionalWidget = false), Category = "Components")
+	UTextBlock* TxtName;
 };

@@ -3,47 +3,43 @@
 #include "Widget/Task/WidgetTaskRootItem.h"
 
 #include "Components/TextBlock.h"
-#include "Widget/Task/WidgetTaskCategory.h"
+#include "Components/VerticalBox.h"
+#include "Components/VerticalBoxSlot.h"
+#include "ObjectPool/ObjectPoolModuleStatics.h"
+#include "Task/Base/TaskAsset.h"
 #include "Widget/Task/WidgetTaskContainer.h"
 #include "Widget/Task/WidgetTaskItem.h"
 #include "Widget/Task/WidgetTaskPanel.h"
 
 UWidgetTaskRootItem::UWidgetTaskRootItem(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
-	bSelectable = true;
-	bToggleable = true;
-
-	TxtName = nullptr;
-	TxtDetail = nullptr;
-
-	Task = nullptr;
+	TaskContainerClass = nullptr;
+	TaskAsset = nullptr;
 	TaskContainer = nullptr;
-	TaskCategory = nullptr;
 }
 
 void UWidgetTaskRootItem::OnDespawn_Implementation(bool bRecovery)
 {
 	Super::OnDespawn_Implementation(bRecovery);
 
-	Task = nullptr;
-	TaskContainer->Destroy(true);
-	TaskContainer = nullptr;
-	TaskCategory = nullptr;
+	TaskAsset = nullptr;
+	TaskContainer->ClearTaskItem();
+	TaskContainer->RemoveFromRoot();
+}
+
+void UWidgetTaskRootItem::OnCreate(UUserWidget* InOwner, const TArray<FParameter>& InParams)
+{
+	TaskContainer = UObjectPoolModuleStatics::SpawnObject<UWidgetTaskContainer>(this, nullptr, TaskContainerClass);
+	TaskContainer->SetVisibility(ESlateVisibility::Collapsed);
+
+	Super::OnCreate(InOwner, InParams);
 }
 
 void UWidgetTaskRootItem::OnInitialize(const TArray<FParameter>& InParams)
 {
-	if(InParams.IsValidIndex(0))
-	{
-		Task = InParams[0];
-	}
 	if(InParams.IsValidIndex(1))
 	{
-		TaskContainer = InParams[1];
-	}
-	if(InParams.IsValidIndex(2))
-	{
-		TaskCategory = InParams[2];
+		TaskAsset = InParams[1];
 	}
 	Super::OnInitialize(InParams);
 }
@@ -52,23 +48,15 @@ void UWidgetTaskRootItem::OnRefresh()
 {
 	Super::OnRefresh();
 
-	if(Task)
+	for(auto Iter : TaskContainer->GetTaskItems())
 	{
-		TxtName->SetText(Task->TaskDisplayName);
-		TxtDetail->SetText(Task->TaskDescription);
-	}
-	if(TaskContainer)
-	{
-		for(auto Iter : TaskContainer->GetTaskItems())
-		{
-			Iter->Refresh();
-		}
+		Iter->Refresh();
 	}
 }
 
 void UWidgetTaskRootItem::NativeOnSelected(bool bBroadcast)
 {
-	Super::NativeOnSelected(bBroadcast);
+	USubButtonWidgetBase::NativeOnSelected(bBroadcast);
 
 	if(UWidgetTaskPanel* TaskPanel = GetOwnerWidget<UWidgetTaskPanel>())
 	{
@@ -86,12 +74,22 @@ void UWidgetTaskRootItem::NativeOnSelected(bool bBroadcast)
 
 void UWidgetTaskRootItem::NativeOnDeselected(bool bBroadcast)
 {
-	Super::NativeOnDeselected(bBroadcast);
+	USubButtonWidgetBase::NativeOnDeselected(bBroadcast);
 
 	if(UWidgetTaskPanel* TaskPanel = GetOwnerWidget<UWidgetTaskPanel>())
 	{
 		TaskContainer->SetVisibility(ESlateVisibility::Collapsed);
 		TaskContainer->ClearTaskItem();
 		TaskPanel->OnTaskRootItemDeselected(this);
+	}
+}
+
+void UWidgetTaskRootItem::OnAddToContainer(UWidgetTaskContainer* InTaskContainer)
+{
+	Super::OnAddToContainer(InTaskContainer);
+
+	if(UVerticalBoxSlot* VerticalBoxSlot = Cast<UVerticalBoxSlot>(InTaskContainer->GetTaskContent()->AddChild(TaskContainer)))
+	{
+		VerticalBoxSlot->SetPadding(FMargin(0.f, 0.f, 0.f, 0.f));
 	}
 }

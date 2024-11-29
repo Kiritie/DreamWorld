@@ -5,6 +5,8 @@
 
 #include "DWCharacterData.generated.h"
 
+class UDialogue;
+
 UCLASS(BlueprintType)
 class DREAMWORLD_API UDWCharacterData : public UAbilityCharacterDataBase
 {
@@ -16,7 +18,7 @@ public:
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	EDWCharacterNature Nature;
-			
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float AttackDistance;
 	
@@ -40,6 +42,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TArray<FDWCharacterSkillAttackAbilityData> SkillAttackAbilities;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<UDialogue*> Dialogues;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (EditConditionHides, EditCondition = "(int32)Nature > 2"))
 	UBehaviorTree* DefaultBehaviorTree;

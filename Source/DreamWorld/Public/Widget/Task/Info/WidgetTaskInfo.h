@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "Widget/Screen/SubWidgetBase.h"
+#include "Widget/Sub/SubWidgetBase.h"
 #include "WidgetTaskInfo.generated.h"
 
 class UTextBlock;

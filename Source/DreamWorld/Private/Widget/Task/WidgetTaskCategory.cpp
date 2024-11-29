@@ -3,23 +3,19 @@
 #include "Widget/Task/WidgetTaskCategory.h"
 
 #include "Components/TextBlock.h"
-#include "Task/Base/TaskAsset.h"
+#include "Widget/Task/WidgetTaskContainer.h"
+#include "Widget/Task/WidgetTaskItem.h"
 #include "Widget/Task/WidgetTaskPanel.h"
 
 UWidgetTaskCategory::UWidgetTaskCategory(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	TxtName = nullptr;
 
-	TaskAsset = nullptr;
+	TaskContainer = nullptr;
 }
 
 void UWidgetTaskCategory::OnSpawn_Implementation(UObject* InOwner, const TArray<FParameter>& InParams)
 {
-	if(InParams.IsValidIndex(0))
-	{
-		TaskAsset = InParams[0];
-	}
-
 	Super::OnSpawn_Implementation(InOwner, InParams);
 }
 
@@ -27,16 +23,29 @@ void UWidgetTaskCategory::OnDespawn_Implementation(bool bRecovery)
 {
 	Super::OnDespawn_Implementation(bRecovery);
 
-	TaskAsset = nullptr;
+	TaskContainer->ClearTaskItem();
 }
 
+void UWidgetTaskCategory::OnInitialize(const TArray<FParameter>& InParams)
+{
+	if(InParams.IsValidIndex(0))
+	{
+		TaskName = InParams[0];
+	}
+	Super::OnInitialize(InParams);
+}
 
 void UWidgetTaskCategory::OnRefresh()
 {
 	Super::OnRefresh();
 
-	if(TaskAsset)
+	if(TxtName)
 	{
-		TxtName->SetText(TaskAsset->DisplayName);
+		TxtName->SetText(TaskName);
+	}
+
+	for(auto Iter : TaskContainer->GetTaskItems())
+	{
+		Iter->Refresh();
 	}
 }

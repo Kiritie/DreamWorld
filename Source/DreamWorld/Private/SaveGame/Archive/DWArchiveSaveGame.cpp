@@ -3,14 +3,13 @@
 #include "SaveGame/Archive/DWArchiveSaveGame.h"
 
 #include "Achievement/AchievementModule.h"
-#include "Achievement/DWAchievementModule.h"
 #include "Character/DWCharacterModule.h"
 #include "Character/Player/DWPlayerCharacter.h"
 #include "Debug/DebugModuleTypes.h"
 #include "Gameplay/DWPlayerController.h"
 #include "Common/CommonStatics.h"
 #include "SaveGame/SaveGameModuleStatics.h"
-#include "Task/DWTaskModule.h"
+#include "Task/TaskModule.h"
 #include "Team/DWTeamModule.h"
 #include "Voxel/VoxelModule.h"
 #include "Voxel/DWVoxelModule.h"
@@ -47,8 +46,8 @@ void UDWArchiveSaveGame::OnLoad_Implementation(EPhase InPhase)
 	}
 	UDWVoxelModule::Get().LoadSaveData(&SaveData.WorldData, InPhase);
 	UCommonStatics::GetPlayerController<ADWPlayerController>()->LoadSaveData(&SaveData.PlayerData, InPhase);
-	UDWAchievementModule::Get().LoadSaveData(&SaveData.AchievementData, InPhase);
-	UDWTaskModule::Get().LoadSaveData(&SaveData.TaskData, InPhase);
+	UAchievementModule::Get().LoadSaveData(&SaveData.AchievementData, InPhase);
+	UTaskModule::Get().LoadSaveData(&SaveData.TaskData, InPhase);
 	UDWTeamModule::Get().LoadSaveData(&SaveData.TeamData, InPhase);
 }
 
@@ -62,8 +61,8 @@ void UDWArchiveSaveGame::OnUnload_Implementation(EPhase InPhase)
 	}
 	UDWVoxelModule::Get().UnloadSaveData(InPhase);
 	UCommonStatics::GetPlayerController<ADWPlayerController>()->UnloadSaveData(InPhase);
-	UDWAchievementModule::Get().UnloadSaveData(InPhase);
-	UDWTaskModule::Get().UnloadSaveData(InPhase);
+	UAchievementModule::Get().UnloadSaveData(InPhase);
+	UTaskModule::Get().UnloadSaveData(InPhase);
 	UDWTeamModule::Get().UnloadSaveData(InPhase);
 }
 
@@ -73,8 +72,8 @@ void UDWArchiveSaveGame::OnRefresh_Implementation()
 
 	SaveData.WorldData = UDWVoxelModule::Get().GetSaveDataRef<FDWWorldSaveData>(true);
 	SaveData.PlayerData = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>()->GetSaveDataRef<FDWPlayerSaveData>(true);
-	SaveData.AchievementData = UDWAchievementModule::Get().GetSaveDataRef<FDWAchievementModuleSaveData>(true);
-	SaveData.TaskData = UDWTaskModule::Get().GetSaveDataRef<FDWTaskModuleSaveData>(true);
+	SaveData.AchievementData = UAchievementModule::Get().GetSaveDataRef<FAchievementModuleSaveData>(true);
+	SaveData.TaskData = UTaskModule::Get().GetSaveDataRef<FTaskModuleSaveData>(true);
 	SaveData.TeamData = UDWTeamModule::Get().GetSaveDataRef<FDWTeamModuleSaveData>(true);
 }
 

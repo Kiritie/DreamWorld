@@ -11,12 +11,15 @@
 #include "Camera/CameraModuleTypes.h"
 #include "Common/CommonTypes.h"
 #include "Input/InputModuleTypes.h"
+#include "Setting/SettingModuleTypes.h"
 #include "Task/TaskModuleTypes.h"
 #include "Team/DWTeamModuleTypes.h"
 #include "Video/VideoModuleTypes.h"
+#include "Widget/WidgetModuleTypes.h"
 
 #include "DWCommonTypes.generated.h"
 
+class UDialogue;
 class UCharacterAbilityBase;
 class UBehaviorTree;
 class UVoxelModule;
@@ -359,6 +362,7 @@ public:
 		AttackAbilityQueues = TMap<EDWWeaponType, FDWCharacterAttackAbilityQueue>();
 		FallingAttackAbilities = TMap<EDWWeaponType, FDWCharacterFallingAttackAbilityData>();
 		SkillAttackAbilities = TMap<FPrimaryAssetId, FDWCharacterSkillAttackAbilityData>();
+		Dialogue = nullptr;
 	}
 	
 	FORCEINLINE FDWCharacterSaveData(const FCharacterSaveData& InCharacterSaveData) : FCharacterSaveData(InCharacterSaveData)
@@ -368,6 +372,7 @@ public:
 		AttackAbilityQueues = TMap<EDWWeaponType, FDWCharacterAttackAbilityQueue>();
 		FallingAttackAbilities = TMap<EDWWeaponType, FDWCharacterFallingAttackAbilityData>();
 		SkillAttackAbilities = TMap<FPrimaryAssetId, FDWCharacterSkillAttackAbilityData>();
+		Dialogue = nullptr;
 	}
 	
 	UPROPERTY(BlueprintReadOnly)
@@ -384,6 +389,9 @@ public:
 
 	UPROPERTY()
 	TMap<FPrimaryAssetId, FDWCharacterSkillAttackAbilityData> SkillAttackAbilities;
+	
+	UPROPERTY()
+	UDialogue* Dialogue;
 };
 
 USTRUCT(BlueprintType)
@@ -435,6 +443,8 @@ public:
 		BodyColorIndex = 0;
 		CapeColorIndex = 0;
 		InventoryInitType = EDWInventoryInitType::Default;
+		CameraRotation = FRotator::ZeroRotator;
+		CameraDistance = -1.f;
 	}
 		
 	FORCEINLINE FDWPlayerSaveData(const FDWCharacterSaveData& InCharacterSaveData) : FDWPlayerBasicSaveData(InCharacterSaveData)
@@ -443,6 +453,8 @@ public:
 		BodyColorIndex = 0;
 		CapeColorIndex = 0;
 		InventoryInitType = EDWInventoryInitType::Default;
+		CameraRotation = FRotator::ZeroRotator;
+		CameraDistance = -1.f;
 	}
 
 	FORCEINLINE FDWPlayerSaveData(const FDWPlayerBasicSaveData& InBasicSaveData) : FDWPlayerBasicSaveData(InBasicSaveData)
@@ -451,6 +463,8 @@ public:
 		BodyColorIndex = 0;
 		CapeColorIndex = 0;
 		InventoryInitType = EDWInventoryInitType::Default;
+		CameraRotation = FRotator::ZeroRotator;
+		CameraDistance = -1.f;
 	}
 
 	UPROPERTY(BlueprintReadOnly)
@@ -464,6 +478,12 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	EDWInventoryInitType InventoryInitType;
+
+	UPROPERTY()
+	FRotator CameraRotation;
+
+	UPROPERTY()
+	float CameraDistance;
 
 public:
 	virtual void InitInventoryData(FRandomStream InRandomStream = FRandomStream()) override;
@@ -577,96 +597,6 @@ public:
 };
 
 USTRUCT(BlueprintType)
-struct DREAMWORLD_API FDWAudioModuleSaveData : public FAudioModuleSaveData
-{
-	GENERATED_BODY()
-
-public:
-	FORCEINLINE FDWAudioModuleSaveData()
-	{
-	}
-
-	FORCEINLINE FDWAudioModuleSaveData(const FAudioModuleSaveData& InAudioModuleSaveData) : FAudioModuleSaveData(InAudioModuleSaveData)
-	{
-	}
-};
-
-USTRUCT(BlueprintType)
-struct DREAMWORLD_API FDWCameraModuleSaveData : public FCameraModuleSaveData
-{
-	GENERATED_BODY()
-
-public:
-	FORCEINLINE FDWCameraModuleSaveData()
-	{
-	}
-
-	FORCEINLINE FDWCameraModuleSaveData(const FCameraModuleSaveData& InCameraModuleSaveData) : FCameraModuleSaveData(InCameraModuleSaveData)
-	{
-	}
-};
-
-USTRUCT(BlueprintType)
-struct DREAMWORLD_API FDWVideoModuleSaveData : public FVideoModuleSaveData
-{
-	GENERATED_BODY()
-
-public:
-	FORCEINLINE FDWVideoModuleSaveData()
-	{
-	}
-
-	FORCEINLINE FDWVideoModuleSaveData(const FVideoModuleSaveData& InVideoModuleSaveData) : FVideoModuleSaveData(InVideoModuleSaveData)
-	{
-	}
-};
-
-USTRUCT(BlueprintType)
-struct DREAMWORLD_API FDWTaskModuleSaveData : public FTaskModuleSaveData
-{
-	GENERATED_BODY()
-
-public:
-	FORCEINLINE FDWTaskModuleSaveData()
-	{
-	}
-
-	FORCEINLINE FDWTaskModuleSaveData(const FTaskModuleSaveData& InTaskModuleSaveData) : FTaskModuleSaveData(InTaskModuleSaveData)
-	{
-	}
-};
-
-USTRUCT(BlueprintType)
-struct DREAMWORLD_API FDWAchievementModuleSaveData : public FAchievementModuleSaveData
-{
-	GENERATED_BODY()
-
-public:
-	FORCEINLINE FDWAchievementModuleSaveData()
-	{
-	}
-
-	FORCEINLINE FDWAchievementModuleSaveData(const FAchievementModuleSaveData& InAchievementModuleSaveData) : FAchievementModuleSaveData(InAchievementModuleSaveData)
-	{
-	}
-};
-
-USTRUCT(BlueprintType)
-struct DREAMWORLD_API FDWInputModuleSaveData : public FInputModuleSaveData
-{
-	GENERATED_BODY()
-
-public:
-	FORCEINLINE FDWInputModuleSaveData()
-	{
-	}
-
-	FORCEINLINE FDWInputModuleSaveData(const FInputModuleSaveData& InInputModuleSaveData) : FInputModuleSaveData(InInputModuleSaveData)
-	{
-	}
-};
-
-USTRUCT(BlueprintType)
 struct DREAMWORLD_API FDWArchiveSaveData : public FDWArchiveBasicSaveData
 {
 	GENERATED_BODY()
@@ -676,8 +606,8 @@ public:
 	{
 		WorldData = FDWWorldSaveData();
 		PlayerData = FDWPlayerSaveData();
-		AchievementData = FDWAchievementModuleSaveData();
-		TaskData = FDWTaskModuleSaveData();
+		AchievementData = FAchievementModuleSaveData();
+		TaskData = FTaskModuleSaveData();
 		TeamData = FDWTeamModuleSaveData();
 	}
 
@@ -689,10 +619,10 @@ public:
 	FDWPlayerSaveData PlayerData;
 
 	UPROPERTY(VisibleAnywhere)
-	FDWAchievementModuleSaveData AchievementData;
+	FAchievementModuleSaveData AchievementData;
 
 	UPROPERTY(VisibleAnywhere)
-	FDWTaskModuleSaveData TaskData;
+	FTaskModuleSaveData TaskData;
 
 	UPROPERTY(VisibleAnywhere)
 	FDWTeamModuleSaveData TeamData;
@@ -742,7 +672,7 @@ public:
 };
 
 USTRUCT(BlueprintType)
-struct DREAMWORLD_API FDWSettingModuleSaveData : public FSaveData
+struct DREAMWORLD_API FDWSettingModuleSaveData : public FSettingModuleSaveData
 {
 	GENERATED_BODY()
 
@@ -750,27 +680,16 @@ public:
 	FORCEINLINE FDWSettingModuleSaveData()
 	{
 		GameData = FDWGameSaveData();
-		AudioData = FDWAudioModuleSaveData();
-		VideoData = FDWVideoModuleSaveData();
-		CameraData = FDWCameraModuleSaveData();
-		InputData = FDWInputModuleSaveData();
+	}
+
+	FORCEINLINE FDWSettingModuleSaveData(const FSettingModuleSaveData& InSettingModuleSaveData) : FSettingModuleSaveData(InSettingModuleSaveData)
+	{
+		GameData = FDWGameSaveData();
 	}
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Game")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FDWGameSaveData GameData;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Audio")
-	FDWAudioModuleSaveData AudioData;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Video")
-	FDWVideoModuleSaveData VideoData;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera")
-	FDWCameraModuleSaveData CameraData;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Input")
-	FDWInputModuleSaveData InputData;
 
 public:
 	virtual void MakeSaved() override
@@ -778,10 +697,6 @@ public:
 		Super::MakeSaved();
 		
 		GameData.MakeSaved();
-		AudioData.MakeSaved();
-		VideoData.MakeSaved();
-		CameraData.MakeSaved();
-		InputData.MakeSaved();
 	}
 };
 
@@ -841,26 +756,6 @@ enum class EDWGameTraceChannel : uint8
 	Sight = (uint8)ECC_GameTraceChannel11,
 	// ???
 	Step = (uint8)ECC_GameTraceChannel12
-};
-
-/**
- * ???AI??
- */
-UENUM(BlueprintType)
-enum class EDWCharacterAIState : uint8
-{
-	// ??
-	None,
-	// AI???
-	AIPatrol,
-	// AI????
-	AIFollow,
-	// AI???
-	AITrack,
-	// AI????
-	AIAttack,
-	// AI????
-	AIDefend
 };
 
 /**

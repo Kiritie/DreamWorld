@@ -17,8 +17,6 @@ ADWMonsterCharacter::ADWMonsterCharacter(const FObjectInitializer& ObjectInitial
 	AttackPoint = CreateDefaultSubobject<UDWAbilityHitterComponent>(FName("AttackPoint"));
 	AttackPoint->SetupAttachment(GetMesh(), TEXT("AttackPoint"));
 
-	Interaction->AddInteractAction((EInteractAction)EDWInteractAction::Ride);
-	Interaction->AddInteractAction((EInteractAction)EDWInteractAction::UnRide);
 	Interaction->AddInteractAction((EInteractAction)EDWInteractAction::Feed);
 }
 

@@ -12,7 +12,7 @@
 #include "Procedure/ProcedureModuleStatics.h"
 #include "SaveGame/SaveGameModuleStatics.h"
 #include "ObjectPool/ObjectPoolModuleStatics.h"
-#include "Procedure/Archive/Procedure_ArchiveCreating.h"
+#include "Procedure/Archive/DWProcedure_ArchiveCreating.h"
 #include "Character/CharacterModuleStatics.h"
 #include "Input/InputModule.h"
 #include "Main/MainModule.h"
@@ -66,7 +66,7 @@ void ADWPlayerController::LoadData(FSaveData* InSaveData, EPhase InPhase)
 			PlayerCharacter = UObjectPoolModuleStatics::SpawnObject<ADWPlayerCharacter>(nullptr, { SaveData.ActorID, SaveData.AssetID }, SaveData.GetData<UDWCharacterData>().Class);
 			SetPlayerPawn(PlayerCharacter);
 			PlayerCharacter->LoadSaveData(&SaveData, EPhase::Primary);
-			PlayerCharacter->Execute_SetActorVisible(PlayerCharacter, UProcedureModuleStatics::IsCurrentProcedureClass<UProcedure_ArchiveCreating>());
+			PlayerCharacter->Execute_SetActorVisible(PlayerCharacter, UProcedureModuleStatics::IsCurrentProcedureClass<UDWProcedure_ArchiveCreating>());
 			PlayerCharacter->DisableInput(nullptr);
 		}
 	}

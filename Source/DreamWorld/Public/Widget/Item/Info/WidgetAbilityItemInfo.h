@@ -2,7 +2,7 @@
 
 #pragma once
 #include "Ability/AbilityModuleTypes.h"
-#include "Ability/Item/Widget/WidgetAbilityItemBase.h"
+#include "Widget/Sub/SubWidgetBase.h"
 
 #include "WidgetAbilityItemInfo.generated.h"
 
@@ -12,7 +12,7 @@ class UTextBlock;
  * ��ɫ���
  */
 UCLASS()
-class DREAMWORLD_API UWidgetAbilityItemInfo : public UWidgetAbilityItemBase
+class DREAMWORLD_API UWidgetAbilityItemInfo : public USubWidgetBase
 {
 	GENERATED_BODY()
 
@@ -20,7 +20,9 @@ public:
 	UWidgetAbilityItemInfo(const FObjectInitializer& ObjectInitializer);
 
 public:
-	virtual void OnCreate(UUserWidgetBase* InOwner, const TArray<FParameter>& InParams) override;
+	virtual void OnDespawn_Implementation(bool bRecovery) override;
+	
+	virtual void OnCreate(UUserWidget* InOwner, const TArray<FParameter>& InParams) override;
 
 	virtual void OnInitialize(const TArray<FParameter>& InParams) override;
 
@@ -47,4 +49,11 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (BindWidget, OptionalWidget = false), Category = "Components")
 	UTextBlock* TxtAbilityInfo;
+
+protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	FAbilityItem Item;
+
+public:
+	FAbilityItem GetItem() const { return Item; }
 };

@@ -2,10 +2,12 @@
 
 #pragma once
 
+#include "Ability/AbilityModuleTypes.h"
 #include "Task/Base/TaskBase.h"
 #include "Widget/Screen/UserWidgetBase.h"
 #include "WidgetTaskPanel.generated.h"
 
+class UWidgetAbilityItem;
 class UWidgetTaskContainer;
 class UWidgetTaskCategory;
 class UWidgetTaskRootItem;
@@ -24,8 +26,9 @@ class DREAMWORLD_API UWidgetTaskPanel : public UUserWidgetBase
 {
 	GENERATED_BODY()
 
-	friend class UWidgetTaskRootItem;
+	friend class UWidgetTaskCategory;
 	friend class UWidgetTaskItem;
+	friend class UWidgetTaskRootItem;
 	
 public:
 	UWidgetTaskPanel(const FObjectInitializer& ObjectInitializer);
@@ -59,10 +62,13 @@ protected:
 	void OnTaskItemDeselected(UWidgetTaskItem* InItem);
 
 	UFUNCTION()
-	void OnTaskContentRefresh();
+	void OnTaskContentRefresh(bool bScrollToStart = false);
 
 	UFUNCTION()
 	void OnTaskInfoContentRefresh();
+
+	UFUNCTION()
+	void OnPreviewContentRefresh();
 
 	UFUNCTION()
 	void OnStartTaskButtonClicked();
@@ -78,13 +84,13 @@ protected:
 	UVerticalBox* TaskInfoContent;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (BindWidget, OptionalWidget = false), Category = "Components")
+	UWrapBox* PreviewContent;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (BindWidget, OptionalWidget = false), Category = "Components")
 	UCommonButton* BtnStartTask;
 				
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TSubclassOf<UWidgetTaskCategory> TaskCategoryClass;
-				
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	TSubclassOf<UWidgetTaskContainer> TaskContainerClass;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TSubclassOf<UWidgetTaskRootItem> TaskRootItemClass;
@@ -100,10 +106,13 @@ protected:
 	TArray<UWidgetTaskCategory*> TaskCategories;
 	
 	UPROPERTY()
-	TArray<UWidgetTaskRootItem*> TaskRootItems;
+	TArray<UWidgetTaskInfo*> TaskInfos;
 	
 	UPROPERTY()
-	TArray<UWidgetTaskInfo*> TaskInfos;
+	TArray<UWidgetAbilityItem*> PreviewItems;
+
+	UPROPERTY()
+	TArray<FAbilityItem> SelectedPreviewItems;
 
 	UPROPERTY()
 	UWidgetTaskRootItem* SelectedTaskRootItem;
@@ -114,4 +123,7 @@ protected:
 public:
 	UFUNCTION(BlueprintPure)
 	bool GetSelectedTask(UTaskBase*& OutTask) const;
+
+	UFUNCTION(BlueprintCallable)
+	UWidgetTaskCategory* GetOrCreateTaskCategory(UTaskAsset* InTaskAsset);
 };

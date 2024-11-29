@@ -267,6 +267,8 @@ void ADWCharacter::LoadData(FSaveData* InSaveData, EPhase InPhase)
 				Iter.Value.AbilityHandle = AbilitySystem->K2_GiveAbility(Iter.Value.AbilityClass, Iter.Value.Level);
 			}
 		}
+
+		Dialogue = SaveData.Dialogue;
 	}
 	if(PHASEC(InPhase, EPhase::Final))
 	{
@@ -288,6 +290,8 @@ FSaveData* ADWCharacter::ToData()
 	SaveData.FallingAttackAbilities = FallingAttackAbilities;
 	SaveData.AttackAbilityQueues = AttackAbilityQueues;
 	SaveData.SkillAttackAbilities = SkillAttackAbilities;
+
+	SaveData.Dialogue = Dialogue;
 
 	return &SaveData;
 }
@@ -923,14 +927,14 @@ bool ADWCharacter::IsEnemy(IAbilityPawnInterface* InTarget) const
 				{
 					return false;
 				}
-				case EDWCharacterNature::AINeutral:
-				{
-					if(!TargetCharacter->GetBlackboard<UDWAIBlackboard>()->GetIsExcessived())
-					{
-						return false;
-					}
-					break;
-				}
+				// case EDWCharacterNature::AINeutral:
+				// {
+				// 	if(!TargetCharacter->GetBlackboard<UDWAIBlackboard>()->GetIsExcessived())
+				// 	{
+				// 		return false;
+				// 	}
+				// 	break;
+				// }
 				default: break;
 			}
 			break;

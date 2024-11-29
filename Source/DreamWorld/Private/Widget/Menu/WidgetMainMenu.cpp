@@ -8,6 +8,8 @@ UWidgetMainMenu::UWidgetMainMenu(const FObjectInitializer& ObjectInitializer) : 
 	WidgetName = FName("MainMenu");
 	WidgetType = EWidgetType::Temporary;
 	WidgetInputMode = EInputMode::UIOnly;
+
+	SetIsFocusable(true);
 }
 
 void UWidgetMainMenu::OnInitialize(UObject* InOwner, const TArray<FParameter>& InParams)

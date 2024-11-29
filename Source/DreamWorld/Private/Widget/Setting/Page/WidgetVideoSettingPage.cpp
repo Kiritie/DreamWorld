@@ -13,5 +13,5 @@ UWidgetVideoSettingPage::UWidgetVideoSettingPage(const FObjectInitializer& Objec
 
 FSaveData* UWidgetVideoSettingPage::GetDefaultSaveData() const
 {
-	return &USaveGameModuleStatics::GetSaveGame<UDWSettingSaveGame>()->GetDefaultDataRef<FDWSettingModuleSaveData>().VideoData;
+	return &USaveGameModuleStatics::GetOrCreateSaveGame<UDWSettingSaveGame>()->GetDefaultDataRef<FDWSettingModuleSaveData>().VideoData;
 }

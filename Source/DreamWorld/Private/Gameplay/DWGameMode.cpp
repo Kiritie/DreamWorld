@@ -2,11 +2,18 @@
 
 #include "Gameplay/DWGameMode.h"
 
+#include "Gameplay/DWGameState.h"
+#include "Gameplay/DWHUD.h"
+#include "Gameplay/DWPlayerController.h"
+#include "Gameplay/DWPlayerState.h"
 #include "SaveGame/SaveGameModuleStatics.h"
 
 ADWGameMode::ADWGameMode()
 {
-	
+	HUDClass = ADWHUD::StaticClass();
+	PlayerControllerClass = ADWPlayerController::StaticClass();
+	GameStateClass = ADWGameState::StaticClass();
+	PlayerStateClass = ADWPlayerState::StaticClass();
 }
 
 void ADWGameMode::OnInitialize_Implementation()

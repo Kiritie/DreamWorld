@@ -5,8 +5,8 @@
 
 #include "Input/InputModuleStatics.h"
 #include "Procedure/ProcedureModuleStatics.h"
-#include "Procedure/Procedure_Pausing.h"
-#include "Procedure/Procedure_Playing.h"
+#include "Procedure/DWProcedure_Pausing.h"
+#include "Procedure/DWProcedure_Playing.h"
 
 UWidgetPausingMenu::UWidgetPausingMenu(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -40,9 +40,9 @@ FReply UWidgetPausingMenu::NativeOnKeyDown(const FGeometry& InGeometry, const FK
 {
 	if(UInputModuleStatics::IsPlayerMappedKeyByName(FName("SystemOperation"), InKeyEvent.GetKey()))
 	{
-		if(UProcedureModuleStatics::IsCurrentProcedureClass<UProcedure_Pausing>())
+		if(UProcedureModuleStatics::IsCurrentProcedureClass<UDWProcedure_Pausing>())
 		{
-			UProcedureModuleStatics::SwitchProcedureByClass<UProcedure_Playing>();
+			UProcedureModuleStatics::SwitchProcedureByClass<UDWProcedure_Playing>();
 			return FReply::Handled();
 		}
 	}

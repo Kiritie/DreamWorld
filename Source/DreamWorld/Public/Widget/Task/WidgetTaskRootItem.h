@@ -1,22 +1,21 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
+#include "WidgetTaskItem.h"
 #include "Common/DWCommonTypes.h"
-#include "Widget/Screen/SubWidgetBase.h"
 
 #include "WidgetTaskRootItem.generated.h"
 
 class UWidgetTaskContainer;
 class UVerticalBox;
 class UWidgetTaskCategory;
-class UWidgetTaskItem;
 class UTaskBase;
 class UTextBlock;
 /**
  * UI构建项
  */
 UCLASS(BlueprintType)
-class DREAMWORLD_API UWidgetTaskRootItem : public USubWidgetBase
+class DREAMWORLD_API UWidgetTaskRootItem : public UWidgetTaskItem
 {
 	GENERATED_BODY()
 	
@@ -25,6 +24,8 @@ public:
 
 public:
 	virtual void OnDespawn_Implementation(bool bRecovery) override;
+
+	virtual void OnCreate(UUserWidget* InOwner, const TArray<FParameter>& InParams) override;
 
 	virtual void OnInitialize(const TArray<FParameter>& InParams) override;
 
@@ -35,27 +36,21 @@ public:
 
 	virtual void NativeOnDeselected(bool bBroadcast) override;
 
-protected:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (BindWidget, OptionalWidget = false), Category = "Components")
-	UTextBlock* TxtName;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (BindWidget, OptionalWidget = false), Category = "Components")
-	UTextBlock* TxtDetail;
+public:
+	virtual void OnAddToContainer(UWidgetTaskContainer* InTaskContainer) override;
 
 protected:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TSubclassOf<UWidgetTaskContainer> TaskContainerClass;
+
 	UPROPERTY(BlueprintReadOnly)
-	UTaskBase* Task;
+	UTaskAsset* TaskAsset;
 
 	UPROPERTY(BlueprintReadOnly)
 	UWidgetTaskContainer* TaskContainer;
 
-	UPROPERTY(BlueprintReadOnly)
-	UWidgetTaskCategory* TaskCategory;
-
 public:
-	UTaskBase* GetTask() const { return Task; }
+	UTaskAsset* GetTaskAsset() const { return TaskAsset; }
 	
 	UWidgetTaskContainer* GetTaskContainer() const { return TaskContainer; }
-	
-	UWidgetTaskCategory* GetTaskCategory() const { return TaskCategory; }
 };

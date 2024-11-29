@@ -62,6 +62,6 @@ void UWidgetTaskInfo::OnRefresh()
 			}
 		}
 		TxtProgress->SetText(FText::FromString(FString::Printf(TEXT("(%s)"), *ProgressStr)));
-		TxtDetail->SetText(Task->TaskDescription);
+		TxtDetail->SetText(!Task->TaskDescription.IsEmpty() ? Task->TaskDescription : FText::FromString(TEXT("暂无描述")));
 	}
 }

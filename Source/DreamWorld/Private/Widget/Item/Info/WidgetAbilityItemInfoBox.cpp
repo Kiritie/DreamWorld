@@ -34,7 +34,7 @@ void UWidgetAbilityItemInfoBox::OnOpen(const TArray<FParameter>& InParams, bool 
 		Items = InParams[0].GetPointerValueRef<TArray<FAbilityItem>>();
 	}
 	
-	TArray<UWidgetAbilityItemInfo*> ItemInfos = GetAllSubWidgets<UWidgetAbilityItemInfo>();
+	TArray<UWidgetAbilityItemInfo*> ItemInfos = GetSubWidgets<UWidgetAbilityItemInfo>();
 	for(int32 i = 0; i < ItemInfos.Num(); i++)
 	{
 		ItemInfos[i]->SetVisibility(ESlateVisibility::Collapsed);

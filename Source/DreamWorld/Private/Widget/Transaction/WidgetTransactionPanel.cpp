@@ -98,7 +98,7 @@ void UWidgetTransactionPanel::OnOpen(const TArray<FParameter>& InParams, bool bI
 	TransactionTarget = InParams[0];
 	TransactionTarget->GetInventory()->OnRefresh.AddDynamic(this, &UWidgetTransactionPanel::Refresh);
 
-	OnTransactionContentRefresh();
+	OnTransactionContentRefresh(true);
 }
 
 void UWidgetTransactionPanel::OnClose(bool bInstant)
@@ -130,7 +130,21 @@ void UWidgetTransactionPanel::OnRefresh()
 	if(GetSelectedTransactionItem(_SelectedTransactionItem))
 	{
 		UAbilityInventoryBase* Inventory = GetOwnerObject<IAbilityInventoryAgentInterface>()->GetInventory();
-		SelectedPreviewItems = GetTabIndex() < 2 ? _SelectedTransactionItem.GetData<UAbilityTransItemDataBase>().Prices : _SelectedTransactionItem.GetData<UAbilityTransItemDataBase>().Upgrades;
+		switch(GetTabIndex())
+		{
+			case 0:
+			case 1:
+			{
+				SelectedPreviewItems = _SelectedTransactionItem.GetData<UAbilityTransItemDataBase>().Prices;
+				break;
+			}
+			case 2:
+			{
+				SelectedPreviewItems = _SelectedTransactionItem.GetData<UAbilityTransItemDataBase>().Upgrades;
+				break;
+			}
+			default: break;
+		}
 		if(GetTabIndex() != 1)
 		{
 			for(auto& Iter1 : SelectedPreviewItems)
@@ -164,7 +178,7 @@ void UWidgetTransactionPanel::OnTabButtonSelected_Implementation(UCommonButtonBa
 {
 	if(TransactionTarget)
 	{
-		OnTransactionContentRefresh();
+		OnTransactionContentRefresh(true);
 	}
 }
 
@@ -199,7 +213,7 @@ void UWidgetTransactionPanel::OnTransactionItemDeselected_Implementation(UWidget
 	PreviewItems.Empty();
 }
 
-void UWidgetTransactionPanel::OnTransactionContentRefresh()
+void UWidgetTransactionPanel::OnTransactionContentRefresh(bool bScrollToStart)
 {
 	Reset();
 	
@@ -247,6 +261,11 @@ void UWidgetTransactionPanel::OnTransactionContentRefresh()
 				break;
 			}
 			default: break;
+		}
+		
+		if(bScrollToStart)
+		{
+			TransactionContent->ScrollToStart();
 		}
 	}
 

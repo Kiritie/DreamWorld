@@ -90,7 +90,7 @@ void UWidgetGeneratePanel::OnOpen(const TArray<FParameter>& InParams, bool bInst
 		GenerateToolID = InParams[0].GetObjectValue<IPrimaryEntityInterface>()->Execute_GetAssetID(InParams[0]);
 	}
 
-	OnGenerateContentRefresh();
+	OnGenerateContentRefresh(true);
 }
 
 void UWidgetGeneratePanel::OnClose(bool bInstant)
@@ -186,7 +186,7 @@ void UWidgetGeneratePanel::OnGenerateItemDeselected_Implementation(UWidgetGenera
 	PreviewItems.Empty();
 }
 
-void UWidgetGeneratePanel::OnGenerateContentRefresh()
+void UWidgetGeneratePanel::OnGenerateContentRefresh(bool bScrollToStart)
 {
 	Reset();
 
@@ -205,6 +205,11 @@ void UWidgetGeneratePanel::OnGenerateContentRefresh()
 					ScrollBoxSlot->SetPadding(FMargin(0.f, 0.f, 0.f, 5.f));
 				}
 			}
+		}
+		
+		if(bScrollToStart)
+		{
+			GenerateContent->ScrollToStart();
 		}
 	}
 }

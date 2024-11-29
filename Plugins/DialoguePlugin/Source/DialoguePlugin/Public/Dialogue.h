@@ -16,7 +16,7 @@ public:
 
 	//Called when the event is triggered. 
 	//Return bool if you're on 4.16, because void crashes.
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Dialogue Events")
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Dialogue Events")
 	void RecieveEventTriggered(APlayerController* ConsideringPlayer, AActor* NPCActor);
 
 	virtual class UWorld* GetWorld() const override;
@@ -34,9 +34,6 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Dialogue Conditions")
 	bool IsConditionMet(APlayerController* ConsideringPlayer, AActor* NPCActor);
 
-	UFUNCTION()
-	virtual bool IsConditionMet_Internal(APlayerController* ConsideringPlayer, AActor* NPCActor) { return true; }
-
 	virtual class UWorld* GetWorld() const override;
 };
 
@@ -52,7 +49,7 @@ public:
 	UPROPERTY(Instanced, EditDefaultsOnly, Category = "Dialogue Conditions")
 	TArray<UDialogueConditions*> OrConditions;
 
-	virtual bool IsConditionMet_Internal(APlayerController* ConsideringPlayer, AActor* NPCActor) override
+	virtual bool IsConditionMet_Implementation(APlayerController* ConsideringPlayer, AActor* NPCActor) override
 	{
 		for (auto & cond : OrConditions)
 		{
@@ -75,7 +72,7 @@ public:
 	UPROPERTY(Instanced, EditDefaultsOnly, Category = "Dialogue Conditions")
 		TArray<UDialogueConditions*> AndConditions;
 
-	virtual bool IsConditionMet_Internal(APlayerController* ConsideringPlayer, AActor* NPCActor) override
+	virtual bool IsConditionMet_Implementation(APlayerController* ConsideringPlayer, AActor* NPCActor) override
 	{
 		for (auto & cond : AndConditions)
 		{
@@ -108,10 +105,10 @@ struct FDialogueNode
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dialogue Node")
 	FVector2D Coordinates;
 
-	UPROPERTY(Instanced, EditDefaultsOnly, Category = "Dialogue Node")
+	UPROPERTY(Instanced, EditDefaultsOnly, BlueprintReadWrite, Category = "Dialogue Node")
 	TArray<UDialogueEvents*> Events;
 
-	UPROPERTY(Instanced, EditDefaultsOnly, Category = "Dialogue Node")
+	UPROPERTY(Instanced, EditDefaultsOnly, BlueprintReadWrite, Category = "Dialogue Node")
 	TArray<UDialogueConditions*> Conditions;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dialogue Node")

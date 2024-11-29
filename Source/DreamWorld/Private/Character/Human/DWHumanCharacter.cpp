@@ -21,7 +21,6 @@
 #include "Voxel/Components/VoxelMeshComponent.h"
 #include "Voxel/Voxels/Entity/VoxelEntity.h"
 #include "Ability/Item/Equip/AbilityEquipBase.h"
-#include "Character/Human/DWHumanCharacterData.h"
 #include "Character/Human/States/DWHumanCharacterState_Defend.h"
 #include "Character/Player/DWPlayerCharacter.h"
 #include "Character/States/DWCharacterState_Aim.h"
@@ -144,7 +143,7 @@ void ADWHumanCharacter::OnInteract(EInteractAction InInteractAction, IInteractio
 								UWidgetModuleStatics::GetUserWidget<UWidgetInteractionBox>()->Refresh();
 							}
 						});
-						DialogueBox->Open({ GetCharacterData<UDWHumanCharacterData>().Dialogue });
+						DialogueBox->Open({ Dialogue });
 					}
 				}
 				break;

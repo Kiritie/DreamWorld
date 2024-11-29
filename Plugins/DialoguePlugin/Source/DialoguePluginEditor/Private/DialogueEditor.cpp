@@ -184,7 +184,7 @@ void FDialogueEditor::InitDialogueEditor(const EToolkitMode::Type Mode, const TS
 	TSharedPtr<FDialogueEditor> DialogueEditorPtr = SharedThis(this);
 
 	// Default layout
-	const TSharedRef<FTabManager::FLayout> StandaloneDefaultLayout = FTabManager::NewLayout("Standalone_DialogueEditor_Layout_v6")
+	const TSharedRef<FTabManager::FLayout> StandaloneDefaultLayout = FTabManager::NewLayout("Standalone_DialogueEditor_Layout_v7")
 		->AddArea
 		(
 			FTabManager::NewPrimaryArea()

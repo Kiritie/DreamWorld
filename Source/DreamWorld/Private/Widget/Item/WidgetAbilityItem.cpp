@@ -7,18 +7,39 @@
 #include "Blueprint/WidgetLayoutLibrary.h"
 #include "Components/CanvasPanelSlot.h"
 #include "Ability/Item/AbilityItemDataBase.h"
+#include "Components/Image.h"
+#include "Components/TextBlock.h"
 #include "Widget/Item/Info/WidgetAbilityItemInfoBox.h"
 
 UWidgetAbilityItem::UWidgetAbilityItem(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
+	ImgIcon = nullptr;
+	TxtName = nullptr;
+}
+
+void UWidgetAbilityItem::OnInitialize(const TArray<FParameter>& InParams)
+{
+	Super::OnInitialize(InParams);
+}
+
+void UWidgetAbilityItem::OnRefresh()
+{
+	Super::OnRefresh();
 	
+	if(Item.IsValid())
+	{
+		const auto& ItemData = Item.GetData();
+		ImgIcon->SetBrushResourceObject(ItemData.Icon);
+		TxtName->SetText(ItemData.Name);
+	}
 }
 
 void UWidgetAbilityItem::NativeOnMouseEnter(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
 {
 	Super::NativeOnMouseEnter(InGeometry, InMouseEvent);
 
-	UWidgetModuleStatics::OpenUserWidget<UWidgetAbilityItemInfoBox>({ &Item });
+	TArray<FAbilityItem> Items = { Item };
+	UWidgetModuleStatics::OpenUserWidget<UWidgetAbilityItemInfoBox>({ &Items });
 }
 
 void UWidgetAbilityItem::NativeOnMouseLeave(const FPointerEvent& InMouseEvent)

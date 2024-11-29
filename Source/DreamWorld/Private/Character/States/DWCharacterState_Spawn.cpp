@@ -6,7 +6,7 @@
 #include "Character/DWCharacter.h"
 #include "FSM/Components/FSMComponent.h"
 #include "Procedure/ProcedureModuleStatics.h"
-#include "Procedure/Procedure_Testing.h"
+#include "Procedure/DWProcedure_Testing.h"
 #include "Voxel/VoxelModule.h"
 #include "Voxel/VoxelModuleStatics.h"
 
@@ -58,7 +58,7 @@ void UDWCharacterState_Spawn::OnTermination()
 
 void UDWCharacterState_Spawn::TryLeave()
 {
-	if(UVoxelModuleStatics::GetWorldMode() == EVoxelWorldMode::Default || UProcedureModuleStatics::IsCurrentProcedureClass<UProcedure_Testing>())
+	if(UVoxelModuleStatics::GetWorldMode() == EVoxelWorldMode::Default || UProcedureModuleStatics::IsCurrentProcedureClass<UDWProcedure_Testing>())
 	{
 		Super::TryLeave();
 	}

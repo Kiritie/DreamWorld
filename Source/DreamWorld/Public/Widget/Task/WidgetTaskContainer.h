@@ -40,4 +40,6 @@ protected:
 
 public:
 	TArray<UWidgetTaskItem*> GetTaskItems() const { return TaskItems; }
+	
+	UVerticalBox* GetTaskContent() const { return TaskContent; }
 };

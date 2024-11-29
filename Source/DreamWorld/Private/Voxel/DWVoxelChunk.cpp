@@ -4,15 +4,15 @@
 #include "Voxel/DWVoxelChunk.h"
 
 #include "Ability/AbilityModuleStatics.h"
-#include "Ability/Character/AbilityCharacterDataBase.h"
 #include "Ability/PickUp/AbilityPickUpBase.h"
-#include "Ability/Vitality/AbilityVitalityDataBase.h"
 #include "Character/DWCharacter.h"
+#include "Character/DWCharacterData.h"
 #include "Common/CommonTypes.h"
 #include "Team/DWTeamModule.h"
 #include "Vitality/DWVitality.h"
 #include "Voxel/VoxelModule.h"
 #include "SaveGame/SaveGameModuleStatics.h"
+#include "Vitality/DWVitalityData.h"
 #include "Voxel/VoxelModuleStatics.h"
 
 // Sets default values
@@ -110,7 +110,7 @@ void ADWVoxelChunk::SpawnSceneActors()
 		{
 			for(auto& VitalityItem : RaceData.Items)
 			{
-				const auto& VitalityData = VitalityItem.GetData<UAbilityVitalityDataBase>();
+				const auto& VitalityData = VitalityItem.GetData<UDWVitalityData>();
 				const int32 Num = WorldData.RandomStream.RandRange(VitalityItem.MinCount, VitalityItem.MaxCount);
 				const int32 Level = FMath::Clamp(WorldData.RandomStream.RandRange(RaceData.MinLevel, RaceData.MaxLevel), 1, VitalityData.MaxLevel);
 				DON(Num,
@@ -138,7 +138,7 @@ void ADWVoxelChunk::SpawnSceneActors()
 			ADWCharacter* Captain = nullptr;
 			for(auto& CharacterItem : RaceData.Items)
 			{
-				const auto& CharacterData = CharacterItem.GetData<UAbilityCharacterDataBase>();
+				const auto& CharacterData = CharacterItem.GetData<UDWCharacterData>();
 				const int32 Num = WorldData.RandomStream.RandRange(CharacterItem.MinCount, CharacterItem.MaxCount);
 				const int32 Level = FMath::Clamp(WorldData.RandomStream.RandRange(RaceData.MinLevel, RaceData.MaxLevel), 1, CharacterData.MaxLevel);
 				DON(Num,
@@ -152,6 +152,10 @@ void ADWVoxelChunk::SpawnSceneActors()
 						SaveData.Level = Level;
 						SaveData.SpawnTransform = FTransform(FRotator(0.f, FMath::RandRange(0.f, 360.f), 0.f), HitResult.Location, FVector::OneVector);
 						SaveData.InitInventoryData(WorldData.RandomStream);
+						if(CharacterData.Dialogues.Num() > 0)
+						{
+							SaveData.Dialogue = CharacterData.Dialogues[WorldData.RandomStream.RandRange(0, CharacterData.Dialogues.Num() - 1)];
+						}
 						if(ADWCharacter* Character = Cast<ADWCharacter>(UAbilityModuleStatics::SpawnAbilityActor(&SaveData, UVoxelModuleStatics::FindChunkByLocation(SaveData.SpawnTransform.GetLocation()))))
 						{
 							if(!Captain)

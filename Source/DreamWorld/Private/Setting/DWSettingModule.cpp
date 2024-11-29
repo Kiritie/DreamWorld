@@ -4,20 +4,15 @@
 #include "Setting/DWSettingModule.h"
 
 #include "Audio/AudioModule.h"
-#include "Audio/DWAudioModule.h"
-#include "Camera/DWCameraModule.h"
 #include "Common/CommonStatics.h"
 #include "Common/DWCommonTypes.h"
-#include "Input/DWInputModule.h"
 #include "SaveGame/Setting/DWSettingSaveGame.h"
-#include "Video/DWVideoModule.h"
 
 IMPLEMENTATION_MODULE(UDWSettingModule)
 
 // ParamSets default values
 UDWSettingModule::UDWSettingModule()
 {
-	bModuleAutoSave = true;
 	ModuleSaveGame = UDWSettingSaveGame::StaticClass();
 
 	GameLevel = EDWGameLevel::Normal;
@@ -70,15 +65,12 @@ void UDWSettingModule::OnUnPause()
 
 void UDWSettingModule::LoadData(FSaveData* InSaveData, EPhase InPhase)
 {
+	Super::LoadData(InSaveData, InPhase);
+	
 	auto& SaveData = InSaveData->CastRef<FDWSettingModuleSaveData>();
 
 	SetGameLevel(SaveData.GameData.GameLevel);
 	SetAutoJump(SaveData.GameData.bAutoJump);
-	
-	UDWAudioModule::Get().LoadSaveData(&SaveData.AudioData, InPhase);
-	UDWVideoModule::Get().LoadSaveData(&SaveData.VideoData, InPhase);
-	UDWCameraModule::Get().LoadSaveData(&SaveData.CameraData, InPhase);
-	UDWInputModule::Get().LoadSaveData(&SaveData.InputData, InPhase);
 }
 
 void UDWSettingModule::UnloadData(EPhase InPhase)
@@ -89,15 +81,10 @@ void UDWSettingModule::UnloadData(EPhase InPhase)
 FSaveData* UDWSettingModule::ToData()
 {
 	static FDWSettingModuleSaveData SaveData;
-	SaveData = FDWSettingModuleSaveData();
+	SaveData = Super::ToData()->CastRef<FSettingModuleSaveData>();
 
 	SaveData.GameData.GameLevel = GameLevel;
 	SaveData.GameData.bAutoJump = bAutoJump;
-
-	SaveData.AudioData = UDWAudioModule::Get().GetSaveDataRef<FDWAudioModuleSaveData>(true);
-	SaveData.VideoData = UDWVideoModule::Get().GetSaveDataRef<FDWVideoModuleSaveData>(true);
-	SaveData.CameraData = UDWCameraModule::Get().GetSaveDataRef<FDWCameraModuleSaveData>(true);
-	SaveData.InputData = UDWInputModule::Get().GetSaveDataRef<FDWInputModuleSaveData>(false);
 	
 	return &SaveData;
 }
