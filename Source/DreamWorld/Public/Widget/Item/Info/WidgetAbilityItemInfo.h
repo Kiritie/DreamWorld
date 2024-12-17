@@ -20,13 +20,13 @@ public:
 	UWidgetAbilityItemInfo(const FObjectInitializer& ObjectInitializer);
 
 public:
-	virtual void OnDespawn_Implementation(bool bRecovery) override;
-	
 	virtual void OnCreate(UUserWidget* InOwner, const TArray<FParameter>& InParams) override;
 
 	virtual void OnInitialize(const TArray<FParameter>& InParams) override;
 
 	virtual void OnRefresh() override;
+
+	virtual void OnDestroy(bool bRecovery) override;
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (BindWidget, OptionalWidget = false), Category = "Components")

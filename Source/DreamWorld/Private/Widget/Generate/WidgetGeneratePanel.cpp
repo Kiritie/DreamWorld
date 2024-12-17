@@ -18,6 +18,7 @@
 #include "Widget/Common/WidgetUIMask.h"
 #include "Widget/Generate/WidgetGenerateItem.h"
 #include "Widget/Item/WidgetAbilityItem.h"
+#include "Widget/Item/Category/WidgetAbilityItemCategoryBar.h"
 
 UWidgetGeneratePanel::UWidgetGeneratePanel(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -43,6 +44,10 @@ void UWidgetGeneratePanel::OnCreate(UObject* InOwner, const TArray<FParameter>& 
 	if(BtnGenerate)
 	{
 		BtnGenerate->OnClicked().AddUObject(this, &UWidgetGeneratePanel::OnGenerateButtonClicked);
+	}
+	if(CategoryBar)
+	{
+		CategoryBar->OnCategorySelected.AddDynamic(this, &UWidgetGeneratePanel::OnItemCategorySelected);
 	}
 }
 
@@ -76,6 +81,11 @@ void UWidgetGeneratePanel::OnReset(bool bForce)
 
 void UWidgetGeneratePanel::OnOpen(const TArray<FParameter>& InParams, bool bInstant)
 {
+	if(InParams.IsValidIndex(0))
+	{
+		GenerateToolID = InParams[0].GetObjectValue<IPrimaryEntityInterface>()->Execute_GetAssetID(InParams[0]);
+	}
+	
 	Super::OnOpen(InParams, bInstant);
 
 	if(GetOwnerObject<IAbilityInventoryAgentInterface>())
@@ -85,9 +95,9 @@ void UWidgetGeneratePanel::OnOpen(const TArray<FParameter>& InParams, bool bInst
 
 	UWidgetModuleStatics::OpenUserWidget<UWidgetUIMask>();
 
-	if(InParams.IsValidIndex(0))
+	if(CategoryBar)
 	{
-		GenerateToolID = InParams[0].GetObjectValue<IPrimaryEntityInterface>()->Execute_GetAssetID(InParams[0]);
+		CategoryBar->SetSelectedItemType(EAbilityItemType::None);
 	}
 
 	OnGenerateContentRefresh(true);
@@ -153,6 +163,11 @@ void UWidgetGeneratePanel::OnDestroy(bool bRecovery)
 	Super::OnDestroy(bRecovery);
 }
 
+void UWidgetGeneratePanel::OnItemCategorySelected_Implementation(EAbilityItemType InItemType)
+{
+	OnGenerateContentRefresh(true);
+}
+
 void UWidgetGeneratePanel::OnGenerateItemSelected_Implementation(UWidgetGenerateItem* InItem)
 {
 	if(InItem == SelectedGenerateItem) return;
@@ -195,7 +210,7 @@ void UWidgetGeneratePanel::OnGenerateContentRefresh(bool bScrollToStart)
 	{
 		for(auto& Iter : GenerateItemDatas)
 		{
-			if(Iter.ToolID.IsValid() && Iter.ToolID != GenerateToolID) continue;
+			if(Iter.ToolID.IsValid() && Iter.ToolID != GenerateToolID || CategoryBar->GetSelectedItemType() != EAbilityItemType::None && Iter.Item.GetType() != CategoryBar->GetSelectedItemType()) continue;
 			
 			if(UWidgetGenerateItem* GenerateItem = CreateSubWidget<UWidgetGenerateItem>({ &Iter.Item, &Iter }, GenerateItemClass))
 			{

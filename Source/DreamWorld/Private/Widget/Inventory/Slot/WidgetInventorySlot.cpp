@@ -102,6 +102,11 @@ FReply UWidgetInventorySlot::NativeOnMouseButtonDown(const FGeometry& InGeometry
 			MoveItem(-1);
 			return FReply::Handled();
 		}
+		if(InMouseEvent.IsLeftControlDown())
+		{
+			SplitItem(2);
+			return FReply::Handled();
+		}
 	}
 	else if(InMouseEvent.GetEffectingButton() == FKey("RightMouseButton"))
 	{
@@ -213,9 +218,9 @@ void UWidgetInventorySlot::OnActivated_Implementation()
 	Super::OnActivated_Implementation();
 }
 
-void UWidgetInventorySlot::OnDeactived_Implementation()
+void UWidgetInventorySlot::OnDeactivated_Implementation()
 {
-	Super::OnDeactived_Implementation();
+	Super::OnDeactivated_Implementation();
 }
 
 void UWidgetInventorySlot::StartCooldown_Implementation()

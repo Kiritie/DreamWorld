@@ -38,25 +38,16 @@ void FDWPlayerSaveData::InitInventoryData(FRandomStream InRandomStream)
 				InventoryData.AddItem(FAbilityItem(CoinDatas[i]->GetPrimaryAssetId(), CoinDatas[i]->MaxCount, CoinDatas[i]->ClampLevel(Level)), true);
 			}
 
-			// auto VoxelDatas = UAssetModuleStatics::LoadPrimaryAssets<UVoxelData>(FName("Voxel"));
-			// for (int32 i = 0; i < VoxelDatas.Num(); i++)
-			// {
-			// 	if(!VoxelDatas[i]->IsEmpty() && !VoxelDatas[i]->IsUnknown() && VoxelDatas[i]->IsMainPart())
-			// 	{
-			// 		InventoryData.AddItem(FAbilityItem(VoxelDatas[i]->GetPrimaryAssetId(), VoxelDatas[i]->MaxCount, VoxelDatas[i]->ClampLevel(Level)), true);
-			// 	}
-			// }
-
-			auto RawDatas = UAssetModuleStatics::LoadPrimaryAssets<UAbilityRawDataBase>(FName("Raw"));
-			for (int32 i = 0; i < RawDatas.Num(); i++)
-			{
-				InventoryData.AddItem(FAbilityItem(RawDatas[i]->GetPrimaryAssetId(), RawDatas[i]->MaxCount, RawDatas[i]->ClampLevel(Level)), true);
-			}
-
 			auto EquipDatas = UAssetModuleStatics::LoadPrimaryAssets<UAbilityEquipDataBase>(FName("Equip"));
 			for (int32 i = 0; i < EquipDatas.Num(); i++)
 			{
 				InventoryData.AddItem(FAbilityItem(EquipDatas[i]->GetPrimaryAssetId(), EquipDatas[i]->MaxCount, EquipDatas[i]->ClampLevel(Level)), true);
+			}
+
+			auto SkillDatas = UAssetModuleStatics::LoadPrimaryAssets<UAbilitySkillDataBase>(FName("Skill"));
+			for (int32 i = 0; i < SkillDatas.Num(); i++)
+			{
+				InventoryData.AddItem(FAbilityItem(SkillDatas[i]->GetPrimaryAssetId(), SkillDatas[i]->MaxCount, SkillDatas[i]->ClampLevel(Level)), true);
 			}
 
 			auto PropDatas = UAssetModuleStatics::LoadPrimaryAssets<UAbilityPropDataBase>(FName("Prop"));
@@ -65,11 +56,20 @@ void FDWPlayerSaveData::InitInventoryData(FRandomStream InRandomStream)
 				InventoryData.AddItem(FAbilityItem(PropDatas[i]->GetPrimaryAssetId(), PropDatas[i]->MaxCount, PropDatas[i]->ClampLevel(Level)), true);
 			}
 
-			auto SkillDatas = UAssetModuleStatics::LoadPrimaryAssets<UAbilitySkillDataBase>(FName("Skill"));
-			for (int32 i = 0; i < SkillDatas.Num(); i++)
+			auto RawDatas = UAssetModuleStatics::LoadPrimaryAssets<UAbilityRawDataBase>(FName("Raw"));
+			for (int32 i = 0; i < RawDatas.Num(); i++)
 			{
-				InventoryData.AddItem(FAbilityItem(SkillDatas[i]->GetPrimaryAssetId(), SkillDatas[i]->MaxCount, SkillDatas[i]->ClampLevel(Level)), true);
+				InventoryData.AddItem(FAbilityItem(RawDatas[i]->GetPrimaryAssetId(), RawDatas[i]->MaxCount, RawDatas[i]->ClampLevel(Level)), true);
 			}
+
+			// auto VoxelDatas = UAssetModuleStatics::LoadPrimaryAssets<UVoxelData>(FName("Voxel"));
+			// for (int32 i = 0; i < VoxelDatas.Num(); i++)
+			// {
+			// 	if(!VoxelDatas[i]->IsEmpty() && !VoxelDatas[i]->IsUnknown() && VoxelDatas[i]->IsMainPart())
+			// 	{
+			// 		InventoryData.AddItem(FAbilityItem(VoxelDatas[i]->GetPrimaryAssetId(), VoxelDatas[i]->MaxCount, VoxelDatas[i]->ClampLevel(Level)), true);
+			// 	}
+			// }
 			break;
 		}
 		default: break;

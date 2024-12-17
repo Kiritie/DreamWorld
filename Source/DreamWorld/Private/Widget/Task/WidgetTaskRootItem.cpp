@@ -18,15 +18,6 @@ UWidgetTaskRootItem::UWidgetTaskRootItem(const FObjectInitializer& ObjectInitial
 	TaskContainer = nullptr;
 }
 
-void UWidgetTaskRootItem::OnDespawn_Implementation(bool bRecovery)
-{
-	Super::OnDespawn_Implementation(bRecovery);
-
-	TaskAsset = nullptr;
-	TaskContainer->ClearTaskItem();
-	TaskContainer->RemoveFromRoot();
-}
-
 void UWidgetTaskRootItem::OnCreate(UUserWidget* InOwner, const TArray<FParameter>& InParams)
 {
 	TaskContainer = UObjectPoolModuleStatics::SpawnObject<UWidgetTaskContainer>(this, nullptr, TaskContainerClass);
@@ -54,21 +45,35 @@ void UWidgetTaskRootItem::OnRefresh()
 	}
 }
 
+void UWidgetTaskRootItem::OnDestroy(bool bRecovery)
+{
+	Super::OnDestroy(bRecovery);
+
+	TaskAsset = nullptr;
+	TaskContainer->Destroy(bRecovery);
+	TaskContainer = nullptr;
+}
+
 void UWidgetTaskRootItem::NativeOnSelected(bool bBroadcast)
 {
 	USubButtonWidgetBase::NativeOnSelected(bBroadcast);
 
-	if(UWidgetTaskPanel* TaskPanel = GetOwnerWidget<UWidgetTaskPanel>())
+	if(bBroadcast)
 	{
-		TaskContainer->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
-		for(auto Iter : Task->SubTasks)
+		if(UWidgetTaskPanel* TaskPanel = GetOwnerWidget<UWidgetTaskPanel>())
 		{
-			if(UWidgetTaskItem* TaskItem = TaskPanel->CreateSubWidget<UWidgetTaskItem>({ Iter }, TaskPanel->TaskItemClass))
+			TaskContainer->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+			for(auto Iter : Task->SubTasks)
 			{
-				TaskContainer->AddTaskItem(TaskItem);
+				if(Iter->IsLeaved()) continue;
+					
+				if(UWidgetTaskItem* TaskItem = TaskPanel->CreateSubWidget<UWidgetTaskItem>({ Iter }, TaskPanel->TaskItemClass))
+				{
+					TaskContainer->AddTaskItem(TaskItem);
+				}
 			}
+			TaskPanel->OnTaskRootItemSelected(this);
 		}
-		TaskPanel->OnTaskRootItemSelected(this);
 	}
 }
 
@@ -76,11 +81,14 @@ void UWidgetTaskRootItem::NativeOnDeselected(bool bBroadcast)
 {
 	USubButtonWidgetBase::NativeOnDeselected(bBroadcast);
 
-	if(UWidgetTaskPanel* TaskPanel = GetOwnerWidget<UWidgetTaskPanel>())
+	if(bBroadcast)
 	{
-		TaskContainer->SetVisibility(ESlateVisibility::Collapsed);
-		TaskContainer->ClearTaskItem();
-		TaskPanel->OnTaskRootItemDeselected(this);
+		if(UWidgetTaskPanel* TaskPanel = GetOwnerWidget<UWidgetTaskPanel>())
+		{
+			TaskContainer->SetVisibility(ESlateVisibility::Collapsed);
+			TaskContainer->ClearTaskItem();
+			TaskPanel->OnTaskRootItemDeselected(this);
+		}
 	}
 }
 

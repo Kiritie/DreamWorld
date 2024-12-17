@@ -1,15 +1,15 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
+#include "Widget/Sub/SubWidgetBase.h"
 
-#include "Widget/Sub/SubActivatableWidgetBase.h"
 #include "WidgetArchiveCreatingPage.generated.h"
 
 /**
  * ���紴�����
  */
 UCLASS()
-class DREAMWORLD_API UWidgetArchiveCreatingPage : public USubActivatableWidgetBase
+class DREAMWORLD_API UWidgetArchiveCreatingPage : public USubWidgetBase
 {
 	GENERATED_BODY()
 	

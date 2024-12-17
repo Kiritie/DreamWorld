@@ -52,7 +52,7 @@ public:
 
 	virtual void OnActivated_Implementation() override;
 	
-	virtual void OnDeactived_Implementation() override;
+	virtual void OnDeactivated_Implementation() override;
 		
 protected:
 	virtual void StartCooldown_Implementation() override;

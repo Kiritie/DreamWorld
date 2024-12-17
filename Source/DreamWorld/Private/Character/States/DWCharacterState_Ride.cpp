@@ -107,6 +107,7 @@ void UDWCharacterState_Ride::OnLeave(UFiniteStateBase* InNextState)
 		}
 	}
 	
+	Character->SetInteractingAgent(nullptr, true);
 	Character->RidingTarget = nullptr;
 }
 

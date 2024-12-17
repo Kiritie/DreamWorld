@@ -40,9 +40,9 @@ void UDWTaskBase::OnRestore()
 	Super::OnRestore();
 }
 
-void UDWTaskBase::OnEnter(UTaskBase* InLastTask)
+void UDWTaskBase::OnEnter()
 {
-	Super::OnEnter(InLastTask);
+	Super::OnEnter();
 }
 
 void UDWTaskBase::OnRefresh()
@@ -71,8 +71,13 @@ void UDWTaskBase::OnComplete(ETaskExecuteResult InTaskExecuteResult)
 			UWidgetModuleStatics::GetUserWidget<UWidgetContextBox>()->AddMessage(FString::Printf(TEXT("任务%s: %s"), TaskExecuteResult != ETaskExecuteResult::Skipped ? TEXT("完成") : TEXT("失败"), *TaskDisplayName.ToString()));
 		}
 	}
+}
 
-	if(InTaskExecuteResult == ETaskExecuteResult::Succeed)
+void UDWTaskBase::OnLeave()
+{
+	Super::OnLeave();
+
+	if(TaskExecuteResult == ETaskExecuteResult::Succeed)
 	{
 		const ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
 		if(PlayerCharacter && Prizes.Num() > 0)
@@ -83,11 +88,6 @@ void UDWTaskBase::OnComplete(ETaskExecuteResult InTaskExecuteResult)
 			}
 		}
 	}
-}
-
-void UDWTaskBase::OnLeave()
-{
-	Super::OnLeave();
 }
 
 bool UDWTaskBase::CheckTaskCondition_Implementation(FString& OutInfo) const

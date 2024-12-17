@@ -107,12 +107,9 @@ bool ADWHumanCharacter::CanInteract(EInteractAction InInteractAction, IInteracti
 	{
 		case EInteractAction::Dialogue:
 		{
-			if(Cast<ADWPlayerCharacter>(InInteractionAgent))
+			if(ADWPlayerCharacter* InteractionCharacter = Cast<ADWPlayerCharacter>(InInteractionAgent))
 			{
-				if(UWidgetModuleStatics::GetUserWidget<UWidgetDialogueBox>() && !UWidgetModuleStatics::GetUserWidget<UWidgetDialogueBox>()->IsWidgetOpened())
-				{
-					return true;
-				}
+				return !IsEnemy(InteractionCharacter) && UWidgetModuleStatics::GetUserWidget<UWidgetDialogueBox>() && !UWidgetModuleStatics::GetUserWidget<UWidgetDialogueBox>()->IsWidgetOpened();
 			}
 			break;
 		}

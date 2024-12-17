@@ -5,7 +5,6 @@
 #include "Components/ScrollBoxSlot.h"
 #include "Components/ScrollBox.h"
 #include "CommonButtonBase.h"
-#include "Achievement/AchievementModuleStatics.h"
 #include "Asset/AssetModuleStatics.h"
 #include "Components/VerticalBox.h"
 #include "Components/VerticalBoxSlot.h"
@@ -48,9 +47,9 @@ void UWidgetTaskPanel::OnCreate(UObject* InOwner, const TArray<FParameter>& InPa
 {
 	Super::OnCreate(InOwner, InParams);
 
-	if(BtnStartTask)
+	if(BtnTraceTask)
 	{
-		BtnStartTask->OnClicked().AddUObject(this, &UWidgetTaskPanel::OnStartTaskButtonClicked);
+		BtnTraceTask->OnClicked().AddUObject(this, &UWidgetTaskPanel::OnTraceTaskButtonClicked);
 	}
 }
 
@@ -117,14 +116,14 @@ void UWidgetTaskPanel::OnRefresh()
 		Iter->Refresh();
 	}
 
-	bool bCanStartTask = true;
+	bool bCanTraceTask = true;
 	UTaskBase* SelectedTask;
 	if(GetSelectedTask(SelectedTask))
 	{
 		FString Info;
-		if(SelectedTask->TaskExecuteResult != ETaskExecuteResult::None || !SelectedTask->CheckTaskCondition(Info))
+		if(SelectedTask->TaskExecuteResult != ETaskExecuteResult::None && SelectedTask->TaskExecuteResult != ETaskExecuteResult::Failed)
 		{
-			bCanStartTask = false;
+			bCanTraceTask = false;
 		}
 		if(UDWTaskBase* Task = Cast<UDWTaskBase>(SelectedTask))
 		{
@@ -133,12 +132,12 @@ void UWidgetTaskPanel::OnRefresh()
 	}
 	else
 	{
-		bCanStartTask = false;
+		bCanTraceTask = false;
 	}
 	
-	if(BtnStartTask)
+	if(BtnTraceTask)
 	{
-		BtnStartTask->SetIsEnabled(bCanStartTask);
+		BtnTraceTask->SetIsEnabled(bCanTraceTask);
 	}
 }
 
@@ -217,6 +216,8 @@ void UWidgetTaskPanel::OnTaskContentRefresh(bool bScrollToStart)
 			{
 				for(auto Iter2 : Iter1->RootTasks)
 				{
+					if(Iter2->IsLeaved()) continue;
+					
 					if(UWidgetTaskRootItem* TaskRootItem = CreateSubWidget<UWidgetTaskRootItem>({ Iter2, Iter1 }, TaskRootItemClass))
 					{
 						TaskCategory->GetTaskContainer()->AddTaskItem(TaskRootItem);
@@ -276,23 +277,29 @@ void UWidgetTaskPanel::OnPreviewContentRefresh()
 	}
 }
 
-void UWidgetTaskPanel::OnStartTaskButtonClicked()
+void UWidgetTaskPanel::OnTraceTaskButtonClicked()
 {
-	if(SelectedTaskRootItem)
-	{
-		UTaskModuleStatics::SwitchTaskAsset(SelectedTaskRootItem->GetTaskAsset());
-	}
 	UTaskBase* SelectedTask;
 	if(GetSelectedTask(SelectedTask))
 	{
-		if(!SelectedTask->IsEntered())
+		if(!SelectedTask->IsCompleted(true))
 		{
-			if(UWidgetModuleStatics::GetUserWidget<UWidgetContextBox>())
+			if(!SelectedTask->IsCurrent())
 			{
-				UWidgetModuleStatics::GetUserWidget<UWidgetContextBox>()->AddMessage(FString::Printf(TEXT("开始任务: %s"), *SelectedTask->TaskDisplayName.ToString()));
+				if(UWidgetModuleStatics::GetUserWidget<UWidgetContextBox>())
+				{
+					UWidgetModuleStatics::GetUserWidget<UWidgetContextBox>()->AddMessage(FString::Printf(TEXT("追踪任务: %s"), *SelectedTask->TaskDisplayName.ToString()));
+				}
+				UTaskModuleStatics::SetCurrentTask(SelectedTask);
 			}
-			UTaskModuleStatics::EnterTask(SelectedTask);
-			UAchievementModuleStatics::UnlockAchievement(FName("FirstStartTaskItem"));
+			else
+			{
+				if(UWidgetModuleStatics::GetUserWidget<UWidgetContextBox>())
+				{
+					UWidgetModuleStatics::GetUserWidget<UWidgetContextBox>()->AddMessage(FString::Printf(TEXT("停止追踪任务: %s"), *SelectedTask->TaskDisplayName.ToString()));
+				}
+				UTaskModuleStatics::SetCurrentTask(nullptr);
+			}
 		}
 		else
 		{

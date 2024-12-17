@@ -3,7 +3,7 @@
 
 #include "Widget/Archive/WidgetArchiveCreatingPanel.h"
 
-#include "CommonActivatableWidgetSwitcher.h"
+#include "CommonAnimatedSwitcher.h"
 #include "Widget/Archive/WidgetArchiveCreatingPage.h"
 
 UWidgetArchiveCreatingPanel::UWidgetArchiveCreatingPanel(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)

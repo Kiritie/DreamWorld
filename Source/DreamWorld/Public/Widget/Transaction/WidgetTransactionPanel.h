@@ -7,6 +7,7 @@
 #include "Widget/Screen/UserWidgetBase.h"
 #include "WidgetTransactionPanel.generated.h"
 
+class UWidgetAbilityItemCategoryBar;
 class UWidgetAbilityItem;
 class UCommonButtonGroup;
 class IAbilityInventoryAgentInterface;
@@ -45,6 +46,9 @@ public:
 
 protected:
 	UFUNCTION(BlueprintNativeEvent)
+	void OnItemCategorySelected(EAbilityItemType InItemType);
+
+	UFUNCTION(BlueprintNativeEvent)
 	void OnTabButtonSelected(UCommonButtonBase* SelectedTabButton, int32 ButtonIndex);
 	
 	UFUNCTION(BlueprintNativeEvent)
@@ -63,6 +67,9 @@ protected:
 	void OnTransactionButtonClicked();
 
 protected:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (BindWidget, OptionalWidget = false), Category = "Components")
+	UWidgetAbilityItemCategoryBar* CategoryBar;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (BindWidget, OptionalWidget = false), Category = "Components")
 	UPanelWidget* TabContent;
 		

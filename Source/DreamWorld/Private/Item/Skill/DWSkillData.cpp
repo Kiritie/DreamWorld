@@ -20,7 +20,7 @@ FString UDWSkillData::GetItemErrorInfo(AActor* InOwner, int32 InLevel) const
 	{
 		if(!Character->CheckWeaponType(EDWWeaponPart::None, WeaponType))
 		{
-			ErrorInfo.Appendf(TEXT("\n角色未装备[%s]"), *UCommonStatics::GetEnumValueDisplayName(TEXT("/Script/DreamWorld.EDWWeaponType"), (int32)WeaponType).ToString());
+			ErrorInfo.Appendf(TEXT("\n角色未装备[%s]"), *UCommonStatics::GetEnumDisplayNameByValue(TEXT("/Script/DreamWorld.EDWWeaponType"), (int32)WeaponType).ToString());
 		}
 	}
 	ErrorInfo.RemoveFromStart(TEXT("\n"));

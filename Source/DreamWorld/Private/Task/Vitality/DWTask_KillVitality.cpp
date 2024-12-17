@@ -43,9 +43,9 @@ void UDWTask_KillVitality::OnRestore()
 	CurrentCount = 0;
 }
 
-void UDWTask_KillVitality::OnEnter(UTaskBase* InLastTask)
+void UDWTask_KillVitality::OnEnter()
 {
-	Super::OnEnter(InLastTask);
+	Super::OnEnter();
 }
 
 void UDWTask_KillVitality::OnRefresh()

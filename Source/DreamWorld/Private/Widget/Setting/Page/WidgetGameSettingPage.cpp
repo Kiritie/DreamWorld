@@ -37,14 +37,14 @@ void UWidgetGameSettingPage::OnApply()
 	UDWSettingModule::Get().SetAutoJump(SettingItem_AutoJump->GetValue());
 }
 
-void UWidgetGameSettingPage::OnActivated()
+void UWidgetGameSettingPage::NativeOnActivated()
 {
-	Super::OnActivated();
+	Super::NativeOnActivated();
 }
 
-void UWidgetGameSettingPage::OnDeactivated()
+void UWidgetGameSettingPage::NativeOnDeactivated()
 {
-	Super::OnDeactivated();
+	Super::NativeOnDeactivated();
 	
 	SettingItem_GameLevel->SetValue((int32)UDWSettingModule::Get().GetGameLevel());
 	SettingItem_AutoJump->SetValue(UDWSettingModule::Get().IsAutoJump());

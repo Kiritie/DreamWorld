@@ -43,9 +43,9 @@ void UDWTask_GenerateVoxel::OnRestore()
 	CurrentCount = 0;
 }
 
-void UDWTask_GenerateVoxel::OnEnter(UTaskBase* InLastTask)
+void UDWTask_GenerateVoxel::OnEnter()
 {
-	Super::OnEnter(InLastTask);
+	Super::OnEnter();
 }
 
 void UDWTask_GenerateVoxel::OnRefresh()

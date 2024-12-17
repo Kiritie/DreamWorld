@@ -40,24 +40,31 @@ void UWidgetTaskInfo::OnRefresh()
 	{
 		TxtName->SetText(Task->TaskDisplayName);
 		FString ProgressStr;
-		switch(Task->GetTaskState())
+		switch(Task->TaskExecuteResult)
 		{
-			case ETaskState::Executing:
+			case ETaskExecuteResult::None:
 			{
-				FString TaskProgressInfo;
-				Task->CheckTaskProgress(TaskProgressInfo);
-				ProgressStr = TaskProgressInfo.IsEmpty() ? TEXT("进行中") : TaskProgressInfo;
-				break;
-			}
-			case ETaskState::Completed:
-			case ETaskState::Leaved:
-			{
-				ProgressStr = TEXT("已完成");
+				switch(Task->GetTaskState())
+				{
+					case ETaskState::Entered:
+					{
+						ProgressStr = TEXT("未开始");
+						break;
+					}
+					case ETaskState::Executing:
+					{
+						FString TaskProgressInfo;
+						Task->CheckTaskProgress(TaskProgressInfo);
+						ProgressStr = TaskProgressInfo.IsEmpty() ? TEXT("进行中") : TaskProgressInfo;
+						break;
+					}
+					default: break;
+				}
 				break;
 			}
 			default:
 			{
-				ProgressStr = TEXT("未开始");
+				ProgressStr = TEXT("已完成");
 				break;
 			}
 		}

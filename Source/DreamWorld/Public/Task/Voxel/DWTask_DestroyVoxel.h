@@ -32,7 +32,7 @@ public:
 	
 	virtual void OnRestore() override;
 	
-	virtual void OnEnter(UTaskBase* InLastTask) override;
+	virtual void OnEnter() override;
 	
 	virtual void OnRefresh() override;
 

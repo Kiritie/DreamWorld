@@ -6,6 +6,7 @@
 #include "Widget/Screen/UserWidgetBase.h"
 #include "WidgetGeneratePanel.generated.h"
 
+class UWidgetAbilityItemCategoryBar;
 class UWidgetAbilityItem;
 class UWidgetGenerateItem;
 class UScrollBox;
@@ -42,6 +43,9 @@ public:
 
 protected:
 	UFUNCTION(BlueprintNativeEvent)
+	void OnItemCategorySelected(EAbilityItemType InItemType);
+
+	UFUNCTION(BlueprintNativeEvent)
 	void OnGenerateItemSelected(UWidgetGenerateItem* InItem);
 
 	UFUNCTION(BlueprintNativeEvent)
@@ -57,6 +61,9 @@ protected:
 	void OnGenerateButtonClicked();
 
 protected:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (BindWidget, OptionalWidget = false), Category = "Components")
+	UWidgetAbilityItemCategoryBar* CategoryBar;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (BindWidget, OptionalWidget = false), Category = "Components")
 	UScrollBox* GenerateContent;
 

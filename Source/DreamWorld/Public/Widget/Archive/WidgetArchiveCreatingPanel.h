@@ -6,7 +6,7 @@
 #include "WidgetArchiveCreatingPanel.generated.h"
 
 class UWidgetArchiveCreatingPage;
-class UCommonActivatableWidgetSwitcher;
+class UCommonAnimatedSwitcher;
 /**
  * ���紴�����
  */
@@ -29,7 +29,7 @@ public:
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (BindWidget, OptionalWidget = false), Category = "Components")
-	UCommonActivatableWidgetSwitcher* Switcher_Page;
+	UCommonAnimatedSwitcher* Switcher_Page;
 
 	UPROPERTY(BlueprintReadOnly)
 	int32 CurrentPageIndex;

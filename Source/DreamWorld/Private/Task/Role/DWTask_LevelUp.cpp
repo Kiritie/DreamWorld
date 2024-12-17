@@ -36,9 +36,9 @@ void UDWTask_LevelUp::OnRestore()
 	Super::OnRestore();
 }
 
-void UDWTask_LevelUp::OnEnter(UTaskBase* InLastTask)
+void UDWTask_LevelUp::OnEnter()
 {
-	Super::OnEnter(InLastTask);
+	Super::OnEnter();
 }
 
 void UDWTask_LevelUp::OnRefresh()

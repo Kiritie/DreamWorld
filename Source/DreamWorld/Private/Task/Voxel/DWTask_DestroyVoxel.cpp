@@ -43,9 +43,9 @@ void UDWTask_DestroyVoxel::OnRestore()
 	CurrentCount = 0;
 }
 
-void UDWTask_DestroyVoxel::OnEnter(UTaskBase* InLastTask)
+void UDWTask_DestroyVoxel::OnEnter()
 {
-	Super::OnEnter(InLastTask);
+	Super::OnEnter();
 }
 
 void UDWTask_DestroyVoxel::OnRefresh()

@@ -18,6 +18,7 @@
 #include "Widget/Common/CommonButtonGroup.h"
 #include "Widget/Common/WidgetUIMask.h"
 #include "Widget/Item/WidgetAbilityItem.h"
+#include "Widget/Item/Category/WidgetAbilityItemCategoryBar.h"
 #include "Widget/Transaction/WidgetTransactionItem.h"
 
 UWidgetTransactionPanel::UWidgetTransactionPanel(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
@@ -44,6 +45,10 @@ void UWidgetTransactionPanel::OnCreate(UObject* InOwner, const TArray<FParameter
 	if(BtnTransaction)
 	{
 		BtnTransaction->OnClicked().AddUObject(this, &UWidgetTransactionPanel::OnTransactionButtonClicked);
+	}
+	if(CategoryBar)
+	{
+		CategoryBar->OnCategorySelected.AddDynamic(this, &UWidgetTransactionPanel::OnItemCategorySelected);
 	}
 
 	TabGroup = UObjectPoolModuleStatics::SpawnObject<UCommonButtonGroup>();
@@ -86,6 +91,9 @@ void UWidgetTransactionPanel::OnReset(bool bForce)
 
 void UWidgetTransactionPanel::OnOpen(const TArray<FParameter>& InParams, bool bInstant)
 {
+	TransactionTarget = InParams[0];
+	TransactionTarget->GetInventory()->OnRefresh.AddDynamic(this, &UWidgetTransactionPanel::Refresh);
+	
 	Super::OnOpen(InParams, bInstant);
 
 	if(GetOwnerObject<IAbilityInventoryAgentInterface>())
@@ -95,8 +103,10 @@ void UWidgetTransactionPanel::OnOpen(const TArray<FParameter>& InParams, bool bI
 
 	UWidgetModuleStatics::OpenUserWidget<UWidgetUIMask>();
 
-	TransactionTarget = InParams[0];
-	TransactionTarget->GetInventory()->OnRefresh.AddDynamic(this, &UWidgetTransactionPanel::Refresh);
+	if(CategoryBar)
+	{
+		CategoryBar->SetSelectedItemType(EAbilityItemType::None);
+	}
 
 	OnTransactionContentRefresh(true);
 }
@@ -174,8 +184,17 @@ void UWidgetTransactionPanel::OnDestroy(bool bRecovery)
 	Super::OnDestroy(bRecovery);
 }
 
+void UWidgetTransactionPanel::OnItemCategorySelected_Implementation(EAbilityItemType InItemType)
+{
+	OnTransactionContentRefresh(true);
+}
+
 void UWidgetTransactionPanel::OnTabButtonSelected_Implementation(UCommonButtonBase* SelectedTabButton, int32 ButtonIndex)
 {
+	if(CategoryBar)
+	{
+		CategoryBar->SetSelectedItemType(EAbilityItemType::None);
+	}
 	if(TransactionTarget)
 	{
 		OnTransactionContentRefresh(true);
@@ -228,7 +247,7 @@ void UWidgetTransactionPanel::OnTransactionContentRefresh(bool bScrollToStart)
 
 				for(auto& Iter : Seller->GetInventory()->GetAllItems())
 				{
-					if(Iter.IsEmpty() || !Iter.IsDataType<UAbilityTransItemDataBase>() || Iter.GetData<UAbilityTransItemDataBase>().Prices.IsEmpty()) continue;
+					if(Iter.IsEmpty() || !Iter.IsDataType<UAbilityTransItemDataBase>() || Iter.GetData<UAbilityTransItemDataBase>().Prices.IsEmpty() || CategoryBar->GetSelectedItemType() != EAbilityItemType::None && Iter.GetType() != CategoryBar->GetSelectedItemType()) continue;
 
 					if(UWidgetTransactionItem* TransactionItem = CreateSubWidget<UWidgetTransactionItem>({ &Iter }, TransactionItemClass))
 					{
@@ -247,7 +266,7 @@ void UWidgetTransactionPanel::OnTransactionContentRefresh(bool bScrollToStart)
 
 				for(auto Iter : Buyer->GetInventory()->GetAllSlots())
 				{
-					if(Iter->IsEmpty() || !Iter->GetItem().IsDataType<UAbilityTransItemDataBase>() || Iter->GetItem().GetData<UAbilityTransItemDataBase>().Upgrades.IsEmpty() || Iter->GetItem().Level == Iter->GetItem().GetData<UAbilityTransItemDataBase>().MaxLevel) continue;
+					if(Iter->IsEmpty() || !Iter->GetItem().IsDataType<UAbilityTransItemDataBase>() || Iter->GetItem().GetData<UAbilityTransItemDataBase>().Upgrades.IsEmpty() || Iter->GetItem().Level == Iter->GetItem().GetData<UAbilityTransItemDataBase>().MaxLevel || CategoryBar->GetSelectedItemType() != EAbilityItemType::None && Iter->GetItem().GetType() != CategoryBar->GetSelectedItemType()) continue;
 
 					if(UWidgetTransactionItem* TransactionItem = CreateSubWidget<UWidgetTransactionItem>({ &Iter->GetItem() }, TransactionItemClass))
 					{

@@ -21,11 +21,13 @@ public:
 	UWidgetTaskItem(const FObjectInitializer& ObjectInitializer);
 
 public:
-	virtual void OnDespawn_Implementation(bool bRecovery) override;
+	virtual void OnCreate(UUserWidget* InOwner, const TArray<FParameter>& InParams) override;
 
 	virtual void OnInitialize(const TArray<FParameter>& InParams) override;
 
 	virtual void OnRefresh() override;
+
+	virtual void OnDestroy(bool bRecovery) override;
 
 public:
 	virtual void NativeOnSelected(bool bBroadcast) override;
@@ -38,9 +40,6 @@ public:
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (BindWidget, OptionalWidget = false), Category = "Components")
 	UTextBlock* TxtName;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (BindWidget, OptionalWidget = false), Category = "Components")
-	UTextBlock* TxtLevel;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (BindWidget, OptionalWidget = false), Category = "Components")
 	UTextBlock* TxtProgress;

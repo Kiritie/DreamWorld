@@ -16,18 +16,15 @@ UWidgetTaskItem::UWidgetTaskItem(const FObjectInitializer& ObjectInitializer) : 
 	bToggleable = true;
 
 	TxtName = nullptr;
-	TxtLevel = nullptr;
 	TxtProgress = nullptr;
 	TxtDetail = nullptr;
 
 	Task = nullptr;
 }
 
-void UWidgetTaskItem::OnDespawn_Implementation(bool bRecovery)
+void UWidgetTaskItem::OnCreate(UUserWidget* InOwner, const TArray<FParameter>& InParams)
 {
-	Super::OnDespawn_Implementation(bRecovery);
-
-	Task = nullptr;
+	Super::OnCreate(InOwner, InParams);
 }
 
 void UWidgetTaskItem::OnInitialize(const TArray<FParameter>& InParams)
@@ -46,20 +43,6 @@ void UWidgetTaskItem::OnRefresh()
 	if(Task)
 	{
 		TxtName->SetText(Task->TaskDisplayName);
-		if(TxtLevel)
-		{
-			if(UDWTaskBase* TaskBase = Cast<UDWTaskBase>(Task))
-			{
-				if(TaskBase->Level > 0)
-				{
-					TxtLevel->SetText(FText::FromString(FString::Printf(TEXT("Lv.%d"), TaskBase->Level)));
-				}
-				else
-				{
-					TxtLevel->SetText(FText::FromString(TEXT("无限制")));
-				}
-			}
-		}
 		if(TxtProgress)
 		{
 			FString ProgressStr;
@@ -70,16 +53,16 @@ void UWidgetTaskItem::OnRefresh()
 					switch(Task->GetTaskState())
 					{
 						case ETaskState::Entered:
+						{
+							ProgressStr = TEXT("未开始");
+							break;
+						}
 						case ETaskState::Executing:
 						{
 							ProgressStr = TEXT("进行中");
 							break;
 						}
-						default:
-						{
-							ProgressStr = TEXT("未开始");
-							break;
-						}
+						default: break;
 					}
 					break;
 				}
@@ -95,13 +78,23 @@ void UWidgetTaskItem::OnRefresh()
 	}
 }
 
+void UWidgetTaskItem::OnDestroy(bool bRecovery)
+{
+	Super::OnDestroy(bRecovery);
+
+	Task = nullptr;
+}
+
 void UWidgetTaskItem::NativeOnSelected(bool bBroadcast)
 {
 	Super::NativeOnSelected(bBroadcast);
 
-	if(UWidgetTaskPanel* TaskPanel = GetOwnerWidget<UWidgetTaskPanel>())
+	if(bBroadcast)
 	{
-		TaskPanel->OnTaskItemSelected(this);
+		if(UWidgetTaskPanel* TaskPanel = GetOwnerWidget<UWidgetTaskPanel>())
+		{
+			TaskPanel->OnTaskItemSelected(this);
+		}
 	}
 }
 
@@ -109,9 +102,12 @@ void UWidgetTaskItem::NativeOnDeselected(bool bBroadcast)
 {
 	Super::NativeOnDeselected(bBroadcast);
 
-	if(UWidgetTaskPanel* TaskPanel = GetOwnerWidget<UWidgetTaskPanel>())
+	if(bBroadcast)
 	{
-		TaskPanel->OnTaskItemDeselected(this);
+		if(UWidgetTaskPanel* TaskPanel = GetOwnerWidget<UWidgetTaskPanel>())
+		{
+			TaskPanel->OnTaskItemDeselected(this);
+		}
 	}
 }
 

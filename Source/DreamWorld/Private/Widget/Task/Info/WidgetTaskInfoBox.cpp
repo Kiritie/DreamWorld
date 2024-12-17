@@ -6,8 +6,7 @@
 #include "Components/VerticalBox.h"
 #include "Components/VerticalBoxSlot.h"
 #include "Event/EventModuleStatics.h"
-#include "Event/Handle/Task/EventHandle_TaskEntered.h"
-#include "Event/Handle/Task/EventHandle_TaskLeaved.h"
+#include "Event/Handle/Task/EventHandle_CurrentTaskChanged.h"
 #include "Event/Handle/Task/EventHandle_TaskStateChanged.h"
 #include "Task/TaskModuleStatics.h"
 #include "Task/Base/TaskBase.h"
@@ -38,9 +37,7 @@ void UWidgetTaskInfoBox::OnOpen(const TArray<FParameter>& InParams, bool bInstan
 {
 	Super::OnOpen(InParams, bInstant);
 
-	UEventModuleStatics::SubscribeEvent<UEventHandle_TaskEntered>(this, GET_FUNCTION_NAME_THISCLASS(OnTaskInfoContentRefresh));
-	UEventModuleStatics::SubscribeEvent<UEventHandle_TaskLeaved>(this, GET_FUNCTION_NAME_THISCLASS(OnTaskInfoContentRefresh));
-
+	UEventModuleStatics::SubscribeEvent<UEventHandle_CurrentTaskChanged>(this, GET_FUNCTION_NAME_THISCLASS(OnTaskInfoContentRefresh));
 	UEventModuleStatics::SubscribeEvent<UEventHandle_TaskStateChanged>(this, GET_FUNCTION_NAME_THISCLASS(Refresh));
 	
 	OnTaskInfoContentRefresh();
@@ -50,9 +47,7 @@ void UWidgetTaskInfoBox::OnClose(bool bInstant)
 {
 	Super::OnClose(bInstant);
 
-	UEventModuleStatics::UnsubscribeEvent<UEventHandle_TaskEntered>(this, GET_FUNCTION_NAME_THISCLASS(OnTaskInfoContentRefresh));
-	UEventModuleStatics::UnsubscribeEvent<UEventHandle_TaskLeaved>(this, GET_FUNCTION_NAME_THISCLASS(OnTaskInfoContentRefresh));
-
+	UEventModuleStatics::UnsubscribeEvent<UEventHandle_CurrentTaskChanged>(this, GET_FUNCTION_NAME_THISCLASS(OnTaskInfoContentRefresh));
 	UEventModuleStatics::UnsubscribeEvent<UEventHandle_TaskStateChanged>(this, GET_FUNCTION_NAME_THISCLASS(Refresh));
 }
 
@@ -95,6 +90,8 @@ void UWidgetTaskInfoBox::OnCreateTaskInfo(UTaskBase* InTask)
 		}
 		for(auto Iter : InTask->SubTasks)
 		{
+			if(Iter->IsLeaved()) continue;
+			
 			OnCreateTaskInfo(Iter);
 		}
 	}

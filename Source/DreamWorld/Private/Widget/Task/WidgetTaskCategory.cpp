@@ -14,16 +14,9 @@ UWidgetTaskCategory::UWidgetTaskCategory(const FObjectInitializer& ObjectInitial
 	TaskContainer = nullptr;
 }
 
-void UWidgetTaskCategory::OnSpawn_Implementation(UObject* InOwner, const TArray<FParameter>& InParams)
+void UWidgetTaskCategory::OnCreate(UUserWidget* InOwner, const TArray<FParameter>& InParams)
 {
-	Super::OnSpawn_Implementation(InOwner, InParams);
-}
-
-void UWidgetTaskCategory::OnDespawn_Implementation(bool bRecovery)
-{
-	Super::OnDespawn_Implementation(bRecovery);
-
-	TaskContainer->ClearTaskItem();
+	Super::OnCreate(InOwner, InParams);
 }
 
 void UWidgetTaskCategory::OnInitialize(const TArray<FParameter>& InParams)
@@ -48,4 +41,12 @@ void UWidgetTaskCategory::OnRefresh()
 	{
 		Iter->Refresh();
 	}
+}
+
+void UWidgetTaskCategory::OnDestroy(bool bRecovery)
+{
+	Super::OnDestroy(bRecovery);
+
+	TaskName = FText::GetEmpty();
+	TaskContainer->ClearTaskItem();
 }

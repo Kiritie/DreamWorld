@@ -44,9 +44,9 @@ void UWidgetGenerateItem::OnRefresh()
 	{
 		const auto& ItemData = Item.GetData();
 
-		TxtRarity->SetText(FText::FromString(FString::Printf(TEXT("[%s]"), *UCommonStatics::GetEnumValueDisplayName(TEXT("/Script/WHFramework.EAbilityItemRarity"), (int32)ItemData.Rarity).ToString())));
+		TxtRarity->SetText(FText::FromString(FString::Printf(TEXT("[%s]"), *UCommonStatics::GetEnumDisplayNameByValue(TEXT("/Script/WHFramework.EAbilityItemRarity"), (int32)ItemData.Rarity).ToString())));
 		TxtRarity->SetVisibility(ItemData.Rarity != EAbilityItemRarity::None ? ESlateVisibility::SelfHitTestInvisible : ESlateVisibility::Collapsed);
-		TxtType->SetText(FText::FromString(FString::Printf(TEXT("[%s]"), *UCommonStatics::GetEnumValueDisplayName(TEXT("/Script/WHFramework.EAbilityItemType"), (int32)ItemData.GetItemType()).ToString())));
+		TxtType->SetText(FText::FromString(FString::Printf(TEXT("[%s]"), *UCommonStatics::GetEnumDisplayNameByValue(TEXT("/Script/WHFramework.EAbilityItemType"), (int32)ItemData.GetItemType()).ToString())));
 		TxtLevel->SetText(FText::FromString(FString::Printf(TEXT("Lv.%d"), Item.Level)));
 		TxtLevel->SetVisibility(Item.Level != 0 ? ESlateVisibility::SelfHitTestInvisible : ESlateVisibility::Collapsed);
 	}
@@ -56,9 +56,12 @@ void UWidgetGenerateItem::NativeOnSelected(bool bBroadcast)
 {
 	Super::NativeOnSelected(bBroadcast);
 
-	if(UWidgetGeneratePanel* GeneratePanel = GetOwnerWidget<UWidgetGeneratePanel>())
+	if(bBroadcast)
 	{
-		GeneratePanel->OnGenerateItemSelected(this);
+		if(UWidgetGeneratePanel* GeneratePanel = GetOwnerWidget<UWidgetGeneratePanel>())
+		{
+			GeneratePanel->OnGenerateItemSelected(this);
+		}
 	}
 }
 
@@ -66,8 +69,11 @@ void UWidgetGenerateItem::NativeOnDeselected(bool bBroadcast)
 {
 	Super::NativeOnDeselected(bBroadcast);
 
-	if(UWidgetGeneratePanel* GeneratePanel = GetOwnerWidget<UWidgetGeneratePanel>())
+	if(bBroadcast)
 	{
-		GeneratePanel->OnGenerateItemDeselected(this);
+		if(UWidgetGeneratePanel* GeneratePanel = GetOwnerWidget<UWidgetGeneratePanel>())
+		{
+			GeneratePanel->OnGenerateItemDeselected(this);
+		}
 	}
 }

@@ -83,7 +83,7 @@ void UWidgetInventoryPanel::OnInitialize(UObject* InOwner, const TArray<FParamet
 			{
 				if(UWidgetInventoryEquipSlot* EquipSlot = CreateSubWidget<UWidgetInventoryEquipSlot>({ EquipSlots[i] }, UISlotDatas[ESlotSplitType::Equip].Class))
 				{
-					EquipSlot->SetEquipPart(UCommonStatics::GetEnumValueDisplayName(TEXT("/Script/DreamWorld.EDWEquipPart"), i));
+					EquipSlot->SetEquipPart(UCommonStatics::GetEnumDisplayNameByValue(TEXT("/Script/DreamWorld.EDWEquipPart"), i));
 					if(UGridSlot* GridSlot = (i % 2 == 0 ? LeftEquipContent->AddChildToGrid(EquipSlot) : RightEquipContent->AddChildToGrid(EquipSlot)))
 					{
 						GridSlot->SetPadding(FMargin(2.5f, 20.f, 2.5f, 2.5f));

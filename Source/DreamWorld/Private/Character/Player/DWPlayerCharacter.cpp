@@ -145,6 +145,11 @@ void ADWPlayerCharacter::LoadData(FSaveData* InSaveData, EPhase InPhase)
 		SetCapeColor(SaveData.CapeColorIndex);
 	}
 
+	if(PHASEC(InPhase, EPhase::Final))
+	{
+		RefreshAttributes();
+	}
+
 	Super::LoadData(InSaveData, InPhase);
 }
 
@@ -377,7 +382,7 @@ void ADWPlayerCharacter::OnActiveItem(const FAbilityItem& InItem, bool bPassive,
 
 	if(!bPassive && !bSuccess)
 	{
-		UWidgetModuleStatics::OpenUserWidget<UWidgetMessageBox>({ FText::FromString(FString::Printf(TEXT("暂时无法使用该%s！"), *UCommonStatics::GetEnumValueDisplayName(TEXT("/Script/WHFramework.EAbilityItemType"), (int32)InItem.GetType()).ToString())) });
+		UWidgetModuleStatics::OpenUserWidget<UWidgetMessageBox>({ FText::FromString(FString::Printf(TEXT("暂时无法使用该%s！"), *UCommonStatics::GetEnumDisplayNameByValue(TEXT("/Script/WHFramework.EAbilityItemType"), (int32)InItem.GetType()).ToString())) });
 	}
 }
 
@@ -465,21 +470,21 @@ void ADWPlayerCharacter::OnAttributeChange(const FOnAttributeChangeData& InAttri
 	{
 		if(UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>())
 		{
-			UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>()->SetMoveSpeed(FString::FromInt(InAttributeChangeData.NewValue));
+			UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>()->SetMoveSpeed(UCommonStatics::SanitizeFloat(InAttributeChangeData.NewValue, 2));
 		}
 	}
 	else if(InAttributeChangeData.Attribute == GetSwimSpeedAttribute())
 	{
 		if(UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>())
 		{
-			UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>()->SetSwimSpeed(FString::FromInt(InAttributeChangeData.NewValue));
+			UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>()->SetSwimSpeed(UCommonStatics::SanitizeFloat(InAttributeChangeData.NewValue, 2));
 		}
 	}
 	else if(InAttributeChangeData.Attribute == GetFlySpeedAttribute())
 	{
 		if(UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>())
 		{
-			UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>()->SetFlySpeed(FString::FromInt(InAttributeChangeData.NewValue));
+			UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>()->SetFlySpeed(UCommonStatics::SanitizeFloat(InAttributeChangeData.NewValue, 2));
 		}
 	}
 	else if(InAttributeChangeData.Attribute == GetRotationSpeedAttribute())
@@ -490,63 +495,63 @@ void ADWPlayerCharacter::OnAttributeChange(const FOnAttributeChangeData& InAttri
 	{
 		if(UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>())
 		{
-			UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>()->SetAttackForce(FString::FromInt(InAttributeChangeData.NewValue));
+			UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>()->SetAttackForce(UCommonStatics::SanitizeFloat(InAttributeChangeData.NewValue, 2));
 		}
 	}
 	else if(InAttributeChangeData.Attribute == GetRepulseForceAttribute())
 	{
 		if(UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>())
 		{
-			UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>()->SetRepulseForce(FString::FromInt(InAttributeChangeData.NewValue));
+			UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>()->SetRepulseForce(UCommonStatics::SanitizeFloat(InAttributeChangeData.NewValue, 2));
 		}
 	}
 	else if(InAttributeChangeData.Attribute == GetAttackSpeedAttribute())
 	{
 		if(UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>())
 		{
-			UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>()->SetAttackSpeed(FString::SanitizeFloat(InAttributeChangeData.NewValue, 0));
+			UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>()->SetAttackSpeed(UCommonStatics::SanitizeFloat(InAttributeChangeData.NewValue, 2));
 		}
 	}
 	else if(InAttributeChangeData.Attribute == GetAttackCritRateAttribute())
 	{
 		if(UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>())
 		{
-			UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>()->SetAttackCritRate(FString::Printf(TEXT("%s%%"), *FString::SanitizeFloat(InAttributeChangeData.NewValue * 100.f, 0)));
+			UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>()->SetAttackCritRate(FString::Printf(TEXT("%s%%"), *UCommonStatics::SanitizeFloat(InAttributeChangeData.NewValue * 100.f, 2)));
 		}
 	}
 	else if(InAttributeChangeData.Attribute == GetAttackStealRateAttribute())
 	{
 		if(UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>())
 		{
-			UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>()->SetAttackStealRate(FString::Printf(TEXT("%s%%"), *FString::SanitizeFloat(InAttributeChangeData.NewValue * 100.f, 0)));
+			UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>()->SetAttackStealRate(FString::Printf(TEXT("%s%%"), *UCommonStatics::SanitizeFloat(InAttributeChangeData.NewValue * 100.f, 2)));
 		}
 	}
 	else if(InAttributeChangeData.Attribute == GetDefendRateAttribute() || InAttributeChangeData.Attribute == GetDefendScopeRateAttribute())
 	{
 		if(UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>())
 		{
-			UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>()->SetDefendRate(FString::Printf(TEXT("%s%%|%s%%"), *FString::SanitizeFloat(GetDefendRate() * 100.f, 0), *FString::SanitizeFloat(GetDefendScopeRate() * 100.f, 0)));
+			UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>()->SetDefendRate(FString::Printf(TEXT("%s%%|%s%%"), *UCommonStatics::SanitizeFloat(GetDefendRate() * 100.f, 2), *UCommonStatics::SanitizeFloat(GetDefendScopeRate() * 100.f, 2)));
 		}
 	}
 	else if(InAttributeChangeData.Attribute == GetPhysicsResAttribute())
 	{
 		if(UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>())
 		{
-			UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>()->SetPhysicsRes(FString::Printf(TEXT("%s(%s%%)"), *FString::SanitizeFloat(InAttributeChangeData.NewValue, 0), *FString::SanitizeFloat(InAttributeChangeData.NewValue / (100.f + InAttributeChangeData.NewValue) * 100.f, 0)));
+			UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>()->SetPhysicsRes(FString::Printf(TEXT("%s(%s%%)"), *UCommonStatics::SanitizeFloat(InAttributeChangeData.NewValue, 2), *UCommonStatics::SanitizeFloat(InAttributeChangeData.NewValue / (100.f + InAttributeChangeData.NewValue) * 100.f, 2)));
 		}
 	}
 	else if(InAttributeChangeData.Attribute == GetMagicResAttribute())
 	{
 		if(UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>())
 		{
-			UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>()->SetMagicRes(FString::Printf(TEXT("%s(%s%%)"), *FString::SanitizeFloat(InAttributeChangeData.NewValue, 0), *FString::SanitizeFloat(InAttributeChangeData.NewValue / (100.f + InAttributeChangeData.NewValue) * 100.f, 0)));
+			UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>()->SetMagicRes(FString::Printf(TEXT("%s(%s%%)"), *UCommonStatics::SanitizeFloat(InAttributeChangeData.NewValue, 2), *UCommonStatics::SanitizeFloat(InAttributeChangeData.NewValue / (100.f + InAttributeChangeData.NewValue) * 100.f, 2)));
 		}
 	}
 	else if(InAttributeChangeData.Attribute == GetToughnessRateAttribute())
 	{
 		if(UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>())
 		{
-			UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>()->SetToughnessRate(FString::Printf(TEXT("%s%%"), *FString::SanitizeFloat(InAttributeChangeData.NewValue * 100.f, 0)));
+			UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>()->SetToughnessRate(FString::Printf(TEXT("%s%%"), *UCommonStatics::SanitizeFloat(InAttributeChangeData.NewValue * 100.f, 2)));
 		}
 	}
 	Super::OnAttributeChange(InAttributeChangeData);

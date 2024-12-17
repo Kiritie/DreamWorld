@@ -71,7 +71,7 @@ protected:
 	void OnPreviewContentRefresh();
 
 	UFUNCTION()
-	void OnStartTaskButtonClicked();
+	void OnTraceTaskButtonClicked();
 
 	UFUNCTION()
 	void OnCreateTaskInfo(UTaskBase* InTask);
@@ -87,7 +87,7 @@ protected:
 	UWrapBox* PreviewContent;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (BindWidget, OptionalWidget = false), Category = "Components")
-	UCommonButton* BtnStartTask;
+	UCommonButton* BtnTraceTask;
 				
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TSubclassOf<UWidgetTaskCategory> TaskCategoryClass;

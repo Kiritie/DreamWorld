@@ -21,12 +21,9 @@ bool ADWNPCCharacter::CanInteract(EInteractAction InInteractAction, IInteraction
 	{
 		case EInteractAction::Transaction:
 		{
-			if(Cast<ADWPlayerCharacter>(InInteractionAgent))
+			if(ADWPlayerCharacter* InteractionCharacter = Cast<ADWPlayerCharacter>(InInteractionAgent))
 			{
-				if(UWidgetModuleStatics::GetUserWidget<UWidgetTransactionPanel>() && !UWidgetModuleStatics::GetUserWidget<UWidgetTransactionPanel>()->IsWidgetOpened())
-				{
-					return true;
-				}
+				return !IsEnemy(InteractionCharacter) && UWidgetModuleStatics::GetUserWidget<UWidgetTransactionPanel>() && !UWidgetModuleStatics::GetUserWidget<UWidgetTransactionPanel>()->IsWidgetOpened();
 			}
 			break;
 		}
