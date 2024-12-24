@@ -7,7 +7,7 @@
 
 UDWTask_LevelUp::UDWTask_LevelUp()
 {
-	TaskDisplayName = FText::FromString(TEXT("等级提升"));
+	TaskDisplayName = FText::FromString(TEXT("提升等级"));
 	TaskDescription = FText::FromString(TEXT("提升角色等级到XX级"));
 
 	TargetLevel = 0;
@@ -49,7 +49,7 @@ void UDWTask_LevelUp::OnRefresh()
 	if(PlayerCharacter && CurrentLevel != PlayerCharacter->GetLevelA())
 	{
 		CurrentLevel = PlayerCharacter->GetLevelA();
-		RefreshState();
+		Restate();
 		if(CurrentLevel >= TargetLevel)
 		{
 			Complete(ETaskExecuteResult::Succeed);

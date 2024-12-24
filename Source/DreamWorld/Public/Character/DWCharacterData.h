@@ -16,6 +16,9 @@ public:
 	UDWCharacterData();
 
 public:
+	virtual void OnReset_Implementation() override;
+
+public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	EDWCharacterNature Nature;
 	
@@ -51,4 +54,12 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (EditConditionHides, EditCondition = "Nature == EDWCharacterNature::AINeutral"))
 	UBehaviorTree* ExcessiveBehaviorTree;
+
+protected:
+	UPROPERTY(Transient)
+	int32 LocalDialogueIndex;
+
+public:
+	UFUNCTION(BlueprintCallable)
+	UDialogue* GetRandomDialogue(FRandomStream RandomStream = FRandomStream());
 };

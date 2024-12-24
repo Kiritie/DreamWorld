@@ -60,23 +60,13 @@ void UWidgetGeneratePanel::OnReset(bool bForce)
 {
 	Super::OnReset(bForce);
 
+	OnGenerateItemDeselected(SelectedGenerateItem);
+
 	for(auto Iter : GenerateItems)
 	{
 		DestroySubWidget(Iter, true);
 	}
 	GenerateItems.Empty();
-
-	for(auto Iter : PreviewItems)
-	{
-		DestroySubWidget(Iter, true);
-	}
-	PreviewItems.Empty();
-
-	PreviewGenerateRawDataIndex = 0;
-	SelectedGenerateItem = nullptr;
-	SelectedGenerateRawData = FDWGenerateRawData();
-
-	GetWorld()->GetTimerManager().ClearTimer(PreviewContentRefreshTH);
 }
 
 void UWidgetGeneratePanel::OnOpen(const TArray<FParameter>& InParams, bool bInstant)
@@ -86,6 +76,13 @@ void UWidgetGeneratePanel::OnOpen(const TArray<FParameter>& InParams, bool bInst
 		GenerateToolID = InParams[0].GetObjectValue<IPrimaryEntityInterface>()->Execute_GetAssetID(InParams[0]);
 	}
 	
+	if(CategoryBar)
+	{
+		CategoryBar->SetSelectedItemType(EAbilityItemType::None);
+	}
+
+	OnGenerateContentRefresh(true);
+
 	Super::OnOpen(InParams, bInstant);
 
 	if(GetOwnerObject<IAbilityInventoryAgentInterface>())
@@ -94,13 +91,6 @@ void UWidgetGeneratePanel::OnOpen(const TArray<FParameter>& InParams, bool bInst
 	}
 
 	UWidgetModuleStatics::OpenUserWidget<UWidgetUIMask>();
-
-	if(CategoryBar)
-	{
-		CategoryBar->SetSelectedItemType(EAbilityItemType::None);
-	}
-
-	OnGenerateContentRefresh(true);
 }
 
 void UWidgetGeneratePanel::OnClose(bool bInstant)
@@ -191,14 +181,19 @@ void UWidgetGeneratePanel::OnGenerateItemDeselected_Implementation(UWidgetGenera
 
 	SelectedGenerateItem = nullptr;
 
+	PreviewGenerateRawDataIndex = 0;
+
+	SelectedGenerateRawData = FDWGenerateRawData();
+
 	Refresh();
 
-	GetWorld()->GetTimerManager().ClearTimer(PreviewContentRefreshTH);
 	for(auto Iter : PreviewItems)
 	{
 		DestroySubWidget(Iter, true);
 	}
 	PreviewItems.Empty();
+
+	GetWorld()->GetTimerManager().ClearTimer(PreviewContentRefreshTH);
 }
 
 void UWidgetGeneratePanel::OnGenerateContentRefresh(bool bScrollToStart)

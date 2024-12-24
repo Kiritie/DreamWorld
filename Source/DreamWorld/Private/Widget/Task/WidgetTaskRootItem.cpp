@@ -24,6 +24,11 @@ void UWidgetTaskRootItem::OnCreate(UUserWidget* InOwner, const TArray<FParameter
 	TaskContainer->SetVisibility(ESlateVisibility::Collapsed);
 
 	Super::OnCreate(InOwner, InParams);
+
+	if(Task->bRuntimeSelected)
+	{
+		SetIsSelected(true, false);
+	}
 }
 
 void UWidgetTaskRootItem::OnInitialize(const TArray<FParameter>& InParams)
@@ -60,6 +65,8 @@ void UWidgetTaskRootItem::NativeOnSelected(bool bBroadcast)
 
 	if(bBroadcast)
 	{
+		Task->bRuntimeSelected = true;
+
 		if(UWidgetTaskPanel* TaskPanel = GetOwnerWidget<UWidgetTaskPanel>())
 		{
 			TaskContainer->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
@@ -83,6 +90,8 @@ void UWidgetTaskRootItem::NativeOnDeselected(bool bBroadcast)
 
 	if(bBroadcast)
 	{
+		Task->bRuntimeSelected = false;
+
 		if(UWidgetTaskPanel* TaskPanel = GetOwnerWidget<UWidgetTaskPanel>())
 		{
 			TaskContainer->SetVisibility(ESlateVisibility::Collapsed);

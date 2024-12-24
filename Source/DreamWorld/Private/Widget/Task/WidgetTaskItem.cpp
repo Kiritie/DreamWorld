@@ -6,7 +6,6 @@
 #include "Components/VerticalBox.h"
 #include "Components/VerticalBoxSlot.h"
 #include "Task/Base/TaskBase.h"
-#include "Task/Base/DWTaskBase.h"
 #include "Widget/Task/WidgetTaskContainer.h"
 #include "Widget/Task/WidgetTaskPanel.h"
 

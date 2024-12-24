@@ -11,7 +11,7 @@
 
 UDWTask_KillVitality::UDWTask_KillVitality()
 {
-	TaskDisplayName = FText::FromString(TEXT("击杀"));
+	TaskDisplayName = FText::FromString(TEXT("击杀目标"));
 	TaskDescription = FText::FromString(TEXT("击杀XX个XX"));
 
 	TargetVitalityID = FPrimaryAssetId();
@@ -117,7 +117,7 @@ void UDWTask_KillVitality::OnVitalityDead_Implementation(UObject* InSender, UEve
 	if(InEventHandle->Killer == UCommonStatics::GetPlayerPawn() && (!TargetVitalityID.IsValid() || IPrimaryEntityInterface::Execute_GetAssetID(InEventHandle->Vitality.GetObject()) == TargetVitalityID))
 	{
 		CurrentCount++;
-		RefreshState();
+		Restate();
 		if(CurrentCount >= TargetCount)
 		{
 			Complete(ETaskExecuteResult::Succeed);

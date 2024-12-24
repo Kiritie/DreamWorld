@@ -62,30 +62,25 @@ void UWidgetTaskPanel::OnReset(bool bForce)
 {
 	Super::OnReset(bForce);
 
+	OnTaskItemDeselected(SelectedTaskItem);
+	OnTaskRootItemDeselected(SelectedTaskRootItem);
+
 	for(auto Iter : TaskCategories)
 	{
 		DestroySubWidget(Iter, true);
 	}
 	TaskCategories.Empty();
-
-	for(auto Iter : TaskInfos)
-	{
-		DestroySubWidget(Iter, true);
-	}
-	TaskInfos.Empty();
-
-	SelectedTaskItem = nullptr;
 }
 
 void UWidgetTaskPanel::OnOpen(const TArray<FParameter>& InParams, bool bInstant)
 {
+	OnTaskContentRefresh(true);
+
 	Super::OnOpen(InParams, bInstant);
 
 	UEventModuleStatics::SubscribeEvent<UEventHandle_TaskStateChanged>(this, GET_FUNCTION_NAME_THISCLASS(Refresh));
 
 	UWidgetModuleStatics::OpenUserWidget<UWidgetUIMask>();
-
-	OnTaskContentRefresh(true);
 }
 
 void UWidgetTaskPanel::OnClose(bool bInstant)
@@ -120,8 +115,7 @@ void UWidgetTaskPanel::OnRefresh()
 	UTaskBase* SelectedTask;
 	if(GetSelectedTask(SelectedTask))
 	{
-		FString Info;
-		if(SelectedTask->TaskExecuteResult != ETaskExecuteResult::None && SelectedTask->TaskExecuteResult != ETaskExecuteResult::Failed)
+		if(SelectedTask->IsLeaved())
 		{
 			bCanTraceTask = false;
 		}
@@ -150,6 +144,11 @@ void UWidgetTaskPanel::OnTaskRootItemSelected_Implementation(UWidgetTaskRootItem
 {
 	if(InItem == SelectedTaskRootItem) return;
 
+	if(SelectedTaskItem)
+	{
+		SelectedTaskItem->SetIsSelected(false, false);
+	}
+
 	if(SelectedTaskRootItem)
 	{
 		SelectedTaskRootItem->SetIsSelected(false, false);
@@ -163,6 +162,8 @@ void UWidgetTaskPanel::OnTaskRootItemDeselected_Implementation(UWidgetTaskRootIt
 	if(InItem != SelectedTaskRootItem) return;
 
 	SelectedTaskRootItem = nullptr;
+
+	OnTaskItemDeselected(SelectedTaskItem);
 }
 
 void UWidgetTaskPanel::OnTaskItemSelected_Implementation(UWidgetTaskItem* InItem)
@@ -216,7 +217,7 @@ void UWidgetTaskPanel::OnTaskContentRefresh(bool bScrollToStart)
 			{
 				for(auto Iter2 : Iter1->RootTasks)
 				{
-					if(Iter2->IsLeaved()) continue;
+					if(Iter2->IsLeaved(true)) continue;
 					
 					if(UWidgetTaskRootItem* TaskRootItem = CreateSubWidget<UWidgetTaskRootItem>({ Iter2, Iter1 }, TaskRootItemClass))
 					{
@@ -303,11 +304,8 @@ void UWidgetTaskPanel::OnTraceTaskButtonClicked()
 		}
 		else
 		{
-			if(UWidgetModuleStatics::GetUserWidget<UWidgetContextBox>())
-			{
-				UWidgetModuleStatics::GetUserWidget<UWidgetContextBox>()->AddMessage(FString::Printf(TEXT("结束任务: %s"), *SelectedTask->TaskDisplayName.ToString()));
-			}
 			UTaskModuleStatics::LeaveTask(SelectedTask);
+			OnTaskContentRefresh();
 		}
 	}
 	Refresh();
@@ -345,6 +343,8 @@ bool UWidgetTaskPanel::GetSelectedTask(UTaskBase*& OutTask) const
 
 UWidgetTaskCategory* UWidgetTaskPanel::GetOrCreateTaskCategory(UTaskAsset* InTaskAsset)
 {
+	if(InTaskAsset->IsAllTaskLeaved()) return nullptr;
+	
 	for(auto Iter : TaskCategories)
 	{
 		if(Iter->GetTaskName().EqualTo(InTaskAsset->DisplayName))

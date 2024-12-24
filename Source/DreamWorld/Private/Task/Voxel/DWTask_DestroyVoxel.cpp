@@ -11,7 +11,7 @@
 
 UDWTask_DestroyVoxel::UDWTask_DestroyVoxel()
 {
-	TaskDisplayName = FText::FromString(TEXT("破坏"));
+	TaskDisplayName = FText::FromString(TEXT("破坏方块"));
 	TaskDescription = FText::FromString(TEXT("破坏XX个方块"));
 
 	TargetVoxelID = FPrimaryAssetId();
@@ -117,7 +117,7 @@ void UDWTask_DestroyVoxel::OnVoxelDestroyed_Implementation(UObject* InSender, UE
 	if(InEventHandle->VoxelAgent == UCommonStatics::GetPlayerPawn() && (!TargetVoxelID.IsValid() || InEventHandle->VoxelItem.ID == TargetVoxelID))
 	{
 		CurrentCount++;
-		RefreshState();
+		Restate();
 		if(CurrentCount >= TargetCount)
 		{
 			Complete(ETaskExecuteResult::Succeed);

@@ -31,14 +31,14 @@ void UDWInventoryEquipSlot::OnInitialize(UAbilityInventoryBase* InInventory, EAb
 	EquipPart = (EDWEquipPart)InSlotIndex;
 }
 
-void UDWInventoryEquipSlot::OnItemPreChange(FAbilityItem& InNewItem)
+void UDWInventoryEquipSlot::OnItemPreChange(FAbilityItem& InNewItem, bool bBroadcast)
 {
-	Super::OnItemPreChange(InNewItem);
+	Super::OnItemPreChange(InNewItem, bBroadcast);
 }
 
-void UDWInventoryEquipSlot::OnItemChanged(FAbilityItem& InOldItem)
+void UDWInventoryEquipSlot::OnItemChanged(FAbilityItem& InOldItem, bool bBroadcast)
 {
-	Super::OnItemChanged(InOldItem);
+	Super::OnItemChanged(InOldItem, bBroadcast);
 }
 
 bool UDWInventoryEquipSlot::MatchItemLimit(FAbilityItem InItem, bool bForce) const

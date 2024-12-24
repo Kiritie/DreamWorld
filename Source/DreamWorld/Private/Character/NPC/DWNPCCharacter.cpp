@@ -36,19 +36,22 @@ void ADWNPCCharacter::OnInteract(EInteractAction InInteractAction, IInteractionA
 {
 	Super::OnInteract(InInteractAction, InInteractionAgent, bPassive);
 
-	if(bPassive)
+	switch (InInteractAction)
 	{
-		switch (InInteractAction)
+		case EInteractAction::Transaction:
 		{
-			case EInteractAction::Transaction:
+			Static();
+			if(bPassive)
 			{
-				if(Cast<ADWPlayerCharacter>(InInteractionAgent))
+				if(ADWPlayerCharacter* PlayerCharacter = Cast<ADWPlayerCharacter>(InInteractionAgent))
 				{
 					if(UWidgetTransactionPanel* TransactionPanel = UWidgetModuleStatics::GetUserWidget<UWidgetTransactionPanel>())
 					{
-						FDelegateHandle DelegateHandle = TransactionPanel->OnClosed.AddLambda([this, DelegateHandle, TransactionPanel](bool bInstant)
+						FDelegateHandle DelegateHandle = TransactionPanel->OnClosed.AddLambda([this, DelegateHandle, TransactionPanel, PlayerCharacter](bool bInstant)
 						{
 							TransactionPanel->OnClosed.Remove(DelegateHandle);
+							UnStatic();
+							PlayerCharacter->UnStatic();
 							if(UWidgetModuleStatics::GetUserWidget<UWidgetInteractionBox>())
 							{
 								UWidgetModuleStatics::GetUserWidget<UWidgetInteractionBox>()->Refresh();

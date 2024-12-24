@@ -13,4 +13,27 @@ UDWCharacterData::UDWCharacterData()
 
 	DefaultBehaviorTree = nullptr;
 	ExcessiveBehaviorTree = nullptr;
+	
+	LocalDialogueIndex = -1;
+}
+
+void UDWCharacterData::OnReset_Implementation()
+{
+	Super::OnReset_Implementation();
+
+	LocalDialogueIndex = -1;
+}
+
+UDialogue* UDWCharacterData::GetRandomDialogue(FRandomStream RandomStream)
+{
+	if(Dialogues.Num() > 0)
+	{
+		if(++LocalDialogueIndex >= Dialogues.Num())
+		{
+			LocalDialogueIndex = 0;
+		}
+		return Dialogues[LocalDialogueIndex];
+		// return Dialogues[RandomStream.RandRange(0, Dialogues.Num())];
+	}
+	return nullptr;
 }

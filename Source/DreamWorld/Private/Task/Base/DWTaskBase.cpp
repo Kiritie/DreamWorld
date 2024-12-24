@@ -77,12 +77,12 @@ void UDWTaskBase::OnLeave()
 {
 	Super::OnLeave();
 
-	if(TaskExecuteResult == ETaskExecuteResult::Succeed)
+	if(IsSucceed())
 	{
 		const ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
 		if(PlayerCharacter && Prizes.Num() > 0)
 		{
-			for(auto Iter : Prizes)
+			for(auto& Iter : Prizes)
 			{
 				PlayerCharacter->GetInventory()->AddItemByRange(Iter);
 			}

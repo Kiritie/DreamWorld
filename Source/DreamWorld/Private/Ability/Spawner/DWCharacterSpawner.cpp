@@ -14,7 +14,7 @@ ADWCharacterSpawner::ADWCharacterSpawner()
 
 AActor* ADWCharacterSpawner::SpawnImpl_Implementation(const FAbilityItem& InAbilityItem)
 {
-	const auto& CharacterData = InAbilityItem.GetData<UDWCharacterData>();
+	auto& CharacterData = InAbilityItem.GetData<UDWCharacterData>();
 	
 	auto SaveData = FDWCharacterSaveData();
 	SaveData.AssetID = CharacterData.GetPrimaryAssetId();
@@ -23,10 +23,7 @@ AActor* ADWCharacterSpawner::SpawnImpl_Implementation(const FAbilityItem& InAbil
 	SaveData.Level = InAbilityItem.Level;
 	SaveData.SpawnTransform = GetActorTransform();
 	SaveData.InitInventoryData();
-	if(CharacterData.Dialogues.Num() > 0)
-	{
-		SaveData.Dialogue = CharacterData.Dialogues[FMath::RandRange(0, CharacterData.Dialogues.Num() - 1)];
-	}
+	SaveData.Dialogue = CharacterData.GetRandomDialogue();
 
 	return UAbilityModuleStatics::SpawnAbilityActor(&SaveData);
 }

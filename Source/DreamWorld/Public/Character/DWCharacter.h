@@ -252,7 +252,7 @@ protected:
 	UPROPERTY()
 	AAbilityProjectileBase* AttackProjectile;
 
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere)
 	UDialogue* Dialogue;
 
 	UPROPERTY()

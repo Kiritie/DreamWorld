@@ -11,7 +11,7 @@
 
 UDWTask_GenerateVoxel::UDWTask_GenerateVoxel()
 {
-	TaskDisplayName = FText::FromString(TEXT("建造"));
+	TaskDisplayName = FText::FromString(TEXT("建造方块"));
 	TaskDescription = FText::FromString(TEXT("建造XX个方块"));
 
 	TargetVoxelID = FPrimaryAssetId();
@@ -117,7 +117,7 @@ void UDWTask_GenerateVoxel::OnVoxelGenerated_Implementation(UObject* InSender, U
 	if(InEventHandle->VoxelAgent == UCommonStatics::GetPlayerPawn() && (!TargetVoxelID.IsValid() || InEventHandle->VoxelItem.ID == TargetVoxelID))
 	{
 		CurrentCount++;
-		RefreshState();
+		Restate();
 		if(CurrentCount >= TargetCount)
 		{
 			Complete(ETaskExecuteResult::Succeed);

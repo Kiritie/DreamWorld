@@ -73,20 +73,13 @@ void UWidgetTransactionPanel::OnReset(bool bForce)
 {
 	Super::OnReset(bForce);
 
+	OnTransactionItemDeselected(SelectedTransactionItem);
+
 	for(auto Iter : TransactionItems)
 	{
 		DestroySubWidget(Iter, true);
 	}
 	TransactionItems.Empty();
-
-	for(auto Iter : PreviewItems)
-	{
-		DestroySubWidget(Iter, true);
-	}
-	PreviewItems.Empty();
-
-	SelectedTransactionItem = nullptr;
-	SelectedPreviewItems = TArray<FAbilityItem>();
 }
 
 void UWidgetTransactionPanel::OnOpen(const TArray<FParameter>& InParams, bool bInstant)
@@ -94,6 +87,13 @@ void UWidgetTransactionPanel::OnOpen(const TArray<FParameter>& InParams, bool bI
 	TransactionTarget = InParams[0];
 	TransactionTarget->GetInventory()->OnRefresh.AddDynamic(this, &UWidgetTransactionPanel::Refresh);
 	
+	if(CategoryBar)
+	{
+		CategoryBar->SetSelectedItemType(EAbilityItemType::None);
+	}
+
+	OnTransactionContentRefresh(true);
+
 	Super::OnOpen(InParams, bInstant);
 
 	if(GetOwnerObject<IAbilityInventoryAgentInterface>())
@@ -102,13 +102,6 @@ void UWidgetTransactionPanel::OnOpen(const TArray<FParameter>& InParams, bool bI
 	}
 
 	UWidgetModuleStatics::OpenUserWidget<UWidgetUIMask>();
-
-	if(CategoryBar)
-	{
-		CategoryBar->SetSelectedItemType(EAbilityItemType::None);
-	}
-
-	OnTransactionContentRefresh(true);
 }
 
 void UWidgetTransactionPanel::OnClose(bool bInstant)
@@ -222,6 +215,8 @@ void UWidgetTransactionPanel::OnTransactionItemDeselected_Implementation(UWidget
 	if(InItem != SelectedTransactionItem) return;
 
 	SelectedTransactionItem = nullptr;
+
+	SelectedPreviewItems = TArray<FAbilityItem>();
 
 	Refresh();
 

@@ -1,6 +1,6 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
-#include "Dialogue/Events/DWDialogueEvent_DoInteract.h"
+#include "Dialogue/Events/Interact/DWDialogueEvent_DoInteract.h"
 
 #include "Character/Player/DWPlayerCharacter.h"
 #include "Common/CommonStatics.h"

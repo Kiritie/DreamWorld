@@ -37,7 +37,7 @@ void FDWTeamSaveData::DissolveTeam()
 {
 	for (int i = 0; i < Members.Num(); i++)
 	{
-		USceneModuleStatics::GetSceneActor<IDWTeamAgentInterface>(Members[i].ToString())->SetTeamID(TEXT(""));
+		USceneModuleStatics::GetSceneActor<IDWTeamAgentInterface>(Members[i].ToString(), false)->SetTeamID(TEXT(""));
 	}
 	Members.Empty();
 }
@@ -49,7 +49,7 @@ TArray<IDWTeamAgentInterface*> FDWTeamSaveData::GetMembers(IDWTeamAgentInterface
 	{
 		if (Members[i] != InMember->GetActorIDT())
 		{
-			Arr.Add(USceneModuleStatics::GetSceneActor<IDWTeamAgentInterface>(Members[i].ToString()));
+			Arr.Add(USceneModuleStatics::GetSceneActor<IDWTeamAgentInterface>(Members[i].ToString(), false));
 		}
 	}
 	return Arr;

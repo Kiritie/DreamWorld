@@ -9,6 +9,7 @@
 #include "Procedure/DWProcedure_Testing.h"
 #include "Voxel/VoxelModule.h"
 #include "Voxel/VoxelModuleStatics.h"
+#include "Voxel/Chunks/VoxelChunk.h"
 
 UDWCharacterState_Spawn::UDWCharacterState_Spawn()
 {
@@ -58,12 +59,26 @@ void UDWCharacterState_Spawn::OnTermination()
 
 void UDWCharacterState_Spawn::TryLeave()
 {
-	if(UVoxelModuleStatics::GetWorldMode() == EVoxelWorldMode::Default || UProcedureModuleStatics::IsCurrentProcedureClass<UDWProcedure_Testing>())
+	if(UProcedureModuleStatics::IsCurrentProcedureClass<UDWProcedure_Testing>())
 	{
 		Super::TryLeave();
 	}
 	else
 	{
-		FSM->SwitchStateByClass<UAbilityCharacterState_Static>();
+		if(UVoxelModuleStatics::GetWorldMode() == EVoxelWorldMode::Default)
+		{
+			ADWCharacter* Character = GetAgent<ADWCharacter>();
+			if(AVoxelChunk* VoxelChunk = Cast<AVoxelChunk>(ISceneActorInterface::Execute_GetContainer(Character).GetObject()))
+			{
+				if(VoxelChunk->IsGenerated())
+				{
+					Super::TryLeave();
+				}
+			}
+		}
+		else
+		{
+			FSM->SwitchStateByClass<UAbilityCharacterState_Static>();
+		}
 	}
 }

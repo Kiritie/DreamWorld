@@ -138,7 +138,7 @@ void ADWVoxelChunk::SpawnSceneActors()
 			ADWCharacter* Captain = nullptr;
 			for(auto& CharacterItem : RaceData.Items)
 			{
-				const auto& CharacterData = CharacterItem.GetData<UDWCharacterData>();
+				auto& CharacterData = CharacterItem.GetData<UDWCharacterData>();
 				const int32 Num = WorldData.RandomStream.RandRange(CharacterItem.MinCount, CharacterItem.MaxCount);
 				const int32 Level = FMath::Clamp(WorldData.RandomStream.RandRange(RaceData.MinLevel, RaceData.MaxLevel), 1, CharacterData.MaxLevel);
 				DON(Num,
@@ -152,10 +152,7 @@ void ADWVoxelChunk::SpawnSceneActors()
 						SaveData.Level = Level;
 						SaveData.SpawnTransform = FTransform(FRotator(0.f, FMath::RandRange(0.f, 360.f), 0.f), HitResult.Location, FVector::OneVector);
 						SaveData.InitInventoryData(WorldData.RandomStream);
-						if(CharacterData.Dialogues.Num() > 0)
-						{
-							SaveData.Dialogue = CharacterData.Dialogues[WorldData.RandomStream.RandRange(0, CharacterData.Dialogues.Num() - 1)];
-						}
+						SaveData.Dialogue = CharacterData.GetRandomDialogue(WorldData.RandomStream);
 						if(ADWCharacter* Character = Cast<ADWCharacter>(UAbilityModuleStatics::SpawnAbilityActor(&SaveData, UVoxelModuleStatics::FindChunkByLocation(SaveData.SpawnTransform.GetLocation()))))
 						{
 							if(!Captain)

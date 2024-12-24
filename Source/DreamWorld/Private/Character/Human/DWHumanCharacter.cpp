@@ -122,19 +122,22 @@ void ADWHumanCharacter::OnInteract(EInteractAction InInteractAction, IInteractio
 {
 	Super::OnInteract(InInteractAction, InInteractionAgent, bPassive);
 
-	if(bPassive)
+	switch (InInteractAction)
 	{
-		switch (InInteractAction)
+		case EInteractAction::Dialogue:
 		{
-			case EInteractAction::Dialogue:
+			Static();
+			if(bPassive)
 			{
-				if(Cast<ADWPlayerCharacter>(InInteractionAgent))
+				if(ADWPlayerCharacter* PlayerCharacter = Cast<ADWPlayerCharacter>(InInteractionAgent))
 				{
 					if(UWidgetDialogueBox* DialogueBox = UWidgetModuleStatics::GetUserWidget<UWidgetDialogueBox>())
 					{
-						FDelegateHandle DelegateHandle = DialogueBox->OnClosed.AddLambda([this, DelegateHandle, DialogueBox](bool bInstant)
+						FDelegateHandle DelegateHandle = DialogueBox->OnClosed.AddLambda([this, DelegateHandle, DialogueBox, PlayerCharacter](bool bInstant)
 						{
 							DialogueBox->OnClosed.Remove(DelegateHandle);
+							UnStatic();
+							PlayerCharacter->UnStatic();
 							if(UWidgetModuleStatics::GetUserWidget<UWidgetInteractionBox>())
 							{
 								UWidgetModuleStatics::GetUserWidget<UWidgetInteractionBox>()->Refresh();

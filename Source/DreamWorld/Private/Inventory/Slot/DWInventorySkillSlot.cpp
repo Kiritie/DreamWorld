@@ -16,14 +16,14 @@ void UDWInventorySkillSlot::OnInitialize(UAbilityInventoryBase* InInventory, EAb
 	Super::OnInitialize(InInventory, InLimitType, InSplitType, InSlotIndex);
 }
 
-void UDWInventorySkillSlot::OnItemPreChange(FAbilityItem& InNewItem)
+void UDWInventorySkillSlot::OnItemPreChange(FAbilityItem& InNewItem, bool bBroadcast)
 {
-	Super::OnItemPreChange(InNewItem);
+	Super::OnItemPreChange(InNewItem, bBroadcast);
 }
 
-void UDWInventorySkillSlot::OnItemChanged(FAbilityItem& InOldItem)
+void UDWInventorySkillSlot::OnItemChanged(FAbilityItem& InOldItem, bool bBroadcast)
 {
-	Super::OnItemChanged(InOldItem);
+	Super::OnItemChanged(InOldItem, bBroadcast);
 }
 
 bool UDWInventorySkillSlot::MatchItemLimit(FAbilityItem InItem, bool bForce) const

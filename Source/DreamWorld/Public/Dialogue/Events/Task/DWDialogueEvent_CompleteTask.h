@@ -4,19 +4,20 @@
 
 #include "CoreMinimal.h"
 #include "Dialogue.h"
-#include "DWDialogueEvent_TakeTask.generated.h"
+#include "Task/TaskModuleTypes.h"
+#include "DWDialogueEvent_CompleteTask.generated.h"
 
 class UTaskAsset;
 /**
  * 
  */
 UCLASS(BlueprintType)
-class DREAMWORLD_API UDWDialogueEvent_TakeTask : public UDialogueEvents
+class DREAMWORLD_API UDWDialogueEvent_CompleteTask : public UDialogueEvents
 {
 	GENERATED_BODY()
 
 public:
-	UDWDialogueEvent_TakeTask();
+	UDWDialogueEvent_CompleteTask();
 
 public:
 	virtual void RecieveEventTriggered_Implementation(APlayerController* ConsideringPlayer, AActor* NPCActor) override;
@@ -24,4 +25,10 @@ public:
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	UTaskAsset* TaskAsset;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FString TaskGUID;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	ETaskExecuteResult TaskResult;
 };
