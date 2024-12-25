@@ -61,9 +61,9 @@ FSaveData* ADWVoxelChunk::ToData()
 	return &SaveData;
 }
 
-void ADWVoxelChunk::Initialize(FIndex InIndex, int32 InBatch)
+void ADWVoxelChunk::Initialize(UVoxelModule* InModule, FIndex InIndex, int32 InBatch)
 {
-	Super::Initialize(InIndex, InBatch);
+	Super::Initialize(InModule, InIndex, InBatch);
 }
 
 void ADWVoxelChunk::Generate(EPhase InPhase)
@@ -100,7 +100,7 @@ void ADWVoxelChunk::SpawnSceneActors()
 {
 	Super::SpawnSceneActors();
 
-	const auto& WorldData = UVoxelModule::Get().GetWorldData();
+	const auto& WorldData = Module->GetWorldData();
 	const FVector2D WorldLocation = FVector2D(GetChunkLocation().X + WorldData.GetChunkRealSize().X * 0.5f, GetChunkLocation().Y + WorldData.GetChunkRealSize().Y * 0.5f) / WorldData.BlockSize;
 
 	TArray<FVitalityRaceData> VitalityRaceDatas;
@@ -170,4 +170,9 @@ void ADWVoxelChunk::SpawnSceneActors()
 			}
 		}
 	}
+}
+
+TSubclassOf<AActor> ADWVoxelChunk::GetBuildingClassByID(int32 InID) const
+{
+	return LoadClass<AActor>(nullptr, *FString::Printf(TEXT("Blueprint'/Game/Blueprints/Voxel/Building/BP_Voxel_Building_%d.BP_Voxel_Building_%d_C'"), InID, InID));
 }

@@ -37,7 +37,7 @@ protected:
 	//////////////////////////////////////////////////////////////////////////
 	// Chunk
 public:
-	virtual void Initialize(FIndex InIndex, int32 InBatch) override;
+	virtual void Initialize(UVoxelModule* InModule, FIndex InIndex, int32 InBatch) override;
 
 	virtual void Generate(EPhase InPhase) override;
 
@@ -48,5 +48,8 @@ public:
 	virtual void LoadSceneActors(FSaveData* InSaveData) override;
 
 	virtual void SpawnSceneActors() override;
+
+public:
+	virtual TSubclassOf<AActor> GetBuildingClassByID(int32 InID) const override;
 };
 
