@@ -374,7 +374,11 @@ public:
 		SkillAttackAbilities = TMap<FPrimaryAssetId, FDWCharacterSkillAttackAbilityData>();
 		Dialogue = nullptr;
 	}
-	
+
+public:
+	virtual void InitDialogueData(FRandomStream InRandomStream = FRandomStream());
+
+public:
 	UPROPERTY(BlueprintReadOnly)
 	FName TeamID;
 

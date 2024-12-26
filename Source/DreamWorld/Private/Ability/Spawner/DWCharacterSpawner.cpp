@@ -23,7 +23,7 @@ AActor* ADWCharacterSpawner::SpawnImpl_Implementation(const FAbilityItem& InAbil
 	SaveData.Level = InAbilityItem.Level;
 	SaveData.SpawnTransform = GetActorTransform();
 	SaveData.InitInventoryData();
-	SaveData.Dialogue = CharacterData.GetRandomDialogue();
+	SaveData.InitDialogueData();
 
 	return UAbilityModuleStatics::SpawnAbilityActor(&SaveData);
 }

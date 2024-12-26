@@ -10,9 +10,15 @@
 #include "Character/DWCharacter.h"
 #include "Ability/Vitality/AbilityVitalityInterface.h"
 #include "Asset/AssetModuleStatics.h"
+#include "Character/DWCharacterData.h"
 #include "FSM/Components/FSMComponent.h"
 #include "ObjectPool/ObjectPoolModuleStatics.h"
 #include "Voxel/Datas/VoxelData.h"
+
+void FDWCharacterSaveData::InitDialogueData(FRandomStream InRandomStream)
+{
+	Dialogue = GetData<UDWCharacterData>().GetRandomDialogue();
+}
 
 void FDWPlayerSaveData::InitInventoryData(FRandomStream InRandomStream)
 {
