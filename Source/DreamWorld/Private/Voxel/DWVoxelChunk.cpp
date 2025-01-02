@@ -101,7 +101,7 @@ void ADWVoxelChunk::SpawnSceneActors()
 	Super::SpawnSceneActors();
 
 	const auto& WorldData = Module->GetWorldData();
-	const FVector2D WorldLocation = FVector2D(GetChunkLocation().X + WorldData.GetChunkRealSize().X * 0.5f, GetChunkLocation().Y + WorldData.GetChunkRealSize().Y * 0.5f) / WorldData.BlockSize;
+	const FVector2D WorldLocation = FVector2D(GetWorldLocation().X + WorldData.GetChunkRealSize().X * 0.5f, GetWorldLocation().Y + WorldData.GetChunkRealSize().Y * 0.5f) / WorldData.BlockSize;
 
 	TArray<FVitalityRaceData> VitalityRaceDatas;
 	if(UAbilityModuleStatics::GetNoiseRaceDatas(WorldLocation, WorldData.WorldSeed, VitalityRaceDatas))
