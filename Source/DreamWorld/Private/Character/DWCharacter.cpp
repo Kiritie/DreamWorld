@@ -589,7 +589,7 @@ void ADWCharacter::AddMovementInput(FVector WorldDirection, float ScaleValue, bo
 
 	Super::AddMovementInput(WorldDirection, ScaleValue, bForce);
 
-	if(!IsPlayer() || UDWSettingModule::IsValid() && UDWSettingModule::Get().IsAutoJump())
+	if(!IsPlayer() || UDWSettingModule::IsValid() && UDWSettingModule::Get().IsAutoJump(true))
 	{
 		FHitResult hitResult;
 		if(RaycastStep(hitResult))

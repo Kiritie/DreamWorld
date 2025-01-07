@@ -417,22 +417,22 @@ UENUM(BlueprintType)
 enum class EDWInventoryInitType : uint8
 {
 	// 默认
-	Default UMETA(DisplayName = "默认"),
+	Default,
 	// 无
-	Empty UMETA(DisplayName = "无"),
+	Empty,
 	// 充满（调试用）
-	All UMETA(DisplayName = "充满（调试用）")
+	All
 };
 
 UENUM(BlueprintType)
 enum class EDWTimeSection : uint8
 {
 	// 早上
-	Morn UMETA(DisplayName = "早上"),
+	Morn,
 	// 中午
-	Noon UMETA(DisplayName = "中午"),
+	Noon,
 	// 晚上
-	Night UMETA(DisplayName = "晚上")
+	Night
 };
 
 USTRUCT(BlueprintType)
@@ -648,11 +648,11 @@ UENUM(BlueprintType)
 enum class EDWGameLevel : uint8
 {
 	// 简单
-	Sample UMETA(DisplayName = "简单"),
+	Sample,
 	// 普通
-	Normal UMETA(DisplayName = "普通"),
+	Normal,
 	// 困难
-	Hard UMETA(DisplayName = "困难")
+	Hard
 };
 
 USTRUCT(BlueprintType)
@@ -665,6 +665,7 @@ public:
 	{
 		GameLevel = EDWGameLevel::Normal;
 		bAutoJump = true;
+		bAutoJumpWithCreating = true;
 	}
 
 public:
@@ -673,6 +674,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bAutoJump;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bAutoJumpWithCreating;
 };
 
 USTRUCT(BlueprintType)
@@ -800,13 +804,13 @@ UENUM(BlueprintType)
 enum class EDWInteractAction : uint8
 {
 	// 无
-	None = EInteractAction::None UMETA(DisplayName="无"),
+	None = EInteractAction::None,
 	// 喂食
-	Feed = EInteractAction::Custom3 UMETA(DisplayName="喂食"),
+	Feed = EInteractAction::Custom3,
 	// 骑乘
-	Ride = EInteractAction::Custom4 UMETA(DisplayName="骑乘"),
+	Ride = EInteractAction::Custom4,
 	// 取消骑乘
-	UnRide = EInteractAction::Custom5 UMETA(DisplayName="取消骑乘")
+	UnRide = EInteractAction::Custom5
 };
 
 UCLASS(Blueprintable, meta = (ShowWorldContextPin))

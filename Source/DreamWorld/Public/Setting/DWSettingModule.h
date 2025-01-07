@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Common/DWCommonTypes.h"
 #include "Setting/SettingModule.h"
 
 #include "DWSettingModule.generated.h"
@@ -53,6 +54,9 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "GameSetting")
 	bool bAutoJump;
 
+	UPROPERTY(EditAnywhere, Category = "GameSetting")
+	bool bAutoJumpWithCreating;
+
 public:
 	UFUNCTION(BlueprintPure)
 	EDWGameLevel GetGameLevel() const { return GameLevel; }
@@ -61,8 +65,14 @@ public:
 	void SetGameLevel(EDWGameLevel InGameLevel) { GameLevel = InGameLevel; }
 
 	UFUNCTION(BlueprintPure)
-	bool IsAutoJump() const { return bAutoJump; }
+	bool IsAutoJump(bool bCheckCreating = false) const;
 
 	UFUNCTION(BlueprintCallable)
 	void SetAutoJump(bool bInAutoJump) { bAutoJump = bInAutoJump; }
+
+	UFUNCTION(BlueprintPure)
+	bool IsAutoJumpWithCreating() const { return bAutoJumpWithCreating; }
+
+	UFUNCTION(BlueprintCallable)
+	void SetAutoJumpWithCreating(bool bInAutoJumpWithCreating) { bAutoJumpWithCreating = bInAutoJumpWithCreating; }
 };

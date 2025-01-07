@@ -10,7 +10,7 @@ UWidgetCharacterHP::UWidgetCharacterHP(const FObjectInitializer& ObjectInitializ
 	WidgetName = FName("CharacterHP");
 	
 	WidgetAlignment = FVector2D(0.5f);
-	WidgetVisibility = EWorldWidgetVisibility::ScreenAndDistance;
+	WidgetVisibility = EWorldWidgetVisibility::RenderScreenAndDistance;
 	WidgetShowDistance = 1800.f;
 
 	bWidgetTickAble = true;

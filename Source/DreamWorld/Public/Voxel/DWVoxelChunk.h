@@ -48,8 +48,5 @@ public:
 	virtual void LoadSceneActors(FSaveData* InSaveData) override;
 
 	virtual void SpawnSceneActors() override;
-
-public:
-	virtual TSubclassOf<AActor> GetBuildingClassByID(int32 InID) const override;
 };
 

@@ -24,6 +24,8 @@ public:
 
 	virtual void OnReset(bool bForce) override;
 
+	virtual void OnValueChange(UWidgetSettingItemBase* InSettingItem, const FParameter& InValue) override;
+
 	virtual void OnApply() override;
 
 	virtual void NativeOnActivated() override;
@@ -44,4 +46,7 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly, Category = "Components")
 	UWidgetBoolSettingItemBase* SettingItem_AutoJump;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Components")
+	UWidgetBoolSettingItemBase* SettingItem_AutoJumpWithCreating;
 };

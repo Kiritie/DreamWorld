@@ -171,8 +171,3 @@ void ADWVoxelChunk::SpawnSceneActors()
 		}
 	}
 }
-
-TSubclassOf<AActor> ADWVoxelChunk::GetBuildingClassByID(int32 InID) const
-{
-	return LoadClass<AActor>(nullptr, *FString::Printf(TEXT("Blueprint'/Game/Blueprints/Voxel/Building/BP_Voxel_Building_%d.BP_Voxel_Building_%d_C'"), InID, InID));
-}

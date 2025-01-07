@@ -4,6 +4,7 @@
 #include "Setting/DWSettingModule.h"
 
 #include "Audio/AudioModule.h"
+#include "Character/Player/DWPlayerCharacter.h"
 #include "Common/CommonStatics.h"
 #include "Common/DWCommonTypes.h"
 #include "SaveGame/Setting/DWSettingSaveGame.h"
@@ -17,6 +18,7 @@ UDWSettingModule::UDWSettingModule()
 
 	GameLevel = EDWGameLevel::Normal;
 	bAutoJump = true;
+	bAutoJumpWithCreating = false;
 }
 
 UDWSettingModule::~UDWSettingModule()
@@ -71,6 +73,7 @@ void UDWSettingModule::LoadData(FSaveData* InSaveData, EPhase InPhase)
 
 	SetGameLevel(SaveData.GameData.GameLevel);
 	SetAutoJump(SaveData.GameData.bAutoJump);
+	SetAutoJumpWithCreating(SaveData.GameData.bAutoJumpWithCreating);
 }
 
 void UDWSettingModule::UnloadData(EPhase InPhase)
@@ -85,6 +88,20 @@ FSaveData* UDWSettingModule::ToData()
 
 	SaveData.GameData.GameLevel = GameLevel;
 	SaveData.GameData.bAutoJump = bAutoJump;
+	SaveData.GameData.bAutoJumpWithCreating = bAutoJumpWithCreating;
 	
 	return &SaveData;
+}
+
+bool UDWSettingModule::IsAutoJump(bool bCheckCreating) const
+{
+	bool ReturnValue = bAutoJump;
+	if(bCheckCreating)
+	{
+		if(ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>())
+		{
+			ReturnValue = ReturnValue && PlayerCharacter->GetControlMode() != EDWCharacterControlMode::Creating || bAutoJumpWithCreating;	
+		}
+	}
+	return ReturnValue;
 }
