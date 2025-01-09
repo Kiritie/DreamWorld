@@ -3,12 +3,15 @@
 
 #include "Widget/Context/WidgetContextInputBox.h"
 
+#include "Character/Player/DWPlayerCharacter.h"
+#include "Common/CommonStatics.h"
 #include "Components/EditableTextBox.h"
 #include "Widget/WidgetModule.h"
 #include "Widget/WidgetModuleStatics.h"
 #include "Widget/Common/CommonButton.h"
 #include "Widget/Common/WidgetUIMask.h"
 #include "Widget/Context/WidgetContextBox.h"
+#include "Ability/Inventory/AbilityInventoryBase.h"
 
 UWidgetContextInputBox::UWidgetContextInputBox(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -64,9 +67,53 @@ void UWidgetContextInputBox::OnTextBoxValueCommitted(const FText& InText, ETextC
 {
 	if(InCommitMethod == ETextCommit::OnEnter || InCommitMethod == ETextCommit::OnCleared)
 	{
-		if(!InText.IsEmpty())
+		if(!InText.IsEmpty() && InCommitMethod != ETextCommit::OnCleared)
 		{
-			UWidgetModuleStatics::GetUserWidget<UWidgetContextBox>()->AddMessage(InText.ToString());
+			const FString Message = InText.ToString();
+			if(Message.StartsWith(TEXT("/")) && Message.Len() > 1)
+			{
+				FString Command = Message.Mid(1, Message.Len());
+				FString Params;
+				Command.Split(TEXT(" "), &Command, &Params);
+				
+				if(Command.Equals(TEXT("AddItem"), ESearchCase::IgnoreCase))
+				{
+					TArray<FString> ParamArr;
+					if(Params.ParseIntoArray(ParamArr, TEXT(" ")) >= 3)
+					{
+						FAbilityItem Item = FAbilityItem(FPrimaryAssetId(*ParamArr[0]), FCString::Atoi(*ParamArr[1]), FCString::Atoi(*ParamArr[2]));
+						ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
+						if(PlayerCharacter && PlayerCharacter->IsActive(true))
+						{
+							PlayerCharacter->GetInventory()->AddItemByRange(Item);
+						}
+					}
+				}
+				else if(Command.Equals(TEXT("Kill"), ESearchCase::IgnoreCase))
+				{
+					ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
+					if(PlayerCharacter && PlayerCharacter->IsActive(true))
+					{
+						PlayerCharacter->Death(PlayerCharacter);
+					}
+				}
+				else if(Command.Equals(TEXT("LevelUp"), ESearchCase::IgnoreCase))
+				{
+					ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
+					if(PlayerCharacter && PlayerCharacter->IsActive(true))
+					{
+						PlayerCharacter->SetLevelA(PlayerCharacter->GetLevelA() + 1);
+					}
+				}
+				else
+				{
+					UWidgetModuleStatics::GetUserWidget<UWidgetContextBox>()->AddMessage(FString::Printf(TEXT("无效命令: %s"), *Command));
+				}
+			}
+			else
+			{
+				UWidgetModuleStatics::GetUserWidget<UWidgetContextBox>()->AddMessage(Message);
+			}
 		}
 		Close();
 	}

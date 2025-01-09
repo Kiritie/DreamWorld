@@ -85,6 +85,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TSubclassOf<UWidgetTransactionItem> TransactionItemClass;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TMap<EDWTransactionType, EDWCharacterCraft> TransactionCraftMap;
+
 protected:
 	UPROPERTY()
 	UCommonButtonGroup* TabGroup;
@@ -102,13 +105,19 @@ protected:
 	TArray<FAbilityItem> SelectedPreviewItems;
 
 	IAbilityInventoryAgentInterface* TransactionTarget;
+	
+	UPROPERTY()
+	int32 GenerateRawDataIndex;
+		
+	UPROPERTY()
+	FTimerHandle ContentRefreshTH;
 
 public:
 	UFUNCTION(BlueprintPure)
-	int32 GetTabIndex() const;
+	EDWTransactionType GetSelectedTabType() const;
 
 	UFUNCTION(BlueprintCallable)
-	void SetTabIndex(int32 InIndex) const;
+	void SetSelectedTabType(EDWTransactionType InIndex) const;
 
 	UFUNCTION(BlueprintPure)
 	bool GetSelectedTransactionItem(FAbilityItem& OutItemData) const;

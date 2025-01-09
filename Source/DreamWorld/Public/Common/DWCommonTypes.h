@@ -7,15 +7,11 @@
 #include "SaveGame/SaveGameModuleTypes.h"
 #include "Voxel/VoxelModuleTypes.h"
 #include "Asset/AssetModuleTypes.h"
-#include "Audio/AudioModuleTypes.h"
 #include "Camera/CameraModuleTypes.h"
 #include "Common/CommonTypes.h"
-#include "Input/InputModuleTypes.h"
 #include "Setting/SettingModuleTypes.h"
 #include "Task/TaskModuleTypes.h"
 #include "Team/DWTeamModuleTypes.h"
-#include "Video/VideoModuleTypes.h"
-#include "Widget/WidgetModuleTypes.h"
 
 #include "DWCommonTypes.generated.h"
 
@@ -54,6 +50,24 @@ class UAttributeSetBase;
 class UDWCharacterAttributeSet;
 class UTargetType;
 class UAbilityInventorySlotBase;
+
+/**
+ * ??????
+ */
+UENUM(BlueprintType)
+enum class EDWTransactionType : uint8
+{
+	// 购买
+	Buy,
+	// 出售
+	Sell,
+	// 升级
+	Upgrade,
+	// 锻造
+	Generate,
+	// 拆解
+	Split,
+};
 
 /**
  * ??????
@@ -104,17 +118,29 @@ enum class EDWCharacterCraft : uint8
 UENUM(BlueprintType)
 enum class EDWPropType : uint8
 {
+	// 无
+	None,
 	// ??
 	Potion,
 	// ???
 	Food,
 	// ????
-	Container
+	Container,
+	Blueprint
+};
+
+UENUM(BlueprintType)
+enum class EDWRawType : uint8
+{
+	// 无
+	None,
 };
 
 UENUM(BlueprintType)
 enum class EDWEquipType : uint8
 {
+	// 无
+	None,
 	// 武器
 	Weapon,
 	// 防具

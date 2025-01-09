@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Ability/Item/Raw/AbilityRawDataBase.h"
+#include "Common/DWCommonTypes.h"
 
 #include "DWRawData.generated.h"
 
@@ -11,4 +12,8 @@ class DREAMWORLD_API UDWRawData : public UAbilityRawDataBase
 
 public:
 	UDWRawData();
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	EDWRawType RawType;
 };

@@ -115,24 +115,21 @@ void UWidgetGeneratePanel::OnRefresh()
 	}
 
 	bool bCanGenerate = true;
-	FDWGenerateItemData SelectedGenerateItemData;
-	if(GetSelectedGenerateItemData(SelectedGenerateItemData))
+	FDWGenerateItemData _SelectedGenerateItemData;
+	if(GetSelectedGenerateItemData(_SelectedGenerateItemData))
 	{
 		UAbilityInventoryBase* Inventory = GetOwnerObject<IAbilityInventoryAgentInterface>()->GetInventory();
-		for(auto& Iter1 : SelectedGenerateItemData.RawDatas)
+		SelectedPreviewItems = _SelectedGenerateItemData.RawDatas[GenerateRawDataIndex].Raws;
+		if(++GenerateRawDataIndex >= _SelectedGenerateItemData.RawDatas.Num())
 		{
-			for(auto& Iter2 : Iter1.Raws)
+			GenerateRawDataIndex = 0;
+		}
+		for(auto& Iter : SelectedPreviewItems)
+		{
+			const FItemQueryData ItemQueryData = Inventory->QueryItemByRange(EItemQueryType::Get, Iter);
+			if(ItemQueryData.Item.Count < Iter.Count)
 			{
-				const FItemQueryData ItemQueryData = Inventory->QueryItemByRange(EItemQueryType::Get, Iter2);
-				if(ItemQueryData.Item.Count < Iter2.Count)
-				{
-					bCanGenerate = false;
-					break;
-				}
-			}
-			if(bCanGenerate)
-			{
-				SelectedGenerateRawData = Iter1;
+				bCanGenerate = false;
 				break;
 			}
 		}
@@ -144,8 +141,12 @@ void UWidgetGeneratePanel::OnRefresh()
 	
 	if(BtnGenerate)
 	{
-		BtnGenerate->SetIsEnabled(bCanGenerate);
+		// BtnGenerate->SetIsEnabled(bCanGenerate);
+		BtnGenerate->SetRenderOpacity(bCanGenerate ? 1.f : 0.5f);
+		BtnGenerate->SetVisibility(bCanGenerate ? ESlateVisibility::SelfHitTestInvisible : ESlateVisibility::HitTestInvisible);
 	}
+
+	OnPreviewContentRefresh();
 }
 
 void UWidgetGeneratePanel::OnDestroy(bool bRecovery)
@@ -169,10 +170,11 @@ void UWidgetGeneratePanel::OnGenerateItemSelected_Implementation(UWidgetGenerate
 
 	SelectedGenerateItem = InItem;
 
+	GenerateRawDataIndex = 0;
+
 	Refresh();
 
-	PreviewGenerateRawDataIndex = 0;
-	GetWorld()->GetTimerManager().SetTimer(PreviewContentRefreshTH, FTimerDelegate::CreateUObject(this, &UWidgetGeneratePanel::OnPreviewContentRefresh), 1.5f, true, 0.f);
+	GetWorld()->GetTimerManager().SetTimer(ContentRefreshTH, FTimerDelegate::CreateUObject(this, &UWidgetGeneratePanel::Refresh), 1.5f, true);
 }
 
 void UWidgetGeneratePanel::OnGenerateItemDeselected_Implementation(UWidgetGenerateItem* InItem)
@@ -181,9 +183,9 @@ void UWidgetGeneratePanel::OnGenerateItemDeselected_Implementation(UWidgetGenera
 
 	SelectedGenerateItem = nullptr;
 
-	PreviewGenerateRawDataIndex = 0;
+	GenerateRawDataIndex = 0;
 
-	SelectedGenerateRawData = FDWGenerateRawData();
+	SelectedPreviewItems = TArray<FAbilityItem>();
 
 	Refresh();
 
@@ -193,17 +195,17 @@ void UWidgetGeneratePanel::OnGenerateItemDeselected_Implementation(UWidgetGenera
 	}
 	PreviewItems.Empty();
 
-	GetWorld()->GetTimerManager().ClearTimer(PreviewContentRefreshTH);
+	GetWorld()->GetTimerManager().ClearTimer(ContentRefreshTH);
 }
 
 void UWidgetGeneratePanel::OnGenerateContentRefresh(bool bScrollToStart)
 {
 	Reset();
 
-	TArray<FDWGenerateItemData> GenerateItemDatas;
-	if(GenerateContent && UAssetModuleStatics::ReadDataTable(GenerateItemDatas))
+	TArray<FDWGenerateItemData> _GenerateItemDatas;
+	if(GenerateContent && UAssetModuleStatics::ReadDataTable(_GenerateItemDatas))
 	{
-		for(auto& Iter : GenerateItemDatas)
+		for(auto& Iter : _GenerateItemDatas)
 		{
 			if(Iter.ToolID.IsValid() && Iter.ToolID != GenerateToolID || CategoryBar->GetSelectedItemType() != EAbilityItemType::None && Iter.Item.GetType() != CategoryBar->GetSelectedItemType()) continue;
 			
@@ -236,7 +238,7 @@ void UWidgetGeneratePanel::OnPreviewContentRefresh()
 				DestroySubWidget(Iter, true);
 			}
 			PreviewItems.Empty();
-			for(auto& Iter : _SelectedGenerateItemData.RawDatas[PreviewGenerateRawDataIndex].Raws)
+			for(auto& Iter : SelectedPreviewItems)
 			{
 				if(UWidgetAbilityItem* PreviewItem = CreateSubWidget<UWidgetAbilityItem>({ &Iter }, UAssetModuleStatics::GetStaticClass(FName("RequiredPreviewItem"))))
 				{
@@ -246,14 +248,6 @@ void UWidgetGeneratePanel::OnPreviewContentRefresh()
 						WrapBoxSlot->SetPadding(FMargin(5.f, 5.f, 5.f, 5.f));
 					}
 				}
-			}
-			if(_SelectedGenerateItemData.RawDatas.Num() == 1)
-			{
-				GetWorld()->GetTimerManager().ClearTimer(PreviewContentRefreshTH);
-			}
-			else if(++PreviewGenerateRawDataIndex >= _SelectedGenerateItemData.RawDatas.Num())
-			{
-				PreviewGenerateRawDataIndex = 0;
 			}
 		}
 	}
@@ -265,15 +259,11 @@ void UWidgetGeneratePanel::OnGenerateButtonClicked()
 	if(GetSelectedGenerateItemData(_SelectedGenerateItemData))
 	{
 		UAbilityInventoryBase* Inventory = GetOwnerObject<IAbilityInventoryAgentInterface>()->GetInventory();
-		for(auto& Iter : SelectedGenerateRawData.Raws)
+		for(auto& Iter : SelectedPreviewItems)
 		{
 			Inventory->RemoveItemByRange(Iter);
 		}
 		Inventory->AddItemByRange(_SelectedGenerateItemData.Item, -1);
-		if(_SelectedGenerateItemData.Item.Count > 0)
-		{
-			GetOwnerObject<IAbilityInventoryAgentInterface>()->OnDiscardItem(_SelectedGenerateItemData.Item, false);
-		}
 		UAchievementModuleStatics::UnlockAchievement(FName("FirstGenerateItem"));
 	}
 }

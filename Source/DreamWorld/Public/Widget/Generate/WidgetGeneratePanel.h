@@ -87,16 +87,16 @@ protected:
 	UWidgetGenerateItem* SelectedGenerateItem;
 
 	UPROPERTY()
-	FDWGenerateRawData SelectedGenerateRawData;
+	TArray<FAbilityItem> SelectedPreviewItems;
 
 	UPROPERTY()
 	FPrimaryAssetId GenerateToolID;
 	
 	UPROPERTY()
-	int32 PreviewGenerateRawDataIndex;
+	int32 GenerateRawDataIndex;
 	
 	UPROPERTY()
-	FTimerHandle PreviewContentRefreshTH;
+	FTimerHandle ContentRefreshTH;
 
 public:
 	UFUNCTION(BlueprintPure)

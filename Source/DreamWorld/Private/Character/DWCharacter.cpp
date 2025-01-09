@@ -50,6 +50,7 @@
 #include "Character/States/DWCharacterState_Climb.h"
 #include "Character/States/DWCharacterState_Fly.h"
 #include "Item/Skill/DWSkillData.h"
+#include "Widget/Interaction/WidgetInteractionProgressBox.h"
 
 // Sets default values
 ADWCharacter::ADWCharacter(const FObjectInitializer& ObjectInitializer) :
@@ -696,36 +697,92 @@ void ADWCharacter::OnAuxiliaryItem(const FAbilityItem& InItem)
 	Super::OnAuxiliaryItem(InItem);
 }
 
-bool ADWCharacter::OnPickUp(AAbilityPickUpBase* InPickUp)
+void ADWCharacter::OnPickUp(AAbilityPickUpBase* InPickUp)
 {
-	return Super::OnPickUp(InPickUp);
+	Super::OnPickUp(InPickUp);
 }
 
-bool ADWCharacter::OnGenerateVoxel(const FVoxelHitResult& InVoxelHitResult)
+bool ADWCharacter::OnGenerateVoxel(EInputInteractEvent InInteractEvent, const FVoxelHitResult& InHitResult)
 {
 	if(!GenerateVoxelID.IsValid()) return false;
-	
+
 	FItemQueryData ItemQueryData = Inventory->QueryItemByRange(EItemQueryType::Remove, FAbilityItem(GenerateVoxelID, 1), -1);
-	if(ItemQueryData.IsValid() && DoAction(GameplayTags::Ability_Character_Action_Generate))
+	if(!ItemQueryData.IsValid()) return false;
+
+	switch(InInteractEvent)
 	{
-		if(Super::OnGenerateVoxel(InVoxelHitResult))
+		case EInputInteractEvent::Started:
 		{
-			Inventory->RemoveItemByQueryData(ItemQueryData);
-			UAchievementModuleStatics::UnlockAchievement(FName("FirstGenerateVoxel"));
-			return true;
+			return IVoxelAgentInterface::OnGenerateVoxel(InInteractEvent, InHitResult);
+		}
+		case EInputInteractEvent::Triggered:
+		{
+			return IVoxelAgentInterface::OnGenerateVoxel(InInteractEvent, InHitResult);
+		}
+		case EInputInteractEvent::Completed:
+		{
+			if(DoAction(GameplayTags::Ability_Character_Action_Generate) && IVoxelAgentInterface::OnGenerateVoxel(InInteractEvent, InHitResult))
+			{
+				Inventory->RemoveItemByQueryData(ItemQueryData);
+				UAchievementModuleStatics::UnlockAchievement(FName("FirstGenerateVoxel"));
+				return true;
+			}
+			break;
 		}
 	}
 	return false;
 }
 
-bool ADWCharacter::OnDestroyVoxel(const FVoxelHitResult& InVoxelHitResult)
+bool ADWCharacter::OnDestroyVoxel(EInputInteractEvent InInteractEvent, const FVoxelHitResult& InHitResult)
 {
-	if(DoAction(GameplayTags::Ability_Character_Action_Destroy))
+	switch(InInteractEvent)
 	{
-		if(Super::OnDestroyVoxel(InVoxelHitResult))
+		case EInputInteractEvent::Started:
 		{
-			UAchievementModuleStatics::UnlockAchievement(FName("FirstDestroyVoxel"));
-			return true;
+			if(DoAction(GameplayTags::Ability_Character_Action_Destroy))
+			{
+				if(IsPlayer())
+				{
+					UWidgetModuleStatics::OpenUserWidget<UWidgetInteractionProgressBox>({ FText::FromString(TEXT("破坏体素")) });
+				}
+				return IVoxelAgentInterface::OnDestroyVoxel(InInteractEvent, InHitResult);
+			}
+			break;
+		}
+		case EInputInteractEvent::Triggered:
+		{
+			if(InteractVoxelItem.IsValid())
+			{
+				DoAction(GameplayTags::Ability_Character_Action_Destroy);
+				if(IsExhausted())
+				{
+					OnDestroyVoxel(EInputInteractEvent::Completed, InHitResult);
+					InteractVoxelItem = FVoxelItem::Unknown;
+					break;
+				}
+				if(IsPlayer() && UWidgetModuleStatics::GetUserWidget<UWidgetInteractionProgressBox>())
+				{
+					UWidgetModuleStatics::GetUserWidget<UWidgetInteractionProgressBox>()->SetProgress(GetInteractVoxelProgress());
+				}
+			}
+			if(IVoxelAgentInterface::OnDestroyVoxel(InInteractEvent, InHitResult))
+			{
+				UAchievementModuleStatics::UnlockAchievement(FName("FirstDestroyVoxel"));
+				return true;
+			}
+			break;
+		}
+		case EInputInteractEvent::Completed:
+		{
+			if(InteractVoxelItem.IsValid())
+			{
+				StopAction(GameplayTags::Ability_Character_Action_Destroy);
+				if(IsPlayer())
+				{
+					UWidgetModuleStatics::CloseUserWidget<UWidgetInteractionProgressBox>();
+				}
+			}
+			return IVoxelAgentInterface::OnDestroyVoxel(InInteractEvent, InHitResult);
 		}
 	}
 	return false;

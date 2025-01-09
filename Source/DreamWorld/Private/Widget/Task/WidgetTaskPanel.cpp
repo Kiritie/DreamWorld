@@ -131,7 +131,9 @@ void UWidgetTaskPanel::OnRefresh()
 	
 	if(BtnTraceTask)
 	{
-		BtnTraceTask->SetIsEnabled(bCanTraceTask);
+		// BtnTraceTask->SetIsEnabled(bCanTraceTask);
+		BtnTraceTask->SetRenderOpacity(bCanTraceTask ? 1.f : 0.5f);
+		BtnTraceTask->SetVisibility(bCanTraceTask ? ESlateVisibility::SelfHitTestInvisible : ESlateVisibility::HitTestInvisible);
 	}
 }
 

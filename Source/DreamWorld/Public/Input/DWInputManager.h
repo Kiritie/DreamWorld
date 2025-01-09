@@ -58,16 +58,25 @@ protected:
 	virtual void OnPrimaryPressed();
 
 	UFUNCTION()
+	virtual void OnPrimaryRepeated();
+
+	UFUNCTION()
 	virtual void OnPrimaryReleased();
 
 	UFUNCTION()
 	virtual void OnSecondaryPressed();
 
 	UFUNCTION()
+	virtual void OnSecondaryRepeated();
+
+	UFUNCTION()
 	virtual void OnSecondaryReleased();
 
 	UFUNCTION()
 	virtual void OnThirdPressed();
+
+	UFUNCTION()
+	virtual void OnThirdRepeated();
 
 	UFUNCTION()
 	virtual void OnThirdReleased();

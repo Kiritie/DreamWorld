@@ -13,6 +13,8 @@
 #include "Ability/Inventory/AbilityInventoryBase.h"
 #include "Ability/Item/AbilityTransItemDataBase.h"
 #include "Achievement/AchievementModuleStatics.h"
+#include "Item/Prop/Blueprint/DWPropBlueprintData.h"
+#include "Voxel/VoxelModule.h"
 #include "Widget/WidgetModuleStatics.h"
 #include "Widget/Common/CommonButton.h"
 #include "Widget/Common/CommonButtonGroup.h"
@@ -36,6 +38,24 @@ UWidgetTransactionPanel::UWidgetTransactionPanel(const FObjectInitializer& Objec
 	bWidgetAutoFocus = true;
 
 	SetIsFocusable(true);
+
+	TransactionCraftMap = {
+		{
+			EDWTransactionType::Buy, EDWCharacterCraft::Merchant
+		},
+		{
+			EDWTransactionType::Sell, EDWCharacterCraft::Merchant
+		},
+		{
+			EDWTransactionType::Upgrade, EDWCharacterCraft::Blacksmith
+		},
+		{
+			EDWTransactionType::Generate, EDWCharacterCraft::Blacksmith
+		},
+		{
+			EDWTransactionType::Split, EDWCharacterCraft::Blacksmith
+		},
+	};
 }
 
 void UWidgetTransactionPanel::OnCreate(UObject* InOwner, const TArray<FParameter>& InParams)
@@ -132,33 +152,54 @@ void UWidgetTransactionPanel::OnRefresh()
 	FAbilityItem _SelectedTransactionItem;
 	if(GetSelectedTransactionItem(_SelectedTransactionItem))
 	{
-		UAbilityInventoryBase* Inventory = GetOwnerObject<IAbilityInventoryAgentInterface>()->GetInventory();
-		switch(GetTabIndex())
+		switch(GetSelectedTabType())
 		{
-			case 0:
-			case 1:
+			case EDWTransactionType::Buy:
+			case EDWTransactionType::Sell:
 			{
 				SelectedPreviewItems = _SelectedTransactionItem.GetData<UAbilityTransItemDataBase>().Prices;
 				break;
 			}
-			case 2:
+			case EDWTransactionType::Upgrade:
 			{
 				SelectedPreviewItems = _SelectedTransactionItem.GetData<UAbilityTransItemDataBase>().Upgrades;
 				break;
 			}
+			case EDWTransactionType::Generate:
+			{
+				SelectedPreviewItems = _SelectedTransactionItem.GetData<UDWPropBlueprintData>().GenerateRawDatas[GenerateRawDataIndex].Raws;
+				if(++GenerateRawDataIndex >= _SelectedTransactionItem.GetData<UDWPropBlueprintData>().GenerateRawDatas.Num())
+				{
+					GenerateRawDataIndex = 0;
+				}
+				break;
+			}
+			case EDWTransactionType::Split:
+			{
+				SelectedPreviewItems = _SelectedTransactionItem.GetData<UAbilityTransItemDataBase>().Splits;
+				break;
+			}
 			default: break;
 		}
-		if(GetTabIndex() != 1)
+		switch(GetSelectedTabType())
 		{
-			for(auto& Iter1 : SelectedPreviewItems)
+			case EDWTransactionType::Buy:
+			case EDWTransactionType::Upgrade:
+			case EDWTransactionType::Generate:
 			{
-				const FItemQueryData ItemQueryData = Inventory->QueryItemByRange(EItemQueryType::Get, Iter1);
-				if(ItemQueryData.Item.Count < Iter1.Count)
+				UAbilityInventoryBase* Inventory = GetOwnerObject<IAbilityInventoryAgentInterface>()->GetInventory();
+				for(auto& Iter : SelectedPreviewItems)
 				{
-					bCanTransaction = false;
-					break;
+					const FItemQueryData ItemQueryData = Inventory->QueryItemByRange(EItemQueryType::Get, Iter);
+					if(ItemQueryData.Item.Count < Iter.Count)
+					{
+						bCanTransaction = false;
+						break;
+					}
 				}
+				break;
 			}
+			default: break;
 		}
 	}
 	else
@@ -168,8 +209,12 @@ void UWidgetTransactionPanel::OnRefresh()
 	
 	if(BtnTransaction)
 	{
-		BtnTransaction->SetIsEnabled(bCanTransaction);
+		// BtnTransaction->SetIsEnabled(bCanTransaction);
+		BtnTransaction->SetRenderOpacity(bCanTransaction ? 1.f : 0.5f);
+		BtnTransaction->SetVisibility(bCanTransaction ? ESlateVisibility::SelfHitTestInvisible : ESlateVisibility::HitTestInvisible);
 	}
+
+	OnPreviewContentRefresh();
 }
 
 void UWidgetTransactionPanel::OnDestroy(bool bRecovery)
@@ -205,9 +250,11 @@ void UWidgetTransactionPanel::OnTransactionItemSelected_Implementation(UWidgetTr
 
 	SelectedTransactionItem = InItem;
 
+	GenerateRawDataIndex = 0;
+
 	Refresh();
 
-	OnPreviewContentRefresh();
+	GetWorld()->GetTimerManager().SetTimer(ContentRefreshTH, FTimerDelegate::CreateUObject(this, &UWidgetTransactionPanel::Refresh), 1.5f, true);
 }
 
 void UWidgetTransactionPanel::OnTransactionItemDeselected_Implementation(UWidgetTransactionItem* InItem)
@@ -215,6 +262,8 @@ void UWidgetTransactionPanel::OnTransactionItemDeselected_Implementation(UWidget
 	if(InItem != SelectedTransactionItem) return;
 
 	SelectedTransactionItem = nullptr;
+
+	GenerateRawDataIndex = 0;
 
 	SelectedPreviewItems = TArray<FAbilityItem>();
 
@@ -225,6 +274,8 @@ void UWidgetTransactionPanel::OnTransactionItemDeselected_Implementation(UWidget
 		DestroySubWidget(Iter, true);
 	}
 	PreviewItems.Empty();
+
+	GetWorld()->GetTimerManager().ClearTimer(ContentRefreshTH);
 }
 
 void UWidgetTransactionPanel::OnTransactionContentRefresh(bool bScrollToStart)
@@ -233,48 +284,74 @@ void UWidgetTransactionPanel::OnTransactionContentRefresh(bool bScrollToStart)
 	
 	if(TransactionContent)
 	{
-		switch(GetTabIndex())
+		TArray<FAbilityItem> _TransactionItems;
+		switch(GetSelectedTabType())
 		{
-			case 0:
-			case 1:
+			case EDWTransactionType::Buy:
 			{
-				IAbilityInventoryAgentInterface* Seller = GetTabIndex() == 0 ? TransactionTarget : GetOwnerObject<IAbilityInventoryAgentInterface>();
-
-				for(auto& Iter : Seller->GetInventory()->GetAllItems())
+				for(auto& Iter : TransactionTarget->GetInventory()->GetAllItems(true))
 				{
-					if(Iter.IsEmpty() || !Iter.IsDataType<UAbilityTransItemDataBase>() || Iter.GetData<UAbilityTransItemDataBase>().Prices.IsEmpty() || CategoryBar->GetSelectedItemType() != EAbilityItemType::None && Iter.GetType() != CategoryBar->GetSelectedItemType()) continue;
+					if(!Iter.IsDataType<UAbilityTransItemDataBase>() || Iter.GetData<UAbilityTransItemDataBase>().Prices.IsEmpty()) continue;
 
-					if(UWidgetTransactionItem* TransactionItem = CreateSubWidget<UWidgetTransactionItem>({ &Iter }, TransactionItemClass))
-					{
-						TransactionItems.Add(TransactionItem);
-						if(UScrollBoxSlot* ScrollBoxSlot = Cast<UScrollBoxSlot>(TransactionContent->AddChild(TransactionItem)))
-						{
-							ScrollBoxSlot->SetPadding(FMargin(0.f, 0.f, 0.f, 5.f));
-						}
-					}
+					_TransactionItems.Add(Iter);
 				}
 				break;
 			}
-			case 2:
+			case EDWTransactionType::Sell:
 			{
-				IAbilityInventoryAgentInterface* Buyer = GetOwnerObject<IAbilityInventoryAgentInterface>();
-
-				for(auto Iter : Buyer->GetInventory()->GetAllSlots())
+				for(auto& Iter : GetOwnerObject<IAbilityInventoryAgentInterface>()->GetInventory()->GetAllItems(true))
 				{
-					if(Iter->IsEmpty() || !Iter->GetItem().IsDataType<UAbilityTransItemDataBase>() || Iter->GetItem().GetData<UAbilityTransItemDataBase>().Upgrades.IsEmpty() || Iter->GetItem().Level == Iter->GetItem().GetData<UAbilityTransItemDataBase>().MaxLevel || CategoryBar->GetSelectedItemType() != EAbilityItemType::None && Iter->GetItem().GetType() != CategoryBar->GetSelectedItemType()) continue;
+					if(!Iter.IsDataType<UAbilityTransItemDataBase>() || Iter.GetData<UAbilityTransItemDataBase>().Prices.IsEmpty()) continue;
 
-					if(UWidgetTransactionItem* TransactionItem = CreateSubWidget<UWidgetTransactionItem>({ &Iter->GetItem() }, TransactionItemClass))
-					{
-						TransactionItems.Add(TransactionItem);
-						if(UScrollBoxSlot* ScrollBoxSlot = Cast<UScrollBoxSlot>(TransactionContent->AddChild(TransactionItem)))
-						{
-							ScrollBoxSlot->SetPadding(FMargin(0.f, 0.f, 0.f, 5.f));
-						}
-					}
+					_TransactionItems.Add(Iter);
+				}
+				break;
+			}
+			case EDWTransactionType::Upgrade:
+			{
+				for(auto& Iter : GetOwnerObject<IAbilityInventoryAgentInterface>()->GetInventory()->GetAllItems())
+				{
+					if(!Iter.IsDataType<UAbilityTransItemDataBase>() || Iter.GetData<UAbilityTransItemDataBase>().Upgrades.IsEmpty() || Iter.Level == Iter.GetData<UAbilityTransItemDataBase>().MaxLevel) continue;
+
+					_TransactionItems.Add(Iter);
+				}
+				break;
+			}
+			case EDWTransactionType::Generate:
+			{
+				for(auto& Iter : GetOwnerObject<IAbilityInventoryAgentInterface>()->GetInventory()->GetAllItems())
+				{
+					if(!Iter.IsDataType<UDWPropBlueprintData>() || Iter.GetData<UDWPropBlueprintData>().GenerateItemType == EAbilityItemType::None) continue;
+
+					_TransactionItems.Add(Iter);
+				}
+				break;
+			}
+			case EDWTransactionType::Split:
+			{
+				for(auto& Iter : GetOwnerObject<IAbilityInventoryAgentInterface>()->GetInventory()->GetAllItems())
+				{
+					if(!Iter.IsDataType<UAbilityTransItemDataBase>() || Iter.GetData<UAbilityTransItemDataBase>().Splits.IsEmpty()) continue;
+
+					_TransactionItems.Add(Iter);
 				}
 				break;
 			}
 			default: break;
+		}
+		
+		for(auto& Iter : _TransactionItems)
+		{
+			if(CategoryBar->GetSelectedItemType() != EAbilityItemType::None && Iter.GetType() != CategoryBar->GetSelectedItemType()) continue;
+			
+			if(UWidgetTransactionItem* TransactionItem = CreateSubWidget<UWidgetTransactionItem>({ &Iter }, TransactionItemClass))
+			{
+				TransactionItems.Add(TransactionItem);
+				if(UScrollBoxSlot* ScrollBoxSlot = Cast<UScrollBoxSlot>(TransactionContent->AddChild(TransactionItem)))
+				{
+					ScrollBoxSlot->SetPadding(FMargin(0.f, 0.f, 0.f, 5.f));
+				}
+			}
 		}
 		
 		if(bScrollToStart)
@@ -300,7 +377,8 @@ void UWidgetTransactionPanel::OnPreviewContentRefresh()
 			PreviewItems.Empty();
 			for(auto& Iter : SelectedPreviewItems)
 			{
-				if(UWidgetAbilityItem* PreviewItem = CreateSubWidget<UWidgetAbilityItem>({ &Iter }, UAssetModuleStatics::GetStaticClass(GetTabIndex() != 1 ? FName("RequiredPreviewItem") : FName("SimplePreviewItem"))))
+				if(UWidgetAbilityItem* PreviewItem = CreateSubWidget<UWidgetAbilityItem>({ &Iter }, UAssetModuleStatics::GetStaticClass((GetSelectedTabType() == EDWTransactionType::Buy ||
+					GetSelectedTabType() == EDWTransactionType::Upgrade || GetSelectedTabType() == EDWTransactionType::Generate) ? FName("RequiredPreviewItem") : FName("SimplePreviewItem"))))
 				{
 					PreviewItems.Add(PreviewItem);
 					if(UWrapBoxSlot* WrapBoxSlot = PreviewContent->AddChildToWrapBox(PreviewItem))
@@ -318,13 +396,13 @@ void UWidgetTransactionPanel::OnTransactionButtonClicked()
 	FAbilityItem _SelectedTransactionItem;
 	if(GetSelectedTransactionItem(_SelectedTransactionItem))
 	{
-		switch(GetTabIndex())
+		switch(GetSelectedTabType())
 		{
-			case 0:
-			case 1:
+			case EDWTransactionType::Buy:
+			case EDWTransactionType::Sell:
 			{
-				IAbilityInventoryAgentInterface* Buyer = GetTabIndex() == 0 ? GetOwnerObject<IAbilityInventoryAgentInterface>() : TransactionTarget;
-				IAbilityInventoryAgentInterface* Seller = GetTabIndex() == 0 ? TransactionTarget : GetOwnerObject<IAbilityInventoryAgentInterface>();
+				IAbilityInventoryAgentInterface* Buyer = GetSelectedTabType() == EDWTransactionType::Buy ? GetOwnerObject<IAbilityInventoryAgentInterface>() : TransactionTarget;
+				IAbilityInventoryAgentInterface* Seller = GetSelectedTabType() == EDWTransactionType::Buy ? TransactionTarget : GetOwnerObject<IAbilityInventoryAgentInterface>();
 		
 				FAbilityItem _TransactionItem = FAbilityItem(_SelectedTransactionItem, 1);
 				TArray<FAbilityItem> _PreviewItems = SelectedPreviewItems;
@@ -334,10 +412,6 @@ void UWidgetTransactionPanel::OnTransactionButtonClicked()
 					Buyer->GetInventory()->RemoveItemByRange(Iter);
 				}
 				Buyer->GetInventory()->AddItemByRange(_TransactionItem, -1);
-				if(_TransactionItem.Count > 0)
-				{
-					Buyer->OnDiscardItem(_TransactionItem, false);
-				}
 		
 				_TransactionItem = FAbilityItem(_SelectedTransactionItem, 1);
 				Seller->GetInventory()->RemoveItemByRange(_TransactionItem);
@@ -357,7 +431,7 @@ void UWidgetTransactionPanel::OnTransactionButtonClicked()
 				}
 				break;
 			}
-			case 2:
+			case EDWTransactionType::Upgrade:
 			{
 				IAbilityInventoryAgentInterface* Buyer = GetOwnerObject<IAbilityInventoryAgentInterface>();
 				IAbilityInventoryAgentInterface* Seller = TransactionTarget;
@@ -390,8 +464,50 @@ void UWidgetTransactionPanel::OnTransactionButtonClicked()
 				{
 					SelectedTransactionItem->Init({ &_TransactionItem });
 					Refresh();
-					OnPreviewContentRefresh();
 				}
+				break;
+			}
+			case EDWTransactionType::Generate:
+			{
+				IAbilityInventoryAgentInterface* Buyer = GetOwnerObject<IAbilityInventoryAgentInterface>();
+				IAbilityInventoryAgentInterface* Seller = TransactionTarget;
+
+				FAbilityItem _TransactionItem = _SelectedTransactionItem;
+				FAbilityItem _GenerateItem = _TransactionItem.GetData<UDWPropBlueprintData>().GetGenerateItem(_TransactionItem.Level, UVoxelModule::Get().GetWorldData().RandomStream);
+				TArray<FAbilityItem> _PreviewItems = SelectedPreviewItems;
+
+				Buyer->GetInventory()->RemoveItemByRange(_TransactionItem);
+
+				for(auto Iter : _PreviewItems)
+				{
+					Buyer->GetInventory()->RemoveItemByRange(Iter);
+				}
+
+				Buyer->GetInventory()->AddItemByRange(_GenerateItem, -1);
+			
+				for(auto Iter : _PreviewItems)
+				{
+					Seller->GetInventory()->AddItemByRange(Iter);
+				}
+
+				OnTransactionContentRefresh();
+				break;
+			}
+			case EDWTransactionType::Split:
+			{
+				IAbilityInventoryAgentInterface* Buyer = GetOwnerObject<IAbilityInventoryAgentInterface>();
+		
+				FAbilityItem _TransactionItem = _SelectedTransactionItem;
+				TArray<FAbilityItem> _PreviewItems = SelectedPreviewItems;
+
+				Buyer->GetInventory()->RemoveItemByRange(_TransactionItem);
+
+				for(auto Iter : _PreviewItems)
+				{
+					Buyer->GetInventory()->AddItemByRange(Iter);
+				}
+
+				OnTransactionContentRefresh();
 				break;
 			}
 			default: break;
@@ -401,14 +517,14 @@ void UWidgetTransactionPanel::OnTransactionButtonClicked()
 	}
 }
 
-int32 UWidgetTransactionPanel::GetTabIndex() const
+EDWTransactionType UWidgetTransactionPanel::GetSelectedTabType() const
 {
-	return TabGroup->GetSelectedButtonIndex();
+	return (EDWTransactionType)TabGroup->GetSelectedButtonIndex();
 }
 
-void UWidgetTransactionPanel::SetTabIndex(int32 InIndex) const
+void UWidgetTransactionPanel::SetSelectedTabType(EDWTransactionType InIndex) const
 {
-	TabGroup->SelectButtonAtIndex(InIndex);
+	TabGroup->SelectButtonAtIndex((int32)InIndex);
 }
 
 bool UWidgetTransactionPanel::GetSelectedTransactionItem(FAbilityItem& OutItemData) const

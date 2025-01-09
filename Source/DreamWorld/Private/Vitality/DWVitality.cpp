@@ -156,14 +156,14 @@ void ADWVitality::OnAuxiliaryItem(const FAbilityItem& InItem)
 	Super::OnAuxiliaryItem(InItem);
 }
 
-bool ADWVitality::OnGenerateVoxel(const FVoxelHitResult& InVoxelHitResult)
+bool ADWVitality::OnGenerateVoxel(EInputInteractEvent InInteractEvent, const FVoxelHitResult& InHitResult)
 {
 	if(!GenerateVoxelID.IsValid()) return false;
 	
 	FItemQueryData ItemQueryData = Inventory->QueryItemByRange(EItemQueryType::Remove, FAbilityItem(GenerateVoxelID, 1), -1);
 	if(ItemQueryData.IsValid())
 	{
-		if(Super::OnGenerateVoxel(InVoxelHitResult))
+		if(Super::OnGenerateVoxel(InInteractEvent, InHitResult))
 		{
 			Inventory->RemoveItemByQueryData(ItemQueryData);
 			return true;
@@ -172,9 +172,9 @@ bool ADWVitality::OnGenerateVoxel(const FVoxelHitResult& InVoxelHitResult)
 	return false;
 }
 
-bool ADWVitality::OnDestroyVoxel(const FVoxelHitResult& InVoxelHitResult)
+bool ADWVitality::OnDestroyVoxel(EInputInteractEvent InInteractEvent, const FVoxelHitResult& InHitResult)
 {
-	return Super::OnDestroyVoxel(InVoxelHitResult);
+	return Super::OnDestroyVoxel(InInteractEvent, InHitResult);
 }
 
 void ADWVitality::OnAttributeChange(const FOnAttributeChangeData& InAttributeChangeData)

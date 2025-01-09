@@ -4,6 +4,6 @@ UDWEquipData::UDWEquipData()
 {
 	MaxLevel = 100;
 	
-	EquipType = EDWEquipType::Weapon;
+	EquipType = EDWEquipType::None;
 	EquipPart = EDWEquipPart::Head;
 }

@@ -311,9 +311,9 @@ void ADWPlayerCharacter::OnInteract(EInteractAction InInteractAction, IInteracti
 	}
 }
 
-bool ADWPlayerCharacter::OnInteractVoxel(const FVoxelHitResult& InVoxelHitResult, EInputInteractAction InInteractAction)
+bool ADWPlayerCharacter::OnInteractVoxel(EInputInteractAction InInteractAction, EInputInteractEvent InInteractEvent, const FVoxelHitResult& InHitResult)
 {
-	return Super::OnInteractVoxel(InVoxelHitResult, InInteractAction);
+	return Super::OnInteractVoxel(InInteractAction, InInteractEvent, InHitResult);
 }
 
 void ADWPlayerCharacter::MoveForward_Implementation(float InValue)
