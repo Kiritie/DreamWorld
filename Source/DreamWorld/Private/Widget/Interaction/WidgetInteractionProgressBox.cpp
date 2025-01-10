@@ -32,7 +32,11 @@ void UWidgetInteractionProgressBox::OnOpen(const TArray<FParameter>& InParams, b
 
 	if(InParams.IsValidIndex(0))
 	{
-		TxtActionName->SetText(InParams[0]);
+		TxtTargetName->SetText(InParams[0]);
+	}
+	if(InParams.IsValidIndex(1))
+	{
+		TxtActionName->SetText(InParams[1]);
 	}
 
 	SetProgress(0.f);

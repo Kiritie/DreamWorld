@@ -69,24 +69,29 @@ void UWidgetContextInputBox::OnTextBoxValueCommitted(const FText& InText, ETextC
 	{
 		if(!InText.IsEmpty() && InCommitMethod != ETextCommit::OnCleared)
 		{
-			const FString Message = InText.ToString();
+			FString Message = InText.ToString();
 			if(Message.StartsWith(TEXT("/")) && Message.Len() > 1)
 			{
 				FString Command = Message.Mid(1, Message.Len());
 				FString Params;
 				Command.Split(TEXT(" "), &Command, &Params);
-				
+
+				Message = TEXT("");
 				if(Command.Equals(TEXT("AddItem"), ESearchCase::IgnoreCase))
 				{
 					TArray<FString> ParamArr;
-					if(Params.ParseIntoArray(ParamArr, TEXT(" ")) >= 3)
+					if(Params.ParseIntoArray(ParamArr, TEXT(" ")) >= 1)
 					{
-						FAbilityItem Item = FAbilityItem(FPrimaryAssetId(*ParamArr[0]), FCString::Atoi(*ParamArr[1]), FCString::Atoi(*ParamArr[2]));
+						FAbilityItem Item = FAbilityItem(FPrimaryAssetId(*ParamArr[0]), ParamArr.IsValidIndex(1) ? FCString::Atoi(*ParamArr[1]) : 1, ParamArr.IsValidIndex(2) ? FCString::Atoi(*ParamArr[2]) : 0);
 						ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
 						if(PlayerCharacter && PlayerCharacter->IsActive(true))
 						{
-							PlayerCharacter->GetInventory()->AddItemByRange(Item);
+							PlayerCharacter->GetInventory()->AddItemByRange(Item, -1);
 						}
+					}
+					else
+					{
+						Message = FString::Printf(TEXT("命令参数错误: %s"), *Command);
 					}
 				}
 				else if(Command.Equals(TEXT("Kill"), ESearchCase::IgnoreCase))
@@ -107,10 +112,10 @@ void UWidgetContextInputBox::OnTextBoxValueCommitted(const FText& InText, ETextC
 				}
 				else
 				{
-					UWidgetModuleStatics::GetUserWidget<UWidgetContextBox>()->AddMessage(FString::Printf(TEXT("无效命令: %s"), *Command));
+					Message = FString::Printf(TEXT("无效命令: %s"), *Command);
 				}
 			}
-			else
+			if(!Message.IsEmpty())
 			{
 				UWidgetModuleStatics::GetUserWidget<UWidgetContextBox>()->AddMessage(Message);
 			}

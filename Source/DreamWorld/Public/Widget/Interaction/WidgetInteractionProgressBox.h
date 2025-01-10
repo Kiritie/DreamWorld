@@ -5,7 +5,7 @@
 #include "Widget/Screen/UserWidgetBase.h"
 #include "WidgetInteractionProgressBox.generated.h"
 
-class UCommonTextBlockN;
+class UTextBlock;
 class IInteractionAgentInterface;
 class UWidgetAbilityItem;
 class UWidgetKeyTipsItemBase;
@@ -34,7 +34,10 @@ public:
 	
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (BindWidget, OptionalWidget = false), Category = "Components")
-	UCommonTextBlockN* TxtActionName;
+	UTextBlock* TxtTargetName;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (BindWidget, OptionalWidget = false), Category = "Components")
+	UTextBlock* TxtActionName;
 
 public:
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)

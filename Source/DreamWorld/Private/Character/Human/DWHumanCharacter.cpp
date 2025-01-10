@@ -57,6 +57,7 @@ ADWHumanCharacter::ADWHumanCharacter(const FObjectInitializer& ObjectInitializer
 	GenerateHammerMesh->SetRelativeRotation(FRotator::ZeroRotator);
 	GenerateHammerMesh->SetVisibility(false);
 	GenerateHammerMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	GenerateHammerMesh->CastShadow = false;
 	
 	FSM->DefaultState = UDWCharacterState_Spawn::StaticClass();
 	FSM->FinalState = UDWCharacterState_Death::StaticClass();
