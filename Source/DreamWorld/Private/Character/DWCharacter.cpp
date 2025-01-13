@@ -776,9 +776,9 @@ bool ADWCharacter::OnDestroyVoxel(EInputInteractEvent InInteractEvent, const FVo
 			{
 				if(IsPlayer())
 				{
+					UWidgetModuleStatics::CloseUserWidget<UWidgetInteractionProgressBox>();
 					UAchievementModuleStatics::UnlockAchievement(FName("FirstDestroyVoxel"));
 				}
-				OnDestroyVoxel(EInputInteractEvent::Completed, InHitResult);
 				return true;
 			}
 			break;

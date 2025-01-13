@@ -832,11 +832,11 @@ enum class EDWInteractAction : uint8
 	// 无
 	None = EInteractAction::None,
 	// 喂食
-	Feed = EInteractAction::Custom3,
+	Feed = EInteractAction::Custom6,
 	// 骑乘
-	Ride = EInteractAction::Custom4,
+	Ride = EInteractAction::Custom7,
 	// 取消骑乘
-	UnRide = EInteractAction::Custom5
+	UnRide = EInteractAction::Custom8
 };
 
 UCLASS(Blueprintable, meta = (ShowWorldContextPin))

@@ -168,10 +168,6 @@ void UWidgetTransactionPanel::OnRefresh()
 			case EDWTransactionType::Generate:
 			{
 				SelectedPreviewItems = _SelectedTransactionItem.GetData<UDWPropBlueprintData>().GenerateRawDatas[GenerateRawDataIndex].Raws;
-				if(++GenerateRawDataIndex >= _SelectedTransactionItem.GetData<UDWPropBlueprintData>().GenerateRawDatas.Num())
-				{
-					GenerateRawDataIndex = 0;
-				}
 				break;
 			}
 			case EDWTransactionType::Split:
@@ -254,7 +250,7 @@ void UWidgetTransactionPanel::OnTransactionItemSelected_Implementation(UWidgetTr
 
 	Refresh();
 
-	GetWorld()->GetTimerManager().SetTimer(ContentRefreshTH, FTimerDelegate::CreateUObject(this, &UWidgetTransactionPanel::Refresh), 1.5f, true);
+	GetWorld()->GetTimerManager().SetTimer(GenerateRawDataRefreshTH, FTimerDelegate::CreateUObject(this, &UWidgetTransactionPanel::OnGenerateRawDataRefresh), 1.5f, true);
 }
 
 void UWidgetTransactionPanel::OnTransactionItemDeselected_Implementation(UWidgetTransactionItem* InItem)
@@ -275,7 +271,7 @@ void UWidgetTransactionPanel::OnTransactionItemDeselected_Implementation(UWidget
 	}
 	PreviewItems.Empty();
 
-	GetWorld()->GetTimerManager().ClearTimer(ContentRefreshTH);
+	GetWorld()->GetTimerManager().ClearTimer(GenerateRawDataRefreshTH);
 }
 
 void UWidgetTransactionPanel::OnTransactionContentRefresh(bool bScrollToStart)
@@ -363,6 +359,27 @@ void UWidgetTransactionPanel::OnTransactionContentRefresh(bool bScrollToStart)
 	Refresh();
 }
 
+void UWidgetTransactionPanel::OnGenerateRawDataRefresh()
+{
+	FAbilityItem _SelectedTransactionItem;
+	if(GetSelectedTransactionItem(_SelectedTransactionItem))
+	{
+		switch(GetSelectedTabType())
+		{
+			case EDWTransactionType::Generate:
+			{
+				if(++GenerateRawDataIndex >= _SelectedTransactionItem.GetData<UDWPropBlueprintData>().GenerateRawDatas.Num())
+				{
+					GenerateRawDataIndex = 0;
+				}
+				Refresh();
+				break;
+			}
+			default: break;
+		}
+	}
+}
+
 void UWidgetTransactionPanel::OnPreviewContentRefresh()
 {
 	if(PreviewContent)
@@ -428,6 +445,7 @@ void UWidgetTransactionPanel::OnTransactionButtonClicked()
 				{
 					_SelectedTransactionItem.Count--;
 					SelectedTransactionItem->Init({ &_SelectedTransactionItem });
+					Refresh();
 				}
 				break;
 			}
@@ -491,6 +509,8 @@ void UWidgetTransactionPanel::OnTransactionButtonClicked()
 				}
 
 				OnTransactionContentRefresh();
+				
+				GetWorld()->GetTimerManager().SetTimer(GenerateRawDataRefreshTH, FTimerDelegate::CreateUObject(this, &UWidgetTransactionPanel::OnGenerateRawDataRefresh), 1.5f, true);
 				break;
 			}
 			case EDWTransactionType::Split:

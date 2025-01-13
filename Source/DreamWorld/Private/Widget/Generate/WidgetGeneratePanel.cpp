@@ -120,10 +120,6 @@ void UWidgetGeneratePanel::OnRefresh()
 	{
 		UAbilityInventoryBase* Inventory = GetOwnerObject<IAbilityInventoryAgentInterface>()->GetInventory();
 		SelectedPreviewItems = _SelectedGenerateItemData.RawDatas[GenerateRawDataIndex].Raws;
-		if(++GenerateRawDataIndex >= _SelectedGenerateItemData.RawDatas.Num())
-		{
-			GenerateRawDataIndex = 0;
-		}
 		for(auto& Iter : SelectedPreviewItems)
 		{
 			const FItemQueryData ItemQueryData = Inventory->QueryItemByRange(EItemQueryType::Get, Iter);
@@ -174,7 +170,7 @@ void UWidgetGeneratePanel::OnGenerateItemSelected_Implementation(UWidgetGenerate
 
 	Refresh();
 
-	GetWorld()->GetTimerManager().SetTimer(ContentRefreshTH, FTimerDelegate::CreateUObject(this, &UWidgetGeneratePanel::Refresh), 1.5f, true);
+	GetWorld()->GetTimerManager().SetTimer(GenerateRawDataRefreshTH, FTimerDelegate::CreateUObject(this, &UWidgetGeneratePanel::OnGenerateRawDataRefresh), 1.5f, true);
 }
 
 void UWidgetGeneratePanel::OnGenerateItemDeselected_Implementation(UWidgetGenerateItem* InItem)
@@ -195,7 +191,7 @@ void UWidgetGeneratePanel::OnGenerateItemDeselected_Implementation(UWidgetGenera
 	}
 	PreviewItems.Empty();
 
-	GetWorld()->GetTimerManager().ClearTimer(ContentRefreshTH);
+	GetWorld()->GetTimerManager().ClearTimer(GenerateRawDataRefreshTH);
 }
 
 void UWidgetGeneratePanel::OnGenerateContentRefresh(bool bScrollToStart)
@@ -223,6 +219,19 @@ void UWidgetGeneratePanel::OnGenerateContentRefresh(bool bScrollToStart)
 		{
 			GenerateContent->ScrollToStart();
 		}
+	}
+}
+
+void UWidgetGeneratePanel::OnGenerateRawDataRefresh()
+{
+	FDWGenerateItemData _SelectedGenerateItemData;
+	if(GetSelectedGenerateItemData(_SelectedGenerateItemData))
+	{
+		if(++GenerateRawDataIndex >= _SelectedGenerateItemData.RawDatas.Num())
+		{
+			GenerateRawDataIndex = 0;
+		}
+		Refresh();
 	}
 }
 
@@ -259,11 +268,13 @@ void UWidgetGeneratePanel::OnGenerateButtonClicked()
 	if(GetSelectedGenerateItemData(_SelectedGenerateItemData))
 	{
 		UAbilityInventoryBase* Inventory = GetOwnerObject<IAbilityInventoryAgentInterface>()->GetInventory();
-		for(auto& Iter : SelectedPreviewItems)
+		for(auto Iter : SelectedPreviewItems)
 		{
 			Inventory->RemoveItemByRange(Iter);
 		}
 		Inventory->AddItemByRange(_SelectedGenerateItemData.Item, -1);
+		Refresh();
+		GetWorld()->GetTimerManager().SetTimer(GenerateRawDataRefreshTH, FTimerDelegate::CreateUObject(this, &UWidgetGeneratePanel::OnGenerateRawDataRefresh), 1.5f, true);
 		UAchievementModuleStatics::UnlockAchievement(FName("FirstGenerateItem"));
 	}
 }

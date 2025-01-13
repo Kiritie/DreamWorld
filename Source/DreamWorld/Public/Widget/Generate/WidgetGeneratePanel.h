@@ -55,6 +55,9 @@ protected:
 	void OnGenerateContentRefresh(bool bScrollToStart = false);
 
 	UFUNCTION()
+	void OnGenerateRawDataRefresh();
+
+	UFUNCTION()
 	void OnPreviewContentRefresh();
 
 	UFUNCTION()
@@ -96,7 +99,7 @@ protected:
 	int32 GenerateRawDataIndex;
 	
 	UPROPERTY()
-	FTimerHandle ContentRefreshTH;
+	FTimerHandle GenerateRawDataRefreshTH;
 
 public:
 	UFUNCTION(BlueprintPure)
