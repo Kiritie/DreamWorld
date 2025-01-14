@@ -256,6 +256,22 @@ void ADWPlayerCharacter::OnInteract(EInteractAction InInteractAction, IInteracti
 	{
 		switch(InInteractAction)
 		{
+			case EInteractAction::Interact:
+			{
+				if(AVoxelInteractAuxiliary* InteractionAgent = Cast<AVoxelInteractAuxiliary>(InInteractionAgent))
+				{
+					switch(InteractionAgent->GetVoxelItem().GetVoxelType())
+					{
+						case EVoxelType::Bed:
+						{
+							WHDebug(TEXT("睡觉！"));
+							break;
+						}
+						default: break;
+					}
+				}
+				break;
+			}
 			case (EInteractAction)EVoxelInteractAction::Open:
 			{
 				if(AVoxelInteractAuxiliary* InteractionAgent = Cast<AVoxelInteractAuxiliary>(InInteractionAgent))
