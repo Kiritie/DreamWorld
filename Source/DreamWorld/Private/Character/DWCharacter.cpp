@@ -49,8 +49,10 @@
 #include "Ability/Character/States/AbilityCharacterState_Walk.h"
 #include "Character/States/DWCharacterState_Climb.h"
 #include "Character/States/DWCharacterState_Fly.h"
+#include "Character/States/DWCharacterState_Sleep.h"
 #include "Item/Skill/DWSkillData.h"
 #include "Voxel/Datas/VoxelData.h"
+#include "Voxel/Voxels/Auxiliary/VoxelInteractAuxiliary.h"
 #include "Widget/Interaction/WidgetInteractionProgressBox.h"
 
 // Sets default values
@@ -88,6 +90,7 @@ ADWCharacter::ADWCharacter(const FObjectInitializer& ObjectInitializer) :
 	FSM->States.Add(UAbilityCharacterState_Interrupt::StaticClass());
 	FSM->States.Add(UAbilityCharacterState_Jump::StaticClass());
 	FSM->States.Add(UDWCharacterState_Ride::StaticClass());
+	FSM->States.Add(UDWCharacterState_Sleep::StaticClass());
 	FSM->States.Add(UAbilityCharacterState_Static::StaticClass());
 	FSM->States.Add(UAbilityCharacterState_Swim::StaticClass());
 	FSM->States.Add(UAbilityCharacterState_Walk::StaticClass());
@@ -97,8 +100,6 @@ ADWCharacter::ADWCharacter(const FObjectInitializer& ObjectInitializer) :
 	TeamID = NAME_None;
 	
 	Equips = TMap<EDWEquipPart, ADWEquip*>();
-
-	RidingTarget = nullptr;
 
 	// local
 	SkillAttackAbilityItem = FAbilityItem();
@@ -151,8 +152,6 @@ void ADWCharacter::OnInitialize_Implementation()
 void ADWCharacter::OnRefresh_Implementation(float DeltaSeconds)
 {
 	Super::OnRefresh_Implementation(DeltaSeconds);
-
-	if(IsDead()) return;
 
 	if(IsActive())
 	{
@@ -394,6 +393,19 @@ void ADWCharacter::UnRide()
 	}
 }
 
+void ADWCharacter::Sleep(AVoxelInteractAuxiliary* InBed)
+{
+	FSM->SwitchStateByClass<UDWCharacterState_Sleep>({ InBed });
+}
+
+void ADWCharacter::UnSleep()
+{
+	if(FSM->IsCurrentStateClass<UDWCharacterState_Sleep>())
+	{
+		FSM->SwitchState(nullptr);
+	}
+}
+
 void ADWCharacter::Aim()
 {
 	FSM->SwitchStateByClass<UDWCharacterState_Aim>();
@@ -627,13 +639,41 @@ void ADWCharacter::OnInteract(EInteractAction InInteractAction, IInteractionAgen
 {
 	Super::OnInteract(InInteractAction, InInteractionAgent, bPassive);
 
-	if(bPassive)
+	if(!bPassive)
 	{
 		switch (InInteractAction)
 		{
-			case EInteractAction::Revive:
+			case EInteractAction::Interact:
 			{
-				Revive(Cast<IAbilityVitalityInterface>(InInteractionAgent));
+				if(AVoxelInteractAuxiliary* InteractionAgent = Cast<AVoxelInteractAuxiliary>(InInteractionAgent))
+				{
+					switch(InteractionAgent->GetVoxelItem().GetVoxelType())
+					{
+						case EVoxelType::Bed:
+						{
+							Sleep(InteractionAgent);
+							break;
+						}
+						default: break;
+					}
+				}
+				break;
+			}
+			case EInteractAction::UnInteract:
+			{
+				if(AVoxelInteractAuxiliary* InteractionAgent = Cast<AVoxelInteractAuxiliary>(InInteractionAgent))
+				{
+					switch(InteractionAgent->GetVoxelItem().GetVoxelType())
+					{
+						case EVoxelType::Bed:
+						{
+							UnSleep();
+							break;
+						}
+						default: break;
+					}
+				}
+				break;
 			}
 			default: break;
 		}
@@ -932,12 +972,12 @@ void ADWCharacter::HandleInterrupt(const FGameplayAttribute& InterruptAttribute,
 
 bool ADWCharacter::IsTargetAble_Implementation(APawn* InPlayerPawn) const
 {
-	return Super::IsTargetAble_Implementation(InPlayerPawn) && GetOwnerRider() != InPlayerPawn;
+	return Super::IsTargetAble_Implementation(InPlayerPawn) && FSM->GetStateByClass<UDWCharacterState_Ride>()->GetOwnerRider() != InPlayerPawn;
 }
 
 bool ADWCharacter::IsLookAtAble_Implementation(AActor* InLookerActor) const
 {
-	return Super::IsLookAtAble_Implementation(InLookerActor) && GetOwnerRider() != InLookerActor;
+	return Super::IsLookAtAble_Implementation(InLookerActor) && FSM->GetStateByClass<UDWCharacterState_Ride>()->GetOwnerRider() != InLookerActor;
 }
 
 bool ADWCharacter::CanLookAtTarget()
@@ -1054,6 +1094,11 @@ bool ADWCharacter::IsDefending() const
 bool ADWCharacter::IsRiding() const
 {
 	return AbilitySystem->HasMatchingGameplayTag(GameplayTags::State_Character_Riding);
+}
+
+bool ADWCharacter::IsSleeping() const
+{
+	return AbilitySystem->HasMatchingGameplayTag(GameplayTags::State_Character_Sleeping);
 }
 
 void ADWCharacter::SetControlMode_Implementation(EDWCharacterControlMode InControlMode)

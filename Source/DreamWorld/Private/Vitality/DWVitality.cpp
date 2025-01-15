@@ -92,33 +92,12 @@ void ADWVitality::Revive(IAbilityVitalityInterface* InRescuer)
 
 bool ADWVitality::CanInteract(EInteractAction InInteractAction, IInteractionAgentInterface* InInteractionAgent)
 {
-	switch (InInteractAction)
-	{
-		case EInteractAction::Revive:
-		{
-			return IsDead();
-		}
-		default: break;
-	}
 	return Super::CanInteract(InInteractAction, InInteractionAgent);
 }
 
 void ADWVitality::OnInteract(EInteractAction InInteractAction, IInteractionAgentInterface* InInteractionAgent, bool bPassive)
 {
 	Super::OnInteract(InInteractAction, InInteractionAgent, bPassive);
-
-	if(bPassive)
-	{
-		switch (InInteractAction)
-		{
-			case EInteractAction::Revive:
-			{
-				Revive(Cast<IAbilityVitalityInterface>(InInteractionAgent));
-				break;
-			}
-			default: break;
-		}
-	}
 }
 
 void ADWVitality::OnAdditionItem(const FAbilityItem& InItem)

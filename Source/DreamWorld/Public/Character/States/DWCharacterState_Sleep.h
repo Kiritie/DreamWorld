@@ -5,20 +5,21 @@
 #include "CoreMinimal.h"
 #include "UObject/Object.h"
 #include "Ability/Character/States/AbilityCharacterStateBase.h"
-#include "DWCharacterState_Ride.generated.h"
+#include "DWCharacterState_Sleep.generated.h"
 
+class AVoxelInteractAuxiliary;
 /**
  * 
  */
 UCLASS()
-class DREAMWORLD_API UDWCharacterState_Ride : public UAbilityCharacterStateBase
+class DREAMWORLD_API UDWCharacterState_Sleep : public UAbilityCharacterStateBase
 {
 	GENERATED_BODY()
 
 	friend class ADWCharacter;
 
 public:
-	UDWCharacterState_Ride();
+	UDWCharacterState_Sleep();
 
 public:
 	virtual void OnInitialize(UFSMComponent* InFSM, int32 InStateIndex) override;
@@ -35,13 +36,8 @@ public:
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "CharacterStats")
-	ADWCharacter* OwnerRider;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "CharacterStats")
-	ADWCharacter* RidingTarget;
+	AVoxelInteractAuxiliary* Bed;
 
 public:
-	ADWCharacter* GetOwnerRider() const { return OwnerRider; }
-
-	ADWCharacter* GetRidingTarget() const { return RidingTarget; }
+	AVoxelInteractAuxiliary* GetBed() const { return Bed; }
 };

@@ -34,8 +34,6 @@ void UDWCharacterState_Spawn::OnEnter(UFiniteStateBase* InLastState, const TArra
 	
 	// stats
 	Character->SetControlMode(Character->ControlMode);
-	Character->RidingTarget = nullptr;
-	Character->OwnerRider = nullptr;
 	
 	// local
 	Character->AIMoveLocation = EMPTY_Vector;

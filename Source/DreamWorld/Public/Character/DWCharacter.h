@@ -10,6 +10,7 @@
 
 #include "DWCharacter.generated.h"
 
+class AVoxelInteractAuxiliary;
 class UDialogue;
 class ADWEquip;
 class UEventHandle_VoxelWorldModeChanged;
@@ -106,6 +107,12 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	virtual void UnRide();
+
+	UFUNCTION(BlueprintCallable)
+	virtual void Sleep(AVoxelInteractAuxiliary* InBed);
+
+	UFUNCTION(BlueprintCallable)
+	virtual void UnSleep();
 
 	UFUNCTION(BlueprintCallable)
 	virtual void Aim();
@@ -226,12 +233,6 @@ protected:
 	FName TeamID;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "CharacterStats")
-	ADWCharacter* OwnerRider;
-	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "CharacterStats")
-	ADWCharacter* RidingTarget;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "CharacterStats")
 	bool bHitAble;
 
 protected:
@@ -332,6 +333,9 @@ public:
 	UFUNCTION(BlueprintPure)
 	virtual bool IsRiding() const;
 
+	UFUNCTION(BlueprintPure)
+	virtual bool IsSleeping() const;
+
 public:
 	virtual FGuid GetActorIDT() const override { return ActorID; }
 	
@@ -378,12 +382,6 @@ public:
 
 	UFUNCTION(BlueprintPure)
 	float GetPatrolDuration() const;
-
-	UFUNCTION(BlueprintPure)
-	ADWCharacter* GetOwnerRider() const { return OwnerRider; }
-
-	UFUNCTION(BlueprintPure)
-	ADWCharacter* GetRidingTarget() const { return RidingTarget; }
 
 	UFUNCTION(BlueprintPure)
 	FVector GetAIMoveLocation() const { return AIMoveLocation; }

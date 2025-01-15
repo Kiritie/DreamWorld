@@ -67,7 +67,6 @@ void ADWPlayerController::LoadData(FSaveData* InSaveData, EPhase InPhase)
 			SetPlayerPawn(PlayerCharacter);
 			PlayerCharacter->LoadSaveData(&SaveData, EPhase::Primary);
 			PlayerCharacter->Execute_SetActorVisible(PlayerCharacter, UProcedureModuleStatics::IsCurrentProcedureClass<UDWProcedure_ArchiveCreating>());
-			PlayerCharacter->DisableInput(nullptr);
 		}
 	}
 	if(PHASEC(InPhase, EPhase::Lesser))
@@ -77,7 +76,6 @@ void ADWPlayerController::LoadData(FSaveData* InSaveData, EPhase InPhase)
 	if(PHASEC(InPhase, EPhase::Final))
 	{
 		PlayerCharacter->LoadSaveData(&SaveData, EPhase::Final);
-		PlayerCharacter->EnableInput(nullptr);
 		UCharacterModuleStatics::SwitchCharacter(PlayerCharacter, true);
 		if(SaveData.IsSaved())
 		{

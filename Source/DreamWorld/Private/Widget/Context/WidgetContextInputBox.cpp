@@ -84,7 +84,7 @@ void UWidgetContextInputBox::OnTextBoxValueCommitted(const FText& InText, ETextC
 					{
 						FAbilityItem Item = FAbilityItem(FPrimaryAssetId(*ParamArr[0]), ParamArr.IsValidIndex(1) ? FCString::Atoi(*ParamArr[1]) : 1, ParamArr.IsValidIndex(2) ? FCString::Atoi(*ParamArr[2]) : 0);
 						ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
-						if(PlayerCharacter && PlayerCharacter->IsActive(true))
+						if(PlayerCharacter && PlayerCharacter->IsActive())
 						{
 							PlayerCharacter->GetInventory()->AddItemByRange(Item, -1);
 						}
@@ -97,7 +97,7 @@ void UWidgetContextInputBox::OnTextBoxValueCommitted(const FText& InText, ETextC
 				else if(Command.Equals(TEXT("Kill"), ESearchCase::IgnoreCase))
 				{
 					ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
-					if(PlayerCharacter && PlayerCharacter->IsActive(true))
+					if(PlayerCharacter && PlayerCharacter->IsActive())
 					{
 						PlayerCharacter->Death(PlayerCharacter);
 					}
@@ -105,7 +105,7 @@ void UWidgetContextInputBox::OnTextBoxValueCommitted(const FText& InText, ETextC
 				else if(Command.Equals(TEXT("LevelUp"), ESearchCase::IgnoreCase))
 				{
 					ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
-					if(PlayerCharacter && PlayerCharacter->IsActive(true))
+					if(PlayerCharacter && PlayerCharacter->IsActive())
 					{
 						PlayerCharacter->SetLevelA(PlayerCharacter->GetLevelA() + 1);
 					}

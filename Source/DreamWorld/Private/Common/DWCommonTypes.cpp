@@ -249,6 +249,7 @@ namespace GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(State_Character_Dodging, "State.Character.Dodging", "Character Dodging");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(State_Character_Sprinting, "State.Character.Sprinting", "Character Sprinting");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(State_Character_Riding, "State.Character.Riding", "Character Riding");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(State_Character_Sleeping, "State.Character.Sleeping", "Character Sleeping");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(State_Character_Aiming, "State.Character.Aiming", "Character Aiming");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(State_Character_Attacking, "State.Character.Attacking", "Character Attacking");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(State_Character_Defending, "State.Character.Defending", "Character Defending");
@@ -259,6 +260,7 @@ namespace GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Ability_Character_Action_Dodge, "Ability.Character.Action.Dodge", "Character Action Dodge");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Ability_Character_Action_Sprint, "Ability.Character.Action.Sprint", "Character Action Sprint");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Ability_Character_Action_Ride, "Ability.Character.Action.Ride", "Character Action Ride");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Ability_Character_Action_Sleep, "Ability.Character.Action.Sleep", "Character Action Sleep");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Ability_Character_Action_Take, "Ability.Character.Action.Take", "Character Action Take");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Ability_Character_Action_Use, "Ability.Character.Action.Use", "Character Action Use");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Ability_Character_Action_Discard, "Ability.Character.Action.Discard", "Character Action Discard");

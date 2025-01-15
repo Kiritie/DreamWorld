@@ -7,8 +7,8 @@
 #include "Character/DWCharacterData.h"
 #include "Common/Interaction/InteractionComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "FSM/Components/FSMComponent.h"
 #include "GameFramework/PawnMovementComponent.h"
-#include "Kismet/KismetSystemLibrary.h"
 #include "Scene/SceneModuleStatics.h"
 #include "Voxel/VoxelModule.h"
 #include "Voxel/VoxelModuleStatics.h"
@@ -37,22 +37,20 @@ void UDWCharacterState_Ride::OnEnter(UFiniteStateBase* InLastState, const TArray
 	Super::OnEnter(InLastState, InParams);
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
-	ADWCharacter* RidingTarget = nullptr;
 
 	if(InParams.IsValidIndex(0))
 	{
 		RidingTarget = InParams[0];
 	}
 
-	Character->RidingTarget = RidingTarget;
-
 	Character->GetAbilitySystemComponent()->AddLooseGameplayTag(GameplayTags::State_Character_Riding);
 
 	UCharacterModuleStatics::SwitchCharacter(RidingTarget);
-	
+
 	Character->GetMovementComponent()->SetActive(false);
 	Character->GetCollisionComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	RidingTarget->AttachActor(Character, FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("RiderPoint"));
+	RidingTarget->GetFSMComponent()->GetStateByClass<UDWCharacterState_Ride>()->OwnerRider = Character;
 	Character->SetInteractingAgent(RidingTarget, true);
 	
 	RidingTarget->SetMotionRate(1.f, 1.f);
@@ -68,39 +66,38 @@ void UDWCharacterState_Ride::OnLeave(UFiniteStateBase* InNextState)
 	Super::OnLeave(InNextState);
 
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
-	ADWCharacter* RidingTarget = Character->GetRidingTarget();
 
 	Character->StopAction(GameplayTags::Ability_Character_Action_Ride);
 
 	Character->GetAbilitySystemComponent()->RemoveLooseGameplayTag(GameplayTags::State_Character_Riding);
 
 	RidingTarget->DetachActor(Character, FDetachmentTransformRules::KeepWorldTransform);
+	RidingTarget->GetFSMComponent()->GetStateByClass<UDWCharacterState_Ride>()->OwnerRider = nullptr;
 
 	UCharacterModuleStatics::SwitchCharacter(Character);
 
-	if(Character->IsActive())
-	{
-		Character->GetMovementComponent()->SetActive(true);
-		Character->GetCollisionComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-	}
+	Character->GetMovementComponent()->SetActive(true);
+	Character->GetCollisionComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	
-	if(RidingTarget)
-	{
-		const FVector Offset = Character->GetActorRightVector() * (Character->GetRadius() + RidingTarget->GetRadius());
-		FVector RayStart = Character->GetActorLocation() + Offset;
-		const FVector RayEnd = FVector(RayStart.X, RayStart.Y, 0);
+	const FVector Offset = Character->GetActorRightVector() * (Character->GetRadius() + RidingTarget->GetRadius());
+	FVector RayStart = Character->GetActorLocation() + Offset;
+	RayStart.Z = UVoxelModuleStatics::GetWorldData().GetWorldRealSize().Z;
+	const FVector RayEnd = FVector(RayStart.X, RayStart.Y, 0);
 
-		FHitResult HitResult;
-		RayStart.Z = UVoxelModuleStatics::GetWorldData().GetWorldRealSize().Z;
-		UVoxelModuleStatics::VoxelAgentTraceSingle(RayStart, RayEnd, Character->GetRadius(), Character->GetHalfHeight(), {}, HitResult, false);
-		if (HitResult.bBlockingHit)
-		{
-			Character->SetActorLocation(HitResult.Location);
-		}
+	FHitResult HitResult;
+	UVoxelModuleStatics::VoxelAgentTraceSingle(RayStart, RayEnd, Character->GetRadius(), Character->GetHalfHeight(), {}, HitResult, false);
+	if (HitResult.bBlockingHit)
+	{
+		Character->SetActorLocation(HitResult.Location);
+	}
+	else
+	{
+		Character->SetActorLocation(FVector(RayStart.X, RayStart.Y, Character->GetActorLocation().Z));
 	}
 	
 	Character->SetInteractingAgent(nullptr, true);
-	Character->RidingTarget = nullptr;
+	
+	RidingTarget = nullptr;
 }
 
 void UDWCharacterState_Ride::OnTermination()

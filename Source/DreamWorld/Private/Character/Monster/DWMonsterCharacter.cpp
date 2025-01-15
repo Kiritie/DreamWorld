@@ -9,6 +9,8 @@
 #include "Character/Human/DWHumanCharacter.h"
 #include "Ability/Inventory/AbilityInventoryBase.h"
 #include "Ability/Inventory/Slot/AbilityInventorySlotBase.h"
+#include "Character/States/DWCharacterState_Ride.h"
+#include "FSM/Components/FSMComponent.h"
 #include "Item/Prop/DWPropData.h"
 
 ADWMonsterCharacter::ADWMonsterCharacter(const FObjectInitializer& ObjectInitializer) :
@@ -37,7 +39,7 @@ bool ADWMonsterCharacter::CanInteract(EInteractAction InInteractAction, IInterac
 		{
 			if(ADWCharacter* InteractionCharacter = Cast<ADWCharacter>(InInteractionAgent))
 			{
-				return !IsEnemy(InteractionCharacter) && InteractionCharacter->GetRidingTarget() != this;
+				return !IsEnemy(InteractionCharacter) && InteractionCharacter->GetFSMComponent()->GetStateByClass<UDWCharacterState_Ride>()->GetRidingTarget() != this;
 			}
 			break;
 		}
@@ -45,7 +47,7 @@ bool ADWMonsterCharacter::CanInteract(EInteractAction InInteractAction, IInterac
 		{
 			if(ADWCharacter* InteractionCharacter = Cast<ADWCharacter>(InInteractionAgent))
 			{
-				return !IsEnemy(InteractionCharacter) && InteractionCharacter->GetRidingTarget() == this;
+				return !IsEnemy(InteractionCharacter) && InteractionCharacter->GetFSMComponent()->GetStateByClass<UDWCharacterState_Ride>()->GetRidingTarget() == this;
 			}
 			break;
 		}

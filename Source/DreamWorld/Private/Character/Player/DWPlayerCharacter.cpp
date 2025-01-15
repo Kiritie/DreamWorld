@@ -32,6 +32,7 @@
 #include "Character/DWCharacterData.h"
 #include "Character/Human/States/DWHumanCharacterState_Defend.h"
 #include "Character/Player/States/DWPlayerCharacterState_Aim.h"
+#include "Character/Player/States/DWPlayerCharacterState_Sleep.h"
 #include "Character/States/DWCharacterState_Attack.h"
 #include "Character/States/DWCharacterState_Climb.h"
 #include "Character/States/DWCharacterState_Dodge.h"
@@ -103,6 +104,7 @@ ADWPlayerCharacter::ADWPlayerCharacter(const FObjectInitializer& ObjectInitializ
 	FSM->States.Add(UAbilityCharacterState_Interrupt::StaticClass());
 	FSM->States.Add(UAbilityCharacterState_Jump::StaticClass());
 	FSM->States.Add(UDWCharacterState_Ride::StaticClass());
+	FSM->States.Add(UDWPlayerCharacterState_Sleep::StaticClass());
 	FSM->States.Add(UAbilityCharacterState_Static::StaticClass());
 	FSM->States.Add(UAbilityCharacterState_Swim::StaticClass());
 	FSM->States.Add(UAbilityCharacterState_Walk::StaticClass());
@@ -220,17 +222,6 @@ void ADWPlayerCharacter::OnTargetLookAtOff(AActor* InTargetActor)
 
 bool ADWPlayerCharacter::CanInteract(EInteractAction InInteractAction, IInteractionAgentInterface* InInteractionAgent)
 {
-	switch (InInteractAction)
-	{
-		case EInteractAction::Revive:
-		{
-			if(InInteractionAgent == this)
-			{
-				return IsDead();
-			}
-		}
-		default: break;
-	}
 	return Super::CanInteract(InInteractAction, InInteractionAgent);
 }
 
@@ -256,22 +247,6 @@ void ADWPlayerCharacter::OnInteract(EInteractAction InInteractAction, IInteracti
 	{
 		switch(InInteractAction)
 		{
-			case EInteractAction::Interact:
-			{
-				if(AVoxelInteractAuxiliary* InteractionAgent = Cast<AVoxelInteractAuxiliary>(InInteractionAgent))
-				{
-					switch(InteractionAgent->GetVoxelItem().GetVoxelType())
-					{
-						case EVoxelType::Bed:
-						{
-							WHDebug(TEXT("睡觉！"));
-							break;
-						}
-						default: break;
-					}
-				}
-				break;
-			}
 			case (EInteractAction)EVoxelInteractAction::Open:
 			{
 				if(AVoxelInteractAuxiliary* InteractionAgent = Cast<AVoxelInteractAuxiliary>(InInteractionAgent))
