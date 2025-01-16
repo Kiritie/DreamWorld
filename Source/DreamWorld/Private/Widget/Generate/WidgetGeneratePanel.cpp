@@ -12,9 +12,12 @@
 #include "CommonButtonBase.h"
 #include "Ability/Inventory/AbilityInventoryAgentInterface.h"
 #include "Ability/Inventory/AbilityInventoryBase.h"
+#include "Ability/Item/AbilityItemDataBase.h"
 #include "Achievement/AchievementModuleStatics.h"
+#include "Setting/Widget/Item/WidgetOptionSettingItemBase.h"
 #include "Widget/WidgetModuleStatics.h"
 #include "Widget/Common/CommonButton.h"
+#include "Widget/Common/WidgetProgressBox.h"
 #include "Widget/Common/WidgetUIMask.h"
 #include "Widget/Generate/WidgetGenerateItem.h"
 #include "Widget/Item/WidgetAbilityItem.h"
@@ -48,6 +51,10 @@ void UWidgetGeneratePanel::OnCreate(UObject* InOwner, const TArray<FParameter>& 
 	if(CategoryBar)
 	{
 		CategoryBar->OnCategorySelected.AddDynamic(this, &UWidgetGeneratePanel::OnItemCategorySelected);
+	}
+	if(GenerateNumOption)
+	{
+		GenerateNumOption->OnValueChanged.AddDynamic(this, &UWidgetGeneratePanel::OnGenerateNumOptionValueChange);
 	}
 }
 
@@ -122,6 +129,7 @@ void UWidgetGeneratePanel::OnRefresh()
 		SelectedPreviewItems = _SelectedGenerateItemData.RawDatas[GenerateRawDataIndex].Raws;
 		for(auto& Iter : SelectedPreviewItems)
 		{
+			Iter.Count *= GetSelectedGenerateNum();
 			const FItemQueryData ItemQueryData = Inventory->QueryItemByRange(EItemQueryType::Get, Iter);
 			if(ItemQueryData.Item.Count < Iter.Count)
 			{
@@ -167,6 +175,13 @@ void UWidgetGeneratePanel::OnGenerateItemSelected_Implementation(UWidgetGenerate
 	SelectedGenerateItem = InItem;
 
 	GenerateRawDataIndex = 0;
+
+	if(GenerateNumOption)
+	{
+		TArray<FString> Options;
+		DON_WITHINDEX(20, i, Options.Add(FString::FromInt(SelectedGenerateItem->GetGenerateItemData().Item.Count * (i + 1))); )
+		GenerateNumOption->SetOptionNames(Options);
+	}
 
 	Refresh();
 
@@ -272,11 +287,33 @@ void UWidgetGeneratePanel::OnGenerateButtonClicked()
 		{
 			Inventory->RemoveItemByRange(Iter);
 		}
-		Inventory->AddItemByRange(_SelectedGenerateItemData.Item, -1);
-		Refresh();
-		GetWorld()->GetTimerManager().SetTimer(GenerateRawDataRefreshTH, FTimerDelegate::CreateUObject(this, &UWidgetGeneratePanel::OnGenerateRawDataRefresh), 1.5f, true);
-		UAchievementModuleStatics::UnlockAchievement(FName("FirstGenerateItem"));
+		GetWorld()->GetTimerManager().ClearTimer(GenerateRawDataRefreshTH);
+	
+		FSimpleDelegate OnCompleted = FSimpleDelegate::CreateLambda([this, Inventory](){
+			FDWGenerateItemData _SelectedGenerateItemData;
+			if(GetSelectedGenerateItemData(_SelectedGenerateItemData))
+			{
+				Inventory->AddItemByRange(_SelectedGenerateItemData.Item, -1);
+				UAchievementModuleStatics::UnlockAchievement(FName("FirstGenerateItem"));
+			}
+			GetWorld()->GetTimerManager().SetTimer(GenerateRawDataRefreshTH, FTimerDelegate::CreateUObject(this, &UWidgetGeneratePanel::OnGenerateRawDataRefresh), 1.5f, true);
+		});
+		UWidgetModuleStatics::OpenUserWidget<UWidgetProgressBox>({ FText::FromString(FString::Printf(TEXT("%s×%d"), *_SelectedGenerateItemData.Item.GetData().Name.ToString(), GetSelectedGenerateNum(true))), FText::FromString(TEXT("制作物品")), GetSelectedGenerateNum() * 1.f, true, &OnCompleted });
 	}
+}
+
+void UWidgetGeneratePanel::OnGenerateNumOptionValueChange(UWidgetSettingItemBase* InSettingItem, const FParameter& InValue)
+{
+	Refresh();
+}
+
+int32 UWidgetGeneratePanel::GetSelectedGenerateNum(bool bReal) const
+{
+	if(GenerateNumOption && SelectedGenerateItem)
+	{
+		return FCString::Atoi(*GenerateNumOption->GetValue().GetStringValue()) / (bReal ? 1 : SelectedGenerateItem->GetItem().Count);
+	}
+	return 0;
 }
 
 bool UWidgetGeneratePanel::GetSelectedGenerateItemData(FDWGenerateItemData& OutItemData) const
@@ -284,6 +321,7 @@ bool UWidgetGeneratePanel::GetSelectedGenerateItemData(FDWGenerateItemData& OutI
 	if(SelectedGenerateItem)
 	{
 		OutItemData = SelectedGenerateItem->GetGenerateItemData();
+		OutItemData.Item.Count *= GetSelectedGenerateNum();
 		return true;
 	}
 	return false;

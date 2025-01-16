@@ -6,6 +6,7 @@
 #include "Widget/Screen/UserWidgetBase.h"
 #include "WidgetGeneratePanel.generated.h"
 
+class UWidgetOptionSettingItemBase;
 class UWidgetAbilityItemCategoryBar;
 class UWidgetAbilityItem;
 class UWidgetGenerateItem;
@@ -63,6 +64,9 @@ protected:
 	UFUNCTION()
 	void OnGenerateButtonClicked();
 
+	UFUNCTION()
+	void OnGenerateNumOptionValueChange(UWidgetSettingItemBase* InSettingItem, const FParameter& InValue);
+
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (BindWidget, OptionalWidget = false), Category = "Components")
 	UWidgetAbilityItemCategoryBar* CategoryBar;
@@ -75,7 +79,10 @@ protected:
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (BindWidget, OptionalWidget = false), Category = "Components")
 	UCommonButton* BtnGenerate;
-	
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (BindWidget, OptionalWidget = false), Category = "Components")
+	UWidgetOptionSettingItemBase* GenerateNumOption;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TSubclassOf<UWidgetGenerateItem> GenerateItemClass;
 
@@ -102,6 +109,9 @@ protected:
 	FTimerHandle GenerateRawDataRefreshTH;
 
 public:
+	UFUNCTION(BlueprintPure)
+	int32 GetSelectedGenerateNum(bool bReal = false) const;
+
 	UFUNCTION(BlueprintPure)
 	bool GetSelectedGenerateItemData(FDWGenerateItemData& OutItemData) const;
 };

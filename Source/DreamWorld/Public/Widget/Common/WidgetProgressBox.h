@@ -3,7 +3,7 @@
 #pragma once
 
 #include "Widget/Screen/UserWidgetBase.h"
-#include "WidgetInteractionProgressBox.generated.h"
+#include "WidgetProgressBox.generated.h"
 
 class UTextBlock;
 class IInteractionAgentInterface;
@@ -14,12 +14,12 @@ class UWidgetKeyTipsItemBase;
  * 交互框
  */
 UCLASS()
-class DREAMWORLD_API UWidgetInteractionProgressBox : public UUserWidgetBase
+class DREAMWORLD_API UWidgetProgressBox : public UUserWidgetBase
 {
 	GENERATED_BODY()
 
 public:
-	UWidgetInteractionProgressBox(const FObjectInitializer& ObjectInitializer);
+	UWidgetProgressBox(const FObjectInitializer& ObjectInitializer);
 
 public:
 	virtual void OnCreate(UObject* InOwner, const TArray<FParameter>& InParams) override;
@@ -31,13 +31,21 @@ public:
 	virtual void OnRefresh() override;
 
 	virtual void OnClose(bool bInstant) override;
-	
+
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (BindWidget, OptionalWidget = false), Category = "Components")
-	UTextBlock* TxtTargetName;
+	UTextBlock* TxtItemName;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (BindWidget, OptionalWidget = false), Category = "Components")
 	UTextBlock* TxtActionName;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	float MaxDuration;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	float CurrentTime;
+
+	FSimpleDelegate OnCompleted;
 
 public:
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)

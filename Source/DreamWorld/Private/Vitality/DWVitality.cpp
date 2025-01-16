@@ -103,11 +103,6 @@ void ADWVitality::OnInteract(EInteractAction InInteractAction, IInteractionAgent
 void ADWVitality::OnAdditionItem(const FAbilityItem& InItem)
 {
 	Super::OnAdditionItem(InItem);
-
-	if(InItem.ID.PrimaryAssetName == TEXT("DA_Exp"))
-	{
-		ModifyExp(InItem.Count);
-	}
 }
 
 void ADWVitality::OnActiveItem(const FAbilityItem& InItem, bool bPassive, bool bSuccess)

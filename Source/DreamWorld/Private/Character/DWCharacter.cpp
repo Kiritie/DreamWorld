@@ -53,7 +53,7 @@
 #include "Item/Skill/DWSkillData.h"
 #include "Voxel/Datas/VoxelData.h"
 #include "Voxel/Voxels/Auxiliary/VoxelInteractAuxiliary.h"
-#include "Widget/Interaction/WidgetInteractionProgressBox.h"
+#include "Widget/Common/WidgetProgressBox.h"
 
 // Sets default values
 ADWCharacter::ADWCharacter(const FObjectInitializer& ObjectInitializer) :
@@ -593,20 +593,12 @@ void ADWCharacter::StopAIMove(bool bMulticast /*= false*/)
 
 void ADWCharacter::AddMovementInput(FVector WorldDirection, float ScaleValue, bool bForce)
 {
-	if(IsFloating())
-	{
-		if(WorldDirection.Z > -0.5f)
-		{
-			WorldDirection.Z = 0.f;
-		}
-	}
-
 	Super::AddMovementInput(WorldDirection, ScaleValue, bForce);
 
-	if(!IsPlayer() || UDWSettingModule::IsValid() && UDWSettingModule::Get().IsAutoJump(true))
+	if((!IsCurrent() && !IsPlayer()) || UDWSettingModule::Get().IsAutoJump(true))
 	{
-		FHitResult hitResult;
-		if(RaycastStep(hitResult))
+		FHitResult HitResult;
+		if(RaycastStep(HitResult))
 		{
 			Jump();
 		}
@@ -683,11 +675,6 @@ void ADWCharacter::OnInteract(EInteractAction InInteractAction, IInteractionAgen
 void ADWCharacter::OnAdditionItem(const FAbilityItem& InItem)
 {
 	Super::OnAdditionItem(InItem);
-
-	if(InItem.ID.PrimaryAssetName == TEXT("DA_Exp"))
-	{
-		ModifyExp(InItem.Count);
-	}
 }
 
 void ADWCharacter::OnPreChangeItem(const FAbilityItem& InOldItem)
@@ -799,7 +786,7 @@ bool ADWCharacter::OnDestroyVoxel(EInputInteractEvent InInteractEvent, const FVo
 			{
 				if(IsPlayer())
 				{
-					UWidgetModuleStatics::OpenUserWidget<UWidgetInteractionProgressBox>({ DestroyVoxelItem.GetVoxelData().Name, FText::FromString(TEXT("破坏体素")) });
+					UWidgetModuleStatics::OpenUserWidget<UWidgetProgressBox>({ DestroyVoxelItem.GetVoxelData().Name, FText::FromString(TEXT("破坏体素")) });
 				}
 				DoAction(GameplayTags::Ability_Character_Action_Destroy);
 				if(IsExhausted())
@@ -807,16 +794,16 @@ bool ADWCharacter::OnDestroyVoxel(EInputInteractEvent InInteractEvent, const FVo
 					OnDestroyVoxel(EInputInteractEvent::Completed, InHitResult);
 					break;
 				}
-				if(IsPlayer() && UWidgetModuleStatics::GetUserWidget<UWidgetInteractionProgressBox>())
+				if(IsPlayer() && UWidgetModuleStatics::GetUserWidget<UWidgetProgressBox>())
 				{
-					UWidgetModuleStatics::GetUserWidget<UWidgetInteractionProgressBox>()->SetProgress(GetDestroyVoxelProgress());
+					UWidgetModuleStatics::GetUserWidget<UWidgetProgressBox>()->SetProgress(GetDestroyVoxelProgress());
 				}
 			}
 			if(IVoxelAgentInterface::OnDestroyVoxel(InInteractEvent, InHitResult))
 			{
 				if(IsPlayer())
 				{
-					UWidgetModuleStatics::CloseUserWidget<UWidgetInteractionProgressBox>();
+					UWidgetModuleStatics::CloseUserWidget<UWidgetProgressBox>();
 					UAchievementModuleStatics::UnlockAchievement(FName("FirstDestroyVoxel"));
 				}
 				return true;
@@ -830,7 +817,7 @@ bool ADWCharacter::OnDestroyVoxel(EInputInteractEvent InInteractEvent, const FVo
 				StopAction(GameplayTags::Ability_Character_Action_Destroy);
 				if(IsPlayer())
 				{
-					UWidgetModuleStatics::CloseUserWidget<UWidgetInteractionProgressBox>();
+					UWidgetModuleStatics::CloseUserWidget<UWidgetProgressBox>();
 				}
 			}
 			return IVoxelAgentInterface::OnDestroyVoxel(InInteractEvent, InHitResult);

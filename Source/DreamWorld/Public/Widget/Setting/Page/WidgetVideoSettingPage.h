@@ -6,8 +6,6 @@
 
 #include "WidgetVideoSettingPage.generated.h"
 
-class UWidgetEnumSettingItem;
-
 /**
  * 
  */
