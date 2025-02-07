@@ -179,7 +179,7 @@ void UWidgetGeneratePanel::OnGenerateItemSelected_Implementation(UWidgetGenerate
 	if(GenerateNumOption)
 	{
 		TArray<FString> Options;
-		DON_WITHINDEX(20, i, Options.Add(FString::FromInt(SelectedGenerateItem->GetGenerateItemData().Item.Count * (i + 1))); )
+		DON_WITHINDEX(30, i, Options.Add(FString::FromInt(SelectedGenerateItem->GetGenerateItemData().Item.Count * (i + 1))); )
 		GenerateNumOption->SetOptionNames(Options);
 	}
 
@@ -298,7 +298,7 @@ void UWidgetGeneratePanel::OnGenerateButtonClicked()
 			}
 			GetWorld()->GetTimerManager().SetTimer(GenerateRawDataRefreshTH, FTimerDelegate::CreateUObject(this, &UWidgetGeneratePanel::OnGenerateRawDataRefresh), 1.5f, true);
 		});
-		UWidgetModuleStatics::OpenUserWidget<UWidgetProgressBox>({ FText::FromString(FString::Printf(TEXT("%s×%d"), *_SelectedGenerateItemData.Item.GetData().Name.ToString(), GetSelectedGenerateNum(true))), FText::FromString(TEXT("制作物品")), GetSelectedGenerateNum() * 1.f, true, &OnCompleted });
+		UWidgetModuleStatics::OpenUserWidget<UWidgetProgressBox>({ FText::FromString(FString::Printf(TEXT("%s×%d"), *_SelectedGenerateItemData.Item.GetData().Name.ToString(), GetSelectedGenerateNum())), FText::FromString(TEXT("制作物品")), GetSelectedGenerateNum() * 1.f, true, &OnCompleted });
 	}
 }
 
@@ -307,11 +307,11 @@ void UWidgetGeneratePanel::OnGenerateNumOptionValueChange(UWidgetSettingItemBase
 	Refresh();
 }
 
-int32 UWidgetGeneratePanel::GetSelectedGenerateNum(bool bReal) const
+int32 UWidgetGeneratePanel::GetSelectedGenerateNum() const
 {
-	if(GenerateNumOption && SelectedGenerateItem)
+	if(GenerateNumOption)
 	{
-		return FCString::Atoi(*GenerateNumOption->GetValue().GetStringValue()) / (bReal ? 1 : SelectedGenerateItem->GetItem().Count);
+		return FCString::Atoi(*GenerateNumOption->GetValue().GetStringValue());
 	}
 	return 0;
 }

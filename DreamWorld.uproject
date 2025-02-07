@@ -11,6 +11,14 @@
 			"AdditionalDependencies": [
 				"WHFramework"
 			]
+		},
+		{
+			"Name": "DreamWorldEditor",
+			"Type": "Editor",
+			"LoadingPhase": "Default",
+			"AdditionalDependencies": [
+				"WHFrameworkEditor"
+			]
 		}
 	],
 	"Plugins": [

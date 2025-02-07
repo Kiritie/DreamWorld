@@ -796,7 +796,7 @@ bool ADWCharacter::OnDestroyVoxel(EInputInteractEvent InInteractEvent, const FVo
 				}
 				if(IsPlayer() && UWidgetModuleStatics::GetUserWidget<UWidgetProgressBox>())
 				{
-					UWidgetModuleStatics::GetUserWidget<UWidgetProgressBox>()->SetProgress(GetDestroyVoxelProgress());
+					UWidgetModuleStatics::GetUserWidget<UWidgetProgressBox>()->SetProgress(1.f - DestroyVoxelItem.Durability);
 				}
 			}
 			if(IVoxelAgentInterface::OnDestroyVoxel(InInteractEvent, InHitResult))

@@ -325,7 +325,7 @@ void UDWInputManager::OnPrimaryPressed()
 {
 	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>(LocalPlayerIndex);
 
-	if(!PlayerCharacter || !PlayerCharacter->IsActive()) return;
+	if(!PlayerCharacter || !PlayerCharacter->IsActive() || !PlayerCharacter->IsCurrent()) return;
 
 	bPrimaryPressed = true;
 	switch (PlayerCharacter->ControlMode)
@@ -354,7 +354,7 @@ void UDWInputManager::OnPrimaryRepeated()
 {
 	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>(LocalPlayerIndex);
 
-	if(!PlayerCharacter || !PlayerCharacter->IsActive()) return;
+	if(!PlayerCharacter || !PlayerCharacter->IsActive() || !PlayerCharacter->IsCurrent()) return;
 
 	switch (PlayerCharacter->ControlMode)
 	{
@@ -403,7 +403,7 @@ void UDWInputManager::OnSecondaryPressed()
 {
 	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>(LocalPlayerIndex);
 
-	if(!PlayerCharacter || !PlayerCharacter->IsActive()) return;
+	if(!PlayerCharacter || !PlayerCharacter->IsActive() || !PlayerCharacter->IsCurrent()) return;
 
 	bSecondaryPressed = true;
 	switch (PlayerCharacter->ControlMode)
@@ -432,7 +432,7 @@ void UDWInputManager::OnSecondaryRepeated()
 {
 	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>(LocalPlayerIndex);
 
-	if(!PlayerCharacter || !PlayerCharacter->IsActive()) return;
+	if(!PlayerCharacter || !PlayerCharacter->IsActive() || !PlayerCharacter->IsCurrent()) return;
 
 	switch (PlayerCharacter->ControlMode)
 	{
@@ -481,7 +481,7 @@ void UDWInputManager::OnThirdPressed()
 {
 	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>(LocalPlayerIndex);
 
-	if(!PlayerCharacter || !PlayerCharacter->IsActive()) return;
+	if(!PlayerCharacter || !PlayerCharacter->IsActive() || !PlayerCharacter->IsCurrent()) return;
 
 	PlayerCharacter->GetTargeting()->TargetActor();
 
@@ -508,7 +508,7 @@ void UDWInputManager::OnThirdRepeated()
 {
 	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>(LocalPlayerIndex);
 
-	if(!PlayerCharacter || !PlayerCharacter->IsActive()) return;
+	if(!PlayerCharacter || !PlayerCharacter->IsActive() || !PlayerCharacter->IsCurrent()) return;
 
 	switch (PlayerCharacter->ControlMode)
 	{
@@ -557,7 +557,7 @@ void UDWInputManager::ToggleControlMode()
 {
 	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>(LocalPlayerIndex);
 
-	if(!PlayerCharacter || !PlayerCharacter->IsActive()) return;
+	if(!PlayerCharacter || !PlayerCharacter->IsActive() || !PlayerCharacter->IsCurrent()) return;
 
 	if(PlayerCharacter->ControlMode == EDWCharacterControlMode::Fighting)
 	{
@@ -589,7 +589,7 @@ void UDWInputManager::ChangeHand()
 {
 	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>(LocalPlayerIndex);
 
-	if(!PlayerCharacter || !PlayerCharacter->IsActive()) return;
+	if(!PlayerCharacter || !PlayerCharacter->IsActive() || !PlayerCharacter->IsCurrent()) return;
 
 	PlayerCharacter->ChangeHand();
 }
@@ -598,7 +598,7 @@ void UDWInputManager::ReleaseSkillAbility1()
 {
 	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>(LocalPlayerIndex);
 	
-	if(!PlayerCharacter || !PlayerCharacter->IsActive()) return;
+	if(!PlayerCharacter || !PlayerCharacter->IsActive() || !PlayerCharacter->IsCurrent()) return;
 
 	PlayerCharacter->Skill(0);
 }
@@ -607,7 +607,7 @@ void UDWInputManager::ReleaseSkillAbility2()
 {
 	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>(LocalPlayerIndex);
 	
-	if(!PlayerCharacter || !PlayerCharacter->IsActive()) return;
+	if(!PlayerCharacter || !PlayerCharacter->IsActive() || !PlayerCharacter->IsCurrent()) return;
 
 	PlayerCharacter->Skill(1);
 }
@@ -616,7 +616,7 @@ void UDWInputManager::ReleaseSkillAbility3()
 {
 	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>(LocalPlayerIndex);
 	
-	if(!PlayerCharacter || !PlayerCharacter->IsActive()) return;
+	if(!PlayerCharacter || !PlayerCharacter->IsActive() || !PlayerCharacter->IsCurrent()) return;
 
 	PlayerCharacter->Skill(2);
 }
@@ -625,7 +625,7 @@ void UDWInputManager::ReleaseSkillAbility4()
 {
 	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>(LocalPlayerIndex);
 	
-	if(!PlayerCharacter || !PlayerCharacter->IsActive()) return;
+	if(!PlayerCharacter || !PlayerCharacter->IsActive() || !PlayerCharacter->IsCurrent()) return;
 
 	PlayerCharacter->Skill(3);
 }
@@ -706,7 +706,7 @@ void UDWInputManager::UseInventoryItem()
 {
 	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>(LocalPlayerIndex);
 	
-	if(!PlayerCharacter || !PlayerCharacter->IsActive()) return;
+	if(!PlayerCharacter || !PlayerCharacter->IsActive() || !PlayerCharacter->IsCurrent()) return;
 	
 	UWidgetModuleStatics::GetUserWidget<UWidgetInventoryBar>()->GetSelectedSlot()->UseItem(UInputModuleStatics::GetKeyShortcut(GameplayTags::Input_InventoryAll).IsPressing(UCommonStatics::GetPlayerController(LocalPlayerIndex)) ? -1 : 1);
 }
@@ -715,7 +715,7 @@ void UDWInputManager::DiscardInventoryItem()
 {
 	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>(LocalPlayerIndex);
 	
-	if(!PlayerCharacter || !PlayerCharacter->IsActive()) return;
+	if(!PlayerCharacter || !PlayerCharacter->IsActive() || !PlayerCharacter->IsCurrent()) return;
 	
 	UWidgetModuleStatics::GetUserWidget<UWidgetInventoryBar>()->GetSelectedSlot()->DiscardItem(UInputModuleStatics::GetKeyShortcut(GameplayTags::Input_InventoryAll).IsPressing(UCommonStatics::GetPlayerController(LocalPlayerIndex)) ? -1 : 1, false);
 }
@@ -724,7 +724,7 @@ void UDWInputManager::PrevInventorySlot()
 {
 	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>(LocalPlayerIndex);
 	
-	if(!PlayerCharacter || !PlayerCharacter->IsActive() || UInputModuleStatics::GetKeyShortcut(GameplayTags::Input_CameraZoom).IsPressing(UCommonStatics::GetPlayerController(LocalPlayerIndex))) return;
+	if(!PlayerCharacter || !PlayerCharacter->IsActive() || !PlayerCharacter->IsCurrent() || UInputModuleStatics::GetKeyShortcut(GameplayTags::Input_CameraZoom).IsPressing(UCommonStatics::GetPlayerController(LocalPlayerIndex))) return;
 	
 	UWidgetModuleStatics::GetUserWidget<UWidgetInventoryBar>()->PrevInventorySlot();
 }
@@ -733,7 +733,7 @@ void UDWInputManager::NextInventorySlot()
 {
 	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>(LocalPlayerIndex);
 	
-	if(!PlayerCharacter || !PlayerCharacter->IsActive() || UInputModuleStatics::GetKeyShortcut(GameplayTags::Input_CameraZoom).IsPressing(UCommonStatics::GetPlayerController(LocalPlayerIndex))) return;
+	if(!PlayerCharacter || !PlayerCharacter->IsActive() || !PlayerCharacter->IsCurrent() || UInputModuleStatics::GetKeyShortcut(GameplayTags::Input_CameraZoom).IsPressing(UCommonStatics::GetPlayerController(LocalPlayerIndex))) return;
 	
 	UWidgetModuleStatics::GetUserWidget<UWidgetInventoryBar>()->NextInventorySlot();
 }
@@ -742,7 +742,7 @@ void UDWInputManager::SelectInventorySlot1()
 {
 	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>(LocalPlayerIndex);
 	
-	if(!PlayerCharacter || !PlayerCharacter->IsActive()) return;
+	if(!PlayerCharacter || !PlayerCharacter->IsActive() || !PlayerCharacter->IsCurrent()) return;
 	
 	UWidgetModuleStatics::GetUserWidget<UWidgetInventoryBar>()->SelectInventorySlot(0);
 }
@@ -751,7 +751,7 @@ void UDWInputManager::SelectInventorySlot2()
 {
 	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>(LocalPlayerIndex);
 	
-	if(!PlayerCharacter || !PlayerCharacter->IsActive()) return;
+	if(!PlayerCharacter || !PlayerCharacter->IsActive() || !PlayerCharacter->IsCurrent()) return;
 	
 	UWidgetModuleStatics::GetUserWidget<UWidgetInventoryBar>()->SelectInventorySlot(1);
 }
@@ -760,7 +760,7 @@ void UDWInputManager::SelectInventorySlot3()
 {
 	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>(LocalPlayerIndex);
 	
-	if(!PlayerCharacter || !PlayerCharacter->IsActive()) return;
+	if(!PlayerCharacter || !PlayerCharacter->IsActive() || !PlayerCharacter->IsCurrent()) return;
 	
 	UWidgetModuleStatics::GetUserWidget<UWidgetInventoryBar>()->SelectInventorySlot(2);
 }
@@ -769,7 +769,7 @@ void UDWInputManager::SelectInventorySlot4()
 {
 	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>(LocalPlayerIndex);
 	
-	if(!PlayerCharacter || !PlayerCharacter->IsActive()) return;
+	if(!PlayerCharacter || !PlayerCharacter->IsActive() || !PlayerCharacter->IsCurrent()) return;
 	
 	UWidgetModuleStatics::GetUserWidget<UWidgetInventoryBar>()->SelectInventorySlot(3);
 }
@@ -778,7 +778,7 @@ void UDWInputManager::SelectInventorySlot5()
 {
 	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>(LocalPlayerIndex);
 	
-	if(!PlayerCharacter || !PlayerCharacter->IsActive()) return;
+	if(!PlayerCharacter || !PlayerCharacter->IsActive() || !PlayerCharacter->IsCurrent()) return;
 	
 	UWidgetModuleStatics::GetUserWidget<UWidgetInventoryBar>()->SelectInventorySlot(4);
 }
@@ -787,7 +787,7 @@ void UDWInputManager::SelectInventorySlot6()
 {
 	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>(LocalPlayerIndex);
 	
-	if(!PlayerCharacter || !PlayerCharacter->IsActive()) return;
+	if(!PlayerCharacter || !PlayerCharacter->IsActive() || !PlayerCharacter->IsCurrent()) return;
 	
 	UWidgetModuleStatics::GetUserWidget<UWidgetInventoryBar>()->SelectInventorySlot(5);
 }
@@ -796,7 +796,7 @@ void UDWInputManager::SelectInventorySlot7()
 {
 	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>(LocalPlayerIndex);
 	
-	if(!PlayerCharacter || !PlayerCharacter->IsActive()) return;
+	if(!PlayerCharacter || !PlayerCharacter->IsActive() || !PlayerCharacter->IsCurrent()) return;
 	
 	UWidgetModuleStatics::GetUserWidget<UWidgetInventoryBar>()->SelectInventorySlot(6);
 }
@@ -805,7 +805,7 @@ void UDWInputManager::SelectInventorySlot8()
 {
 	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>(LocalPlayerIndex);
 	
-	if(!PlayerCharacter || !PlayerCharacter->IsActive()) return;
+	if(!PlayerCharacter || !PlayerCharacter->IsActive() || !PlayerCharacter->IsCurrent()) return;
 	
 	UWidgetModuleStatics::GetUserWidget<UWidgetInventoryBar>()->SelectInventorySlot(7);
 }
@@ -814,7 +814,7 @@ void UDWInputManager::SelectInventorySlot9()
 {
 	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>(LocalPlayerIndex);
 	
-	if(!PlayerCharacter || !PlayerCharacter->IsActive()) return;
+	if(!PlayerCharacter || !PlayerCharacter->IsActive() || !PlayerCharacter->IsCurrent()) return;
 	
 	UWidgetModuleStatics::GetUserWidget<UWidgetInventoryBar>()->SelectInventorySlot(8);
 }
@@ -823,7 +823,7 @@ void UDWInputManager::SelectInventorySlot10()
 {
 	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>(LocalPlayerIndex);
 	
-	if(!PlayerCharacter || !PlayerCharacter->IsActive()) return;
+	if(!PlayerCharacter || !PlayerCharacter->IsActive() || !PlayerCharacter->IsCurrent()) return;
 	
 	UWidgetModuleStatics::GetUserWidget<UWidgetInventoryBar>()->SelectInventorySlot(9);
 }
@@ -859,7 +859,7 @@ void UDWInputManager::OpenInventoryPanel()
 {
 	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>(LocalPlayerIndex);
 	
-	if(!PlayerCharacter || !PlayerCharacter->IsActive()) return;
+	if(!PlayerCharacter || !PlayerCharacter->IsActive() || !PlayerCharacter->IsCurrent()) return;
 	
 	UWidgetModuleStatics::OpenUserWidget<UWidgetInventoryPanel>();
 }
@@ -868,7 +868,7 @@ void UDWInputManager::OpenGeneratePanel()
 {
 	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>(LocalPlayerIndex);
 	
-	if(!PlayerCharacter || !PlayerCharacter->IsActive()) return;
+	if(!PlayerCharacter || !PlayerCharacter->IsActive() || !PlayerCharacter->IsCurrent()) return;
 	
 	if(AVoxelInteractAuxiliary* InteractionAgent = PlayerCharacter->GetInteractingAgent<AVoxelInteractAuxiliary>())
 	{
@@ -897,7 +897,7 @@ void UDWInputManager::OpenTaskPanel()
 {
 	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>(LocalPlayerIndex);
 	
-	if(!PlayerCharacter || !PlayerCharacter->IsActive()) return;
+	if(!PlayerCharacter || !PlayerCharacter->IsActive() || !PlayerCharacter->IsCurrent()) return;
 	
 	UWidgetModuleStatics::OpenUserWidget<UWidgetTaskPanel>();
 }
@@ -906,7 +906,7 @@ void UDWInputManager::OpenContextInputBox()
 {
 	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>(LocalPlayerIndex);
 	
-	if(!PlayerCharacter || !PlayerCharacter->IsActive()) return;
+	if(!PlayerCharacter || !PlayerCharacter->IsActive() || !PlayerCharacter->IsCurrent()) return;
 	
 	UWidgetModuleStatics::OpenUserWidget<UWidgetContextInputBox>();
 }

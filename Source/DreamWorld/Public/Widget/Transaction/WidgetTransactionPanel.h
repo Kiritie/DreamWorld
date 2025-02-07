@@ -7,6 +7,7 @@
 #include "Widget/Screen/UserWidgetBase.h"
 #include "WidgetTransactionPanel.generated.h"
 
+class UWidgetOptionSettingItemBase;
 class UWidgetAbilityItemCategoryBar;
 class UWidgetAbilityItem;
 class UCommonButtonGroup;
@@ -69,6 +70,9 @@ protected:
 	UFUNCTION()
 	void OnTransactionButtonClicked();
 
+	UFUNCTION()
+	void OnTransactionNumOptionValueChange(UWidgetSettingItemBase* InSettingItem, const FParameter& InValue);
+
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (BindWidget, OptionalWidget = false), Category = "Components")
 	UWidgetAbilityItemCategoryBar* CategoryBar;
@@ -84,6 +88,9 @@ protected:
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (BindWidget, OptionalWidget = false), Category = "Components")
 	UCommonButton* BtnTransaction;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (BindWidget, OptionalWidget = false), Category = "Components")
+	UWidgetOptionSettingItemBase* TransactionNumOption;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TSubclassOf<UWidgetTransactionItem> TransactionItemClass;
@@ -123,5 +130,8 @@ public:
 	void SetSelectedTabType(EDWTransactionType InIndex) const;
 
 	UFUNCTION(BlueprintPure)
-	bool GetSelectedTransactionItem(FAbilityItem& OutItemData) const;
+	int32 GetSelectedTransactionNum() const;
+
+	UFUNCTION(BlueprintPure)
+	bool GetSelectedTransactionItem(FAbilityItem& OutItemData, bool& bCanTransaction) const;
 };

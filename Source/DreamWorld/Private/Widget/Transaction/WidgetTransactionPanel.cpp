@@ -14,10 +14,12 @@
 #include "Ability/Item/AbilityTransItemDataBase.h"
 #include "Achievement/AchievementModuleStatics.h"
 #include "Item/Prop/Blueprint/DWPropBlueprintData.h"
+#include "Setting/Widget/Item/WidgetOptionSettingItemBase.h"
 #include "Voxel/VoxelModule.h"
 #include "Widget/WidgetModuleStatics.h"
 #include "Widget/Common/CommonButton.h"
 #include "Widget/Common/CommonButtonGroup.h"
+#include "Widget/Common/WidgetProgressBox.h"
 #include "Widget/Common/WidgetUIMask.h"
 #include "Widget/Item/WidgetAbilityItem.h"
 #include "Widget/Item/Category/WidgetAbilityItemCategoryBar.h"
@@ -69,6 +71,10 @@ void UWidgetTransactionPanel::OnCreate(UObject* InOwner, const TArray<FParameter
 	if(CategoryBar)
 	{
 		CategoryBar->OnCategorySelected.AddDynamic(this, &UWidgetTransactionPanel::OnItemCategorySelected);
+	}
+	if(TransactionNumOption)
+	{
+		TransactionNumOption->OnValueChanged.AddDynamic(this, &UWidgetTransactionPanel::OnTransactionNumOptionValueChange);
 	}
 
 	TabGroup = UObjectPoolModuleStatics::SpawnObject<UCommonButtonGroup>();
@@ -148,9 +154,9 @@ void UWidgetTransactionPanel::OnRefresh()
 		Iter->Refresh();
 	}
 
-	bool bCanTransaction = true;
+	bool bCanTransaction;
 	FAbilityItem _SelectedTransactionItem;
-	if(GetSelectedTransactionItem(_SelectedTransactionItem))
+	if(GetSelectedTransactionItem(_SelectedTransactionItem, bCanTransaction))
 	{
 		switch(GetSelectedTabType())
 		{
@@ -177,6 +183,10 @@ void UWidgetTransactionPanel::OnRefresh()
 			}
 			default: break;
 		}
+		for(auto& Iter : SelectedPreviewItems)
+		{
+			Iter.Count *= GetSelectedTransactionNum();
+		}
 		switch(GetSelectedTabType())
 		{
 			case EDWTransactionType::Buy:
@@ -197,10 +207,6 @@ void UWidgetTransactionPanel::OnRefresh()
 			}
 			default: break;
 		}
-	}
-	else
-	{
-		bCanTransaction = false;
 	}
 	
 	if(BtnTransaction)
@@ -247,6 +253,13 @@ void UWidgetTransactionPanel::OnTransactionItemSelected_Implementation(UWidgetTr
 	SelectedTransactionItem = InItem;
 
 	GenerateRawDataIndex = 0;
+	
+	if(TransactionNumOption)
+	{
+		TArray<FString> Options;
+		DON_WITHINDEX(30, i, Options.Add(FString::FromInt(i + 1)); )
+		TransactionNumOption->SetOptionNames(Options);
+	}
 
 	Refresh();
 
@@ -361,8 +374,9 @@ void UWidgetTransactionPanel::OnTransactionContentRefresh(bool bScrollToStart)
 
 void UWidgetTransactionPanel::OnGenerateRawDataRefresh()
 {
+	bool bCanTransaction;
 	FAbilityItem _SelectedTransactionItem;
-	if(GetSelectedTransactionItem(_SelectedTransactionItem))
+	if(GetSelectedTransactionItem(_SelectedTransactionItem, bCanTransaction))
 	{
 		switch(GetSelectedTabType())
 		{
@@ -384,8 +398,9 @@ void UWidgetTransactionPanel::OnPreviewContentRefresh()
 {
 	if(PreviewContent)
 	{
+		bool bCanTransaction;
 		FAbilityItem _SelectedTransactionItem;
-		if(GetSelectedTransactionItem(_SelectedTransactionItem))
+		if(GetSelectedTransactionItem(_SelectedTransactionItem, bCanTransaction))
 		{
 			for(auto Iter : PreviewItems)
 			{
@@ -410,8 +425,9 @@ void UWidgetTransactionPanel::OnPreviewContentRefresh()
 
 void UWidgetTransactionPanel::OnTransactionButtonClicked()
 {
+	bool bCanTransaction;
 	FAbilityItem _SelectedTransactionItem;
-	if(GetSelectedTransactionItem(_SelectedTransactionItem))
+	if(GetSelectedTransactionItem(_SelectedTransactionItem, bCanTransaction))
 	{
 		switch(GetSelectedTabType())
 		{
@@ -421,7 +437,7 @@ void UWidgetTransactionPanel::OnTransactionButtonClicked()
 				IAbilityInventoryAgentInterface* Buyer = GetSelectedTabType() == EDWTransactionType::Buy ? GetOwnerObject<IAbilityInventoryAgentInterface>() : TransactionTarget;
 				IAbilityInventoryAgentInterface* Seller = GetSelectedTabType() == EDWTransactionType::Buy ? TransactionTarget : GetOwnerObject<IAbilityInventoryAgentInterface>();
 		
-				FAbilityItem _TransactionItem = FAbilityItem(_SelectedTransactionItem, 1);
+				FAbilityItem _TransactionItem = _SelectedTransactionItem;
 				TArray<FAbilityItem> _PreviewItems = SelectedPreviewItems;
 
 				for(auto Iter : _PreviewItems)
@@ -430,23 +446,14 @@ void UWidgetTransactionPanel::OnTransactionButtonClicked()
 				}
 				Buyer->GetInventory()->AddItemByRange(_TransactionItem, -1);
 		
-				_TransactionItem = FAbilityItem(_SelectedTransactionItem, 1);
+				_TransactionItem = _SelectedTransactionItem;
 				Seller->GetInventory()->RemoveItemByRange(_TransactionItem);
 				for(auto Iter : _PreviewItems)
 				{
 					Seller->GetInventory()->AddItemByRange(Iter);
 				}
 		
-				if(Seller->GetInventory()->QueryItemByRange(EItemQueryType::Get, _TransactionItem).Item.Count <= 0)
-				{
-					OnTransactionContentRefresh();
-				}
-				else
-				{
-					_SelectedTransactionItem.Count--;
-					SelectedTransactionItem->Init({ &_SelectedTransactionItem });
-					Refresh();
-				}
+				OnTransactionContentRefresh();
 				break;
 			}
 			case EDWTransactionType::Upgrade:
@@ -454,11 +461,8 @@ void UWidgetTransactionPanel::OnTransactionButtonClicked()
 				IAbilityInventoryAgentInterface* Buyer = GetOwnerObject<IAbilityInventoryAgentInterface>();
 				IAbilityInventoryAgentInterface* Seller = TransactionTarget;
 
-				FAbilityItem _TransactionItem = _SelectedTransactionItem;
 				TArray<FAbilityItem> _PreviewItems = SelectedPreviewItems;
 
-				_TransactionItem.Level++;
-				
 				for(auto Iter : _PreviewItems)
 				{
 					Buyer->GetInventory()->RemoveItemByRange(Iter);
@@ -469,20 +473,19 @@ void UWidgetTransactionPanel::OnTransactionButtonClicked()
 					Seller->GetInventory()->AddItemByRange(Iter);
 				}
 
-				if(_TransactionItem.InventorySlot)
-				{
-					_TransactionItem.InventorySlot->SetItem(_TransactionItem);
-				}
-
-				if(_TransactionItem.Level == _TransactionItem.GetData<UAbilityTransItemDataBase>().MaxLevel)
-				{
-					OnTransactionContentRefresh();
-				}
-				else
-				{
-					SelectedTransactionItem->Init({ &_TransactionItem });
-					Refresh();
-				}
+				FSimpleDelegate OnCompleted = FSimpleDelegate::CreateLambda([this](){
+					bool bCanTransaction;
+					FAbilityItem _SelectedTransactionItem;
+					if(GetSelectedTransactionItem(_SelectedTransactionItem, bCanTransaction))
+					{
+						if(_SelectedTransactionItem.InventorySlot)
+						{
+							_SelectedTransactionItem.InventorySlot->SetItem(_SelectedTransactionItem);
+						}
+						OnTransactionContentRefresh();
+					}
+				});
+				UWidgetModuleStatics::OpenUserWidget<UWidgetProgressBox>({ FText::FromString(FString::Printf(TEXT("%s×%d"), *_SelectedTransactionItem.GetData().Name.ToString(), GetSelectedTransactionNum())), FText::FromString(TEXT("升级物品")), GetSelectedTransactionNum() * 1.f, true, &OnCompleted });
 				break;
 			}
 			case EDWTransactionType::Generate:
@@ -491,7 +494,6 @@ void UWidgetTransactionPanel::OnTransactionButtonClicked()
 				IAbilityInventoryAgentInterface* Seller = TransactionTarget;
 
 				FAbilityItem _TransactionItem = _SelectedTransactionItem;
-				FAbilityItem _GenerateItem = _TransactionItem.GetData<UDWPropBlueprintData>().GetGenerateItem(_TransactionItem.Level, UVoxelModule::Get().GetWorldData().RandomStream);
 				TArray<FAbilityItem> _PreviewItems = SelectedPreviewItems;
 
 				Buyer->GetInventory()->RemoveItemByRange(_TransactionItem);
@@ -501,16 +503,25 @@ void UWidgetTransactionPanel::OnTransactionButtonClicked()
 					Buyer->GetInventory()->RemoveItemByRange(Iter);
 				}
 
-				Buyer->GetInventory()->AddItemByRange(_GenerateItem, -1);
-			
 				for(auto Iter : _PreviewItems)
 				{
 					Seller->GetInventory()->AddItemByRange(Iter);
 				}
 
-				OnTransactionContentRefresh();
-				
-				GetWorld()->GetTimerManager().SetTimer(GenerateRawDataRefreshTH, FTimerDelegate::CreateUObject(this, &UWidgetTransactionPanel::OnGenerateRawDataRefresh), 1.5f, true);
+				GetWorld()->GetTimerManager().ClearTimer(GenerateRawDataRefreshTH);
+	
+				FSimpleDelegate OnCompleted = FSimpleDelegate::CreateLambda([this, Buyer](){
+					bool bCanTransaction;
+					FAbilityItem _SelectedTransactionItem;
+					if(GetSelectedTransactionItem(_SelectedTransactionItem, bCanTransaction))
+					{
+						FAbilityItem _GenerateItem = _SelectedTransactionItem.GetData<UDWPropBlueprintData>().GetGenerateItem(_SelectedTransactionItem.Level, UVoxelModule::Get().GetWorldData().RandomStream);
+						Buyer->GetInventory()->AddItemByRange(_GenerateItem, -1);
+					}
+					OnTransactionContentRefresh();
+					GetWorld()->GetTimerManager().SetTimer(GenerateRawDataRefreshTH, FTimerDelegate::CreateUObject(this, &UWidgetTransactionPanel::OnGenerateRawDataRefresh), 1.5f, true);
+				});
+				UWidgetModuleStatics::OpenUserWidget<UWidgetProgressBox>({ FString::Printf(TEXT("%s×%d"), TEXT("未知"), GetSelectedTransactionNum()), 2.f, true, &OnCompleted });
 				break;
 			}
 			case EDWTransactionType::Split:
@@ -518,16 +529,18 @@ void UWidgetTransactionPanel::OnTransactionButtonClicked()
 				IAbilityInventoryAgentInterface* Buyer = GetOwnerObject<IAbilityInventoryAgentInterface>();
 		
 				FAbilityItem _TransactionItem = _SelectedTransactionItem;
-				TArray<FAbilityItem> _PreviewItems = SelectedPreviewItems;
 
 				Buyer->GetInventory()->RemoveItemByRange(_TransactionItem);
 
-				for(auto Iter : _PreviewItems)
-				{
-					Buyer->GetInventory()->AddItemByRange(Iter);
-				}
-
-				OnTransactionContentRefresh();
+				FSimpleDelegate OnCompleted = FSimpleDelegate::CreateLambda([this, Buyer](){
+					TArray<FAbilityItem> _PreviewItems = SelectedPreviewItems;
+					for(auto Iter : _PreviewItems)
+					{
+						Buyer->GetInventory()->AddItemByRange(Iter);
+					}
+					OnTransactionContentRefresh();
+				});
+				UWidgetModuleStatics::OpenUserWidget<UWidgetProgressBox>({ FText::FromString(FString::Printf(TEXT("%s×%d"), *_SelectedTransactionItem.GetData().Name.ToString(), GetSelectedTransactionNum())), FText::FromString(TEXT("拆解物品")), GetSelectedTransactionNum() * 1.f, true, &OnCompleted });
 				break;
 			}
 			default: break;
@@ -535,6 +548,11 @@ void UWidgetTransactionPanel::OnTransactionButtonClicked()
 
 		UAchievementModuleStatics::UnlockAchievement(FName("FirstTransactionItem"));
 	}
+}
+
+void UWidgetTransactionPanel::OnTransactionNumOptionValueChange(UWidgetSettingItemBase* InSettingItem, const FParameter& InValue)
+{
+	Refresh();
 }
 
 EDWTransactionType UWidgetTransactionPanel::GetSelectedTabType() const
@@ -547,11 +565,43 @@ void UWidgetTransactionPanel::SetSelectedTabType(EDWTransactionType InIndex) con
 	TabGroup->SelectButtonAtIndex((int32)InIndex);
 }
 
-bool UWidgetTransactionPanel::GetSelectedTransactionItem(FAbilityItem& OutItemData) const
+int32 UWidgetTransactionPanel::GetSelectedTransactionNum() const
+{
+	if(TransactionNumOption)
+	{
+		return FCString::Atoi(*TransactionNumOption->GetValue().GetStringValue());
+	}
+	return 0;
+}
+
+bool UWidgetTransactionPanel::GetSelectedTransactionItem(FAbilityItem& OutItemData, bool& bCanTransaction) const
 {
 	if(SelectedTransactionItem)
 	{
 		OutItemData = SelectedTransactionItem->GetItem();
+		switch(GetSelectedTabType())
+		{
+			case EDWTransactionType::Buy:
+			case EDWTransactionType::Sell:
+			case EDWTransactionType::Split:
+			{
+				bCanTransaction = OutItemData.Count >= GetSelectedTransactionNum();
+				OutItemData.Count = GetSelectedTransactionNum();
+				break;
+			}
+			case EDWTransactionType::Upgrade:
+			{
+				bCanTransaction = OutItemData.Level + GetSelectedTransactionNum() <= OutItemData.GetData().MaxLevel;
+				OutItemData.Level += GetSelectedTransactionNum();
+				break;
+			}
+			case EDWTransactionType::Generate:
+			{
+				bCanTransaction = true;
+				break;
+			}
+			default: break;
+		}
 		return true;
 	}
 	return false;
