@@ -263,9 +263,9 @@ void ADWHumanCharacter::OnAuxiliaryItem(const FAbilityItem& InItem)
 	}
 }
 
-void ADWHumanCharacter::SetControlMode_Implementation(EDWCharacterControlMode InControlMode)
+void ADWHumanCharacter::SetControlMode(EDWCharacterControlMode InControlMode)
 {
-	Super::SetControlMode_Implementation(InControlMode);
+	Super::SetControlMode(InControlMode);
 
 	switch (ControlMode)
 	{

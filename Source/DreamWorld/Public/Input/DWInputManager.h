@@ -184,6 +184,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual void OpenContextInputBox();
 
+	UFUNCTION(BlueprintCallable)
+	virtual void OpenSwitcherPanel();
+
 protected:
 	UPROPERTY(VisibleAnywhere, Category = "InputStates|Player")
 	bool bPrimaryPressed;

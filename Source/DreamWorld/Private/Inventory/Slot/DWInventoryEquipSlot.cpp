@@ -6,6 +6,7 @@
 #include "Item/Equip/DWEquipData.h"
 #include "Ability/Inventory/AbilityInventoryBase.h"
 #include "Character/DWCharacter.h"
+#include "Common/DWCommonStatics.h"
 #include "Item/Equip/Weapon/DWEquipWeaponData.h"
 
 UDWInventoryEquipSlot::UDWInventoryEquipSlot()
@@ -41,6 +42,11 @@ void UDWInventoryEquipSlot::OnItemChanged(FAbilityItem& InOldItem, bool bBroadca
 	Super::OnItemChanged(InOldItem, bBroadcast);
 }
 
+bool UDWInventoryEquipSlot::MatchItem(FAbilityItem InItem, bool bPutIn) const
+{
+	return Super::MatchItem(InItem, bPutIn);
+}
+
 bool UDWInventoryEquipSlot::MatchItemLimit(FAbilityItem InItem, bool bForce) const
 {
 	if(!Super::MatchItemLimit(InItem, bForce)) return false;
@@ -51,7 +57,7 @@ bool UDWInventoryEquipSlot::MatchItemLimit(FAbilityItem InItem, bool bForce) con
 	{
 		if(bForce)
 		{
-			EDWEquipPart OtherPart = EquipPart == EDWEquipPart::Primary ? EDWEquipPart::Secondary : EDWEquipPart::Primary;
+			EDWEquipPart OtherPart = UDWCommonStatics::GetWeaponPartInSameGroup(EquipPart);
 			UAbilityInventorySlotBase* OtherSlot = Inventory->GetSlotBySplitTypeAndIndex(ESlotSplitType::Equip, (int32)OtherPart);
 			if(OtherSlot != InItem.InventorySlot)
 			{
@@ -77,6 +83,8 @@ void UDWInventoryEquipSlot::Refresh()
 
 bool UDWInventoryEquipSlot::ActiveItem(bool bPassive)
 {
+	if(IsEmpty()) return false;
+
 	if(!bPassive)
 	{
 		ADWCharacter* Character = Inventory->GetOwnerAgent<ADWCharacter>();
@@ -88,4 +96,13 @@ bool UDWInventoryEquipSlot::ActiveItem(bool bPassive)
 void UDWInventoryEquipSlot::DeactiveItem(bool bPassive)
 {
 	Super::DeactiveItem(bPassive);
+}
+
+bool UDWInventoryEquipSlot::IsEnabled() const
+{
+	ADWCharacter* Character = Inventory->GetOwnerAgent<ADWCharacter>();
+
+	if(EquipPart >= EDWEquipPart::Primary && !UDWCommonStatics::GetWeaponPartsByGroup(Character ? Character->GetWeaponGroup() : EDWWeaponGroup::Group1).Contains(EquipPart)) return false;
+
+	return Super::IsEnabled();
 }

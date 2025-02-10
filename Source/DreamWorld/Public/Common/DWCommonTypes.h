@@ -161,7 +161,26 @@ enum class EDWEquipPart : uint8
 	// 主武器
 	Primary,
 	// 次武器
-	Secondary
+	Secondary UMETA(Hidden),
+	// 主武器2
+	Primary2 UMETA(Hidden),
+	// 次武器2
+	Secondary2 UMETA(Hidden),
+	// 主武器3
+	Primary3 UMETA(Hidden),
+	// 次武器3
+	Secondary3 UMETA(Hidden)
+};
+
+UENUM(BlueprintType)
+enum class EDWWeaponGroup : uint8
+{
+	// 组1
+	Group1,
+	// 组2
+	Group2,
+	// 组3
+	Group3
 };
 
 UENUM(BlueprintType)
@@ -385,6 +404,7 @@ public:
 	{
 		TeamID = NAME_None;
 		ControlMode = EDWCharacterControlMode::Fighting;
+		WeaponGroup = EDWWeaponGroup::Group1;
 		AttackAbilityQueues = TMap<EDWWeaponType, FDWCharacterAttackAbilityQueue>();
 		FallingAttackAbilities = TMap<EDWWeaponType, FDWCharacterFallingAttackAbilityData>();
 		SkillAttackAbilities = TMap<FPrimaryAssetId, FDWCharacterSkillAttackAbilityData>();
@@ -395,6 +415,7 @@ public:
 	{
 		TeamID = NAME_None;
 		ControlMode = EDWCharacterControlMode::Fighting;
+		WeaponGroup = EDWWeaponGroup::Group1;
 		AttackAbilityQueues = TMap<EDWWeaponType, FDWCharacterAttackAbilityQueue>();
 		FallingAttackAbilities = TMap<EDWWeaponType, FDWCharacterFallingAttackAbilityData>();
 		SkillAttackAbilities = TMap<FPrimaryAssetId, FDWCharacterSkillAttackAbilityData>();
@@ -410,6 +431,9 @@ public:
 
 	UPROPERTY()
 	EDWCharacterControlMode ControlMode;
+
+	UPROPERTY()
+	EDWWeaponGroup WeaponGroup;
 
 	UPROPERTY()
 	TMap<EDWWeaponType, FDWCharacterAttackAbilityQueue> AttackAbilityQueues;
@@ -873,7 +897,6 @@ namespace GameplayTags
 	DREAMWORLD_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Dodge);
 	
 	DREAMWORLD_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_ToggleCrouch);
-	DREAMWORLD_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_ToggleControlMode);
 	DREAMWORLD_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_ToggleLockSightTarget);
 	DREAMWORLD_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_ChangeHand);
 	
@@ -910,6 +933,7 @@ namespace GameplayTags
 	DREAMWORLD_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_OpenGeneratePanel);
 	DREAMWORLD_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_OpenTaskPanel);
 	DREAMWORLD_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_OpenContextInputBox);
+	DREAMWORLD_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_OpenSwitcherPanel);
 
 	////////////////////////////////////////////////////
 	// State_Character

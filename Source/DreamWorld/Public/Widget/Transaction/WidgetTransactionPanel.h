@@ -50,7 +50,7 @@ protected:
 	void OnItemCategorySelected(EAbilityItemType InItemType);
 
 	UFUNCTION(BlueprintNativeEvent)
-	void OnTabButtonSelected(UCommonButtonBase* SelectedTabButton, int32 ButtonIndex);
+	void OnTabButtonSelected(UCommonButtonBase* AssociatedButton, int32 ButtonIndex);
 	
 	UFUNCTION(BlueprintNativeEvent)
 	void OnTransactionItemSelected(UWidgetTransactionItem* InItem);

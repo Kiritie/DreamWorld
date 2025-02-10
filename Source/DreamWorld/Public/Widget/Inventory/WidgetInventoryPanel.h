@@ -5,6 +5,8 @@
 #include "Widget/Inventory/WidgetInventory.h"
 #include "WidgetInventoryPanel.generated.h"
 
+class UCommonButtonBase;
+class UCommonButtonGroup;
 class UGridPanel;
 class UWrapBox;
 class UWidgetInventoryEquipSlot;
@@ -21,6 +23,8 @@ public:
 	UWidgetInventoryPanel(const FObjectInitializer& ObjectInitializer);
 
 public:
+	virtual void OnCreate(UObject* InOwner, const TArray<FParameter>& InParams) override;
+	
 	virtual void OnInitialize(UObject* InOwner, const TArray<FParameter>& InParams) override;
 
 	virtual void OnOpen(const TArray<FParameter>& InParams, bool bInstant) override;
@@ -28,6 +32,10 @@ public:
 	virtual void OnClose(bool bInstant) override;
 
 	virtual void OnRefresh() override;
+
+protected:
+	UFUNCTION()
+	void OnGroupButtonSelected(UCommonButtonBase* AssociatedButton, int32 ButtonIndex);
 	
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (BindWidget, OptionalWidget = false), Category = "Components")
@@ -38,6 +46,13 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (BindWidget, OptionalWidget = false), Category = "Components")
 	UGridPanel* RightEquipContent;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (BindWidget, OptionalWidget = false), Category = "Components")
+	UPanelWidget* WeaponGroupContent;
+
+protected:
+	UPROPERTY()
+	UCommonButtonGroup* WeaponGroup;
 
 public:
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)

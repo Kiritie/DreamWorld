@@ -27,6 +27,7 @@
 #include "Widget/Context/WidgetContextInputBox.h"
 #include "Widget/MaxMap/WidgetMaxMapBox.h"
 #include "Widget/Setting/WidgetSettingPanel.h"
+#include "Widget/Switcher/WidgetSwitcherPanel.h"
 #include "Widget/Task/WidgetTaskPanel.h"
 
 // ParamSets default values
@@ -149,7 +150,6 @@ void UDWInputManager::OnBindAction(UInputComponentBase* InInputComponent)
 	InInputComponent->BindInputAction(GameplayTags::Input_Dodge, ETriggerEvent::Completed, this, &UDWInputManager::OnDodgeReleased);
 	
 	// InInputComponent->BindInputAction(GameplayTags::Input_ToggleCrouch, ETriggerEvent::Started, this, &UDWInputManager::ToggleCrouch);
-	InInputComponent->BindInputAction(GameplayTags::Input_ToggleControlMode, ETriggerEvent::Started, this, &UDWInputManager::ToggleControlMode);
 	InInputComponent->BindInputAction(GameplayTags::Input_ChangeHand, ETriggerEvent::Started, this, &UDWInputManager::ChangeHand);
 	
 	InInputComponent->BindInputAction(GameplayTags::Input_Primary, ETriggerEvent::Started, this, &UDWInputManager::OnPrimaryPressed);
@@ -191,6 +191,7 @@ void UDWInputManager::OnBindAction(UInputComponentBase* InInputComponent)
 	InInputComponent->BindInputAction(GameplayTags::Input_OpenGeneratePanel, ETriggerEvent::Started, this, &UDWInputManager::OpenGeneratePanel);
 	InInputComponent->BindInputAction(GameplayTags::Input_OpenTaskPanel, ETriggerEvent::Started, this, &UDWInputManager::OpenTaskPanel);
 	InInputComponent->BindInputAction(GameplayTags::Input_OpenContextInputBox, ETriggerEvent::Started, this, &UDWInputManager::OpenContextInputBox);
+	InInputComponent->BindInputAction(GameplayTags::Input_OpenSwitcherPanel, ETriggerEvent::Started, this, &UDWInputManager::OpenSwitcherPanel);
 }
 
 void UDWInputManager::TurnCamera_Implementation(const FInputActionValue& InValue)
@@ -909,4 +910,13 @@ void UDWInputManager::OpenContextInputBox()
 	if(!PlayerCharacter || !PlayerCharacter->IsActive() || !PlayerCharacter->IsCurrent()) return;
 	
 	UWidgetModuleStatics::OpenUserWidget<UWidgetContextInputBox>();
+}
+
+void UDWInputManager::OpenSwitcherPanel()
+{
+	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>(LocalPlayerIndex);
+	
+	if(!PlayerCharacter || !PlayerCharacter->IsActive() || !PlayerCharacter->IsCurrent()) return;
+	
+	UWidgetModuleStatics::OpenUserWidget<UWidgetSwitcherPanel>();
 }

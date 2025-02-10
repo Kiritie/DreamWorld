@@ -587,9 +587,9 @@ void ADWPlayerCharacter::SetActorVisible_Implementation(bool bInVisible)
 	Super::SetActorVisible_Implementation(bInVisible);
 }
 
-void ADWPlayerCharacter::SetControlMode_Implementation(EDWCharacterControlMode InControlMode)
+void ADWPlayerCharacter::SetControlMode(EDWCharacterControlMode InControlMode)
 {
-	Super::SetControlMode_Implementation(InControlMode);
+	Super::SetControlMode(InControlMode);
 }
 
 void ADWPlayerCharacter::SetGenerateVoxelID(const FPrimaryAssetId& InGenerateVoxelID)

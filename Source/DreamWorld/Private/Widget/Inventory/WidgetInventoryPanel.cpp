@@ -15,6 +15,9 @@
 #include "Widget/Common/WidgetUIMask.h"
 #include "Widget/Inventory/Slot/WidgetInventoryEquipSlot.h"
 #include "Ability/Inventory/Slot/AbilityInventorySlotBase.h"
+#include "Character/DWCharacter.h"
+#include "Inventory/Slot/DWInventoryEquipSlot.h"
+#include "Widget/Common/CommonButtonGroup.h"
 
 UWidgetInventoryPanel::UWidgetInventoryPanel(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -36,6 +39,23 @@ UWidgetInventoryPanel::UWidgetInventoryPanel(const FObjectInitializer& ObjectIni
 
 	UISlotDatas.Add(ESlotSplitType::Default);
 	UISlotDatas.Add(ESlotSplitType::Equip);
+}
+
+void UWidgetInventoryPanel::OnCreate(UObject* InOwner, const TArray<FParameter>& InParams)
+{
+	Super::OnCreate(InOwner, InParams);
+	
+	WeaponGroup = UObjectPoolModuleStatics::SpawnObject<UCommonButtonGroup>();
+	WeaponGroup->SetSelectionRequiredN(true);
+	WeaponGroup->OnSelectedButtonBaseChanged.AddDynamic(this, &UWidgetInventoryPanel::OnGroupButtonSelected);
+
+	if(WeaponGroupContent)
+	{
+		for(auto Iter : WeaponGroupContent->GetAllChildren())
+		{
+			WeaponGroup->AddWidget(Iter);
+		}
+	}
 }
 
 void UWidgetInventoryPanel::OnInitialize(UObject* InOwner, const TArray<FParameter>& InParams)
@@ -108,6 +128,12 @@ void UWidgetInventoryPanel::OnOpen(const TArray<FParameter>& InParams, bool bIns
 	Super::OnOpen(InParams, bInstant);
 
 	UWidgetModuleStatics::OpenUserWidget<UWidgetUIMask>();
+
+	ADWCharacter* Character = GetOwnerObject<ADWCharacter>();
+
+	if(!Character) return;
+	
+	WeaponGroup->SelectButtonAtIndex((int32)Character->GetWeaponGroup());
 }
 
 void UWidgetInventoryPanel::OnClose(bool bInstant)
@@ -120,4 +146,13 @@ void UWidgetInventoryPanel::OnClose(bool bInstant)
 void UWidgetInventoryPanel::OnRefresh()
 {
 	Super::OnRefresh();
+}
+
+void UWidgetInventoryPanel::OnGroupButtonSelected(UCommonButtonBase* AssociatedButton, int32 ButtonIndex)
+{
+	ADWCharacter* Character = GetOwnerObject<ADWCharacter>();
+
+	if(!Character || !IsWidgetOpened(false)) return;
+
+	Character->SetWeaponGroup((EDWWeaponGroup)ButtonIndex);
 }

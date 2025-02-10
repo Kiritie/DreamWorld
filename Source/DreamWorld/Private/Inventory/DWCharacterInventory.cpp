@@ -27,14 +27,14 @@ void UDWCharacterInventory::UnloadData(EPhase InPhase)
 	Super::UnloadData(InPhase);
 }
 
-UAbilityInventoryEquipSlotBase* UDWCharacterInventory::GetEquipSlotByPart(EDWEquipPart InEquipPart)
+UDWInventoryEquipSlot* UDWCharacterInventory::GetEquipSlotByPart(EDWEquipPart InEquipPart)
 {
 	auto EquipSlots = GetSlotsBySplitType(ESlotSplitType::Equip);
 	for(int32 i = 0; i < EquipSlots.Num(); i++)
 	{
 		if(EquipSlots[i]->GetItem().GetData<UDWEquipData>().EquipPart == InEquipPart)
 		{
-			return Cast<UAbilityInventoryEquipSlotBase>(EquipSlots[i]);
+			return Cast<UDWInventoryEquipSlot>(EquipSlots[i]);
 		}
 	}
 	return nullptr;

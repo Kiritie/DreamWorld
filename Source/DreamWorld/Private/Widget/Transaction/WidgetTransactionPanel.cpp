@@ -229,7 +229,7 @@ void UWidgetTransactionPanel::OnItemCategorySelected_Implementation(EAbilityItem
 	OnTransactionContentRefresh(true);
 }
 
-void UWidgetTransactionPanel::OnTabButtonSelected_Implementation(UCommonButtonBase* SelectedTabButton, int32 ButtonIndex)
+void UWidgetTransactionPanel::OnTabButtonSelected_Implementation(UCommonButtonBase* AssociatedButton, int32 ButtonIndex)
 {
 	if(CategoryBar)
 	{

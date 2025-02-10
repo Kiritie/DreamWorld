@@ -16,6 +16,9 @@ class DREAMWORLD_API UWidgetInventoryEquipSlot : public UWidgetInventorySlot
 public:
 	UWidgetInventoryEquipSlot(const FObjectInitializer& ObjectInitializer);
 
+public:
+	virtual void OnRefresh() override;
+
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FText EquipPart;

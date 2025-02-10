@@ -6,7 +6,7 @@
 #include "Common/DWCommonTypes.h"
 #include "DWCharacterInventory.generated.h"
 
-class UAbilityInventoryEquipSlotBase;
+class UDWInventoryEquipSlot;
 
 /**
  * ��ɫ��Ʒ��
@@ -27,5 +27,5 @@ protected:
 	virtual void UnloadData(EPhase InPhase) override;
 
 public:
-	virtual UAbilityInventoryEquipSlotBase* GetEquipSlotByPart(EDWEquipPart InEquipPart);
+	virtual UDWInventoryEquipSlot* GetEquipSlotByPart(EDWEquipPart InEquipPart);
 };

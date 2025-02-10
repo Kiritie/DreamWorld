@@ -206,7 +206,6 @@ namespace GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Input_Dodge, "Input.Player.Dodge", "Dodge");
 	
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Input_ToggleCrouch, "Input.Player.ToggleCrouch", "Toggle Crouch");
-	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Input_ToggleControlMode, "Input.Player.ToggleControlMode", "Toggle Control Mode");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Input_ToggleLockSightTarget, "Input.Player.ToggleLockSightTarget", "Toggle LockSight Target");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Input_ChangeHand, "Input.Player.ChangeHand", "ChangeHand");
 	
@@ -243,6 +242,7 @@ namespace GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Input_OpenGeneratePanel, "Input.System.OpenGeneratePanel", "Open Generate Panel");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Input_OpenTaskPanel, "Input.System.OpenTaskPanel", "Open Task Panel");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Input_OpenContextInputBox, "Input.System.OpenContextInputBox", "Open Context Input Box");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Input_OpenSwitcherPanel, "Input.System.OpenSwitcherPanel", "Open Switcher Panel");
 
 	////////////////////////////////////////////////////
 	// State_Character

@@ -54,7 +54,7 @@ FReply UWidgetGameHUD::NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEv
 			return FReply::Handled();
 		}
 	}
-	return FReply::Unhandled();
+	return Super::NativeOnKeyDown(InGeometry, InKeyEvent);
 }
 
 void UWidgetGameHUD::OnInputModeChanged(UObject* InSender, UEventHandle_InputModeChanged* InEventHandle)

@@ -28,6 +28,8 @@ public:
 
 	virtual void OnItemChanged(FAbilityItem& InOldItem, bool bBroadcast) override;
 
+	virtual bool MatchItem(FAbilityItem InItem, bool bPutIn) const override;
+
 	virtual bool MatchItemLimit(FAbilityItem InItem, bool bForce = false) const override;
 	
 	virtual void Refresh() override;
@@ -41,5 +43,7 @@ protected:
 	EDWEquipPart EquipPart;
 
 public:
+	virtual bool IsEnabled() const override;
+	
 	EDWEquipPart GetEquipPart() const { return EquipPart; }
 };

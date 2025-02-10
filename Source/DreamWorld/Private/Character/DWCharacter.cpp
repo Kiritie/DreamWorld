@@ -50,6 +50,8 @@
 #include "Character/States/DWCharacterState_Climb.h"
 #include "Character/States/DWCharacterState_Fly.h"
 #include "Character/States/DWCharacterState_Sleep.h"
+#include "Common/DWCommonStatics.h"
+#include "Inventory/Slot/DWInventoryEquipSlot.h"
 #include "Item/Skill/DWSkillData.h"
 #include "Voxel/Datas/VoxelData.h"
 #include "Voxel/Voxels/Auxiliary/VoxelInteractAuxiliary.h"
@@ -97,6 +99,7 @@ ADWCharacter::ADWCharacter(const FObjectInitializer& ObjectInitializer) :
 
 	// stats
 	ControlMode = EDWCharacterControlMode::Fighting;
+	WeaponGroup = EDWWeaponGroup::Group1;
 	TeamID = NAME_None;
 	
 	Equips = TMap<EDWEquipPart, ADWEquip*>();
@@ -217,6 +220,7 @@ void ADWCharacter::LoadData(FSaveData* InSaveData, EPhase InPhase)
 	if(PHASEC(InPhase, EPhase::Primary))
 	{
 		SetControlMode(SaveData.ControlMode);
+		SetWeaponGroup(SaveData.WeaponGroup);
 		SetTeamID(SaveData.TeamID);
 
 		if(!SaveData.IsSaved())
@@ -287,6 +291,7 @@ FSaveData* ADWCharacter::ToData()
 
 	SaveData.TeamID = TeamID;
 	SaveData.ControlMode = ControlMode;
+	SaveData.WeaponGroup = WeaponGroup;
 
 	SaveData.FallingAttackAbilities = FallingAttackAbilities;
 	SaveData.AttackAbilityQueues = AttackAbilityQueues;
@@ -1088,7 +1093,7 @@ bool ADWCharacter::IsSleeping() const
 	return AbilitySystem->HasMatchingGameplayTag(GameplayTags::State_Character_Sleeping);
 }
 
-void ADWCharacter::SetControlMode_Implementation(EDWCharacterControlMode InControlMode)
+void ADWCharacter::SetControlMode(EDWCharacterControlMode InControlMode)
 {
 	ControlMode = InControlMode;
 
@@ -1109,6 +1114,34 @@ void ADWCharacter::SetControlMode_Implementation(EDWCharacterControlMode InContr
 				Execute_SetActorVisible(Iter, false);
 			}
 			break;
+		}
+	}
+}
+
+void ADWCharacter::SetWeaponGroup(EDWWeaponGroup InWeaponGroup)
+{
+	for(auto Iter : Inventory->GetSlotsBySplitType(ESlotSplitType::Equip))
+	{
+		if(UDWInventoryEquipSlot* EquipSlot = Cast<UDWInventoryEquipSlot>(Iter))
+		{
+			if(UDWCommonStatics::GetWeaponPartsByGroup(WeaponGroup).Contains(EquipSlot->GetEquipPart()))
+			{
+				EquipSlot->OnItemPreChange(EquipSlot->GetItem(), true);
+			}
+		}
+	}
+
+	WeaponGroup = InWeaponGroup;
+
+	for(auto Iter : Inventory->GetSlotsBySplitType(ESlotSplitType::Equip))
+	{
+		if(UDWInventoryEquipSlot* EquipSlot = Cast<UDWInventoryEquipSlot>(Iter))
+		{
+			if(UDWCommonStatics::GetWeaponPartsByGroup(WeaponGroup).Contains(EquipSlot->GetEquipPart()))
+			{
+				EquipSlot->OnItemChanged(EquipSlot->GetItem(), true);
+			}
+			EquipSlot->Refresh();
 		}
 	}
 }

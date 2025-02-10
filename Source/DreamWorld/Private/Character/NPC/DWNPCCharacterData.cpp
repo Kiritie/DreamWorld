@@ -10,5 +10,5 @@ UDWNPCCharacterData::UDWNPCCharacterData()
 	
 	InventoryData = FInventorySaveData();
 	InventoryData.InventoryClass = UDWCharacterInventory::StaticClass();
-	InventoryData.SplitItems.Add(ESlotSplitType::Default).Items.SetNum(100);
+	InventoryData.SplitItems.Add(ESlotSplitType::Default, 100);
 }

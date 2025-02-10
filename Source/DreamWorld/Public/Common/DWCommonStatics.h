@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include "DWCommonTypes.h"
 #include "Common/CommonStatics.h"
 #include "DWCommonStatics.generated.h"
 
@@ -9,4 +10,11 @@ UCLASS()
 class DREAMWORLD_API UDWCommonStatics : public UCommonStatics
 {
 	GENERATED_BODY()
+
+public:
+	UFUNCTION(BlueprintPure, Category = "DWCommonStatics")
+	static EDWEquipPart GetWeaponPartInSameGroup(EDWEquipPart InEquipPart);
+
+	UFUNCTION(BlueprintPure, Category = "DWCommonStatics")
+	static TArray<EDWEquipPart> GetWeaponPartsByGroup(EDWWeaponGroup InWeaponGroup);
 };

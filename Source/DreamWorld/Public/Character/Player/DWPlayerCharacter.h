@@ -130,7 +130,7 @@ public:
 
 	virtual void SetActorVisible_Implementation(bool bInVisible) override;
 		
-	virtual void SetControlMode_Implementation(EDWCharacterControlMode InControlMode) override;
+	virtual void SetControlMode(EDWCharacterControlMode InControlMode) override;
 
 	virtual void SetGenerateVoxelID(const FPrimaryAssetId& InGenerateVoxelID) override;
 

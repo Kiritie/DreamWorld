@@ -226,8 +226,11 @@ protected:
 
 protected:
 	// stats
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "CharacterStates")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CharacterStates")
 	EDWCharacterControlMode ControlMode;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CharacterStates")
+	EDWWeaponGroup WeaponGroup;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CharacterStats")
 	FName TeamID;
@@ -350,8 +353,14 @@ public:
 	UFUNCTION(BlueprintPure)
 	EDWCharacterControlMode GetControlMode() const { return ControlMode; }
 
-	UFUNCTION(BlueprintNativeEvent)
-	void SetControlMode(EDWCharacterControlMode InControlMode);
+	UFUNCTION(BlueprintCallable)
+	virtual void SetControlMode(EDWCharacterControlMode InControlMode);
+
+	UFUNCTION(BlueprintPure)
+	EDWWeaponGroup GetWeaponGroup() const { return WeaponGroup; }
+
+	UFUNCTION(BlueprintCallable)
+	virtual void SetWeaponGroup(EDWWeaponGroup InWeaponGroup);
 
 	UFUNCTION(BlueprintPure)
 	UWorldWidgetComponent* GetCharacterHP() const { return CharacterHP; }

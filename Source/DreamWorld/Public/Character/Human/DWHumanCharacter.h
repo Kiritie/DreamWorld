@@ -46,7 +46,7 @@ public:
 
 	virtual void ClearHitTargets() override;
 
-	virtual void SetControlMode_Implementation(EDWCharacterControlMode InControlMode) override;
+	virtual void SetControlMode(EDWCharacterControlMode InControlMode) override;
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
