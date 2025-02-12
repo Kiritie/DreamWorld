@@ -66,7 +66,16 @@ public:
 	
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
 	void SetStaminaInfo(const FString& InValue);
+		
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
+	void SetHungerInfo(const FString& InValue);
 	
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
+	void SetThirstInfo(const FString& InValue);
+	
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
+	void SetOxygenInfo(const FString& InValue);
+
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
 	void SetAttackForce(const FString& InValue);
 	

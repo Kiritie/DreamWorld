@@ -6,6 +6,7 @@
 #include "Ability/Inventory/Slot/AbilityInventorySlotBase.h"
 #include "Ability/Projectile/AbilityProjectileBase.h"
 #include "Character/DWCharacter.h"
+#include "Character/DWCharacterPart.h"
 #include "Character/Player/DWPlayerCharacter.h"
 #include "Common/CommonStatics.h"
 #include "Common/Targeting/TargetingComponent.h"
@@ -24,6 +25,7 @@
 #include "Common/DWCommonTypes.h"
 #include "Procedure/DWProcedure_Testing.h"
 #include "Scene/SceneModuleStatics.h"
+#include "Voxel/Voxels/Voxel.h"
 #include "Widget/Context/WidgetContextInputBox.h"
 #include "Widget/MaxMap/WidgetMaxMapBox.h"
 #include "Widget/Setting/WidgetSettingPanel.h"
@@ -890,7 +892,15 @@ void UDWInputManager::OpenGeneratePanel()
 	}
 	else
 	{
-		UWidgetModuleStatics::OpenUserWidget<UWidgetGeneratePanel>();
+		const FVoxelItem& OverlappingVoxel = PlayerCharacter->GetCharacterPart(EDWCharacterPart::Chest)->GetOverlappingVoxel();
+		if(OverlappingVoxel.IsValid() && OverlappingVoxel.GetVoxelType() == EVoxelType::Water)
+		{
+			UWidgetModuleStatics::OpenUserWidget<UWidgetGeneratePanel>({ &OverlappingVoxel.GetVoxel() });
+		}
+		else
+		{
+			UWidgetModuleStatics::OpenUserWidget<UWidgetGeneratePanel>();
+		}
 	}
 }
 

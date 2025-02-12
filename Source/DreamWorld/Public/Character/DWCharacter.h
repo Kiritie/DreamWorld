@@ -247,6 +247,8 @@ protected:
 	float CameraDoRotationDuration;
 	FRotator CameraDoRotationRotation;
 
+	float StatDamageRemainTime;
+
 	EDWCharacterAttackType AttackType;
 
 	EDWWeaponPart AttackWeaponPart;
@@ -269,6 +271,26 @@ protected:
 	TMap<FPrimaryAssetId, FDWCharacterSkillAttackAbilityData> SkillAttackAbilities;
 
 public:
+	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, Hunger)
+				
+	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, HungerRecovery)
+				
+	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, HungerExpendSpeed)
+
+	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, Thirst)
+								
+	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, ThirstRecovery)
+
+	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, ThirstExpendSpeed)
+
+	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, Oxygen)
+	
+	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, OxygenRecovery)
+
+	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, OxygenRegenSpeed)
+	
+	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, OxygenExpendSpeed)
+
 	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, Mana)
 	
 	ATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, MaxMana)

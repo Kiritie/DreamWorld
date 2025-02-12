@@ -41,4 +41,13 @@ public:
 	
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
 	void SetStaminaPercent(float InStamina, float InMaxStamina);
+	
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
+	void SetHungerValue(float InHunger);
+	
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
+	void SetThirstValue(float InThirst);
+	
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
+	void SetOxygenValue(float InOxygen);
 };

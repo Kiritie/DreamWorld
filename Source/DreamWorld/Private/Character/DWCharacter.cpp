@@ -45,11 +45,11 @@
 #include "Ability/Character/States/AbilityCharacterState_Interrupt.h"
 #include "Ability/Character/States/AbilityCharacterState_Jump.h"
 #include "Ability/Character/States/AbilityCharacterState_Static.h"
-#include "Ability/Character/States/AbilityCharacterState_Swim.h"
 #include "Ability/Character/States/AbilityCharacterState_Walk.h"
 #include "Character/States/DWCharacterState_Climb.h"
 #include "Character/States/DWCharacterState_Fly.h"
 #include "Character/States/DWCharacterState_Sleep.h"
+#include "Character/States/DWCharacterState_Swim.h"
 #include "Common/DWCommonStatics.h"
 #include "Inventory/Slot/DWInventoryEquipSlot.h"
 #include "Item/Skill/DWSkillData.h"
@@ -94,7 +94,7 @@ ADWCharacter::ADWCharacter(const FObjectInitializer& ObjectInitializer) :
 	FSM->States.Add(UDWCharacterState_Ride::StaticClass());
 	FSM->States.Add(UDWCharacterState_Sleep::StaticClass());
 	FSM->States.Add(UAbilityCharacterState_Static::StaticClass());
-	FSM->States.Add(UAbilityCharacterState_Swim::StaticClass());
+	FSM->States.Add(UDWCharacterState_Swim::StaticClass());
 	FSM->States.Add(UAbilityCharacterState_Walk::StaticClass());
 
 	// stats
@@ -115,6 +115,8 @@ ADWCharacter::ADWCharacter(const FObjectInitializer& ObjectInitializer) :
 	CameraDoRotationTime = 0.f;
 	CameraDoRotationDuration = 0.f;
 	CameraDoRotationRotation = EMPTY_Rotator;
+
+	StatDamageRemainTime = 0.f;
 
 	AttackAbilityQueues = TMap<EDWWeaponType, FDWCharacterAttackAbilityQueue>();
 	FallingAttackAbilities = TMap<EDWWeaponType, FDWCharacterFallingAttackAbilityData>();
@@ -166,6 +168,30 @@ void ADWCharacter::OnRefresh_Implementation(float DeltaSeconds)
 			}
 		}
 
+		float FinalStatDamage = 0.f;
+
+		if(IsPlayer())
+		{
+			ModifyHunger(-GetHungerExpendSpeed() * DeltaSeconds * (IsSprinting() ? 2.f : 1.f));
+		
+			ModifyThirst(-GetThirstExpendSpeed() * DeltaSeconds);
+
+			if(GetThirst() <= 0.f)
+			{
+				FinalStatDamage += 10.f;
+			}
+		}
+
+		if(!IsSwimming())
+		{
+			ModifyOxygen(GetOxygenRegenSpeed() * DeltaSeconds);
+		}
+		
+		if(GetOxygen() <= 0.f)
+		{
+			FinalStatDamage += 20.f;
+		}
+
 		ModifyMana(ATTRIBUTE_DELTAVALUE_CLAMP(this, Mana, GetManaRegenSpeed() * DeltaSeconds));
 
 		if(IsSprinting())
@@ -181,7 +207,7 @@ void ADWCharacter::OnRefresh_Implementation(float DeltaSeconds)
 		}
 		else if(IsFreeToAnim())
 		{
-			ModifyStamina(ATTRIBUTE_DELTAVALUE_CLAMP(this, Stamina, GetStaminaRegenSpeed() * DeltaSeconds));
+			ModifyStamina(ATTRIBUTE_DELTAVALUE_CLAMP(this, Stamina, GetStaminaRegenSpeed() * ((GetHunger() / 100.f) * 0.9f + 0.1f) * DeltaSeconds));
 		}
 
 		if(GetStamina() < FMath::Min(GetMaxStamina() * 0.1f, 10.f))
@@ -207,6 +233,29 @@ void ADWCharacter::OnRefresh_Implementation(float DeltaSeconds)
 		if(GetActorLocation().Z < 0)
 		{
 			Kill(this);
+		}
+		else if(FinalStatDamage > 0.f)
+		{
+			if(StatDamageRemainTime <= 0.f)
+			{
+				StatDamageRemainTime = 1.f;
+				
+				UEffectBase* Effect = UObjectPoolModuleStatics::SpawnObject<UEffectBase>();
+
+				FGameplayModifierInfo ModifierInfo;
+				ModifierInfo.Attribute = GET_GAMEPLAYATTRIBUTE(UVitalityAttributeSetBase, RealDamage);
+				ModifierInfo.ModifierOp = EGameplayModOp::Override;
+				ModifierInfo.ModifierMagnitude = FGameplayEffectModifierMagnitude(FinalStatDamage);
+
+				Effect->Modifiers.Add(ModifierInfo);
+			
+				FGameplayEffectContextHandle EffectContext = GetAbilitySystemComponent()->MakeEffectContext();
+				EffectContext.AddSourceObject(this);
+				GetAbilitySystemComponent()->ApplyGameplayEffectToSelf(Effect, 0, EffectContext);
+
+				UObjectPoolModuleStatics::DespawnObject(Effect);
+			}
+			StatDamageRemainTime -= DeltaSeconds;
 		}
 	}
 }
@@ -308,6 +357,9 @@ void ADWCharacter::ResetData()
 
 	SetMana(GetMaxMana());
 	SetStamina(GetMaxStamina());
+	SetHunger(100.f);
+	SetThirst(100.f);
+	SetOxygen(100.f);
 }
 
 void ADWCharacter::SetActorVisible_Implementation(bool bInVisible)
@@ -946,6 +998,18 @@ void ADWCharacter::HandleRecovery(const FGameplayAttribute& RecoveryAttribute, f
 	else if(RecoveryAttribute == GetStaminaRecoveryAttribute())
 	{
 		ModifyStamina(RecoveryValue);
+	}
+	else if(RecoveryAttribute == GetHungerRecoveryAttribute())
+	{
+		ModifyHunger(RecoveryValue);
+	}
+	else if(RecoveryAttribute == GetThirstRecoveryAttribute())
+	{
+		ModifyThirst(RecoveryValue);
+	}
+	else if(RecoveryAttribute == GetOxygenRecoveryAttribute())
+	{
+		ModifyOxygen(RecoveryValue);
 	}
 }
 

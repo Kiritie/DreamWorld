@@ -152,6 +152,10 @@ void UDWDamageHandle::HandleDamage(AActor* SourceActor, AActor* TargetActor, flo
 			}
 		}
 	}
+	else if(DamageAttribute == GET_GAMEPLAYATTRIBUTE(UVitalityAttributeSetBase, RealDamage))
+	{
+		LocalDamageValue = DamageValue;
+	}
 
 	const float _DamageValue = LocalDamageValue;
 	LocalDamageValue *= (1.f - LocalDefendRate);

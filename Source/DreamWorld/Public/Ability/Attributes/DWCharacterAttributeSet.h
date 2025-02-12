@@ -61,6 +61,46 @@ public:
 	GAMEPLAYATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, StaminaExpendSpeed)
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, SaveGame, Category = "CharacterAttributes")
+	FGameplayAttributeData Hunger;
+	GAMEPLAYATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, Hunger)
+				
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, SaveGame, Category = "CharacterAttributes")
+	FGameplayAttributeData HungerRecovery;
+	GAMEPLAYATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, HungerRecovery)
+				
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, SaveGame, Category = "CharacterAttributes")
+	FGameplayAttributeData HungerExpendSpeed;
+	GAMEPLAYATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, HungerExpendSpeed)
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, SaveGame, Category = "CharacterAttributes")
+	FGameplayAttributeData Thirst;
+	GAMEPLAYATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, Thirst)
+								
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, SaveGame, Category = "CharacterAttributes")
+	FGameplayAttributeData ThirstRecovery;
+	GAMEPLAYATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, ThirstRecovery)
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, SaveGame, Category = "CharacterAttributes")
+	FGameplayAttributeData ThirstExpendSpeed;
+	GAMEPLAYATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, ThirstExpendSpeed)
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, SaveGame, Category = "CharacterAttributes")
+	FGameplayAttributeData Oxygen;
+	GAMEPLAYATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, Oxygen)
+					
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, SaveGame, Category = "CharacterAttributes")
+	FGameplayAttributeData OxygenRecovery;
+	GAMEPLAYATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, OxygenRecovery)
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, SaveGame, Category = "CharacterAttributes")
+	FGameplayAttributeData OxygenRegenSpeed;
+	GAMEPLAYATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, OxygenRegenSpeed)
+			
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, SaveGame, Category = "CharacterAttributes")
+	FGameplayAttributeData OxygenExpendSpeed;
+	GAMEPLAYATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, OxygenExpendSpeed)
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, SaveGame, Category = "CharacterAttributes")
 	FGameplayAttributeData DodgeForce;
 	GAMEPLAYATTRIBUTE_ACCESSORS(UDWCharacterAttributeSet, DodgeForce)
 

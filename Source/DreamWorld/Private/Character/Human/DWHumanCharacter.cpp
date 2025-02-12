@@ -10,7 +10,6 @@
 #include "Ability/Character/States/AbilityCharacterState_Interrupt.h"
 #include "Ability/Character/States/AbilityCharacterState_Jump.h"
 #include "Ability/Character/States/AbilityCharacterState_Static.h"
-#include "Ability/Character/States/AbilityCharacterState_Swim.h"
 #include "Ability/Character/States/AbilityCharacterState_Walk.h"
 #include "Ability/Inventory/Slot/AbilityInventorySlotBase.h"
 #include "Components/CapsuleComponent.h"
@@ -32,6 +31,7 @@
 #include "Character/States/DWCharacterState_Float.h"
 #include "Character/States/DWCharacterState_Fly.h"
 #include "Character/States/DWCharacterState_Ride.h"
+#include "Character/States/DWCharacterState_Swim.h"
 #include "Common/Interaction/InteractionComponent.h"
 #include "FSM/Components/FSMComponent.h"
 #include "Item/Equip/DWEquipData.h"
@@ -78,7 +78,7 @@ ADWHumanCharacter::ADWHumanCharacter(const FObjectInitializer& ObjectInitializer
 	FSM->States.Add(UAbilityCharacterState_Jump::StaticClass());
 	FSM->States.Add(UDWCharacterState_Ride::StaticClass());
 	FSM->States.Add(UAbilityCharacterState_Static::StaticClass());
-	FSM->States.Add(UAbilityCharacterState_Swim::StaticClass());
+	FSM->States.Add(UDWCharacterState_Swim::StaticClass());
 	FSM->States.Add(UAbilityCharacterState_Walk::StaticClass());
 
 	Interaction->AddInteractAction(EInteractAction::Dialogue);

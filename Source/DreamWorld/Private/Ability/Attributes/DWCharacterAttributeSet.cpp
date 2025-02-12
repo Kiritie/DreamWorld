@@ -15,6 +15,16 @@ UDWCharacterAttributeSet::UDWCharacterAttributeSet()
 	, StaminaRecovery(0.f)
 	, StaminaRegenSpeed(10.f)
 	, StaminaExpendSpeed(5.f)
+	, Hunger(100.f)
+	, HungerRecovery(0.f)
+	, HungerExpendSpeed(0.1f)
+	, Thirst(100.f)
+	, ThirstRecovery(0.f)
+	, ThirstExpendSpeed(0.15f)
+	, Oxygen(100.f)
+	, OxygenRecovery(0.f)
+	, OxygenRegenSpeed(10.f)
+	, OxygenExpendSpeed(3.f)
 	, DodgeForce(500.f)
 	, RepulseForce(0.f)
 	, AttackForce(0.f)
@@ -51,6 +61,46 @@ void UDWCharacterAttributeSet::PreAttributeBaseChange(const FGameplayAttribute& 
 		NewValue = FMath::Clamp(NewValue, 0.f, NewValue);
 	}
 	else if (Attribute == GetStaminaExpendSpeedAttribute())
+	{
+		NewValue = FMath::Clamp(NewValue, 0.f, NewValue);
+	}
+	else if (Attribute == GetHungerAttribute())
+	{
+		NewValue = FMath::Clamp(NewValue, 0.f, 100.f);
+	}
+	else if (Attribute == GetHungerRecoveryAttribute())
+	{
+		NewValue = FMath::Clamp(NewValue, 0.f, NewValue);
+	}
+	else if (Attribute == GetHungerExpendSpeedAttribute())
+	{
+		NewValue = FMath::Clamp(NewValue, 0.f, NewValue);
+	}
+	else if (Attribute == GetThirstAttribute())
+	{
+		NewValue = FMath::Clamp(NewValue, 0.f, 100.f);
+	}
+	else if (Attribute == GetThirstRecoveryAttribute())
+	{
+		NewValue = FMath::Clamp(NewValue, 0.f, NewValue);
+	}
+	else if (Attribute == GetThirstExpendSpeedAttribute())
+	{
+		NewValue = FMath::Clamp(NewValue, 0.f, NewValue);
+	}
+	else if (Attribute == GetOxygenAttribute())
+	{
+		NewValue = FMath::Clamp(NewValue, 0.f, 100.f);
+	}
+	else if (Attribute == GetOxygenRecoveryAttribute())
+	{
+		NewValue = FMath::Clamp(NewValue, 0.f, NewValue);
+	}
+	else if (Attribute == GetOxygenRegenSpeedAttribute())
+	{
+		NewValue = FMath::Clamp(NewValue, 0.f, NewValue);
+	}
+	else if (Attribute == GetOxygenExpendSpeedAttribute())
 	{
 		NewValue = FMath::Clamp(NewValue, 0.f, NewValue);
 	}
@@ -121,6 +171,46 @@ void UDWCharacterAttributeSet::PreAttributeChange(const FGameplayAttribute& Attr
 		NewValue = FMath::Clamp(NewValue, 0.f, NewValue);
 	}
 	else if (Attribute == GetStaminaExpendSpeedAttribute())
+	{
+		NewValue = FMath::Clamp(NewValue, 0.f, NewValue);
+	}
+	else if (Attribute == GetHungerAttribute())
+	{
+		NewValue = FMath::Clamp(NewValue, 0.f, 100.f);
+	}
+	else if (Attribute == GetHungerRecoveryAttribute())
+	{
+		NewValue = FMath::Clamp(NewValue, 0.f, NewValue);
+	}
+	else if (Attribute == GetHungerExpendSpeedAttribute())
+	{
+		NewValue = FMath::Clamp(NewValue, 0.f, NewValue);
+	}
+	else if (Attribute == GetThirstAttribute())
+	{
+		NewValue = FMath::Clamp(NewValue, 0.f, 100.f);
+	}
+	else if (Attribute == GetThirstRecoveryAttribute())
+	{
+		NewValue = FMath::Clamp(NewValue, 0.f, NewValue);
+	}
+	else if (Attribute == GetThirstExpendSpeedAttribute())
+	{
+		NewValue = FMath::Clamp(NewValue, 0.f, NewValue);
+	}
+	else if (Attribute == GetOxygenAttribute())
+	{
+		NewValue = FMath::Clamp(NewValue, 0.f, 100.f);
+	}
+	else if (Attribute == GetOxygenRecoveryAttribute())
+	{
+		NewValue = FMath::Clamp(NewValue, 0.f, NewValue);
+	}
+	else if (Attribute == GetOxygenRegenSpeedAttribute())
+	{
+		NewValue = FMath::Clamp(NewValue, 0.f, NewValue);
+	}
+	else if (Attribute == GetOxygenExpendSpeedAttribute())
 	{
 		NewValue = FMath::Clamp(NewValue, 0.f, NewValue);
 	}
@@ -218,5 +308,20 @@ void UDWCharacterAttributeSet::PostGameplayEffectExecute(const struct FGameplayE
 	{
 		UReferencePoolModuleStatics::GetReference<URecoveryHandle>(true, RecoveryHandleClass).HandleRecovery(SourceActor, TargetActor, GetStaminaRecovery(), GetStaminaRecoveryAttribute(), HitResult, SourceTags);
 		SetStaminaRecovery(0.f);
+	}
+	else if(Data.EvaluatedData.Attribute == GetHungerRecoveryAttribute())
+	{
+		UReferencePoolModuleStatics::GetReference<URecoveryHandle>(true, RecoveryHandleClass).HandleRecovery(SourceActor, TargetActor, GetHungerRecovery(), GetHungerRecoveryAttribute(), HitResult, SourceTags);
+		SetHungerRecovery(0.f);
+	}
+	else if(Data.EvaluatedData.Attribute == GetThirstRecoveryAttribute())
+	{
+		UReferencePoolModuleStatics::GetReference<URecoveryHandle>(true, RecoveryHandleClass).HandleRecovery(SourceActor, TargetActor, GetThirstRecovery(), GetThirstRecoveryAttribute(), HitResult, SourceTags);
+		SetThirstRecovery(0.f);
+	}
+	else if(Data.EvaluatedData.Attribute == GetOxygenRecoveryAttribute())
+	{
+		UReferencePoolModuleStatics::GetReference<URecoveryHandle>(true, RecoveryHandleClass).HandleRecovery(SourceActor, TargetActor, GetOxygenRecovery(), GetOxygenRecoveryAttribute(), HitResult, SourceTags);
+		SetOxygenRecovery(0.f);
 	}
 }

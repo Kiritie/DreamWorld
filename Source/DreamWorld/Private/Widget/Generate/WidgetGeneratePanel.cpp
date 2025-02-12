@@ -82,6 +82,10 @@ void UWidgetGeneratePanel::OnOpen(const TArray<FParameter>& InParams, bool bInst
 	{
 		GenerateToolID = InParams[0].GetObjectValue<IPrimaryEntityInterface>()->Execute_GetAssetID(InParams[0]);
 	}
+	else
+	{
+		GenerateToolID = FPrimaryAssetId();
+	}
 	
 	if(CategoryBar)
 	{

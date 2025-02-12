@@ -20,7 +20,6 @@
 #include "Ability/Character/States/AbilityCharacterState_Interrupt.h"
 #include "Ability/Character/States/AbilityCharacterState_Jump.h"
 #include "Ability/Character/States/AbilityCharacterState_Static.h"
-#include "Ability/Character/States/AbilityCharacterState_Swim.h"
 #include "Ability/Character/States/AbilityCharacterState_Walk.h"
 #include "Camera/CameraModuleStatics.h"
 #include "Character/Player/States/DWPlayerCharacterState_Death.h"
@@ -36,6 +35,7 @@
 #include "Character/States/DWCharacterState_Attack.h"
 #include "Character/States/DWCharacterState_Climb.h"
 #include "Character/States/DWCharacterState_Dodge.h"
+#include "Character/States/DWCharacterState_Swim.h"
 #include "Common/CommonStatics.h"
 #include "Common/Looking/LookingComponent.h"
 #include "Common/Targeting/TargetingComponent.h"
@@ -106,7 +106,7 @@ ADWPlayerCharacter::ADWPlayerCharacter(const FObjectInitializer& ObjectInitializ
 	FSM->States.Add(UDWCharacterState_Ride::StaticClass());
 	FSM->States.Add(UDWPlayerCharacterState_Sleep::StaticClass());
 	FSM->States.Add(UAbilityCharacterState_Static::StaticClass());
-	FSM->States.Add(UAbilityCharacterState_Swim::StaticClass());
+	FSM->States.Add(UDWCharacterState_Swim::StaticClass());
 	FSM->States.Add(UAbilityCharacterState_Walk::StaticClass());
 }
 
@@ -455,6 +455,39 @@ void ADWPlayerCharacter::OnAttributeChange(const FOnAttributeChangeData& InAttri
 		if(UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>())
 		{
 			UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>()->SetStaminaInfo(FString::Printf(TEXT("%d/%d"), (int32)GetStamina(), (int32)GetMaxStamina()));
+		}
+	}
+	else if(InAttributeChangeData.Attribute == GetHungerAttribute())
+	{
+		if(UWidgetModuleStatics::GetUserWidget<UWidgetHeadBox>())
+		{
+			UWidgetModuleStatics::GetUserWidget<UWidgetHeadBox>()->SetHungerValue(GetHunger());
+		}
+		if(UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>())
+		{
+			UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>()->SetHungerInfo(FString::Printf(TEXT("%d"), (int32)GetHunger()));
+		}
+	}
+	else if(InAttributeChangeData.Attribute == GetThirstAttribute())
+	{
+		if(UWidgetModuleStatics::GetUserWidget<UWidgetHeadBox>())
+		{
+			UWidgetModuleStatics::GetUserWidget<UWidgetHeadBox>()->SetThirstValue(GetThirst());
+		}
+		if(UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>())
+		{
+			UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>()->SetThirstInfo(FString::Printf(TEXT("%d"), (int32)GetThirst()));
+		}
+	}
+	else if(InAttributeChangeData.Attribute == GetOxygenAttribute())
+	{
+		if(UWidgetModuleStatics::GetUserWidget<UWidgetHeadBox>())
+		{
+			UWidgetModuleStatics::GetUserWidget<UWidgetHeadBox>()->SetOxygenValue(GetOxygen());
+		}
+		if(UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>())
+		{
+			UWidgetModuleStatics::GetUserWidget<UWidgetInventoryPanel>()->SetOxygenInfo(FString::Printf(TEXT("%d"), (int32)GetOxygen()));
 		}
 	}
 	else if(InAttributeChangeData.Attribute == GetMoveSpeedAttribute())
