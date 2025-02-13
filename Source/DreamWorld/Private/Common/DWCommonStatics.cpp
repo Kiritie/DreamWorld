@@ -3,7 +3,22 @@
 
 #include "Common/DWCommonStatics.h"
 
-EDWEquipPart UDWCommonStatics::GetWeaponPartInSameGroup(EDWEquipPart InEquipPart)
+EDWEquipPart UDWCommonStatics::GetClampedEquipPart(EDWEquipPart InEquipPart)
+{
+	switch (InEquipPart)
+	{
+		case EDWEquipPart::Primary2:
+		case EDWEquipPart::Primary3:
+			return EDWEquipPart::Primary;
+		case EDWEquipPart::Secondary2:
+		case EDWEquipPart::Secondary3:
+			return EDWEquipPart::Secondary;
+		default: break;
+	}
+	return InEquipPart;
+}
+
+EDWEquipPart UDWCommonStatics::GetMatchedWeaponPart(EDWEquipPart InEquipPart)
 {
 	switch (InEquipPart)
 	{

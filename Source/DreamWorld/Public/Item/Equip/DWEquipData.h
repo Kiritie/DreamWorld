@@ -20,4 +20,7 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	EDWEquipPart EquipPart;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	EDWEquipSocket EquipSocket;
 };

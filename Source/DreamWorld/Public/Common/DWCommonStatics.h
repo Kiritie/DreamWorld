@@ -13,7 +13,10 @@ class DREAMWORLD_API UDWCommonStatics : public UCommonStatics
 
 public:
 	UFUNCTION(BlueprintPure, Category = "DWCommonStatics")
-	static EDWEquipPart GetWeaponPartInSameGroup(EDWEquipPart InEquipPart);
+	static EDWEquipPart GetClampedEquipPart(EDWEquipPart InEquipPart);
+
+	UFUNCTION(BlueprintPure, Category = "DWCommonStatics")
+	static EDWEquipPart GetMatchedWeaponPart(EDWEquipPart InEquipPart);
 
 	UFUNCTION(BlueprintPure, Category = "DWCommonStatics")
 	static TArray<EDWEquipPart> GetWeaponPartsByGroup(EDWWeaponGroup InWeaponGroup);

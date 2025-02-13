@@ -201,5 +201,5 @@ protected:
 	bool bSprintPressed;
 
 	UPROPERTY(VisibleAnywhere, Category = "InputStates|Player")
-	TMap<EDWWeaponPart, int32> AttackAbilityQueue;
+	int32 AttackAbilityQueue;
 };

@@ -20,7 +20,7 @@ void ADWEquip::OnAssemble_Implementation()
 
 	ADWCharacter* Character = GetOwnerActor<ADWCharacter>();
 
-	Character->AttachActor(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale, *UCommonStatics::GetEnumAuthoredNameByValue(TEXT("/Script/DreamWorld.EDWEquipPart"), (int32)GetItemData<UDWEquipData>().EquipPart));
+	Character->AttachActor(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale, *UCommonStatics::GetEnumAuthoredNameByValue(TEXT("/Script/DreamWorld.EDWEquipSocket"), (int32)GetItemData<UDWEquipData>().EquipSocket));
 }
 
 void ADWEquip::OnDisassemble_Implementation()

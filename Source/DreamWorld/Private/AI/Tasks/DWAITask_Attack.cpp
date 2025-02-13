@@ -9,6 +9,7 @@
 UDWAITask_Attack::UDWAITask_Attack(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	AttackAbilityIndex = -1;
+	AttackWeaponPart = EDWWeaponPart::None;
 }
 
 void UDWAITask_Attack::InitializeFromAsset(UBehaviorTree& Asset)
@@ -45,7 +46,7 @@ EBTNodeResult::Type UDWAITask_Attack::ExecuteTask(UBehaviorTreeComponent& OwnerC
 
 	if (!InitTask(OwnerComp)) return EBTNodeResult::Failed;
 
-	if(GetAgent<ADWCharacter>()->Attack(EDWWeaponPart::None, AttackAbilityIndex, FSimpleDelegate::CreateLambda([this, &OwnerComp]()
+	if(GetAgent<ADWCharacter>()->Attack(AttackWeaponPart, AttackAbilityIndex, FSimpleDelegate::CreateLambda([this, &OwnerComp]()
 	{
 		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
 	})))

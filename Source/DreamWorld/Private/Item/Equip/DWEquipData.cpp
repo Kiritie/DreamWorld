@@ -6,4 +6,5 @@ UDWEquipData::UDWEquipData()
 	
 	EquipType = EDWEquipType::None;
 	EquipPart = EDWEquipPart::Head;
+	EquipSocket = EDWEquipSocket::Head;
 }

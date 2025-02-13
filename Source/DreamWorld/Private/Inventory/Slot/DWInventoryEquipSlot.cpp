@@ -57,7 +57,7 @@ bool UDWInventoryEquipSlot::MatchItemLimit(FAbilityItem InItem, bool bForce) con
 	{
 		if(bForce)
 		{
-			EDWEquipPart OtherPart = UDWCommonStatics::GetWeaponPartInSameGroup(EquipPart);
+			EDWEquipPart OtherPart = UDWCommonStatics::GetMatchedWeaponPart(EquipPart);
 			UAbilityInventorySlotBase* OtherSlot = Inventory->GetSlotBySplitTypeAndIndex(ESlotSplitType::Equip, (int32)OtherPart);
 			if(OtherSlot != InItem.InventorySlot)
 			{
@@ -71,7 +71,7 @@ bool UDWInventoryEquipSlot::MatchItemLimit(FAbilityItem InItem, bool bForce) con
 				}
 			}
 		}
-		return true;
+		return InItem.GetData<UDWEquipData>().EquipPart == UDWCommonStatics::GetClampedEquipPart(EquipPart);
 	}
 	return false;
 }

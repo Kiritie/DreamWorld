@@ -51,70 +51,6 @@ class UDWCharacterAttributeSet;
 class UTargetType;
 class UAbilityInventorySlotBase;
 
-/**
- * ??????
- */
-UENUM(BlueprintType)
-enum class EDWTransactionType : uint8
-{
-	// 购买
-	Buy,
-	// 出售
-	Sell,
-	// 升级
-	Upgrade,
-	// 锻造
-	Generate,
-	// 拆解
-	Split,
-};
-
-/**
- * ??????
- */
-UENUM(BlueprintType)
-enum class EDWCharacterControlMode : uint8
-{
-	// ???
-	Fighting,
-	// ????
-	Creating
-};
-
-/**
- * ???????
- */
-UENUM(BlueprintType)
-enum class EDWCharacterNature : uint8
-{
-	// ???
-	None,
-	// ???????
-	NPC,
-	// ???????
-	Player,
-	// ????AI
-	AIFriendly,
-	// ??????AI
-	AINeutral,
-	// ?ж??AI
-	AIHostile
-};
-
-/**
- * ???????
- */
-UENUM(BlueprintType)
-enum class EDWCharacterCraft : uint8
-{
-	// ???
-	None,
-	// ???????
-	Merchant,
-	// ???????
-	Blacksmith
-};
-
 UENUM(BlueprintType)
 enum class EDWPropType : uint8
 {
@@ -161,7 +97,7 @@ enum class EDWEquipPart : uint8
 	// 主武器
 	Primary,
 	// 次武器
-	Secondary UMETA(Hidden),
+	Secondary,
 	// 主武器2
 	Primary2 UMETA(Hidden),
 	// 次武器2
@@ -170,6 +106,25 @@ enum class EDWEquipPart : uint8
 	Primary3 UMETA(Hidden),
 	// 次武器3
 	Secondary3 UMETA(Hidden)
+};
+
+UENUM(BlueprintType)
+enum class EDWEquipSocket : uint8
+{
+	// 头部
+	Head,
+	// 胸部
+	Chest,
+	// 手臂
+	Arm,
+	// 腿部
+	Leg,
+	// 脚部
+	Foot,
+	// 左手
+	LeftHand,
+	// 右手
+	RightHand
 };
 
 UENUM(BlueprintType)
@@ -242,6 +197,70 @@ enum class EDWSkillType : uint8
 	Teleport,
 	// 隐身
 	Stealth
+};
+
+/**
+ * ??????
+ */
+UENUM(BlueprintType)
+enum class EDWCharacterControlMode : uint8
+{
+	// ???
+	Fighting,
+	// ????
+	Creating
+};
+
+/**
+ * ???????
+ */
+UENUM(BlueprintType)
+enum class EDWCharacterNature : uint8
+{
+	// ???
+	None,
+	// ???????
+	NPC,
+	// ???????
+	Player,
+	// ????AI
+	AIFriendly,
+	// ??????AI
+	AINeutral,
+	// ?ж??AI
+	AIHostile
+};
+
+/**
+ * ???????
+ */
+UENUM(BlueprintType)
+enum class EDWCharacterCraft : uint8
+{
+	// ???
+	None,
+	// ???????
+	Merchant,
+	// ???????
+	Blacksmith
+};
+
+/**
+ * ??????
+ */
+UENUM(BlueprintType)
+enum class EDWTransactionType : uint8
+{
+	// 购买
+	Buy,
+	// 出售
+	Sell,
+	// 升级
+	Upgrade,
+	// 锻造
+	Generate,
+	// 拆解
+	Split,
 };
 
 USTRUCT(BlueprintType)

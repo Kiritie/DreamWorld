@@ -2,6 +2,7 @@
 
 #pragma once
 #include "DWAITask_Fight.h"
+#include "Common/DWCommonTypes.h"
 
 #include "DWAITask_Attack.generated.h"
 
@@ -34,4 +35,7 @@ protected:
 protected:
 	UPROPERTY(EditAnywhere, Category = "Blackboard")
 	int32 AttackAbilityIndex;
+
+	UPROPERTY(EditAnywhere, Category = "Blackboard")
+	EDWWeaponPart AttackWeaponPart;
 };

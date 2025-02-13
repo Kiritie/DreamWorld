@@ -39,8 +39,7 @@ UDWInputManager::UDWInputManager()
 	bSecondaryPressed = false;
 	bThirdPressed = false;
 	bSprintPressed = false;
-	AttackAbilityQueue.Add(EDWWeaponPart::Primary, 0);
-	AttackAbilityQueue.Add(EDWWeaponPart::Secondary, 0);
+	AttackAbilityQueue = 0;
 }
 
 void UDWInputManager::OnInitialize()
@@ -56,7 +55,7 @@ void UDWInputManager::OnReset()
 	bSecondaryPressed = false;
 	bThirdPressed = false;
 	bSprintPressed = false;
-	ITER_MAP(AttackAbilityQueue, Item, Item.Value = 0;)
+	AttackAbilityQueue = 0;
 }
 
 void UDWInputManager::OnRefresh(float DeltaSeconds)
@@ -86,12 +85,12 @@ void UDWInputManager::OnRefresh(float DeltaSeconds)
 		{
 			if(PlayerCharacter->IsExhausted())
 			{
-				ITER_MAP(AttackAbilityQueue, Item, Item.Value = 0;)
+				AttackAbilityQueue = 0;
 			}
 
 			if(bSecondaryPressed)
 			{
-				if(PlayerCharacter->GetWeaponProjectile(EDWWeaponPart::Secondary))
+				if(PlayerCharacter->GetWeaponProjectile(EDWWeaponPart::Primary))
 				{
 					PlayerCharacter->Aim();
 				}
@@ -102,32 +101,22 @@ void UDWInputManager::OnRefresh(float DeltaSeconds)
 			}
 			else
 			{
-				if(AttackAbilityQueue[EDWWeaponPart::Secondary] > 0)
-				{
-					if(PlayerCharacter->Attack(EDWWeaponPart::Secondary))
-					{
-						AttackAbilityQueue[EDWWeaponPart::Secondary]--;
-					}
-				}
-				else
-				{
-					PlayerCharacter->UnAim();
-				}
+				PlayerCharacter->UnAim();
 				PlayerCharacter->UnDefend();
 			}
 
-			if(bPrimaryPressed || AttackAbilityQueue[EDWWeaponPart::Primary] > 0)
+			if(bPrimaryPressed || AttackAbilityQueue > 0)
 			{
-				if(PlayerCharacter->Attack(EDWWeaponPart::Primary) && AttackAbilityQueue[EDWWeaponPart::Primary] > 0)
+				if(PlayerCharacter->Attack(EDWWeaponPart::Primary) && AttackAbilityQueue > 0)
 				{
-					AttackAbilityQueue[EDWWeaponPart::Primary]--;
+					AttackAbilityQueue--;
 				}
 			}
 			break;
 		}
 		case EDWCharacterControlMode::Creating:
 		{
-			ITER_MAP(AttackAbilityQueue, Item, Item.Value = 0;)
+			AttackAbilityQueue = 0;
 			break;
 		}
 	}
@@ -337,7 +326,7 @@ void UDWInputManager::OnPrimaryPressed()
 		{
 			if(PlayerCharacter->IsFreeToAnim() || PlayerCharacter->IsAttacking())
 			{
-				AttackAbilityQueue[EDWWeaponPart::Primary]++; 
+				AttackAbilityQueue++; 
 			}
 			break;
 		}
@@ -413,10 +402,6 @@ void UDWInputManager::OnSecondaryPressed()
 	{
 		case EDWCharacterControlMode::Fighting:
 		{
-			if(PlayerCharacter->IsFreeToAnim() || PlayerCharacter->IsAttacking())
-			{
-				AttackAbilityQueue[EDWWeaponPart::Secondary]++; 
-			}
 			break;
 		}
 		case EDWCharacterControlMode::Creating:
