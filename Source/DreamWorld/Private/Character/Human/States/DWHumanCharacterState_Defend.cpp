@@ -18,12 +18,16 @@ bool UDWHumanCharacterState_Defend::OnPreEnter(UFiniteStateBase* InLastState, co
 {
 	ADWCharacter* Character = GetAgent<ADWCharacter>();
 
-	return Character->CheckWeaponType(EDWWeaponPart::Secondary, EDWWeaponType::Shield) && Character->GetWeapon(EDWWeaponPart::Secondary)->Active() && Super::OnPreEnter(InLastState, InParams);
+	return Character->CheckWeaponType(EDWWeaponPart::Secondary, EDWWeaponType::Shield) && Super::OnPreEnter(InLastState, InParams);
 }
 
 void UDWHumanCharacterState_Defend::OnEnter(UFiniteStateBase* InLastState, const TArray<FParameter>& InParams)
 {
 	Super::OnEnter(InLastState, InParams);
+
+	ADWCharacter* Character = GetAgent<ADWCharacter>();
+
+	Character->GetWeapon(EDWWeaponPart::Secondary)->Active();
 }
 
 void UDWHumanCharacterState_Defend::OnRefresh(float DeltaSeconds)
