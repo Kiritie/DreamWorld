@@ -16,6 +16,8 @@ UWidgetSwitcherPanel::UWidgetSwitcherPanel(const FObjectInitializer& ObjectIniti
 	WidgetInputMode = EInputMode::UIOnly;
 	WidgetType = EWidgetType::Temporary;
 
+	bWidgetAutoFocus = true;
+	
 	SetIsFocusable(true);
 }
 
@@ -34,9 +36,9 @@ void UWidgetSwitcherPanel::OnInitialize(UObject* InOwner, const TArray<FParamete
 
 void UWidgetSwitcherPanel::OnOpen(const TArray<FParameter>& InParams, bool bInstant)
 {
-	UWidgetModuleStatics::OpenUserWidget<UWidgetUIMask>();
-
 	Super::OnOpen(InParams, bInstant);
+
+	UWidgetModuleStatics::OpenUserWidget<UWidgetUIMask>();
 
 	ADWPlayerCharacter* Character = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
 
