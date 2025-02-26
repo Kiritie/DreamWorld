@@ -50,7 +50,7 @@ public:
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-	UStaticMeshComponent* GenerateHammerMesh;
+	UStaticMeshComponent* GenerateToolMesh;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "CharacterStats")
 	AVoxelEntity* GenerateVoxelEntity;

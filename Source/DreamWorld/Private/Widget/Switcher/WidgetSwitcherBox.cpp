@@ -4,6 +4,7 @@
 #include "Widget/Switcher/WidgetSwitcherBox.h"
 
 #include "ObjectPool/ObjectPoolModuleStatics.h"
+#include "Widget/Common/CommonButton.h"
 #include "Widget/Common/CommonButtonGroup.h"
 
 UWidgetSwitcherBox::UWidgetSwitcherBox(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
@@ -35,6 +36,25 @@ void UWidgetSwitcherBox::OnInitialize(const TArray<FParameter>& InParams)
 void UWidgetSwitcherBox::OnRefresh()
 {
 	Super::OnRefresh();
+}
+
+void UWidgetSwitcherBox::NativePreConstruct()
+{
+	Super::NativePreConstruct();
+
+	if(SwitcherContent)
+	{
+		const TArray<UWidget*> Items = SwitcherContent->GetAllChildren();
+		ItemTitles.SetNum(Items.Num());
+		for(int32 i = 0; i < Items.Num(); i++)
+		{
+			if(UCommonButton* Item = Cast<UCommonButton>(Items[i]))
+			{
+				Item->SetIconBrush(ItemTitles[i].Icon);
+				Item->SetTitle(ItemTitles[i].Title);
+			}
+		}
+	}
 }
 
 void UWidgetSwitcherBox::OnSwitcherButtonSelected(UCommonButtonBase* AssociatedButton, int32 ButtonIndex)

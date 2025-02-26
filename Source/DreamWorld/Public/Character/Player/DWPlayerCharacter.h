@@ -134,6 +134,12 @@ public:
 
 	virtual void SetGenerateVoxelID(const FPrimaryAssetId& InGenerateVoxelID) override;
 
+	UFUNCTION(BlueprintImplementableEvent)
+	EVoxelGenerateToolType GetGenerateToolType() const override;
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void SetGenerateToolType(EVoxelGenerateToolType InGenerateToolType) override;
+
 protected:
 	UFUNCTION(BlueprintImplementableEvent, BlueprintPure)
 	int32 GetBodyColor();

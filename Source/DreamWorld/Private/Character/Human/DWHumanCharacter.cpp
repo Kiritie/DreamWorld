@@ -51,13 +51,13 @@ ADWHumanCharacter::ADWHumanCharacter(const FObjectInitializer& ObjectInitializer
 
 	GetMesh()->SetRelativeLocation(FVector(0.f, 0.f, -70.f));
 
-	GenerateHammerMesh = CreateDefaultSubobject<UStaticMeshComponent>(FName("HammerMesh"));
-	GenerateHammerMesh->SetupAttachment(GetMesh(), TEXT("GenerateHammerMesh"));
-	GenerateHammerMesh->SetRelativeLocation(FVector::ZeroVector);
-	GenerateHammerMesh->SetRelativeRotation(FRotator::ZeroRotator);
-	GenerateHammerMesh->SetVisibility(false);
-	GenerateHammerMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	GenerateHammerMesh->CastShadow = false;
+	GenerateToolMesh = CreateDefaultSubobject<UStaticMeshComponent>(FName("ToolMesh"));
+	GenerateToolMesh->SetupAttachment(GetMesh(), TEXT("GenerateToolMesh"));
+	GenerateToolMesh->SetRelativeLocation(FVector::ZeroVector);
+	GenerateToolMesh->SetRelativeRotation(FRotator::ZeroRotator);
+	GenerateToolMesh->SetVisibility(false);
+	GenerateToolMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	GenerateToolMesh->CastShadow = false;
 	
 	FSM->DefaultState = UDWCharacterState_Spawn::StaticClass();
 	FSM->FinalState = UDWCharacterState_Death::StaticClass();
@@ -271,13 +271,13 @@ void ADWHumanCharacter::SetControlMode(EDWCharacterControlMode InControlMode)
 	{
 		case EDWCharacterControlMode::Fighting:
 		{
-			GenerateHammerMesh->SetVisibility(false);
+			GenerateToolMesh->SetVisibility(false);
 			if(GenerateVoxelEntity) GenerateVoxelEntity->Execute_SetActorVisible(GenerateVoxelEntity, false);
 			break;
 		}
 		case EDWCharacterControlMode::Creating:
 		{
-			GenerateHammerMesh->SetVisibility(Execute_IsVisible(this));
+			GenerateToolMesh->SetVisibility(Execute_IsVisible(this));
 			if(GenerateVoxelEntity) GenerateVoxelEntity->Execute_SetActorVisible(GenerateVoxelEntity, Execute_IsVisible(this));
 			break;
 		}

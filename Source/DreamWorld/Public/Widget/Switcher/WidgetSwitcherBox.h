@@ -7,6 +7,25 @@
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnSwitcherButtonSelected, int32, ButtonIndex);
 
+USTRUCT(BlueprintType)
+struct DREAMWORLD_API FDWSwitcherItemData
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FSlateBrush Icon;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FText Title;
+
+	FORCEINLINE FDWSwitcherItemData()
+	{
+		Icon = FSlateBrush();
+		Title = FText::GetEmpty();
+	}
+};
+
 class UCommonButtonBase;
 class UCommonButtonGroup;
 /**
@@ -27,6 +46,9 @@ public:
 
 	virtual void OnRefresh() override;
 
+public:
+	virtual void NativePreConstruct() override;
+
 protected:
 	UFUNCTION()
 	void OnSwitcherButtonSelected(UCommonButtonBase* AssociatedButton, int32 ButtonIndex);
@@ -34,6 +56,9 @@ protected:
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (BindWidget, OptionalWidget = false), Category = "Components")
 	UPanelWidget* SwitcherContent;
+
+	UPROPERTY(EditAnywhere)
+	TArray<FDWSwitcherItemData> ItemTitles;
 
 	UPROPERTY()
 	UCommonButtonGroup* SwitcherGroup;

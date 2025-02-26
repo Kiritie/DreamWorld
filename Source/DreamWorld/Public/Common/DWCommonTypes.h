@@ -516,6 +516,7 @@ public:
 		BodyColorIndex = 0;
 		CapeColorIndex = 0;
 		InventoryInitType = EDWInventoryInitType::Default;
+		GenerateToolType = EVoxelGenerateToolType::Pickaxe;
 		CameraRotation = FRotator::ZeroRotator;
 		CameraDistance = -1.f;
 	}
@@ -526,6 +527,7 @@ public:
 		BodyColorIndex = 0;
 		CapeColorIndex = 0;
 		InventoryInitType = EDWInventoryInitType::Default;
+		GenerateToolType = EVoxelGenerateToolType::Pickaxe;
 		CameraRotation = FRotator::ZeroRotator;
 		CameraDistance = -1.f;
 	}
@@ -536,6 +538,7 @@ public:
 		BodyColorIndex = 0;
 		CapeColorIndex = 0;
 		InventoryInitType = EDWInventoryInitType::Default;
+		GenerateToolType = EVoxelGenerateToolType::Pickaxe;
 		CameraRotation = FRotator::ZeroRotator;
 		CameraDistance = -1.f;
 	}
@@ -551,6 +554,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	EDWInventoryInitType InventoryInitType;
+
+	UPROPERTY()
+	EVoxelGenerateToolType GenerateToolType;
 
 	UPROPERTY()
 	FRotator CameraRotation;

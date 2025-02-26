@@ -46,7 +46,7 @@ void UWidgetGameHUD::OnRefresh()
 
 FReply UWidgetGameHUD::NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent)
 {
-	if(UInputModuleStatics::IsPlayerMappedKeyByName(FName("SystemOperation"), InKeyEvent.GetKey()))
+	if(UInputModuleStatics::IsPlayerMappedKeyByTag(GameplayTags::Input_SystemOperation, InKeyEvent.GetKey()))
 	{
 		if(TemporaryChild)
 		{

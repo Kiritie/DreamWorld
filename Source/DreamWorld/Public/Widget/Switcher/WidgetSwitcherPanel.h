@@ -29,11 +29,17 @@ public:
 	virtual void OnRefresh() override;
 
 protected:
+	virtual FReply NativeOnKeyUp(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent) override;
+
+protected:
 	UFUNCTION()
 	void OnControlModeButtonSelected(int32 ButtonIndex);
 
 	UFUNCTION()
 	void OnWeaponGroupButtonSelected(int32 ButtonIndex);
+
+	UFUNCTION()
+	void OnGenerateToolButtonSelected(int32 ButtonIndex);
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (BindWidget, OptionalWidget = false), Category = "Components")
@@ -41,4 +47,7 @@ protected:
 		
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (BindWidget, OptionalWidget = false), Category = "Components")
 	UWidgetSwitcherBox* Switcher_WeaponGroup;
+		
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (BindWidget, OptionalWidget = false), Category = "Components")
+	UWidgetSwitcherBox* Switcher_GenerateTool;
 };

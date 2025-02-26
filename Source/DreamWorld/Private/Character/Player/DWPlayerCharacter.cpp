@@ -133,6 +133,11 @@ void ADWPlayerCharacter::LoadData(FSaveData* InSaveData, EPhase InPhase)
 {
 	auto& SaveData = InSaveData->CastRef<FDWPlayerSaveData>();
 
+	if(PHASEC(InPhase, EPhase::Primary))
+	{
+		SetGenerateToolType(SaveData.GenerateToolType);
+	}
+
 	if(PHASEC(InPhase, EPhase::PrimaryAndLesser))
 	{
 		if(!SaveData.InventoryData.IsSaved())
@@ -162,6 +167,8 @@ FSaveData* ADWPlayerCharacter::ToData()
 	
 	SaveData.BodyColorIndex = GetBodyColor();
 	SaveData.CapeColorIndex = GetCapeColor();
+	
+	SaveData.GenerateToolType = GetGenerateToolType();
 	
 	SaveData.CameraRotation = UCameraModuleStatics::GetCameraRotation();
 	SaveData.CameraDistance = UCameraModuleStatics::GetCameraDistance();
