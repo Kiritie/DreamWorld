@@ -31,7 +31,7 @@ bool ADWMonsterCharacter::CanInteract(EInteractAction InInteractAction, IInterac
 			if(ADWCharacter* InteractionCharacter = Cast<ADWCharacter>(InInteractionAgent))
 			{
 				const FAbilityItem SelectedItem = InteractionCharacter->GetInventory()->GetSelectedItem(ESlotSplitType::Shortcut);
-				return !IsEnemy(InteractionCharacter) && SelectedItem.IsValid() && SelectedItem.GetType() == EAbilityItemType::Prop && SelectedItem.GetData<UDWPropData>().PropType == EDWPropType::Food;
+				return !IsEnemy(InteractionCharacter) && !IsTeamMate(InteractionCharacter) && SelectedItem.IsValid() && SelectedItem.GetType() == EAbilityItemType::Prop && SelectedItem.GetData<UDWPropData>().PropType == EDWPropType::Food;
 			}
 			break;
 		}
@@ -39,7 +39,7 @@ bool ADWMonsterCharacter::CanInteract(EInteractAction InInteractAction, IInterac
 		{
 			if(ADWCharacter* InteractionCharacter = Cast<ADWCharacter>(InInteractionAgent))
 			{
-				return !IsEnemy(InteractionCharacter) && InteractionCharacter->GetFSMComponent()->GetStateByClass<UDWCharacterState_Ride>()->GetRidingTarget() != this;
+				return IsTeamMate(InteractionCharacter) && InteractionCharacter->GetFSMComponent()->GetStateByClass<UDWCharacterState_Ride>()->GetRidingTarget() != this;
 			}
 			break;
 		}
@@ -47,7 +47,7 @@ bool ADWMonsterCharacter::CanInteract(EInteractAction InInteractAction, IInterac
 		{
 			if(ADWCharacter* InteractionCharacter = Cast<ADWCharacter>(InInteractionAgent))
 			{
-				return !IsEnemy(InteractionCharacter) && InteractionCharacter->GetFSMComponent()->GetStateByClass<UDWCharacterState_Ride>()->GetRidingTarget() == this;
+				return IsTeamMate(InteractionCharacter) && InteractionCharacter->GetFSMComponent()->GetStateByClass<UDWCharacterState_Ride>()->GetRidingTarget() == this;
 			}
 			break;
 		}
@@ -68,9 +68,8 @@ void ADWMonsterCharacter::OnInteract(EInteractAction InInteractAction, IInteract
 			{
 				if(ADWCharacter* InteractionCharacter = Cast<ADWCharacter>(InInteractionAgent))
 				{
-					InteractionCharacter->GetInventory()->SetConnectInventory(GetInventory());
-					InteractionCharacter->GetInventory()->GetSelectedSlot(ESlotSplitType::Shortcut)->MoveItem(1);
-					InteractionCharacter->GetInventory()->SetConnectInventory(nullptr);
+					InteractionCharacter->GetInventory()->GetSelectedSlot(ESlotSplitType::Shortcut)->SubItem(1);
+					InteractionCharacter->AddTeamMate(this);
 				}
 				break;
 			}

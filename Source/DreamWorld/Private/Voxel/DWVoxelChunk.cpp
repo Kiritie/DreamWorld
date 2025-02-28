@@ -8,7 +8,6 @@
 #include "Character/DWCharacter.h"
 #include "Character/DWCharacterData.h"
 #include "Common/CommonTypes.h"
-#include "Team/DWTeamModule.h"
 #include "Vitality/DWVitality.h"
 #include "Voxel/VoxelModule.h"
 #include "SaveGame/SaveGameModuleStatics.h"
@@ -158,7 +157,7 @@ void ADWVoxelChunk::SpawnSceneActors()
 							if(!Captain)
 							{
 								Captain = Character;
-								UDWTeamModule::Get().CreateTeam(Captain);
+								Captain->CreateTeam();
 							}
 							else
 							{

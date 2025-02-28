@@ -22,6 +22,8 @@ void UWidgetHeadBox::OnCreate(UObject* InOwner, const TArray<FParameter>& InPara
 void UWidgetHeadBox::OnInitialize(UObject* InOwner, const TArray<FParameter>& InParams)
 {
 	Super::OnInitialize(InOwner, InParams);
+
+	ClearTeamMates();
 }
 
 void UWidgetHeadBox::OnOpen(const TArray<FParameter>& InParams, bool bInstant)

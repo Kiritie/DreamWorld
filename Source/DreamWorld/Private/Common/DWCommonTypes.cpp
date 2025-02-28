@@ -94,6 +94,8 @@ void UDWDamageHandle::HandleDamage(AActor* SourceActor, AActor* TargetActor, flo
 
 	ADWCharacter* TargetCharacter = Cast<ADWCharacter>(TargetActor);
 
+	if(SourceCharacter && TargetCharacter && SourceCharacter->IsTeamMate(TargetCharacter)) return;
+	
 	float SourceAttackCritRate = 0.f;
 	float SourceAttackStealRate = 0.f;
 

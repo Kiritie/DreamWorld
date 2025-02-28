@@ -53,7 +53,7 @@ void UDWProcedure_Loading::OnEnter(UProcedureBase* InLastProcedure)
 
 	USaveGameModuleStatics::LoadSaveGame<UDWArchiveSaveGame>(-1, EPhase::Final);
 
-	GameHUD->Init(UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>());
+	GameHUD->Init(UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>(), nullptr, true);
 }
 
 void UDWProcedure_Loading::OnRefresh()

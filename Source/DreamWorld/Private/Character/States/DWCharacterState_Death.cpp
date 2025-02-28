@@ -28,6 +28,8 @@ void UDWCharacterState_Death::OnEnter(UFiniteStateBase* InLastState, const TArra
 
 	Character->SetMana(0.f);
 	Character->SetStamina(0.f);
+
+	Character->LeaveTeam();
 }
 
 void UDWCharacterState_Death::OnRefresh(float DeltaSeconds)

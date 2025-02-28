@@ -3,6 +3,8 @@
 
 #include "AI/DWAIController.h"
 #include "Character/DWCharacter.h"
+#include "Character/Player/DWPlayerCharacter.h"
+#include "Common/CommonStatics.h"
 
 ADWAIController::ADWAIController()
 {
@@ -26,5 +28,9 @@ void ADWAIController::OnUnPossess()
 
 void ADWAIController::OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus)
 {
+	ADWCharacter* OwnerAgent = GetPawn<ADWCharacter>();
+	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
+	if(OwnerAgent && PlayerCharacter && OwnerAgent->IsTeamMate(PlayerCharacter)) return;
+	
 	Super::OnTargetPerceptionUpdated(Actor, Stimulus);
 }

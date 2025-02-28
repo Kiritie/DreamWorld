@@ -372,6 +372,8 @@ public:
 
 	virtual bool SetLevelA(int32 InLevel) override;
 
+	virtual void ModifyExp(float InDeltaValue) override;
+
 	UFUNCTION(BlueprintPure)
 	EDWCharacterControlMode GetControlMode() const { return ControlMode; }
 

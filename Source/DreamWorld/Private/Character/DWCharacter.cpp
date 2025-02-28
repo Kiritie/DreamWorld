@@ -46,6 +46,7 @@
 #include "Ability/Character/States/AbilityCharacterState_Jump.h"
 #include "Ability/Character/States/AbilityCharacterState_Static.h"
 #include "Ability/Character/States/AbilityCharacterState_Walk.h"
+#include "Character/Player/DWPlayerCharacter.h"
 #include "Character/States/DWCharacterState_Climb.h"
 #include "Character/States/DWCharacterState_Fly.h"
 #include "Character/States/DWCharacterState_Sleep.h"
@@ -56,6 +57,8 @@
 #include "Voxel/Datas/VoxelData.h"
 #include "Voxel/Voxels/Auxiliary/VoxelInteractAuxiliary.h"
 #include "Widget/Common/WidgetProgressBox.h"
+#include "Widget/Head/WidgetHeadBox.h"
+#include "Widget/Head/WidgetTeamMateHeadBox.h"
 
 // Sets default values
 ADWCharacter::ADWCharacter(const FObjectInitializer& ObjectInitializer) :
@@ -891,12 +894,20 @@ void ADWCharacter::OnAttributeChange(const FOnAttributeChangeData& InAttributeCh
 		{
 			GetCharacterHPWidget()->SetHeadInfo(GetHeadInfo());
 		}
+		if(UWidgetModuleStatics::GetUserWidget<UWidgetHeadBox>() && UWidgetModuleStatics::GetUserWidget<UWidgetHeadBox>()->GetTeamMateHeadBoxWidget(this))
+		{
+			UWidgetModuleStatics::GetUserWidget<UWidgetHeadBox>()->GetTeamMateHeadBoxWidget(this)->SetHeadInfo(GetHeadInfo());
+		}
 	}
 	else if(InAttributeChangeData.Attribute == GetHealthAttribute() || InAttributeChangeData.Attribute == GetMaxHealthAttribute())
 	{
 		if(GetCharacterHPWidget())
 		{
 			GetCharacterHPWidget()->SetHealthPercent(GetHealth(), GetMaxHealth());
+		}
+		if(UWidgetModuleStatics::GetUserWidget<UWidgetHeadBox>() && UWidgetModuleStatics::GetUserWidget<UWidgetHeadBox>()->GetTeamMateHeadBoxWidget(this))
+		{
+			UWidgetModuleStatics::GetUserWidget<UWidgetHeadBox>()->GetTeamMateHeadBoxWidget(this)->SetHealthPercent(GetHealth(), GetMaxHealth());
 		}
 	}
 	else if(InAttributeChangeData.Attribute == GetManaAttribute() || InAttributeChangeData.Attribute == GetMaxManaAttribute())
@@ -905,6 +916,10 @@ void ADWCharacter::OnAttributeChange(const FOnAttributeChangeData& InAttributeCh
 		{
 			GetCharacterHPWidget()->SetManaPercent(GetMana(), GetMaxMana());
 		}
+		if(UWidgetModuleStatics::GetUserWidget<UWidgetHeadBox>() && UWidgetModuleStatics::GetUserWidget<UWidgetHeadBox>()->GetTeamMateHeadBoxWidget(this))
+		{
+			UWidgetModuleStatics::GetUserWidget<UWidgetHeadBox>()->GetTeamMateHeadBoxWidget(this)->SetManaPercent(GetMana(), GetMaxMana());
+		}
 	}
 	else if(InAttributeChangeData.Attribute == GetStaminaAttribute())
 	{
@@ -912,12 +927,20 @@ void ADWCharacter::OnAttributeChange(const FOnAttributeChangeData& InAttributeCh
 		{
 			GetCharacterHPWidget()->SetStaminaPercent(GetStamina(), GetMaxStamina());
 		}
+		if(UWidgetModuleStatics::GetUserWidget<UWidgetHeadBox>() && UWidgetModuleStatics::GetUserWidget<UWidgetHeadBox>()->GetTeamMateHeadBoxWidget(this))
+		{
+			UWidgetModuleStatics::GetUserWidget<UWidgetHeadBox>()->GetTeamMateHeadBoxWidget(this)->SetStaminaPercent(GetStamina(), GetMaxStamina());
+		}
 	}
 	else if(InAttributeChangeData.Attribute == GetMaxStaminaAttribute())
 	{
 		if(GetCharacterHPWidget())
 		{
 			GetCharacterHPWidget()->SetStaminaPercent(GetStamina(), GetMaxStamina());
+		}
+		if(UWidgetModuleStatics::GetUserWidget<UWidgetHeadBox>() && UWidgetModuleStatics::GetUserWidget<UWidgetHeadBox>()->GetTeamMateHeadBoxWidget(this))
+		{
+			UWidgetModuleStatics::GetUserWidget<UWidgetHeadBox>()->GetTeamMateHeadBoxWidget(this)->SetStaminaPercent(GetStamina(), GetMaxStamina());
 		}
 	}
 	else if(InAttributeChangeData.Attribute == GetMoveSpeedAttribute())
@@ -982,6 +1005,30 @@ void ADWCharacter::HandleDamage(const FGameplayAttribute& DamageAttribute, float
 			{
 				Blackboard->SetTargetAgent(SourceCharacter);
 				Blackboard->SetIsExcessived(true);
+			}
+			
+			ADWCharacter* PlayerCharacter = nullptr;
+			ADWCharacter* TargetCharacter = nullptr;
+			if(IsPlayer())
+			{
+				PlayerCharacter = this;
+				TargetCharacter = SourceCharacter;
+			}
+			else if(SourceCharacter->IsPlayer())
+			{
+				PlayerCharacter = SourceCharacter;
+				TargetCharacter = this;
+			}
+			if(PlayerCharacter && TargetCharacter)
+			{
+				for(auto Iter : PlayerCharacter->GetTeamMates<ADWCharacter>())
+				{
+					if(UDWAIBlackboard* Blackboard = Iter->GetBlackboard<UDWAIBlackboard>())
+					{
+						Blackboard->SetTargetAgent(TargetCharacter);
+						Blackboard->SetIsExcessived(true);
+					}
+				}
 			}
 		}
 	}
@@ -1091,14 +1138,6 @@ bool ADWCharacter::IsEnemy(IAbilityPawnInterface* InTarget) const
 				{
 					return false;
 				}
-				// case EDWCharacterNature::AINeutral:
-				// {
-				// 	if(!TargetCharacter->GetBlackboard<UDWAIBlackboard>()->GetIsExcessived())
-				// 	{
-				// 		return false;
-				// 	}
-				// 	break;
-				// }
 				default: break;
 			}
 			break;
@@ -1259,13 +1298,50 @@ bool ADWCharacter::SetLevelA(int32 InLevel)
 	return true;
 }
 
+void ADWCharacter::ModifyExp(float InDeltaValue)
+{
+	Super::ModifyExp(InDeltaValue);
+
+	for(auto Iter : GetTeamMates())
+	{
+		if(ADWCharacter* Character = Cast<ADWCharacter>(Iter))
+		{
+			Character->ModifyExp(InDeltaValue);
+		}
+	}
+}
+
 void ADWCharacter::SetTeamID(FName InTeamID)
 {
+	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
+
+	if(InTeamID.IsNone() && IsTeamMate(PlayerCharacter))
+	{
+		if(UWidgetModuleStatics::GetUserWidget<UWidgetHeadBox>())
+		{
+			UWidgetModuleStatics::GetUserWidget<UWidgetHeadBox>()->RemoveTeamMate(this);
+		}
+	}
+	
 	TeamID = InTeamID;
 
 	if(GetCharacterHPWidget())
 	{
 		GetCharacterHPWidget()->SetHeadInfo(GetHeadInfo());
+	}
+
+	if(!InTeamID.IsNone() && IsTeamMate(PlayerCharacter))
+	{
+		if(UDWAIBlackboard* Blackboard = GetBlackboard<UDWAIBlackboard>())
+		{
+			Blackboard->SetTargetAgent(PlayerCharacter);
+			Blackboard->SetIsExcessived(false);
+		}
+		if(UWidgetModuleStatics::GetUserWidget<UWidgetHeadBox>())
+		{
+			UWidgetModuleStatics::GetUserWidget<UWidgetHeadBox>()->AddTeamMate(this);
+		}
+		RefreshAttributes();
 	}
 }
 

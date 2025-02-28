@@ -35,24 +35,30 @@ void FDWTeamSaveData::RemoveMember(IDWTeamAgentInterface* InMember)
 
 void FDWTeamSaveData::DissolveTeam()
 {
-	for (int i = 0; i < Members.Num(); i++)
+	for (int32 i = 0; i < Members.Num(); i++)
 	{
-		USceneModuleStatics::GetSceneActor<IDWTeamAgentInterface>(Members[i].ToString(), false)->SetTeamID(TEXT(""));
+		if(IDWTeamAgentInterface* TeamAgent = USceneModuleStatics::GetSceneActor<IDWTeamAgentInterface>(Members[i].ToString(), false))
+		{
+			TeamAgent->SetTeamID(TEXT(""));
+		}
 	}
 	Members.Empty();
 }
 
 TArray<IDWTeamAgentInterface*> FDWTeamSaveData::GetMembers(IDWTeamAgentInterface* InMember)
 {
-	auto Arr = TArray<IDWTeamAgentInterface*>();
-	for (int i = 0; i < Members.Num(); i++)
+	TArray<IDWTeamAgentInterface*> ReturnValues;
+	for (int32 i = 0; i < Members.Num(); i++)
 	{
 		if (Members[i] != InMember->GetActorIDT())
 		{
-			Arr.Add(USceneModuleStatics::GetSceneActor<IDWTeamAgentInterface>(Members[i].ToString(), false));
+			if(IDWTeamAgentInterface* TeamAgent = USceneModuleStatics::GetSceneActor<IDWTeamAgentInterface>(Members[i].ToString(), false))
+			{
+				ReturnValues.Add(TeamAgent);
+			}
 		}
 	}
-	return Arr;
+	return ReturnValues;
 }
 
 bool FDWTeamSaveData::IsCaptain(IDWTeamAgentInterface* InMember) const

@@ -8,6 +8,7 @@
 #include "BehaviorTree/BlackboardComponent.h"
 #include "BehaviorTree/BehaviorTree.h"
 #include "BehaviorTree/Blackboard/BlackboardKeyType_Vector.h"
+#include "Voxel/VoxelModuleStatics.h"
 
 UDWAITask_MoveTo::UDWAITask_MoveTo(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -66,6 +67,24 @@ void UDWAITask_MoveTo::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMe
 	}
 	else
 	{
+		if(MoveTarget->IsPlayer() && GetAgent<ADWCharacter>()->IsTeamMate(MoveTarget) && GetAgent<ADWCharacter>()->GetDistance(MoveTarget, false, false) >= MoveDistance * 10.f)
+		{
+			const FVector Direction = GetAgent<ADWCharacter>()->GetActorLocation() - MoveTarget->GetActorLocation();
+			FVector RayStart = MoveTarget->GetActorLocation() + Direction.GetSafeNormal() * MoveDistance;
+			RayStart.Z = UVoxelModuleStatics::GetWorldData().GetWorldRealSize().Z;
+			const FVector RayEnd = FVector(RayStart.X, RayStart.Y, 0);
+
+			FHitResult HitResult;
+			UVoxelModuleStatics::VoxelAgentTraceSingle(RayStart, RayEnd, GetAgent<ADWCharacter>()->GetRadius(), GetAgent<ADWCharacter>()->GetHalfHeight(), {}, HitResult, false);
+			if (HitResult.bBlockingHit)
+			{
+				GetAgent<ADWCharacter>()->SetActorLocation(HitResult.Location);
+			}
+			else
+			{
+				GetAgent<ADWCharacter>()->SetActorLocation(FVector(RayStart.X, RayStart.Y, MoveTarget->GetActorLocation().Z));
+			}
+		}
 		if(GetAgent<ADWCharacter>()->DoAIMove(MoveTarget, MoveDistance) && DurationTime == -1.f)
 		{
 			FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);

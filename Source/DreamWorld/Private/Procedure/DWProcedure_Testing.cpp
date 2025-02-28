@@ -41,7 +41,7 @@ void UDWProcedure_Testing::OnEnter(UProcedureBase* InLastProcedure)
 	{
 		Spawner->Spawn();
 
-		GameHUD->Init(Spawner->GetAbilityActor());
+		GameHUD->Init(Spawner->GetAbilityActor(), nullptr, true);
 	}
 
 	GameHUD->Open();

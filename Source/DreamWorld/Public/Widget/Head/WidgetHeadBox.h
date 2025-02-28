@@ -5,6 +5,8 @@
 #include "Widget/Screen/UserWidgetBase.h"
 #include "WidgetHeadBox.generated.h"
 
+class UWidgetTeamMateHeadBox;
+class ADWCharacter;
 class ADWPlayerCharacter;
 
 /**
@@ -28,6 +30,19 @@ public:
 	virtual void OnRefresh() override;
 
 	virtual void OnClose(bool bInstant) override;
+
+public:
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
+	void AddTeamMate(ADWCharacter* InTeamMate);
+	
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
+	void RemoveTeamMate(ADWCharacter* InTeamMate);
+		
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
+	void ClearTeamMates();
+		
+	UFUNCTION(BlueprintPure, BlueprintImplementableEvent)
+	UWidgetTeamMateHeadBox* GetTeamMateHeadBoxWidget(ADWCharacter* InTeamMate) const;
 
 public:
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)

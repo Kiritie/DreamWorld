@@ -6,7 +6,6 @@
 #include "BehaviorTree/BehaviorTreeTypes.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Character/DWCharacter.h"
-#include "Kismet/KismetSystemLibrary.h"
 #include "Scene/SceneModuleStatics.h"
 #include "Voxel/VoxelModule.h"
 #include "Voxel/VoxelModuleStatics.h"
@@ -47,14 +46,14 @@ void UDWAIService_QueryPatrolPath::TickNode(UBehaviorTreeComponent& OwnerComp, u
 
 	FVector PatrolLocation = GetAgent<ADWCharacter>()->GetActorLocation();
 	DON(10,
-		FVector rayStart = GetAgent<ADWCharacter>()->GetBirthTransform().GetLocation() + FRotator(0.f, FMath::RandRange(0.f, 360.f), 0.f).Vector() * FMath::FRandRange(0.f, PatrolDistance);
-		rayStart.Z = UVoxelModuleStatics::GetWorldData().GetWorldRealSize().Z;
-		const FVector rayEnd = FVector(rayStart.X, rayStart.Y, 0.f);
-		FHitResult hitResult;
-		UVoxelModuleStatics::VoxelAgentTraceSingle(rayStart, rayEnd, GetAgent<ADWCharacter>()->GetRadius(), GetAgent<ADWCharacter>()->GetHalfHeight(), {}, hitResult, true);
-		if(hitResult.bBlockingHit)
+		FVector RayStart = GetAgent<ADWCharacter>()->GetBirthTransform().GetLocation() + FRotator(0.f, FMath::RandRange(0.f, 360.f), 0.f).Vector() * FMath::FRandRange(0.f, PatrolDistance);
+		RayStart.Z = UVoxelModuleStatics::GetWorldData().GetWorldRealSize().Z;
+		const FVector RayEnd = FVector(RayStart.X, RayStart.Y, 0.f);
+		FHitResult HitResult;
+		UVoxelModuleStatics::VoxelAgentTraceSingle(RayStart, RayEnd, GetAgent<ADWCharacter>()->GetRadius(), GetAgent<ADWCharacter>()->GetHalfHeight(), {}, HitResult, true);
+		if(HitResult.bBlockingHit)
 		{
-			PatrolLocation = hitResult.Location;
+			PatrolLocation = HitResult.Location;
 			break;
 		}
 	)

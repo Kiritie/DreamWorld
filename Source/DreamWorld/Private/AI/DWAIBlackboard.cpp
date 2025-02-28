@@ -5,6 +5,8 @@
 
 #include "AI/Base/AIControllerBase.h"
 #include "Character/DWCharacter.h"
+#include "Character/Player/DWPlayerCharacter.h"
+#include "Common/CommonStatics.h"
 
 void UDWAIBlackboard::PostLoad()
 {
@@ -52,7 +54,17 @@ void UDWAIBlackboard::OnValueReset(FName InValueName)
 {
 	Super::OnValueReset(InValueName);
 
-	if(InValueName.IsEqual(NAME_IsExcessived))
+	if(InValueName.IsEqual(NAME_TargetAgent))
+	{
+		ADWCharacter* OwnerAgent = GetAgent<ADWCharacter>();
+		ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
+		if(OwnerAgent && PlayerCharacter && GetAgent<ADWCharacter>()->IsTeamMate(UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>()))
+		{
+			SetTargetAgent(PlayerCharacter);
+			SetIsExcessived(false);
+		}
+	}
+	else if(InValueName.IsEqual(NAME_IsExcessived))
 	{
 		SetIsExcessived(false);
 	}

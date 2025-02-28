@@ -67,6 +67,7 @@ void ADWPlayerController::LoadData(FSaveData* InSaveData, EPhase InPhase)
 			SetPlayerPawn(PlayerCharacter);
 			PlayerCharacter->LoadSaveData(&SaveData, EPhase::Primary);
 			PlayerCharacter->Execute_SetActorVisible(PlayerCharacter, UProcedureModuleStatics::IsCurrentProcedureClass<UDWProcedure_ArchiveCreating>());
+			PlayerCharacter->Execute_SetBlockAllInput(PlayerCharacter, true);
 		}
 	}
 	if(PHASEC(InPhase, EPhase::Lesser))
@@ -76,6 +77,8 @@ void ADWPlayerController::LoadData(FSaveData* InSaveData, EPhase InPhase)
 	if(PHASEC(InPhase, EPhase::Final))
 	{
 		PlayerCharacter->LoadSaveData(&SaveData, EPhase::Final);
+		PlayerCharacter->CreateTeam();
+		PlayerCharacter->Execute_SetBlockAllInput(PlayerCharacter, false);
 		UCharacterModuleStatics::SwitchCharacter(PlayerCharacter, true);
 		if(SaveData.IsSaved())
 		{
@@ -105,7 +108,7 @@ void ADWPlayerController::UnloadData(EPhase InPhase)
 		if(PHASEC(InPhase, EPhase::Lesser))
 		{
 			PlayerCharacter->Execute_SetActorVisible(PlayerCharacter, false);
-			PlayerCharacter->DisableInput(nullptr);
+			PlayerCharacter->Execute_SetBlockAllInput(PlayerCharacter, true);
 			UCharacterModuleStatics::SwitchCharacter(nullptr);
 		}
 	}

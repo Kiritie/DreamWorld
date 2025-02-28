@@ -26,7 +26,7 @@ bool UDWAIDecorator_CheckInteresting::CalculateRawConditionValue(UBehaviorTreeCo
 	else if(Character->IsA<ADWMonsterCharacter>())
 	{
 		const FAbilityItem SelectedItem = CheckTarget->GetInventory()->GetSelectedItem(ESlotSplitType::Shortcut);
-		return SelectedItem.IsValid() && SelectedItem.IsDataType<UDWPropData>() && SelectedItem.GetData<UDWPropData>(false).PropType == EDWPropType::Food;
+		return (CheckTarget->IsPlayer() && Character->IsTeamMate(CheckTarget)) || (SelectedItem.IsValid() && SelectedItem.IsDataType<UDWPropData>() && SelectedItem.GetData<UDWPropData>(false).PropType == EDWPropType::Food);
 	}
 	return false;
 }

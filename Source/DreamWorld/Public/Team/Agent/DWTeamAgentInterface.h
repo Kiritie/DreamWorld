@@ -33,6 +33,17 @@ public:
 
 	virtual TArray<IDWTeamAgentInterface*> GetTeamMates();
 
+	template<class T>
+	TArray<T*> GetTeamMates()
+	{
+		TArray<T*> TeamMates;
+		for(auto Iter : GetTeamMates())
+		{
+			TeamMates.Add(Cast<T>(Iter));
+		}
+		return TeamMates;
+	}
+
 public:
 	virtual FGuid GetActorIDT() const = 0;
 	
