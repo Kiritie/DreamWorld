@@ -161,7 +161,7 @@ void ADWVitality::OnAttributeChange(const FOnAttributeChangeData& InAttributeCha
 
 void ADWVitality::OnWorldModeChanged(UObject* InSender, UEventHandle_VoxelWorldModeChanged* InEventHandle)
 {
-	if(FSM->IsCurrentStateClass<UAbilityVitalityState_Spawn>()) return;
+	if(IsCurrentFiniteStateClass<UAbilityVitalityState_Spawn>()) return;
 	
 	switch(InEventHandle->WorldMode)
 	{

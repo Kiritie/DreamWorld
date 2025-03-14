@@ -21,9 +21,9 @@ void ADWGameMode::OnInitialize_Implementation()
 	Super::OnInitialize_Implementation();
 }
 
-void ADWGameMode::OnPreparatory_Implementation(EPhase InPhase)
+void ADWGameMode::OnPreparatory_Implementation()
 {
-	Super::OnPreparatory_Implementation(InPhase);
+	Super::OnPreparatory_Implementation();
 }
 
 void ADWGameMode::OnRefresh_Implementation(float DeltaSeconds)
@@ -31,7 +31,7 @@ void ADWGameMode::OnRefresh_Implementation(float DeltaSeconds)
 	Super::OnRefresh_Implementation(DeltaSeconds);
 }
 
-void ADWGameMode::OnTermination_Implementation(EPhase InPhase)
+void ADWGameMode::OnTermination_Implementation()
 {
-	Super::OnTermination_Implementation(InPhase);
+	Super::OnTermination_Implementation();
 }

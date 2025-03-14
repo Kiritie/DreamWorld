@@ -7,9 +7,9 @@ void ADWHUD::OnInitialize_Implementation()
 	Super::OnInitialize_Implementation();
 }
 
-void ADWHUD::OnPreparatory_Implementation(EPhase InPhase)
+void ADWHUD::OnPreparatory_Implementation()
 {
-	Super::OnPreparatory_Implementation(InPhase);
+	Super::OnPreparatory_Implementation();
 }
 
 void ADWHUD::OnRefresh_Implementation(float DeltaSeconds)
@@ -17,7 +17,7 @@ void ADWHUD::OnRefresh_Implementation(float DeltaSeconds)
 	Super::OnRefresh_Implementation(DeltaSeconds);
 }
 
-void ADWHUD::OnTermination_Implementation(EPhase InPhase)
+void ADWHUD::OnTermination_Implementation()
 {
-	Super::OnTermination_Implementation(InPhase);
+	Super::OnTermination_Implementation();
 }

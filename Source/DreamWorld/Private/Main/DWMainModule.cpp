@@ -28,7 +28,7 @@ void ADWMainModule::OnInitialize_Implementation()
 	UAssetModuleStatics::AddStaticObject(FName("EDWInventoryInitType"), FStaticObject(UEnum::StaticClass(), TEXT("/Script/DreamWorld.EDWInventoryInitType")));
 }
 
-void ADWMainModule::OnPreparatory_Implementation(EPhase InPhase)
+void ADWMainModule::OnPreparatory_Implementation()
 {
-	Super::OnPreparatory_Implementation(InPhase);
+	Super::OnPreparatory_Implementation();
 }

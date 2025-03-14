@@ -87,6 +87,8 @@ public:
 
 public:
 	virtual void Death(IAbilityVitalityInterface* InKiller) override;
+
+	virtual void Kill(IAbilityVitalityInterface* InTarget) override;
 			
 	virtual void Revive(IAbilityVitalityInterface* InRescuer) override;
 

@@ -39,7 +39,7 @@ bool ADWMonsterCharacter::CanInteract(EInteractAction InInteractAction, IInterac
 		{
 			if(ADWCharacter* InteractionCharacter = Cast<ADWCharacter>(InInteractionAgent))
 			{
-				return IsTeamMate(InteractionCharacter) && InteractionCharacter->GetFSMComponent()->GetStateByClass<UDWCharacterState_Ride>()->GetRidingTarget() != this;
+				return IsTeamMate(InteractionCharacter) && InteractionCharacter->GetFiniteStateByClass<UDWCharacterState_Ride>()->GetRidingTarget() != this;
 			}
 			break;
 		}
@@ -47,7 +47,7 @@ bool ADWMonsterCharacter::CanInteract(EInteractAction InInteractAction, IInterac
 		{
 			if(ADWCharacter* InteractionCharacter = Cast<ADWCharacter>(InInteractionAgent))
 			{
-				return IsTeamMate(InteractionCharacter) && InteractionCharacter->GetFSMComponent()->GetStateByClass<UDWCharacterState_Ride>()->GetRidingTarget() == this;
+				return IsTeamMate(InteractionCharacter) && InteractionCharacter->GetFiniteStateByClass<UDWCharacterState_Ride>()->GetRidingTarget() == this;
 			}
 			break;
 		}

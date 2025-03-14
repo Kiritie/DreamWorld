@@ -32,19 +32,19 @@ void UDWCharacterAnim::NativeHandleNotify(const FString& AnimNotifyName)
 
 	if(AnimNotifyName.Equals(TEXT("Attack start")))
 	{
-		Character->GetFSMComponent()->GetStateByClass<UDWCharacterState_Attack>()->AttackStart();
+		Character->GetFiniteStateByClass<UDWCharacterState_Attack>()->AttackStart();
 	}
 	else if(AnimNotifyName.Equals(TEXT("Attack step")))
 	{
-		Character->GetFSMComponent()->GetStateByClass<UDWCharacterState_Attack>()->AttackStep();
+		Character->GetFiniteStateByClass<UDWCharacterState_Attack>()->AttackStep();
 	}
 	else if(AnimNotifyName.Equals(TEXT("Attack end")))
 	{
-		Character->GetFSMComponent()->GetStateByClass<UDWCharacterState_Attack>()->AttackEnd();
+		Character->GetFiniteStateByClass<UDWCharacterState_Attack>()->AttackEnd();
 	}
 	else if(AnimNotifyName.Equals(TEXT("Attack complete")))
 	{
-		Character->GetFSMComponent()->GetStateByClass<UDWCharacterState_Attack>()->AttackComplete();
+		Character->GetFiniteStateByClass<UDWCharacterState_Attack>()->AttackComplete();
 	}
 }
 

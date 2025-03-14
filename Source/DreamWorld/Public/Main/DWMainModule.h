@@ -24,5 +24,5 @@ public:
 public:
 	virtual void OnInitialize_Implementation() override;
 	
-	virtual void OnPreparatory_Implementation(EPhase InPhase) override;
+	virtual void OnPreparatory_Implementation() override;
 };

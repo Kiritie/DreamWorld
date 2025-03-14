@@ -147,11 +147,8 @@ void UDWDamageHandle::HandleDamage(AActor* SourceActor, AActor* TargetActor, flo
 	{
 		if(SourceCharacter)
 		{
-			const float FallHeight = SourceCharacter->GetFSMComponent()->GetStateByClass<UAbilityCharacterState_Fall>()->GetFallHeight();
-			if(FallHeight > 350.f)
-			{
-				LocalDamageValue = DamageValue * (1.f - PhysicsDefendRate) * (FallHeight / 10.f);
-			}
+			const float FallHeight = SourceCharacter->GetFiniteStateByClass<UAbilityCharacterState_Fall>()->GetFallHeight();
+			LocalDamageValue = DamageValue * (1.f - PhysicsDefendRate) * (FallHeight / 10.f);
 		}
 	}
 	else if(DamageAttribute == GET_GAMEPLAYATTRIBUTE(UVitalityAttributeSetBase, RealDamage))

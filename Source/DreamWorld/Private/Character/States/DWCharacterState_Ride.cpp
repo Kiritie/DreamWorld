@@ -50,7 +50,7 @@ void UDWCharacterState_Ride::OnEnter(UFiniteStateBase* InLastState, const TArray
 	Character->GetMovementComponent()->SetActive(false);
 	Character->GetCollisionComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	RidingTarget->AttachActor(Character, FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("RiderPoint"));
-	RidingTarget->GetFSMComponent()->GetStateByClass<UDWCharacterState_Ride>()->OwnerRider = Character;
+	RidingTarget->GetFiniteStateByClass<UDWCharacterState_Ride>()->OwnerRider = Character;
 	Character->SetInteractingAgent(RidingTarget, true);
 	
 	RidingTarget->SetMotionRate(1.f, 1.f);
@@ -72,7 +72,7 @@ void UDWCharacterState_Ride::OnLeave(UFiniteStateBase* InNextState)
 	Character->GetAbilitySystemComponent()->RemoveLooseGameplayTag(GameplayTags::State_Character_Riding);
 
 	RidingTarget->DetachActor(Character, FDetachmentTransformRules::KeepWorldTransform);
-	RidingTarget->GetFSMComponent()->GetStateByClass<UDWCharacterState_Ride>()->OwnerRider = nullptr;
+	RidingTarget->GetFiniteStateByClass<UDWCharacterState_Ride>()->OwnerRider = nullptr;
 
 	UCharacterModuleStatics::SwitchCharacter(Character);
 

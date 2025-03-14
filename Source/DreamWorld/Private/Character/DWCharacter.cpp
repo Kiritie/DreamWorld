@@ -378,14 +378,14 @@ void ADWCharacter::OnFiniteStateRefresh(UFiniteStateBase* InCurrentState)
 	{
 		case MOVE_Flying:
 		{
-			FSM->SwitchStateByClass<UDWCharacterState_Fly>();
+			SwitchFiniteStateByClass<UDWCharacterState_Fly>();
 			break;
 		}
 		case MOVE_Swimming:
 		{
 			if(!InCurrentState)
 			{
-				FSM->SwitchStateByClass<UAbilityCharacterState_Walk>();
+				SwitchFiniteStateByClass<UAbilityCharacterState_Walk>();
 			}
 			break;
 		}
@@ -406,6 +406,15 @@ void ADWCharacter::Death(IAbilityVitalityInterface* InKiller)
 	Super::Death(InKiller);
 }
 
+void ADWCharacter::Kill(IAbilityVitalityInterface* InTarget)
+{
+	for(auto Iter : GetTeamMates<ADWCharacter>())
+	{
+		Iter->ModifyExp(InTarget->GetLevelA() * 10.f);
+	}
+	Super::Kill(InTarget);
+}
+
 void ADWCharacter::Revive(IAbilityVitalityInterface* InRescuer)
 {
 	Super::Revive(InRescuer);
@@ -413,14 +422,14 @@ void ADWCharacter::Revive(IAbilityVitalityInterface* InRescuer)
 
 void ADWCharacter::Dodge()
 {
-	FSM->SwitchStateByClass<UDWCharacterState_Dodge>();
+	SwitchFiniteStateByClass<UDWCharacterState_Dodge>();
 }
 
 void ADWCharacter::UnDodge()
 {
-	if(FSM->IsCurrentStateClass<UDWCharacterState_Dodge>())
+	if(IsCurrentFiniteStateClass<UDWCharacterState_Dodge>())
 	{
-		FSM->SwitchState(nullptr);
+		SwitchFiniteState(nullptr);
 	}
 }
 
@@ -442,40 +451,40 @@ void ADWCharacter::UnSprint()
 
 void ADWCharacter::Ride(ADWCharacter* InTarget)
 {
-	FSM->SwitchStateByClass<UDWCharacterState_Ride>({ InTarget });
+	SwitchFiniteStateByClass<UDWCharacterState_Ride>({ InTarget });
 }
 
 void ADWCharacter::UnRide()
 {
-	if(FSM->IsCurrentStateClass<UDWCharacterState_Ride>())
+	if(IsCurrentFiniteStateClass<UDWCharacterState_Ride>())
 	{
-		FSM->SwitchState(nullptr);
+		SwitchFiniteState(nullptr);
 	}
 }
 
 void ADWCharacter::Sleep(AVoxelInteractAuxiliary* InBed)
 {
-	FSM->SwitchStateByClass<UDWCharacterState_Sleep>({ InBed });
+	SwitchFiniteStateByClass<UDWCharacterState_Sleep>({ InBed });
 }
 
 void ADWCharacter::UnSleep()
 {
-	if(FSM->IsCurrentStateClass<UDWCharacterState_Sleep>())
+	if(IsCurrentFiniteStateClass<UDWCharacterState_Sleep>())
 	{
-		FSM->SwitchState(nullptr);
+		SwitchFiniteState(nullptr);
 	}
 }
 
 void ADWCharacter::Aim()
 {
-	FSM->SwitchStateByClass<UDWCharacterState_Aim>();
+	SwitchFiniteStateByClass<UDWCharacterState_Aim>();
 }
 
 void ADWCharacter::UnAim()
 {
-	if(FSM->IsCurrentStateClass<UDWCharacterState_Aim>())
+	if(IsCurrentFiniteStateClass<UDWCharacterState_Aim>())
 	{
-		FSM->SwitchState(nullptr);
+		SwitchFiniteState(nullptr);
 	}
 }
 
@@ -489,7 +498,7 @@ bool ADWCharacter::Attack(EDWWeaponPart InWeaponPart, int32 InAbilityIndex, cons
 		const auto AbilityData = GetAttackAbility(WeaponType, InAbilityIndex);
 		if(AbilityData.IsValid())
 		{
-			return FSM->SwitchStateByClass<UDWCharacterState_Attack>({ &AbilityData.AbilityHandle, (uint8)EDWCharacterAttackType::NormalAttack, (uint8)InWeaponPart, InAbilityIndex, &OnCompleted });
+			return SwitchFiniteStateByClass<UDWCharacterState_Attack>({ &AbilityData.AbilityHandle, (uint8)EDWCharacterAttackType::NormalAttack, (uint8)InWeaponPart, InAbilityIndex, &OnCompleted });
 		}
 	}
 	else
@@ -507,7 +516,7 @@ bool ADWCharacter::FallingAttack(EDWWeaponPart InWeaponPart, const FSimpleDelega
 	{
 		if(!IsFalling()) Jump();
 
-		return FSM->SwitchStateByClass<UDWCharacterState_Attack>({ &AbilityData.AbilityHandle, (uint8)EDWCharacterAttackType::FallingAttack, (uint8)InWeaponPart, &OnCompleted });
+		return SwitchFiniteStateByClass<UDWCharacterState_Attack>({ &AbilityData.AbilityHandle, (uint8)EDWCharacterAttackType::FallingAttack, (uint8)InWeaponPart, &OnCompleted });
 	}
 	return false;
 }
@@ -554,29 +563,29 @@ bool ADWCharacter::SkillAttack(const FAbilityItem& InAbilityItem, const FSimpleD
 	const auto AbilityData = GetSkillAttackAbility(InAbilityItem.ID);
 	if(AbilityData.IsValid())
 	{
-		return FSM->SwitchStateByClass<UDWCharacterState_Attack>({ &AbilityData.AbilityHandle, (uint8)EDWCharacterAttackType::SkillAttack, &InAbilityItem, &OnCompleted });
+		return SwitchFiniteStateByClass<UDWCharacterState_Attack>({ &AbilityData.AbilityHandle, (uint8)EDWCharacterAttackType::SkillAttack, &InAbilityItem, &OnCompleted });
 	}
 	return false;
 }
 
 void ADWCharacter::UnAttack()
 {
-	if(FSM->IsCurrentStateClass<UDWCharacterState_Attack>())
+	if(IsCurrentFiniteStateClass<UDWCharacterState_Attack>())
 	{
-		FSM->SwitchState(nullptr);
+		SwitchFiniteState(nullptr);
 	}
 }
 
 void ADWCharacter::Defend()
 {
-	FSM->SwitchStateByClass<UDWCharacterState_Defend>();
+	SwitchFiniteStateByClass<UDWCharacterState_Defend>();
 }
 
 void ADWCharacter::UnDefend()
 {
-	if(FSM->IsCurrentStateClass<UDWCharacterState_Defend>())
+	if(IsCurrentFiniteStateClass<UDWCharacterState_Defend>())
 	{
-		FSM->SwitchState(nullptr);
+		SwitchFiniteState(nullptr);
 	}
 }
 
@@ -964,7 +973,7 @@ void ADWCharacter::OnAttributeChange(const FOnAttributeChangeData& InAttributeCh
 
 void ADWCharacter::OnWorldModeChanged(UObject* InSender, UEventHandle_VoxelWorldModeChanged* InEventHandle)
 {
-	if(FSM->IsCurrentStateClass<UDWCharacterState_Spawn>()) return;
+	if(IsCurrentFiniteStateClass<UDWCharacterState_Spawn>()) return;
 	
 	switch(InEventHandle->WorldMode)
 	{
@@ -1113,7 +1122,9 @@ bool ADWCharacter::IsEnemy(IAbilityPawnInterface* InTarget) const
 	ADWCharacter* TargetCharacter = Cast<ADWCharacter>(InTarget);
 
 	if(!TargetCharacter) return false;
-	
+
+	if(IsTeamMate(TargetCharacter)) return false;
+
 	switch (GetNature())
 	{
 		case EDWCharacterNature::NPC:
@@ -1144,10 +1155,6 @@ bool ADWCharacter::IsEnemy(IAbilityPawnInterface* InTarget) const
 		}
 	}
 	
-	if(IsTeamMate(TargetCharacter))
-	{
-		return false;
-	}
 	return Super::IsEnemy(InTarget);
 }
 
@@ -1301,14 +1308,6 @@ bool ADWCharacter::SetLevelA(int32 InLevel)
 void ADWCharacter::ModifyExp(float InDeltaValue)
 {
 	Super::ModifyExp(InDeltaValue);
-
-	for(auto Iter : GetTeamMates())
-	{
-		if(ADWCharacter* Character = Cast<ADWCharacter>(Iter))
-		{
-			Character->ModifyExp(InDeltaValue);
-		}
-	}
 }
 
 void ADWCharacter::SetTeamID(FName InTeamID)

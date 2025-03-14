@@ -7,9 +7,9 @@ void ADWPlayerState::OnInitialize_Implementation()
 	Super::OnInitialize_Implementation();
 }
 
-void ADWPlayerState::OnPreparatory_Implementation(EPhase InPhase)
+void ADWPlayerState::OnPreparatory_Implementation()
 {
-	Super::OnPreparatory_Implementation(InPhase);
+	Super::OnPreparatory_Implementation();
 }
 
 void ADWPlayerState::OnRefresh_Implementation(float DeltaSeconds)
@@ -17,7 +17,7 @@ void ADWPlayerState::OnRefresh_Implementation(float DeltaSeconds)
 	Super::OnRefresh_Implementation(DeltaSeconds);
 }
 
-void ADWPlayerState::OnTermination_Implementation(EPhase InPhase)
+void ADWPlayerState::OnTermination_Implementation()
 {
-	Super::OnTermination_Implementation(InPhase);
+	Super::OnTermination_Implementation();
 }

@@ -9,7 +9,7 @@ bool IDWTeamAgentInterface::HasTeam() const
 
 bool IDWTeamAgentInterface::IsTeamMate(IDWTeamAgentInterface* InTargetCharacter) const
 {
-	return !GetTeamID().IsNone() && InTargetCharacter->GetTeamID() == GetTeamID();
+	return InTargetCharacter != this && !GetTeamID().IsNone() && InTargetCharacter->GetTeamID() == GetTeamID();
 }
 
 bool IDWTeamAgentInterface::CreateTeam(const FName& InTeamName /*= MANE_None*/, FString InTeamDetail /*= TEXT("")*/)
