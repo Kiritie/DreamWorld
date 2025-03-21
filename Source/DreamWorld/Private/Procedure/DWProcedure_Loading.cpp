@@ -13,6 +13,7 @@
 #include "SaveGame/SaveGameModuleStatics.h"
 #include "Scene/SceneModule.h"
 #include "Voxel/DWVoxelModule.h"
+#include "Voxel/VoxelModuleStatics.h"
 #include "Widget/WidgetGameHUD.h"
 #include "Widget/WidgetModuleStatics.h"
 #include "Widget/Loading/WidgetLoadingPanel.h"
@@ -52,6 +53,8 @@ void UDWProcedure_Loading::OnEnter(UProcedureBase* InLastProcedure)
 	UWidgetGameHUD* GameHUD = UWidgetModuleStatics::CreateUserWidget<UWidgetGameHUD>();
 
 	USaveGameModuleStatics::LoadSaveGame<UDWArchiveSaveGame>(-1, EPhase::Final);
+	
+	UVoxelModuleStatics::SetWorldMode(EVoxelWorldMode::Default);
 
 	GameHUD->Init(UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>(), nullptr, true);
 }

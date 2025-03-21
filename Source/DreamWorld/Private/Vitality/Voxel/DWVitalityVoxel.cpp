@@ -9,7 +9,7 @@
 #include "Vitality/Voxel/DWVitalityVoxelData.h"
 #include "Voxel/VoxelModule.h"
 #include "Voxel/Components/VoxelMeshComponent.h"
-#include "Voxel/Datas/VoxelData.h"
+#include "Voxel/Voxels/Data/VoxelData.h"
 
 // Sets default values
 ADWVitalityVoxel::ADWVitalityVoxel(const FObjectInitializer& ObjectInitializer) :

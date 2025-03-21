@@ -54,7 +54,7 @@
 #include "Common/DWCommonStatics.h"
 #include "Inventory/Slot/DWInventoryEquipSlot.h"
 #include "Item/Skill/DWSkillData.h"
-#include "Voxel/Datas/VoxelData.h"
+#include "Voxel/Voxels/Data/VoxelData.h"
 #include "Voxel/Voxels/Auxiliary/VoxelInteractAuxiliary.h"
 #include "Widget/Common/WidgetProgressBox.h"
 #include "Widget/Head/WidgetHeadBox.h"

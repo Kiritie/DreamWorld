@@ -831,10 +831,6 @@ enum class EDWGameTraceChannel : uint8
 {
 	// ??
 	None = 0,
-	// ?????
-	Chunk = (uint8)ECC_GameTraceChannel9,
-	// ????
-	Voxel = (uint8)ECC_GameTraceChannel10,
 	// ????
 	Sight = (uint8)ECC_GameTraceChannel11,
 	// ???

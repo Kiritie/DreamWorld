@@ -14,6 +14,7 @@
 #include "SaveGame/Archive/DWArchiveSaveGame.h"
 #include "SaveGame/SaveGameModuleStatics.h"
 #include "Scene/SceneModule.h"
+#include "Voxel/VoxelModuleStatics.h"
 #include "Widget/WidgetModuleStatics.h"
 #include "Widget/Archive/WidgetArchiveChoosingPanel.h"
 #include "Widget/Menu/WidgetMainMenu.h"
@@ -63,6 +64,8 @@ void UDWProcedure_Starting::OnEnter(UProcedureBase* InLastProcedure)
 	{
 		USaveGameModuleStatics::UnloadSaveGame<UDWArchiveSaveGame>(-1, EPhase::Lesser);
 	}
+	
+	UVoxelModuleStatics::SetWorldMode(EVoxelWorldMode::Preview);
 
 	AMainModule::PauseModuleByClass<USceneModule>();
 

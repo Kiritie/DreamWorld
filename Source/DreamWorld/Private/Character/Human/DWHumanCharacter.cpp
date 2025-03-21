@@ -36,7 +36,7 @@
 #include "FSM/Components/FSMComponent.h"
 #include "Item/Equip/DWEquipData.h"
 #include "Item/Equip/Weapon/DWEquipWeaponMelee.h"
-#include "Voxel/Datas/VoxelData.h"
+#include "Voxel/Voxels/Data/VoxelData.h"
 #include "Widget/WidgetModuleStatics.h"
 #include "Widget/Dialogue/WidgetDialogueBox.h"
 #include "Widget/Interaction/WidgetInteractionBox.h"

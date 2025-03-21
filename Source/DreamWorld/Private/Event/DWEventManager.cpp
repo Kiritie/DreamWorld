@@ -11,10 +11,12 @@ void UDWEventManager::OnInitialize()
 	Super::OnInitialize();
 
 	UAssetModuleStatics::AddEnumMapping(TEXT("/Script/WHFramework.EInteractAction"), TEXT("/Script/DreamWorld.EDWInteractAction"));
-	
-	USceneModuleStatics::AddTraceMapping(FName("Chunk"), (ECollisionChannel)EDWGameTraceChannel::Chunk);
-	USceneModuleStatics::AddTraceMapping(FName("Voxel"), (ECollisionChannel)EDWGameTraceChannel::Voxel);
 
+	UAssetModuleStatics::AddStaticObject(FName("EDWEquipPart"), FStaticObject(UEnum::StaticClass(), TEXT("/Script/DreamWorld.EDWEquipPart")));
+	UAssetModuleStatics::AddStaticObject(FName("EDWGameLevel"), FStaticObject(UEnum::StaticClass(), TEXT("/Script/DreamWorld.EDWGameLevel")));
+	UAssetModuleStatics::AddStaticObject(FName("EDWInventoryInitType"), FStaticObject(UEnum::StaticClass(), TEXT("/Script/DreamWorld.EDWInventoryInitType")));
+
+	USceneModuleStatics::AddTraceMapping(FName("PickUp"), (ECollisionChannel)EGameTraceChannel::Chunk);
 	USceneModuleStatics::AddTraceMapping(FName("Sight"), (ECollisionChannel)EDWGameTraceChannel::Sight);
 	USceneModuleStatics::AddTraceMapping(FName("Step"), (ECollisionChannel)EDWGameTraceChannel::Step);
 }

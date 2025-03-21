@@ -13,7 +13,7 @@
 #include "Character/DWCharacterData.h"
 #include "FSM/Components/FSMComponent.h"
 #include "ObjectPool/ObjectPoolModuleStatics.h"
-#include "Voxel/Datas/VoxelData.h"
+#include "Voxel/Voxels/Data/VoxelData.h"
 
 void FDWCharacterSaveData::InitDialogueData(FRandomStream InRandomStream)
 {
