@@ -54,7 +54,7 @@ void UDWProcedure_Loading::OnEnter(UProcedureBase* InLastProcedure)
 
 	USaveGameModuleStatics::LoadSaveGame<UDWArchiveSaveGame>(-1, EPhase::Final);
 	
-	UVoxelModuleStatics::SetWorldMode(EVoxelWorldMode::Default);
+	UVoxelModuleStatics::SetVoxelWorldMode(EVoxelWorldMode::Default);
 
 	GameHUD->Init(UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>(), nullptr, true);
 }

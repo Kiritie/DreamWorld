@@ -65,7 +65,7 @@ void UDWProcedure_Starting::OnEnter(UProcedureBase* InLastProcedure)
 		USaveGameModuleStatics::UnloadSaveGame<UDWArchiveSaveGame>(-1, EPhase::Lesser);
 	}
 	
-	UVoxelModuleStatics::SetWorldMode(EVoxelWorldMode::Preview);
+	UVoxelModuleStatics::SetVoxelWorldMode(EVoxelWorldMode::Preview);
 
 	AMainModule::PauseModuleByClass<USceneModule>();
 

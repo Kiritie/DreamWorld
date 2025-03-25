@@ -47,7 +47,7 @@ void UDWAIService_QueryPatrolPath::TickNode(UBehaviorTreeComponent& OwnerComp, u
 	FVector PatrolLocation = GetAgent<ADWCharacter>()->GetActorLocation();
 	DON(10,
 		FVector RayStart = GetAgent<ADWCharacter>()->GetBirthTransform().GetLocation() + FRotator(0.f, FMath::RandRange(0.f, 360.f), 0.f).Vector() * FMath::FRandRange(0.f, PatrolDistance);
-		RayStart.Z = UVoxelModuleStatics::GetWorldData().GetWorldRealSize().Z;
+		RayStart.Z = UVoxelModuleStatics::GetVoxelWorldData().GetWorldRealSize().Z;
 		const FVector RayEnd = FVector(RayStart.X, RayStart.Y, 0.f);
 		FHitResult HitResult;
 		UVoxelModuleStatics::VoxelAgentTraceSingle(RayStart, RayEnd, GetAgent<ADWCharacter>()->GetRadius(), GetAgent<ADWCharacter>()->GetHalfHeight(), {}, HitResult, true);

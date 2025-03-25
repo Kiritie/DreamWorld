@@ -81,7 +81,7 @@ void UDWCharacterState_Ride::OnLeave(UFiniteStateBase* InNextState)
 	
 	const FVector Offset = Character->GetActorRightVector() * (Character->GetRadius() + RidingTarget->GetRadius());
 	FVector RayStart = Character->GetActorLocation() + Offset;
-	RayStart.Z = UVoxelModuleStatics::GetWorldData().GetWorldRealSize().Z;
+	RayStart.Z = UVoxelModuleStatics::GetVoxelWorldData().GetWorldRealSize().Z;
 	const FVector RayEnd = FVector(RayStart.X, RayStart.Y, 0);
 
 	FHitResult HitResult;
