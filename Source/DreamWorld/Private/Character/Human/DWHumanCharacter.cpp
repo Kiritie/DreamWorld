@@ -229,7 +229,8 @@ void ADWHumanCharacter::OnSelectItem(const FAbilityItem& InItem)
 				AttachActor(GenerateVoxelEntity, FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("GenerateVoxelMesh"));
 				GenerateVoxelEntity->SetActorScale3D(FVector(0.3f));
 			}
-			GenerateVoxelEntity->LoadSaveData(new FVoxelItem(InItem));
+			auto SaveData = FVoxelItem(InItem);
+			GenerateVoxelEntity->LoadSaveData(&SaveData);
 		}
 		else if(GenerateVoxelEntity)
 		{
@@ -253,7 +254,8 @@ void ADWHumanCharacter::OnAuxiliaryItem(const FAbilityItem& InItem)
 			AuxiliaryVoxelEntity->SetActorScale3D(FVector(0.3f));
 			AuxiliaryVoxelEntity->GetMeshComponent()->SetCastShadow(false);
 		}
-		AuxiliaryVoxelEntity->LoadSaveData(new FVoxelItem(InItem));
+		auto SaveData = FVoxelItem(InItem);
+		AuxiliaryVoxelEntity->LoadSaveData(&SaveData);
 	}
 	else if(AuxiliaryVoxelEntity)
 	{
