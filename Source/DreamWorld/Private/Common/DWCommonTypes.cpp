@@ -212,10 +212,6 @@ namespace GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Input_ToggleLockSightTarget, "Input.Player.ToggleLockSightTarget", "Toggle LockSight Target");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Input_ChangeHand, "Input.Player.ChangeHand", "ChangeHand");
 	
-	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Input_Primary, "Input.Player.Primary", "Primary");
-	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Input_Secondary, "Input.Player.Secondary", "Secondary");
-	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Input_Third, "Input.Player.Third", "Third");
-	
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Input_ReleaseSkillAbility1, "Input.Player.ReleaseSkillAbility1", "Release Skill Ability1");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Input_ReleaseSkillAbility2, "Input.Player.ReleaseSkillAbility2", "Release Skill Ability2");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Input_ReleaseSkillAbility3, "Input.Player.ReleaseSkillAbility3", "Release Skill Ability3");

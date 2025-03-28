@@ -3,7 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Common/DWCommonTypes.h"
 #include "Input/Manager/DefaultInputManagerBase.h"
 
 #include "DWInputManager.generated.h"
@@ -27,21 +26,39 @@ public:
 	virtual void OnBindAction(UInputComponentBase* InInputComponent) override;
 
 protected:
-	virtual void TurnCamera_Implementation(const FInputActionValue& InValue) override;
+	virtual void OnTurnCamera_Implementation(const FInputActionValue& InValue) override;
 
-	virtual void TurnPlayer_Implementation(const FInputActionValue& InValue) override;
+	virtual void OnTurnPlayer_Implementation(const FInputActionValue& InValue) override;
 
-	virtual void MoveForwardPlayer_Implementation(const FInputActionValue& InValue) override;
+	virtual void OnMoveForwardPlayer_Implementation(const FInputActionValue& InValue) override;
 
-	virtual void MoveRightPlayer_Implementation(const FInputActionValue& InValue) override;
+	virtual void OnMoveRightPlayer_Implementation(const FInputActionValue& InValue) override;
 	
-	virtual void MoveUpPlayer_Implementation(const FInputActionValue& InValue) override;
+	virtual void OnMoveUpPlayer_Implementation(const FInputActionValue& InValue) override;
 
-	virtual void ActionUpPlayer_Implementation(const FInputActionValue& InValue) override;
+	virtual void OnActionUpPlayer_Implementation(const FInputActionValue& InValue) override;
 
 	virtual void SystemOperation_Implementation() override;
 	
 protected:
+	virtual void OnPrimaryPressed_Implementation() override;
+
+	virtual void OnPrimaryRepeated_Implementation() override;
+
+	virtual void OnPrimaryReleased_Implementation() override;
+
+	virtual void OnSecondaryPressed_Implementation() override;
+
+	virtual void OnSecondaryRepeated_Implementation() override;
+
+	virtual void OnSecondaryReleased_Implementation() override;
+
+	virtual void OnThirdPressed_Implementation() override;
+
+	virtual void OnThirdRepeated_Implementation() override;
+
+	virtual void OnThirdReleased_Implementation() override;
+
 	UFUNCTION()
 	virtual void OnSprintPressed();
 
@@ -53,33 +70,6 @@ protected:
 
 	UFUNCTION()
 	virtual void OnDodgeReleased();
-
-	UFUNCTION()
-	virtual void OnPrimaryPressed();
-
-	UFUNCTION()
-	virtual void OnPrimaryRepeated();
-
-	UFUNCTION()
-	virtual void OnPrimaryReleased();
-
-	UFUNCTION()
-	virtual void OnSecondaryPressed();
-
-	UFUNCTION()
-	virtual void OnSecondaryRepeated();
-
-	UFUNCTION()
-	virtual void OnSecondaryReleased();
-
-	UFUNCTION()
-	virtual void OnThirdPressed();
-
-	UFUNCTION()
-	virtual void OnThirdRepeated();
-
-	UFUNCTION()
-	virtual void OnThirdReleased();
 
 public:
 	UFUNCTION(BlueprintCallable)

@@ -142,18 +142,6 @@ void UDWInputManager::OnBindAction(UInputComponentBase* InInputComponent)
 	
 	// InInputComponent->BindInputAction(GameplayTags::Input_ToggleCrouch, ETriggerEvent::Started, this, &UDWInputManager::ToggleCrouch);
 	InInputComponent->BindInputAction(GameplayTags::Input_ChangeHand, ETriggerEvent::Started, this, &UDWInputManager::ChangeHand);
-	
-	InInputComponent->BindInputAction(GameplayTags::Input_Primary, ETriggerEvent::Started, this, &UDWInputManager::OnPrimaryPressed);
-	InInputComponent->BindInputAction(GameplayTags::Input_Primary, ETriggerEvent::Triggered, this, &UDWInputManager::OnPrimaryRepeated);
-	InInputComponent->BindInputAction(GameplayTags::Input_Primary, ETriggerEvent::Completed, this, &UDWInputManager::OnPrimaryReleased);
-	
-	InInputComponent->BindInputAction(GameplayTags::Input_Secondary, ETriggerEvent::Started, this, &UDWInputManager::OnSecondaryPressed);
-	InInputComponent->BindInputAction(GameplayTags::Input_Secondary, ETriggerEvent::Triggered, this, &UDWInputManager::OnSecondaryRepeated);
-	InInputComponent->BindInputAction(GameplayTags::Input_Secondary, ETriggerEvent::Completed, this, &UDWInputManager::OnSecondaryReleased);
-		
-	InInputComponent->BindInputAction(GameplayTags::Input_Third, ETriggerEvent::Started, this, &UDWInputManager::OnThirdPressed);
-	InInputComponent->BindInputAction(GameplayTags::Input_Third, ETriggerEvent::Triggered, this, &UDWInputManager::OnThirdRepeated);
-	InInputComponent->BindInputAction(GameplayTags::Input_Third, ETriggerEvent::Completed, this, &UDWInputManager::OnThirdReleased);
 
 	InInputComponent->BindInputAction(GameplayTags::Input_ReleaseSkillAbility1, ETriggerEvent::Started, this, &UDWInputManager::ReleaseSkillAbility1);
 	InInputComponent->BindInputAction(GameplayTags::Input_ReleaseSkillAbility2, ETriggerEvent::Started, this, &UDWInputManager::ReleaseSkillAbility2);
@@ -185,9 +173,9 @@ void UDWInputManager::OnBindAction(UInputComponentBase* InInputComponent)
 	InInputComponent->BindInputAction(GameplayTags::Input_OpenSwitcherPanel, ETriggerEvent::Started, this, &UDWInputManager::OpenSwitcherPanel);
 }
 
-void UDWInputManager::TurnCamera_Implementation(const FInputActionValue& InValue)
+void UDWInputManager::OnTurnCamera_Implementation(const FInputActionValue& InValue)
 {
-	Super::TurnCamera_Implementation(InValue);
+	Super::OnTurnCamera_Implementation(InValue);
 
 	if(InValue.Get<float>() == 0.f) return;
 
@@ -198,7 +186,7 @@ void UDWInputManager::TurnCamera_Implementation(const FInputActionValue& InValue
 	PlayerCharacter->Targeting->TargetActorWithAxisInput(InValue.Get<float>());
 }
 
-void UDWInputManager::TurnPlayer_Implementation(const FInputActionValue& InValue)
+void UDWInputManager::OnTurnPlayer_Implementation(const FInputActionValue& InValue)
 {
 	if(InValue.Get<float>() == 0.f) return;
 	
@@ -209,7 +197,7 @@ void UDWInputManager::TurnPlayer_Implementation(const FInputActionValue& InValue
 	IWHPlayerInterface::Execute_Turn(PossessedCharacter, InValue.Get<float>());
 }
 
-void UDWInputManager::MoveForwardPlayer_Implementation(const FInputActionValue& InValue)
+void UDWInputManager::OnMoveForwardPlayer_Implementation(const FInputActionValue& InValue)
 {
 	if(InValue.Get<float>() == 0.f) return;
 	
@@ -220,7 +208,7 @@ void UDWInputManager::MoveForwardPlayer_Implementation(const FInputActionValue& 
 	IWHPlayerInterface::Execute_MoveForward(PossessedCharacter, InValue.Get<float>());
 }
 
-void UDWInputManager::MoveRightPlayer_Implementation(const FInputActionValue& InValue)
+void UDWInputManager::OnMoveRightPlayer_Implementation(const FInputActionValue& InValue)
 {
 	if(InValue.Get<float>() == 0.f) return;
 	
@@ -231,7 +219,7 @@ void UDWInputManager::MoveRightPlayer_Implementation(const FInputActionValue& In
 	IWHPlayerInterface::Execute_MoveRight(PossessedCharacter, InValue.Get<float>());
 }
 
-void UDWInputManager::MoveUpPlayer_Implementation(const FInputActionValue& InValue)
+void UDWInputManager::OnMoveUpPlayer_Implementation(const FInputActionValue& InValue)
 {
 	if(InValue.Get<float>() == 0.f) return;
 	
@@ -242,7 +230,7 @@ void UDWInputManager::MoveUpPlayer_Implementation(const FInputActionValue& InVal
 	IWHPlayerInterface::Execute_MoveUp(PossessedCharacter, InValue.Get<float>());
 }
 
-void UDWInputManager::ActionUpPlayer_Implementation(const FInputActionValue& InValue)
+void UDWInputManager::OnActionUpPlayer_Implementation(const FInputActionValue& InValue)
 {
 	ADWCharacter* PossessedCharacter = UCommonStatics::GetPossessedPawn<ADWCharacter>(LocalPlayerIndex);
 
@@ -274,6 +262,234 @@ void UDWInputManager::SystemOperation_Implementation()
 	else if(UProcedureModuleStatics::IsCurrentProcedureClass<UDWProcedure_Testing>())
 	{
 		UWidgetModuleStatics::OpenUserWidget<UWidgetSettingPanel>();
+	}
+}
+
+void UDWInputManager::OnPrimaryPressed_Implementation()
+{
+	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>(LocalPlayerIndex);
+
+	if(!PlayerCharacter || !PlayerCharacter->IsActive() || PlayerCharacter->Execute_IsBlockAllInput(PlayerCharacter)) return;
+
+	bPrimaryPressed = true;
+	switch (PlayerCharacter->ControlMode)
+	{
+		case EDWCharacterControlMode::Fighting:
+		{
+			if(PlayerCharacter->IsFreeToAnim() || PlayerCharacter->IsAttacking())
+			{
+				AttackAbilityQueue++; 
+			}
+			break;
+		}
+		case EDWCharacterControlMode::Creating:
+		{
+			FVoxelHitResult VoxelHitResult;
+			if(UVoxelModuleStatics::VoxelRaycastSinge(EVoxelRaycastType::FromAimPoint, PlayerCharacter->GetInteractDistance(), {}, VoxelHitResult))
+			{
+				PlayerCharacter->OnInteractVoxel(EInputInteractAction::Primary, EInputInteractEvent::Started, VoxelHitResult);
+			}
+			break;
+		}
+	}
+}
+
+void UDWInputManager::OnPrimaryRepeated_Implementation()
+{
+	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>(LocalPlayerIndex);
+
+	if(!PlayerCharacter || !PlayerCharacter->IsActive() || PlayerCharacter->Execute_IsBlockAllInput(PlayerCharacter)) return;
+
+	switch (PlayerCharacter->ControlMode)
+	{
+		case EDWCharacterControlMode::Fighting:
+		{
+			break;
+		}
+		case EDWCharacterControlMode::Creating:
+		{
+			FVoxelHitResult VoxelHitResult;
+			if(UVoxelModuleStatics::VoxelRaycastSinge(EVoxelRaycastType::FromAimPoint, PlayerCharacter->GetInteractDistance(), {}, VoxelHitResult))
+			{
+				PlayerCharacter->OnInteractVoxel(EInputInteractAction::Primary, EInputInteractEvent::Triggered, VoxelHitResult);
+			}
+			break;
+		}
+	}
+}
+
+void UDWInputManager::OnPrimaryReleased_Implementation()
+{
+	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>(LocalPlayerIndex);
+
+	if(!PlayerCharacter) return;
+
+	bPrimaryPressed = false;
+	switch (PlayerCharacter->ControlMode)
+	{
+		case EDWCharacterControlMode::Fighting:
+		{
+			break;
+		}
+		case EDWCharacterControlMode::Creating:
+		{
+			FVoxelHitResult VoxelHitResult;
+			if(UVoxelModuleStatics::VoxelRaycastSinge(EVoxelRaycastType::FromAimPoint, PlayerCharacter->GetInteractDistance(), {}, VoxelHitResult))
+			{
+				PlayerCharacter->OnInteractVoxel(EInputInteractAction::Primary, EInputInteractEvent::Completed, VoxelHitResult);
+			}
+			break;
+		}
+	}
+}
+
+void UDWInputManager::OnSecondaryPressed_Implementation()
+{
+	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>(LocalPlayerIndex);
+
+	if(!PlayerCharacter || !PlayerCharacter->IsActive() || PlayerCharacter->Execute_IsBlockAllInput(PlayerCharacter)) return;
+
+	bSecondaryPressed = true;
+	switch (PlayerCharacter->ControlMode)
+	{
+		case EDWCharacterControlMode::Fighting:
+		{
+			break;
+		}
+		case EDWCharacterControlMode::Creating:
+		{
+			FVoxelHitResult VoxelHitResult;
+			if(UVoxelModuleStatics::VoxelRaycastSinge(EVoxelRaycastType::FromAimPoint, PlayerCharacter->GetInteractDistance(), {}, VoxelHitResult))
+			{
+				PlayerCharacter->OnInteractVoxel(EInputInteractAction::Secondary, EInputInteractEvent::Started, VoxelHitResult);
+			}
+			break;
+		}
+	}
+}
+
+void UDWInputManager::OnSecondaryRepeated_Implementation()
+{
+	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>(LocalPlayerIndex);
+
+	if(!PlayerCharacter || !PlayerCharacter->IsActive() || PlayerCharacter->Execute_IsBlockAllInput(PlayerCharacter)) return;
+
+	switch (PlayerCharacter->ControlMode)
+	{
+		case EDWCharacterControlMode::Fighting:
+		{
+			break;
+		}
+		case EDWCharacterControlMode::Creating:
+		{
+			FVoxelHitResult VoxelHitResult;
+			if(UVoxelModuleStatics::VoxelRaycastSinge(EVoxelRaycastType::FromAimPoint, PlayerCharacter->GetInteractDistance(), {}, VoxelHitResult))
+			{
+				PlayerCharacter->OnInteractVoxel(EInputInteractAction::Secondary, EInputInteractEvent::Triggered, VoxelHitResult);
+			}
+			break;
+		}
+	}
+}
+
+void UDWInputManager::OnSecondaryReleased_Implementation()
+{
+	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>(LocalPlayerIndex);
+
+	if(!PlayerCharacter) return;
+
+	bSecondaryPressed = false;
+	switch (PlayerCharacter->ControlMode)
+	{
+		case EDWCharacterControlMode::Fighting:
+		{
+			break;
+		}
+		case EDWCharacterControlMode::Creating:
+		{
+			FVoxelHitResult VoxelHitResult;
+			if(UVoxelModuleStatics::VoxelRaycastSinge(EVoxelRaycastType::FromAimPoint, PlayerCharacter->GetInteractDistance(), {}, VoxelHitResult))
+			{
+				PlayerCharacter->OnInteractVoxel(EInputInteractAction::Secondary, EInputInteractEvent::Completed, VoxelHitResult);
+			}
+			break;
+		}
+	}
+}
+
+void UDWInputManager::OnThirdPressed_Implementation()
+{
+	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>(LocalPlayerIndex);
+
+	if(!PlayerCharacter || !PlayerCharacter->IsActive() || PlayerCharacter->Execute_IsBlockAllInput(PlayerCharacter)) return;
+
+	PlayerCharacter->GetTargeting()->TargetActor();
+
+	bThirdPressed = true;
+	switch (PlayerCharacter->ControlMode)
+	{
+		case EDWCharacterControlMode::Fighting:
+		{
+			break;
+		}
+		case EDWCharacterControlMode::Creating:
+		{
+			FVoxelHitResult VoxelHitResult;
+			if(UVoxelModuleStatics::VoxelRaycastSinge(EVoxelRaycastType::FromAimPoint, PlayerCharacter->GetInteractDistance(), {}, VoxelHitResult))
+			{
+				PlayerCharacter->OnInteractVoxel(EInputInteractAction::Third, EInputInteractEvent::Started, VoxelHitResult);
+			}
+			break;
+		}
+	}
+}
+
+void UDWInputManager::OnThirdRepeated_Implementation()
+{
+	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>(LocalPlayerIndex);
+
+	if(!PlayerCharacter || !PlayerCharacter->IsActive() || PlayerCharacter->Execute_IsBlockAllInput(PlayerCharacter)) return;
+
+	switch (PlayerCharacter->ControlMode)
+	{
+		case EDWCharacterControlMode::Fighting:
+		{
+			break;
+		}
+		case EDWCharacterControlMode::Creating:
+		{
+			FVoxelHitResult VoxelHitResult;
+			if(UVoxelModuleStatics::VoxelRaycastSinge(EVoxelRaycastType::FromAimPoint, PlayerCharacter->GetInteractDistance(), {}, VoxelHitResult))
+			{
+				PlayerCharacter->OnInteractVoxel(EInputInteractAction::Third, EInputInteractEvent::Triggered, VoxelHitResult);
+			}
+			break;
+		}
+	}
+}
+
+void UDWInputManager::OnThirdReleased_Implementation()
+{
+	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>(LocalPlayerIndex);
+
+	if(!PlayerCharacter) return;
+
+	bThirdPressed = false;
+	switch (PlayerCharacter->ControlMode)
+	{
+		case EDWCharacterControlMode::Fighting:
+		{
+			break;
+		}
+		case EDWCharacterControlMode::Creating:
+		{
+			FVoxelHitResult VoxelHitResult;
+			if(UVoxelModuleStatics::VoxelRaycastSinge(EVoxelRaycastType::FromAimPoint, PlayerCharacter->GetInteractDistance(), {}, VoxelHitResult))
+			{
+				PlayerCharacter->OnInteractVoxel(EInputInteractAction::Third, EInputInteractEvent::Completed, VoxelHitResult);
+			}
+			break;
+		}
 	}
 }
 
@@ -311,234 +527,6 @@ void UDWInputManager::OnDodgeReleased()
 	if(!PossessedCharacter || !PossessedCharacter->IsActive()) return;
 
 	// PossessedCharacter->UnDodge();
-}
-
-void UDWInputManager::OnPrimaryPressed()
-{
-	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>(LocalPlayerIndex);
-
-	if(!PlayerCharacter || !PlayerCharacter->IsActive() || PlayerCharacter->Execute_IsBlockAllInput(PlayerCharacter)) return;
-
-	bPrimaryPressed = true;
-	switch (PlayerCharacter->ControlMode)
-	{
-		case EDWCharacterControlMode::Fighting:
-		{
-			if(PlayerCharacter->IsFreeToAnim() || PlayerCharacter->IsAttacking())
-			{
-				AttackAbilityQueue++; 
-			}
-			break;
-		}
-		case EDWCharacterControlMode::Creating:
-		{
-			FVoxelHitResult VoxelHitResult;
-			if(UVoxelModuleStatics::VoxelRaycastSinge(EVoxelRaycastType::FromAimPoint, PlayerCharacter->GetInteractDistance(), {}, VoxelHitResult))
-			{
-				PlayerCharacter->OnInteractVoxel(EInputInteractAction::Primary, EInputInteractEvent::Started, VoxelHitResult);
-			}
-			break;
-		}
-	}
-}
-
-void UDWInputManager::OnPrimaryRepeated()
-{
-	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>(LocalPlayerIndex);
-
-	if(!PlayerCharacter || !PlayerCharacter->IsActive() || PlayerCharacter->Execute_IsBlockAllInput(PlayerCharacter)) return;
-
-	switch (PlayerCharacter->ControlMode)
-	{
-		case EDWCharacterControlMode::Fighting:
-		{
-			break;
-		}
-		case EDWCharacterControlMode::Creating:
-		{
-			FVoxelHitResult VoxelHitResult;
-			if(UVoxelModuleStatics::VoxelRaycastSinge(EVoxelRaycastType::FromAimPoint, PlayerCharacter->GetInteractDistance(), {}, VoxelHitResult))
-			{
-				PlayerCharacter->OnInteractVoxel(EInputInteractAction::Primary, EInputInteractEvent::Triggered, VoxelHitResult);
-			}
-			break;
-		}
-	}
-}
-
-void UDWInputManager::OnPrimaryReleased()
-{
-	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>(LocalPlayerIndex);
-
-	if(!PlayerCharacter) return;
-
-	bPrimaryPressed = false;
-	switch (PlayerCharacter->ControlMode)
-	{
-		case EDWCharacterControlMode::Fighting:
-		{
-			break;
-		}
-		case EDWCharacterControlMode::Creating:
-		{
-			FVoxelHitResult VoxelHitResult;
-			if(UVoxelModuleStatics::VoxelRaycastSinge(EVoxelRaycastType::FromAimPoint, PlayerCharacter->GetInteractDistance(), {}, VoxelHitResult))
-			{
-				PlayerCharacter->OnInteractVoxel(EInputInteractAction::Primary, EInputInteractEvent::Completed, VoxelHitResult);
-			}
-			break;
-		}
-	}
-}
-
-void UDWInputManager::OnSecondaryPressed()
-{
-	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>(LocalPlayerIndex);
-
-	if(!PlayerCharacter || !PlayerCharacter->IsActive() || PlayerCharacter->Execute_IsBlockAllInput(PlayerCharacter)) return;
-
-	bSecondaryPressed = true;
-	switch (PlayerCharacter->ControlMode)
-	{
-		case EDWCharacterControlMode::Fighting:
-		{
-			break;
-		}
-		case EDWCharacterControlMode::Creating:
-		{
-			FVoxelHitResult VoxelHitResult;
-			if(UVoxelModuleStatics::VoxelRaycastSinge(EVoxelRaycastType::FromAimPoint, PlayerCharacter->GetInteractDistance(), {}, VoxelHitResult))
-			{
-				PlayerCharacter->OnInteractVoxel(EInputInteractAction::Secondary, EInputInteractEvent::Started, VoxelHitResult);
-			}
-			break;
-		}
-	}
-}
-
-void UDWInputManager::OnSecondaryRepeated()
-{
-	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>(LocalPlayerIndex);
-
-	if(!PlayerCharacter || !PlayerCharacter->IsActive() || PlayerCharacter->Execute_IsBlockAllInput(PlayerCharacter)) return;
-
-	switch (PlayerCharacter->ControlMode)
-	{
-		case EDWCharacterControlMode::Fighting:
-		{
-			break;
-		}
-		case EDWCharacterControlMode::Creating:
-		{
-			FVoxelHitResult VoxelHitResult;
-			if(UVoxelModuleStatics::VoxelRaycastSinge(EVoxelRaycastType::FromAimPoint, PlayerCharacter->GetInteractDistance(), {}, VoxelHitResult))
-			{
-				PlayerCharacter->OnInteractVoxel(EInputInteractAction::Secondary, EInputInteractEvent::Triggered, VoxelHitResult);
-			}
-			break;
-		}
-	}
-}
-
-void UDWInputManager::OnSecondaryReleased()
-{
-	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>(LocalPlayerIndex);
-
-	if(!PlayerCharacter) return;
-
-	bSecondaryPressed = false;
-	switch (PlayerCharacter->ControlMode)
-	{
-		case EDWCharacterControlMode::Fighting:
-		{
-			break;
-		}
-		case EDWCharacterControlMode::Creating:
-		{
-			FVoxelHitResult VoxelHitResult;
-			if(UVoxelModuleStatics::VoxelRaycastSinge(EVoxelRaycastType::FromAimPoint, PlayerCharacter->GetInteractDistance(), {}, VoxelHitResult))
-			{
-				PlayerCharacter->OnInteractVoxel(EInputInteractAction::Secondary, EInputInteractEvent::Completed, VoxelHitResult);
-			}
-			break;
-		}
-	}
-}
-
-void UDWInputManager::OnThirdPressed()
-{
-	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>(LocalPlayerIndex);
-
-	if(!PlayerCharacter || !PlayerCharacter->IsActive() || PlayerCharacter->Execute_IsBlockAllInput(PlayerCharacter)) return;
-
-	PlayerCharacter->GetTargeting()->TargetActor();
-
-	bThirdPressed = true;
-	switch (PlayerCharacter->ControlMode)
-	{
-		case EDWCharacterControlMode::Fighting:
-		{
-			break;
-		}
-		case EDWCharacterControlMode::Creating:
-		{
-			FVoxelHitResult VoxelHitResult;
-			if(UVoxelModuleStatics::VoxelRaycastSinge(EVoxelRaycastType::FromAimPoint, PlayerCharacter->GetInteractDistance(), {}, VoxelHitResult))
-			{
-				PlayerCharacter->OnInteractVoxel(EInputInteractAction::Third, EInputInteractEvent::Started, VoxelHitResult);
-			}
-			break;
-		}
-	}
-}
-
-void UDWInputManager::OnThirdRepeated()
-{
-	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>(LocalPlayerIndex);
-
-	if(!PlayerCharacter || !PlayerCharacter->IsActive() || PlayerCharacter->Execute_IsBlockAllInput(PlayerCharacter)) return;
-
-	switch (PlayerCharacter->ControlMode)
-	{
-		case EDWCharacterControlMode::Fighting:
-		{
-			break;
-		}
-		case EDWCharacterControlMode::Creating:
-		{
-			FVoxelHitResult VoxelHitResult;
-			if(UVoxelModuleStatics::VoxelRaycastSinge(EVoxelRaycastType::FromAimPoint, PlayerCharacter->GetInteractDistance(), {}, VoxelHitResult))
-			{
-				PlayerCharacter->OnInteractVoxel(EInputInteractAction::Third, EInputInteractEvent::Triggered, VoxelHitResult);
-			}
-			break;
-		}
-	}
-}
-
-void UDWInputManager::OnThirdReleased()
-{
-	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>(LocalPlayerIndex);
-
-	if(!PlayerCharacter) return;
-
-	bThirdPressed = false;
-	switch (PlayerCharacter->ControlMode)
-	{
-		case EDWCharacterControlMode::Fighting:
-		{
-			break;
-		}
-		case EDWCharacterControlMode::Creating:
-		{
-			FVoxelHitResult VoxelHitResult;
-			if(UVoxelModuleStatics::VoxelRaycastSinge(EVoxelRaycastType::FromAimPoint, PlayerCharacter->GetInteractDistance(), {}, VoxelHitResult))
-			{
-				PlayerCharacter->OnInteractVoxel(EInputInteractAction::Third, EInputInteractEvent::Completed, VoxelHitResult);
-			}
-			break;
-		}
-	}
 }
 
 void UDWInputManager::ToggleControlMode()
