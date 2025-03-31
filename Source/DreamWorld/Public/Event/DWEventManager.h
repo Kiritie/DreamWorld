@@ -3,14 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Event/Manager/EventManagerBase.h"
+#include "Event/Manager/DefaultEventManagerBase.h"
 #include "DWEventManager.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class DREAMWORLD_API UDWEventManager : public UEventManagerBase
+class DREAMWORLD_API UDWEventManager : public UDefaultEventManagerBase
 {
 	GENERATED_BODY()
 

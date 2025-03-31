@@ -178,18 +178,18 @@ public:
 	virtual void OpenSwitcherPanel();
 
 protected:
-	UPROPERTY(VisibleAnywhere, Category = "InputStates|Player")
+	UPROPERTY(VisibleAnywhere)
 	bool bPrimaryPressed;
 		
-	UPROPERTY(VisibleAnywhere, Category = "InputStates|Player")
+	UPROPERTY(VisibleAnywhere)
 	bool bSecondaryPressed;
 		
-	UPROPERTY(VisibleAnywhere, Category = "InputStates|Player")
+	UPROPERTY(VisibleAnywhere)
 	bool bThirdPressed;
 
-	UPROPERTY(VisibleAnywhere, Category = "InputStates|Player")
+	UPROPERTY(VisibleAnywhere)
 	bool bSprintPressed;
 
-	UPROPERTY(VisibleAnywhere, Category = "InputStates|Player")
+	UPROPERTY(VisibleAnywhere)
 	int32 AttackAbilityQueue;
 };
