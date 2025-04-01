@@ -42,7 +42,7 @@ bool UDWInventorySkillSlot::ActiveItem(bool bPassive /*= false*/)
 		if(!Character || Character->GetControlMode() != EDWCharacterControlMode::Fighting) return false;
 
 		const auto& SkillData = Item.GetData<UDWSkillData>();
-		if(Character->CheckWeaponType(EDWWeaponPart::None, SkillData.WeaponType))
+		if(Character->CheckWeaponType(SkillData.WeaponPart, SkillData.WeaponType))
 		{
 			if(Super::ActiveItem(bPassive))
 			{

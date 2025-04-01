@@ -44,12 +44,12 @@ void UDWCharacterState_Attack::OnEnter(UFiniteStateBase* InLastState, const TArr
 	Character->LimitToAnim();
 
 	Character->AttackType = (EDWCharacterAttackType)InParams[1].GetByteValue();
+	Character->AttackWeaponPart = (EDWWeaponPart)InParams[2].GetByteValue();
 
 	switch (Character->AttackType)
 	{
 		case EDWCharacterAttackType::NormalAttack:
 		{
-			Character->AttackWeaponPart = (EDWWeaponPart)InParams[2].GetByteValue();
 			EDWWeaponType WeaponType = Character->GetWeaponType(Character->AttackWeaponPart);
 			Character->GetAttackAbilityQueue(WeaponType).Index = InParams[3];
 			OnAttackCompleted = InParams[4].GetPointerValueRef<FSimpleDelegate>();
@@ -64,14 +64,13 @@ void UDWCharacterState_Attack::OnEnter(UFiniteStateBase* InLastState, const TArr
 		}
 		case EDWCharacterAttackType::FallingAttack:
 		{
-			Character->AttackWeaponPart = (EDWWeaponPart)InParams[2].GetByteValue();
 			OnAttackCompleted = InParams[3].GetPointerValueRef<FSimpleDelegate>();
 			break;
 		}
 		case EDWCharacterAttackType::SkillAttack:
 		{
-			Character->SkillAttackAbilityItem = InParams[2].GetPointerValueRef<FAbilityItem>();
-			OnAttackCompleted = InParams[3].GetPointerValueRef<FSimpleDelegate>();
+			Character->SkillAttackAbilityItem = InParams[3].GetPointerValueRef<FAbilityItem>();
+			OnAttackCompleted = InParams[4].GetPointerValueRef<FSimpleDelegate>();
 			if(Character->SkillAttackAbilityItem.GetData<UAbilitySkillDataBase>().ProjectileClass)
 			{
 				Character->SetUseControllerRotation(true);

@@ -19,6 +19,9 @@ public:
 	EDWSkillType SkillType;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	EDWWeaponPart WeaponPart;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	EDWWeaponType WeaponType;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)

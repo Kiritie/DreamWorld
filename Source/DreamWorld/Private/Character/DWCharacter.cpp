@@ -563,7 +563,7 @@ bool ADWCharacter::SkillAttack(const FAbilityItem& InAbilityItem, const FSimpleD
 	const auto AbilityData = GetSkillAttackAbility(InAbilityItem.ID);
 	if(AbilityData.IsValid())
 	{
-		return SwitchFiniteStateByClass<UDWCharacterState_Attack>({ &AbilityData.AbilityHandle, (uint8)EDWCharacterAttackType::SkillAttack, &InAbilityItem, &OnCompleted });
+		return SwitchFiniteStateByClass<UDWCharacterState_Attack>({ &AbilityData.AbilityHandle, (uint8)EDWCharacterAttackType::SkillAttack, (uint8)InAbilityItem.GetData<UDWSkillData>().WeaponPart, &InAbilityItem, &OnCompleted });
 	}
 	return false;
 }
@@ -1392,10 +1392,10 @@ TArray<ADWEquip*> ADWCharacter::GetEquips() const
 
 ADWEquipWeapon* ADWCharacter::GetWeapon(EDWWeaponPart InWeaponPart) const
 {
-	for(auto& Iter : GetWeapons())
+	for(auto Iter : GetWeapons())
 	{
 		const auto& WeaponData = Iter->GetItemData<UDWEquipWeaponData>();
-		if(InWeaponPart == EDWWeaponPart::None || WeaponData.EquipPart == (EDWEquipPart)InWeaponPart || WeaponData.WeaponHand == EDWWeaponHand::Both)
+		if(InWeaponPart == EDWWeaponPart::None || WeaponData.EquipPart == (EDWEquipPart)InWeaponPart)
 		{
 			return Iter;
 		}
@@ -1406,13 +1406,13 @@ ADWEquipWeapon* ADWCharacter::GetWeapon(EDWWeaponPart InWeaponPart) const
 TArray<ADWEquipWeapon*> ADWCharacter::GetWeapons() const
 {
 	TArray<ADWEquipWeapon*> ReturnValues;
-	for(auto& Iter : Equips)
-	{
-		if(ADWEquipWeapon* Weapon = Cast<ADWEquipWeapon>(Iter.Value))
+	const TArray WeaponParts = { EDWEquipPart::Primary, EDWEquipPart::Secondary };
+	ITER_ARRAY(WeaponParts, WeaponPart,
+		if(ADWEquipWeapon* Weapon = GetEquip<ADWEquipWeapon>(WeaponPart))
 		{
 			ReturnValues.Add(Weapon);
 		}
-	}
+	)
 	return ReturnValues;
 }
 
@@ -1432,7 +1432,7 @@ bool ADWCharacter::CheckWeaponType(EDWWeaponPart InWeaponPart, EDWWeaponType InW
 	for(auto Iter : GetWeapons())
 	{
 		const auto& WeaponData = Iter->GetItemData<UDWEquipWeaponData>();
-		if((InWeaponPart == EDWWeaponPart::None || WeaponData.WeaponHand == EDWWeaponHand::Both || WeaponData.EquipPart == (EDWEquipPart)InWeaponPart) && WeaponData.WeaponType == InWeaponType)
+		if((InWeaponPart == EDWWeaponPart::None || WeaponData.EquipPart == (EDWEquipPart)InWeaponPart) && WeaponData.WeaponType == InWeaponType)
 		{
 			return true;
 		}
