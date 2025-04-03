@@ -147,10 +147,10 @@ void ADWHumanCharacter::OnInteract(EInteractAction InInteractAction, IInteractio
 						DialogueBox->Open({ Dialogue });
 					}
 				}
-				break;
 			}
-			default: break;
+			break;
 		}
+		default: break;
 	}
 }
 
