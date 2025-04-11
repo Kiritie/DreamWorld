@@ -63,7 +63,7 @@ void UDWProcedure_Loading::OnRefresh()
 {
 	Super::OnRefresh();
 
-	if(UVoxelModule::Get().IsBasicGenerated())
+	if(UVoxelModule::Get().IsWorldBasicGenerated())
 	{
 		UProcedureModuleStatics::SwitchProcedureByClass<UDWProcedure_Playing>();
 	}

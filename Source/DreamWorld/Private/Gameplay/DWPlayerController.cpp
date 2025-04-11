@@ -16,7 +16,7 @@
 #include "Character/CharacterModuleStatics.h"
 #include "Input/InputModule.h"
 #include "Main/MainModule.h"
-#include "Voxel/VoxelModuleStatics.h"
+#include "Voxel/VoxelModule.h"
 
 ADWPlayerController::ADWPlayerController()
 {
@@ -59,6 +59,11 @@ void ADWPlayerController::LoadData(FSaveData* InSaveData, EPhase InPhase)
 			{
 				bNeedSpawn = false;
 			}
+		}
+		if(SaveData.SpawnTransform.GetTranslation().IsZero())
+		{
+			const FVector2D SpawnRange = FVector2D(UVoxelModule::Get().GetWorldData().GetWorldRealSize().X * 5.f, UVoxelModule::Get().GetWorldData().GetWorldRealSize().Y * 5.f);
+			SaveData.SpawnTransform.SetTranslation(FVector(FMath::RandRange(-SpawnRange.X, SpawnRange.X), FMath::RandRange(-SpawnRange.Y, SpawnRange.Y), 0.f));
 		}
 		if(bNeedSpawn)
 		{

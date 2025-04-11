@@ -52,10 +52,10 @@ void UDWPlayerCharacterState_Spawn::TryLeave()
 	{
 		Super::TryLeave();
 	}
-	else if(UVoxelModule::Get().IsBasicGenerated())
+	else if(UVoxelModule::Get().IsWorldBasicGenerated())
 	{
 		ADWPlayerCharacter* PlayerCharacter = GetAgent<ADWPlayerCharacter>();
-		if(PlayerCharacter->GetActorLocation().IsNearlyZero())
+		if(PlayerCharacter->GetActorLocation().Z <= 0.f)
 		{
 			const auto& CharacterData = PlayerCharacter->GetCharacterData<UAbilityCharacterDataBase>();
 			FHitResult HitResult;
