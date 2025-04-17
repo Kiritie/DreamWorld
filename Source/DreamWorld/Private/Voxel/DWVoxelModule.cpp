@@ -5,7 +5,6 @@
 
 #include "Components/StaticMeshComponent.h"
 #include "Voxel/DWVoxelChunk.h"
-#include "Voxel/VoxelModuleStatics.h"
 #include "SaveGame/SaveGameModuleStatics.h"
 
 IMPLEMENTATION_MODULE(UDWVoxelModule)

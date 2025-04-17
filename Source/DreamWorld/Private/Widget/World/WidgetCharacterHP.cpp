@@ -4,6 +4,7 @@
 #include "Widget/World/WidgetCharacterHP.h"
 
 #include "Character/DWCharacter.h"
+#include "Voxel/VoxelModuleStatics.h"
 
 UWidgetCharacterHP::UWidgetCharacterHP(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -28,7 +29,7 @@ bool UWidgetCharacterHP::IsWidgetVisible_Implementation(bool bRefresh)
 	if(bRefresh)
 	{
 		ADWCharacter* Character = GetOwnerObject<ADWCharacter>();
-		return Character && !Character->IsPlayer() && !Character->IsDead() && ISceneActorInterface::Execute_IsVisible(Character);
+		return Character && !Character->IsPlayer() && !Character->IsDead() && ISceneActorInterface::Execute_IsVisible(Character) && UVoxelModuleStatics::GetVoxelWorldMode() == EVoxelWorldMode::Default;
 	}
 	return true;
 }

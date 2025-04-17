@@ -8,8 +8,8 @@
 #include "Gameplay/DWPlayerController.h"
 #include "Common/CommonStatics.h"
 #include "Main/MainModule.h"
+#include "Procedure/DWProcedure_Pausing.h"
 #include "Procedure/ProcedureModuleStatics.h"
-#include "Procedure/DWProcedure_Initializing.h"
 #include "Procedure/Archive/DWProcedure_ArchiveChoosing.h"
 #include "SaveGame/Archive/DWArchiveSaveGame.h"
 #include "SaveGame/SaveGameModuleStatics.h"
@@ -56,11 +56,11 @@ void UDWProcedure_Starting::OnEnter(UProcedureBase* InLastProcedure)
 
 	Super::OnEnter(InLastProcedure);
 
-	if(!InLastProcedure || InLastProcedure->IsA<UDWProcedure_Initializing>())
+	if(!InLastProcedure)
 	{
 		USaveGameModuleStatics::LoadOrCreateSaveGame<UDWArchiveSaveGame>(-1, EPhase::PrimaryAndLesser);
 	}
-	else
+	else if(InLastProcedure->IsA<UDWProcedure_Pausing>())
 	{
 		USaveGameModuleStatics::UnloadSaveGame<UDWArchiveSaveGame>(-1, EPhase::Lesser);
 	}

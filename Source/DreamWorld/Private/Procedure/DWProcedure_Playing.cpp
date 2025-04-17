@@ -42,7 +42,7 @@ void UDWProcedure_Playing::OnEnter(UProcedureBase* InLastProcedure)
 {
 	Super::OnEnter(InLastProcedure);
 
-	if(!InLastProcedure || InLastProcedure->IsA<UDWProcedure_Loading>())
+	if(InLastProcedure->IsA<UDWProcedure_Loading>())
 	{
 		AMainModule::UnPauseModuleByClass<USceneModule>();
 		

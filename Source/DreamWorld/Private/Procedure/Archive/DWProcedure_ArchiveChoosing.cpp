@@ -46,7 +46,7 @@ void UDWProcedure_ArchiveChoosing::OnInitialize()
 
 void UDWProcedure_ArchiveChoosing::OnEnter(UProcedureBase* InLastProcedure)
 {
-	if(InLastProcedure && InLastProcedure->IsA<UDWProcedure_Starting>())
+	if(InLastProcedure->IsA<UDWProcedure_Starting>())
 	{
 		CameraViewParams.CameraViewYaw = UCameraModuleStatics::GetCameraRotation().Yaw;
 	}

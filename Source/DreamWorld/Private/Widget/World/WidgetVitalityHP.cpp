@@ -4,6 +4,7 @@
 #include "Widget/World/WidgetVitalityHP.h"
 
 #include "Vitality/DWVitality.h"
+#include "Voxel/VoxelModuleStatics.h"
 
 UWidgetVitalityHP::UWidgetVitalityHP(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -26,7 +27,7 @@ bool UWidgetVitalityHP::IsWidgetVisible_Implementation(bool bRefresh)
 	if(bRefresh)
 	{
 		ADWVitality* Vitality = GetOwnerObject<ADWVitality>();
-		return Vitality && !Vitality->IsDead() && ISceneActorInterface::Execute_IsVisible(Vitality);
+		return Vitality && !Vitality->IsDead() && ISceneActorInterface::Execute_IsVisible(Vitality) && UVoxelModuleStatics::GetVoxelWorldMode() == EVoxelWorldMode::Default;
 	}
 	return true;
 }

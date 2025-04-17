@@ -102,15 +102,18 @@ void ADWPlayerController::UnloadData(EPhase InPhase)
 {
 	ADWPlayerCharacter* PlayerCharacter = GetPlayerPawn<ADWPlayerCharacter>();
 	
-	if(PlayerCharacter)
+	if(PHASEC(InPhase, EPhase::Primary))
 	{
-		if(PHASEC(InPhase, EPhase::Primary))
+		if(PlayerCharacter)
 		{
 			UObjectPoolModuleStatics::DespawnObject(PlayerCharacter);
 			SetPlayerPawn(nullptr);
 			UCharacterModuleStatics::SwitchCharacter(nullptr);
 		}
-		if(PHASEC(InPhase, EPhase::Lesser))
+	}
+	if(PHASEC(InPhase, EPhase::Lesser))
+	{
+		if(PlayerCharacter)
 		{
 			PlayerCharacter->Execute_SetActorVisible(PlayerCharacter, false);
 			PlayerCharacter->Execute_SetBlockAllInput(PlayerCharacter, true);

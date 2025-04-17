@@ -48,7 +48,7 @@ void UDWProcedure_Loading::OnEnter(UProcedureBase* InLastProcedure)
 	AMainModule::PauseModuleByClass<USceneModule>();
 	AMainModule::PauseModuleByClass<UCameraModule>();
 
-	UWidgetModuleStatics::OpenUserWidget<UWidgetLoadingPanel>({ FString(TEXT("生成世界中...")) });
+	UWidgetModuleStatics::OpenUserWidget<UWidgetLoadingPanel>({ TEXT("生成世界中..."), 3 });
 
 	UWidgetGameHUD* GameHUD = UWidgetModuleStatics::CreateUserWidget<UWidgetGameHUD>();
 
