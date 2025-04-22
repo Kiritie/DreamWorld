@@ -25,7 +25,6 @@
 #include "Common/DWCommonTypes.h"
 #include "Procedure/DWProcedure_Testing.h"
 #include "Scene/SceneModuleStatics.h"
-#include "Voxel/Voxels/Voxel.h"
 #include "Widget/Context/WidgetContextInputBox.h"
 #include "Widget/MaxMap/WidgetMaxMapBox.h"
 #include "Widget/Setting/WidgetSettingPanel.h"
@@ -287,7 +286,7 @@ void UDWInputManager::OnPrimaryPressed_Implementation()
 			FVoxelHitResult VoxelHitResult;
 			if(UVoxelModuleStatics::VoxelRaycastSinge(EVoxelRaycastType::FromAimPoint, PlayerCharacter->GetInteractDistance(), {}, VoxelHitResult))
 			{
-				PlayerCharacter->OnInteractVoxel(EInputInteractAction::Primary, EInputInteractEvent::Started, VoxelHitResult);
+				PlayerCharacter->InteractVoxel(EInputInteractAction::Primary, EInputInteractEvent::Started, VoxelHitResult);
 			}
 			break;
 		}
@@ -311,7 +310,7 @@ void UDWInputManager::OnPrimaryRepeated_Implementation()
 			FVoxelHitResult VoxelHitResult;
 			if(UVoxelModuleStatics::VoxelRaycastSinge(EVoxelRaycastType::FromAimPoint, PlayerCharacter->GetInteractDistance(), {}, VoxelHitResult))
 			{
-				PlayerCharacter->OnInteractVoxel(EInputInteractAction::Primary, EInputInteractEvent::Triggered, VoxelHitResult);
+				PlayerCharacter->InteractVoxel(EInputInteractAction::Primary, EInputInteractEvent::Triggered, VoxelHitResult);
 			}
 			break;
 		}
@@ -336,7 +335,11 @@ void UDWInputManager::OnPrimaryReleased_Implementation()
 			FVoxelHitResult VoxelHitResult;
 			if(UVoxelModuleStatics::VoxelRaycastSinge(EVoxelRaycastType::FromAimPoint, PlayerCharacter->GetInteractDistance(), {}, VoxelHitResult))
 			{
-				PlayerCharacter->OnInteractVoxel(EInputInteractAction::Primary, EInputInteractEvent::Completed, VoxelHitResult);
+				PlayerCharacter->InteractVoxel(EInputInteractAction::Primary, EInputInteractEvent::Completed, VoxelHitResult);
+			}
+			else
+			{
+				PlayerCharacter->UnInteractVoxel(EInputInteractAction::Primary, EInputInteractEvent::Completed);
 			}
 			break;
 		}
@@ -361,7 +364,7 @@ void UDWInputManager::OnSecondaryPressed_Implementation()
 			FVoxelHitResult VoxelHitResult;
 			if(UVoxelModuleStatics::VoxelRaycastSinge(EVoxelRaycastType::FromAimPoint, PlayerCharacter->GetInteractDistance(), {}, VoxelHitResult))
 			{
-				PlayerCharacter->OnInteractVoxel(EInputInteractAction::Secondary, EInputInteractEvent::Started, VoxelHitResult);
+				PlayerCharacter->InteractVoxel(EInputInteractAction::Secondary, EInputInteractEvent::Started, VoxelHitResult);
 			}
 			break;
 		}
@@ -385,7 +388,7 @@ void UDWInputManager::OnSecondaryRepeated_Implementation()
 			FVoxelHitResult VoxelHitResult;
 			if(UVoxelModuleStatics::VoxelRaycastSinge(EVoxelRaycastType::FromAimPoint, PlayerCharacter->GetInteractDistance(), {}, VoxelHitResult))
 			{
-				PlayerCharacter->OnInteractVoxel(EInputInteractAction::Secondary, EInputInteractEvent::Triggered, VoxelHitResult);
+				PlayerCharacter->InteractVoxel(EInputInteractAction::Secondary, EInputInteractEvent::Triggered, VoxelHitResult);
 			}
 			break;
 		}
@@ -410,7 +413,11 @@ void UDWInputManager::OnSecondaryReleased_Implementation()
 			FVoxelHitResult VoxelHitResult;
 			if(UVoxelModuleStatics::VoxelRaycastSinge(EVoxelRaycastType::FromAimPoint, PlayerCharacter->GetInteractDistance(), {}, VoxelHitResult))
 			{
-				PlayerCharacter->OnInteractVoxel(EInputInteractAction::Secondary, EInputInteractEvent::Completed, VoxelHitResult);
+				PlayerCharacter->InteractVoxel(EInputInteractAction::Secondary, EInputInteractEvent::Completed, VoxelHitResult);
+			}
+			else
+			{
+				PlayerCharacter->UnInteractVoxel(EInputInteractAction::Secondary, EInputInteractEvent::Completed);
 			}
 			break;
 		}
@@ -437,7 +444,7 @@ void UDWInputManager::OnThirdPressed_Implementation()
 			FVoxelHitResult VoxelHitResult;
 			if(UVoxelModuleStatics::VoxelRaycastSinge(EVoxelRaycastType::FromAimPoint, PlayerCharacter->GetInteractDistance(), {}, VoxelHitResult))
 			{
-				PlayerCharacter->OnInteractVoxel(EInputInteractAction::Third, EInputInteractEvent::Started, VoxelHitResult);
+				PlayerCharacter->InteractVoxel(EInputInteractAction::Third, EInputInteractEvent::Started, VoxelHitResult);
 			}
 			break;
 		}
@@ -461,7 +468,7 @@ void UDWInputManager::OnThirdRepeated_Implementation()
 			FVoxelHitResult VoxelHitResult;
 			if(UVoxelModuleStatics::VoxelRaycastSinge(EVoxelRaycastType::FromAimPoint, PlayerCharacter->GetInteractDistance(), {}, VoxelHitResult))
 			{
-				PlayerCharacter->OnInteractVoxel(EInputInteractAction::Third, EInputInteractEvent::Triggered, VoxelHitResult);
+				PlayerCharacter->InteractVoxel(EInputInteractAction::Third, EInputInteractEvent::Triggered, VoxelHitResult);
 			}
 			break;
 		}
@@ -486,7 +493,11 @@ void UDWInputManager::OnThirdReleased_Implementation()
 			FVoxelHitResult VoxelHitResult;
 			if(UVoxelModuleStatics::VoxelRaycastSinge(EVoxelRaycastType::FromAimPoint, PlayerCharacter->GetInteractDistance(), {}, VoxelHitResult))
 			{
-				PlayerCharacter->OnInteractVoxel(EInputInteractAction::Third, EInputInteractEvent::Completed, VoxelHitResult);
+				PlayerCharacter->InteractVoxel(EInputInteractAction::Third, EInputInteractEvent::Completed, VoxelHitResult);
+			}
+			else
+			{
+				PlayerCharacter->UnInteractVoxel(EInputInteractAction::Third, EInputInteractEvent::Completed);
 			}
 			break;
 		}

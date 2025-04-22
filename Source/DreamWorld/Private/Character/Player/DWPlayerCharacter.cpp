@@ -309,11 +309,6 @@ void ADWPlayerCharacter::OnInteract(EInteractAction InInteractAction, IInteracti
 	}
 }
 
-bool ADWPlayerCharacter::OnInteractVoxel(EInputInteractAction InInteractAction, EInputInteractEvent InInteractEvent, const FVoxelHitResult& InHitResult)
-{
-	return Super::OnInteractVoxel(InInteractAction, InInteractEvent, InHitResult);
-}
-
 void ADWPlayerCharacter::MoveForward_Implementation(float InValue)
 {
 	FVector Direction;

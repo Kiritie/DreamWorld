@@ -52,7 +52,7 @@ void UDWPlayerCharacterState_Spawn::TryLeave()
 	{
 		Super::TryLeave();
 	}
-	else if(UVoxelModule::Get().IsWorldBasicGenerated())
+	else if(UVoxelModule::Get().GetWorldGeneratePercent() >= 1.f)
 	{
 		ADWPlayerCharacter* PlayerCharacter = GetAgent<ADWPlayerCharacter>();
 		if(PlayerCharacter->GetActorLocation().Z <= 0.f)

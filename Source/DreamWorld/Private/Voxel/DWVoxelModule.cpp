@@ -100,7 +100,7 @@ void UDWVoxelModule::GenerateWorld()
 	if(BoundsMesh && ChunkGenerateIndex != EMPTY_Index)
 	{
 		BoundsMesh->SetActorLocation(ChunkIndexToLocation(ChunkGenerateIndex));
-		BoundsMesh->SetActorScale3D(WorldData->GetWorldRealSize() * 0.01f);
+		BoundsMesh->SetActorScale3D(FVector(WorldData->GetWorldRealSize().X, WorldData->GetWorldRealSize().Y, WorldData->GetWorldRealHeight()) * 0.01f);
 	}
 }
 

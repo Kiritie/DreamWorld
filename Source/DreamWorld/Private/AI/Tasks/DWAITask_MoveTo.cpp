@@ -71,7 +71,7 @@ void UDWAITask_MoveTo::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMe
 		{
 			const FVector Direction = GetAgent<ADWCharacter>()->GetActorLocation() - MoveTarget->GetActorLocation();
 			FVector RayStart = MoveTarget->GetActorLocation() + Direction.GetSafeNormal() * MoveDistance;
-			RayStart.Z = UVoxelModuleStatics::GetVoxelWorldData().GetWorldRealSize().Z;
+			RayStart.Z = UVoxelModuleStatics::GetVoxelWorldData().GetWorldRealHeight();
 			const FVector RayEnd = FVector(RayStart.X, RayStart.Y, 0);
 
 			FHitResult HitResult;

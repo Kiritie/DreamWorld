@@ -813,14 +813,10 @@ bool ADWCharacter::OnGenerateVoxel(EInputInteractEvent InInteractEvent, const FV
 		}
 		case EInputInteractEvent::Completed:
 		{
-			FItemQueryData ItemQueryData;
-			if(GenerateVoxelItem.IsValid())
+			FItemQueryData ItemQueryData = Inventory->QueryItemByRange(EItemQueryType::Remove, FAbilityItem(GenerateVoxelItem, 1), -1);
+			if(!ItemQueryData.IsValid() || !DoAction(GameplayTags::Ability_Character_Action_Generate))
 			{
-				ItemQueryData = Inventory->QueryItemByRange(EItemQueryType::Remove, FAbilityItem(GenerateVoxelItem, 1), -1);
-				if(!ItemQueryData.IsValid() || !bCanGenerateVoxel || !DoAction(GameplayTags::Ability_Character_Action_Generate))
-				{
-					GenerateVoxelItem = FVoxelItem::Empty;
-				}
+				bCanGenerateVoxel = false;
 			}
 			if(IVoxelAgentInterface::OnGenerateVoxel(InInteractEvent, InHitResult))
 			{

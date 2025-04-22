@@ -63,7 +63,7 @@ void UDWProcedure_Loading::OnRefresh()
 {
 	Super::OnRefresh();
 
-	if(UVoxelModule::Get().IsWorldBasicGenerated())
+	if(UVoxelModule::Get().GetWorldGeneratePercent() >= 1.f)
 	{
 		UProcedureModuleStatics::SwitchProcedureByClass<UDWProcedure_Playing>();
 	}
