@@ -64,6 +64,8 @@ protected:
 protected:
 	virtual void OnWorldStateChanged() override;
 
+	virtual void OnWorldCenterChanged() override;
+
 protected:
 	virtual void GenerateWorld() override;
 

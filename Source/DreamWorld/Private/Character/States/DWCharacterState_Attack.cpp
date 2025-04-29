@@ -145,7 +145,7 @@ void UDWCharacterState_Attack::AttackStart()
 		{
 			if(Character->SkillAttackAbilityItem.GetData<UAbilitySkillDataBase>().ProjectileClass)
 			{
-				Character->AttackProjectile = UAbilityModuleStatics::SpawnAbilityProjectile(Character->SkillAttackAbilityItem.GetData<UAbilitySkillDataBase>().ProjectileClass, Character, Character->SkillAttackAbilityItem.AbilityHandle);
+				Character->AttackProjectile = UAbilityModuleStatics::SpawnAbilityProjectile(Character->SkillAttackAbilityItem.GetData<UAbilitySkillDataBase>().ProjectileClass, Character, Character->SkillAttackAbilityItem.Handle);
 				Character->AttackProjectile->Launch(Character->GetLooking()->GetLookingTarget() ? Character->GetLooking()->GetLookingRotation().Vector() :
 					(Character->IsPlayer() ? UCameraModuleStatics::GetCameraRotation(true).Vector() : FVector::ZeroVector));
 			}

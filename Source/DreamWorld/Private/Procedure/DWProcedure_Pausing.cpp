@@ -5,7 +5,7 @@
 
 #include "Common/CommonStatics.h"
 #include "Procedure/DWProcedure_Starting.h"
-#include "Widget/WidgetGameHUD.h"
+#include "Widget/Main/WidgetGameHUD.h"
 #include "Widget/WidgetModuleStatics.h"
 #include "Widget/Inventory/WidgetInventoryBar.h"
 #include "Widget/Menu/WidgetPausingMenu.h"

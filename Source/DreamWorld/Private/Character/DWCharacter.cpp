@@ -54,6 +54,7 @@
 #include "Common/DWCommonStatics.h"
 #include "Inventory/Slot/DWInventoryEquipSlot.h"
 #include "Item/Skill/DWSkillData.h"
+#include "Item/Talent/DWTalentData.h"
 #include "Voxel/Voxels/Data/VoxelData.h"
 #include "Voxel/Voxels/Auxiliary/VoxelInteractAuxiliary.h"
 #include "Widget/Common/WidgetProgressBox.h"
@@ -104,6 +105,9 @@ ADWCharacter::ADWCharacter(const FObjectInitializer& ObjectInitializer) :
 	ControlMode = EDWCharacterControlMode::Fighting;
 	WeaponGroup = EDWWeaponGroup::Group1;
 	TeamID = NAME_None;
+
+	TalentPoint = 0;
+	TalentItems = TArray<FAbilityItems>();
 	
 	Equips = TMap<EDWEquipPart, ADWEquip*>();
 
@@ -275,6 +279,18 @@ void ADWCharacter::LoadData(FSaveData* InSaveData, EPhase InPhase)
 		SetWeaponGroup(SaveData.WeaponGroup);
 		SetTeamID(SaveData.TeamID);
 
+		SetTalentPoint(SaveData.TalentPoint);
+		SetTalentItems(SaveData.TalentItems);
+
+		for(auto& Iter1 : TalentItems)
+		{
+			for(auto& Iter2 : Iter1.Items)
+			{
+				Iter2.Handle = AbilitySystem->K2_GiveAbility(Iter2.GetData().AbilityClass, Iter2.Level);
+				AbilitySystem->TryActivateAbility(Iter2.Handle);
+			}			
+		}
+
 		if(!SaveData.IsSaved())
 		{
 			const UDWCharacterData& CharacterData = GetCharacterData<UDWCharacterData>();
@@ -344,6 +360,8 @@ FSaveData* ADWCharacter::ToData()
 	SaveData.TeamID = TeamID;
 	SaveData.ControlMode = ControlMode;
 	SaveData.WeaponGroup = WeaponGroup;
+	SaveData.TalentPoint = TalentPoint;
+	SaveData.TalentItems = TalentItems;
 
 	SaveData.FallingAttackAbilities = FallingAttackAbilities;
 	SaveData.AttackAbilityQueues = AttackAbilityQueues;
@@ -1283,7 +1301,11 @@ void ADWCharacter::SetRaceID(FName InRaceID)
 
 bool ADWCharacter::SetLevelA(int32 InLevel)
 {
+	const int32 _level = Level;
+	
 	if(!Super::SetLevelA(InLevel)) return false;
+
+	TalentPoint += Level - _level;
 
 	if(GetCharacterHPWidget())
 	{

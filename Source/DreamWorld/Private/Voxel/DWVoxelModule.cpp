@@ -93,15 +93,20 @@ void UDWVoxelModule::OnWorldStateChanged()
 	Super::OnWorldStateChanged();
 }
 
-void UDWVoxelModule::GenerateWorld()
+void UDWVoxelModule::OnWorldCenterChanged()
 {
-	Super::GenerateWorld();
+	Super::OnWorldCenterChanged();
 
 	if(BoundsMesh && ChunkGenerateIndex != EMPTY_Index)
 	{
 		BoundsMesh->SetActorLocation(ChunkIndexToLocation(ChunkGenerateIndex));
-		BoundsMesh->SetActorScale3D(FVector(WorldData->GetWorldRealSize().X, WorldData->GetWorldRealSize().Y, WorldData->GetWorldRealHeight()) * 0.01f);
+		BoundsMesh->SetActorScale3D(FVector(WorldData->GetWorldRealSize().X, WorldData->GetWorldRealSize().Y, WorldData->GetWorldRealHeight() * 0.5f) * 0.01f);
 	}
+}
+
+void UDWVoxelModule::GenerateWorld()
+{
+	Super::GenerateWorld();
 }
 
 void UDWVoxelModule::BuildChunkMap(FIndex InIndex, int32 InStage)

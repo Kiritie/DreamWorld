@@ -144,7 +144,7 @@ void UWidgetInventorySlot::OnTick_Implementation(float DeltaSeconds)
 		const auto& ItemData = GetItem().GetData();
 		if(ImgError)
 		{
-			ImgError->SetVisibility(ItemData.GetItemErrorInfo(GetOwnerWidget<UUserWidgetBase>()->GetOwnerObject<AActor>()).IsEmpty() ? ESlateVisibility::Hidden : ESlateVisibility::Visible);
+			ImgError->SetVisibility(ItemData.GetItemErrorInfo(GetItem()).IsEmpty() ? ESlateVisibility::Hidden : ESlateVisibility::Visible);
 		}
 	}
 }

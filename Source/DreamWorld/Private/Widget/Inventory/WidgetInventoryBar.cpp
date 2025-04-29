@@ -15,7 +15,7 @@
 #include "Ability/Inventory/Slot/AbilityInventorySlotBase.h"
 #include "Asset/AssetModuleStatics.h"
 #include "Widget/WidgetModuleStatics.h"
-#include "Widget/WidgetGameHUD.h"
+#include "Widget/Main/WidgetGameHUD.h"
 #include "Widget/Inventory/Slot/WidgetInventoryAuxiliarySlot.h"
 #include "Widget/Inventory/Slot/WidgetInventoryShortcutSlot.h"
 #include "Widget/Inventory/Slot/WidgetInventorySkillSlot.h"

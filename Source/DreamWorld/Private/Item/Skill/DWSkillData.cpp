@@ -1,5 +1,7 @@
 #include "Item/Skill/DWSkillData.h"
 
+#include "Ability/Inventory/AbilityInventoryBase.h"
+#include "Ability/Inventory/Slot/AbilityInventorySlotBase.h"
 #include "Character/DWCharacter.h"
 #include "Common/CommonStatics.h"
 
@@ -13,18 +15,19 @@ UDWSkillData::UDWSkillData()
 	bCancelAble = false;
 }
 
-FString UDWSkillData::GetItemErrorInfo(AActor* InOwner, int32 InLevel) const
+FString UDWSkillData::GetItemErrorInfo(FAbilityItem InItem) const
 {
-	FString ErrorInfo = Super::GetItemErrorInfo(InOwner, InLevel);
-
-	if(ADWCharacter* Character = Cast<ADWCharacter>(InOwner))
+	FString ErrorInfo = Super::GetItemErrorInfo(InItem);
+	if(UAbilityInventorySlotBase* InventorySlot = InItem.GetPayload<UAbilityInventorySlotBase>())
 	{
-		if(!Character->CheckWeaponType(WeaponPart, WeaponType))
+		if(ADWCharacter* Character = InventorySlot->GetInventory()->GetOwnerAgent<ADWCharacter>())
 		{
-			ErrorInfo.Appendf(TEXT("\n角色未装备[%s]"), *UCommonStatics::GetEnumDisplayNameByValue(TEXT("/Script/DreamWorld.EDWWeaponType"), (int32)WeaponType).ToString());
+			if(!Character->CheckWeaponType(WeaponPart, WeaponType))
+			{
+				ErrorInfo.Appendf(TEXT("\n角色未装备[%s]"), *UCommonStatics::GetEnumDisplayNameByValue(TEXT("/Script/DreamWorld.EDWWeaponType"), (int32)WeaponType).ToString());
+			}
+			ErrorInfo.RemoveFromStart(TEXT("\n"));
 		}
 	}
-	ErrorInfo.RemoveFromStart(TEXT("\n"));
-	
 	return ErrorInfo;
 }

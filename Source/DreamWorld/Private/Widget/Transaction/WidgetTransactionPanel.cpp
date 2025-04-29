@@ -478,9 +478,9 @@ void UWidgetTransactionPanel::OnTransactionButtonClicked()
 					FAbilityItem _SelectedTransactionItem;
 					if(GetSelectedTransactionItem(_SelectedTransactionItem, bCanTransaction))
 					{
-						if(_SelectedTransactionItem.InventorySlot)
+						if(_SelectedTransactionItem.GetPayload<UAbilityInventorySlotBase>())
 						{
-							_SelectedTransactionItem.InventorySlot->SetItem(_SelectedTransactionItem);
+							_SelectedTransactionItem.GetPayload<UAbilityInventorySlotBase>()->SetItem(_SelectedTransactionItem);
 						}
 						OnTransactionContentRefresh();
 					}

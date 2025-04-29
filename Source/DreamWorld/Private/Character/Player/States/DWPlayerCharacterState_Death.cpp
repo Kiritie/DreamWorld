@@ -6,7 +6,7 @@
 #include "Character/Player/DWPlayerCharacter.h"
 #include "Common/Targeting/TargetingComponent.h"
 #include "Input/InputModule.h"
-#include "Widget/WidgetGameHUD.h"
+#include "Widget/Main/WidgetGameHUD.h"
 #include "Widget/WidgetModuleStatics.h"
 
 UDWPlayerCharacterState_Death::UDWPlayerCharacterState_Death()

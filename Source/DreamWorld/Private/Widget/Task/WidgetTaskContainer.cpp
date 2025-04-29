@@ -2,7 +2,6 @@
 
 #include "Widget/Task/WidgetTaskContainer.h"
 
-#include "Components/VerticalBox.h"
 #include "Widget/Task/WidgetTaskItem.h"
 
 UWidgetTaskContainer::UWidgetTaskContainer(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)

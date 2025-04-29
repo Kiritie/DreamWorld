@@ -4,6 +4,7 @@
 #include "Procedure/Archive/DWProcedure_ArchiveCreating.h"
 
 #include "Camera/CameraModuleStatics.h"
+#include "Character/DWCharacterData.h"
 #include "Character/Player/DWPlayerCharacter.h"
 #include "Gameplay/DWPlayerController.h"
 #include "Common/CommonStatics.h"
@@ -127,6 +128,7 @@ FDWPlayerSaveData& UDWProcedure_ArchiveCreating::GetPlayerData() const
 {
 	static FDWPlayerSaveData SaveData;
 	SaveData = PlayerSaveData;
+	SaveData.InitTalentData();
 	SaveData.InitInventoryData();
 	return SaveData;
 }

@@ -29,6 +29,7 @@
 #include "Widget/MaxMap/WidgetMaxMapBox.h"
 #include "Widget/Setting/WidgetSettingPanel.h"
 #include "Widget/Switcher/WidgetSwitcherPanel.h"
+#include "Widget/Talent/WidgetTalentPanel.h"
 #include "Widget/Task/WidgetTaskPanel.h"
 
 // ParamSets default values
@@ -170,6 +171,7 @@ void UDWInputManager::OnBindAction(UInputComponentBase* InInputComponent)
 	InInputComponent->BindInputAction(GameplayTags::Input_OpenTaskPanel, ETriggerEvent::Started, this, &UDWInputManager::OpenTaskPanel);
 	InInputComponent->BindInputAction(GameplayTags::Input_OpenContextInputBox, ETriggerEvent::Started, this, &UDWInputManager::OpenContextInputBox);
 	InInputComponent->BindInputAction(GameplayTags::Input_OpenSwitcherPanel, ETriggerEvent::Started, this, &UDWInputManager::OpenSwitcherPanel);
+	InInputComponent->BindInputAction(GameplayTags::Input_OpenTalentPanel, ETriggerEvent::Started, this, &UDWInputManager::OpenTalentPanel);
 }
 
 void UDWInputManager::OnTurnCamera_Implementation(const FInputActionValue& InValue)
@@ -913,4 +915,13 @@ void UDWInputManager::OpenSwitcherPanel()
 	if(!PlayerCharacter || !PlayerCharacter->IsActive() || PlayerCharacter->Execute_IsBlockAllInput(PlayerCharacter)) return;
 	
 	UWidgetModuleStatics::OpenUserWidget<UWidgetSwitcherPanel>();
+}
+
+void UDWInputManager::OpenTalentPanel()
+{
+	ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>(LocalPlayerIndex);
+	
+	if(!PlayerCharacter || !PlayerCharacter->IsActive() || PlayerCharacter->Execute_IsBlockAllInput(PlayerCharacter)) return;
+	
+	UWidgetModuleStatics::OpenUserWidget<UWidgetTalentPanel>();
 }

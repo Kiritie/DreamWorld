@@ -240,6 +240,12 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "CharacterStats")
 	bool bHitAble;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "CharacterStats")
+	int32 TalentPoint;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "CharacterStats")
+	TArray<FAbilityItems> TalentItems;
+
 protected:
 	float AIMoveStopDistance;
 
@@ -403,6 +409,18 @@ public:
 	UFUNCTION(BlueprintPure)
 	EDWCharacterNature GetNature() const;
 
+	UFUNCTION(BlueprintPure)
+	int32 GetTalentPoint() const { return TalentPoint; }
+
+	UFUNCTION(BlueprintCallable)
+	void SetTalentPoint(int32 InTalentPoint) { TalentPoint = InTalentPoint; }
+
+	UFUNCTION(BlueprintPure)
+	TArray<FAbilityItems> GetTalentItems() const { return TalentItems; }
+
+	UFUNCTION(BlueprintCallable)
+	void SetTalentItems(const TArray<FAbilityItems>& InTalentItems) { TalentItems = InTalentItems; }
+	
 	UFUNCTION(BlueprintPure)
 	float GetAttackDistance() const;
 	

@@ -25,6 +25,7 @@ AActor* ADWPlayerSpawner::SpawnImpl_Implementation(const FAbilityItem& InAbility
 	SaveData.SpawnTransform = GetActorTransform();
 	SaveData.InventoryData = CharacterData.InventoryData;
 	SaveData.InventoryInitType = InventoryInitType;
+	SaveData.InitTalentData();
 
 	ADWPlayerController* PlayerController = UCommonStatics::GetPlayerController<ADWPlayerController>();
 	PlayerController->LoadSaveData(&SaveData, EPhase::PrimaryAndFinal);

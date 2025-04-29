@@ -15,6 +15,12 @@
 #include "ObjectPool/ObjectPoolModuleStatics.h"
 #include "Voxel/Voxels/Data/VoxelData.h"
 
+void FDWCharacterSaveData::InitTalentData()
+{
+	TalentPoint = Level;
+	TalentItems = GetData<UDWCharacterData>().TalentItems;
+}
+
 void FDWCharacterSaveData::InitDialogueData(FRandomStream InRandomStream)
 {
 	Dialogue = GetData<UDWCharacterData>().GetRandomDialogue();
@@ -242,6 +248,7 @@ namespace GameplayTags
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Input_OpenTaskPanel, "Input.System.OpenTaskPanel", "Open Task Panel");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Input_OpenContextInputBox, "Input.System.OpenContextInputBox", "Open Context Input Box");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Input_OpenSwitcherPanel, "Input.System.OpenSwitcherPanel", "Open Switcher Panel");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Input_OpenTalentPanel, "Input.System.OpenTalentPanel", "Open Talent Panel");
 
 	////////////////////////////////////////////////////
 	// State_Character

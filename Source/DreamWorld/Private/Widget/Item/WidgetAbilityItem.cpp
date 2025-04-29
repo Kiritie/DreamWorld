@@ -29,8 +29,14 @@ void UWidgetAbilityItem::OnRefresh()
 	if(Item.IsValid())
 	{
 		const auto& ItemData = Item.GetData();
-		ImgIcon->SetBrushResourceObject(ItemData.Icon);
-		TxtName->SetText(ItemData.Name);
+		if(ImgIcon)
+		{
+			ImgIcon->SetBrushResourceObject(ItemData.Icon);
+		}
+		if(TxtName)
+		{
+			TxtName->SetText(ItemData.Name);
+		}
 	}
 }
 

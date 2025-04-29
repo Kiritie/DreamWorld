@@ -6,6 +6,7 @@
 
 #include "WidgetAbilityItemInfo.generated.h"
 
+class UHorizontalBox;
 class UTextBlock;
 
 /**
@@ -29,6 +30,9 @@ public:
 	virtual void OnDestroy(bool bRecovery) override;
 
 protected:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (BindWidget, OptionalWidget = false), Category = "Components")
+	UHorizontalBox* TitleBox;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (BindWidget, OptionalWidget = false), Category = "Components")
 	UTextBlock* TxtName;
 

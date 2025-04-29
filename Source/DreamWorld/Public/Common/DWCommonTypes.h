@@ -384,7 +384,7 @@ public:
 	int32 AbilityLevel;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TSubclassOf<UGameplayEffect> EffectClass;
+	TSubclassOf<UEffectBase> EffectClass;
 
 	FActiveGameplayEffectHandle EffectHandle;
 
@@ -424,6 +424,8 @@ public:
 		TeamID = NAME_None;
 		ControlMode = EDWCharacterControlMode::Fighting;
 		WeaponGroup = EDWWeaponGroup::Group1;
+		TalentPoint = 1;
+		TalentItems = TArray<FAbilityItems>();
 		AttackAbilityQueues = TMap<EDWWeaponType, FDWCharacterAttackAbilityQueue>();
 		FallingAttackAbilities = TMap<EDWWeaponType, FDWCharacterFallingAttackAbilityData>();
 		SkillAttackAbilities = TMap<FPrimaryAssetId, FDWCharacterSkillAttackAbilityData>();
@@ -435,6 +437,8 @@ public:
 		TeamID = NAME_None;
 		ControlMode = EDWCharacterControlMode::Fighting;
 		WeaponGroup = EDWWeaponGroup::Group1;
+		TalentPoint = 1;
+		TalentItems = TArray<FAbilityItems>();
 		AttackAbilityQueues = TMap<EDWWeaponType, FDWCharacterAttackAbilityQueue>();
 		FallingAttackAbilities = TMap<EDWWeaponType, FDWCharacterFallingAttackAbilityData>();
 		SkillAttackAbilities = TMap<FPrimaryAssetId, FDWCharacterSkillAttackAbilityData>();
@@ -442,6 +446,8 @@ public:
 	}
 
 public:
+	virtual void InitTalentData();
+
 	virtual void InitDialogueData(FRandomStream InRandomStream = FRandomStream());
 
 public:
@@ -453,6 +459,12 @@ public:
 
 	UPROPERTY()
 	EDWWeaponGroup WeaponGroup;
+
+	UPROPERTY()
+	int32 TalentPoint;
+
+	UPROPERTY()
+	TArray<FAbilityItems> TalentItems;
 
 	UPROPERTY()
 	TMap<EDWWeaponType, FDWCharacterAttackAbilityQueue> AttackAbilityQueues;
@@ -951,6 +963,7 @@ namespace GameplayTags
 	DREAMWORLD_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_OpenTaskPanel);
 	DREAMWORLD_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_OpenContextInputBox);
 	DREAMWORLD_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_OpenSwitcherPanel);
+	DREAMWORLD_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_OpenTalentPanel);
 
 	////////////////////////////////////////////////////
 	// State_Character

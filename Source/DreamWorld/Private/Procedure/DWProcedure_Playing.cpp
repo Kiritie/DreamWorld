@@ -11,7 +11,7 @@
 #include "Procedure/DWProcedure_Loading.h"
 #include "Procedure/DWProcedure_Starting.h"
 #include "Scene/SceneModule.h"
-#include "Widget/WidgetGameHUD.h"
+#include "Widget/Main/WidgetGameHUD.h"
 #include "Widget/WidgetModuleStatics.h"
 #include "Widget/Context/WidgetContextBox.h"
 

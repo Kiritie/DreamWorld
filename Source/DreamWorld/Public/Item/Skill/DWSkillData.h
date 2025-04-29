@@ -28,5 +28,5 @@ public:
 	bool bCancelAble;
 
 public:
-	virtual FString GetItemErrorInfo(AActor* InOwner, int32 InLevel) const override;
+	virtual FString GetItemErrorInfo(FAbilityItem InItem) const override;
 };

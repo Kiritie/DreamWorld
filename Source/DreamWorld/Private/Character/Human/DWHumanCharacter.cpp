@@ -158,7 +158,7 @@ void ADWHumanCharacter::OnPreChangeItem(const FAbilityItem& InOldItem)
 {
 	Super::OnPreChangeItem(InOldItem);
 
-	if(InOldItem.IsValid() && InOldItem.InventorySlot->IsMatched())
+	if(InOldItem.IsValid() && InOldItem.GetPayload<UAbilityInventorySlotBase>()->IsMatched())
 	{
 		const auto& ItemData = InOldItem.GetData<UAbilityItemDataBase>();
 		switch(ItemData.GetItemType())
@@ -183,7 +183,7 @@ void ADWHumanCharacter::OnChangeItem(const FAbilityItem& InNewItem)
 {
 	Super::OnChangeItem(InNewItem);
 
-	if(InNewItem.IsValid() && InNewItem.InventorySlot->IsMatched())
+	if(InNewItem.IsValid() && InNewItem.GetPayload<UAbilityInventorySlotBase>()->IsMatched())
 	{
 		const auto& ItemData = InNewItem.GetData<UAbilityItemDataBase>();
 		switch(ItemData.GetItemType())
@@ -218,7 +218,7 @@ void ADWHumanCharacter::OnSelectItem(const FAbilityItem& InItem)
 {
 	Super::OnSelectItem(InItem);
 
-	if(InItem.InventorySlot->GetSplitType() == ESlotSplitType::Shortcut)
+	if(InItem.GetPayload<UAbilityInventorySlotBase>()->GetSplitType() == ESlotSplitType::Shortcut)
 	{
 		if(InItem.IsValid() && InItem.GetType() == EAbilityItemType::Voxel)
 		{

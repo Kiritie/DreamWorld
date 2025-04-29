@@ -59,7 +59,7 @@ bool UDWInventoryEquipSlot::MatchItemLimit(FAbilityItem InItem, bool bForce) con
 		{
 			EDWEquipPart OtherPart = UDWCommonStatics::GetMatchedWeaponPart(EquipPart);
 			UAbilityInventorySlotBase* OtherSlot = Inventory->GetSlotBySplitTypeAndIndex(ESlotSplitType::Equip, (int32)OtherPart);
-			if(OtherSlot != InItem.InventorySlot)
+			if(OtherSlot != InItem.GetPayload<UAbilityInventorySlotBase>())
 			{
 				if(InItem.GetData<UDWEquipWeaponData>().WeaponHand == EDWWeaponHand::Both)
 				{

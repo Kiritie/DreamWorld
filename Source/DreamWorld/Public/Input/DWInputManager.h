@@ -177,6 +177,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual void OpenSwitcherPanel();
 
+	UFUNCTION(BlueprintCallable)
+	virtual void OpenTalentPanel();
+
 protected:
 	UPROPERTY(VisibleAnywhere)
 	bool bPrimaryPressed;

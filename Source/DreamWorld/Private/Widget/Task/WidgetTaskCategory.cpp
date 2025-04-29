@@ -5,7 +5,6 @@
 #include "Components/TextBlock.h"
 #include "Widget/Task/WidgetTaskContainer.h"
 #include "Widget/Task/WidgetTaskItem.h"
-#include "Widget/Task/WidgetTaskPanel.h"
 
 UWidgetTaskCategory::UWidgetTaskCategory(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {

@@ -37,6 +37,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float PatrolDuration;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<FAbilityItems> TalentItems;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TMap<EDWWeaponType, FDWCharacterAttackAbilities> AttackAbilities;
 

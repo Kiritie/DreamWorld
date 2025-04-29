@@ -73,6 +73,7 @@ FDWPlayerBasicSaveData& UDWCharacterModule::GetPlayerBasicData()
 	{
 		PlayerBasicData.AssetID = PlayerRaceData.Items[0].ID;
 		PlayerBasicData.Level = PlayerRaceData.Items[0].Level;
+		PlayerBasicData.InitTalentData();
 	}
 	PlayerBasicData.InitInventoryData();
 	return PlayerBasicData;

@@ -14,7 +14,7 @@
 #include "Scene/SceneModule.h"
 #include "Voxel/DWVoxelModule.h"
 #include "Voxel/VoxelModuleStatics.h"
-#include "Widget/WidgetGameHUD.h"
+#include "Widget/Main/WidgetGameHUD.h"
 #include "Widget/WidgetModuleStatics.h"
 #include "Widget/Loading/WidgetLoadingPanel.h"
 

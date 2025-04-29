@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Widget/WidgetGameHUD.h"
+#include "Widget/Main/WidgetGameHUD.h"
 
 #include "Character/DWCharacter.h"
 #include "Event/EventModuleStatics.h"
@@ -21,7 +21,7 @@ void UWidgetGameHUD::OnCreate(UObject* InOwner, const TArray<FParameter>& InPara
 {
 	Super::OnCreate(InOwner, InParams);
 
-	UEventModuleStatics::SubscribeEvent(UEventHandle_InputModeChanged::StaticClass(), this, FName("OnInputModeChanged"));
+	UEventModuleStatics::SubscribeEvent<UEventHandle_InputModeChanged>(this, GET_FUNCTION_NAME_THISCLASS(OnInputModeChanged));
 }
 
 void UWidgetGameHUD::OnInitialize(UObject* InOwner, const TArray<FParameter>& InParams)

@@ -5,7 +5,7 @@
 
 #include "Ability/Spawner/DWPlayerSpawner.h"
 #include "Procedure/DWProcedure_Loading.h"
-#include "Widget/WidgetGameHUD.h"
+#include "Widget/Main/WidgetGameHUD.h"
 #include "Widget/WidgetModuleStatics.h"
 
 UDWProcedure_Testing::UDWProcedure_Testing()
