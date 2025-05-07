@@ -767,7 +767,28 @@ public:
 };
 
 USTRUCT(BlueprintType)
-struct DREAMWORLD_API FDWSettingModuleSaveData : public FSettingModuleSaveData
+struct DREAMWORLD_API FDWVideoModuleSaveData : public FVideoModuleSaveData
+{
+	GENERATED_BODY()
+
+public:
+	FORCEINLINE FDWVideoModuleSaveData()
+	{
+		VoxelWorldRange = 15.f;
+	}
+	
+	FORCEINLINE FDWVideoModuleSaveData(const FVideoModuleSaveData& InVideoModuleSaveData) : FVideoModuleSaveData(InVideoModuleSaveData)
+	{
+		VoxelWorldRange = 15.f;
+	}
+
+public:
+	UPROPERTY()
+	float VoxelWorldRange;
+};
+
+USTRUCT(BlueprintType)
+struct DREAMWORLD_API FDWSettingModuleSaveData : public FSaveData
 {
 	GENERATED_BODY()
 
@@ -775,16 +796,48 @@ public:
 	FORCEINLINE FDWSettingModuleSaveData()
 	{
 		GameData = FDWGameSaveData();
+		
+		WidgetData = FWidgetModuleSaveData();
+		AudioData = FAudioModuleSaveData();
+		VideoData = FDWVideoModuleSaveData();
+		CameraData = FCameraModuleSaveData();
+		InputData = FInputModuleSaveData();
+		ParameterData = FParameterModuleSaveData();
 	}
 
-	FORCEINLINE FDWSettingModuleSaveData(const FSettingModuleSaveData& InSettingModuleSaveData) : FSettingModuleSaveData(InSettingModuleSaveData)
+	FORCEINLINE FDWSettingModuleSaveData(const FSettingModuleSaveData& InSettingModuleSaveData)
 	{
 		GameData = FDWGameSaveData();
+		
+		WidgetData = InSettingModuleSaveData.WidgetData;
+		AudioData = InSettingModuleSaveData.AudioData;
+		VideoData = InSettingModuleSaveData.VideoData;
+		CameraData = InSettingModuleSaveData.CameraData;
+		InputData = InSettingModuleSaveData.InputData;
+		ParameterData = InSettingModuleSaveData.ParameterData;
 	}
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FDWGameSaveData GameData;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FWidgetModuleSaveData WidgetData;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FAudioModuleSaveData AudioData;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FDWVideoModuleSaveData VideoData;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FCameraModuleSaveData CameraData;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FInputModuleSaveData InputData;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FParameterModuleSaveData ParameterData;
 
 public:
 	virtual void MakeSaved() override
@@ -792,6 +845,12 @@ public:
 		Super::MakeSaved();
 		
 		GameData.MakeSaved();
+		WidgetData.MakeSaved();
+		AudioData.MakeSaved();
+		VideoData.MakeSaved();
+		CameraData.MakeSaved();
+		InputData.MakeSaved();
+		ParameterData.MakeSaved();
 	}
 };
 
