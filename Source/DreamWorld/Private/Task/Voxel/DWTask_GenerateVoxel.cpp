@@ -68,15 +68,13 @@ void UDWTask_GenerateVoxel::OnExecute()
 void UDWTask_GenerateVoxel::OnComplete(ETaskExecuteResult InTaskExecuteResult)
 {
 	Super::OnComplete(InTaskExecuteResult);
-
-	UEventModuleStatics::UnsubscribeEvent<UEventHandle_VoxelGenerated>(this, GET_FUNCTION_NAME_THISCLASS(OnVoxelGenerated));
 }
 
 void UDWTask_GenerateVoxel::OnLeave()
 {
 	Super::OnLeave();
 
-	UEventModuleStatics::UnsubscribeEvent<UEventHandle_VoxelGenerated>(this, GET_FUNCTION_NAME_CHECKED(UDWTask_GenerateVoxel, OnVoxelGenerated));
+	UEventModuleStatics::UnsubscribeEvent<UEventHandle_VoxelGenerated>(this, GET_FUNCTION_NAME_THISCLASS(OnVoxelGenerated));
 }
 
 void UDWTask_GenerateVoxel::Serialize(FArchive& Ar)

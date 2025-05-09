@@ -6,7 +6,6 @@
 #include "Task/Base/DWTaskBase.h"
 #include "DWTask_LevelUp.generated.h"
 
-class UEventHandle_VoxelDestroyed;
 /**
  * 
  */

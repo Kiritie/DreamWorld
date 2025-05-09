@@ -110,7 +110,7 @@ protected:
 
 public:
 	UFUNCTION(BlueprintPure)
-	int32 GetSelectedGenerateNum() const;
+	int32 GetSelectedGenerateNum(bool bReal = false) const;
 
 	UFUNCTION(BlueprintPure)
 	bool GetSelectedGenerateItemData(FDWGenerateItemData& OutItemData) const;

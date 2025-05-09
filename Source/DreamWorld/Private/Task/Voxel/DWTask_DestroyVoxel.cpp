@@ -68,8 +68,6 @@ void UDWTask_DestroyVoxel::OnExecute()
 void UDWTask_DestroyVoxel::OnComplete(ETaskExecuteResult InTaskExecuteResult)
 {
 	Super::OnComplete(InTaskExecuteResult);
-
-	UEventModuleStatics::UnsubscribeEvent<UEventHandle_VoxelDestroyed>(this, GET_FUNCTION_NAME_THISCLASS(OnVoxelDestroyed));
 }
 
 void UDWTask_DestroyVoxel::OnLeave()

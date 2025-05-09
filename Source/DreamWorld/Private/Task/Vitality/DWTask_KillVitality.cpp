@@ -68,8 +68,6 @@ void UDWTask_KillVitality::OnExecute()
 void UDWTask_KillVitality::OnComplete(ETaskExecuteResult InTaskExecuteResult)
 {
 	Super::OnComplete(InTaskExecuteResult);
-
-	UEventModuleStatics::UnsubscribeEvent<UEventHandle_VitalityDead>(this, GET_FUNCTION_NAME_THISCLASS(OnVitalityDead));
 }
 
 void UDWTask_KillVitality::OnLeave()
