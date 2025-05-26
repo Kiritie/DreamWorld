@@ -28,7 +28,11 @@ void UWidgetTransactionItem::OnDespawn_Implementation(bool bRecovery)
 
 void UWidgetTransactionItem::OnInitialize(const TArray<FParameter>& InParams)
 {
-	Super::OnInitialize(InParams);
+	if(InParams.IsValidIndex(0))
+	{
+		Item = InParams[0].GetPointerValueRef<FAbilityItem>();
+	}
+	USubButtonWidgetBase::OnInitialize(InParams);
 }
 
 void UWidgetTransactionItem::OnRefresh()

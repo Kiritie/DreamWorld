@@ -41,7 +41,11 @@ void UDWAIService_QueryDefendPath::TickNode(UBehaviorTreeComponent& OwnerComp, u
 
 	if (!InitService(OwnerComp)) return;
 
-	RefreshDefendLocation(OwnerComp);
+	const float DefendDistance = DefendTarget->GetAttackDistance() + DefendDistanceOffset;
+	
+	const FVector DefendLocation = DefendTarget->GetActorLocation() + (GetAgent<ADWCharacter>()->GetDistance(DefendTarget, false, false) < DefendDistance ? (-GetAgent<ADWCharacter>()->GetActorForwardVector()) * DefendDistance : FVector::ZeroVector);
+
+	OwnerComp.GetBlackboardComponent()->SetValueAsVector(DefendLocationKey.SelectedKeyName, DefendLocation);
 }
 
 void UDWAIService_QueryDefendPath::OnSearchStart(FBehaviorTreeSearchData& SearchData)
@@ -54,8 +58,6 @@ void UDWAIService_QueryDefendPath::OnBecomeRelevant(UBehaviorTreeComponent& Owne
 	Super::OnBecomeRelevant(OwnerComp, NodeMemory);
 
 	if (!InitService(OwnerComp)) return;
-
-	RefreshDefendLocation(OwnerComp);
 }
 
 void UDWAIService_QueryDefendPath::OnCeaseRelevant(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
@@ -63,13 +65,4 @@ void UDWAIService_QueryDefendPath::OnCeaseRelevant(UBehaviorTreeComponent& Owner
 	Super::OnCeaseRelevant(OwnerComp, NodeMemory);
 
 	if (!InitService(OwnerComp)) return;
-}
-
-void UDWAIService_QueryDefendPath::RefreshDefendLocation(UBehaviorTreeComponent& OwnerComp)
-{
-	const float DefendDistance = DefendTarget->GetAttackDistance() + DefendDistanceOffset;
-	
-	const FVector DefendLocation = DefendTarget->GetActorLocation() + (GetAgent<ADWCharacter>()->GetDistance(DefendTarget, false, false) < DefendDistance ? (-GetAgent<ADWCharacter>()->GetActorForwardVector()) * DefendDistance : FVector::ZeroVector);
-
-	OwnerComp.GetBlackboardComponent()->SetValueAsVector(DefendLocationKey.SelectedKeyName, DefendLocation);
 }

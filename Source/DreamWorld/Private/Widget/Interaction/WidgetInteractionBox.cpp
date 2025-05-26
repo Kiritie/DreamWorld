@@ -54,7 +54,7 @@ void UWidgetInteractionBox::OnOpen(const TArray<FParameter>& InParams, bool bIns
 	}
 	else if(AVoxelInteractAuxiliary* Auxiliary = Cast<AVoxelInteractAuxiliary>(InteractionAgent.GetObject()))
 	{
-		Item = FAbilityItem(Auxiliary->GetVoxelItem());
+		Item = Auxiliary->GetVoxelItem().ID;
 	}
 	else if(IPrimaryEntityInterface* Entity = Cast<IPrimaryEntityInterface>(InteractionAgent.GetObject()))
 	{

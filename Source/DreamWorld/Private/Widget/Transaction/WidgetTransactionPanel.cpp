@@ -189,8 +189,15 @@ void UWidgetTransactionPanel::OnRefresh()
 		}
 		switch(GetSelectedTabType())
 		{
-			case EDWTransactionType::Buy:
 			case EDWTransactionType::Upgrade:
+			{
+				if(_SelectedTransactionItem.GetData().MaxLevel - _SelectedTransactionItem.Level < GetSelectedTransactionNum())
+				{
+					bCanTransaction = false;
+					break;
+				}
+			}
+			case EDWTransactionType::Buy:
 			case EDWTransactionType::Generate:
 			{
 				UAbilityInventoryBase* Inventory = GetOwnerObject<IAbilityInventoryAgentInterface>()->GetInventory();
@@ -604,5 +611,6 @@ bool UWidgetTransactionPanel::GetSelectedTransactionItem(FAbilityItem& OutItemDa
 		}
 		return true;
 	}
+	bCanTransaction = false;
 	return false;
 }

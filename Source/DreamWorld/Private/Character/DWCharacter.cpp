@@ -179,9 +179,15 @@ void ADWCharacter::OnRefresh_Implementation(float DeltaSeconds)
 
 		if(IsPlayer())
 		{
-			ModifyHunger(-GetHungerExpendSpeed() * DeltaSeconds * (IsSprinting() ? 2.f : 1.f));
+			if(GetHunger() > 0.f)
+			{
+				ModifyHunger(-GetHungerExpendSpeed() * DeltaSeconds * (IsSprinting() ? 2.f : 1.f));
+			}
 		
-			ModifyThirst(-GetThirstExpendSpeed() * DeltaSeconds);
+			if(GetThirst() > 0.f)
+			{
+				ModifyThirst(-GetThirstExpendSpeed() * DeltaSeconds);
+			}
 
 			if(GetThirst() <= 0.f)
 			{
@@ -189,7 +195,7 @@ void ADWCharacter::OnRefresh_Implementation(float DeltaSeconds)
 			}
 		}
 
-		if(!IsSwimming())
+		if(!IsSwimming() && GetOxygen() < 100.f)
 		{
 			ModifyOxygen(GetOxygenRegenSpeed() * DeltaSeconds);
 		}
@@ -287,7 +293,10 @@ void ADWCharacter::LoadData(FSaveData* InSaveData, EPhase InPhase)
 			for(auto& Iter2 : Iter1.Items)
 			{
 				Iter2.Handle = AbilitySystem->K2_GiveAbility(Iter2.GetData().AbilityClass, Iter2.Level);
-				AbilitySystem->TryActivateAbility(Iter2.Handle);
+				if(Iter2.Level > 0)
+				{
+					AbilitySystem->TryActivateAbility(Iter2.Handle);
+				}
 			}			
 		}
 
@@ -699,7 +708,7 @@ void ADWCharacter::SetMotionRate(float InMovementRate, float InRotationRate)
 	GetCharacterMovement()->MaxWalkSpeed = GetMoveSpeed() * (IsSprinting() ? 1.5f : 1.f) * MovementRate;
 	GetCharacterMovement()->MaxSwimSpeed = GetSwimSpeed() * (IsSprinting() ? 1.5f : 1.f) * MovementRate;
 	GetCharacterMovement()->MaxFlySpeed = GetFlySpeed() * (IsSprinting() ? 1.5f : 1.f) * MovementRate;
-	GetCharacterMovement()->RotationRate = FRotator(0, GetRotationSpeed() * (IsSprinting() ? 1.5f : 1.f) * RotationRate, 0.f);
+	GetCharacterMovement()->RotationRate = FRotator(0.f, GetRotationSpeed() * (IsSprinting() ? 1.5f : 1.f) * RotationRate, 0.f);
 }
 
 bool ADWCharacter::RaycastStep(FHitResult& OutHitResult)
@@ -831,7 +840,7 @@ bool ADWCharacter::OnGenerateVoxel(EInputInteractEvent InInteractEvent, const FV
 		}
 		case EInputInteractEvent::Completed:
 		{
-			FItemQueryData ItemQueryData = Inventory->QueryItemByRange(EItemQueryType::Remove, FAbilityItem(GenerateVoxelItem, 1), -1);
+			FItemQueryData ItemQueryData = Inventory->QueryItemByRange(EItemQueryType::Remove, GenerateVoxelItem.ID, -1);
 			if(!ItemQueryData.IsValid() || !DoAction(GameplayTags::Ability_Character_Action_Generate))
 			{
 				bCanGenerateVoxel = false;

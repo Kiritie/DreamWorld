@@ -6,7 +6,6 @@
 #include "Gameplay/DWHUD.h"
 #include "Gameplay/DWPlayerController.h"
 #include "Gameplay/DWPlayerState.h"
-#include "SaveGame/SaveGameModuleStatics.h"
 
 ADWGameMode::ADWGameMode()
 {

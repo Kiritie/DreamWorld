@@ -15,7 +15,7 @@ UDWAIService_QueryPatrolPath::UDWAIService_QueryPatrolPath(const FObjectInitiali
 	bCallTickOnSearchStart = true;
 	bRestartTimerOnEachActivation = true;
 
-	Interval = -1.f;
+	Interval = 10.f;
 
 	PatrolDistanceKey.AddFloatFilter(this, GET_MEMBER_NAME_CHECKED(UDWAIService_QueryPatrolPath, PatrolDistanceKey));
 	PatrolDurationKey.AddFloatFilter(this, GET_MEMBER_NAME_CHECKED(UDWAIService_QueryPatrolPath, PatrolDurationKey));
