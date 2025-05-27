@@ -55,7 +55,7 @@ void UDWPlayerCharacterState_Spawn::TryLeave()
 	else if(UVoxelModule::Get().GetWorldGeneratePercent() >= 1.f)
 	{
 		ADWPlayerCharacter* PlayerCharacter = GetAgent<ADWPlayerCharacter>();
-		if(PlayerCharacter->GetActorLocation().Z <= 0.f)
+		if(PlayerCharacter->GetActorLocation().Z == UVoxelModule::Get().GetWorldData().GetWorldRealHeight())
 		{
 			const auto& CharacterData = PlayerCharacter->GetCharacterData<UAbilityCharacterDataBase>();
 			FHitResult HitResult;

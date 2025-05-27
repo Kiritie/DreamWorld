@@ -65,8 +65,7 @@ void UDWCharacterState_Spawn::TryLeave()
 	{
 		if(UVoxelModuleStatics::GetVoxelWorldMode() == EVoxelWorldMode::Default)
 		{
-			ADWCharacter* Character = GetAgent<ADWCharacter>();
-			if(AVoxelChunk* VoxelChunk = Cast<AVoxelChunk>(ISceneActorInterface::Execute_GetContainer(Character).GetObject()))
+			if(AVoxelChunk* VoxelChunk = Cast<AVoxelChunk>(ISceneActorInterface::Execute_GetContainer(GetAgent<ADWCharacter>()).GetObject()))
 			{
 				if(VoxelChunk->IsGenerated())
 				{

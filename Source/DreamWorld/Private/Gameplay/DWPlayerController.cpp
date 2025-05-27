@@ -63,7 +63,7 @@ void ADWPlayerController::LoadData(FSaveData* InSaveData, EPhase InPhase)
 		if(SaveData.SpawnTransform.GetTranslation().IsZero())
 		{
 			const FVector2D SpawnRange = FVector2D(UVoxelModule::Get().GetWorldData().GetWorldRealSize().X * 5.f, UVoxelModule::Get().GetWorldData().GetWorldRealSize().Y * 5.f);
-			SaveData.SpawnTransform.SetTranslation(FVector(FMath::RandRange(-SpawnRange.X, SpawnRange.X), FMath::RandRange(-SpawnRange.Y, SpawnRange.Y), 0.f));
+			SaveData.SpawnTransform.SetTranslation(FVector(FMath::RandRange(-SpawnRange.X, SpawnRange.X), FMath::RandRange(-SpawnRange.Y, SpawnRange.Y), UVoxelModule::Get().GetWorldData().GetWorldRealHeight()));
 		}
 		if(bNeedSpawn)
 		{

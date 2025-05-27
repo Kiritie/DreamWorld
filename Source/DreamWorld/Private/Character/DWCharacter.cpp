@@ -878,7 +878,7 @@ bool ADWCharacter::OnDestroyVoxel(EInputInteractEvent InInteractEvent, const FVo
 			{
 				if(IsPlayer())
 				{
-					UWidgetModuleStatics::OpenUserWidget<UWidgetProgressBox>({ DestroyVoxelItem.GetVoxelData().Name, FText::FromString(TEXT("破坏体素")) });
+					UWidgetModuleStatics::OpenUserWidget<UWidgetProgressBox>({ DestroyVoxelItem.GetData().Name, FText::FromString(TEXT("破坏体素")) });
 				}
 				DoAction(GameplayTags::Ability_Character_Action_Destroy);
 				if(IsExhausted())
