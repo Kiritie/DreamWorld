@@ -9,7 +9,6 @@
 #include "Procedure/DWProcedure_Testing.h"
 #include "Voxel/VoxelModule.h"
 #include "Voxel/VoxelModuleStatics.h"
-#include "Voxel/Chunks/VoxelChunk.h"
 
 UDWPlayerCharacterState_Spawn::UDWPlayerCharacterState_Spawn()
 {
@@ -65,12 +64,9 @@ void UDWPlayerCharacterState_Spawn::TryLeave()
 				Super::TryLeave();
 			}
 		}
-		else if(AVoxelChunk* VoxelChunk = Cast<AVoxelChunk>(ISceneActorInterface::Execute_GetContainer(PlayerCharacter).GetObject()))
+		else
 		{
-			if(VoxelChunk->IsGenerated())
-			{
-				Super::TryLeave();
-			}
+			Super::TryLeave();
 		}
 	}
 }

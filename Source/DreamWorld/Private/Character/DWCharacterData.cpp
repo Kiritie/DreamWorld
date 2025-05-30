@@ -5,6 +5,8 @@ UDWCharacterData::UDWCharacterData()
 	MaxLevel = 100;
 
 	Nature = EDWCharacterNature::None;
+
+	ActiveDistance = 7;
 	AttackDistance = 100.f;
 	InteractDistance = 500.f;
 	FollowDistance = 300.f;

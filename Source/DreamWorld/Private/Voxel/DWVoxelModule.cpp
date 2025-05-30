@@ -97,9 +97,9 @@ void UDWVoxelModule::OnWorldCenterChanged()
 {
 	Super::OnWorldCenterChanged();
 
-	if(BoundsMesh && ChunkGenerateIndex != EMPTY_Index)
+	if(BoundsMesh && WorldCenterIndex != EMPTY_Index)
 	{
-		BoundsMesh->SetActorLocation(ChunkIndexToLocation(ChunkGenerateIndex));
+		BoundsMesh->SetActorLocation(ChunkIndexToLocation(WorldCenterIndex));
 		BoundsMesh->SetActorScale3D(FVector(WorldData->GetWorldRealSize().X, WorldData->GetWorldRealSize().Y, WorldData->GetWorldRealHeight() * 0.5f) * 0.01f);
 	}
 }

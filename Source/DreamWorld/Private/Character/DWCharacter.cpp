@@ -52,9 +52,11 @@
 #include "Character/States/DWCharacterState_Sleep.h"
 #include "Character/States/DWCharacterState_Swim.h"
 #include "Common/DWCommonStatics.h"
+#include "Event/Handle/Voxel/EventHandle_VoxelWorldAgentMoved.h"
 #include "Inventory/Slot/DWInventoryEquipSlot.h"
 #include "Item/Skill/DWSkillData.h"
 #include "Item/Talent/DWTalentData.h"
+#include "Voxel/VoxelModule.h"
 #include "Voxel/Voxels/Data/VoxelData.h"
 #include "Voxel/Voxels/Auxiliary/VoxelInteractAuxiliary.h"
 #include "Widget/Common/WidgetProgressBox.h"
@@ -137,6 +139,7 @@ void ADWCharacter::OnSpawn_Implementation(UObject* InOwner, const TArray<FParame
 	Super::OnSpawn_Implementation(InOwner, InParams);
 
 	UEventModuleStatics::SubscribeEvent<UEventHandle_VoxelWorldModeChanged>(this, GET_FUNCTION_NAME_THISCLASS(OnWorldModeChanged));
+	UEventModuleStatics::SubscribeEvent<UEventHandle_VoxelWorldAgentMoved>(this, GET_FUNCTION_NAME_THISCLASS(OnWorldAgentMoved));
 
 	CharacterHP->CreateWorldWidget();
 }
@@ -146,6 +149,7 @@ void ADWCharacter::OnDespawn_Implementation(bool bRecovery)
 	Super::OnDespawn_Implementation(bRecovery);
 
 	UEventModuleStatics::UnsubscribeEvent<UEventHandle_VoxelWorldModeChanged>(this, GET_FUNCTION_NAME_THISCLASS(OnWorldModeChanged));
+	UEventModuleStatics::UnsubscribeEvent<UEventHandle_VoxelWorldAgentMoved>(this, GET_FUNCTION_NAME_THISCLASS(OnWorldAgentMoved));
 
 	CharacterHP->DestroyWorldWidget();
 
@@ -996,21 +1000,39 @@ void ADWCharacter::OnAttributeChange(const FOnAttributeChangeData& InAttributeCh
 
 void ADWCharacter::OnWorldModeChanged(UObject* InSender, UEventHandle_VoxelWorldModeChanged* InEventHandle)
 {
+	OnActiveRefresh();
+}
+
+void ADWCharacter::OnWorldAgentMoved(UObject* InSender, UEventHandle_VoxelWorldAgentMoved* InEventHandle)
+{
+	OnActiveRefresh();
+}
+
+void ADWCharacter::OnActiveRefresh()
+{
 	if(IsCurrentFiniteStateClass<UDWCharacterState_Spawn>()) return;
 	
-	switch(InEventHandle->WorldMode)
+	if(GetCharacterData<UDWCharacterData>().ActiveDistance != -1 &&
+		UVoxelModule::Get().GetWorldAgentIndex().DistanceTo(UVoxelModuleStatics::LocationToChunkIndex(GetActorLocation()), true) > GetCharacterData<UDWCharacterData>().ActiveDistance)
 	{
-		case EVoxelWorldMode::Preview:
+		Static();
+	}
+	else
+	{
+		switch(UVoxelModule::Get().GetWorldMode())
 		{
-			Static();
-			break;
+			case EVoxelWorldMode::Preview:
+			{
+				Static();
+				break;
+			}
+			case EVoxelWorldMode::Default:
+			{
+				UnStatic();
+				break;
+			}
+			default: break;
 		}
-		case EVoxelWorldMode::Default:
-		{
-			UnStatic();
-			break;
-		}
-		default: break;
 	}
 }
 
@@ -1138,6 +1160,13 @@ void ADWCharacter::ClearHitTargets()
 TArray<AActor*> ADWCharacter::GetHitTargets() const
 {
 	return TArray<AActor*>();
+}
+
+void ADWCharacter::SetContainer_Implementation(const TScriptInterface<ISceneContainerInterface>& InContainer)
+{
+	Super::SetContainer_Implementation(InContainer);
+
+	OnActiveRefresh();
 }
 
 bool ADWCharacter::IsEnemy(IAbilityPawnInterface* InTarget) const

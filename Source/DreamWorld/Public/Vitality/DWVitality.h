@@ -7,6 +7,7 @@
 
 #include "DWVitality.generated.h"
 
+class UEventHandle_VoxelWorldAgentMoved;
 class UEventHandle_VoxelWorldModeChanged;
 class UWorldWidgetComponent;
 class UAbilityVitalityInventoryBase;
@@ -71,6 +72,11 @@ protected:
 
 	UFUNCTION()
 	virtual void OnWorldModeChanged(UObject* InSender, UEventHandle_VoxelWorldModeChanged* InEventHandle);
+
+	UFUNCTION()
+	virtual void OnWorldAgentMoved(UObject* InSender, UEventHandle_VoxelWorldAgentMoved* InEventHandle);
+
+	virtual void OnActiveRefresh();
 
 public:
 	virtual void HandleDamage(const FGameplayAttribute& DamageAttribute, float DamageValue, float DefendValue, bool bHasCrited, const FHitResult& HitResult, const FGameplayTagContainer& SourceTags, AActor* SourceActor) override;

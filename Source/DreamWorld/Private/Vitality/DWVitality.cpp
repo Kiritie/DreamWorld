@@ -9,11 +9,15 @@
 #include "Ability/Vitality/States/AbilityVitalityState_Spawn.h"
 #include "Character/DWCharacter.h"
 #include "Event/EventModuleStatics.h"
+#include "Event/Handle/Voxel/EventHandle_VoxelWorldAgentMoved.h"
 #include "Event/Handle/Voxel/EventHandle_VoxelWorldModeChanged.h"
 #include "FSM/Components/FSMComponent.h"
 #include "Inventory/DWVitalityInventory.h"
 #include "UObject/ConstructorHelpers.h"
+#include "Vitality/DWVitalityData.h"
 #include "Voxel/DWVoxelChunk.h"
+#include "Voxel/VoxelModule.h"
+#include "Voxel/VoxelModuleStatics.h"
 #include "Widget/World/WidgetVitalityHP.h"
 #include "Widget/World/WorldWidgetComponent.h"
 
@@ -41,6 +45,7 @@ void ADWVitality::OnSpawn_Implementation(UObject* InOwner, const TArray<FParamet
 	Super::OnSpawn_Implementation(InOwner, InParams);
 
 	UEventModuleStatics::SubscribeEvent<UEventHandle_VoxelWorldModeChanged>(this, GET_FUNCTION_NAME_THISCLASS(OnWorldModeChanged));
+	UEventModuleStatics::SubscribeEvent<UEventHandle_VoxelWorldAgentMoved>(this, GET_FUNCTION_NAME_THISCLASS(OnWorldAgentMoved));
 
 	VitalityHP->CreateWorldWidget();
 }
@@ -50,6 +55,7 @@ void ADWVitality::OnDespawn_Implementation(bool bRecovery)
 	Super::OnDespawn_Implementation(bRecovery);
 
 	UEventModuleStatics::UnsubscribeEvent<UEventHandle_VoxelWorldModeChanged>(this, GET_FUNCTION_NAME_THISCLASS(OnWorldModeChanged));
+	UEventModuleStatics::UnsubscribeEvent<UEventHandle_VoxelWorldAgentMoved>(this, GET_FUNCTION_NAME_THISCLASS(OnWorldAgentMoved));
 
 	VitalityHP->DestroyWorldWidget();
 }
@@ -161,21 +167,39 @@ void ADWVitality::OnAttributeChange(const FOnAttributeChangeData& InAttributeCha
 
 void ADWVitality::OnWorldModeChanged(UObject* InSender, UEventHandle_VoxelWorldModeChanged* InEventHandle)
 {
+	OnActiveRefresh();
+}
+
+void ADWVitality::OnWorldAgentMoved(UObject* InSender, UEventHandle_VoxelWorldAgentMoved* InEventHandle)
+{
+	OnActiveRefresh();
+}
+
+void ADWVitality::OnActiveRefresh()
+{
 	if(IsCurrentFiniteStateClass<UAbilityVitalityState_Spawn>()) return;
 	
-	switch(InEventHandle->WorldMode)
+	if(GetVitalityData<UDWVitalityData>().ActiveDistance != -1 &&
+		UVoxelModule::Get().GetWorldAgentIndex().DistanceTo(UVoxelModuleStatics::LocationToChunkIndex(GetActorLocation()), true) > GetVitalityData<UDWVitalityData>().ActiveDistance)
 	{
-		case EVoxelWorldMode::Preview:
+		Static();
+	}
+	else
+	{
+		switch(UVoxelModule::Get().GetWorldMode())
 		{
-			Static();
-			break;
+			case EVoxelWorldMode::Preview:
+			{
+				Static();
+				break;
+			}
+			case EVoxelWorldMode::Default:
+			{
+				UnStatic();
+				break;
+			}
+			default: break;
 		}
-		case EVoxelWorldMode::Default:
-		{
-			UnStatic();
-			break;
-		}
-		default: break;
 	}
 }
 

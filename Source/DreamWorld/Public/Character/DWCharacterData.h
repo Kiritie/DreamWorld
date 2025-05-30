@@ -23,6 +23,9 @@ public:
 	EDWCharacterNature Nature;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 ActiveDistance;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float AttackDistance;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)

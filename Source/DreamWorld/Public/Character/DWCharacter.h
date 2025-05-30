@@ -10,6 +10,7 @@
 
 #include "DWCharacter.generated.h"
 
+class UEventHandle_VoxelWorldAgentMoved;
 class AVoxelInteractAuxiliary;
 class UDialogue;
 class ADWEquip;
@@ -200,6 +201,11 @@ protected:
 	UFUNCTION()
 	virtual void OnWorldModeChanged(UObject* InSender, UEventHandle_VoxelWorldModeChanged* InEventHandle);
 
+	UFUNCTION()
+	virtual void OnWorldAgentMoved(UObject* InSender, UEventHandle_VoxelWorldAgentMoved* InEventHandle);
+
+	virtual void OnActiveRefresh();
+
 public:
 	virtual void HandleDamage(const FGameplayAttribute& DamageAttribute, float DamageValue, float DefendValue, bool bHasCrited, const FHitResult& HitResult, const FGameplayTagContainer& SourceTags, AActor* SourceActor) override;
 
@@ -221,6 +227,8 @@ public:
 	virtual void ClearHitTargets() override;
 
 	virtual TArray<AActor*> GetHitTargets() const override;
+
+	virtual void SetContainer_Implementation(const TScriptInterface<ISceneContainerInterface>& InContainer) override;
 	
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
