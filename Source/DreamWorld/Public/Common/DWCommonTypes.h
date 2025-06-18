@@ -608,6 +608,7 @@ public:
 	virtual void MakeSaved() override
 	{
 		Super::MakeSaved();
+		
 		for(auto& Iter : CharacterDatas)
 		{
 			Iter.MakeSaved();
@@ -627,17 +628,17 @@ struct DREAMWORLD_API FDWWorldSaveData : public FVoxelWorldSaveData
 public:
 	FORCEINLINE FDWWorldSaveData()
 	{
-		ChunkDatas = TMap<FVector, FDWVoxelChunkSaveData>();
+		ChunkDatas = TMap<FIndex, FDWVoxelChunkSaveData>();
 	}
 	
 	FORCEINLINE FDWWorldSaveData(const FVoxelWorldBasicSaveData& InBasicSaveData) : FVoxelWorldSaveData(InBasicSaveData)
 	{
-		ChunkDatas = TMap<FVector, FDWVoxelChunkSaveData>();
+		ChunkDatas = TMap<FIndex, FDWVoxelChunkSaveData>();
 	}
 
 public:
 	UPROPERTY(BlueprintReadOnly)
-	TMap<FVector, FDWVoxelChunkSaveData> ChunkDatas;
+	TMap<FIndex, FDWVoxelChunkSaveData> ChunkDatas;
 
 public:
 	virtual void MakeSaved() override
@@ -651,17 +652,17 @@ public:
 	
 	virtual bool IsExistChunkData(FIndex InChunkIndex) const override
 	{
-		return ChunkDatas.Contains(InChunkIndex.ToVector());
+		return ChunkDatas.Contains(InChunkIndex);
 	}
 
 	virtual FVoxelChunkSaveData* GetChunkData(FIndex InChunkIndex) override
 	{
-		return ChunkDatas.Find(InChunkIndex.ToVector());
+		return ChunkDatas.Find(InChunkIndex);
 	}
 
 	virtual void SetChunkData(FIndex InChunkIndex, FVoxelChunkSaveData* InChunkData) override
 	{
-		ChunkDatas.Emplace(InChunkIndex.ToVector(), InChunkData->CastRef<FDWVoxelChunkSaveData>());
+		ChunkDatas.Emplace(InChunkIndex, InChunkData->CastRef<FDWVoxelChunkSaveData>());
 	}
 };
 
@@ -774,12 +775,12 @@ struct DREAMWORLD_API FDWVideoModuleSaveData : public FVideoModuleSaveData
 public:
 	FORCEINLINE FDWVideoModuleSaveData()
 	{
-		VoxelWorldRange = 15.f;
+		VoxelWorldRange = 30.f;
 	}
 	
 	FORCEINLINE FDWVideoModuleSaveData(const FVideoModuleSaveData& InVideoModuleSaveData) : FVideoModuleSaveData(InVideoModuleSaveData)
 	{
-		VoxelWorldRange = 15.f;
+		VoxelWorldRange = 30.f;
 	}
 
 public:

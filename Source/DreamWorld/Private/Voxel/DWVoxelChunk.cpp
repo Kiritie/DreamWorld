@@ -4,7 +4,6 @@
 #include "Voxel/DWVoxelChunk.h"
 
 #include "Ability/AbilityModuleStatics.h"
-#include "Ability/PickUp/AbilityPickUpBase.h"
 #include "Character/DWCharacter.h"
 #include "Character/DWCharacterData.h"
 #include "Common/CommonTypes.h"
@@ -38,7 +37,7 @@ FSaveData* ADWVoxelChunk::ToData()
 {
 	static FDWVoxelChunkSaveData SaveData;
 	SaveData = Super::ToData()->CastRef<FVoxelChunkSaveData>();
-
+	
 	for(auto& Iter : SceneActorMap)
 	{
 		if(ADWCharacter* Character = Cast<ADWCharacter>(Iter.Value))
