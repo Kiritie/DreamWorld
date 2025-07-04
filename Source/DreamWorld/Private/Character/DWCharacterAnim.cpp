@@ -3,7 +3,6 @@
 #include "Character/DWCharacterAnim.h"
 #include "Character/DWCharacter.h"
 #include "Character/States/DWCharacterState_Attack.h"
-#include "FSM/Components/FSMComponent.h"
 #include "Common/CommonStatics.h"
 
 UDWCharacterAnim::UDWCharacterAnim()
@@ -64,4 +63,5 @@ void UDWCharacterAnim::NativeUpdateAnimation(float DeltaSeconds)
 	bClimbing = Character->IsClimbing();
 	bCrouching = Character->IsCrouching();
 	bSwimming = Character->IsSwimming() || Character->IsFloating();
+	bAiming = Character->IsAiming();
 }

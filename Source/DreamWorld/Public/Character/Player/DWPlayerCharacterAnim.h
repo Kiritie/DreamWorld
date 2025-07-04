@@ -18,4 +18,8 @@ public:
 
 protected:
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
+	
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CharacterStates")
+	float AimLookUpAngle;
 };

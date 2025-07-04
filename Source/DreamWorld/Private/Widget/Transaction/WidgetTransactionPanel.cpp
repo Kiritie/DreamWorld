@@ -218,9 +218,7 @@ void UWidgetTransactionPanel::OnRefresh()
 	
 	if(BtnTransaction)
 	{
-		// BtnTransaction->SetIsEnabled(bCanTransaction);
-		BtnTransaction->SetRenderOpacity(bCanTransaction ? 1.f : 0.5f);
-		BtnTransaction->SetVisibility(bCanTransaction ? ESlateVisibility::SelfHitTestInvisible : ESlateVisibility::HitTestInvisible);
+		BtnTransaction->SetIsEnabledN(bCanTransaction);
 	}
 
 	OnPreviewContentRefresh();

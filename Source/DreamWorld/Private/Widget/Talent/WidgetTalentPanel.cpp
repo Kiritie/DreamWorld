@@ -107,9 +107,7 @@ void UWidgetTalentPanel::OnRefresh()
 	
 	if(BtnActivate)
 	{
-		// BtnTalent->SetIsEnabled(bCanTalent);
-		BtnActivate->SetRenderOpacity(bCanTalent ? 1.f : 0.5f);
-		BtnActivate->SetVisibility(bCanTalent ? ESlateVisibility::SelfHitTestInvisible : ESlateVisibility::HitTestInvisible);
+		BtnActivate->SetIsEnabledN(bCanTalent);
 	}
 
 	OnPreviewContentRefresh();

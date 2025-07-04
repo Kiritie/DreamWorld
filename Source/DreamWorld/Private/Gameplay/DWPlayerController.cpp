@@ -84,18 +84,28 @@ void ADWPlayerController::LoadData(FSaveData* InSaveData, EPhase InPhase)
 		PlayerCharacter->LoadSaveData(&SaveData, EPhase::Final);
 		PlayerCharacter->CreateTeam();
 		PlayerCharacter->Execute_SetBlockAllInput(PlayerCharacter, false);
-		UCharacterModuleStatics::SwitchCharacter(PlayerCharacter, true);
 		if(SaveData.IsSaved())
 		{
 			UCameraModuleStatics::SetCameraRotation(SaveData.CameraRotation.Yaw, SaveData.CameraRotation.Pitch, true);
 		}
 		UCameraModuleStatics::SetCameraDistance(SaveData.CameraDistance, true);
+		UCharacterModuleStatics::SwitchCharacter(PlayerCharacter, true);
 	}
 }
 
 FSaveData* ADWPlayerController::ToData()
 {
-	return nullptr;
+	ADWPlayerCharacter* PlayerCharacter = GetPlayerPawn<ADWPlayerCharacter>();
+
+	static FDWPlayerSaveData SaveData;
+	if(PlayerCharacter)
+	{
+		SaveData = PlayerCharacter->ToData()->CastRef<FDWCharacterSaveData>();
+	}
+	SaveData.CameraRotation = UCameraModuleStatics::GetCameraRotation();
+	SaveData.CameraDistance = UCameraModuleStatics::GetCameraDistance();
+
+	return &SaveData;
 }
 
 void ADWPlayerController::UnloadData(EPhase InPhase)

@@ -108,18 +108,24 @@ void UDWProcedure_ArchiveCreating::OnPlayerChanged(APawn* InPlayerPawn)
 
 void UDWProcedure_ArchiveCreating::CreatePlayer(FDWPlayerSaveData& InPlayerSaveData, EPhase InPhase)
 {
+	if(!IsCurrent()) return;
+	
 	UCommonStatics::GetPlayerController<ADWPlayerController>()->LoadSaveData(&InPlayerSaveData, InPhase);
 	USaveGameModuleStatics::GetSaveGame<UDWArchiveSaveGame>()->GetSaveDataRef<FDWArchiveSaveData>().PlayerData = InPlayerSaveData;
 }
 
 void UDWProcedure_ArchiveCreating::CreateWorld(FDWWorldSaveData& InWorldSaveData, EPhase InPhase)
 {
+	if(!IsCurrent()) return;
+	
 	UVoxelModule::Get().LoadSaveData(&InWorldSaveData, InPhase);
 	USaveGameModuleStatics::GetSaveGame<UDWArchiveSaveGame>()->GetSaveDataRef<FDWArchiveSaveData>().WorldData = InWorldSaveData;
 }
 
 void UDWProcedure_ArchiveCreating::CreateArchive(FDWArchiveSaveData& InArchiveSaveData)
 {
+	if(!IsCurrent()) return;
+	
 	USaveGameModuleStatics::GetSaveGame<UDWArchiveSaveGame>()->SetSaveData(&InArchiveSaveData);
 	UProcedureModuleStatics::SwitchProcedureByClass<UDWProcedure_Loading>();
 }

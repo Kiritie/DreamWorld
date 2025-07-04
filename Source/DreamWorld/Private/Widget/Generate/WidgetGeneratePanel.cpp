@@ -149,9 +149,7 @@ void UWidgetGeneratePanel::OnRefresh()
 	
 	if(BtnGenerate)
 	{
-		// BtnGenerate->SetIsEnabled(bCanGenerate);
-		BtnGenerate->SetRenderOpacity(bCanGenerate ? 1.f : 0.5f);
-		BtnGenerate->SetVisibility(bCanGenerate ? ESlateVisibility::SelfHitTestInvisible : ESlateVisibility::HitTestInvisible);
+		BtnGenerate->SetIsEnabledN(bCanGenerate);
 	}
 
 	OnPreviewContentRefresh();
