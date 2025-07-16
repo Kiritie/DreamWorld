@@ -277,6 +277,9 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	UDialogue* Dialogue;
 
+	UPROPERTY(VisibleAnywhere)
+	TArray<FDWCharacterSkinSaveData> SkinDatas;
+
 	UPROPERTY()
 	TMap<EDWEquipPart, ADWEquip*> Equips;
 

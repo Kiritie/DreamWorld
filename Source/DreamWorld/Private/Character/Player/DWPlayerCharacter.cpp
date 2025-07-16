@@ -145,12 +145,6 @@ void ADWPlayerCharacter::LoadData(FSaveData* InSaveData, EPhase InPhase)
 		}
 	}
 
-	if(PHASEC(InPhase, EPhase::All))
-	{
-		SetBodyColor(SaveData.BodyColorIndex);
-		SetCapeColor(SaveData.CapeColorIndex);
-	}
-
 	if(PHASEC(InPhase, EPhase::Final))
 	{
 		RefreshAttributes();
@@ -163,9 +157,6 @@ FSaveData* ADWPlayerCharacter::ToData()
 {
 	static FDWPlayerSaveData SaveData;
 	SaveData = Super::ToData()->CastRef<FDWCharacterSaveData>();
-	
-	SaveData.BodyColorIndex = GetBodyColor();
-	SaveData.CapeColorIndex = GetCapeColor();
 	
 	SaveData.GenerateToolType = GetGenerateToolType();
 

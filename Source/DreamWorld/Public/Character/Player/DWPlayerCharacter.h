@@ -137,17 +137,4 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void SetGenerateToolType(EVoxelGenerateToolType InGenerateToolType) override;
-
-protected:
-	UFUNCTION(BlueprintImplementableEvent, BlueprintPure)
-	int32 GetBodyColor();
-
-	UFUNCTION(BlueprintImplementableEvent, BlueprintPure)
-	int32 GetCapeColor();
-
-	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
-	void SetBodyColor(int32 InColorIndex);
-
-	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
-	void SetCapeColor(int32 InColorIndex);
 };

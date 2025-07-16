@@ -20,6 +20,7 @@
 #include "Voxel/Components/VoxelMeshComponent.h"
 #include "Voxel/Voxels/Entity/VoxelEntity.h"
 #include "Ability/Item/Equip/AbilityEquipBase.h"
+#include "Character/DWCharacterData.h"
 #include "Character/Human/States/DWHumanCharacterState_Defend.h"
 #include "Character/Player/DWPlayerCharacter.h"
 #include "Character/States/DWCharacterState_Aim.h"

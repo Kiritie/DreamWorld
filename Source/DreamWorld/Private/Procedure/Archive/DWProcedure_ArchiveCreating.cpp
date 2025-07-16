@@ -108,7 +108,7 @@ void UDWProcedure_ArchiveCreating::OnPlayerChanged(APawn* InPlayerPawn)
 
 void UDWProcedure_ArchiveCreating::CreatePlayer(FDWPlayerSaveData& InPlayerSaveData, EPhase InPhase)
 {
-	if(!IsCurrent()) return;
+	if(!IsCurrent() || !InPlayerSaveData.IsValid()) return;
 	
 	UCommonStatics::GetPlayerController<ADWPlayerController>()->LoadSaveData(&InPlayerSaveData, InPhase);
 	USaveGameModuleStatics::GetSaveGame<UDWArchiveSaveGame>()->GetSaveDataRef<FDWArchiveSaveData>().PlayerData = InPlayerSaveData;

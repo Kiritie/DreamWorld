@@ -55,6 +55,7 @@ void ADWPlayerController::LoadData(FSaveData* InSaveData, EPhase InPhase)
 		if(PlayerCharacter)
 		{
 			SaveData.SpawnTransform = PlayerCharacter->GetActorTransform();
+			SaveData.SpawnTransform.SetTranslation(FVector(SaveData.SpawnTransform.GetTranslation().X, SaveData.SpawnTransform.GetTranslation().Y, UVoxelModule::Get().GetWorldData().GetWorldRealHeight()));
 			if(PlayerCharacter->Execute_GetAssetID(PlayerCharacter) == SaveData.AssetID)
 			{
 				bNeedSpawn = false;

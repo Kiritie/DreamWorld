@@ -47,7 +47,7 @@ FSaveData* ADWVoxelChunk::ToData()
 				SaveData.CharacterDatas.Add(Character->GetSaveDataRef<FDWCharacterSaveData>(true));
 			}
 		}
-		if(ADWVitality* Vitality = Cast<ADWVitality>(Iter.Value))
+		else if(ADWVitality* Vitality = Cast<ADWVitality>(Iter.Value))
 		{
 			if(!Vitality->IsDead())
 			{

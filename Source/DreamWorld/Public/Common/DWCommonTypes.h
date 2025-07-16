@@ -264,6 +264,56 @@ enum class EDWTransactionType : uint8
 };
 
 USTRUCT(BlueprintType)
+struct DREAMWORLD_API FDWCharacterSkinData
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FText DisplayName;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FName MeshCompTag;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 MatSlotIndex;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<UMaterialInterface*> Materials;
+
+	FORCEINLINE FDWCharacterSkinData()
+	{
+		DisplayName = FText::GetEmpty();
+		MeshCompTag = NAME_None;
+		MatSlotIndex = 0;
+		Materials = TArray<UMaterialInterface*>();
+	}
+};
+
+USTRUCT(BlueprintType)
+struct DREAMWORLD_API FDWCharacterSkinSaveData
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FName MeshCompTag;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 MatSlotIndex;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UMaterialInterface* Material;
+
+	FORCEINLINE FDWCharacterSkinSaveData()
+	{
+		MeshCompTag = NAME_None;
+		MatSlotIndex = 0;
+		Material = nullptr;
+	}
+};
+
+USTRUCT(BlueprintType)
 struct DREAMWORLD_API FDWCharacterAttackAbilityData : public FAbilityData
 {
 	GENERATED_BODY()
@@ -430,6 +480,7 @@ public:
 		FallingAttackAbilities = TMap<EDWWeaponType, FDWCharacterFallingAttackAbilityData>();
 		SkillAttackAbilities = TMap<FPrimaryAssetId, FDWCharacterSkillAttackAbilityData>();
 		Dialogue = nullptr;
+		SkinDatas = TArray<FDWCharacterSkinSaveData>();
 	}
 	
 	FORCEINLINE FDWCharacterSaveData(const FCharacterSaveData& InCharacterSaveData) : FCharacterSaveData(InCharacterSaveData)
@@ -443,6 +494,7 @@ public:
 		FallingAttackAbilities = TMap<EDWWeaponType, FDWCharacterFallingAttackAbilityData>();
 		SkillAttackAbilities = TMap<FPrimaryAssetId, FDWCharacterSkillAttackAbilityData>();
 		Dialogue = nullptr;
+		SkinDatas = TArray<FDWCharacterSkinSaveData>();
 	}
 
 public:
@@ -477,6 +529,9 @@ public:
 	
 	UPROPERTY()
 	UDialogue* Dialogue;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<FDWCharacterSkinSaveData> SkinDatas;
 };
 
 USTRUCT(BlueprintType)
@@ -525,8 +580,6 @@ public:
 	FORCEINLINE FDWPlayerSaveData()
 	{
 		ArchiveID = 0;
-		BodyColorIndex = 0;
-		CapeColorIndex = 0;
 		InventoryInitType = EDWInventoryInitType::Default;
 		GenerateToolType = EVoxelGenerateToolType::Pickaxe;
 		CameraRotation = FRotator::ZeroRotator;
@@ -536,8 +589,6 @@ public:
 	FORCEINLINE FDWPlayerSaveData(const FDWCharacterSaveData& InCharacterSaveData) : FDWPlayerBasicSaveData(InCharacterSaveData)
 	{
 		ArchiveID = 0;
-		BodyColorIndex = 0;
-		CapeColorIndex = 0;
 		InventoryInitType = EDWInventoryInitType::Default;
 		GenerateToolType = EVoxelGenerateToolType::Pickaxe;
 		CameraRotation = FRotator::ZeroRotator;
@@ -547,8 +598,6 @@ public:
 	FORCEINLINE FDWPlayerSaveData(const FDWPlayerBasicSaveData& InBasicSaveData) : FDWPlayerBasicSaveData(InBasicSaveData)
 	{
 		ArchiveID = 0;
-		BodyColorIndex = 0;
-		CapeColorIndex = 0;
 		InventoryInitType = EDWInventoryInitType::Default;
 		GenerateToolType = EVoxelGenerateToolType::Pickaxe;
 		CameraRotation = FRotator::ZeroRotator;
@@ -557,12 +606,6 @@ public:
 
 	UPROPERTY(BlueprintReadOnly)
 	int32 ArchiveID;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 BodyColorIndex;
-		
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 CapeColorIndex;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	EDWInventoryInitType InventoryInitType;

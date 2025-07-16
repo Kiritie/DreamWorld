@@ -356,6 +356,17 @@ void ADWCharacter::LoadData(FSaveData* InSaveData, EPhase InPhase)
 
 		Dialogue = SaveData.Dialogue;
 	}
+	if(PHASEC(InPhase, EPhase::Lesser))
+	{
+		SkinDatas = SaveData.SkinDatas;
+		for(int32 i = 0; i < SkinDatas.Num(); i++)
+		{
+			if(const auto MeshComp = SkinDatas[i].MeshCompTag.IsNone() ? GetMesh() : FindComponentByTag<UMeshComponent>(SkinDatas[i].MeshCompTag))
+			{
+				MeshComp->SetMaterial(SkinDatas[i].MatSlotIndex, SkinDatas[i].Material);
+			}
+		}
+	}
 	if(PHASEC(InPhase, EPhase::Final))
 	{
 		if(GetCharacterHPWidget())
@@ -381,6 +392,7 @@ FSaveData* ADWCharacter::ToData()
 	SaveData.SkillAttackAbilities = SkillAttackAbilities;
 
 	SaveData.Dialogue = Dialogue;
+	SaveData.SkinDatas = SkinDatas;
 
 	return &SaveData;
 }
