@@ -3,8 +3,7 @@
 
 #include "Procedure/Archive/DWProcedure_ArchiveCreating.h"
 
-#include "Camera/CameraModuleStatics.h"
-#include "Character/DWCharacterData.h"
+#include "Camera/CameraModule.h"
 #include "Character/Player/DWPlayerCharacter.h"
 #include "Gameplay/DWPlayerController.h"
 #include "Common/CommonStatics.h"
@@ -17,8 +16,6 @@
 #include "Voxel/VoxelModule.h"
 #include "Common/DWCommonTypes.h"
 #include "Procedure/Archive/DWProcedure_ArchiveChoosing.h"
-
-class UDWPlayerCharacterData;
 
 UDWProcedure_ArchiveCreating::UDWProcedure_ArchiveCreating()
 {
@@ -81,6 +78,12 @@ void UDWProcedure_ArchiveCreating::OnEnter(UProcedureBase* InLastProcedure)
 void UDWProcedure_ArchiveCreating::OnRefresh()
 {
 	Super::OnRefresh();
+
+	if(ADWPlayerCharacter* PlayerCharacter = Cast<ADWPlayerCharacter>(OperationTarget.LoadSynchronous()))
+	{
+		WHDebug(FString::SanitizeFloat(UCameraModule::Get().GetCurrentCameraDistance() - UCameraModule::Get().GetMinCameraDistance()));
+		UCameraModule::Get().SetCameraOffset(FVector(0.f, 0.f, FMath::Lerp(0.f, PlayerCharacter->GetHalfHeight() - 20.f, 1.f - 100.f / FMath::Clamp(UCameraModule::Get().GetCurrentCameraDistance() - UCameraModule::Get().GetMinCameraDistance(), 0.f, 100.f))));
+	}
 }
 
 void UDWProcedure_ArchiveCreating::OnGuide()

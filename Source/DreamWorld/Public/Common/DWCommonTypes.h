@@ -264,6 +264,25 @@ enum class EDWTransactionType : uint8
 };
 
 USTRUCT(BlueprintType)
+struct DREAMWORLD_API FDWCharacterSkinMeshData
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FName MeshCompTag;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 MatSlotIndex;
+
+	FORCEINLINE FDWCharacterSkinMeshData()
+	{
+		MeshCompTag = NAME_None;
+		MatSlotIndex = 0;
+	}
+};
+
+USTRUCT(BlueprintType)
 struct DREAMWORLD_API FDWCharacterSkinData
 {
 	GENERATED_BODY()
@@ -273,10 +292,7 @@ public:
 	FText DisplayName;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FName MeshCompTag;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 MatSlotIndex;
+	TArray<FDWCharacterSkinMeshData> MeshDatas;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<UMaterialInterface*> Materials;
@@ -284,31 +300,26 @@ public:
 	FORCEINLINE FDWCharacterSkinData()
 	{
 		DisplayName = FText::GetEmpty();
-		MeshCompTag = NAME_None;
-		MatSlotIndex = 0;
+		MeshDatas = TArray<FDWCharacterSkinMeshData>();
 		Materials = TArray<UMaterialInterface*>();
 	}
 };
 
 USTRUCT(BlueprintType)
-struct DREAMWORLD_API FDWCharacterSkinSaveData
+struct DREAMWORLD_API FDWCharacterSkinSaveData : public FSaveData
 {
 	GENERATED_BODY()
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FName MeshCompTag;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 MatSlotIndex;
+	TArray<FDWCharacterSkinMeshData> MeshDatas;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UMaterialInterface* Material;
 
 	FORCEINLINE FDWCharacterSkinSaveData()
 	{
-		MeshCompTag = NAME_None;
-		MatSlotIndex = 0;
+		MeshDatas = TArray<FDWCharacterSkinMeshData>();
 		Material = nullptr;
 	}
 };

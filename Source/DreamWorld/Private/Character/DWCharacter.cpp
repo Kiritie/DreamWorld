@@ -359,11 +359,14 @@ void ADWCharacter::LoadData(FSaveData* InSaveData, EPhase InPhase)
 	if(PHASEC(InPhase, EPhase::Lesser))
 	{
 		SkinDatas = SaveData.SkinDatas;
-		for(int32 i = 0; i < SkinDatas.Num(); i++)
+		for(auto& Iter1 : SkinDatas)
 		{
-			if(const auto MeshComp = SkinDatas[i].MeshCompTag.IsNone() ? GetMesh() : FindComponentByTag<UMeshComponent>(SkinDatas[i].MeshCompTag))
+			for(auto& Iter2 : Iter1.MeshDatas)
 			{
-				MeshComp->SetMaterial(SkinDatas[i].MatSlotIndex, SkinDatas[i].Material);
+				if(const auto MeshComp = Iter2.MeshCompTag.IsNone() ? GetMesh() : FindComponentByTag<UMeshComponent>(Iter2.MeshCompTag))
+				{
+					MeshComp->SetMaterial(Iter2.MatSlotIndex, Iter1.Material);
+				}
 			}
 		}
 	}
