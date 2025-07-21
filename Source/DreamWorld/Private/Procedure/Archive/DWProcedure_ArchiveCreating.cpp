@@ -4,6 +4,7 @@
 #include "Procedure/Archive/DWProcedure_ArchiveCreating.h"
 
 #include "Camera/CameraModule.h"
+#include "Character/DWCharacterData.h"
 #include "Character/Player/DWPlayerCharacter.h"
 #include "Gameplay/DWPlayerController.h"
 #include "Common/CommonStatics.h"
@@ -15,6 +16,7 @@
 #include "Widget/Archive/WidgetArchiveCreatingPanel.h"
 #include "Voxel/VoxelModule.h"
 #include "Common/DWCommonTypes.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "Procedure/Archive/DWProcedure_ArchiveChoosing.h"
 
 UDWProcedure_ArchiveCreating::UDWProcedure_ArchiveCreating()
@@ -24,6 +26,12 @@ UDWProcedure_ArchiveCreating::UDWProcedure_ArchiveCreating()
 
 	bTrackTarget = true;
 	TrackTargetMode = ECameraTrackMode::LocationOnly;
+
+	MinCameraDistance = 60.f;
+	MaxCameraDistance = 350.f;
+
+	LocalMinCameraDistance = 0.f;
+	LocalMaxCameraDistance = 0.f;
 }
 
 #if WITH_EDITOR
@@ -73,6 +81,12 @@ void UDWProcedure_ArchiveCreating::OnEnter(UProcedureBase* InLastProcedure)
 	{
 		UWidgetModuleStatics::OpenUserWidget<UWidgetArchiveCreatingPanel>();
 	}
+
+	LocalMinCameraDistance = UCameraModule::Get().GetMinCameraDistance();
+	LocalMaxCameraDistance = UCameraModule::Get().GetMaxCameraDistance();
+	
+	UCameraModule::Get().SetMinCameraDistance(MinCameraDistance);
+	UCameraModule::Get().SetMaxCameraDistance(MaxCameraDistance);
 }
 
 void UDWProcedure_ArchiveCreating::OnRefresh()
@@ -81,8 +95,7 @@ void UDWProcedure_ArchiveCreating::OnRefresh()
 
 	if(ADWPlayerCharacter* PlayerCharacter = Cast<ADWPlayerCharacter>(OperationTarget.LoadSynchronous()))
 	{
-		WHDebug(FString::SanitizeFloat(UCameraModule::Get().GetCurrentCameraDistance() - UCameraModule::Get().GetMinCameraDistance()));
-		UCameraModule::Get().SetCameraOffset(FVector(0.f, 0.f, FMath::Lerp(0.f, PlayerCharacter->GetHalfHeight() - 20.f, 1.f - 100.f / FMath::Clamp(UCameraModule::Get().GetCurrentCameraDistance() - UCameraModule::Get().GetMinCameraDistance(), 0.f, 100.f))));
+		UCameraModule::Get().SetCameraOffset(UKismetMathLibrary::VLerp(FVector::ZeroVector, PlayerCharacter->GetCharacterData<UDWCharacterData>().EyesOffset, 1.f - FMath::Clamp(UCameraModule::Get().GetCurrentCameraDistance(true) - UCameraModule::Get().GetMinCameraDistance(), 0.f, 100.f) / 100.f));
 	}
 }
 
@@ -102,6 +115,9 @@ void UDWProcedure_ArchiveCreating::OnLeave(UProcedureBase* InNextProcedure)
 			ISceneActorInterface::Execute_SetActorVisible(OperationTarget.LoadSynchronous(), false);
 		}
 	}
+
+	UCameraModule::Get().SetMinCameraDistance(LocalMinCameraDistance);
+	UCameraModule::Get().SetMaxCameraDistance(LocalMaxCameraDistance);
 }
 
 void UDWProcedure_ArchiveCreating::OnPlayerChanged(APawn* InPlayerPawn)

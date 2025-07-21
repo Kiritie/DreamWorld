@@ -57,6 +57,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<FDWCharacterSkinData> SkinDatas;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FVector EyesOffset;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (EditConditionHides, EditCondition = "(int32)Nature > 2"))
 	UBehaviorTree* DefaultBehaviorTree;

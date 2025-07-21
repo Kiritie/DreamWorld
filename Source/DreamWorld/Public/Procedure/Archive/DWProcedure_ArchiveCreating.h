@@ -60,6 +60,16 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "SaveData")
 	FDWWorldSaveData WorldSaveData;
 
+	UPROPERTY(EditAnywhere, Category = "Camera")
+	float MinCameraDistance;
+
+	UPROPERTY(EditAnywhere, Category = "Camera")
+	float MaxCameraDistance;
+
+private:
+	float LocalMinCameraDistance;
+	float LocalMaxCameraDistance;
+
 public:
 	UFUNCTION(BlueprintPure)
 	FDWPlayerSaveData& GetPlayerData() const;
