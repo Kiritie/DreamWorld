@@ -20,7 +20,15 @@ void UDWPlayerCharacterAnim::NativeUpdateAnimation(float DeltaSeconds)
 
 	if(!Character || !Character->Execute_GetAssetID(Character).IsValid() || !UCommonStatics::IsPlaying()) return;
 
-	const FRotator DeltaRotator = UKismetMathLibrary::NormalizedDeltaRotator(Character->GetControlRotation(), Character->GetActorRotation());
-
-	AimLookUpAngle = DeltaRotator.Pitch;
+	if(Character->IsCurrent())
+	{
+		bAiming = true;
+		const FRotator DeltaRotator = UKismetMathLibrary::NormalizedDeltaRotator(Character->GetControlRotation(), Character->GetActorRotation());
+		AimLookUpAngle = DeltaRotator.Pitch;
+	}
+	else
+	{
+		bAiming = false;
+		AimLookUpAngle = 0.f;
+	}
 }

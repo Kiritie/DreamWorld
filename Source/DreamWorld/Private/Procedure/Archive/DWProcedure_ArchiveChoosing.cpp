@@ -80,6 +80,8 @@ void UDWProcedure_ArchiveChoosing::OnPlayerChanged(APawn* InPlayerPawn)
 
 void UDWProcedure_ArchiveChoosing::CreateArchive()
 {
+	if(!IsCurrent()) return;
+	
 	if(USaveGameModuleStatics::GetSaveGame<UDWArchiveSaveGame>()->IsSaved())
 	{
 		USaveGameModuleStatics::CreateSaveGame<UDWArchiveSaveGame>(-1, EPhase::PrimaryAndLesser);
@@ -89,6 +91,8 @@ void UDWProcedure_ArchiveChoosing::CreateArchive()
 
 void UDWProcedure_ArchiveChoosing::RemoveArchive(int32 InArchiveID)
 {
+	if(!IsCurrent()) return;
+	
 	const bool bNeedCreateArchive = USaveGameModuleStatics::GetSaveGameInfo<UDWArchiveSaveGame>().ActiveIndex == InArchiveID;
 	USaveGameModuleStatics::DestroySaveGame<UDWArchiveSaveGame>(InArchiveID);
 	if(bNeedCreateArchive) USaveGameModuleStatics::CreateSaveGame<UDWArchiveSaveGame>(-1, EPhase::PrimaryAndLesser);
@@ -97,6 +101,8 @@ void UDWProcedure_ArchiveChoosing::RemoveArchive(int32 InArchiveID)
 
 void UDWProcedure_ArchiveChoosing::ChooseArchive(int32 InArchiveID)
 {
+	if(!IsCurrent()) return;
+	
 	if(USaveGameModuleStatics::GetSaveGameInfo<UDWArchiveSaveGame>().ActiveIndex != InArchiveID)
 	{
 		USaveGameModuleStatics::LoadSaveGame<UDWArchiveSaveGame>(InArchiveID, EPhase::PrimaryAndLesser);

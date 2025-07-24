@@ -57,9 +57,9 @@ void UDWProcedure_ArchiveCreating::OnEnter(UProcedureBase* InLastProcedure)
 {
 	Super::OnEnter(InLastProcedure);
 
-	if(OperationTarget.LoadSynchronous() && OperationTarget.LoadSynchronous()->Implements<USceneActorInterface>())
+	if(ADWPlayerCharacter* PlayerCharacter = GetOperationTarget<ADWPlayerCharacter>())
 	{
-		ISceneActorInterface::Execute_SetActorVisible(OperationTarget.LoadSynchronous(), true);
+		PlayerCharacter->Execute_SetActorVisible(PlayerCharacter, true);
 	}
 
 	if(!InLastProcedure)
@@ -93,7 +93,7 @@ void UDWProcedure_ArchiveCreating::OnRefresh()
 {
 	Super::OnRefresh();
 
-	if(ADWPlayerCharacter* PlayerCharacter = Cast<ADWPlayerCharacter>(OperationTarget.LoadSynchronous()))
+	if(ADWPlayerCharacter* PlayerCharacter = GetOperationTarget<ADWPlayerCharacter>())
 	{
 		UCameraModule::Get().SetCameraOffset(UKismetMathLibrary::VLerp(FVector::ZeroVector, PlayerCharacter->GetCharacterData<UDWCharacterData>().EyesOffset, 1.f - FMath::Clamp(UCameraModule::Get().GetCurrentCameraDistance(true) - UCameraModule::Get().GetMinCameraDistance(), 0.f, 100.f) / 100.f));
 	}
@@ -110,9 +110,9 @@ void UDWProcedure_ArchiveCreating::OnLeave(UProcedureBase* InNextProcedure)
 
 	if(InNextProcedure->IsA<UDWProcedure_ArchiveChoosing>())
 	{
-		if(OperationTarget.LoadSynchronous() && OperationTarget.LoadSynchronous()->Implements<USceneActorInterface>())
+		if(ADWPlayerCharacter* PlayerCharacter = GetOperationTarget<ADWPlayerCharacter>())
 		{
-			ISceneActorInterface::Execute_SetActorVisible(OperationTarget.LoadSynchronous(), false);
+			PlayerCharacter->Execute_SetActorVisible(PlayerCharacter, false);
 		}
 	}
 
