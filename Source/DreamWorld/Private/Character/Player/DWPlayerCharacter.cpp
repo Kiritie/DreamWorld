@@ -71,8 +71,8 @@ ADWPlayerCharacter::ADWPlayerCharacter(const FObjectInitializer& ObjectInitializ
 	Targeting->LockedOnWidgetParentSocket = FName("LockPoint");
 	Targeting->MinimumDistanceToEnable = 1500.f;
 	Targeting->RotatingSmoothnessSpeed = 20.f;
-	Targeting->PitchMin = -20.f;
-	Targeting->PitchMax = -10.f;
+	Targeting->PitchMin = -30.f;
+	Targeting->PitchMax = 0.f;
 	Targeting->OnTargetLockOn.AddDynamic(this, &ADWPlayerCharacter::OnTargetLockedOn);
 	Targeting->OnTargetLockOff.AddDynamic(this, &ADWPlayerCharacter::OnTargetLockedOff);
 	Targeting->OnTargetSetRotation.AddDynamic(this, &ADWPlayerCharacter::OnTargetSetRotation);
@@ -139,9 +139,9 @@ void ADWPlayerCharacter::LoadData(FSaveData* InSaveData, EPhase InPhase)
 
 	if(PHASEC(InPhase, EPhase::PrimaryAndLesser))
 	{
-		if(!SaveData.InventoryData.IsSaved())
+		if(!SaveData.IsSaved())
 		{
-			SaveData.InitInventoryData();
+			SaveData.InitData();
 		}
 	}
 

@@ -15,27 +15,35 @@ UDWCharacterData::UDWCharacterData()
 
 	DefaultBehaviorTree = nullptr;
 	ExcessiveBehaviorTree = nullptr;
-	
-	LocalDialogueIndex = -1;
 }
 
 void UDWCharacterData::OnReset_Implementation()
 {
 	Super::OnReset_Implementation();
-
-	LocalDialogueIndex = -1;
 }
 
-UDialogue* UDWCharacterData::GetRandomDialogue(FRandomStream RandomStream)
+UDialogue* UDWCharacterData::GetRandomDialogue(FRandomStream InRandomStream) const
 {
+	UDialogue* _Dialogue = nullptr;
 	if(Dialogues.Num() > 0)
 	{
-		if(++LocalDialogueIndex >= Dialogues.Num())
-		{
-			LocalDialogueIndex = 0;
-		}
-		return Dialogues[LocalDialogueIndex];
-		// return Dialogues[RandomStream.RandRange(0, Dialogues.Num())];
+		_Dialogue = Dialogues[InRandomStream.RandRange(0, Dialogues.Num() - 1)];
 	}
-	return nullptr;
+	return _Dialogue;
+}
+
+TArray<FDWCharacterSkinSaveData> UDWCharacterData::GetRandomSkinDatas(FRandomStream InRandomStream) const
+{
+	TArray<FDWCharacterSkinSaveData> _SkinDatas;
+	for (auto& Iter : SkinDatas)
+	{
+		FDWCharacterSkinSaveData _SkinData;
+		_SkinData.MeshDatas = Iter.MeshDatas;
+		if (Iter.Materials.Num() > 0)
+		{
+			_SkinData.Material = Iter.Materials[InRandomStream.RandRange(0, Iter.Materials.Num() - 1)];
+		}
+		_SkinDatas.Add(_SkinData);
+	}
+	return _SkinDatas;
 }

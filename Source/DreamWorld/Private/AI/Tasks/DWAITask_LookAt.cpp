@@ -68,9 +68,4 @@ void UDWAITask_LookAt::OnTaskFinished(UBehaviorTreeComponent& OwnerComp, uint8* 
 	Super::OnTaskFinished(OwnerComp, NodeMemory, TaskResult);
 
 	if (!InitTask(OwnerComp)) return;
-
-	if(LookAtTarget)
-	{
-		GetAgent<ADWCharacter>()->GetLooking()->TargetLookingOff();
-	}
 }

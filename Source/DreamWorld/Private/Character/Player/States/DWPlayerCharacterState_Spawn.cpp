@@ -58,7 +58,7 @@ void UDWPlayerCharacterState_Spawn::TryLeave()
 		{
 			const auto& CharacterData = PlayerCharacter->GetCharacterData<UAbilityCharacterDataBase>();
 			FHitResult HitResult;
-			if(UVoxelModuleStatics::VoxelAgentTraceSingle(PlayerCharacter->GetActorLocation(), FVector2D(1000.f), CharacterData.Radius, CharacterData.HalfHeight, {}, HitResult, true, 100, true, true))
+			if(UVoxelModuleStatics::VoxelAgentTraceSingle(PlayerCharacter->GetActorLocation(), FVector2D(1000.f), CharacterData.Radius, CharacterData.HalfHeight, {}, HitResult, false, 100, true, true))
 			{
 				PlayerCharacter->SetActorLocationAndRotation(HitResult.Location, FRotator::ZeroRotator);
 				Super::TryLeave();

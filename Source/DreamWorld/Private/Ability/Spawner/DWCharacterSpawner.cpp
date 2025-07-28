@@ -22,9 +22,7 @@ AActor* ADWCharacterSpawner::SpawnImpl_Implementation(const FAbilityItem& InAbil
 	SaveData.RaceID = CharacterData.RaceID;
 	SaveData.Level = InAbilityItem.Level;
 	SaveData.SpawnTransform = GetActorTransform();
-	SaveData.InitTalentData();
-	SaveData.InitInventoryData();
-	SaveData.InitDialogueData();
+	SaveData.InitData();
 
 	return UAbilityModuleStatics::SpawnAbilityActor(&SaveData);
 }

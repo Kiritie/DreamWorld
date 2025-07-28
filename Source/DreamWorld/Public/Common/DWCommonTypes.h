@@ -509,9 +509,7 @@ public:
 	}
 
 public:
-	virtual void InitTalentData();
-
-	virtual void InitDialogueData(FRandomStream InRandomStream = FRandomStream());
+	virtual void InitData(FRandomStream InRandomStream = FRandomStream()) override;
 
 public:
 	UPROPERTY(BlueprintReadOnly)
@@ -631,7 +629,7 @@ public:
 	float CameraDistance;
 
 public:
-	virtual void InitInventoryData(FRandomStream InRandomStream = FRandomStream()) override;
+	virtual void InitData(FRandomStream InRandomStream = FRandomStream()) override;
 };
 
 USTRUCT(BlueprintType)

@@ -11,23 +11,31 @@
 #include "Ability/Vitality/AbilityVitalityInterface.h"
 #include "Asset/AssetModuleStatics.h"
 #include "Character/DWCharacterData.h"
-#include "FSM/Components/FSMComponent.h"
 #include "ObjectPool/ObjectPoolModuleStatics.h"
 #include "Voxel/Voxels/Data/VoxelData.h"
 
-void FDWCharacterSaveData::InitTalentData()
+void FDWCharacterSaveData::InitData(FRandomStream InRandomStream)
 {
+	Super::InitData(InRandomStream);
+
+	auto& CharacterData = GetData<UDWCharacterData>();
+	
 	TalentPoint = Level;
-	TalentItems = GetData<UDWCharacterData>().TalentItems;
+	TalentItems = CharacterData.TalentItems;
+
+	Dialogue = CharacterData.GetRandomDialogue(InRandomStream);
+	SkinDatas = CharacterData.GetRandomSkinDatas(InRandomStream);
 }
 
-void FDWCharacterSaveData::InitDialogueData(FRandomStream InRandomStream)
+void FDWPlayerSaveData::InitData(FRandomStream InRandomStream)
 {
-	Dialogue = GetData<UDWCharacterData>().GetRandomDialogue();
-}
+	FActorSaveData::InitData(InRandomStream);
 
-void FDWPlayerSaveData::InitInventoryData(FRandomStream InRandomStream)
-{
+	auto& CharacterData = GetData<UDWCharacterData>();
+	
+	TalentPoint = Level;
+	TalentItems = CharacterData.TalentItems;
+
 	switch (InventoryInitType)
 	{
 		case EDWInventoryInitType::Empty:
@@ -37,13 +45,10 @@ void FDWPlayerSaveData::InitInventoryData(FRandomStream InRandomStream)
 		}
 		case EDWInventoryInitType::Default:
 		{
-			FDWPlayerBasicSaveData::InitInventoryData(InRandomStream);
 			break;
 		}
 		case EDWInventoryInitType::All:
 		{
-			FDWPlayerBasicSaveData::InitInventoryData(InRandomStream);
-
 			auto CoinDatas = UAssetModuleStatics::LoadPrimaryAssets<UAbilityCoinDataBase>(FName("Coin"));
 			for (int32 i = 0; i < CoinDatas.Num(); i++)
 			{
@@ -73,15 +78,6 @@ void FDWPlayerSaveData::InitInventoryData(FRandomStream InRandomStream)
 			{
 				InventoryData.AddItem(FAbilityItem(RawDatas[i]->GetPrimaryAssetId(), RawDatas[i]->MaxCount, RawDatas[i]->ClampLevel(Level)), true);
 			}
-
-			// auto VoxelDatas = UAssetModuleStatics::LoadPrimaryAssets<UVoxelData>(FName("Voxel"));
-			// for (int32 i = 0; i < VoxelDatas.Num(); i++)
-			// {
-			// 	if(!VoxelDatas[i]->IsEmpty() && !VoxelDatas[i]->IsUnknown() && VoxelDatas[i]->IsMainPart())
-			// 	{
-			// 		InventoryData.AddItem(FAbilityItem(VoxelDatas[i]->GetPrimaryAssetId(), VoxelDatas[i]->MaxCount, VoxelDatas[i]->ClampLevel(Level)), true);
-			// 	}
-			// }
 			break;
 		}
 		default: break;

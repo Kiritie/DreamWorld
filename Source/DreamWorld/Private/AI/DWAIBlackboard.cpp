@@ -7,6 +7,7 @@
 #include "Character/DWCharacter.h"
 #include "Character/Player/DWPlayerCharacter.h"
 #include "Common/CommonStatics.h"
+#include "Common/Looking/LookingComponent.h"
 
 void UDWAIBlackboard::PostLoad()
 {
@@ -56,12 +57,15 @@ void UDWAIBlackboard::OnValueReset(FName InValueName)
 
 	if(InValueName.IsEqual(NAME_TargetAgent))
 	{
-		ADWCharacter* OwnerAgent = GetAgent<ADWCharacter>();
-		ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
-		if(OwnerAgent && PlayerCharacter && GetAgent<ADWCharacter>()->IsTeamMate(UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>()))
+		if(ADWCharacter* OwnerAgent = GetAgent<ADWCharacter>())
 		{
-			SetTargetAgent(PlayerCharacter);
-			SetIsExcessived(false);
+			ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
+			if (PlayerCharacter && OwnerAgent->IsTeamMate(UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>()))
+			{
+				SetTargetAgent(PlayerCharacter);
+				SetIsExcessived(false);
+			}
+			OwnerAgent->GetLooking()->TargetLookingOff();
 		}
 	}
 	else if(InValueName.IsEqual(NAME_IsExcessived))

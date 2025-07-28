@@ -153,8 +153,7 @@ FDWPlayerSaveData& UDWProcedure_ArchiveCreating::GetPlayerData() const
 {
 	static FDWPlayerSaveData SaveData;
 	SaveData = PlayerSaveData;
-	SaveData.InitTalentData();
-	SaveData.InitInventoryData();
+	SaveData.InitData();
 	return SaveData;
 }
 

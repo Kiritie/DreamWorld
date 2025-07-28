@@ -4,21 +4,20 @@
 #include "Character/DWCharacter.h"
 #include "Character/States/DWCharacterState_Attack.h"
 #include "Common/CommonStatics.h"
+#include "Common/Looking/LookingComponent.h"
+#include "Debug/DebugTypes.h"
+#include "Kismet/KismetMathLibrary.h"
 
 UDWCharacterAnim::UDWCharacterAnim()
 {
-	bFalling = false;
 	bSprinting = false;
 	bAttacking = false;
 	bDefending = false;
-	bClimbing = false;
-	bCrouching = false;
-	bFlying = false;
 	bRiding = false;
-	bSwimming = false;
-	MoveDirection = 0;
-	HorizontalSpeed = 0;
-	VerticalSpeed = 0;
+	bClimbing = false;
+	bAiming = false;
+	AimLookUpAngle = 0.f;
+	AimTurnAngle = 0.f;
 }
 
 void UDWCharacterAnim::NativeHandleNotify(const FString& AnimNotifyName)
@@ -63,5 +62,36 @@ void UDWCharacterAnim::NativeUpdateAnimation(float DeltaSeconds)
 	bClimbing = Character->IsClimbing();
 	bCrouching = Character->IsCrouching();
 	bSwimming = Character->IsSwimming() || Character->IsFloating();
-	bAiming = Character->IsAiming();
+	if (!Character->IsPlayer())
+	{
+		if (Character->GetLooking()->GetLookingTarget())
+		{
+			bAiming = true;
+			const FRotator DeltaRotator = UKismetMathLibrary::NormalizedDeltaRotator(Character->GetLooking()->GetLookingRotation(), Character->GetActorRotation());
+			AimLookUpAngle = DeltaRotator.Pitch;
+			AimTurnAngle = DeltaRotator.Yaw;
+		}
+		else
+		{
+			bAiming = false;
+			AimLookUpAngle = 0.f;
+			AimTurnAngle = 0.f;
+		}
+	}
+	else
+	{
+		if(Character->IsCurrent())
+		{
+			bAiming = true;
+			const FRotator DeltaRotator = UKismetMathLibrary::NormalizedDeltaRotator(Character->GetControlRotation(), Character->GetActorRotation());
+			AimLookUpAngle = DeltaRotator.Pitch;
+			AimTurnAngle = 0.f;
+		}
+		else
+		{
+			bAiming = false;
+			AimLookUpAngle = 0.f;
+			AimTurnAngle = 0.f;
+		}
+	}
 }

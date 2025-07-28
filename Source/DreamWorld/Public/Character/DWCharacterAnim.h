@@ -39,4 +39,10 @@ public:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bAiming;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float AimLookUpAngle;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float AimTurnAngle;
 };

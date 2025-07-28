@@ -37,6 +37,11 @@ void UDWAITask_Fight::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMem
 	Super::TickTask(OwnerComp, NodeMemory, DeltaSeconds);
 
 	if(!InitTask(OwnerComp)) return;
+
+	if(bLookingTarget)
+	{
+		GetAgent<ADWCharacter>()->GetLooking()->DoLookAtTarget(FightTarget);
+	}
 }
 
 EBTNodeResult::Type UDWAITask_Fight::AbortTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
@@ -54,11 +59,6 @@ EBTNodeResult::Type UDWAITask_Fight::ExecuteTask(UBehaviorTreeComponent& OwnerCo
 
 	if (!InitTask(OwnerComp)) return EBTNodeResult::Failed;
 
-	if(bLookingTarget)
-	{
-		GetAgent<ADWCharacter>()->GetLooking()->TargetLookingOn(FightTarget);
-	}
-
 	return EBTNodeResult::InProgress;
 }
 
@@ -67,9 +67,4 @@ void UDWAITask_Fight::OnTaskFinished(UBehaviorTreeComponent& OwnerComp, uint8* N
 	Super::OnTaskFinished(OwnerComp, NodeMemory, TaskResult);
 
 	if (!InitTask(OwnerComp)) return;
-
-	if(bLookingTarget)
-	{
-		GetAgent<ADWCharacter>()->GetLooking()->TargetLookingOff();
-	}
 }

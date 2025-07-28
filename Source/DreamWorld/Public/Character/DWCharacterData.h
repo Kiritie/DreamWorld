@@ -67,11 +67,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (EditConditionHides, EditCondition = "Nature == EDWCharacterNature::AINeutral"))
 	UBehaviorTree* ExcessiveBehaviorTree;
 
-protected:
-	UPROPERTY(Transient)
-	int32 LocalDialogueIndex;
-
 public:
-	UFUNCTION(BlueprintCallable)
-	UDialogue* GetRandomDialogue(FRandomStream RandomStream = FRandomStream());
+	UFUNCTION(BlueprintPure)
+	UDialogue* GetRandomDialogue(FRandomStream InRandomStream = FRandomStream()) const;
+
+	UFUNCTION(BlueprintPure)
+	TArray<FDWCharacterSkinSaveData> GetRandomSkinDatas(FRandomStream InRandomStream = FRandomStream()) const;
 };
