@@ -40,8 +40,6 @@ void UDWAIBlackboard::OnRefresh()
 {
 	Super::OnRefresh();
 
-	if(!GetAgent<ADWCharacter>()) return;
-
 	if(GetTargetAgent<ADWCharacter>() && GetTargetAgent<ADWCharacter>()->IsDead())
 	{
 		ResetIsLostTarget();
@@ -57,16 +55,13 @@ void UDWAIBlackboard::OnValueReset(FName InValueName)
 
 	if(InValueName.IsEqual(NAME_TargetAgent))
 	{
-		if(ADWCharacter* OwnerAgent = GetAgent<ADWCharacter>())
+		ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
+		if (PlayerCharacter && GetAgent<ADWCharacter>()->IsTeamMate(PlayerCharacter))
 		{
-			ADWPlayerCharacter* PlayerCharacter = UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>();
-			if (PlayerCharacter && OwnerAgent->IsTeamMate(UCommonStatics::GetPlayerPawn<ADWPlayerCharacter>()))
-			{
-				SetTargetAgent(PlayerCharacter);
-				SetIsExcessived(false);
-			}
-			OwnerAgent->GetLooking()->TargetLookingOff();
+			SetTargetAgent(PlayerCharacter);
+			SetIsExcessived(false);
 		}
+		GetAgent<ADWCharacter>()->GetLooking()->TargetLookingOff();
 	}
 	else if(InValueName.IsEqual(NAME_IsExcessived))
 	{

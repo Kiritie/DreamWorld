@@ -62,6 +62,7 @@ void UDWCharacterAnim::NativeUpdateAnimation(float DeltaSeconds)
 	bClimbing = Character->IsClimbing();
 	bCrouching = Character->IsCrouching();
 	bSwimming = Character->IsSwimming() || Character->IsFloating();
+	
 	if (!Character->IsPlayer())
 	{
 		if (Character->GetLooking()->GetLookingTarget())
